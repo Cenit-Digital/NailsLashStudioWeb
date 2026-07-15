@@ -44,9 +44,11 @@ la metodología y una plantilla pública, así que **la fusión es siempre manua
    bot se creen con el token de la App y que, por tanto, `harness-ci.yml` corra
    sobre sus PRs. Si ya está instalada "para todos los repos" del org, esto ya
    está cubierto.
-4. **Protección de rama sobre `main`** — es lo que hace REAL la política de
-   "solo abre PR" (ver el paso obligatorio de la checklist, abajo). Sin ella, un
-   bot con `contents: write` podría técnicamente empujar a `main`; con ella, no.
+4. ~~**Protección de rama sobre `main`**~~ — en la plantilla es lo que hace REAL
+   la política de "solo abre PR", pero **en este repo no está disponible**: es
+   privado y la organización está en plan Free (ver la checklist, abajo). Sin
+   ella, un bot con `contents: write` puede técnicamente empujar a `main`, y aquí
+   nada se lo impide por mecanismo. Otra razón para no encenderlo aún.
 
 Las etiquetas `autonomous`, `needs-human-review` y `permissions-change` **no hace
 falta crearlas a mano**: se crean de forma idempotente antes de usarse.
@@ -55,9 +57,23 @@ falta crearlas a mano**: se crean de forma idempotente antes de usarse.
 
 - [ ] Añadir el secret `CLAUDE_CODE_OAUTH_TOKEN`.
 - [ ] Confirmar que la GitHub App de Claude está instalada en el repo.
-- [ ] **OBLIGATORIO — Proteger `main`.** Esta es la barrera que convierte "solo
-      abre PR" de promesa en garantía estructural. En *Settings → Branches → Add
-      branch protection rule* (o *Settings → Rules → Rulesets*) sobre `main`:
+- [ ] ~~**OBLIGATORIO — Proteger `main`.**~~ **AQUÍ NO SE PUEDE (verificado).**
+      Este repo es **privado** y la organización está en plan **Free**, y en esa
+      combinación GitHub **no aplica** la protección de rama: puedes crear la
+      regla, pero no hace nada. Lo dice él mismo al intentarlo, literalmente:
+      *"Your rules won't be enforced on this private repository until you upgrade
+      this organization to GitHub Team or Enterprise"* (y en la pestaña de
+      rulesets, lo equivalente). Así que, en ESTE repo, "solo abre PR" **no puede
+      imponerse mecánicamente**: descansa en el mandato, en el guardián de rutas
+      sensibles y en tu revisión, igual que en `SistemaDeMemoriaUncleBob` (que es
+      privado por lo mismo). Es una razón más para no encender el bot todavía
+      (ver § Cadencia).
+
+      Si algún día la organización sube a **GitHub Team**, esto se activa solo y
+      entonces sí merece la pena hacer la checklist de abajo — que es la del repo
+      canónico de la plantilla, que **sí** es público y **sí** la tiene puesta.
+      En *Settings → Branches → Add branch protection rule* (o *Settings → Rules
+      → Rulesets*) sobre `main`:
     - ✅ *Require a pull request before merging* → *Require approvals: 1* y
       ✅ *Require review from Code Owners*.
     - ✅ *Require status checks to pass before merging* y añade los checks de la
@@ -164,11 +180,14 @@ El diseño no acota al bot restringiéndole el alcance, sino **poniendo el filtr
 en el sitio correcto** y respaldándolo con mecanismos que no dependen de la buena
 fe del bot:
 
-- **Alcance total, fusión manual — y ahora mecánica.** El bot puede tocar
-  cualquier cosa; nada llega a `main` sin que un humano lea el diff y pulse
-  *merge*. Con la **protección de rama** de la checklist, esa garantía deja de ser
-  una instrucción de prompt y pasa a estar impuesta por GitHub: push directo y
-  auto-merge quedan bloqueados sin aprobación.
+- **Alcance total, fusión manual — pero aquí NO mecánica.** El bot puede tocar
+  cualquier cosa; nada debería llegar a `main` sin que un humano lea el diff y
+  pulse *merge*. En el repo canónico de la plantilla eso lo impone GitHub con la
+  protección de rama; **en este repo, no**: privado + plan Free = la protección
+  no se aplica (ver § Puesta en marcha). Aquí la garantía es solo el mandato, el
+  guardián y tu revisión — la misma postura honesta que `SistemaDeMemoriaUncleBob`.
+  Es el motivo de más peso para dejar el bot apagado hasta que haga falta de
+  verdad, o hasta subir a GitHub Team.
 - **Alarma de auto-permisos, con respaldo mecánico.** Si el bot toca su workflow,
   su mandato, `permissions:`/secrets, `CODEOWNERS`, **o la cadena de verificación
   (`harness-ci.yml`, `.harness/harness.mjs`)**, debe avisarlo en la primera línea
