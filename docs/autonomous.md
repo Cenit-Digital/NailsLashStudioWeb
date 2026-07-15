@@ -118,6 +118,10 @@ falta crearlas a mano**: se crean de forma idempotente antes de usarse.
 
 ## Cadencia
 
+> Decisiones de arquitectura en Confluence (espacio DDS): **`DE-003`** (cadencia y
+> guardas) y **`DE-004`** (qué puede hacer un bot en un repo de proyecto y por qué
+> este sigue apagado).
+
 Cron **lunes, miércoles y viernes a las 06:31 UTC** (`31 6 * * 1,3,5`), con una
 guarda que impide que haya más de un PR del bot esperando revisión a la vez.
 
