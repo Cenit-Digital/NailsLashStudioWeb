@@ -8,11 +8,14 @@
 
 ## Qué es
 
-Un workflow programado (`.github/workflows/autonomous-evolve.yml`) que, una vez
-por semana, lanza [Claude Code](https://github.com/anthropics/claude-code-action)
+Un workflow programado (`.github/workflows/autonomous-evolve.yml`) que, tres
+veces por semana, lanzaría [Claude Code](https://github.com/anthropics/claude-code-action)
 dentro de GitHub Actions con un único encargo: **elegir una tarea del backlog,
 completarla con verificación real y abrir un Pull Request**. Nunca fusiona, nunca
 empuja a `main`.
+
+**En este repo está apagado y de momento debe seguir así** — el porqué, y qué
+haría falta para encenderlo bien, en § Cadencia.
 
 Es la misma idea que el bot de `DocsTemplateSSDUncleBob`, pero con una diferencia
 deliberada: allí el bot reescribe prosa y hace auto-merge; aquí toca el motor de
@@ -72,9 +75,11 @@ falta crearlas a mano**: se crean de forma idempotente antes de usarse.
       contra el bot** es más simple: *exigir PR y bloquear el push directo a
       `main`*, con la App de Claude fuera de cualquier *bypass*. Las aprobaciones
       humanas y el review de Code Owners son calidad de revisión añadida.
-- [ ] Probar sin esperar al lunes: *Actions → «Evolución autónoma del arnés» →
-      Run workflow* (`workflow_dispatch`). Requiere que el workflow ya esté en la
-      rama por defecto.
+- [ ] Probar sin esperar al próximo lunes/miércoles/viernes: *Actions →
+      «Evolución autónoma del arnés» → Run workflow* (`workflow_dispatch`); marca
+      **`forzar`** si quieres saltarte la guarda de PR abierto. Requiere que el
+      workflow ya esté en la rama por defecto **y** que el job esté encendido
+      (ver § Cadencia: hoy no lo está, a propósito).
 - [ ] Revisar el PR que abra, leer el diff con calma (con especial atención si
       lleva la etiqueta `permissions-change`) y fusionar —o pedir cambios— a mano.
 
@@ -86,26 +91,72 @@ falta crearlas a mano**: se crean de forma idempotente antes de usarse.
   se copia, pero el job **no corre** salvo que se opte explícitamente creando la
   variable de repo `ENABLE_AUTONOMOUS_EVOLVE=true`
   (*Settings → Secrets and variables → Actions → Variables*). Verás un run
-  semanal marcado como *skipped* mientras no optes: es inofensivo. Así ningún
-  proyecto nuevo hereda un bot programado que no pidió.
+  marcado como *skipped* cada lunes, miércoles y viernes mientras no optes: es
+  inofensivo (un job saltado no consume minutos ni hace fallar nada). Así ningún
+  proyecto nuevo hereda un bot programado que no pidió. **Este repo es uno de
+  esos consumidores y hoy NO ha optado**: lee § Cadencia antes de crear la
+  variable.
 - **Desactivarlo del todo**: borra `.github/workflows/autonomous-evolve.yml` (y,
   si quieres, `.github/AUTONOMOUS.md` y `.github/workflows/guard-sensitive-paths.yml`),
   o desactiva el workflow desde la pestaña *Actions*.
 
 ## Cadencia
 
-Cron semanal, **lunes 06:00 UTC**. Semanal a propósito: con alcance total, cada
-PR puede tocar el motor o los agentes y merece lectura humana sin prisa. Subir la
-frecuencia es una línea (`schedule.cron`), pero valóralo solo cuando ya haya un
-patrón de PRs revisados en verde.
+Cron **lunes, miércoles y viernes a las 06:31 UTC** (`31 6 * * 1,3,5`), con una
+guarda que impide que haya más de un PR del bot esperando revisión a la vez.
 
-> Dos avisos sobre workflows programados en GitHub:
-> - Solo se disparan desde la **rama por defecto**. Hasta que este fichero no
->   esté en `main`, ni el cron ni `workflow_dispatch` estarán activos.
-> - GitHub **desactiva automáticamente** los crons tras **~60 días sin actividad**
->   en el repo. Si dejas de ver PRs semanales, revisa la pestaña *Actions* por si
->   el workflow quedó desactivado y reactívalo. (Los fallos de runs programadas
->   se notifican por email al último que tocó el fichero del workflow.)
+> ### ⛔ Ojo: hoy este bot está APAGADO, y encenderlo tal cual sería un error
+>
+> El cron está puesto, pero el job no corre: este repo nació de
+> `TemplateSSDUncleBob` con "Use this template", y la guarda de plantilla
+> (`if: github.repository == 'Cenit-Digital/TemplateSSDUncleBob' || vars.ENABLE_AUTONOMOUS_EVOLVE == 'true'`)
+> lo deja en *skipped* mientras no crees la variable. **No la crees todavía.**
+>
+> El motivo no es el cron: es el mandato. `.github/AUTONOMOUS.md` también se
+> copió literal, así que **el mandato de este repo sigue siendo el de la
+> plantilla** — se titula "Evolución autónoma — TemplateSSDUncleBob" y su
+> backlog habla de adaptadores, ejemplos y el motor `.harness/`. Peor aún: su
+> **límite 4 prohíbe expresamente** tocar `features/`, `progress/`, `src/`,
+> `project-spec.md` y `feature_list.json`, que es justo *todo* el proyecto de
+> NailsLash. Encender el bot hoy no te daría un bot que avanza la web de la
+> clienta: te daría uno que **tiene prohibido tocarla** y que se dedicaría a
+> reescribir el motor del arnés dentro del repo de un cliente, derivando de la
+> plantilla canónica.
+>
+> Además, el proyecto está sin arrancar: `feature_list.json` sigue con
+> `"project": "mi-proyecto"` y `ejemplo_feature`, y `features/` está vacío. No
+> hay trabajo real que un bot pudiera coger.
+>
+> **Para encenderlo de verdad hacen falta las dos cosas, en este orden:**
+>
+> 1. Reescribir `.github/AUTONOMOUS.md` con un mandato propio de ESTE proyecto
+>    (qué puede tocar, qué no, y su backlog real). Ojo al diseño del arnés: el
+>    pipeline tiene una **puerta humana** sobre los `.feature` (`AGENTS.md` §4),
+>    así que un bot no puede recorrer el ciclo SDD entero por su cuenta sin
+>    saltársela. Mira `.github/AUTONOMOUS.md` de `WebEmpresa` como ejemplo de
+>    mandato de proyecto que respeta esa puerta.
+> 2. Crear la variable `ENABLE_AUTONOMOUS_EVOLVE=true` en *Settings → Secrets and
+>    variables → Actions → **pestaña Variables***. (Es una *variable*, no un
+>    *secret*: los secrets `CLAUDE_CODE_OAUTH_TOKEN` y `ORG_READ_TOKEN` que ya
+>    están dados de alta aquí no encienden nada por sí solos.)
+>
+> Mientras tanto verás runs *skipped* los lunes, miércoles y viernes: son
+> inofensivos y no consumen minutos.
+
+> Avisos sobre workflows programados, de la doc oficial de GitHub:
+>
+> - Solo se disparan desde la **rama por defecto** ("Scheduled workflows will
+>   only run on the default branch"). Hasta que este fichero no esté en `main`,
+>   ni el cron ni `workflow_dispatch` estarán activos.
+> - Pueden retrasarse en horas de carga alta, y con carga suficiente "some queued
+>   jobs may be dropped". Por eso el cron va a las **06:31** y no en punto.
+> - La desactivación automática por inactividad la doc **solo la enuncia para
+>   repos públicos**: "In a public repository, scheduled workflows are
+>   automatically disabled when no repository activity has occurred in 60 days".
+>   Este repo es **privado**, y sobre los privados la doc no dice nada, ni a
+>   favor ni en contra — así que no demos por hecho que estamos exentos. Si dejas
+>   de ver runs, revisa la pestaña *Actions*. (Los fallos de runs programadas se
+>   notifican por email al último que tocó el fichero del workflow.)
 
 ## Modelo de seguridad
 
