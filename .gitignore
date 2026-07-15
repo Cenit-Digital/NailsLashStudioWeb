@@ -4,11 +4,16 @@ node_modules/
 
 # Artefactos de build
 dist/
+dist-ssr/
 build/
 *.tsbuildinfo
 
+# vite-react-ssg
+.vite-react-ssg-temp/
+
 # Mutación / tests
 .stryker-tmp/
+reports/
 .coverage
 htmlcov/
 coverage/

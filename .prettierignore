@@ -1,0 +1,16 @@
+pnpm-lock.yaml
+dist
+coverage
+reports
+.stryker-tmp
+
+# Skills vendorizadas por autoskills (fuentes externas, ver skills-lock.json).
+# Son de terceros: no las gestiona Prettier, igual que node_modules.
+.agents/
+
+# Caché de la memoria organizacional (se regenera con scripts/sync-memoria.*).
+.memoria-cache/
+
+# Estáticos sin parser de Prettier (SEO). Se sirven tal cual desde public/.
+public/robots.txt
+public/sitemap.xml

@@ -1,0 +1,15 @@
+# Ajustes de pnpm (v11): el hogar de estos settings dejó de ser package.json.
+
+# Aprobación de scripts de build de dependencias (reemplaza a onlyBuiltDependencies).
+# Solo binarios nativos imprescindibles del toolchain.
+allowBuilds:
+  '@swc/core': true
+  esbuild: true
+  '@parcel/watcher': true
+
+# react-helmet-async (vía vite-react-ssg) es compatible con React 19 pero aún no
+# lo declara en su rango de peers. Acotamos la excepción para no arrastrar avisos.
+peerDependencyRules:
+  allowedVersions:
+    'react-helmet-async>react': '19'
+    'react-helmet-async>react-dom': '19'

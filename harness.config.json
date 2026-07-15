@@ -1,25 +1,25 @@
 {
   "$schema": "./harness.schema.json",
-  "project": "mi-proyecto",
-  "language": "generic",
-  "description": "Rellena este archivo con los comandos de TU stack. Es el único punto que hace al arnés dependiente del lenguaje. Ver docs/configuration.md y los ejemplos en examples/.",
+  "project": "nails-lash-studio-web",
+  "language": "node",
+  "description": "Web del salón Nails & Lash Studio. Stack heredado de WebEmpresa (Vite + React + TypeScript + SCSS + pnpm + SSG vía vite-react-ssg). `lint` fusiona typecheck porque el schema no tiene ranura propia y el base lo trata como puerta obligatoria. `paths.tests` es `src` porque en este stack los tests conviven con el código (vitest.config.ts → include: src/**/*.{test,spec}.{ts,tsx}). `mutation.threshold` va en proporción 0-1 (Stryker usa porcentaje: thresholds.break 100).",
   "commands": {
-    "install": "",
-    "lint": "",
-    "test": "",
-    "mutate": "",
-    "build": ""
+    "install": "pnpm install",
+    "lint": "pnpm typecheck && pnpm lint",
+    "test": "pnpm test",
+    "mutate": "node tools/mutate.mjs {{target}}",
+    "build": "pnpm build"
   },
   "paths": {
     "src": "src",
-    "tests": "tests",
+    "tests": "src",
     "features": "features",
     "progress": "progress",
     "spec": "project-spec.md",
     "feature_list": "feature_list.json"
   },
   "mutation": {
-    "threshold": 0.8,
+    "threshold": 1.0,
     "targets": []
   },
   "rules": {
