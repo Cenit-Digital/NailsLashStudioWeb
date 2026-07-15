@@ -128,16 +128,93 @@ que resolverlo en `project-spec.md` antes de escribir Gherkin.
 - **Datos que solo puede dar el cliente**: teléfono, email, razón social y CIF
   (aviso legal, LSSI art. 10), ofertas vigentes, fotos reales.
 
-## Investigación lanzada (3 workflows en paralelo)
+## 2026-07-16 — Fase 0 CERRADA. Investigación rehecha y durable.
 
-| Workflow | Qué produce | Salida |
-| --- | --- | --- |
-| `nls-fase0-investigacion` | Auditoría del prototipo (lógica testeable, contraste WCAG, a11y, responsive/perf) + legal ES/UE (LSSI, RGPD, cookies, reseñas falsas, EAA, Google Fonts, precios) + técnica (schema.org, WCAG movimiento, Stryker, WhatsApp, SEO). Cada afirmación verificada de forma adversarial contra su fuente. | `scratchpad/research/fase0-informe.md` |
-| `nls-estudio-webempresa` | Manual de conformidad con el repo base: stack exacto, cómo meter la paleta rosa en los tokens, arquitectura/SSG/SEO, testing y mutación, formato del arnés y **troceado propuesto en features**, traspaso `.dc.html` → código, aprendizajes heredados. | `scratchpad/research/base-webempresa-manual.md` |
-| `nls-datos-reales` | Ficha real del negocio, catálogo real, equipo real, vía legal/técnica para las reseñas, y la lista cerrada de lo que debe aportar el cliente. | `scratchpad/research/datos-reales-y-resenas.md` |
+**La lección de la sesión anterior.** Los 3 workflows de investigación escribían
+en `scratchpad/`, la sesión murió por límite y **se perdieron los 3 informes
+enteros** (~45 min). Se rehízo la investigación escribiendo **en el repo**
+(`docs/research/`) y **commiteando según salía**. Regla nueva: *si no está
+commiteado, no existe.*
+
+**Investigación v2 (hecha).** 20 investigadores + verificación adversarial:
+21 informes, 820 KB, en `docs/research/`. El sintetizador **murió por límite** y
+se relanzó a mano → `docs/research/00-fase0-informe.md` (994 líneas). Coste real:
+**4,16 M tokens** de subagentes; agotó el límite de sesión dos veces.
+
+**El verificador adversarial refutó 22 afirmaciones.** Los informes `legal-*`,
+`datos-*`, `audit-*` y `stack-*` son **material en bruto**: no se dan por buenos.
+Manda `docs/research/01-hechos-verificados-lead.md` y luego el informe maestro.
+
+### Lo que cambió el proyecto
+
+1. **Es un REDISEÑO, no una web nueva.** El salón ya tiene
+   <https://www.nailslashlasrozas.es/> (one-page, `lastmod 2022-12-01`). Nadie lo
+   había dicho; lo destapó la verificación. Abre la pregunta del dominio y las 301.
+2. **La web viva del cliente incumple la LSSI**: su aviso legal da **404** y la
+   política de privacidad no identifica responsable. Es el fallo a NO repetir.
+3. **El CIF no está en ninguna fuente pública** → la decisión 6 es un **hecho
+   verificado**, no prudencia. La web **no se puede publicar**: el objetivo es
+   *lista para publicar*.
+4. **El prototipo se equivoca de CATEGORÍAS**: son **Uñas · Pestañas · Cejas**,
+   no Uñas/Facial/Depilación. "Facial" **no existe** en este negocio.
+5. **La paleta Rosa elegida NO cumple AA**: 32/68 combinaciones fallan, incluido
+   el botón «Reservar» (4,37:1). Se corrige con `--accent-dark #A23E5F`, que ya
+   está en la paleta. Trampas: `clamp()` (pasa en escritorio, falla en móvil) y
+   `color-mix()` (el contraste de la cabecera cambia al hacer scroll).
+6. **WebEmpresa arrastra 3 bloqueantes AA en HEAD con las 3 puertas verdes**,
+   porque ninguna feature los representaba, y su checklist decía «AA validado»
+   siendo falso. → *Una auditoría sin puerta no existe.* **No copiar
+   `_tokens.scss` del base.**
+7. **Treatwell (cl. 4.2.2) niega al salón republicar reseñas** → la decisión 7
+   queda confirmada por la norma. Treatwell 4,9·1.231 y Google 4,9·226 **no son
+   sumables ni intercambiables**.
+8. **Tres premisas del encargo eran falsas**: `WebEmpresa/harness.config.json`
+   no existe; el choque de pnpm no bloquea (10.21.0 auto-descarga la 11.9.0); el
+   umbral es **1.0** (proporción), no 0.8 — `break: 100` de Stryker es porcentaje.
+
+### Estado del arnés
+
+- `feature_list.json`: **20 features** (16 pending, 4 blocked). Camino crítico de
+  9. Las **cinco primeras no son maquetación**.
+- `harness.config.json`: relleno y validado. `paths.tests: "src"` (los tests
+  conviven con el código), `lint` fusiona typecheck, `threshold: 1.0`.
+- **F-00 (arranque del stack): HECHO y verde** — install, typecheck, lint, test y
+  build; prerender SSG comprobado de verdad (el `<h1>` viaja horneado en
+  `dist/index.html`). Ver `progress/f00_arranque_stack.md`.
+- ⚠️ **`bin/harness verify` está ROJO** hasta la primera feature con lógica:
+  `mutate: []` → Stryker sale 1. Es la verdad del esqueleto, no un fallo de
+  config. **No se finge verde.** Se cura con F-01.
+
+### Dos bugs DE LA PLANTILLA encontrados (deben subir aguas arriba)
+
+1. **`bin/harness.ps1` no corría en Windows PowerShell 5.1** (`Join-Path`
+   multi-segmento es firma de PS7). La ruta que CLAUDE.md documenta para Windows
+   **nunca funcionó** sin `pwsh`. **Arreglado aquí** con `Join-Path` anidado.
+2. **`scripts/sync-memoria.*` clona por HTTPS y no intenta SSH** aunque el remoto
+   del propio proyecto sea SSH. Se destrabó autenticando `gh`; el bug sigue.
+   → Ahora la memoria sincroniza: **2 patrones**, y **los dos aplican**
+   (`estado-base-visible-ssg-reduced-motion`, `red-css-para-rama-solo-js-en-ssg`).
+   Raíz común: *bajo SSG el HTML horneado congela el estado que el JS iba a
+   corregir.* Ya ha mordido 3 veces en WebEmpresa.
+
+Y un bug **propio**, cazado por el agente de F-00: el bloque de config que le pasé
+omitía el token `{{target}}` de `docs/configuration.md:54`, así que
+`bin/harness mutate <fichero>` **descartaba el target en silencio**. Arreglado con
+`tools/mutate.mjs`.
 
 ## Siguiente paso
 
-Con los 3 informes: cerrar `project-spec.md` con el humano (`spec_partner`),
-rellenar `harness.config.json` con los comandos del stack, ejecutar `init.sh`,
-y trocear `feature_list.json`. Luego Gherkin y **puerta de aprobación humana**.
+`project-spec.md` **cerrado**. En curso: `gherkin_author` destilando
+`features/puerta_placeholders.feature` (feature #1). Después: **puerta de
+aprobación humana** sobre el `.feature` (CLAUDE.md la declara innegociable) y solo
+entonces `tdd_craftsman`.
+
+**Dos agujeros de F-01 que levantó el `spec_partner` y que van al Gherkin sin
+darse por resueltos:** la puerta puede dar **verde por vacuidad** (si apunta a un
+artefacto que no se generó, devuelve 0 violaciones y el build pasa "protegido"), y
+el patrón `600123456` **no caza** `+34 600 123 456` con espacios — el placeholder
+más peligroso escaparía por comparación literal.
+
+**Pendiente del humano (no bloquea el código):** elegir dominio (¿migrar
+`nailslashlasrozas.es` con 301?) y plataforma de reseñas (Treatwell 1.231 vs
+Google 226).
