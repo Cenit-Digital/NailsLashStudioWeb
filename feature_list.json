@@ -5,9 +5,15 @@
     "one_feature_at_a_time": true,
     "require_tests_to_close": true,
     "require_approved_spec_to_implement": true,
-    "valid_status": ["pending", "spec_ready", "in_progress", "done", "blocked"],
+    "valid_status": [
+      "pending",
+      "spec_ready",
+      "in_progress",
+      "done",
+      "blocked"
+    ],
     "sdd_required_when": "feature has \"sdd\": true",
-    "mutation_threshold": 1.0,
+    "mutation_threshold": 1,
     "notas": [
       "El umbral de mutación es 1.0 (proporción), heredado del break:100 de WebEmpresa: una feature no cierra si sobrevive UN mutante en sus archivos.",
       "'mutable' declara si la feature tiene lógica que Stryker pueda mutar. Si es false, NO lleva mutate propio y se dice por escrito en progress/ en vez de fingir cobertura. Stryker no ve CSS/SCSS.",
@@ -18,7 +24,17 @@
       "Verde ≠ funciona: para las features de UI, verificar con pnpm build + fetch del HTML crudo. jsdom solo ve el estado post-hidratación; el SSG tiene además el estado prerender."
     ]
   },
-  "camino_critico": ["puerta_placeholders", "datos_negocio_fuente_unica", "tokens_paleta_contraste", "cascaron_semantico", "cero_terceros", "hero_marca", "catalogo_servicios", "mapa_como_llegar", "contacto"],
+  "camino_critico": [
+    "puerta_placeholders",
+    "datos_negocio_fuente_unica",
+    "tokens_paleta_contraste",
+    "cascaron_semantico",
+    "cero_terceros",
+    "hero_marca",
+    "catalogo_servicios",
+    "mapa_como_llegar",
+    "contacto"
+  ],
   "features": [
     {
       "id": 1,
@@ -36,7 +52,7 @@
       "depends_on": [],
       "mutable": true,
       "sdd": true,
-      "status": "pending"
+      "status": "in_progress"
     },
     {
       "id": 2,
@@ -51,7 +67,9 @@
         "Mutar la normalización E.164 (quitar +, ceros o espacios) rompe un test"
       ],
       "puerta_legal": "TRLGDCU art. 20.1.a) + 60.2.b) (identidad y teléfono en la oferta comercial)",
-      "depends_on": ["puerta_placeholders"],
+      "depends_on": [
+        "puerta_placeholders"
+      ],
       "mutable": true,
       "sdd": true,
       "status": "pending"
@@ -89,7 +107,10 @@
         "Mutar la composición del title o de la canónica rompe un test"
       ],
       "puerta_legal": "WCAG SC 3.1.1, 1.3.1, 2.4.2, 2.4.7 · LSSI art. 10.1 (enlace permanente) · TRLGDCU art. 60.4 (castellano)",
-      "depends_on": ["datos_negocio_fuente_unica", "tokens_paleta_contraste"],
+      "depends_on": [
+        "datos_negocio_fuente_unica",
+        "tokens_paleta_contraste"
+      ],
       "mutable": true,
       "sdd": true,
       "status": "pending"
@@ -125,7 +146,9 @@
         "Mutar el breakpoint o el predicado de nav rompe un test"
       ],
       "puerta_legal": "WCAG SC 2.4.11 (foco no oscurecido)",
-      "depends_on": ["cascaron_semantico"],
+      "depends_on": [
+        "cascaron_semantico"
+      ],
       "mutable": true,
       "sdd": true,
       "status": "pending"
@@ -144,7 +167,10 @@
         "El hook de IntersectionObserver es SSR-safe y arma el flag en useEffect, no en render"
       ],
       "puerta_legal": "WCAG SC 2.2.2 (A) · LCP ≤ 2,5s p75",
-      "depends_on": ["tokens_paleta_contraste", "cascaron_semantico"],
+      "depends_on": [
+        "tokens_paleta_contraste",
+        "cascaron_semantico"
+      ],
       "mutable": true,
       "sdd": true,
       "status": "pending"
@@ -161,7 +187,9 @@
         "Un test lee el SCSS y asevera la regla de rejilla"
       ],
       "puerta_legal": "WCAG SC 1.4.10 Reflow",
-      "depends_on": ["cascaron_semantico"],
+      "depends_on": [
+        "cascaron_semantico"
+      ],
       "mutable": false,
       "nota_mutacion": "Nada que mutar: es CSS. Stryker no ve SCSS y src/styles/ no está en la lista mutate. No lleva mutate propio y se declara aquí en vez de fingir cobertura.",
       "sdd": true,
@@ -180,7 +208,11 @@
         "La UI se NIEGA a renderizar un precio anterior sin respaldo de un histórico con fechas"
       ],
       "puerta_legal": "Ley 11/1998 CM art. 14.2 · TRLGDCU art. 20.1.c) (precio final con impuestos) · art. 20.2 · LSSI art. 10.1.f)",
-      "depends_on": ["puerta_placeholders", "datos_negocio_fuente_unica", "tokens_paleta_contraste"],
+      "depends_on": [
+        "puerta_placeholders",
+        "datos_negocio_fuente_unica",
+        "tokens_paleta_contraste"
+      ],
       "mutable": true,
       "bloqueada_para_publicar": "Precios reales sin verificar (el titular no los publica en su web) + ¿llevan IVA? + contradicción Treatwell↔pestañas. Se CONSTRUYE ya con datos placeholder tras la puerta F-01.",
       "riesgo": "Un campo libre precio_anterior editable a mano es una máquina de generar infracciones.",
@@ -198,7 +230,9 @@
         "El modelo admite excepciones (festivos, cierre de agosto) sin tocar el copy",
         "Mutar los límites de las franjas o el comparador rompe un test"
       ],
-      "depends_on": ["datos_negocio_fuente_unica"],
+      "depends_on": [
+        "datos_negocio_fuente_unica"
+      ],
       "mutable": true,
       "bloqueada_para_publicar": "Las excepciones (festivos, agosto) no están verificadas con el salón.",
       "sdd": true,
@@ -215,7 +249,9 @@
         "La dirección menciona Planta 0, Local 41"
       ],
       "puerta_legal": "art. 22.2 LSSI (sostiene el cero cookies)",
-      "depends_on": ["cero_terceros"],
+      "depends_on": [
+        "cero_terceros"
+      ],
       "mutable": true,
       "sdd": true,
       "status": "pending"
@@ -232,7 +268,9 @@
         "No aparece TikTok"
       ],
       "puerta_legal": "RD 193/2023 art. 14.1 (información accesible independientemente del canal)",
-      "depends_on": ["datos_negocio_fuente_unica"],
+      "depends_on": [
+        "datos_negocio_fuente_unica"
+      ],
       "mutable": true,
       "bloqueada_para_publicar": "El email (centroesteticarozas@gmail.com aparece solo en el JSON-LD de la web actual, nunca visible) hay que confirmarlo con el cliente.",
       "sdd": true,
@@ -254,7 +292,12 @@
         "Mutar && por || en canBook, el +5 de ((rev%5)+5)%5 o idx<flow.length rompe un test"
       ],
       "puerta_legal": "RGPD art. 13.1 (informar al obtener) · base art. 6.1.b) no consentimiento · minimización art. 5.1.c) · art. 11 LOPDGDD",
-      "depends_on": ["datos_negocio_fuente_unica", "tokens_paleta_contraste", "cascaron_semantico", "horario"],
+      "depends_on": [
+        "datos_negocio_fuente_unica",
+        "tokens_paleta_contraste",
+        "cascaron_semantico",
+        "horario"
+      ],
       "mutable": true,
       "riesgo": "El formato wa.me/<num>?text=<urlencoded> NO está verificado contra fuente primaria: verificar a mano y probar en Android, iOS y WhatsApp Web ANTES de implementar. El date-picker es el punto más difícil de hacer accesible: partir de input type=date nativo o de un patrón ARIA probado, nunca de un calendario a medida.",
       "sdd": true,
@@ -273,7 +316,9 @@
         "Se muestra el aviso del art. 20.4 TRLGDCU sobre si se garantiza el origen de las reseñas"
       ],
       "puerta_legal": "art. 20.4 TRLGDCU",
-      "depends_on": ["cascaron_semantico"],
+      "depends_on": [
+        "cascaron_semantico"
+      ],
       "mutable": true,
       "bloqueada_para_publicar": "La elección de plataforma (Treatwell 1.231 vs Google 226) la decide el cliente.",
       "sdd": true,
@@ -289,7 +334,9 @@
         "El acordeón es de apertura única y expone aria-expanded y aria-controls",
         "Mutar el toggle (s.faq===i?-1:i) rompe un test"
       ],
-      "depends_on": ["cascaron_semantico"],
+      "depends_on": [
+        "cascaron_semantico"
+      ],
       "mutable": true,
       "bloqueada_para_publicar": "'Formas de pago' y 'cancelación 24h' son compromisos contractuales de plantilla: los confirma el cliente o no se publican.",
       "sdd": true,
@@ -306,7 +353,10 @@
         "Ningún dato legal está hardcodeado en el JSX: todos vienen de la fuente única"
       ],
       "puerta_legal": "LSSI art. 10.1 a) y f) · régimen sancionador art. 38.3.b) (infracción grave)",
-      "depends_on": ["puerta_placeholders", "cascaron_semantico"],
+      "depends_on": [
+        "puerta_placeholders",
+        "cascaron_semantico"
+      ],
       "mutable": true,
       "bloqueada_para_publicar": "Razón social, NIF/CIF, domicilio fiscal y email. Verificado que NO existen en ninguna fuente pública: el aviso legal del propio cliente es un 404.",
       "sdd": true,
@@ -323,7 +373,9 @@
         "El LCP no lleva loading=lazy y el resto sí",
         "Se sirve AVIF con fallback WebP y JPEG"
       ],
-      "depends_on": ["puerta_placeholders"],
+      "depends_on": [
+        "puerta_placeholders"
+      ],
       "mutable": true,
       "bloqueada_para_publicar": "Fotos reales en proporción exacta: equipo 4/3, categorías 4/5.",
       "sdd": true,
@@ -339,7 +391,9 @@
         "Ninguna foto generada por IA se presenta como una profesional real en producción"
       ],
       "puerta_legal": "LO 1/1982 art. 2.3 (derechos de imagen) · RGPD art. 7.3 (retirada del consentimiento) · LCD art. 5.1.g)",
-      "depends_on": ["puerta_placeholders"],
+      "depends_on": [
+        "puerta_placeholders"
+      ],
       "mutable": true,
       "bloqueada_para_publicar": "Fotos reales del equipo + consentimiento firmado de cada profesional. Las ph-woman*.png son placeholder de desarrollo bloqueado en producción (decisión 8).",
       "sdd": true,
@@ -357,7 +411,9 @@
         "La selección es única y expone aria-pressed"
       ],
       "puerta_legal": "WCAG SC 1.4.1 (el uso del color)",
-      "depends_on": ["solicitud_whatsapp"],
+      "depends_on": [
+        "solicitud_whatsapp"
+      ],
       "mutable": true,
       "bloqueada_para_publicar": "La carta de esmaltes real del salón.",
       "sdd": true,
@@ -371,7 +427,10 @@
       "acceptance": [
         "El CI falla si LCP p75 > 2,5s o CLS p75 > 0,1"
       ],
-      "depends_on": ["hero_marca", "pipeline_imagenes"],
+      "depends_on": [
+        "hero_marca",
+        "pipeline_imagenes"
+      ],
       "mutable": false,
       "nota_mutacion": "Es configuración de CI: no lleva mutate propio.",
       "sdd": false,
@@ -379,10 +438,25 @@
     }
   ],
   "no_se_construyen": [
-    { "del_prototipo": "#reserva (chat simulado)", "motivo": "Simula un agente 'en línea' que no existe y no envía nada; recoge el nombre sin aviso de privacidad. Se sustituye por solicitud_whatsapp." },
-    { "del_prototipo": "Agenda con disponibilidad por profesional", "motivo": "Sin backend no hay disponibilidad: dos clientas pueden 'reservar' la misma hora." },
-    { "del_prototipo": "Reseñas por profesional", "motivo": "Inventadas, rotadas (Paula ≡ Lucía) y con ★★★★★ fijo." },
-    { "del_prototipo": "Capa de temas (3 paletas)", "motivo": "Decisión 5 del humano. Las 3 opciones eran el mismo archivo salvo 4 líneas: nunca fue una feature." },
-    { "del_prototipo": "cat.slot", "motivo": "Campo muerto e incoherente (s1-depil vs s1-depilacion)." }
+    {
+      "del_prototipo": "#reserva (chat simulado)",
+      "motivo": "Simula un agente 'en línea' que no existe y no envía nada; recoge el nombre sin aviso de privacidad. Se sustituye por solicitud_whatsapp."
+    },
+    {
+      "del_prototipo": "Agenda con disponibilidad por profesional",
+      "motivo": "Sin backend no hay disponibilidad: dos clientas pueden 'reservar' la misma hora."
+    },
+    {
+      "del_prototipo": "Reseñas por profesional",
+      "motivo": "Inventadas, rotadas (Paula ≡ Lucía) y con ★★★★★ fijo."
+    },
+    {
+      "del_prototipo": "Capa de temas (3 paletas)",
+      "motivo": "Decisión 5 del humano. Las 3 opciones eran el mismo archivo salvo 4 líneas: nunca fue una feature."
+    },
+    {
+      "del_prototipo": "cat.slot",
+      "motivo": "Campo muerto e incoherente (s1-depil vs s1-depilacion)."
+    }
   ]
 }
