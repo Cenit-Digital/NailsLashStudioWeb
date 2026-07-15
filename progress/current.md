@@ -68,6 +68,34 @@ Su "Cuándo NO aplica" leído: no exime de respetar `prefers-reduced-motion`.
 4. **Reseñas:** son **reales** y salen de Treatwell. Fotos del equipo: el humano
    acepta placeholder de momento (pendiente de resolver, ver riesgo abajo).
 
+### Decisiones cerradas el 2026-07-15 (segunda ronda, puerta humana)
+
+5. **Paleta: solo `Opcion-1-Rosa`.** Fondo `#FDF4F7`, acento `#C05576`. Se
+   descartan Azul (1b) y Amarillo (1c) y **no** se construye capa de temas: un
+   solo tema, sin interruptor. (Las 3 opciones eran el mismo diseño byte a byte
+   salvo las variables CSS del `:root`, así que la capa de temas era barata; el
+   humano prefiere no cargar con esa superficie.)
+6. **No hay contacto con el cliente todavía.** → Se trabaja **solo** con lo
+   verificable en fuentes públicas (Treatwell/Google). Todo lo que exija datos
+   del titular queda **bloqueado**, *incluidas las páginas legales*
+   (aviso legal necesita razón social + NIF/CIF + domicilio, LSSI art. 10).
+   → **Corolario duro: la web no se puede publicar al final de este trabajo.**
+   El objetivo alcanzable es "lista para publicar en cuanto entren los datos".
+7. **Reseñas: solo nota agregada + enlace a Treatwell.** Mostrar «4,9 · 1.231
+   opiniones» enlazando al perfil real como fuente. **No** se republica el texto
+   de terceros, **no** se tocan datos personales y **no** se filtran solo las
+   positivas. Se descartan: republicar textos (salvo que la investigación
+   demuestre vía legal), testimonios propios (dependen del cliente) y quitar la
+   sección. Pendiente: confirmar ToS de Treatwell (informe `legal-treatwell.md`).
+8. **Equipo: se mantienen las fotos IA (`ph-woman*.png`) como placeholder de
+   desarrollo**, marcadas como tales y **bloqueadas para producción**. El humano
+   asume el aviso: presentarlas como el equipo real sería práctica engañosa, así
+   que solo valen para ver el diseño en local.
+9. **Puerta de build (consecuencia de 6 y 8).** El contenido no verificado vive
+   en una capa explícita de *placeholders* y **el build de producción falla** si
+   queda alguno. Es lo que hace **estructuralmente imposible** publicar datos
+   inventados por accidente. Es una feature del proyecto, no un apaño.
+
 ## Hallazgo crítico: el prototipo inventó el contenido
 
 El salón **existe** (Treatwell, 4,9 · 1.231 opiniones). Los datos del prototipo
