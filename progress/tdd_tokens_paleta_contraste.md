@@ -2,7 +2,14 @@
 
 ## Estado: CERRADO EN VERDE
 
-**18/18 escenarios implementados por TDD estricto. 183 tests verdes.**
+> **POST-CIERRE (2026-07-16, sesión de higiene).** Los hallazgos 1 y 2 del `judge`
+> (no bloqueantes, «higiene, no huecos»). **Deuda 2: CERRADA** (186 tests, mutación
+> `puerta-contraste.ts` 100 %, **0 timeouts**). **Deuda 1: ESCALADA A PUERTA HUMANA** — al
+> intentar arreglarla se confirmó por medición que el contrato tiene una **contradicción real
+> entre `@s14` y `@s15`**. No la toco. Ver §«Post-cierre» al final.
+
+**18/18 escenarios implementados por TDD estricto. 183 tests verdes** (186 tras la sesión de
+higiene: +3 de la deuda 2).
 `typecheck` · `lint` · `build` (con las dos puertas) **verdes, 0 warnings**.
 
 **Mutación (toda a `--concurrency 1`, la única medición honesta — ver Hallazgo 2):**
@@ -70,7 +77,7 @@ Enganchada a `pnpm build`, **no** a `dev` (D-8, como F-01).
 | @s11 | `@s11 "%s" sobre "%s" … pasa` (16 filas) + no-violación + puerta limpia exit 0 + auditabilidad + ruta vigilada |
 | @s12 | `@s12 emite exactamente 1 violación …` + `… exit != 0` + `… enganchada al build, y NO al dev` + `… determinista` |
 | @s13 | `@s13 ningún par … declara #C05576 como primer plano` + `… usa --accent-dark` + `… sigue existiendo como relleno` |
-| @s14 | `@s14 con %s el código de salida es distinto de 0` (2 filas) + `@s14 la salida declara que no se evaluó el mínimo` |
+| @s14 | `@s14 con %s el código de salida es distinto de 0` (2 filas; la 2ª **inerte** — ver post-cierre) + `@s14 la salida declara que no se evaluó el mínimo` + (post-cierre) `@s14 el mínimo … es exactamente 18` + `@s14 con un par MENOS del mínimo exigido …` + `@s14 la matriz real satisface el mínimo real …` |
 | @s15 | 5 tests: fichero ilegible (ENOENT), token no declarado, hex malformado, `--header-bg` irreconocible, `--header-bg` ausente |
 | @s16 | matriz declara «Studio» + umbral 4.5 no 3.0 + fixture 4.19 → violación + corregido 5.98 pasa |
 | @s17 | 2 filas centrales (negro puro) + 10 filas de margen + matriz vigila nav Y logo + 4 filas de espaciado de `color-mix` |
@@ -258,3 +265,141 @@ tocar: ni una línea.**
 - **Tocados:** `package.json` (puerta al `build`), `stryker.config.json` (+2 ficheros a `mutate`),
   `src/styles/main.scss` (`@use 'tokens'`), `.prettierignore` (caja de los hex).
 - **NO tocados:** `features/*.feature`, `feature_list.json` (el `done` no lo marco yo).
+
+---
+
+# Post-cierre — las dos deudas de higiene del `judge` (2026-07-16)
+
+F-03 ya estaba aprobada y pusheada (`7181f1e`). Esto no reabre la feature: cierra deuda.
+**Producción NO tocada: `git diff HEAD -- src/lib/puerta-contraste.ts` vacío.** El único fichero
+modificado es `src/lib/puerta-contraste.test.ts` (+47 líneas, 3 tests).
+
+## Deuda 2 — `MINIMO_DE_PARES = 18` sin ancla: **CERRADA**
+
+### El rojo, demostrado (no supuesto)
+
+El hallazgo decía «bajarlo a 1 no pondría rojo nada». **Lo verifiqué sabotéandolo**, que es la
+única forma honesta de probar un ancla sobre producción que ya existe:
+
+| paso | producción | suite |
+| ---- | ---------- | ----- |
+| 1. sabotaje, sin tests nuevos | `MINIMO_DE_PARES = 1` | **183/183 VERDE** ← el hueco, confirmado |
+| 2. con los 3 tests nuevos | `MINIMO_DE_PARES = 1` | **1 failed** (`expected 1 to be 18`) |
+| 3. restaurado | `MINIMO_DE_PARES = 18` | **186/186 VERDE** |
+
+El paso 1 es el hallazgo del `judge` reproducido: la guarda anti-vacuidad del build real se
+podía **desactivar en silencio** con todo en verde. Es la misma clase de fallo que F-03 existe
+para impedir, y ya estaba escrita como anti-patrón en `docs/verification.md` («Una constante que
+decide una guarda y que ningún test fija»).
+
+### Los tres tests, y por qué son tres
+
+1. **`@s14 el mínimo de pares que la puerta exige en el build es exactamente 18`** — el ancla del
+   `judge`. Contra el **literal `18` escrito a mano**, NUNCA contra el símbolo importado ni contra
+   `MATRIZ_DE_USO.length`: contra el símbolo el test seguiría al mutante y no fijaría nada
+   (memoria: `doble-de-test-anclado-al-literal-no-al-simbolo`). Mismo argumento con el que ya se
+   anclaba `RUTA_DE_LOS_TOKENS` en `@s11`. Coge las **dos direcciones**: bajarlo (guarda muerta)
+   y subirlo a 19 (guarda insatisfacible).
+2. **`@s14 con un par MENOS del mínimo exigido la puerta falla, aunque ningún par viole su
+   umbral`** — la frontera, con el mínimo REAL de producción. Es el verde por vacuidad literal:
+   0 fallos sobre pocos pares no es estar protegido. Se recorta a `MINIMO_DE_PARES - 1`, **no** a
+   `length - 1`, para que **añadir** un par a la matriz no lo ponga rojo sin motivo.
+3. **`@s14 la matriz real satisface el mínimo real: la puerta de producción sale con código 0`** —
+   la otra mitad de la frontera. La guarda tiene que ser exigente **y satisfacible**.
+
+**El reparto símbolo/literal es deliberado:** el test 1 fija el **VALOR** (literal); los tests 2 y
+3 fijan el **COMPORTAMIENTO** de `length < minimo` (símbolo). Verificado en vivo: bajo el sabotaje
+`18 → 1` los tests 2 y 3 **siguen verdes** —usan el símbolo, así que *siguen al mutante*— y solo
+el test 1 se pone rojo. Es la razón exacta por la que el ancla va contra el literal, comprobada en
+el propio repo en vez de citada.
+
+### `covered 0` no es un defecto: es el argumento
+
+El test 1 mata **0 mutantes** (`✘ … el mínimo … es exactamente 18 (covered 0)` en el informe).
+No es un fallo del test: **Stryker no muta un literal numérico suelto** (sus mutadores numéricos
+tocan operador/condición, no una constante por otra). Por eso la mutación decía 100 % con la
+guarda desanclada, y por eso hacía falta este test. **El mutante aquí es HUMANO**, exactamente
+como el 88 → 82 del SCSS que `@s18` existe para anclar (el SCSS tampoco lo muta Stryker). Un
+fichero al 100 % de mutación puede tener una guarda muerta: el score no cubre esta clase.
+
+### Lo que NO hice, y por qué
+
+- **No anclé que el humilde pase `MINIMO_DE_PARES`** (el `judge` lo apunta de pasada). El humilde
+  es *humble object* sin decisiones, sin tests y fuera de mutación **por diseño ya aprobado en
+  F-01**. Aseverar sobre su texto fuente sería testear lo que no decide. Precedente respetado: se
+  ancla la CONSTANTE (como `RUTA_DE_LOS_TOKENS`), y del cableado responde el humilde.
+  **Residual conocido y aceptado:** si alguien editara `tools/puerta-contraste.ts` para pasar
+  `minimoDePares: 1`, ningún test lo vería. Es el mismo residual que `RUTA_DE_LOS_TOKENS` ya
+  tenía desde F-01; si algún día molesta, es un escenario nuevo, no un parche.
+
+### Verificación
+
+`typecheck` · `lint` · `build` **verdes, 0 warnings**. `pnpm test` → **186**. El humilde real
+contra el SCSS real → `✓ los 18 pares en uso cumplen su umbral WCAG 2.2 AA`, exit 0.
+
+**Mutación de `src/lib/puerta-contraste.ts`** (`--mutate src/lib/puerta-contraste.ts
+--concurrency 1 --timeoutMS 60000`, sin nada compitiendo por la CPU):
+
+| Score | Muertos | Supervivientes | **Timeouts** | No cov | Errores |
+| ----- | ------- | -------------- | ------------ | ------ | ------- |
+| **100,00 %** | 232 | **0** | **0** | 0 | 0 |
+
+**`# timeout` leído ANTES que el score** (regla del arnés, `docs/verification.md`): es 0, así que
+el score vale. No se re-midió la tanda completa: `contraste.ts` no se ha tocado y
+`placeholders.ts`/`puerta.ts`/`site.ts` siguen byte a byte idénticos a `origin/main`; el único
+cambio es **añadir** tests, y más tests solo pueden matar más mutantes, nunca menos.
+
+## Deuda 1 — la 2ª fila de `@s14`: **ESCALADA, NO ARREGLADA**
+
+**La fila es inerte: confirmado.** Las dos filas pasan `matriz: []`, y con matriz vacía la guarda
+del mínimo cortocircuita **antes** de que `leerScss` influya. Medido con la producción real:
+
+| caso | matriz | SCSS | exit | línea emitida |
+| ---- | ------ | ---- | ---- | ------------- |
+| A (fila 1) | vacía | real | 1 | `no se evaluó el mínimo de pares exigido: 0 de 16` |
+| B (fila 2) | vacía | `body { color: red; }` | 1 | **idéntica a A** ← la fila 2 es la fila 1 con otro nombre |
+| **C (la fila que pide el encargo)** | **REAL** | `body { color: red; }` | 1 | `la puerta … no pudo completar el análisis: el token "--muted" … no está declarado en el :root` |
+
+**Y aquí para el trabajo: el caso C sale por la rama de `@s15`, no por la de `@s14`.**
+
+### La contradicción del contrato, en concreto
+
+`@s14` dice: *«Given una matriz de uso vacía, **o un regex del SCSS que no casa ningún token**»* →
+*«And la salida declara **que no se evaluó el mínimo de pares exigido**»*. Leído en Gherkin
+estricto, los tres `Then` valen para los **dos** `Given`.
+
+**Ese `Then` es INSATISFACIBLE para el segundo `Given` con matriz no vacía**, y no por un
+descuido del código: porque **`@s15` manda lo contrario**. `@s15` declara *«un token de la matriz
+de uso no está declarado en el :root»* → *«la salida declara la causa»*, y `valorDelToken` LANZA
+antes de llegar a la guarda del mínimo. Un SCSS que no casa ningún token **es** un token no
+declarado. Los dos escenarios **se solapan sobre la misma entrada y exigen mensajes distintos**.
+
+Se ve en que el caso C ya está cubierto: es, letra por letra, la 1ª fila del `it.each` de `@s15`
+(`:root { --bg: #FDF4F7; }` + un par cualquiera). **Cualquier arreglo de la fila 2 es redundante
+con `@s15` o contradice a `@s14`.** Por eso no la toco.
+
+### El origen del choque
+
+El comentario de `@s14` describe un diseño donde el regex roto produce **0 pares evaluados** y la
+guarda del mínimo lo caza. Eso exigiría que `evaluarMatriz` **se saltara en silencio** los pares
+que no puede resolver. La producción **lanza**, y es lo correcto: las dos variantes fallan cerrada
+—no hay agujero de seguridad—, pero la que lanza **acusa el token exacto** (`--muted`) en vez de
+gruñir `0 de 18`. Es lo que exige `docs/conventions.md` y la lección del `motivoDelReventon` de
+F-01, ya citada en este mismo fichero de test: «exigir la CAUSA concreta, no un "no pudo
+completar" que cualquier cosa cumple». **El contrato encoded el diseño peor en `@s14` y el mejor
+en `@s15`.** Misma forma que la contradicción A-16 (4,59 vs 4,60) que el propio contrato
+documenta: una hipótesis del contrato sobre la implementación que la implementación refutó.
+
+### Las tres salidas (decisión del humano, no mía)
+
+1. **RECOMENDADA — retirar el 2º `Given` de `@s14`.** `@s14` queda como «matriz vacía o corta →
+   falla por el mínimo»; el caso del regex es de `@s15`, que ya lo cubre y lo cubre mejor.
+   **No se pierde cobertura** (medido) y desaparece el solapamiento. Exige editar el `.feature`.
+2. Relajar el `Then` de `@s14` a «declara la causa». Deja `@s14` y `@s15` casi duplicados y
+   **debilita** el `Then` que hoy es fuerte para la matriz vacía. No me gusta.
+3. **Cambiar la producción** para que los pares irresolubles se descarten y caigan en la guarda
+   del mínimo. **Mala**: rompe `@s15`, y el build pasaría de acusar «el token `--muted` no está
+   declarado» a decir «0 de 18». **Menos informativa por contrato. No la haría sin orden expresa.**
+
+**Precedente aplicado:** igual que con el `^` de `HEX_VALIDO` y con el arranque de esta feature —
+un hueco del CONTRATO **no autoriza a un agente a editar el contrato**: autoriza a pedirlo.

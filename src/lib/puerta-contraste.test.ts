@@ -6,6 +6,7 @@ import {
   evaluarMatriz,
   extraerTokens,
   MATRIZ_DE_USO,
+  MINIMO_DE_PARES,
   RUTA_DE_LOS_TOKENS,
   type EspecificacionColor,
   type ParDeUso,
@@ -308,6 +309,52 @@ describe('la puerta falla cerrada (A-13 guarda (a); modos de error)', () => {
 
     expect(resultado.lineas.join('\n')).toContain('mínimo de pares')
     expect(resultado.lineas.join('\n')).not.toContain('sin fallos')
+  })
+
+  // @s14, «un mínimo CONOCIDO de pares». Todo lo de arriba inyecta `minimoDePares` a mano
+  // (correcto: anti-tautología), así que hasta aquí NINGÚN test tocaba el valor REAL que el
+  // humilde le pasa a la puerta en el build: bajarlo a 1 dejaba las 183 pruebas en verde y la
+  // guarda anti-vacuidad MUERTA en producción — verificado sabotéandolo, no supuesto. Es el
+  // mismo argumento con el que ya se ancla RUTA_DE_LOS_TOKENS (@s11): si el humilde exigiera
+  // otro mínimo, nada de lo anterior demostraría nada.
+  // El 18 va A MANO, NUNCA `MATRIZ_DE_USO.length` ni el símbolo importado: contra el símbolo el
+  // test seguiría al mutante y no fijaría nada (memoria: `doble-de-test-anclado-al-literal-no-al-simbolo`).
+  it('@s14 el mínimo de pares que la puerta exige en el build es exactamente 18', () => {
+    expect(MINIMO_DE_PARES).toBe(18)
+  })
+
+  // @s14, la frontera de la guarda, con el mínimo REAL de producción (aquí el símbolo es lo
+  // correcto: estos dos fijan el COMPORTAMIENTO de `length < minimo`, no el valor —que lo fija
+  // el test de arriba contra el literal—).
+  // Con UN par menos del exigido la puerta falla AUNQUE NINGÚN PAR VIOLE SU UMBRAL: es
+  // exactamente el verde por vacuidad que @s14 persigue —0 fallos sobre pocos pares no es estar
+  // protegido, es no haber mirado—. Se recorta a `MINIMO_DE_PARES - 1` y no a `length - 1` para
+  // que añadir un par nuevo a la matriz no ponga esto rojo sin motivo.
+  it('@s14 con un par MENOS del mínimo exigido la puerta falla, aunque ningún par viole su umbral', () => {
+    const unoMenosDelMinimo = MATRIZ_DE_USO.slice(0, MINIMO_DE_PARES - 1)
+
+    const resultado = ejecutarPuertaDeContraste({
+      leerScss: scssReal,
+      matriz: unoMenosDelMinimo,
+      minimoDePares: MINIMO_DE_PARES,
+    })
+
+    expect(resultado.codigoSalida).not.toBe(0)
+    expect(resultado.lineas.join('\n')).toContain('mínimo de pares')
+  })
+
+  // La otra mitad de la frontera: el mínimo declarado lo SATISFACE la matriz declarada. Sin
+  // esto, un MINIMO_DE_PARES por encima de la matriz real (19) dejaría el build roto para
+  // siempre y ningún test lo diría. La guarda tiene que ser exigente Y satisfacible.
+  it('@s14 la matriz real satisface el mínimo real: la puerta de producción sale con código 0', () => {
+    const resultado = ejecutarPuertaDeContraste({
+      leerScss: scssReal,
+      matriz: MATRIZ_DE_USO,
+      minimoDePares: MINIMO_DE_PARES,
+    })
+
+    expect(resultado.codigoSalida).toBe(0)
+    expect(resultado.lineas).toEqual([])
   })
 
   // @s15 (modos de error, derivación de I-3 igual que F-01). Una puerta que se traga la
