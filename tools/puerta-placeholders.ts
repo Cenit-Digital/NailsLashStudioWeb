@@ -1,0 +1,45 @@
+#!/usr/bin/env node
+/**
+ * El humilde de la puerta de placeholders (F-01): cablea `node:fs` y `node:process` con
+ * `ejecutarPuerta`. Enganchado SOLO a `pnpm build` (producción); el build de desarrollo
+ * no lo invoca (D-8: en local las fotos IA y los datos placeholder son legítimos).
+ *
+ * Aquí NO se decide nada: todo lo que decide vive en src/lib/puerta.ts, que está testeado
+ * y mutado. Por eso este fichero no lleva tests propios ni entra en la lista `mutate`.
+ *
+ * Se ejecuta con el type stripping de Node 22 (`--experimental-strip-types`), que exige la
+ * extensión .ts explícita en el import. `tsconfig.json` ya trae `allowImportingTsExtensions`.
+ */
+import { readdirSync, readFileSync } from 'node:fs'
+import process from 'node:process'
+
+import { ejecutarPuerta, type SistemaDeFicheros } from '../src/lib/puerta.ts'
+
+const sistemaDeFicherosReal: SistemaDeFicheros = {
+  listarFicheros: (directorio) =>
+    readdirSync(directorio, { recursive: true, withFileTypes: true })
+      .filter((entrada) => entrada.isFile())
+      .map((entrada) => `${entrada.parentPath}/${entrada.name}`.replaceAll('\\', '/')),
+  leer: (ruta) => readFileSync(ruta, 'utf8'),
+}
+
+/**
+ * Todavía no hay árbol de datos: la fuente única (F-02 `datos_negocio_fuente_unica`) está
+ * `pending`. La vía por FLAG queda cableada pero sin alimentar hasta entonces; la vía por
+ * PATRÓN ya protege el artefacto. Inventar aquí un árbol de datos sería invadir F-02.
+ */
+const registros: never[] = []
+
+const resultado = ejecutarPuerta({ modo: 'produccion', registros, ficheros: sistemaDeFicherosReal })
+
+for (const linea of resultado.lineas) {
+  console.error(`  ✗ ${linea}`)
+}
+
+if (resultado.codigoSalida === 0) {
+  console.log('✓ Puerta de placeholders: el artefacto de producción no tiene placeholders.')
+} else {
+  console.error(`\n✗ Puerta de placeholders: el build de producción NO puede publicarse.`)
+}
+
+process.exit(resultado.codigoSalida)

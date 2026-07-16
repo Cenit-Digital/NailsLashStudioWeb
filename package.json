@@ -13,7 +13,7 @@
   "scripts": {
     "dev": "vite",
     "dev:ssr": "vite-react-ssg dev",
-    "build": "vite-react-ssg build",
+    "build": "vite-react-ssg build && node --experimental-strip-types --disable-warning=ExperimentalWarning tools/puerta-placeholders.ts",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
