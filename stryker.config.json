@@ -9,7 +9,13 @@
   "vitest": {
     "configFile": "vitest.config.ts"
   },
-  "mutate": ["src/lib/placeholders.ts", "src/lib/puerta.ts", "src/lib/site.ts"],
+  "mutate": [
+    "src/lib/placeholders.ts",
+    "src/lib/puerta.ts",
+    "src/lib/site.ts",
+    "src/lib/contraste.ts",
+    "src/lib/puerta-contraste.ts"
+  ],
   "thresholds": {
     "high": 100,
     "low": 90,

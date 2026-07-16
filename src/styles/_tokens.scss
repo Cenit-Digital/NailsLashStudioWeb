@@ -1,0 +1,75 @@
+// Tokens de la paleta ROSA — un :root REAL, con los 7 cambios que cumplen WCAG 2.2 AA (F-03).
+//
+// Contrato: features/tokens_paleta_contraste.feature (@s10).
+// El prototipo los declaraba INLINE en un <div> contenedor (Opcion-1-Rosa.dc.html:28); aquí
+// viven en un :root de verdad.
+//
+// T-1 — NO se copia `_tokens.scss` de WebEmpresa: su base arrastra 3 bloqueantes AA sin
+// cerrar en HEAD con las tres puertas verdes, porque ninguna feature los representaba. Estos
+// valores salen de la paleta auditada (docs/research/audit-a11y.md §2.3) CON las correcciones.
+//
+// ESTOS VALORES ESTÁN VIGILADOS: `tools/puerta-contraste.ts` los lee de este fichero, recorre
+// la matriz de uso y recalcula cada ratio contra su umbral en cada `pnpm build`. Cambiar un
+// hex de aquí y bajar de umbral ROMPE EL BUILD. No es una recomendación: es una puerta.
+//
+// Un solo esquema de color: este proyecto no tiene tema oscuro (decisión 5).
+:root {
+  // --- Fondos y superficies -------------------------------------------------------------
+  --bg: #FDF4F7;
+  --surface: #FFFFFF;
+  --surface2: #FBE7EF;
+  --accent-soft: #F7DDE8;
+
+  // --- Texto ----------------------------------------------------------------------------
+  --text: #5E404A;
+  // Cambio 1: antes #9C7F89, que era inservible como texto (no llegaba a 4,5:1 ni sobre --bg).
+  --muted: #6F525A;
+  // Cambio 6: antes #B0466A. Este es el fondo del pie y el color del logo; con #8E3355
+  // «Studio» sube a 5,98 y pasa incluso a 14 px, que es lo que cierra la trampa del clamp().
+  --ink: #8E3355;
+
+  // --- Marca ----------------------------------------------------------------------------
+  // A4: --accent se CONSERVA como color de marca, pero SOLO para rellenos grandes y
+  // decorativos. PROHIBIDO como texto pequeño o como relleno con texto blanco encima: da
+  // 4,37:1 y se reintroduce solo (regla dura del audit §5.2). Para texto va --accent-dark.
+  --accent: #C05576;
+  // Cambios 2 y 3: el texto y los bordes sobre fondo claro usan este, no --accent.
+  --accent-dark: #A23E5F;
+  // Cambio 4: antes #E38AAE, que daba 2,47:1 con blanco encima.
+  --accent-2: #B3316E;
+  --brush: #C05576;
+  --on-accent: #FFFFFF;
+
+  // --- Líneas y bordes ------------------------------------------------------------------
+  // Cambio 5. La partición es el cambio, no el color: --line sigue siendo el separador
+  // DECORATIVO (no identifica ningún componente, así que SC 1.4.11 no le exige 3:1) y
+  // conserva su valor auditado; --border-interactive es el token NUEVO para lo que delimita
+  // swatch/día/input, que es lo único que le dice al usuario «esto es un control» y por eso
+  // sí exige 3:1 (3,54 sobre --accent-soft).
+  --line: rgba(176, 70, 106, 0.16);
+  --border-interactive: #AB5F79;
+
+  // --- Cabecera translúcida (A-15) ------------------------------------------------------
+  // A QUIEN LEA ESTO DENTRO DE SEIS MESES: si vas a bajar el 88 % «por fidelidad al diseño»,
+  // ESTO es lo que revertirías, y NO es un ajuste estético. Al 82 % del prototipo los enlaces
+  // de la nav (--muted) DEJAN DE CUMPLIR AA en cuanto el usuario elige el esmalte negro:
+  // caen a 4,44 con «Negro Ónix» #1B1B1D —color real de la carta, salon-data.js:90— y a 4,22
+  // con negro puro. El audit no lo vio porque declaró como «peor caso» un #303030 MÁS CLARO
+  // QUE EL NEGRO DE SU PROPIA CARTA DE ESMALTES.
+  //
+  // Al 88 % la cabecera es INCONDICIONALMENTE AA: no existe under —ni el negro puro— que la
+  // tumbe (nav 4,89 · logo 5,38 contra #000000; margen +0,39 sobre 4,5). Conserva la
+  // translucidez (deja pasar el 12 % en vez del 18 %).
+  //
+  // LA PUERTA LEE ESTE 88 % Y RECALCULA: bajarlo pone @s17/@s18 en rojo. No es un número
+  // mágico sin defensa.
+  --header-bg: color-mix(in srgb, var(--bg) 88%, transparent);
+  // El desenfoque NO altera el análisis: PROMEDIA el color, no lo aclara. Para una región
+  // oscura grande el centro sigue oscuro (peor caso intacto); para un elemento oscuro
+  // pequeño el blur solo AYUDA.
+  --header-blur: blur(14px);
+
+  // --- Estado ---------------------------------------------------------------------------
+  // Cambio 7: «en línea» pasa de #2F9D5F (2,69:1 sobre --accent-soft) a #186237 → 5,79.
+  --estado-en-linea: #186237;
+}

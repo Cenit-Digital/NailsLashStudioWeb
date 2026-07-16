@@ -49,3 +49,66 @@ literales.
 - `@s17` y `@s18` **no** exigen enumerar secciones de F-06/F-17: el negro puro las cubre todas.
 - Ojo al **A-16**: `componer` **no cuantiza**. Si algún esperado compuesto no cuadra por ~0,005,
   el sospechoso es una cuantización a 8 bits colada en la implementación, no el literal.
+
+---
+
+# Enmienda por mutación — `@s4` gana una fila (2026-07-16, aprobada por el humano en la puerta)
+
+> Cambio **quirúrgico**: **una fila y su comentario**. No se tocó producción, ni ningún otro
+> escenario, ni la aprobación de la cabecera. **Sigue habiendo 18 escenarios** — esto es una fila,
+> no un escenario nuevo.
+
+## El superviviente
+
+La prueba de mutación dejó **1 superviviente** en `src/lib/contraste.ts` (**98,11 %**, umbral 1.0):
+
+```
+[Survived] Regex — src/lib/contraste.ts:20   /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i  →  borrar el ^
+```
+
+**NO es equivalente** (verificado por el lead). Sin el ancla `^`, el regex solo exige que la cadena
+**TERMINE** en `#` + 3 o 6 dígitos hex. Entonces `1px solid #AB5F79` **casa** → `hexARgb` **no
+lanza**, hace `hex.slice(1)` = `"px solid #AB5F79"` y devuelve **`[NaN, NaN, NaN]`**. Eso viola
+literalmente lo que `@s4` exige: *«hexARgb lanza un error»* y *«no devuelve ningún canal a medias»*.
+
+## El hueco estaba en el CONTRATO, no en el código
+
+La producción **ya era correcta**. Las **5 filas anteriores** de `@s4` (`""`, `A23E5F`, `#GGGGGG`,
+`#12`, `#12345`) se comportan **idéntico con y sin el ancla** —ninguna termina en un hex válido—,
+así que ninguna podía matar al mutante. El contrato no estaba pidiendo lo que creía pedir.
+
+## La fila
+
+```
+| 1px solid #AB5F79 | shorthand de borde: NO empieza por "#" pero TERMINA en un hex válido |
+```
+
+**No es un fixture rebuscado:** `--border: 1px solid #AB5F79` es un valor de token **plausible** en
+SCSS, y la puerta **lee valores de token del SCSS** (`@s10`, `@s11`). Sin esta guarda, un shorthand
+de borde se aceptaría como color. `#AB5F79` es además `--border-interactive`, token real de la
+paleta (`@s10`).
+
+## Precedente citado
+
+**Exactamente** lo que hizo F-01: `@s5` ganó la fila `| 600  123  456 |` (separadores dobles) porque
+el mutante `[ -]+` → `[ -]` sobrevivía, y también pasó por la **puerta de aprobación humana**. Ver
+`progress/mutation_puerta_placeholders.md` §2. Misma forma en las dos: **mutante superviviente →
+hueco en el contrato → fila nueva → producción sin cambios**.
+
+## Qué se tocó, exactamente
+
+| Dónde | Qué |
+| ----- | --- |
+| `@s4` `Examples:` | **+1 fila** (`1px solid #AB5F79`). Tabla realineada a las anchuras nuevas (17/68); las 5 filas previas **no cambian de contenido**. |
+| `@s4` comentario | **+8 líneas**: el porqué — ancla el `^`, por qué las otras 5 no matan al mutante, el `[NaN, NaN, NaN]` en vez de lanzar, y que el valor es plausible. Cita el precedente F-01. |
+| Cabecera | **+3 líneas** en la lista de lo que cierra en su redacción: la fila se añadió por mutación con aprobación humana el 2026-07-16. La cabecera **sigue aprobada**; NO se remarcó como pendiente. |
+
+Verificado mecánicamente tras el cambio: **18 escenarios, 18 tags `@s1`…`@s18`**, tabla de `@s4`
+con **7 filas** (cabecera + 6 ejemplos) y anchuras de columna **idénticas** en todas. El diff del
+contrato son **3 hunks**, todos en la cabecera y en `@s4`.
+
+## Para el tdd_craftsman (esta enmienda)
+
+El ROJO real se demuestra **con el mutante puesto a mano**: borra el `^` de `HEX_VALIDO` en
+`src/lib/contraste.ts:20` y **solo** el caso nuevo debe caer; el resto de la suite sigue verde. Es
+la firma de que la fila muerde donde ninguna otra lo hacía. **La producción no se toca**: ya pasa.

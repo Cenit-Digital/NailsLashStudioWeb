@@ -14,3 +14,10 @@ reports
 # Estáticos sin parser de Prettier (SEO). Se sirven tal cual desde public/.
 public/robots.txt
 public/sitemap.xml
+
+# La CAJA de los hex de la paleta la fija el contrato de F-03: `@s10` exige que el valor del
+# token sea EXACTAMENTE "#6F525A" (mayúsculas), y así están escritos en el audit y en todo el
+# proyecto. Prettier los pasa a minúsculas (#6f525a) y pone `@s10` en rojo. El color es el
+# mismo —`hexARgb` es insensible a la caja (@s3)—, pero el literal que el contrato fija no.
+# Entre reformatear y respetar el contrato, manda el contrato.
+src/styles/_tokens.scss

@@ -4,16 +4,17 @@
 > (regla anti-teléfono-descompuesto). Al cerrar la sesión, mueve el resumen a
 > `history.md` y deja este archivo con solo esta plantilla.
 
-- **Feature en curso:** `3 — tokens_paleta_contraste` (`in_progress`) — el sistema
-  de diseño (paleta AA). Camino hacia la UI visible que pidió el CEO para la reunión.
-- **Fase:** TDD (`tdd_craftsman`) sobre `features/tokens_paleta_contraste.feature`,
-  **aprobado por el humano en la puerta el 2026-07-16** (18 escenarios `@s1..@s18`).
-  A-13/A-14/A-15/A-16 cerradas en su redacción. Bitácora:
-  `progress/tdd_tokens_paleta_contraste.md`; verificación previa:
-  `progress/f03_verificacion_previa.md`.
-- **Anterior:** `2 — datos_negocio_fuente_unica` cerrada `done` (12/12 escenarios,
-  judge APROBADO, mutación 100% en `site.ts` + F-01 sin regresión,
-  `bin/harness verify` verde, `pnpm build` verde).
+- **Feature en curso:** ninguna. `3 — tokens_paleta_contraste` cerrada `done`
+  (18/18 escenarios, judge **APROBADO**, mutación **100 %** en `contraste.ts`
+  (53) y `puerta-contraste.ts` (232) con **0 timeouts** y **0 exclusiones**,
+  183 tests, `pnpm build` verde con las dos puertas).
+- **Siguiente:** F-04 `cascaron_semantico` (`pending`) — depende de F-02 y F-03,
+  ambas `done`. Camino hacia la UI visible que pidió el CEO para la reunión.
+- **Bitácoras de F-03:** `progress/tdd_tokens_paleta_contraste.md` (con las **tres
+  lecciones del arnés** al principio), `judge_…`, `gherkin_…`, y la verificación
+  previa del lead: `progress/f03_verificacion_previa.md`.
+- **Anteriores:** `1 — puerta_placeholders` y `2 — datos_negocio_fuente_unica`,
+  ambas `done`.
 - **Contexto del CEO (2026-07-16):** la web es un **demo** para una primera
   reunión; prioriza el **front visible**; WhatsApp/tel con **datos reales** (los
   provee F-02), citas como demo per diseño (sin backend, F-13). Guardado en la
@@ -279,11 +280,77 @@ contrato no constaba como aprobado (la marca `⏸` seguía puesta, `feature_list
 puerta a sí mismo**. Tenía razón. Aprobado por el humano y **registrado** antes de
 escribir una línea de código.
 
+### F-03 CERRADA — lo que costó y lo que enseñó
+
+**Resultado:** 18/18 escenarios · 183 tests · `contraste.ts` **100 %** (53 mutantes) y
+`puerta-contraste.ts` **100 %** (232), ambos con **0 timeouts** y **0 exclusiones**
+(F-01 necesitó 1) · judge **APROBADO** · build verde con las dos puertas.
+
+**El judge no se fió de nadie: reimplementó G17 desde cero** (script propio, sin importar
+`src/`) y recalculó **todos** los literales. Salieron correctos: los 15 ratios hex↔hex, el
+pie **4,5913**, el fondo `[222.64, 214.72, 217.36]`, nav **4,8915**, logo **5,3809**, el
+82 % → **4,2216**. Y midió el punto de `@s6`: las ramas difieren **2,33e-9** contra una
+tolerancia de **5e-9** en `toBeCloseTo(8)` → **`toBe` era obligatorio** o el escenario era
+decorado.
+
+**La fila `1px solid #AB5F79` de `@s4`** (superviviente real: borrar el `^` de
+`HEX_VALIDO`) se aprobó en la **puerta humana** y quedó **demostrada, no supuesta**: con el
+mutante aplicado a mano cae **exactamente un test, el nuevo** (`1 failed | 28 passed`), y
+las otras 5 filas siguen verdes — eran ciegas al ancla. **Producción sin tocar.**
+
+### Tres hallazgos del judge (higiene, no huecos — no bloquearon el cierre)
+
+1. **La 2ª fila de `@s14` es inerte**: dice probar «un SCSS que no casa ningún token» pero
+   pasa matriz vacía, así que `leerScss` no influye — resultado idéntico con el SCSS falso y
+   con el real. *Un test verde por vacuidad dentro del escenario que persigue el verde por
+   vacuidad.* La protección real existe (rama de `@s15`), pero la fila no prueba lo suyo.
+2. **`MINIMO_DE_PARES = 18` no lo fija ningún test**: bajarlo a 1 no pondría rojo nada y
+   **desactivaría la guarda en el build real**. Merece el mismo ancla que `RUTA_DE_LOS_TOKENS`
+   (contra un **literal a mano**, no contra el símbolo importado: eso sería tautología).
+3. Las lecciones de mutación **solo vivían en bitácoras que nadie relee** → subidas a
+   `docs/verification.md` como **reglas del arnés**. Ya habían mordido en F-01 y F-03.
+
+→ **1 y 2 quedan como deuda declarada.** Necesitan puerta humana (tocan el contrato).
+
+### Las tres lecciones del arnés (ahora en `docs/verification.md`)
+
+1. **Un informe de mutación con TIMEOUTS miente.** Un `Timeout` **cuenta como muerto**.
+   `contraste.ts` —aritmética pura, sin un bucle— cantó **«100 %, 0 supervivientes» con
+   26/53 en timeout**. A concurrencia 1: timeouts **26 → 0** y **apareció el superviviente
+   real**. Síntoma que lo delata: **timeouts en código sin bucles**. Ocurrió **en vivo otra
+   vez** al competir por CPU: 4 timeouts en los primeros 85 mutantes de la tanda completa.
+   → `--concurrency 1` **no es paranoia: es lo único que hace el informe honesto**.
+2. **Calcular en el cuerpo del `describe` produce supervivientes FALSOS.** Stryker activa el
+   mutante **por test**; lo del `describe` corre en **recolección**, sin mutante activo →
+   **189 supervivientes falsos** (score real 19 %). Peor: un mutante que rompía la matriz
+   hacía fallar la recolección → **0 tests corriendo** → contado como superviviente. Con
+   helpers perezosos: 19 → 66 → 91 → 98,7 → **100 %**, **sin tocar producción**.
+3. **`@s6` exige `toBe`, no `toBeCloseTo`** (ver arriba: 2,33e-9 vs 5e-9).
+
+### Deuda del arnés que deja F-03
+
+**`bin/harness verify` ya no es cosa de minutos: 487 mutantes ≈ 2 h** a concurrencia 1.
+Stryker avisa de **199 mutantes estáticos (41 % del total, ~79 % del tiempo)**, casi todos de
+`MATRIZ_DE_USO`. La palanca sería `ignoreStatic`, **pero apagarlos dejaría de vigilar la
+matriz**, que es medio A-13. **Decisión abierta, del humano.** Mientras tanto: **medir
+fichero a fichero**, que es lo práctico.
+
+> Nota de método, verificada: los ficheros **no tocados** no hace falta re-medirlos.
+> `placeholders.ts`, `puerta.ts` y `site.ts` están **byte a byte idénticos a `origin/main`**
+> y sus tests tampoco cambiaron → su 100 % de F-01/F-02 se sostiene. Y **añadir** un test
+> **nunca puede bajar** un score de mutación. Re-medirlos son ~2 h sin información nueva.
+
 ## Siguiente paso
 
-`tdd_craftsman` sobre los 18 escenarios de F-03. Después: `judge` y `mutation_tester`
-(umbral **1.0** — no cierra si sobrevive un mutante), `bin/harness verify` en verde y
-cierre.
+**F-04 `cascaron_semantico`** (`pending`): depende de F-02 y F-03, ambas `done`. Es el
+siguiente del camino crítico hacia la UI visible del demo. Ojo: el JSON-LD **se escribe de
+cero** — copiar el de la web actual propagaría `addressLocality: "Las Ceudas"` y un `vatID`
+malformado.
+
+**Pendiente del humano (no bloquea el código):** dominio (¿migrar `nailslashlasrozas.es`
+con 301?), plataforma de reseñas (Treatwell 1.231 vs Google 226), **A-4** (si «Nails Lash
+Studio» es logotipo, SC 1.4.3 exime el par del `clamp`; **no se depende** de ello), y las
+**dos deudas de higiene** del judge (`@s14` fila 2, y anclar `MINIMO_DE_PARES`).
 
 **Pendiente del humano (no bloquea el código):** elegir dominio (¿migrar
 `nailslashlasrozas.es` con 301?), plataforma de reseñas (Treatwell 1.231 vs Google

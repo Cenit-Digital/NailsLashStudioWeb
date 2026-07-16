@@ -1,7 +1,7 @@
-// Punto de entrada de los estilos globales. Los parciales del sistema
-// (_tokens, _reset, _base) llegan con la feature de diseño; aquí solo va lo
-// mínimo para que el bundle de estilos exista.
-//
+// Punto de entrada de los estilos globales. Los parciales _reset y _base llegan
+// con la feature de maquetación; _tokens es de F-03 y ya está aquí.
+@use 'tokens';
+
 // Un solo esquema de color: este proyecto no tiene tema oscuro (decisión 5).
 :root {
   color-scheme: light;

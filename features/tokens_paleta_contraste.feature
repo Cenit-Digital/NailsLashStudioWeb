@@ -20,6 +20,9 @@
 #   - C4/C7 → dos justificaciones del audit eran falsas; las decisiones sobreviven, el porqué
 #            se reescribió (SC 1.4.11 va de IDENTIFICAR el componente; F83 es Quickcheck)
 #   - C3   → «≥18,5 px negrita» es la cifra OFICIAL y se conserva; «18,66 px» no existe en w3.org
+#   - La fila `1px solid #AB5F79` de @s4 se añadió POR MUTACIÓN (superviviente real: borrar el `^`
+#            de `HEX_VALIDO`), con aprobación humana en la puerta el 2026-07-16. Hueco del CONTRATO,
+#            no del código: la producción no cambia. Precedente F-01/@s5, `progress/mutation_puerta_placeholders.md` §2
 # Razonamiento completo, con los cálculos y las citas: `progress/f03_verificacion_previa.md`.
 # Aquí no hay nada que adivinar: lo que no está escrito, no está decidido.
 #
@@ -184,15 +187,27 @@ Feature: Tokens de la paleta Rosa + puerta de contraste que recalcula los ratios
     And no devuelve ningún canal a medias
 
     Examples:
-      | entrada  | motivo                                              |
-      | ""       | cadena vacía: no hay hex                             |
-      | A23E5F   | sin "#": el parser lo exige                          |
-      | #GGGGGG  | dígitos no hexadecimales                             |
-      | #12      | longitud inválida: ni 3 ni 6 dígitos                 |
-      | #12345   | longitud inválida: 5 dígitos                         |
+      | entrada           | motivo                                                               |
+      | ""                | cadena vacía: no hay hex                                             |
+      | A23E5F            | sin "#": el parser lo exige                                          |
+      | #GGGGGG           | dígitos no hexadecimales                                             |
+      | #12               | longitud inválida: ni 3 ni 6 dígitos                                 |
+      | #12345            | longitud inválida: 5 dígitos                                         |
+      | 1px solid #AB5F79 | shorthand de borde: NO empieza por "#" pero TERMINA en un hex válido |
     # "" denota la cadena vacía. Falla cerrada (derivación de I-3, igual que F-01): ante un hex que
     # el SCSS no debería contener, lanzar en vez de devolver [0,0,0] a medias, que la puerta
     # confundiría con un color real y evaluaría un ratio falso.
+    # LA FILA `1px solid #AB5F79` ANCLA EL `^` de `HEX_VALIDO` (añadida por mutación, aprobada por
+    # el humano en la puerta el 2026-07-16; mismo patrón que la fila `| 600  123  456 |` de @s5 en
+    # F-01 — `progress/mutation_puerta_placeholders.md` §2: mutante superviviente → hueco en el
+    # CONTRATO, no en el código → fila nueva, producción sin cambios). Las otras 5 entradas NO matan
+    # al mutante que borra el ancla: se comportan idéntico con `^` y sin él, porque ninguna TERMINA
+    # en un hex válido. Sin el `^`, el regex solo exige que la cadena ACABE en "#" + 3 o 6 dígitos
+    # hex, así que `1px solid #AB5F79` casaría, `hexARgb` NO lanzaría, haría `slice(1)` =
+    # "px solid #AB5F79" y devolvería **[NaN, NaN, NaN]** — que es exactamente lo que este escenario
+    # prohíbe («lanza un error», «no devuelve ningún canal a medias»). Y no es un fixture rebuscado:
+    # `--border: 1px solid #AB5F79` es un valor de token PLAUSIBLE en SCSS y la puerta LEE valores
+    # de token del SCSS (@s10, @s11); sin esta guarda, un shorthand de borde se aceptaría como color.
 
   # ---------------------------------------------------------------------------
   # canalLineal: linealización sRGB y el umbral 0.04045 (A1; A-14; acceptance 7)
