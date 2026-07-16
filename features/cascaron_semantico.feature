@@ -4,7 +4,40 @@
 # y es la primera aplicación dura de I-8 («verde ≠ funciona: en SSG hay dos estados, y jsdom solo
 # ve el segundo»).
 #
-# ⏸ PENDIENTE DE APROBACIÓN HUMANA. Nadie lo ha aprobado todavía. NO lanzar el tdd_craftsman.
+# Aprobado por el humano en la puerta de aprobación (2026-07-16, sobre los 35 escenarios).
+# Cierra en su redacción:
+#   - A-17 → F-04 = la PUERTA ANTI-404 (ningún href interno apunta a una ruta inexistente en
+#            dist/); F-16 = las rutas, los enlaces y el contenido legal. El troceado se
+#            contradecía (`:673` «aún sin destino» vs `:683` «responde 200») y F-04 NO puede
+#            prometer un aviso legal conforme: no existen razón social ni NIF válido [V].
+#            Y «responde 200» NO prueba conformidad: /es/confidentiality_ws del cliente da 200 y
+#            es jurídicamente nulo (@s23, @s24)
+#   - A-18 → SC 2.4.11 (foco no oscurecido) es de F-06, NO de F-04: no puede testear que la
+#            cabecera tape el foco quien no monta la cabecera. F-04 PONE el scroll-padding-top,
+#            F-06 VIGILA que funcione (@s11)
+#   - A-19 → el JSON-LD de F-04 NO emite horario (es de F-10). Pero F-04 FIJA LA REGLA que F-10
+#            hereda: openingHoursSpecification, NUNCA openingHours, y JAMÁS las dos — coexisten
+#            y ambas son válidas por ramas distintas [V]; sin fijarlo, dos implementadores
+#            eligen distinto y AMBOS pasan los tests (@s35)
+#   - A-20 → priceRange NO entra. Es Text («for example $$$» [V]): un número es sintácticamente
+#            válido y basura semántica, degrada en silencio. Y los precios están bloqueados
+#            (B-5/F-09): emitir un rango sin precios verificados sería INVENTAR. Las dos razones
+#            son independientes: la de los precios basta sola (@s9)
+#   - A-21 → el origen de la canónica entra como PLACEHOLDER cubierto por la puerta de F-01: el
+#            build de PRODUCCIÓN rompe hasta que el cliente decida el dominio, el de desarrollo
+#            no. Es la decisión 9 aplicada literalmente. F-04 NO duplica la puerta de F-01: se
+#            apoya en ella (@s34)
+#   - A-22 → el title queda FIJADO: home → «Nails Lash Studio · Uñas, pestañas y cejas en Las
+#            Rozas de Madrid»; resto → «<Sección> · Nails Lash Studio». Es criterio de
+#            PROYECTO/SEO, JAMÁS SC 2.4.2 (cuyo listón es «describe topic or purpose», con CERO
+#            requisito de unicidad [V]). Sin este literal el mutante del orden SOBREVIVÍA y el
+#            acceptance «mutar la composición rompe un test» no tenía nada que mutar (@s1, @s2)
+#   - @s18 → CONFIRMADA como DÉCIMA regla de violación (`section` con título visible sin
+#            aria-labelledby). La enumeración del spec tenía nueve por descuido. Es LA ÚNICA de
+#            las diez que mide SC 1.3.1 de verdad: las otras nueve son criterio de proyecto o
+#            requisito de Google. Lo detectó el gherkin_author y AVISÓ en vez de colarla
+# Razonamiento completo, con los cálculos y las citas: `progress/f04_verificacion_previa.md`.
+# Aquí no hay nada que adivinar: lo que no está escrito, no está decidido.
 #
 # FUENTE DE VERDAD DE LOS HECHOS: `progress/f04_verificacion_previa.md` (18 subagentes, 9
 # afirmaciones × verificar + refutar adversarialmente: 4 CONFIRMADAS, 5 MATIZADAS, 0 refutadas de
@@ -25,6 +58,22 @@
 #           vacío», o el caso se escapa (@s13)
 #   - El `vatID` «10656940» del cliente NO es válido y NO se repara: se RECHAZA (@s10)
 #   - `geo` se FIJA a la constante y JAMÁS se recalcula desde OSM (@s8, @s21)
+#   - A-18 (cerrada por el lead) → `SC 2.4.11` ES DE F-06, NO DE F-04: F-04 no puede testear que la
+#           cabecera no tape el foco cuando LA CABECERA LA MONTA F-06. **F-04 PONE el
+#           `scroll-padding-top`; F-06 VIGILA QUE FUNCIONE** (@s11)
+#   - A-21 (cerrada) → el ORIGEN de la canónica entra como REGISTRO PLACEHOLDER de F-01: el build de
+#           PRODUCCIÓN rompe mientras el dominio no se decida; el de DESARROLLO no. Es la DECISIÓN 9
+#           del proyecto. F-04 se construye ENTERA HOY, con la canónica probada, y el dato real entra
+#           SIN TOCAR CÓDIGO. **NO se duplica la puerta de F-01: F-04 se APOYA en ella** (@s34)
+#   - A-22 (cerrada) → la COMPOSICIÓN del `title` queda FIJADA: home = `${marca} · ${reclamo}`,
+#           resto = `${sección} · ${marca}`. Cierra el hueco de mutación: **el mutante que invierte
+#           el orden de la concatenación YA MUERE** (@s1)
+#   - A-19 (cerrada) → el HORARIO no entra en F-04 (es de F-10). Pero F-04 FIJA LA REGLA: se emite
+#           `openingHoursSpecification`, NUNCA `openingHours`, JAMÁS las dos (@s9, @s35)
+#   - A-20 (cerrada) → `priceRange` NO entra: los PRECIOS REALES ESTÁN BLOQUEADOS (B-5/F-09) y
+#           emitir un rango sin precios verificados SERÍA INVENTAR. Además es Text, no número (@s9)
+#   - @s18 (confirmada por el humano) → la DÉCIMA regla de violación se queda: es lo único de este
+#           contrato que mide de verdad `SC 1.3.1`
 #
 # Razonamiento completo, con las citas y sus fuentes: `progress/f04_verificacion_previa.md` y
 # `project-spec.md` §Feature 4. Aquí no hay nada que adivinar: lo que no está escrito, no está
@@ -92,15 +141,16 @@
 #     no un `div` con `font-size`. (@s18)
 #   - COMPOSICIÓN DEL `<title>` → SC 2.4.2 (A): el listón es *«describe topic or purpose»*. CERO
 #     REQUISITO DE UNICIDAD [V]. La composición es CRITERIO DE PROYECTO/SEO, legítimo, NUNCA WCAG
-#     → A-22, ABIERTA. (@s1, @s2)
+#     → A-22 CERRADA: la composición ESTÁ FIJADA, y SIGUE SIENDO NUESTRA, no de WCAG. (@s1, @s2)
 #   - `:focus-visible` GLOBAL → SC 2.4.7 (AA): foco VISIBLE. `G165` (foco por defecto) y `C45`
 #     (`:focus-visible`) son AMBAS suficientes. CERO REQUISITO DE CONTRASTE O GROSOR [V]: el 3:1 /
 #     2px es SC 2.4.13, Y ES AAA. → PROHIBIDO atribuir CUALQUIER umbral a 2.4.7. Es la trampa
 #     GEMELA del 1.4.11 de F-03. (@s11)
 #   - `SC 2.4.11 Focus Not Obscured` (AA, NUEVO en WCAG 2.2) → HUECO detectado por la verificación:
 #     su *Understanding* nombra literalmente los STICKY HEADERS, y su técnica suficiente es `C43`
-#     (scroll-padding). F-04 pone el `scroll-padding-top` porque es cáscara global; QUIÉN ES DUEÑO
-#     DE 2.4.11 es A-18, ABIERTA. (@s11)
+#     (scroll-padding). ✅ A-18 CERRADA: **2.4.11 ES DE F-06**. F-04 PONE el `scroll-padding-top`
+#     (cáscara global); **F-06 VIGILA QUE FUNCIONE** — F-04 no puede testear que la cabecera no tape
+#     el foco cuando la cabecera la monta F-06. (@s11)
 #
 # LSSI art. 10.1 — «EN TODAS LAS PÁGINAS» NO ESTÁ EN LA LEY
 #   [VERSIÓN NO DECLARADA [NV]: el art. 10 tiene 4 versiones y el art. 38 tiene 10 (última
@@ -300,41 +350,57 @@
 #   A2 (title/description/canónica HORNEADOS en dist/, sobre el HTML CRUDO, NUNCA jsdom; con
 #      <Head>, porque la metadata NATIVA de React 19 pierde) → @s12, @s13, @s14, @s32, @s33
 #   A3 (JSON-LD de cero y horneado; BeautySalon con name, address PostalAddress y geo; SIN
-#      aggregateRating ni Review a NINGUNA profundidad) → @s7, @s8, @s9, @s19, @s20, @s21, @s22
+#      aggregateRating ni Review a NINGUNA profundidad) → @s7, @s8, @s9, @s19, @s20, @s21, @s22,
+#      @s35
 #   A4 (PUERTA ANTI-404: ningún href interno apunta a una ruta inexistente en dist/) → @s23, @s24
 #   A5 (falla cerrada y NO por vacuidad: mínimo de páginas y de enlaces) → @s26, @s27, @s28, @s29
-#   A6 (mutar la composición del title o de la canónica rompe un test) → @s1, @s2, @s4, @s5
-#      ⚠️ CUBIERTO SOLO EN PARTE, Y SE DECLARA: con A-22 ABIERTA el contrato fija el INVARIANTE
-#      del title (no vacío, distinto por página) y NO su composición literal. El mutante que
-#      invierta el orden de la concatenación SOBREVIVIRÍA. Es el PRECIO DECLARADO de dejar A-22
-#      abierta, no un descuido. La canónica sí queda cubierta (@s4 mata el que ignora el origen,
-#      @s5 el que ignora la ruta). CERRAR A-22 EN LA PUERTA CIERRA ESTE HUECO.
+#   A6 (mutar la composición del title o de la canónica rompe un test) → @s1, @s2, @s4, @s5, @s34
+#      ✅ CUBIERTO POR COMPLETO DESDE QUE A-22 SE CERRÓ (2026-07-16). El title fija sus literales
+#      EXACTOS (@s1) → EL MUTANTE QUE INVIERTE EL ORDEN DE LA CONCATENACIÓN MUERE: produciría
+#      «Uñas… · Nails Lash Studio» en la home o «Nails Lash Studio · Servicios» en las interiores,
+#      y ninguno es el esperado escrito a mano. La canónica ya estaba cubierta (@s4 mata el que
+#      ignora el origen, @s5 el que ignora la ruta).
 #   Guarda anti-«verde por vacuidad» + falla cerrada → @s26, @s27, @s28, @s29
 #
 # =============================================================================================
-# PREGUNTAS ABIERTAS QUE ESTE CONTRATO **NO** CIERRA (y por eso no las finge)
+# LAS CINCO PREGUNTAS QUE SE CERRARON SOBRE ESTE CONTRATO (2026-07-16), Y LO QUE SIGUE ABIERTO
 # =============================================================================================
-#   - A-18 → ¿`SC 2.4.11` es de F-04 o de F-06? F-04 pone el `scroll-padding-top` (cáscara global);
-#     su VALOR depende de la altura de la cabecera sticky, QUE ES F-06 → @s11 fija que existe y es
-#     > 0, NUNCA un número: fijarlo sería INVENTARLO.
-#   - A-19 → `openingHoursSpecification` vs `openingHours`, y ¿F-04 o F-10? MIENTRAS SIGA ABIERTA,
-#     NINGUNA DE LAS DOS SE EMITE (@s9). CUANDO SE CIERRE, LA REGLA YA ESTÁ ESCRITA AQUÍ: ambas son
-#     válidas por ramas distintas de schema.org y COEXISTEN; Google solo recomienda
-#     `openingHoursSpecification` [V] → se fija ESA y SE PROHÍBE LA MEZCLA. Si el contrato no fija
-#     CUÁL, dos implementadores eligen distinto Y AMBOS PASAN LOS TESTS.
-#   - A-20 → `priceRange`: ¿entra ya, espera a F-09, o no entra? MIENTRAS SIGA ABIERTA NO SE EMITE
-#     (@s9). CUANDO SE CIERRE: `priceRange` ES **Text**, NO NÚMERO (literal: «for example $$$»
-#     [V]). Un `"priceRange": 25` es SINTÁCTICAMENTE VÁLIDO Y BASURA SEMÁNTICA: NADIE LO RECHAZA,
-#     DEGRADA EN SILENCIO.
-#   - A-21 → el ORIGEN ABSOLUTO de la canónica: el dominio final es [NV] (lo decide el cliente en
-#     la migración). → `canonicaDe(ruta, origen)` RECIBE el origen; los escenarios usan
-#     `https://example.invalid` (TLD RESERVADO por RFC 2606: NO PUEDE confundirse con una decisión
-#     de dominio). EL DOMINIO REAL NO SE INVENTA (@s4, @s5, @s6).
-#   - A-22 → la COMPOSICIÓN literal del `<title>` (criterio de proyecto/SEO, NUNCA WCAG). Ver el
-#     aviso del acceptance A6: es el hueco de mutación declarado.
+# CERRADAS — el contrato ya las destila; NINGUNA se finge y NINGUNA queda a medias:
+#   - A-18 ✅ `SC 2.4.11` ES DE **F-06**, no de F-04 (decisión del lead). **F-04 PONE** el
+#     `scroll-padding-top`; **F-06 VIGILA QUE FUNCIONE**. F-04 no puede testear que la cabecera no
+#     tape el foco cuando **la cabecera la monta F-06**, y el `feature_list` de F-06 ya lo
+#     contempla. @s11 fija que la declaración existe y es > 0, **NUNCA un número**: el valor depende
+#     de la altura de la cabecera, que solo F-06 conoce. La remisión está escrita en @s11 para que
+#     no se pierda en la grieta entre las dos features.
+#   - A-19 ✅ El **HORARIO NO ENTRA en F-04**: es de **F-10**. Pero **F-04 FIJA LA REGLA** y la hace
+#     cumplir estructuralmente (@s35): se emite **`openingHoursSpecification`**, **NUNCA
+#     `openingHours`**, **JAMÁS las dos**. Ambas son válidas por ramas distintas de schema.org y
+#     COEXISTEN [V]; Google solo recomienda `…Specification` [V]. **Si el contrato no fijara CUÁL,
+#     dos implementadores elegirían distinto Y AMBOS PASARÍAN LOS TESTS.**
+#   - A-20 ✅ **`priceRange` NO ENTRA**, por **DOS razones independientes**: los **PRECIOS REALES
+#     ESTÁN BLOQUEADOS** (B-5/F-09) → emitir un rango **sería INVENTARLO**; y es **Text, NO número**
+#     («for example $$$» [V]) → un `"priceRange": 25` es válido y **basura semántica: degrada en
+#     silencio**. La primera basta por sí sola. (@s9)
+#   - A-21 ✅ El **ORIGEN** de la canónica entra como **REGISTRO PLACEHOLDER de F-01** (@s34): el
+#     build de **PRODUCCIÓN ROMPE** mientras el dominio no se decida; el de **DESARROLLO no**. Es la
+#     **DECISIÓN 9** del proyecto, literal: *el contenido no verificado vive en una capa explícita y
+#     es ESTRUCTURALMENTE IMPOSIBLE publicarlo por accidente*. El dominio sigue **[NV]** (migrar
+#     `nailslashlasrozas.es` con 301 lo decide el cliente) y **NO SE INVENTA**: los escenarios usan
+#     `https://example.invalid` (TLD RESERVADO, RFC 2606). **F-04 se construye ENTERA HOY**, con la
+#     canónica probada (@s4, @s5, @s6), y el dato real entra **sin tocar código**.
+#   - A-22 ✅ La **COMPOSICIÓN del `title` está FIJADA** (@s1): home = `${marca} · ${reclamo}`,
+#     resto = `${sección} · ${marca}`. **Cierra el hueco de mutación del acceptance A6.** Sigue
+#     siendo **criterio de PROYECTO/SEO, JAMÁS `SC 2.4.2`**.
+#
+# SIGUEN ABIERTAS O BLOQUEADAS (y el contrato NO las finge):
 #   - A-11 → el EMAIL no se emite en el JSON-LD hasta que el cliente lo confirme (@s9).
 #   - B-1/B-2 → SIGUEN BLOQUEADAS. El `vatID` hallado NO desbloquea nada. Pero el contrato DEJA DE
-#     DECIR que «no existe ningún identificador en fuente pública»: EXISTE, Y ES INVÁLIDO.
+#     DECIR que «no existe ningún identificador en fuente pública»: EXISTE, Y ES INVÁLIDO (@s10).
+#   - B-5 / F-09 → los PRECIOS REALES siguen bloqueados: es lo que deja fuera a `priceRange` (@s9).
+#   - El DOMINIO final → [NV], decisión del cliente. Cubierto por el placeholder de F-01 (@s34).
+#   - @s28 (≥1 `href` en `dist/index.html`) → [NV]: no verificable hasta que la cáscara exista. Si
+#     saliera con 0 `href`, **la guarda NACE EN ROJO y se vuelve a la puerta humana**, NO se le baja
+#     el listón. Es la postura correcta y está confirmada por el lead.
 #
 # LÍMITE DECLARADO (T3, título duplicado): Helmet inyecta su `<title>` justo DESPUÉS de `<head>`,
 # SIN DEDUPLICAR contra el `index.html` [V]. Hoy el `index.html` del repo NO tiene `<title>`
@@ -603,7 +669,7 @@ Feature: Cáscara semántica horneada, JSON-LD escrito de cero y la puerta que m
     # que probar. Fingir uno sería inventarlo.
 
   # ---------------------------------------------------------------------------
-  # La cáscara global: :focus-visible y scroll-padding-top (A-18)
+  # La cáscara global: :focus-visible y scroll-padding-top (A-18 CERRADA → 2.4.11 es de F-06)
   # ---------------------------------------------------------------------------
 
   @s11
@@ -618,11 +684,18 @@ Feature: Cáscara semántica horneada, JSON-LD escrito de cero y la puerta que m
     # 2px es `SC 2.4.13`, Y ES **AAA**. → ESTE ESCENARIO NO ASEVERA NINGÚN UMBRAL, Y NO PUEDE
     # HACERLO SIN MENTIR. PROHIBIDO ATRIBUIR CUALQUIER UMBRAL A 2.4.7. Es la TRAMPA GEMELA del
     # 1.4.11 de F-03, donde el audit ya se equivocó una vez.
-    # `scroll-padding-top` (técnica `C43`) es lo que conforma `SC 2.4.11 Focus Not Obscured` (AA,
-    # NUEVO en WCAG 2.2), cuyo *Understanding* nombra LITERALMENTE los sticky headers [V]. → A-18
-    # ABIERTA: ¿el dueño de 2.4.11 es F-04 o F-06? F-04 pone la declaración porque es cáscara
-    # global; **EL VALOR DEPENDE DE LA ALTURA DE LA CABECERA STICKY, QUE ES F-06** → el contrato
-    # fija que EXISTE y es > 0, NUNCA un número: fijarlo hoy sería INVENTARLO.
+    # ✅ **A-18 CERRADA POR EL LEAD (2026-07-16): `SC 2.4.11 Focus Not Obscured` (AA, NUEVO en WCAG
+    # 2.2) ES DE F-06, NO DE F-04.** El razonamiento, para que no se pierda entre features:
+    # **F-04 NO PUEDE TESTEAR QUE LA CABECERA NO TAPE EL FOCO CUANDO LA CABECERA LA MONTA F-06** —
+    # no hay nada que pueda tapar nada todavía. El `feature_list.json` de F-06 ya lo contempla.
+    # 🔁 **REPARTO, ESCRITO AQUÍ PARA QUE NO SE CAIGA POR LA GRIETA ENTRE LAS DOS FEATURES:**
+    #     **F-04 PONE** el `scroll-padding-top` (es cáscara global, y este escenario lo fija).
+    #     **F-06 VIGILA QUE FUNCIONE** (que el foco no quede oculto tras la cabecera sticky).
+    # `scroll-padding-top` es la técnica **`C43`**, suficiente para 2.4.11, cuyo *Understanding*
+    # nombra **LITERALMENTE los sticky headers** [V]. **EL VALOR DEPENDE DE LA ALTURA DE LA CABECERA
+    # STICKY, QUE ES DE F-06** → este contrato fija que la declaración **EXISTE y es > 0**, **NUNCA
+    # un número: fijarlo hoy sería INVENTARLO**. F-06 es quien puede fijarlo, porque es quien conoce
+    # la altura.
     # El SCSS NO ES MUTABLE (Stryker no ve CSS/SCSS y `src/styles/` no está en `mutate`), igual que
     # en F-03: aquí el mutante es HUMANO y la puerta de aprobación es su única defensa.
 
@@ -766,11 +839,15 @@ Feature: Cáscara semántica horneada, JSON-LD escrito de cero y la puerta que m
     # LA TERCERA FILA ES LA QUE MUERDE: un `aria-labelledby` que apunta a un id INEXISTENTE es
     # **peor que no ponerlo** (promete una relación que el árbol de accesibilidad no puede resolver)
     # y **pasa cualquier comprobación de mera presencia del atributo**.
-    # ⚠️ NOTA PARA LA PUERTA HUMANA: la lista de violaciones del `project-spec.md` §Feature 4 →
-    # «Contrato» enumera **NUEVE** reglas y ESTA NO ESTÁ ENTRE ELLAS. Se destila igualmente porque
-    # el **acceptance 1** de `feature_list.json` (reescrito el 2026-07-16) la nombra explícitamente
-    # como «lo que SÍ mide 1.3.1». **ES UNA DÉCIMA REGLA: el humano debe confirmarla o retirarla en
-    # la puerta.** No se cuela en silencio.
+    # ✅ **CONFIRMADA POR EL HUMANO (2026-07-16) COMO LA DÉCIMA REGLA DE VIOLACIÓN.** La lista del
+    # `project-spec.md` §Feature 4 → «Contrato» enumeraba **NUEVE** y esta no estaba; se destiló
+    # igualmente porque el **acceptance 1** de `feature_list.json` (reescrito el 2026-07-16) la
+    # nombra explícitamente como «lo que SÍ mide 1.3.1», y se **AVISÓ en la puerta en vez de
+    # colarla**. El humano la mantiene. **El desfase con `project-spec.md` lo corrige el lead**
+    # añadiendo la décima a su enumeración — este contrato no toca el spec.
+    # ⭐ **ES LO ÚNICO DE ESTE CONTRATO QUE MIDE DE VERDAD `SC 1.3.1`.** Las otras nueve reglas son
+    # **criterio de proyecto** (@s16, @s17) o requisito de **Google**/decisión nuestra (@s21). Esta
+    # es la norma.
 
   # ---------------------------------------------------------------------------
   # La puerta: el JSON-LD horneado (A3; T-6; el alias y el @graph anidado)
@@ -916,6 +993,37 @@ Feature: Cáscara semántica horneada, JSON-LD escrito de cero y la puerta que m
     # data are ineligible…» [V]. `BeautySalon` cae **POR LAS DOS RAMAS** de la herencia múltiple. La
     # regla es «LocalBusiness **y cualquier subtipo, incluido BeautySalon**»: cierra el «es que yo
     # uso BeautySalon».
+
+  @s35
+  Scenario Outline: la puerta prohíbe openingHours y prohíbe la MEZCLA — la regla que hereda F-10
+    Given el HTML CRUDO de la ruta "/" con un JSON-LD BeautySalon en el que "<situacion>"
+    When se inspecciona el sitio con la lista de rutas esperadas ["/"]
+    Then hay exactamente <violaciones> violación(es) por la regla "horario: solo openingHoursSpecification, nunca openingHours, jamás las dos"
+
+    Examples:
+      | situacion                                                        | violaciones | por qué                                                       |
+      | no hay ni openingHours ni openingHoursSpecification              | 0           | ES EL ESTADO DE F-04 HOY: el horario es de F-10 (A-19)        |
+      | hay openingHours                                                 | 1           | la clave PROHIBIDA: Google solo recomienda …Specification [V] |
+      | hay openingHoursSpecification                                    | 0           | la forma ELEGIDA: la que F-10 deberá emitir                   |
+      | hay openingHours Y openingHoursSpecification a la vez            | 1           | LA MEZCLA: dos fuentes de verdad para el mismo hecho          |
+
+    # ✅ **A-19 CERRADA POR EL HUMANO (2026-07-16): el horario NO entra en F-04 — es de F-10.** Pero
+    # **F-04 SÍ FIJA LA REGLA**, y este escenario es el mecanismo por el que la fija.
+    # 🔴 **POR QUÉ ESTA REGLA EXISTE HOY, SI F-04 NO EMITE HORARIO:** `openingHours` y
+    # `openingHoursSpecification` **COEXISTEN y AMBAS son válidas por ramas distintas de
+    # schema.org** [V]. **SI EL CONTRATO NO FIJA CUÁL, DOS IMPLEMENTADORES ELIGEN DISTINTO Y AMBOS
+    # PASAN LOS TESTS.** Google solo recomienda `openingHoursSpecification` [V] → **se fija ESA y se
+    # PROHÍBE `openingHours`**.
+    # **LA 4ª FILA ES LA QUE MÁS IMPORTA Y LA QUE MÁS FÁCIL SE OLVIDA: LA MEZCLA.** Emitir las dos
+    # es «válido» para schema.org y es **dos fuentes de verdad para el mismo hecho**, que es
+    # exactamente lo que I-7 (fuente única) existe para prohibir. Divergen en silencio.
+    # **LA 1ª FILA ES EL ESTADO REAL DE F-04 HOY**, y no es decorativa: sin ella la regla nacería
+    # rompiendo el build de F-04, que no emite horario. Y la 3ª fila **NACE INERTE respecto a la
+    # producción de F-04** (nadie emite `…Specification` todavía) **a propósito**: es el contrato que
+    # **F-10 HEREDA YA ESCRITO**, con su fixture, para que llegue a una decisión tomada en vez de
+    # tomarla otra vez.
+    # ⚠️ **PARA F-10:** esta regla es tuya y ya está en verde. Emite `openingHoursSpecification`
+    # desde el `HORARIO` de la fuente única (F-02) y **nunca** `openingHours`.
 
   # ---------------------------------------------------------------------------
   # La puerta ANTI-404 (A4; A-17) — el eje «permanente» se asevera contra el DESTINO

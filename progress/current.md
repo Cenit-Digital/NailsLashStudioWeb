@@ -4,12 +4,16 @@
 > (regla anti-teléfono-descompuesto). Al cerrar la sesión, mueve el resumen a
 > `history.md` y deja este archivo con solo esta plantilla.
 
-- **Feature en curso:** ninguna. `3 — tokens_paleta_contraste` cerrada `done`
-  (18/18 escenarios, judge **APROBADO**, mutación **100 %** en `contraste.ts`
-  (53) y `puerta-contraste.ts` (232) con **0 timeouts** y **0 exclusiones**,
-  183 tests, `pnpm build` verde con las dos puertas).
-- **Siguiente:** F-04 `cascaron_semantico` (`pending`) — depende de F-02 y F-03,
-  ambas `done`. Camino hacia la UI visible que pidió el CEO para la reunión.
+- **Feature en curso:** `4 — cascaron_semantico` (`in_progress`) — la cáscara
+  HORNEADA, el JSON-LD de cero y la puerta que mira `dist/`.
+- **Fase:** TDD (`tdd_craftsman`) sobre `features/cascaron_semantico.feature`,
+  **aprobado por el humano en la puerta el 2026-07-16** (35 escenarios `@s1..@s35`).
+  **A-17…A-22 cerradas** en su redacción: **0 preguntas abiertas**. Fuente de verdad
+  de los hechos: `progress/f04_verificacion_previa.md` (18 subagentes contra fuente
+  primaria).
+- **Anteriores:** `1 — puerta_placeholders`, `2 — datos_negocio_fuente_unica` y
+  `3 — tokens_paleta_contraste`, las tres `done` con judge aprobado y mutación
+  **100 %**. F-03 cerró además sus **dos deudas de higiene** (`eacd6e0`, `833796d`).
 - **Bitácoras de F-03:** `progress/tdd_tokens_paleta_contraste.md` (con las **tres
   lecciones del arnés** al principio), `judge_…`, `gherkin_…`, y la verificación
   previa del lead: `progress/f03_verificacion_previa.md`.

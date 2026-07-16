@@ -114,7 +114,7 @@
       ],
       "mutable": true,
       "sdd": true,
-      "status": "spec_ready",
+      "status": "in_progress",
       "nota_alcance": "A-17 (cerrada por el humano 2026-07-16): el troceado se contradecia — 00-fase0-informe.md:673 dice «el pie con los huecos de los enlaces legales (AUN SIN DESTINO)» y :683 exige que el enlace «responda 200». Incompatibles. Ademas [V] F-04 NO puede prometer un aviso legal conforme: no existen razon social ni NIF valido en fuente publica. Y «responde 200» NO prueba conformidad: /es/confidentiality_ws del cliente da 200 y es juridicamente nulo. Reparto: F-04 = puerta anti-404 estructural; F-16 = rutas, enlaces y contenido legal. Decae tambien «el enlace es permanente: aparece en todas las paginas»: [V] eso NO esta en la LSSI (escaneo del estatuto entero: 0 ocurrencias de «todas las paginas» y de «pie de pagina»), y ademas «permanente» es TEMPORAL, no espacial. Ver progress/f04_verificacion_previa.md y project-spec.md §Feature 4."
     },
     {

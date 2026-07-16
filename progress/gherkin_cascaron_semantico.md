@@ -1,21 +1,26 @@
 # F-04 `cascaron_semantico` — nota de destilación del contrato (gherkin_author, 2026-07-16)
 
-> `features/cascaron_semantico.feature` — **33 escenarios**, `@s1`…`@s33`, tags secuenciales y sin
-> duplicados (verificado mecánicamente). `feature_list.json` id 4: `pending` → **`spec_ready`**.
+> `features/cascaron_semantico.feature` — **35 escenarios**, `@s1`…`@s35`, sin duplicados y con
+> cobertura completa del rango (verificado mecánicamente). `feature_list.json` id 4: `pending` →
+> **`spec_ready`**.
 >
 > ⏸ **PENDIENTE DE APROBACIÓN HUMANA.** Nadie lo ha aprobado. **NO lanzar el `tdd_craftsman`.**
+> La puerta la pasa el lead con el humano.
 >
 > Fuente de los hechos: **`progress/f04_verificacion_previa.md`** (manda sobre el troceado).
 > Traza al **acceptance reescrito por A-17**, no al viejo. Modelo de calidad igualado:
 > `features/tokens_paleta_contraste.feature`.
+>
+> **2ª pasada (2026-07-16): las CINCO decisiones del humano destiladas.** 33 → 35 escenarios
+> (`@s34` A-21, `@s35` A-19). Ver §«Segunda pasada» al final: es donde está lo que cambió.
 
 ## Reparto de los 33 escenarios
 
 | Bloque | Tags | Qué fija |
 | ------ | ---- | -------- |
-| `src/lib/seo.ts` puro | `@s1`–`@s10` | `componerTitulo` (invariante, **no** composición: A-22) · `canonicaDe` (absoluta, **una por página**, origen inyectado: A-21) · `construirJsonLd` (objeto acordado, `geo` exacto, conjunto EXACTO de claves) · **la prohibición del NIF** |
-| Cáscara global | `@s11` | `:focus-visible` **sin umbral atribuido** · `scroll-padding-top > 0` (A-18) |
-| Puerta pura sobre el HTML **CRUDO** de `dist/` | `@s12`–`@s25` | title/description/canónica · canónica repetida entre rutas · `lang` · h1 · landmarks · `section aria-labelledby` · JSON-LD (ausente, no parseable, **tipo efectivo**, `name`/`address`/`geo`) · **reseñas a cualquier profundidad** · **puerta anti-404** · informe determinista |
+| `src/lib/seo.ts` puro | `@s1`–`@s10`, `@s34` | `componerTitulo` (**composición FIJADA**: A-22) · `canonicaDe` (absoluta, **una por página**, origen inyectado; **`@s34`: el origen es placeholder de F-01**: A-21) · `construirJsonLd` (objeto acordado, `geo` exacto, conjunto EXACTO de claves) · **la prohibición del NIF** |
+| Cáscara global | `@s11` | `:focus-visible` **sin umbral atribuido** · `scroll-padding-top > 0` (**A-18: F-04 pone, F-06 vigila**) |
+| Puerta pura sobre el HTML **CRUDO** de `dist/` | `@s12`–`@s25`, `@s35` | title/description/canónica · canónica repetida entre rutas · `lang` · h1 · landmarks · `section aria-labelledby` · JSON-LD (ausente, no parseable, **tipo efectivo**, `name`/`address`/`geo`) · **reseñas a cualquier profundidad** · **`@s35`: horario solo `…Specification`, nunca la mezcla** · **puerta anti-404** · informe determinista |
 | El humilde (exit code) | `@s26`–`@s31` | vacuidad (rutas esperadas, lista vacía, 0 enlaces) · falla cerrada · camino feliz · `dev` no la invoca |
 | Las dos trampas ancla | `@s32`, `@s33` | **React 19 nativa → `<head>` vacío + jsdom da VERDE** · **pinchar el literal `<head>`** |
 
@@ -31,8 +36,8 @@
 | 6 | Verde por vacuidad + falla cerrada | **`@s26`, `@s27`, `@s28`, `@s29`**. `@s27` es **la guarda de la guarda** (lista vacía → @s26 se satisface **vacuamente**) |
 | 7 | Canónica por página | **`@s14`** — con **fixture de DOS rutas** sobre el decisor puro, o **nace inerte** (hoy solo existe `/` [V: `App.tsx`]) |
 | 8 | **PROHIBIR completar/inferir el NIF** | **`@s10`** — el 4º `And` (*«NO contiene "10656940" seguido de ninguna letra de control»*) es el corazón. Validación **FORMAL** declarada: **no** calcula el módulo 23, **no** acredita titularidad |
-| 9 | `priceRange` es Text | **`@s9`** (fila prohibida, A-20 abierta) + la regla escrita para cuando se cierre |
-| 10 | `openingHours` vs `…Specification` | **`@s9`** (ambas prohibidas, A-19 abierta) + la regla y el **«prohibida la mezcla»** escritos |
+| 9 | `priceRange` es Text | **`@s9`** — **A-20 CERRADA**: no entra. Dos razones independientes (precios bloqueados → inventar; Text vs número → degrada en silencio) |
+| 10 | `openingHours` vs `…Specification` | **`@s9`** (no se emite: es de F-10) + **`@s35`** — **A-19 CERRADA**: la puerta **prohíbe `openingHours` y prohíbe LA MEZCLA**, estructuralmente |
 
 ## Los tres ejes: separados, escenario por escenario
 
@@ -45,7 +50,7 @@ atribución.**
 - `@s15` (`lang`) → `SC 3.1.1` exige idioma **determinable por código**; `lang` es **H57, técnica
   suficiente**; que un `lang` incorrecto falle va marcado **[I]**.
 - `@s1`/`@s2` (`title`) → `SC 2.4.2` = *«describe topic or purpose»*, **cero unicidad**. La
-  composición es **proyecto/SEO** (A-22).
+  composición, **ya fijada** (A-22), sigue siendo **proyecto/SEO** — fijarla no la vuelve WCAG.
 - `@s11` (`:focus-visible`) → **cero umbral atribuido a 2.4.7**; el 3:1/2px es **2.4.13, AAA**.
 - `@s23` (anti-404) → **«permanente» es TEMPORAL**; «en todas las páginas» **no está en la LSSI**; el
   pie global es **suficiente, no necesario**. **Toda cita de la LSSI lleva su marca `[NV]` de
@@ -65,36 +70,53 @@ Todo esperado **a mano**, ninguno importado ni recomputado: `40.5179875` · `-3.
 `https://example.invalid/servicios`. `@s21` muta **un solo dígito** de `geo` (…875→…876, …688→…680)
 para anclar la comparación exacta.
 
-## 🔴 LO QUE **NO** HE PODIDO CERRAR — para la puerta humana
+## Estado de los 6 puntos que declaré sin cerrar (1ª pasada)
 
-1. **A6 queda cubierto SOLO EN PARTE, y está declarado en el contrato.** El acceptance 6 pide
-   *«mutar la composición del title o de la canónica rompe un test»*. **La canónica sí** (`@s4` mata
-   al que ignora el origen, `@s5` al que ignora la ruta). **El title no del todo**: con **A-22
-   abierta**, el contrato solo puede fijar el invariante (no vacío, distinto por página), así que
-   **el mutante que invierte el orden de la concatenación SOBREVIVE**. No es un descuido: es el
-   precio de dejar A-22 abierta. **Cerrar A-22 en la puerta cierra el hueco** con una fila de
-   esperados literales.
-2. **`@s18` es una DÉCIMA regla de violación.** El `project-spec.md` §Feature 4 → «Contrato»
-   enumera **nueve**, y `section aria-labelledby` **no está entre ellas**. La he destilado porque el
-   **acceptance 1** (reescrito el 2026-07-16) la nombra explícitamente como «lo que SÍ mide 1.3.1»,
-   y el acceptance es la fuente más nueva y cerrada por el humano. **El humano debe confirmarla o
-   retirarla.** No se cuela en silencio.
-3. **`@s28` (0 enlaces) exige que la cáscara emita ≥1 `href` en `dist/index.html`.** Es razonable
-   (la `nav`/`footer` emiten enlaces o anclas) pero **[NV]: no está verificado sobre un `dist/`
-   real, porque la cáscara aún no existe**. Si al implementar sale con 0 `href`, **la guarda nace en
-   rojo → volver a la puerta humana**, no bajarle el listón.
-4. **A-19 y A-20 se destilan como PROHIBICIÓN provisional** (`@s9`: `openingHours`,
-   `openingHoursSpecification` y `priceRange` **no se emiten** mientras las preguntas sigan
-   abiertas). Es la lectura literal del spec («A-19», «A-20» como diferidas), y aseverar el
-   **conjunto exacto de claves** impide que se cuelen sin cerrar su pregunta. **Si el humano cierra
-   A-19 o A-20 a favor de F-04, esas filas caen y hay que añadir su escenario positivo.** Escrito
-   para que ese cambio sea **visible**.
-5. **Límite declarado (T3): el `<title>` DUPLICADO no lo caza nadie.** Helmet **no deduplica**
-   contra `index.html` [V]. Hoy no hay `<title>` estático [V] → no hay duplicado. **No he inventado
-   una regla de unicidad** que el spec no fija; queda como límite declarado (precedente `@s11` de
-   F-01). Si el humano la quiere, es una fila más en `@s13`.
-6. **Ningún camino positivo para `@s10`, y es deliberado**: **no existe ningún identificador válido
-   que probar**. Fingir uno sería inventarlo. **B-1/B-2 siguen bloqueadas.**
+| # | Punto | Estado |
+| - | ----- | ------ |
+| 1 | A6 cubierto a medias (mutante del orden del `title`) | ✅ **CERRADO** por **A-22**. `@s1` fija los literales → **el mutante muere** |
+| 2 | `@s18` es una décima regla | ✅ **CONFIRMADA** por el humano. El desfase con `project-spec.md` **lo corrige el lead**; yo no toco el spec |
+| 3 | `@s28` exige ≥1 `href` **[NV]** | ⏳ **SE QUEDA TAL CUAL** (confirmado): si nace en rojo, **se vuelve a la puerta**, no se baja el listón |
+| 4 | A-19/A-20 como prohibición provisional | ✅ **CONSOLIDADAS**, no caen. Además `@s35` **fija la regla** que hereda F-10 |
+| 5 | T3: `<title>` duplicado | ⏳ **LÍMITE DECLARADO** (confirmado): bien no inventar una regla que el spec no fija |
+| 6 | `@s10` sin camino positivo | ✅ **CORRECTO Y DELIBERADO** (confirmado). B-1/B-2 siguen bloqueadas |
+
+## Segunda pasada — las CINCO decisiones destiladas (2026-07-16)
+
+**33 → 35 escenarios.** Tags nuevos **al final de la numeración**, colocados **por lógica** en el
+fichero (precedente F-01: `@s24`/`@s25`/`@s26` van intercalados). Los tags son **identificadores
+estables**: no se renumera nada.
+
+| Decisión | Qué se destiló | Dónde |
+| -------- | -------------- | ----- |
+| **A-18** — `SC 2.4.11` es de **F-06** | El escenario ya fijaba `scroll-padding-top > 0` y **NUNCA un número**; ahora lleva **la remisión escrita**: *F-04 PONE, F-06 VIGILA QUE FUNCIONE*, con el porqué (F-04 no puede testear que la cabecera tape el foco cuando **la cabecera la monta F-06**). Escrito **dentro del escenario** para que no se caiga por la grieta entre features | `@s11` + cabecera |
+| **A-21** — origen = **placeholder de F-01** | **`@s34` NUEVO.** El build de **producción rompe** por el flag de F-01; **dev no**. El 2º `And` es el que **impide la duplicación**: *la violación la emite la puerta de F-01, NO la del cascarón*. Se cita la **decisión 9** literal. `@s4` pasa de «A-21 ABIERTA» a «CERRADA vía F-01», conservando `example.invalid` (RFC 2606) | **`@s34`** (nuevo), `@s4` |
+| **A-22** — composición del `title` | `@s1` reescrito de «no vacío» a **Scenario Outline con los 3 literales exactos**. **Dos ramas** (home invierte el orden respecto a las interiores) → un mutante que las unifique también muere. `@s2` se conserva por el invariante | `@s1`, `@s2` |
+| **A-19** — horario | Filas de `@s9` **consolidadas** (de «ABIERTA» a «CERRADA: es de F-10»). **`@s35` NUEVO**: la puerta **prohíbe `openingHours` y prohíbe LA MEZCLA**, con las 4 filas | **`@s35`** (nuevo), `@s9` |
+| **A-20** — `priceRange` | Fila consolidada con **las dos razones independientes**: precios **bloqueados** (B-5/F-09) → emitir sería **inventar**; y es **Text, no número**. **La primera basta sola** | `@s9` |
+| **`@s18`** | De «el humano debe confirmarla» → **«CONFIRMADA»**, marcada como **lo único del contrato que mide de verdad `SC 1.3.1`** | `@s18` |
+
+### `@s1` — el mutante del orden **YA MUERE** (era el punto 1)
+
+```
+home   →  "Nails Lash Studio · Uñas, pestañas y cejas en Las Rozas de Madrid"
+resto  →  "Servicios · Nails Lash Studio"  ·  "Contacto · Nails Lash Studio"
+```
+
+Invertir la concatenación produce `"Uñas, pestañas y cejas… · Nails Lash Studio"` (home) o
+`"Nails Lash Studio · Servicios"` (interiores) → **≠ el esperado escrito a mano → muere**. Con
+`@s1` en su forma anterior («no vacío, contiene la página») **sobrevivía**. Contenido **[V]**:
+categorías **Uñas · Pestañas · Cejas** — **«Facial» NO existe** y no aparece en el fichero
+(verificado: 1 sola ocurrencia, la que lo prohíbe) — y **Las Rozas de Madrid**.
+
+### `@s35` — por qué existe una regla de horario en una feature que no emite horario
+
+`openingHours` y `openingHoursSpecification` **coexisten y ambas son válidas** por ramas distintas
+de schema.org [V]. **Si el contrato no fija cuál, dos implementadores eligen distinto y AMBOS PASAN
+LOS TESTS.** La 1ª fila (ninguna de las dos) **es el estado real de F-04 hoy** y evita que la regla
+nazca rompiendo el build; la 3ª **nace inerte a propósito** — es el contrato que **F-10 hereda ya
+escrito, con su fixture**. La 4ª (**la mezcla**) es la que más fácil se olvida: es «válida» para
+schema.org y son **dos fuentes de verdad para el mismo hecho**, justo lo que I-7 prohíbe.
 
 ## Para el `tdd_craftsman` (cuando el humano apruebe)
 
@@ -106,6 +128,13 @@ para anclar la comparación exacta.
 - El mutante **«cortar la recursión»** de `@s22` y el **`> 1` → `>= 1`** de `@s16` son los dos que
   más fácil sobreviven. Sin la fila de **2 h1** y sin las filas **anidadas**, sobreviven seguro.
 - **No importes `site.ts` en los tests** para construir esperados. Si el test importa la constante
-  que debería vigilar, no vigila nada.
+  que debería vigilar, no vigila nada. **Vale también para los 3 títulos de `@s1`**: escríbelos a
+  mano, carácter a carácter, separador «·» incluido. Si recompones el título con la misma plantilla
+  que vigilas, **el mutante del orden vuelve a sobrevivir** y habremos deshecho A-22.
 - **`tools/puerta-cascaron.ts` no lleva tests propios y va fuera de `mutate`** — el contrato exacto
   de `tools/puerta-contraste.ts` [V].
+- **`@s34` NO lleva lógica nueva**: el origen es un **registro placeholder** y lo caza **la puerta
+  de F-01 por el flag**. Si te descubres escribiendo una comprobación de placeholder dentro de
+  F-04, **para**: estás duplicando F-01 y las dos copias divergirán.
+- **`@s35` nace con una fila inerte a propósito** (la de `…Specification`): es el contrato que
+  **F-10 hereda**. No la borres por «no aporta hoy» — aporta el día que F-10 empiece.
