@@ -1,8 +1,10 @@
 # Contrato de la feature 2 (`datos_negocio_fuente_unica`) de feature_list.json.
 # Destilado de project-spec.md → «Feature 2: datos_negocio_fuente_unica — el NAP canónico».
 #
-# PENDIENTE de aprobación humana (puerta de aprobación) — este contrato aún NO se ha aprobado
-# ni se ha empezado su TDD. F-02 es la primera aplicación de I-7
+# Aprobado por el humano en la puerta de aprobación (Opción 1, 2026-07-16). Matiz del CEO: la web
+# es un DEMO para una primera reunión y F-02 provee el tel:/WhatsApp con DATOS REALES (el CEO lo
+# pidió así); las citas y demás van como demo en features posteriores. F-02 es la primera
+# aplicación de I-7
 # («los datos viven fuera del JSX, en una fuente única») al dato MÁS peligroso del prototipo:
 # el teléfono, escrito siete veces a mano y con el href aparte del texto.
 #

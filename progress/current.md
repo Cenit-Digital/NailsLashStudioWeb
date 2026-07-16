@@ -4,11 +4,35 @@
 > (regla anti-teléfono-descompuesto). Al cerrar la sesión, mueve el resumen a
 > `history.md` y deja este archivo con solo esta plantilla.
 
-- **Feature en curso:** ninguna. `1 — puerta_placeholders` cerrada como `done`.
-- **Siguiente:** F-02 `datos_negocio_fuente_unica` (`pending`), la fuente única
-  de datos que alimenta la vía por FLAG de la puerta ya construida.
-- **Bitácora del ciclo cerrado:** `progress/tdd_puerta_placeholders.md`
-  (+ `progress/judge_puerta_placeholders.md`, `progress/mutation_puerta_placeholders.md`)
+- **Feature en curso:** ninguna. `2 — datos_negocio_fuente_unica` cerrada `done`
+  (12/12 escenarios, judge APROBADO, mutación 100% en `site.ts` + F-01 sin
+  regresión, `bin/harness verify` verde, `pnpm build` verde).
+- **Siguiente:** F-03 `tokens_paleta_contraste` (`pending`) — el sistema de
+  diseño (paleta AA). Camino hacia la UI visible que pidió el CEO para la reunión.
+- **Contexto del CEO (2026-07-16):** la web es un **demo** para una primera
+  reunión; prioriza el **front visible**; WhatsApp/tel con **datos reales** (los
+  provee F-02), citas como demo per diseño (sin backend, F-13). Guardado en la
+  memoria del proyecto (`memory/ceo-demo-primera-reunion.md`).
+- **Bitácoras de F-02:** `progress/tdd_datos_negocio_fuente_unica.md`
+  (+ `judge_…`, `mutation_…`).
+- **Bitácoras de F-01 (cerrada):** `progress/tdd_puerta_placeholders.md`
+  (+ `judge_…`, `mutation_…`).
+
+### 2026-07-16 — F-02 CERRADA + CI arreglada
+
+**F-02 `datos_negocio_fuente_unica`** implementada entera por TDD estricto (12
+escenarios, sin rondas de reparación). `src/lib/site.ts` es la fuente única del
+NAP verificado (`telHref`→E.164 idempotente, `waHref` sin `+` + `encodeURIComponent`,
+`registros`). Cablea el humilde de F-01 (A-12); email diferido (A-11); host de
+WhatsApp no atado (A-10, mutante equivalente excluido con justificación). 84 tests,
+mutación 100% en los 3 ficheros a baja concurrencia, `pnpm build` verde.
+
+**CI (`.github/workflows/harness-ci.yml`) arreglada.** Llevaba roja desde F-00:
+`setup-node@v5` autodetecta pnpm por el `packageManager` y lo invoca antes de
+instalarlo. Fix: `pnpm/action-setup@v6` (node24) + `cache: pnpm` en root;
+`package-manager-cache: false` en los ejemplos. 3 jobs verdes, 0 warnings
+(commits `8c1fb22`, `fe3a6b1`). El commit «Skills» (`6bb981e`) es `autoskills`
+auto-commiteando definiciones bajo la identidad del usuario — benigno.
 
 ## Bitácora
 

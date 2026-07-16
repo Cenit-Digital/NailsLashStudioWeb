@@ -14,6 +14,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import process from 'node:process'
 
 import { ejecutarPuerta, type SistemaDeFicheros } from '../src/lib/puerta.ts'
+import { registros } from '../src/lib/site.ts'
 
 const sistemaDeFicherosReal: SistemaDeFicheros = {
   // Honra el contrato del puerto: responde sin lanzar. Es lo que permite a la puerta
@@ -27,12 +28,11 @@ const sistemaDeFicherosReal: SistemaDeFicheros = {
 }
 
 /**
- * Todavía no hay árbol de datos: la fuente única (F-02 `datos_negocio_fuente_unica`) está
- * `pending`. La vía por FLAG queda cableada pero sin alimentar hasta entonces; la vía por
- * PATRÓN ya protege el artefacto. Inventar aquí un árbol de datos sería invadir F-02.
+ * A-12: los `registros` verificados de F-02 (`src/lib/site.ts`) alimentan la vía por FLAG que
+ * F-01 dejó cableada. Todos son esPlaceholder:false, así que no producen violaciones y el build
+ * de producción sigue verde; el día que entre un dato sin confirmar (email, A-11 en F-12/F-16)
+ * como esPlaceholder:true, la puerta romperá el build a propósito (D-6).
  */
-const registros: never[] = []
-
 const resultado = ejecutarPuerta({ modo: 'produccion', registros, ficheros: sistemaDeFicherosReal })
 
 for (const linea of resultado.lineas) {
