@@ -197,9 +197,10 @@ No están cerradas. **No se dan por resueltas** y ninguna se resuelve adivinando
 | **A-10** | **`waHref`: ¿host `wa.me` o `api.whatsapp.com/send`?** Ligada a **A-3**. Lo **testeable** de F-02 (número **E.164 sin `+`** + texto **`encodeURIComponent`**) es host-agnóstico; el host se **verifica a mano** (Android/iOS/WhatsApp Web) antes de F-13 y se trata como constante configurable. Ver F-02, contrato | Nosotros, ligado a A-3 |
 | **A-11** | **¿El email entra en `site.ts` como registro `esPlaceholder: true` desde F-02** (rompiendo ya el build de producción, que es lo correcto por D-6) **o se difiere a F-12?** `centroesteticarozas@gmail.com` solo consta en el JSON-LD oculto de la web actual y **[NV]** si se atiende **[V]**. Ver F-02, alcance | Humano, en el Gherkin de F-02 |
 | **A-12** | **¿F-02 cablea `registros` en `tools/puerta-placeholders.ts`** (hoy `never[] = []`) **o es paso posterior?** El TODO del humilde dice que F-02 alimenta la vía por flag **[V: código]**. Recomendación: sí, es de F-02 (cambio de una línea en el humilde, sin TDD ni mutación). Ver F-02, alcance | Humano/lead, en la puerta de aprobación de F-02 |
-| **A-13** | **¿Dónde vive y cómo se mantiene honesta la «matriz de uso» de F-03?** (pares fg/bg + rol/umbral + tamaño efectivo del `clamp`). El SCSS solo tiene colores; el umbral 4,5/3,0 es información de **uso**, no de token. Incluye el **mínimo de pares exigido** (contra el verde por vacuidad) y **cómo asevera el negativo** «`#C05576` nunca como texto». Análogo a A-8/A-9. Ver F-03 | Humano, en el Gherkin de F-03 |
-| **A-14** | **El mutante `0.04045 → 0.03928` es EQUIVALENTE para color de 8 bits [V: audit §2.1]**: ningún canal `c/255` cae en el hueco, así que ningún hex lo distingue. Con umbral de mutación **1.0** un superviviente inmatable bloquea la feature. Confirmar qué mutantes genera Stryker 9.6 sobre la rama a trozos y **cubrir `canalLineal` con inputs sintéticos**. Ver F-03 | Nosotros/lead, antes del Gherkin de F-03 |
-| **A-15** | **¿La cabecera de F-03 se conserva translúcida (`color-mix 82%`) o se hace opaca?** El audit calculó la trampa `color-mix` con tokens **viejos** y **no** re-verificó la cabecera corregida; la decisión define qué pares (y qué peor `under`) entran en la matriz. Incluye el **inventario exacto de tokens** del `:root` (13 base + `--border-interactive` + estado `#186237`). Ver F-03 | Humano (diseño), en el Gherkin de F-03 |
+| **A-13** | ✅ **CERRADA (2026-07-16) en el Gherkin de F-03.** La matriz de uso es **declarada** (par fg/bg + rol + umbral + tamaño efectivo del `clamp`), **no** el producto cartesiano de tokens. Dos guardas anti-«verde por vacuidad», análogas a @s20/@s21 de F-01: (a) la puerta **exige** haber evaluado un mínimo conocido de pares — matriz vacía o regex que no casa → falla cerrada (@s14); (b) asevera el **negativo**: ningún par de rol texto/componente usa `#C05576` como fg (@s13). Ver F-03 | **Cerrada** |
+| **A-14** | ✅ **CERRADA (2026-07-16), confirmada en doc oficial.** El mutante `0.04045 → 0.03928` es EQUIVALENTE en 8 bits — **verificado por cálculo exhaustivo**: de los 256 canales `c/255`, **ninguno** cae en el hueco `(0.03928, 0.04045]` (vecinos `10/255 = 0,039216` y `11/255 = 0,043137`). Pero **Stryker 9.6 NO genera ese mutante**: sus mutadores no sustituyen un literal numérico por otro concreto (doc oficial). El riesgo del umbral 1.0 **no existe**. La constante **sí** es mutable vía su entorno sintáctico (`c <= 0.04045`), y eso lo cubren @s5/@s6 con inputs sintéticos. **Ojo: la equivalencia depende ESTRICTAMENTE de los 8 bits** — a 10 bits `41/1023 = 0,040078` sí cae en el hueco. Usar `0.04045` cubre ambos casos. Ver `progress/f03_verificacion_previa.md` §2 | **Cerrada** |
+| **A-15** | ✅ **CERRADA (2026-07-16) por el humano: cabecera translúcida al 88 %.** El default propuesto (82 %) **NO cumplía AA** — calculado, no estimado: la nav `--muted #6F525A` cae a **4,44** con «Negro Ónix» `#1B1B1D` debajo (color real de la carta, `salon-data.js:90`) y a **4,22** con negro puro. **El audit declaró como peor caso un `#303030` más claro que el negro de su propia carta de esmaltes.** Al **88 %** la cabecera es **incondicionalmente AA**: nav **4,89** · logo **5,38** contra el peor under posible (negro puro), conservando translucidez (12 % vs 18 %) y `blur(14px)`. **Desacopla F-03 de F-06 y F-17**: ya no hay que enumerar qué scrollea debajo ni limitar cómo de oscuras pueden ser las fotos. Ver `progress/f03_verificacion_previa.md` §1 | **Cerrada** |
+| **A-16** | ✅ **CERRADA (2026-07-16) por el lead: `componer` devuelve flotantes, sin cuantizar.** Hallazgo propio: **el contrato se contradecía**. `@s9` fija `componer` en coma flotante (`[214.2,…]`, fraccionario y explícito) pero el esperado **4,60** de la fila del pie de `@s11` salía de un cálculo **cuantizado a 8 bits** (así lo hizo el audit). Con el `componer` que el propio contrato manda, el ratio real es **4,5913**, y `toBeCloseTo(4.60)` (precisión 2 → exige desvío < 0,005) **habría estrellado el TDD** por 0,0087. Esa fila vale **4.59**. La cuantización es un detalle de **render**, no del color especificado, y el delta de 0,01 **no cambia ningún veredicto** (ambos ≥ 4,5). **Afecta solo a las filas compuestas** (`rgba`/`color-mix`): las hex↔hex del audit se reproducen exactas. Ver `progress/f03_verificacion_previa.md` §3 | **Cerrada** |
 
 **Y lo que no es una pregunta sino un aviso con valor legal:** hay que decirle al cliente
 **ya**, sin esperar a la web nueva, que **su aviso legal actual da 404** y que su política
@@ -558,7 +559,7 @@ ejecutada). «Antes» = paleta cerrada; «después» = corregida. Ojo a la disti
 | 3 | `--accent` **como relleno con texto blanco (uso)** | `#C05576` → **`--accent-dark #A23E5F`** | Blanco sobre `#C05576` = **4,37:1** → **el botón «Reservar», la CTA del negocio, falla**. Blanco sobre `#A23E5F` = **6,19:1** |
 | 4 | `--accent-2` **(valor: texto blanco/icono)** | `#E38AAE` → **`#B3316E`** | Blanco sobre `#E38AAE` = **2,47:1** (badges de oferta y **estrellas** de reseña). `#B3316E` da 5,86:1 |
 | 5 | `--border-interactive` **(token NUEVO)** | — → **`#AB5F79`** | `--line rgba(176,70,106,.16)` da **1,26:1**: vale como decorativo, **no** para delimitar controles (SC 1.4.11, 3:1). Se **parte** el token: `--line` decorativo se queda; los bordes de swatch/día/input usan `#AB5F79` (peor caso **3,54:1** sobre `--accent-soft`) |
-| 6 | `--ink` **como fondo del pie (valor)** | `#B0466A` → **`#8E3355`** | Con `#B0466A`, **ninguna** opacidad de blanco < 1.0 alcanza 4,5:1 (`.82` cae a 4,15:1) — **límite matemático [V]**. Con `#8E3355`, `rgba(255,255,255,.70)` = **4,60:1** y `.82` = 5,68:1 |
+| 6 | `--ink` **como fondo del pie (valor)** | `#B0466A` → **`#8E3355`** | Con `#B0466A`, **ninguna** opacidad de blanco < 1.0 alcanza 4,5:1 (`.82` cae a 4,15:1) — **límite matemático [V]**. Con `#8E3355`, `rgba(255,255,255,.70)` = **4,60:1** y `.82` = 5,68:1. *(El 4,60 es el valor **cuantizado** del audit; en coma flotante es **4,59** — ver A-16. Pasa en ambos modelos, el cambio de token sigue justificado.)* |
 | 7 | «en línea» del chat **(valor)** | `#2f9d5f` → **`#186237`** | `#2f9d5f` sobre `--accent-soft` = **2,69:1**. `#186237` = 5,79:1 |
 
 **`#C05576` se CONSERVA** como color de marca en **rellenos grandes y decorativos**
@@ -598,7 +599,7 @@ blanco** — «se reintroduce solo». Cómo asevera la puerta ese negativo es **
 | `canalLineal(c8: number): number` | `c = c8/255`; **si `c <= 0.04045` → `c/12.92`; si no → `((c+0.055)/1.055)^2.4`**. El umbral es **0.04045** (WCAG 2.2; el `0.03928` es el valor anterior, sin efecto práctico en 8 bits). **Pura** |
 | `luminancia([r,g,b]): number` | `0.2126·canalLineal(r) + 0.7152·canalLineal(g) + 0.0722·canalLineal(b)`. **Pura** |
 | `ratio(colorA, colorB): number` | `(L1 + 0.05) / (L2 + 0.05)`, con **L1 = max**, L2 = min de las dos luminancias. Simétrica: `ratio(a,b) === ratio(b,a)`. **Pura** |
-| `componer(rgba, fondoRgb): [r,g,b]` | Composición sobre fondo opaco: `canal = α·fg + (1−α)·bg`. Cubre `--line` (α=.16) y el `color-mix(in srgb, --bg 82%, transparent)` de la cabecera (equivale a `--bg` con α=.82 sobre lo que scrollee debajo). **Pura** |
+| `componer(rgba, fondoRgb): [r,g,b]` | Composición sobre fondo opaco: `canal = α·fg + (1−α)·bg`. **Devuelve flotantes, sin cuantizar a 8 bits (A-16).** Cubre `--line` (α=.16) y el `color-mix(in srgb, --bg 88%, transparent)` de la cabecera (equivale a `--bg` con α=.88 sobre lo que scrollee debajo — **premultiplicada**, spec normativa; **precondición: `--bg` opaco**, la regla general es `α_resultante = α(--bg) × 0.88`). **Pura** |
 
 Como en F-01: **la función es pura; el `exit ≠ 0` vive en la puerta** (test + hook de build),
 no en la función. Por eso `contraste.ts` es testeable y mutable, y por eso `dev` no falla.
@@ -615,7 +616,7 @@ audit, no el producto cartesiano de tokens; ver A-13). Representativos **[V, aud
 | `#FFF` / `--accent-2 #B3316E` (badge/icono estrellas) | texto/icono | 4,5 | 5,86 |
 | `--ink #8E3355` / `--bg`, `--surface2`, `--accent-soft` | texto/grande | 4,5/3 | 7,06 · 6,45 · 5,98 |
 | `--text #5E404A` / `--bg`, `--surface2` | texto | 4,5 | 8,43 · 7,70 |
-| `rgba(#FFF,.70)` / `--ink #8E3355` (pie) | texto | 4,5 | 4,60 |
+| `rgba(#FFF,.70)` / `--ink #8E3355` (pie) | texto | 4,5 | **4,59** *(A-16: flotante. El 4,60 del audit es el valor cuantizado a 8 bits; con el `componer` flotante que fija @s9 el ratio es 4,5913 y `toBeCloseTo(4.60)` fallaría. **Única fila compuesta → única afectada**)* |
 | `--border-interactive #AB5F79` / `--accent-soft` (peor fondo) | **componente** | **3** | 3,54 |
 | `#186237` / `--accent-soft` («en línea») | texto | 4,5 | 5,79 |
 
@@ -639,17 +640,40 @@ recomputa el esperado con la función de producción, **un formula rota pasaría
    **logotipo**, SC 1.4.3 lo exime y este par decae — es **A-4**, decisión del humano; se
    construye AA igual, no se depende de esa exención.)*
 2. **(b) La trampa de `color-mix()` — la cabecera translúcida cambia de contraste al hacer
-   scroll.** `background: color-mix(in srgb, var(--bg) 82%, transparent)` → el fondo real es
-   **82 % `--bg` + 18 % de lo que pase por debajo** **[V]**. Se testea **sin navegador**
-   porque `color-mix` es composición determinista: `componer(--bg@.82, under)` para cada
-   `under` posible (los fondos de sección que pueden scrollear bajo la cabecera, y el peor
-   caso de foto oscura), y se recalculan `--muted` (nav) y `--ink` (logo) contra cada uno. Con
-   los tokens **viejos** el logo `--ink` caía a **3,88:1 / 3,96:1** cuando el pie o un botón
-   pasaban por debajo **[V, audit §2.6]**. **⚠️ El audit calculó esta trampa con los tokens
-   ANTIGUOS y NO re-verificó la cabecera con la paleta corregida** → si la cabecera sigue
-   translúcida en producción, **la puerta es quien decide** si los `--muted #6F525A` / `--ink
-   #8E3355` sobreviven el peor `under`; la alternativa de diseño (cabecera **opaca**) elimina
-   la trampa entera. Esto es **A-15**.
+   scroll. ✅ RESUELTA: A-15 → 88 %.** `background: color-mix(in srgb, var(--bg) 88%,
+   transparent)` → el fondo real es **88 % `--bg` + 12 % de lo que pase por debajo**. Se testea
+   **sin navegador** porque `color-mix` es composición determinista (**premultiplicada**, spec
+   normativa; precondición: `--bg` opaco): `componer(--bg@.88, under)`.
+
+   **El 82 % del prototipo NO cumplía AA, y se descubrió calculándolo, no estimándolo.** El
+   audit dejó esta trampa explícitamente sin re-verificar con los tokens corregidos y se dio
+   por buena de palabra («casi seguro pasan»). Los números reales al 82 %:
+
+   | `under` | nav `--muted #6F525A` | logo `--ink #8E3355` |
+   | ------- | --------------------- | -------------------- |
+   | `#303030` — «peor caso» **declarado por el audit** | 4,61 ✅ | 5,07 ✅ |
+   | **`#1B1B1D` «Negro Ónix»** — **color real de la carta** (`salon-data.js:90`) | **4,44 ❌** | 4,88 ✅ |
+   | `#000000` negro puro | **4,22 ❌** | 4,64 ✅ |
+
+   **El audit declaró como peor caso un `#303030` más claro que el negro de su propia carta de
+   esmaltes.** Y el contrato tampoco lo habría cazado: declaraba «foto oscura» como `under`
+   **solo para `--ink` (logo)**, no para `--muted` (nav) — y **la nav es la que falla**. Logo y
+   nav viven en la **misma** cabecera: lo que scrollea bajo uno scrollea bajo el otro. La
+   asimetría escondía la única combinación mala.
+
+   **Al 88 % la cabecera es incondicionalmente AA**: nav **4,89** · logo **5,38** contra el
+   **peor under posible** (negro puro). Conserva la translucidez (deja pasar 12 % frente al
+   18 %) y el `backdrop-filter: blur(14px)`. Verificado que el redondeo a 8 bits no lo tumba.
+   **Esto desacopla F-03 de F-06 y F-17**: `@s17` ya no valida una lista declarada de `under`s
+   —que era frágil y es justo lo que falló— sino **el peor `under` posible**; si pasa con negro
+   puro, pasa con cualquier cosa. No hay que enumerar qué secciones scrollean debajo ni
+   restringir cómo de oscuras pueden ser las fotos reales. `@s18` ancla el 88 con el 4,22 del
+   82 %, porque el 88 vive en el SCSS —que Stryker no muta— y el mutante real ahí es **humano**:
+   alguien que dentro de seis meses lo baje «por fidelidad al prototipo».
+
+   > `blur(14px)` no altera el análisis, y el audit ya lo decía: el desenfoque **promedia** el
+   > color, no lo aclara. Región oscura grande → el centro sigue oscuro (peor caso intacto);
+   > elemento oscuro pequeño → el blur solo **ayuda**.
 3. **El umbral 4,5 vs 3,0 sale del ROL del par, no del SCSS.** El token file solo tiene
    colores; «esto es texto / esto es texto grande / esto es un borde de control» es
    información de **uso**. Por eso hace falta la matriz de uso (A-13): sin ella la puerta **no
@@ -708,24 +732,47 @@ recomputa el esperado con la función de producción, **un formula rota pasaría
 > inputs sintéticos** que straddlen el punto de corte, no solo a través de hex, para que la
 > rama esté cubierta de verdad.
 
-#### Preguntas abiertas de esta feature
+#### Preguntas abiertas de esta feature — TODAS CERRADAS (2026-07-16)
 
-- **A-13** — **¿Dónde vive y cómo se mantiene honesta la «matriz de uso»** (pares fg/bg +
-  rol/umbral + tamaño efectivo del `clamp`)? El SCSS solo tiene colores; el umbral es
-  información de uso. Recomendación: matriz **declarada en el test** (las combinaciones reales
-  del audit) + un **mínimo de pares exigido** para evitar el verde por vacuidad + **cómo se
-  asevera el negativo** «`#C05576` nunca como texto» (caso límite 3, regla dura). Es el
-  análogo de F-03 a A-8/A-9 de F-01.
-- **A-14** — **El mutante `0.04045 → 0.03928` es equivalente en 8 bits**: confirmar qué
-  mutantes genera Stryker 9.6 sobre la rama a trozos y cubrir `canalLineal` con inputs
-  sintéticos para que la puerta no herede un superviviente inmatable (umbral 1.0).
-- **A-15** — **¿La cabecera se conserva translúcida (`color-mix 82%`) o se hace opaca?** El
-  audit calculó la trampa (b) con tokens **viejos** y **no** re-verificó la cabecera
-  corregida; la decisión de diseño define qué pares (y qué peor `under`) entran en la matriz.
-  Incluye el **inventario exacto de tokens** del `:root` (13 base + `--border-interactive` +
-  estado `#186237`).
-- **A-4** (ya abierta) — si «Nails Lash Studio» es **logotipo**, SC 1.4.3 exime el par del
-  `clamp` (caso límite (a)). Decisión de negocio del humano; **no se depende** de ella.
+Ninguna queda abierta. El detalle razonado, con los cálculos y las citas oficiales, está en
+**`progress/f03_verificacion_previa.md`**. Resumen:
+
+- **A-13** ✅ — matriz de uso **declarada** (no producto cartesiano), con **mínimo de pares
+  exigido** (@s14) y **aseveración del negativo** «`#C05576` nunca como texto» (@s13).
+- **A-14** ✅ — **Stryker 9.6 no genera el mutante `0.04045 → 0.03928`** (doc oficial): el
+  riesgo del umbral 1.0 **no existe**. La equivalencia en 8 bits se verificó por cálculo
+  exhaustivo (0 canales de 256 en el hueco); **depende estrictamente de los 8 bits** (a 10 bits
+  `41/1023` sí cae dentro). La constante sí es mutable vía su entorno sintáctico → @s5/@s6 con
+  input sintético en el punto de corte.
+- **A-15** ✅ — **cabecera translúcida al 88 %** (decisión del humano). El 82 % **no cumplía**:
+  nav **4,44** con «Negro Ónix» `#1B1B1D`, **4,22** con negro puro. Al 88 % es
+  **incondicionalmente AA** (nav 4,89 · logo 5,38 contra el peor under posible). `@s17` valida
+  **el peor under POSIBLE**, no una lista declarada; `@s18` ancla el 88 con el 4,22 del 82 %.
+- **A-16** ✅ *(nueva, del lead)* — **`componer` en coma flotante**; la fila del pie vale
+  **4.59**, no 4.60 (que es el valor cuantizado del audit). Sin esto el TDD se estrellaba.
+- **A-4** (ya abierta, **sigue abierta**) — si «Nails Lash Studio» es **logotipo**, SC 1.4.3
+  exime el par del `clamp` (caso límite (a)). Decisión de negocio del humano; **no se depende**
+  de ella: se construye AA igual.
+
+**Correcciones de fuente y justificación aplicadas al contrato** (verificadas contra
+documentación oficial por 14 subagentes, 7 afirmaciones × verificar + refutar):
+
+- **La fuente citada estaba desactualizada.** `w3.org/WAI/GL/wiki/Relative_luminance` **sigue
+  imprimiendo `0.03928`** con una errata encima. **No** contradice al contrato: lo respalda —
+  pero un revisor futuro que lo cite «corregiría» la implementación hacia el valor obsoleto.
+  **Fuente de verdad: el glosario de WCAG 2.2**, no el wiki.
+- **«SC 1.4.11 exige 3:1 a los bordes de control» es falso como regla.** El eje normativo es
+  **la información visual requerida para IDENTIFICAR el componente y su estado**. Partir
+  `--line` de `--border-interactive` sigue siendo correcto; el porqué estaba mal escrito.
+- **«WCAG exige el peor caso» es falso.** F83 lo trata como *Quickcheck*: condición
+  **suficiente, no necesaria**. La exigencia real es ≥4,5:1 entre **cada letra y el fondo
+  inmediatamente detrás**. Exigir el peor under es correcto porque **lo implica**.
+- **«≥18,5 px negrita» es CORRECTO** y se queda: el lead sospechaba que debía ser 18,66 px y
+  **se equivocaba** — «18.66px» **no existe en `w3.org`**. Solo se reformuló que lo normativo
+  son los **puntos** y los px la aproximación oficial.
+- **`color-mix(in srgb, X 88%, transparent)` ≡ `X` con α=0.88** está respaldado por spec
+  normativa (interpolación **premultiplicada**). **Precondición: `--bg` debe ser OPACO**
+  (`α_resultante = α(--bg) × 0.88`).
 
 ---
 
