@@ -202,6 +202,13 @@ No están cerradas. **No se dan por resueltas** y ninguna se resuelve adivinando
 | **A-15** | ✅ **CERRADA (2026-07-16) por el humano: cabecera translúcida al 88 %.** El default propuesto (82 %) **NO cumplía AA** — calculado, no estimado: la nav `--muted #6F525A` cae a **4,44** con «Negro Ónix» `#1B1B1D` debajo (color real de la carta, `salon-data.js:90`) y a **4,22** con negro puro. **El audit declaró como peor caso un `#303030` más claro que el negro de su propia carta de esmaltes.** Al **88 %** la cabecera es **incondicionalmente AA**: nav **4,89** · logo **5,38** contra el peor under posible (negro puro), conservando translucidez (12 % vs 18 %) y `blur(14px)`. **Desacopla F-03 de F-06 y F-17**: ya no hay que enumerar qué scrollea debajo ni limitar cómo de oscuras pueden ser las fotos. Ver `progress/f03_verificacion_previa.md` §1 | **Cerrada** |
 | **A-16** | ✅ **CERRADA (2026-07-16) por el lead: `componer` devuelve flotantes, sin cuantizar.** Hallazgo propio: **el contrato se contradecía**. `@s9` fija `componer` en coma flotante (`[214.2,…]`, fraccionario y explícito) pero el esperado **4,60** de la fila del pie de `@s11` salía de un cálculo **cuantizado a 8 bits** (así lo hizo el audit). Con el `componer` que el propio contrato manda, el ratio real es **4,5913**, y `toBeCloseTo(4.60)` (precisión 2 → exige desvío < 0,005) **habría estrellado el TDD** por 0,0087. Esa fila vale **4.59**. La cuantización es un detalle de **render**, no del color especificado, y el delta de 0,01 **no cambia ningún veredicto** (ambos ≥ 4,5). **Afecta solo a las filas compuestas** (`rgba`/`color-mix`): las hex↔hex del audit se reproducen exactas. Ver `progress/f03_verificacion_previa.md` §3 | **Cerrada** |
 
+| **A-17** | 🔴 **¿De quién son las páginas legales, y cómo se reescriben los acceptance 3 y 4 de F-04?** El troceado se contradice: la entrega de F-04 dice «el pie con los huecos de los enlaces legales (**aún sin destino**)» y su acceptance 3 exige que **el destino responda 200** **[V: `00-fase0-informe.md:673, 683-684`]**. Y **«responde 200» es NECESARIO PERO NO SUFICIENTE**: `/es/confidentiality_ws` del cliente **da 200 y es jurídicamente nulo** **[V]** → un escenario `status == 200` **bendeciría** una página legalmente vacía; F-04 cambiaría un 404 por un **200 hueco**. Además **F-04 no puede prometer un aviso legal conforme** (faltan razón social y NIF válido, **verificado**). *Propuesta en §F-04 «Alcance»:* **F-04** entrega la **puerta anti-404** (ningún `href` interno apunta a una ruta inexistente en `dist/`: testeable HOY, más fuerte, y no promete nada); **F-16** entrega rutas, enlaces y contenido — su **propio acceptance** ya dice «la estructura de ambas páginas existe y es navegable» **[V]**. El acceptance 4 decae con él (y además está mal fundado: «en todas las páginas» **no está en la LSSI**). **NO destilar el acceptance 3 tal cual** | **Humano/lead**, antes del Gherkin de F-04 |
+| **A-18** | **¿`SC 2.4.11 Focus Not Obscured` (AA, nuevo en WCAG 2.2) es de F-04 o de F-06?** Su *Understanding* **nombra literalmente los sticky headers** y su técnica suficiente es **`C43`** (`scroll-padding`) **[V]**. **No estaba en la `puerta_legal` de F-04** y **F-06 ya lo contempla** **[V: `feature_list.json` id 6]**, pero **F-04 pone el `scroll-padding-top`** y **F-06 monta la cabecera**. O se parte (F-04 el mecanismo, F-06 la medida real), o es entero de F-06 | Humano/lead |
+| **A-19** | **¿`openingHoursSpecification` u `openingHours` — y quién lo emite?** **Coexisten y ambas son válidas por ramas distintas** **[V]**; si el contrato no fija **cuál**, dos implementadores eligen distinto y **ambos pasan los tests**. Google solo recomienda `openingHoursSpecification` → *recomendación: esa, y **prohibir la mezcla***. **Conflicto de troceado:** el JSON-LD es de F-04, pero **F-10 declara `openingHoursSpecification` en su propia descripción** **[V: `feature_list.json` id 10]**. *Recomendación: F-04 no lo emite; lo emite F-10 (dueña de la lógica de horario) y F-04 deja el hueco* | Humano/lead |
+| **A-20** | **¿`priceRange` entra en el JSON-LD de F-04, espera a F-09, o no entra?** Es **Text, no número** (*«for example $$$»* **[V]**): un `"priceRange": 25` es **sintácticamente válido y basura semántica** — **nadie lo rechaza, degrada en silencio**. Y los **precios reales están bloqueados** (B-5, F-09): emitir un rango sin precios verificados sería **inventar**. *Recomendación: NO entra en F-04* | Humano/lead |
+| **A-21** | **La canónica necesita un ORIGEN absoluto, y el dominio final es [NV].** El dominio real es `nailslashlasrozas.es` **[V]**, no el `nailslashstudio.com` que inventó el prototipo **[V]**, y **la migración (301, SEO, dominio) solo la cierra el cliente** **[V]**. → ¿La canónica se emite con un **origen placeholder** —rompiendo ya el build de producción, que es **lo correcto por D-6**, exactamente como A-11 con el email— o se difiere? *Sin decidirlo, F-04 hornea una canónica que apunta a un dominio que quizá no sea el nuestro: **un dato inventado con forma de URL**.* Ligada a A-11 | Humano, en el Gherkin de F-04 |
+| **A-22** | **La composición literal del `<title>`.** Es **criterio de PROYECTO/SEO, nunca `SC 2.4.2`**: el listón normativo es *«describe topic or purpose»* y tiene **CERO requisito de unicidad** **[V]**. El acceptance 5 («mutar la composición del title rompe un test») **exige un literal acordado**, o no hay nada que mutar. **No se estima una longitud máxima**: no consta cifra en fuente **[NV]** | Humano, en el Gherkin de F-04 |
+
 **Y lo que no es una pregunta sino un aviso con valor legal:** hay que decirle al cliente
 **ya**, sin esperar a la web nueva, que **su aviso legal actual da 404** y que su política
 de privacidad no identifica al responsable. El **art. 48.4 TRLGDCU** rebaja un escalón la
@@ -776,7 +783,462 @@ documentación oficial por 14 subagentes, 7 afirmaciones × verificar + refutar)
 
 ---
 
-### Las 17 features restantes
+### Feature 4: `cascaron_semantico` — la cáscara HORNEADA, el JSON-LD de cero y la puerta que mira `dist/`
+
+> Feature `#4` de `feature_list.json`. Depende de **F-02** (el NAP que consume el JSON-LD) y
+> **F-03** (`:focus-visible` necesita tokens con contraste). Encarna **T-6** («JSON-LD escrito
+> de cero, sin `aggregateRating`») y es la primera aplicación dura de **I-8** («verde ≠
+> funciona: en SSG hay dos estados, y jsdom solo ve el segundo»).
+>
+> **Toda esta sección es coherente con `progress/f04_verificacion_previa.md`** (18 subagentes,
+> 9 afirmaciones × verificar + refutar: **4 confirmadas, 5 matizadas, 0 refutadas de raíz**).
+> Donde el troceado de `docs/research/00-fase0-informe.md` §7 y esa verificación se
+> contradigan, **manda la verificación**. Aquí se contradicen en un punto grave: el acceptance
+> 3 (ver «Alcance»).
+
+#### Propósito
+
+Que el HTML **que sale del build** —no el que se ve en `pnpm dev`, no el que ve jsdom— lleve
+horneados el idioma, el `title`, la `description`, la canónica, un `h1`, los landmarks y un
+JSON-LD **escrito de cero**; y que una **puerta mecánica** lea el **HTML crudo de `dist/`**,
+**por cada ruta prerenderizada**, y rompa el build si algo de eso falta.
+
+#### Por qué la puerta mira `dist/` y NO el DOM de jsdom — la bomba de F-04
+
+**Esta feature entera vive o muere en un detalle del `vite-react-ssg` 0.9.0 que nadie había
+verificado nunca.** La verificación previa lo destapó contra el **código realmente instalado**
+(no contra el README ni contra `main`), y el lead lo reconfirmó de primera mano al escribir
+este contrato:
+
+`extractHelmet` lee **exclusivamente del contexto de Helmet**. El parámetro `html`
+(= `appHTML`, el árbol de React ya renderizado) **solo** alimenta al `styleCollector`:
+**nunca se parsea buscando metadata** **[V: `node_modules/vite-react-ssg/dist/shared/
+vite-react-ssg.DsKK_1op.mjs:429-446`]**. Y `renderHTML` inyecta con
+`indexHTML.replace('<head>', '<head>' + metaTags)` **[V: `:122-124`]**.
+
+> **Si F-04 usa la metadata NATIVA de React 19 (`<title>`/`<meta>` hoisteados por el propio
+> React), el `<head>` del build sale VACÍO. Y estaría VERDE en `pnpm dev` y VERDE en jsdom.
+> SEO cero en producción, con toda la suite en verde.**
+
+Es **el patrón de la memoria organizacional** (`red-css-para-rama-solo-js-en-ssg`): *bajo SSG
+el HTML horneado congela el estado que el JS de cliente iba a corregir.* Ya ha mordido **3
+veces** en WebEmpresa. Aquí mordería una cuarta — y esta vez en el `<head>`.
+
+→ **Decisión: la única vía permitida es `<Head>` de `vite-react-ssg`** (`import { Head } from
+'vite-react-ssg'` **[V: `dist/index.d.ts:3`]**), que es un wrapper de `react-helmet-async`
+(dependencia **directa** `^1.3.0`, no *peer* → sin conflicto con React 19). **La metadata
+nativa de React 19 queda PROHIBIDA en este proyecto.** No es preferencia de estilo: es la
+diferencia entre tener SEO y no tenerlo.
+*Alternativa descartada:* una propiedad `head` en las rutas — **no existe** **[V]**.
+
+**Y de ahí la segunda mitad de la decisión: jsdom NO puede ser la entrada de la aserción.**
+Conviene decir el porqué exacto, porque es más fino que «jsdom malo»: `react-helmet-async`
+**también** hace efecto sobre `document.head` en cliente, y React
+19 **también** hoistea su metadata al hidratar. **Los dos caminos dan VERDE en jsdom.** Es
+decir: **jsdom es exactamente ciego al único bug que esta feature existe para prevenir.**
+Testing Library aquí no es «insuficiente»: es **incapaz por construcción** **[I sólida, sobre
+[V]]**.
+
+→ **La aserción se hace sobre los bytes de `dist/**/*.html`.** Que el decisor los parsee con
+regex o con un parser es detalle de implementación; lo que el contrato fija es **la entrada**:
+el artefacto de producción, nunca un render del árbol de componentes.
+
+> **Hallazgo propio del lead, que ACOTA la verificación previa (no la contradice).** En el
+> mismo `dist` hay **una** ruta que sí mete HTML del `appHTML` en el `<head>`:
+> `metaAttributes.unshift(headElements.innerHTML)` **[V: `:613-617`]**. **No nos aplica**:
+> cuelga de `META_CONTAINER_ID = "__SSG_TANSTACK_META_CONTAINER__"` **[V:
+> `vite-react-ssg.BqDzTpJh.mjs:3`]**, es decir, del adaptador de **TanStack Router**. Este
+> repo usa el adaptador de **react-router** (`ViteReactSSG({ routes })` con `RouteRecord`
+> **[V: `src/main.tsx`, `src/App.tsx`]**), cuyo `render` llama a `extractHelmet` **y a nada
+> más** **[V: `:455-472`]**. → **T1 se sostiene íntegra para nuestra configuración**, y ahora
+> además sabemos **por qué** existía esa aparente escapatoria. Se deja escrito para que quien
+> re-verifique dentro de seis meses encuentre `:616`, crea haber refutado el contrato y **lea
+> esta nota antes de revertirlo**.
+
+> **Segundo hallazgo propio: el JSON-LD SÍ tiene vía.** `extractHelmet` incluye
+> `helmet.script.toString()` en `metaStrings` **[V: `:437-442`]** → un
+> `<Head><script type="application/ld+json">` **se hornea**. Sin este dato el contrato no
+> podría prometer JSON-LD prerenderizado, que es justo lo que le pide el acceptance 2.
+
+#### Alcance — qué entra, qué NO entra, y **el desacuerdo con el troceado**
+
+**Entra en F-04:** la cáscara (`<Head>`, `lang`, `title`, `description`, canónica, `h1`,
+`main`/`nav`/`footer`, `section aria-labelledby`, `:focus-visible` global,
+`scroll-padding-top`), el **JSON-LD escrito de cero**, y la **puerta del cascarón** sobre
+`dist/`.
+
+**NO entra en F-04:**
+
+- **Las páginas legales — ni su contenido, ni su estructura, ni «vacías». Son F-16**, y lo
+  dice el **propio acceptance de F-16**: *«La estructura de ambas páginas existe y es
+  navegable»* **[V: `feature_list.json` id 16]**. F-04 no las crea.
+- **La cabecera sticky y el menú móvil**: son **F-06** (`header_nav_footer`). F-04 pone el
+  `scroll-padding-top` porque es cáscara global; **quién es dueño de `SC 2.4.11` es A-18.**
+
+##### 🔴 El desacuerdo: **el acceptance 3 de F-04 es insostenible y hay que reescribirlo**
+
+Hoy dice: *«El enlace del aviso legal responde 200 (hoy, en la web del cliente, da 404: es el
+test de regresión que previene el fallo real)»*. **Tres motivos por los que no se puede
+destilar tal cual:**
+
+1. **Se contradice con su propia entrega.** El troceado (§7) describe la entrega de F-04 como
+   *«el pie con los huecos de los enlaces legales (**aún sin destino**)»* y, dos líneas
+   después, exige que **el destino responda 200** **[V: `00-fase0-informe.md:673, 683-684`]**.
+   Las dos cosas a la vez son imposibles.
+2. **«Responde 200» es NECESARIO PERO NO SUFICIENTE, y hay prueba viva.**
+   `/es/confidentiality_ws` del cliente **responde 200 y es jurídicamente nulo**: su art. 2
+   dice que el responsable es *«la persona a cargo del sitio web»* — sin nombre, sin razón
+   social, sin NIF, sin domicilio **[V]**. **Un escenario que solo compruebe `status == 200`
+   bendeciría una página legalmente vacía.** F-04 cambiaría un 404 por un **200 hueco** y el
+   test lo daría por bueno. Eso no es prevenir el fallo del cliente: es **reproducirlo un
+   escalón más arriba**.
+3. **F-04 no puede prometer un aviso legal conforme, y prometerlo sería mentir.** Faltan razón
+   social y un NIF válido, y **eso está verificado** (D-6, B-1/B-2). *Ver abajo el `vatID`.*
+
+**Reparto honesto propuesto** (es **A-17**, la cierra el humano/lead):
+
+| Quién | Qué entrega |
+| ----- | ----------- |
+| **F-04** | La **puerta anti-404**: *ningún `href` interno del artefacto apunta a una ruta que no exista en `dist/`*. Se puede testear **HOY**, es **más fuerte** que «`/aviso-legal` responde 200» (cubre **todos** los enlaces, no uno), y **no promete** ningún aviso legal |
+| **F-16** | Las rutas legales, **los enlaces del pie que apuntan a ellas**, y el contenido — con todos los campos como placeholder cubiertos por F-01 (`blocked`) |
+
+Así, **el pie de F-04 no emite enlaces legales todavía**. Suena incómodo y es lo correcto: la
+web **no se puede publicar** (D-6), y un pie que enlaza a la nada es **literalmente el bug del
+cliente**. Cuando F-16 se desbloquee, los enlaces aparecen **con destino real**, y la puerta de
+F-04 hace **estructuralmente imposible** que aparezcan sin él.
+*Alternativa descartada:* que F-04 emita los enlaces y F-16 cree las rutas → deja la puerta de
+F-04 en **rojo** hasta F-16, rompiendo «una feature a la vez».
+*Alternativa descartada:* que F-04 cree las páginas legales **con todo placeholder** (F-01 ya
+rompería el build de producción) → es coherente, pero **invade F-16** literalmente.
+
+**Consecuencia:** el **acceptance 4** («*El enlace legal del pie es permanente: aparece en
+todas las páginas*») **también decae para F-04** y se muda a F-16 — además de estar mal
+fundado (ver «Los tres ejes»: *«en todas las páginas» no está en la LSSI*).
+
+##### 🚨 El `vatID`: lo que apareció, y la prohibición que hay que escribir
+
+La verificación encontró un dato que **nadie había visto**, escondido en el JSON-LD de la home
+del cliente (no se renderiza como texto visible; por eso las búsquedas anteriores lo
+perdieron): `"vatID": "10656940"` **[V]**.
+
+**No desbloquea nada, porque no es un identificador válido** (contrastado contra boe.es):
+
+- **Persona jurídica** — Orden EHA/451/2008 art. 2: el NIF *«estará compuesto por nueve
+  caracteres»*. `10656940` son **8**, todos dígitos → **no es CIF** **[V]**.
+- **Persona física** — RD 1065/2007 art. 19.1: el NIF es el número del DNI *«seguido del
+  correspondiente código o carácter de verificación, constituido por una letra mayúscula»*.
+  No la lleva → **NIF incompleto** **[V]**.
+- **8 dígitos es exactamente un número de DNI sin su letra** → es verosímil que sea **el DNI
+  del titular truncado**, es decir, **dato personal de una persona física** **[I sobre [V]]**.
+
+→ **B-1/B-2 siguen bloqueadas.** Pero el contrato **deja de decir** que «no existe ningún
+identificador en fuente pública»: **existe, y es inválido.**
+
+> **PROHIBICIÓN EXPRESA, y es urgente escribirla.** **La letra del DNI es DETERMINISTA**
+> (módulo 23 sobre una tabla). Cualquier agente de este pipeline —**incluido el lead, incluido
+> quien escriba esto**— puede calcularla en un segundo y «arreglar» el dato publicando
+> `10656940<letra>`. **ESO SERÍA INVENTAR UN NIF.** Derivar el carácter de verificación **no
+> acredita** que el número pertenezca al titular, ni que el titular sea persona física, ni que
+> ese sea su NIF a efectos del art. 10.1 LSSI; y **publicaría un dato personal**. El agente
+> que lo encontró lo dejó escrito: *«YO NO HE CALCULADO LA LETRA Y EL CONTRATO DEBE
+> PROHIBIRLO EXPLÍCITAMENTE.»* Queda prohibido **completar, corregir, inferir o derivar** el
+> NIF/CIF. Un identificador que no cumple el formato legal **se RECHAZA y bloquea la
+> publicación**; no se repara.
+
+**Corolario limpio para el JSON-LD de F-04:** schema.org tiene propiedades para esto y las
+**dejamos vacías a propósito** — **`legalName` NO se emite** (razón social desconocida) y
+**`vatID` NO se emite** (no hay ninguno válido). Se emite `name: "Nails Lash Studio"`, que es
+el **nombre comercial** **[V]**, no la razón social.
+
+#### Los tres ejes — la regla que más cara ha salido, en una tabla
+
+**Nunca se mezclan: letra de la norma ≠ técnica suficiente ≠ criterio de proyecto. Y
+schema.org ≠ Google.** Cinco de las nueve afirmaciones que sostenían F-04 eran **decisiones
+correctas con el porqué falso**. La decisión sobrevive; **la justificación se reescribe**.
+
+| Lo que F-04 hace | **Letra de la norma [V]** | **Técnica suficiente** (no es requisito) | **Criterio de proyecto** (nuestro, legítimo, testeable) |
+| ---------------- | ------------------------- | --------------------------------------- | ------------------------------------------------------ |
+| `<html lang="es">` | **SC 3.1.1 (A)**: el idioma debe ser **determinable por código**. **No dice «lang»** | **H57** (`lang` en `<html>`) satisface el SC en HTML | Que un `lang` **incorrecto** falle es **[I]**, no frase citable |
+| **Un solo `<h1>`** | **`SC 1.3.1` NO lo exige.** *Ninguna frase sobre el número de h1 existe en toda la norma* **[V: fetch de la página completa]** | `H101`, `ARIA11`, `ARIA20` son **técnicas suficientes en OR** | ✅ **Criterio de proyecto.** Buena regla, se testea igual. **Lo prohibido es la atribución normativa** |
+| **Landmarks `main`/`nav`/`footer`** | **`SC 1.3.1` NO los exige** **[V]** | `ARIA11` | ✅ **Criterio de proyecto** |
+| **`section aria-labelledby`** | **Esto SÍ es 1.3.1**: una relación que el diseño comunica **visualmente** debe existir **en el código** → título de sección = *heading real* + `aria-labelledby`, **no un `div` con `font-size`** | — | — |
+| **Composición del `<title>`** | **`SC 2.4.2` (A)**: el listón es *«describe topic or purpose»*. **CERO requisito de unicidad** **[V]** | — | ✅ **Criterio de PROYECTO/SEO.** Legítimo, **nunca WCAG** (A-22) |
+| **`:focus-visible` global** | **`SC 2.4.7` (AA)**: foco **visible**. **CERO requisito de contraste o grosor** **[V]** | `G165` (foco por defecto) y `C45` (`:focus-visible`) son **ambas suficientes** | El 3:1 / 2px es **`SC 2.4.13`, y es AAA**. → **PROHIBIDO atribuir cualquier umbral a 2.4.7.** *Es la trampa gemela del 1.4.11 de F-03* |
+| **Enlace legal en el pie** | **LSSI art. 10.1**: acceso *«**permanente, fácil, directa y gratuita**»* **[V: los cuatro adverbios son literales]** | — | **«aparece en todas las páginas» NO ESTÁ EN LA LEY** (ver abajo) |
+
+##### El eje que se confundía: **«permanente» es TEMPORAL, no espacial**
+
+**Escaneo léxico del estatuto entero** (395.867 caracteres): `"pie de página"` = **0** ·
+`"todas las páginas"` = **0** · `"cada página"` = **0** **[V]**. El dato que lo cierra:
+*«página de inicio»* **sí** aparece 4 veces (art. 39.3.a) → **el legislador TIENE vocabulario
+para localizar algo en una página concreta y eligió no usarlo en el art. 10** **[I sobre [V]]**.
+**Contraindicio directo:** el art. 10.2 resuelve el cumplimiento con *«su página **o** sitio de
+Internet»* — **contempla que la obligación se satisfaga en UNA página** **[V]**.
+
+> *Permanente* = disponible siempre **en el tiempo**. *En todas las páginas* = presente en todo
+> el **espacio** del sitio. **Son ejes distintos.** Un test que solo verifique «el enlace está
+> en el pie de las N páginas» da **VERDE mientras se incumple de verdad** (destino 404, gateado
+> tras login, caducado) y **ROJO en un caso lícito** (art. 10.2). **Es exactamente el 404 del
+> cliente: el enlace está en el pie, y el destino no existe.**
+
+→ **Redacción honesta, que es la que salva al contrato de mentir:** «LSSI art. 10.1 exige
+acceso **permanente, fácil, directo y gratuito** **[V]**. **Decisión del proyecto**: enlace en
+el pie de todas las páginas **como medio de cumplimiento** — el art. 10.2 admite «página o
+sitio», luego el pie global es **SUFICIENTE, no NECESARIO**.» Y el eje **permanente** se
+asevera contra **el destino**, no contra la presencia del enlace: es la puerta anti-404 de
+F-04.
+
+**Dos avisos más sobre la LSSI, para F-16 y F-09:**
+
+- **Falta el art. 10.1.f) — precios.** Es un estudio de uñas/pestañas: **si la web muestra
+  tarifas, f) se activa** y obliga a indicar si el precio incluye impuestos. Con a), es el
+  único párrafo del 10.1 que puede escalar a **GRAVE** **[V]**. Riesgo real, **no cubierto por
+  F-04**: es de **F-09** (que ya lo lleva) y **F-16**.
+- **Toda cita de la LSSI debe declarar VERSIÓN.** El art. 10 tiene **4 versiones** y el art. 38
+  **10** (última 23-01-2025) **[V]**. Una cita sin versión es incomprobable. **Este contrato
+  cita el art. 10.1 SIN versión declarada [NV] → verificar en `act.php`, sin pinear fecha, y
+  NUNCA ordenando los bloques de la API del BOE por `fecha_vigencia`** (los ordena por
+  **publicación**: es la trampa que documenta §9.4 de la verificación).
+- **La calificación sancionadora NO es plana.** Ni «grave» ni «leve»: depende de
+  *«significativo»* (art. 38.3.b), **concepto indeterminado** **[V]**. El contrato refleja el
+  condicional o se calla.
+
+##### schema.org ≠ Google — **y `name` era el hueco más caro**
+
+La jerarquía real, **literal de schema.org**, con herencia **múltiple** **[V]**:
+
+```
+Thing > Organization > LocalBusiness > HealthAndBeautyBusiness > BeautySalon
+Thing > Place        > LocalBusiness > HealthAndBeautyBusiness > BeautySalon
+```
+
+El padre **directo** es `HealthAndBeautyBusiness`; `LocalBusiness` es **ancestro**. Decir
+«BeautySalon, subtipo de LocalBusiness» es cierto **transitivamente** y falso como jerarquía —
+y **borra el mecanismo que justifica el contrato**: es la **ruta dual** lo que hace válidas a
+la vez `address` (vía `Organization`) y `geo` (vía `Place`).
+
+| | **schema.org** (validez de vocabulario) | **Google** (elegibilidad de *rich result*) |
+| - | --------------------------------------- | ------------------------------------------ |
+| **Obligatorio** | **NADA. Cero propiedades.** Un JSON-LD con solo `@type` es **válido** **[V: verificado por ausencia citable — en `schema.org/BeautySalon` y `/LocalBusiness` no existe ninguna frase que marque propiedad alguna como *required*]** | **`name`** (Text) y **`address`** (PostalAddress) **[V]** |
+| **Recomendado** | — | `geo`, `openingHoursSpecification`, `telephone`, `priceRange`… **[V]** |
+
+→ **PROHIBIDA en este contrato la palabra «obligatorio» sin sujeto explícito.** Todo
+«obligatorio» se lee «obligatorio **para** \<schema.org|Google\>». **Ningún escenario puede
+afirmar «falla porque schema.org obliga a X»: sería falso.**
+→ **Se FIJA `name`.** El acceptance 2 actual **no lo menciona** y es requisito de Google:
+**es el hueco más caro de la redacción de hoy.**
+→ Exigir **`PostalAddress`** (y no `Text`) en `address` es **decisión de proyecto más estricta
+que el vocabulario** — se declara, o el siguiente lector creerá que lo impone schema.org.
+→ Google **respalda el subtipo**: *«Use the most specific LocalBusiness sub-type possible»*
+**[V]**. Y **no garantiza nada**: *«Google does not guarantee that features that consume
+structured data will show up in search results»* **[V]**.
+
+##### `aggregateRating`: la decisión se queda, **el porqué era falso**
+
+**❌ Google NO lo prohíbe por *self-serving*.** Es **INELEGIBILIDAD**, no prohibición. FAQ
+oficial, literal: *«Do I need to remove self-serving reviews…? **No, you don't need to remove
+them.** Google Search just won't display review snippets…»* y *«Will I get a manual action…?
+**You won't get a manual action just for this.**»* **[V]**.
+→ **PROHIBIDA** en el Gherkin y en el código la redacción «Google prohíbe `aggregateRating`
+self-serving». **Es refutable con la FAQ oficial y hunde la credibilidad del contrato entero.**
+*(Nota tranquilizadora: **T-6 ya cita la regla correcta** —«Don't aggregate reviews or ratings
+from other websites»— **[V]**. No hay que corregir T-6; hay que **no degradarlo** al
+destilarlo.)*
+
+**El motivo se escribe en TRES capas, porque son tres hechos distintos:**
+
+| | Fundamento | Fuerza |
+| - | ---------- | ------ |
+| **(a)** | Google, *Technical guidelines*: *«**Don't aggregate reviews or ratings from other websites**»*, bajo *«Warning: … Google may take **manual action** against it»* **[V]** | **Prohibición** |
+| **(b)** | Google: una página con `LocalBusiness`/subtipo que puntúa sobre sí misma es *«ineligible for star review feature»* **[V]** | **Inutilidad** (cero *upside* en SERP) |
+| **(c)** | Treatwell cl. 4.2.2: el salón **no tiene derecho** sobre las reseñas **[V]** | **Falta de título** — *no* es «prohibido republicar»: es que **no hay licencia**. Escribirlo como prohibición expresa **sería inventar** |
+
+**(a) y (c) sostienen la decisión POR SEPARADO.** Si mañana Google derogase la regla
+*self-serving*, **(a) y (c) siguen vivos**. Eso hace la decisión **robusta**, y hay que
+escribirlo así. El 4,9 · 1.231 vive en **Treatwell — otro sitio**: **(a) es la cita que
+aplica.**
+
+**Aplicabilidad, sin escapatoria:** *«If the entity that's being reviewed controls the reviews
+about itself, their pages that use **LocalBusiness or any other type of Organization**
+structured data are ineligible…»* **[V]**. `BeautySalon` cae **por las dos ramas**. El contrato
+dice **«LocalBusiness y cualquier subtipo, incluido BeautySalon»** — cerrando el *«es que yo
+uso BeautySalon»*.
+
+#### Comportamiento esperado
+
+1. Toda la metadata del `<head>` se emite **exclusivamente** con **`<Head>` de
+   `vite-react-ssg`**. **La metadata nativa de React 19 está PROHIBIDA** (ver «la bomba»).
+2. `index.html` contiene el literal **exacto** `<head>`, en **minúsculas y sin atributos**
+   (hoy lo cumple **[V: fichero real del repo]**), y **no** contiene `<title>` estático (hoy
+   tampoco **[V]**).
+3. **`src/lib/seo.ts`** — funciones **puras** que **componen**: el `title`, la **canónica** y
+   el **objeto JSON-LD**. No leen ficheros, ni el reloj, ni `process.env`.
+4. **El JSON-LD se escribe de cero** (T-6) y **por cada ruta prerenderizada** se emite dentro
+   de `<Head>` como `<script type="application/ld+json">`. Contenido acordado:
+   - `@type: "BeautySalon"` — el subtipo **más específico** que Google respalda **[V]**.
+   - **`name: "Nails Lash Studio"`** — **requisito de Google**, nombre **comercial** **[V]**.
+   - `address` como **`PostalAddress`** (decisión de proyecto **más estricta** que schema.org,
+     que admite `Text`), con **`addressLocality: "Las Rozas de Madrid"`** — **nunca «Las
+     Ceudas»**, que es el bug **confirmado** del cliente **[V]** — y `postalCode: "28232"`.
+   - `geo` con **exactamente** `40.5179875, -3.9226688`.
+   - `telephone` derivado de **F-02** (fuente única, I-7).
+   - **SIN `aggregateRating`. SIN `Review`. SIN `legalName`. SIN `vatID`. SIN `email`**
+     (A-11). `openingHoursSpecification` → **A-19**. `priceRange` → **A-20**.
+5. **La canónica es POR PÁGINA.** El fallo típico es que **todas hereden la misma** (la de la
+   home): la puerta lo asevera **entre páginas**, no dentro de una.
+6. Existe **la puerta del cascarón**: recorre **`dist/**/*.html`**, **por CADA ruta
+   prerenderizada** (no solo la home), sobre el **HTML crudo**, y **rompe el build de
+   producción** si hay violaciones. Se engancha a `pnpm build` **después** de
+   `vite-react-ssg build`, como F-01 y F-03 **[V: `package.json`]**.
+7. `dev` **no** la invoca. Como en F-01 y F-03: **la función es pura; el `exit ≠ 0` vive en la
+   puerta.**
+
+#### Contrato
+
+**`src/lib/seo.ts` — composición pura (mutable):**
+
+| Función | Contrato |
+| ------- | -------- |
+| `componerTitulo(pagina): string` | **Pura.** La composición exacta es **criterio de proyecto/SEO, NUNCA `SC 2.4.2`** → **A-22**. Lo que sí fija ya el contrato: **no vacío**, y **distinto por página** (regla de proyecto) |
+| `canonicaDe(ruta, origen): string` | **Pura.** **Una por página.** ⚠️ Necesita un **origen absoluto**, y el dominio final es **[NV]** (migración: la decide el cliente) → **A-21** |
+| `construirJsonLd(datos): object` | **Pura.** Recibe el NAP de F-02 y devuelve el objeto. **No** serializa, **no** lee nada. `geo` **se copia de la constante**: jamás se recalcula |
+
+**`src/lib/puerta-cascaron.ts` — el decisor puro (mutable):**
+
+| | |
+| - | - |
+| **Entrada** | `inspeccionarSitio(paginas: readonly {ruta, html: string}[], rutasEsperadas)`. **`html` son los BYTES de `dist/`**, nunca un render del árbol de componentes. **No lee ficheros, ni el reloj, ni el entorno** |
+| **Salida** | `violaciones[]`. Vacío = pasa. Cada violación identifica **qué** falta, **en qué ruta** y **con qué valor**. La puerta **acusa**, no gruñe (precedente F-01/F-03) |
+| **Determinismo** | Misma entrada → misma salida, **mismo orden**. Informe diffable |
+| **Quién decide el exit code** | **No la función.** `tools/puerta-cascaron.ts` es el **humilde**: cablea `node:fs` (recorre `dist/`), `node:process` y el `exit`. **Sin lógica, sin tests propios, fuera de `mutate`** — el contrato exacto de `tools/puerta-contraste.ts` **[V: código]** |
+
+**Violaciones que emite** (una por ruta y por regla):
+
+1. **`<title>` ausente o vacío** · 2. **`<meta name="description">` ausente o vacía** ·
+3. **canónica ausente**, o **repetida entre rutas distintas** · 4. **`lang` ausente, duplicado
+o distinto de `es`** · 5. **`<h1>` ausente o más de uno** · 6. **`main`/`nav`/`footer`
+ausente** · 7. **JSON-LD ausente, no parseable, `@type` efectivo ≠ `BeautySalon`, sin `name`,
+sin `address`, `geo` ≠ la constante** · 8. **`aggregateRating`/`Review`/`ratingValue`/
+`reviewCount` presentes a CUALQUIER profundidad** · 9. **`href` interno sin fichero
+correspondiente en `dist/`** (la puerta anti-404, A-17).
+
+**Guarda anti-«verde por vacuidad»** (A-8 en F-01, @s14 en F-03; **aquí es obligatoria**): la
+puerta recibe **`RUTAS_ESPERADAS` declarada** y exige que `dist/` contenga **una HTML por cada
+ruta esperada**, con `RUTAS_ESPERADAS` **no vacía**. Es **mejor que un mínimo mágico**: crece
+con las rutas y no hay que acordarse de subir un número. *Sin esto, `dist/` vacío → 0
+violaciones → build verde → «protegidos».*
+
+#### Casos límite debatidos
+
+1. **🔴 La trampa de React 19 — verde en `dev`, verde en jsdom, `<head>` VACÍO en producción.**
+   Ya razonada arriba. **Escenario obligatorio:** la aserción se hace sobre los bytes de
+   `dist/`, y **debe existir un escenario que demuestre que jsdom NO lo caza** — o el próximo
+   agente «simplificará» la puerta a un test de Testing Library y **la desactivará sin
+   enterarse**. *Esta es la clase de bug que ya ha matado 3 veces al stack base.*
+2. **🔴 La trampa del `replace()` literal — falla EN SILENCIO.**
+   `indexHTML.replace('<head>', …)` es **match de string exacto**, y `String.replace` con
+   string **no lanza si no encuentra**: **devuelve el HTML intacto** **[V]**. Si alguien
+   escribe `<head >`, `<HEAD>` o `<head lang="es">` en `index.html`, **la inyección no ocurre y
+   el build sigue VERDE con el `<head>` vacío**. Verde por vacuidad, **un nivel más abajo**.
+   → **Escenario obligatorio: pinchar el literal `<head>` de `index.html` y exigir ROJO.**
+   → **Buena noticia de diseño:** la puerta ya lo caza **por construcción** — sin `<head>`
+   inyectado, faltan a la vez `title`, `description`, canónica y JSON-LD. El escenario existe
+   para **anclar el porqué**, igual que `@s18` ancla el 88 % en F-03.
+3. **🔴 El `title` vacío DESAPARECE, no sale vacío.** *(Hallazgo propio del lead.)*
+   `extractHelmet` hace `if (titleString.split(">")[1] === "</title") titleString = ""`
+   **[V: `:434-436`]** → un `<Head><title>{''}</title>` **no produce un `<title>` vacío:
+   produce NINGÚN `<title>`**. → La violación se formula **«`<title>` ausente o vacío»**, no
+   «vacío»: si solo se buscara el vacío, **este caso se escaparía**.
+4. **🔴 El `200` hueco.** `/es/confidentiality_ws` **responde 200 y es jurídicamente nulo**
+   **[V]**. **Un escenario `status == 200` bendice una página legalmente vacía.** Por eso el
+   acceptance 3 se reescribe (A-17) como **integridad referencial** en F-04 + **aserción de
+   contenido del art. 10.1** en **F-16**. **Ningún escenario de este proyecto puede volver a
+   tratar un `200` como prueba de conformidad legal.**
+5. **🔴 El `@graph` anidado.** `aggregateRating` puede **reaparecer dentro de un
+   `Service`/`Offer`** del `@graph`. → **Recorrido RECURSIVO**, nunca comprobación de primer
+   nivel. Y la prohibición cubre **`Review` Y `AggregateRating`** (*«It applies to Review and
+   AggregateRating»* **[V]**) **y la propiedad suelta** (`ratingValue`/`reviewCount` **sin** su
+   envoltorio).
+6. **🔴 El alias de tipo.** La aserción es sobre el **tipo EFECTIVO**, no sobre el string
+   `"LocalBusiness"`. `@type` puede ser un **array**, o venir por `@context`/alias. **Un test
+   que haga `json['@type'] === 'BeautySalon'` cierra los ojos ante media docena de formas
+   válidas** y deja abierta la escapatoria *«es que yo uso otro tipo»*.
+7. **La canónica heredada.** Todas las páginas con la canónica de la home es **el fallo típico**
+   y **pasa cualquier test que mire una sola página**. → La puerta asevera **unicidad entre
+   rutas**. *Hoy solo hay una ruta (`/` **[V: `App.tsx`]**), así que el escenario nace
+   **inerte**: hay que escribirlo con un **fixture de dos rutas**, o es teatro.* Precedente
+   directo: `@s14` de F-03 nació inerte y **lo cazó el judge**.
+8. **El `lang` tiene DOS fuentes posibles.** Hoy sale de `index.html` (`<html lang="es">`
+   **[V]**); `<Head>` **también** puede inyectarlo (`indexHTML.replace('<html', '<html ' +
+   htmlAttributes)` **[V: `:127-128`]**). Si ambos existen → **`<html lang="xx" lang="es">`**,
+   atributo **duplicado**. Cuál gana es **[NV]** y **no hace falta averiguarlo**: la decisión
+   es **una sola fuente** (`index.html`) y **la puerta asevera exactamente un `lang`, con valor
+   `es`**. *Resolver una ambigüedad prohibiéndola es más barato que verificarla.*
+9. **`geo`: verificado a nivel de EDIFICIO, jamás de Local 41.** La constante **se queda**:
+   `40.5179875, -3.9226688`. Prueba **[V]**: *point-in-polygon* (ray casting) contra Overpass +
+   `api.openstreetmap.org` → el punto cae **geométricamente DENTRO** de `way/34502818`
+   `{building=yes, shop=mall, name="Centro comercial Zoco Rozas"}`; los otros 4 edificios del
+   radio de 80 m dan **fuera**. Reverse de Nominatim del punto exacto: *«Bar Cañas, 75, Avenida
+   de Atenas, Las Rozas de Madrid…»*, a **10,8 m** (haversines recalculadas de forma
+   independiente, R = 6371008.8). **Límite honesto declarado:** Nominatim devuelve `[]` para
+   «Nails Lash Studio Las Rozas» → **un escenario que afirme «geo == Local 41» afirma más de lo
+   que ninguna fuente sostiene**. → **El escenario correcto:** el JSON-LD emite **exactamente
+   la constante acordada**, y **muta si alguien la toca**. **JAMÁS la recalcula ni la "corrige"
+   desde OSM.**
+10. **El CP no se verifica contra OSM.** Se fija a **28232** (dato del cliente). **OSM se
+    contradice a sí mismo** (nodo del mall 28242 vs nodos del nº 75 en 28232) y `way/34502818`
+    **no lleva `addr:postcode`** **[V]**. → *Verificar el CP contra OSM introduciría un bug.*
+11. **`priceRange` es Text, no número.** Literal: *«for example $$$»* **[V]**. Un
+    `"priceRange": 25` es **sintácticamente válido y basura semántica**: **nadie lo rechaza,
+    degrada en silencio**. → **A-20**.
+12. **`address` admite `Text`.** Un string **pasa** la validación de schema.org **[V]**. Exigir
+    `PostalAddress` es **nuestro**, no del vocabulario: se declara como tal.
+
+#### Modos de error
+
+- **Violación encontrada** → **exit ≠ 0** + informe legible: **una línea por violación**, con
+  ruta, regla y valor.
+- **`dist/` inexistente, vacío, o sin una HTML por cada `RUTAS_ESPERADAS`** → **falla
+  cerrada**. Es **el modo de fallo más probable de esta puerta**: se ejecuta **después** del
+  build, y un build que no generó nada la dejaría escaneando el vacío.
+- **JSON-LD no parseable** → **violación**, nunca excepción tragada. Una puerta que se traga su
+  excepción y devuelve `[]` es **peor que ninguna**: es literalmente cómo se evaporaron los 3
+  bloqueantes AA del stack base **[V]**.
+- **Error de la propia puerta** → **build roto, nunca build verde** (derivación de D-9/I-8,
+  **[I]**, igual que F-01 y F-03).
+
+#### Mutantes que deben morir (I-6, umbral 1.0)
+
+- **Negar cualquier predicado de presencia** (`title`, `description`, canónica, `h1`,
+  landmarks, `name`, `address`) → rompe.
+- **`&&` → `||`** en la conjunción de reglas y **`===` → `!==`** en la comparación de `@type`
+  → rompe.
+- **`> 1` → `>= 1`** en la cuenta de `h1` (la frontera exacta entre «uno» y «ninguno/varios»).
+- **Cortar la RECURSIÓN** del buscador de `aggregateRating` (quedarse en el primer nivel) →
+  **debe romper** → exige un **fixture de `@graph` con `aggregateRating` anidado** dentro de un
+  `Service`. *Sin fixture negativo, este mutante sobrevive* (lección de F-03).
+- **Tocar un dígito de `geo`** → rompe (el escenario 9).
+- **Vaciar `RUTAS_ESPERADAS`** → **debe romper** (guarda de vacuidad).
+- **Anti-tautología (regla dura del arnés):** el esperado se escribe **a mano** en el escenario
+  (`'40.5179875'`, `'Las Rozas de Madrid'`, `'BeautySalon'`), **nunca** se importa de
+  `site.ts`/`seo.ts` ni se recomputa con la función vigilada. Si el test importa la constante
+  que debería vigilar, **no vigila nada** — es el primer mutante superviviente de WebEmpresa.
+
+#### Preguntas abiertas de esta feature
+
+- **A-17** — 🔴 **la que bloquea el Gherkin**: reparto F-04/F-16 de las páginas legales y
+  reescritura de los **acceptance 3 y 4**. **NO destilar el acceptance 3 tal cual.**
+- **A-18** — ¿`SC 2.4.11` es de F-04 o de F-06?
+- **A-19** — `openingHoursSpecification` vs `openingHours`, y **¿F-04 o F-10?**
+- **A-20** — `priceRange`: ¿entra ya, espera a F-09, o no entra?
+- **A-21** — el **origen absoluto** de la canónica (dominio **[NV]**, migración).
+- **A-22** — la **composición literal** del `<title>` (criterio de proyecto, **no** WCAG).
+- **A-11** (ya abierta) — si el **email** entra como registro placeholder, **no** se emite en el
+  JSON-LD hasta que el cliente lo confirme.
+
+---
+
+### Las 16 features restantes
 
 **No se especifican aquí a propósito.** Están troceadas, con sus criterios de aceptación,
 sus dependencias, su puerta legal, su flag `mutable` y su estado, en **`feature_list.json`**;
