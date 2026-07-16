@@ -291,11 +291,20 @@ describe('la puerta falla cerrada (A-13 guarda (a); modos de error)', () => {
 
   // @s14. Verde por vacuidad: 0 fallos sobre 0 pares no es estar protegido, es no haber
   // mirado. La puerta EXIGE un mínimo CONOCIDO de pares evaluados.
-  it.each([
-    ['una matriz de uso vacía', scssReal, [] as ParDeUso[]],
-    ['un SCSS cuyo :root no casa ningún token', () => 'body { color: red; }', [] as ParDeUso[]],
-  ])('@s14 con %s el código de salida es distinto de 0', (_caso, leerScss, matriz) => {
-    const resultado = ejecutarPuertaDeContraste({ leerScss, matriz, minimoDePares: 16 })
+  // La 2ª fila («un SCSS cuyo :root no casa ningún token») SE RETIRÓ el 2026-07-16 junto con el 2º
+  // Given de @s14, con aprobación humana en la puerta. Era INERTE y el judge la cazó: pasaba
+  // `matriz: []`, que cortocircuita ANTES de mirar el SCSS, así que `leerScss` no influía — daba
+  // resultado IDÉNTICO con el SCSS falso y con el real. Un test verde por vacuidad dentro del
+  // escenario que persigue el verde por vacuidad.
+  // Ejercerla de verdad (matriz REAL + SCSS que no casa) sale por @s15 —«el token "--muted" no está
+  // declarado en el :root»—, que ya la cubre y la cubre mejor: acusa el token exacto en vez de
+  // gruñir «0 de 18». No se pierde cobertura: está medido.
+  it('@s14 con una matriz de uso vacía el código de salida es distinto de 0', () => {
+    const resultado = ejecutarPuertaDeContraste({
+      leerScss: scssReal,
+      matriz: [],
+      minimoDePares: 16,
+    })
 
     expect(resultado.codigoSalida).not.toBe(0)
   })

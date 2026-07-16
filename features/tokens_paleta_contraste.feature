@@ -20,6 +20,10 @@
 #   - C4/C7 → dos justificaciones del audit eran falsas; las decisiones sobreviven, el porqué
 #            se reescribió (SC 1.4.11 va de IDENTIFICAR el componente; F83 es Quickcheck)
 #   - C3   → «≥18,5 px negrita» es la cifra OFICIAL y se conserva; «18,66 px» no existe en w3.org
+#   - @s14 → se RETIRÓ su 2º Given («o un regex del SCSS que no casa ningún token») el 2026-07-16
+#            con aprobación humana: contradecía a @s15 y su Then era INSATISFACIBLE. Ese caso es
+#            de @s15, que lo cubre mejor (acusa el token exacto). Sin pérdida de cobertura, medido.
+#            Ver el comentario del propio @s14 y `progress/tdd_tokens_paleta_contraste.md` §Post-cierre
 #   - La fila `1px solid #AB5F79` de @s4 se añadió POR MUTACIÓN (superviviente real: borrar el `^`
 #            de `HEX_VALIDO`), con aprobación humana en la puerta el 2026-07-16. Hueco del CONTRATO,
 #            no del código: la producción no cambia. Precedente F-01/@s5, `progress/mutation_puerta_placeholders.md` §2
@@ -406,11 +410,28 @@ Feature: Tokens de la paleta Rosa + puerta de contraste que recalcula los ratios
 
   @s14
   Scenario: la puerta falla si no ha evaluado un mínimo de pares (verde por vacuidad)
-    Given una matriz de uso vacía, o un regex del SCSS que no casa ningún token
+    Given una matriz de uso vacía
     When se ejecuta la puerta de contraste
     Then el código de salida es distinto de 0
     And la salida declara que no se evaluó el mínimo de pares exigido
     And la salida NO declara que no haya fallos de contraste
+    # ⚠️ EL 2º GIVEN («o un regex del SCSS que no casa ningún token») SE RETIRÓ el 2026-07-16 con
+    # APROBACIÓN HUMANA en la puerta: contradecía a @s15 y su Then era INSATISFACIBLE.
+    # Medido con producción real, no razonado en el aire:
+    #   matriz vacía + SCSS real         → «no se evaluó el mínimo… 0 de 16»   (este escenario)
+    #   matriz vacía + SCSS que no casa  → línea IDÉNTICA a la anterior: el SCSS NO influye, porque
+    #                                      la matriz vacía cortocircuita. El test era INERTE (lo
+    #                                      cazó el judge: «un test verde por vacuidad DENTRO del
+    #                                      escenario que persigue el verde por vacuidad»).
+    #   matriz REAL   + SCSS que no casa → «el token "--muted" no está declarado en el :root» → @s15
+    # Un `:root` que no casa ningún token ES «un token de la matriz no declarado en el :root», que
+    # es literalmente la 2ª fila de @s15: la misma entrada satisface los dos Given y cada escenario
+    # exige un mensaje DISTINTO. `valorDelToken` lanza antes de llegar a la guarda del mínimo.
+    # El caso del regex es de @s15, que lo cubre MEJOR: acusa el token exacto en vez de gruñir
+    # «0 de 18». Retirarlo NO pierde cobertura (medido) y no toca producción.
+    # La raíz: @s14 imaginaba un diseño donde `evaluarMatriz` se saltara EN SILENCIO los pares
+    # irresolubles para que la guarda los contara como 0 — el diseño PEOR. @s15 impone el bueno.
+    # El contrato codificaba los dos a la vez. Misma forma que la contradicción A-16.
     # A-13, guarda (a), análoga a A-8 de F-01. Verde por vacuidad: 0 fallos sobre 0 pares no es estar
     # protegido, es no haber mirado. Una matriz que apunta a un token que ya no existe, o un regex que
     # deja de casar `:root`, haría que la puerta pasara «protegidos». La puerta EXIGE un mínimo conocido
