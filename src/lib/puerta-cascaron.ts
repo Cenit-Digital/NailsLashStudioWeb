@@ -106,23 +106,30 @@ function tieneLandmark(html: string, landmark: string): boolean {
  * comunica VISUALMENTE debe existir EN EL CÓDIGO. Una `section` titulada con un `div` con
  * `font-size` le cuenta a quien VE que ese texto la titula, y a nadie más.
  *
- * ⚠️ LÍMITE DECLARADO, Y ESTÁ ESCRITO A PROPÓSITO: esta regla comprueba que el
- * `aria-labelledby` EXISTE y que su id RESUELVE A ALGÚN ELEMENTO — que es literalmente lo que
- * fijan las tres filas de @s18 («cuyo id no existe en NINGÚN elemento»). NO comprueba que el
- * destino sea un heading, y por tanto un `<section aria-labelledby="x">` + `<div id="x">` PASA.
- * Implementarlo sería producción que NINGUNA fila roja pide (Ley 1) y dejaría un mutante
- * INMORTAL: ninguna fila distingue un `<h2 id="x">` de un `<div id="x">`. Cerrar ese coladero
- * exige una FILA NUEVA en el .feature → puerta humana, no un parche aquí.
- * (Precedente literal del repo: la rama de «texto grande» que F-03 NO implementó, por esto.)
+ * ✅ CUARTA FILA AÑADIDA EL 2026-07-17 (puerta humana): el `aria-labelledby` tiene que resolver
+ * A UN HEADING REAL, no a cualquier elemento. Las tres filas originales PROMETÍAN lo que ninguna
+ * probaba —ninguna distinguía un `<h2 id="x">` de un `<div id="x">`— y el coladero estaba
+ * ABIERTO justo en la forma que la regla existe para prohibir.
+ *
+ * QUÉ CUENTA COMO HEADING: `h1`…`h6`, Y NADA MÁS. El contrato NO fija `role="heading"` ni
+ * `aria-level` → NO SE INVENTAN: lo que no está escrito, no está decidido. Si mañana hacen
+ * falta, se vuelve a la puerta y se añade una fila.
  */
 export const REGLA_SECTION = 'section sin aria-labelledby a un heading real'
 
 const SECCION = /<section\b([^>]*)>/gi
 const ATRIBUTO_LABELLEDBY = /\baria-labelledby\s*=\s*"([^"]*)"/i
-const ATRIBUTOS_ID = /\bid\s*=\s*"([^"]*)"/gi
+/**
+ * Los ids que cuelgan de un HEADING REAL (`h1`…`h6`).
+ *
+ * Es lo que hace que @s18 mida `SC 1.3.1` DE VERDAD: la relación que el diseño comunica
+ * VISUALMENTE («este texto titula esta sección») tiene que existir EN EL CÓDIGO. Un `div` con
+ * `font-size` se la cuenta solo a quien VE.
+ */
+const HEADING_CON_ID = /<h[1-6]\b[^>]*\bid\s*=\s*"([^"]*)"[^>]*>/gi
 
-function idsDe(html: string): Set<string> {
-  return new Set([...html.matchAll(ATRIBUTOS_ID)].map((atributo) => atributo[1]))
+export function idsDeHeadings(html: string): Set<string> {
+  return new Set([...html.matchAll(HEADING_CON_ID)].map((heading) => heading[1]))
 }
 
 export const REGLA_JSONLD_AUSENTE = 'JSON-LD ausente'
@@ -134,7 +141,7 @@ const TIPO_ACORDADO = 'BeautySalon'
 
 type NodoJson = Record<string, unknown>
 
-function esNodo(valor: unknown): valor is NodoJson {
+export function esNodo(valor: unknown): valor is NodoJson {
   return typeof valor === 'object' && valor !== null && !Array.isArray(valor)
 }
 
@@ -173,7 +180,7 @@ export function nodosDe(valor: unknown, ruta: string = RAIZ_DEL_JSONLD): NodoLoc
  * El tipo EFECTIVO de un nodo: `@type` es un string O UN ARRAY, y las dos formas son válidas.
  * Una comparación `nodo['@type'] === 'BeautySalon'` cierra los ojos ante `["BeautySalon"]`.
  */
-function tiposDe(nodo: NodoJson): string[] {
+export function tiposDe(nodo: NodoJson): string[] {
   const tipo = nodo['@type']
 
   if (typeof tipo === 'string') {
@@ -355,7 +362,7 @@ export function langsDe(html: string): string[] {
   return [...elemento[1].matchAll(ATRIBUTOS_LANG)].map((atributo) => atributo[1])
 }
 
-function contenidoDelTitulo(html: string): string | null {
+export function contenidoDelTitulo(html: string): string | null {
   const encontrado = TITULO.exec(html)
 
   return encontrado === null ? null : encontrado[1].trim()
@@ -485,7 +492,9 @@ function violacionesDeLaPagina(
     }
   }
 
-  const ids = idsDe(pagina.html)
+  // Los ids de HEADINGS, no los de cualquier elemento (@s18, 4a fila): un aria-labelledby que
+  // resuelve a un <div> promete una relacion que el arbol de accesibilidad no puede construir.
+  const ids = idsDeHeadings(pagina.html)
 
   for (const seccion of pagina.html.matchAll(SECCION)) {
     const referencia = ATRIBUTO_LABELLEDBY.exec(seccion[1])?.[1]

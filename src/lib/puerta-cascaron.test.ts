@@ -7,7 +7,20 @@ import {
   ejecutarPuertaDelCascaron,
   type FicheroHtml,
   inspeccionarSitio,
+  cabezaDe,
+  canonicaDeLaPagina,
+  contenidoDelTitulo,
+  cuantosH1,
+  descripcionDe,
+  esNodo,
+  extraerEnlaces,
+  idsDeHeadings,
+  langsDe,
+  leerJsonLd,
+  nodosDe,
   type PaginaArtefacto,
+  rutaDelFichero,
+  tiposDe,
   RUTAS_ESPERADAS,
 } from './puerta-cascaron.ts'
 
@@ -281,6 +294,20 @@ describe('inspeccionarSitio → section con título en el código (@s18)', () =>
     [
       'una <section aria-labelledby="x"> cuyo id "x" no existe en ningún elemento',
       '<section aria-labelledby="x"><h2 id="otro">Servicios</h2></section>',
+      1,
+    ],
+    /**
+     * ✅ CUARTA FILA (aprobación humana en la puerta, 2026-07-17). Las tres de arriba PROMETÍAN
+     * LO QUE NINGUNA PROBABA: la regla se llama «section sin aria-labelledby A UN HEADING REAL»
+     * y ninguna distinguía un `<h2 id="x">` de un `<div id="x">` → el coladero estaba ABIERTO, y
+     * era JUSTO LA FORMA QUE LA PROSA QUIERE PROHIBIR: el `div` con `font-size` le cuenta «esto
+     * titula esta sección» SOLO A QUIEN LO VE.
+     * Importa más que ninguna otra fila: @s18 es LA ÚNICA de las diez reglas que mide `SC 1.3.1`
+     * DE VERDAD. Sin ella, el acceptance 1 NO ESTABA PROTEGIDO.
+     */
+    [
+      '<section aria-labelledby="x"> con <div id="x">: el id resuelve a algo que NO es heading',
+      '<section aria-labelledby="x"><div id="x" class="titulo">Servicios</div></section>',
       1,
     ],
   ])('@s18 %s → %i violación(es)', (_situacion, secciones, cuantas) => {
@@ -876,5 +903,418 @@ describe('RUTAS_ESPERADAS está anclada (@s26, @s27)', () => {
 
   it('@s27 RUTAS_ESPERADAS no está vacía: si lo estuviera, la guarda de @s26 se desactivaría', () => {
     expect(RUTAS_ESPERADAS.length).toBeGreaterThan(0)
+  })
+})
+
+/**
+ * LOS EXTRACTORES, PROBADOS DIRECTAMENTE.
+ *
+ * Los escenarios ejercitan la puerta de punta a punta, y eso deja los extractores probados SOLO
+ * por la ruta feliz: la mutación destapó que su ROBUSTEZ (la caja, el espaciado, los atributos
+ * de más, lo que no es un objeto) no la fijaba NADIE. Un extractor que deja de casar hace que la
+ * puerta pase «protegidos» sin haber mirado — el mismo verde por vacuidad de @s28, un nivel más
+ * abajo. Precedente literal: F-03 probó `extraerTokens` y `hexARgb` directamente, por esto mismo.
+ *
+ * El HTML del dist viene MINIFICADO y con atributos que no controlamos: `data-rh="true"` lo pone
+ * Helmet [V: dist/index.html real]. Un extractor que exigiera `<title>` exacto no casaría NADA.
+ */
+describe('los extractores del HTML CRUDO, probados directamente', () => {
+  it.each([
+    ['<head><title>Hola</title></head>', 'Hola'],
+    ['<head><title data-rh="true">Hola</title></head>', 'Hola'],
+    ['<head><TITLE>Hola</TITLE></head>', 'Hola'],
+    ['<head><title>\n  Hola\n</title></head>', 'Hola'],
+    ['<head></head>', null],
+  ])('contenidoDelTitulo(%j) es %j', (html, esperado) => {
+    expect(contenidoDelTitulo(cabezaDe(html))).toBe(esperado)
+  })
+
+  it.each([
+    ['<head><meta name="description" content="Hola"></head>', 'Hola'],
+    ['<head><meta content="Hola" name="description"></head>', 'Hola'],
+    ['<head><meta NAME="Description" content="Hola"></head>', 'Hola'],
+    ['<head><meta name = "description" content = "Hola"></head>', 'Hola'],
+    ['<head><meta name="description" content=""></head>', ''],
+    ['<head><meta name="description"></head>', ''],
+    ['<head><meta name="viewport" content="x"></head>', null],
+    ['<head></head>', null],
+  ])('descripcionDe(%j) es %j', (html, esperado) => {
+    expect(descripcionDe(cabezaDe(html))).toBe(esperado)
+  })
+
+  it.each([
+    [
+      '<head><link rel="canonical" href="https://example.invalid/"></head>',
+      'https://example.invalid/',
+    ],
+    [
+      '<head><link href="https://example.invalid/" rel="canonical"></head>',
+      'https://example.invalid/',
+    ],
+    [
+      '<head><link REL="Canonical" href="https://example.invalid/"></head>',
+      'https://example.invalid/',
+    ],
+    ['<head><link rel="canonical"></head>', ''],
+    ['<head><link rel="stylesheet" href="/a.css"></head>', null],
+    ['<head></head>', null],
+  ])('canonicaDeLaPagina(%j) es %j', (html, esperado) => {
+    expect(canonicaDeLaPagina(cabezaDe(html))).toBe(esperado)
+  })
+
+  // El extractor de atributos devuelve '' cuando la etiqueta existe SIN el atributo pedido, y
+  // null cuando la etiqueta no existe. Son casos distintos y la regla los trata igual («ausente
+  // O vacía»), pero el `?? ''` no lo fijaba ningún test: sin él, la puerta reventaría.
+  it('descripcionDe distingue «no hay meta» (null) de «meta sin content» ("")', () => {
+    expect(descripcionDe(cabezaDe('<head></head>'))).toBeNull()
+    expect(descripcionDe(cabezaDe('<head><meta name="description"></head>'))).toBe('')
+  })
+
+  it('canonicaDeLaPagina distingue «no hay link» (null) de «link sin href» ("")', () => {
+    expect(canonicaDeLaPagina(cabezaDe('<head></head>'))).toBeNull()
+    expect(canonicaDeLaPagina(cabezaDe('<head><link rel="canonical"></head>'))).toBe('')
+  })
+
+  // 🔴 `cabezaDe` ES LA MITAD DE LA FEATURE (@s32): sin ella la puerta encuentra el `<title>`
+  // que React 19 emite EN EL BODY y da el build por bueno.
+  it.each([
+    ['<html><head><title>x</title></head><body><h1>y</h1></body></html>', true],
+    ['<html><head></head><body><title>x</title></body></html>', false],
+    ['<html><body><title>x</title></body></html>', false],
+  ])('cabezaDe(%j) aisla el head del body: hay title en el head = %s', (html, headTieneTitulo) => {
+    expect(/<title/i.test(cabezaDe(html))).toBe(headTieneTitulo)
+  })
+
+  it('cabezaDe devuelve "" si no hay head: todas las reglas del head acusan (@s33)', () => {
+    expect(cabezaDe('<html><body><h1>x</h1></body></html>')).toBe('')
+  })
+
+  it('cabezaDe casa el head aunque lleve atributos', () => {
+    expect(cabezaDe('<html><head lang="es"><title>x</title></head></html>')).toContain('<title>')
+  })
+
+  it.each([
+    ['<html lang="es">', ['es']],
+    ['<html>', []],
+    ['<html lang="xx" lang="es">', ['xx', 'es']],
+    ['<html LANG="es">', ['es']],
+    ['<html lang = "es">', ['es']],
+    ['<html data-x="1" lang="es" class="y">', ['es']],
+    // El `lang` de un elemento del BODY no es el del documento: solo cuenta el de <html>.
+    ['<html lang="es"><body><p lang="en">x</p></body></html>', ['es']],
+  ])('langsDe(%j) es %j', (html, esperado) => {
+    expect(langsDe(html)).toEqual(esperado)
+  })
+
+  it.each([
+    ['<h1>x</h1>', 1],
+    ['', 0],
+    ['<h1>a</h1><h1>b</h1>', 2],
+    ['<H1>x</H1>', 1],
+    ['<h1 class="hero">x</h1>', 1],
+    // El `\b` NO es decorativo: sin el, <h10> contaria como h1.
+    ['<h10>x</h10>', 0],
+  ])('cuantosH1(%j) es %i', (html, esperado) => {
+    expect(cuantosH1(html)).toBe(esperado)
+  })
+
+  it.each([
+    ['<a href="/">x</a>', ['/']],
+    ['<a class="c" href="/a" data-x="1">x</a>', ['/a']],
+    ['<a HREF="/a">x</a>', ['/a']],
+    ['<a href="/a">x</a><a href="tel:+34625223366">y</a>', ['/a', 'tel:+34625223366']],
+    ['<a>sin href</a>', []],
+    ['', []],
+    // El `\b`: <article> NO es un enlace.
+    ['<article href="/no">x</article>', []],
+  ])('extraerEnlaces(%j) es %j', (html, esperado) => {
+    expect(extraerEnlaces(html)).toEqual(esperado)
+  })
+
+  it.each([
+    ['dist/index.html', '/'],
+    ['dist/servicios/index.html', '/servicios'],
+    ['dist/aviso-legal/index.html', '/aviso-legal'],
+  ])('rutaDelFichero(%j) es %j', (ubicacion, esperado) => {
+    expect(rutaDelFichero(ubicacion)).toBe(esperado)
+  })
+
+  // 🔴 SOLO los ids que cuelgan de un HEADING REAL (h1…h6): es lo que hace que @s18 mida
+  // `SC 1.3.1` de verdad. Un `div` con id NO titula nada para quien no ve.
+  it.each([
+    ['<section aria-labelledby="x"><h2 id="x">T</h2></section>', ['x']],
+    ['<h1 id="a">A</h1><h6 id="b">B</h6>', ['a', 'b']],
+    ['<h2>sin id</h2>', []],
+    ['<h2 ID="a">A</h2>', ['a']],
+    ['<h2 class="t" id="a" data-x="1">A</h2>', ['a']],
+    ['<div id="a">A</div>', []],
+    ['<p id="a">A</p>', []],
+    // h7 NO existe: el rango es h1..h6 y nada mas.
+    ['<h7 id="a">A</h7>', []],
+  ])('idsDeHeadings(%j) es %j', (html, esperado) => {
+    expect([...idsDeHeadings(html)]).toEqual(esperado)
+  })
+})
+
+/**
+ * EL RECORRIDO DEL JSON-LD, probado directamente. Es el corazon de @s20/@s21/@s22/@s35: si
+ * `esNodo` o `tiposDe` se rompen, la puerta deja de ver nodos y pasa «protegidos» — o revienta.
+ */
+describe('el recorrido del JSON-LD, probado directamente', () => {
+  it.each([
+    [{}, true],
+    [{ a: 1 }, true],
+    // 🔴 `typeof null === 'object'` [V]: sin el `!== null`, un `null` del JSON-LD se trataria
+    // como nodo y `Object.entries(null)` REVENTARIA la puerta.
+    [null, false],
+    [[], false],
+    [[1, 2], false],
+    ['texto', false],
+    [42, false],
+    [undefined, false],
+  ])('esNodo(%j) es %s', (valor, esperado) => {
+    expect(esNodo(valor)).toBe(esperado)
+  })
+
+  it.each([
+    [{ '@type': 'BeautySalon' }, ['BeautySalon']],
+    [{ '@type': ['BeautySalon'] }, ['BeautySalon']],
+    [{ '@type': ['BeautySalon', 'Organization'] }, ['BeautySalon', 'Organization']],
+    [{}, []],
+    [{ '@type': null }, []],
+    [{ '@type': 42 }, []],
+    // Un `@type` con basura NO tumba el recorrido: se queda con los strings.
+    [{ '@type': ['BeautySalon', 42, null] }, ['BeautySalon']],
+  ])('tiposDe(%j) es %j', (nodo, esperado) => {
+    expect(tiposDe(nodo as Record<string, unknown>)).toEqual(esperado)
+  })
+
+  it('nodosDe recorre raiz, @graph y anidados, y les pone su RUTA', () => {
+    expect(
+      nodosDe({ '@graph': [{ '@type': 'Service', offers: { '@type': 'Offer' } }] }).map(
+        (localizado) => localizado.ruta,
+      ),
+    ).toEqual(['$', '$.@graph[0]', '$.@graph[0].offers'])
+  })
+
+  it('nodosDe no revienta con null ni con primitivos dentro', () => {
+    expect(
+      nodosDe({ a: null, b: 'x', c: 1, d: [null, 'y'] }).map((localizado) => localizado.ruta),
+    ).toEqual(['$'])
+  })
+
+  it.each([
+    ['<script type="application/ld+json">{"a":1}</script>', 'leido'],
+    ['<script type="application/ld+json">  {"a":1}  </script>', 'leido'],
+    ['<script data-rh="true" type="application/ld+json">{"a":1}</script>', 'leido'],
+    ['<script type="application/ld+json"></script>', 'roto'],
+    ['<script type="application/ld+json">{ no</script>', 'roto'],
+    ['<script type="text/javascript">var a=1</script>', 'ausente'],
+    ['', 'ausente'],
+  ])('leerJsonLd(%j).estado es %s', (html, esperado) => {
+    expect(leerJsonLd(html).estado).toBe(esperado)
+  })
+
+  // El `.trim()` del crudo: sin el, `JSON.parse('  {..}  ')` funciona igual, pero el VALOR que
+  // el informe acusa llevaria los espacios. El informe acusa lo que hay escrito.
+  it('leerJsonLd acusa el crudo SIN espacios de relleno', () => {
+    const lectura = leerJsonLd('<script type="application/ld+json">   { roto   </script>')
+
+    expect(lectura.estado).toBe('roto')
+    expect(lectura.estado === 'roto' ? lectura.crudo : '').toBe('{ roto')
+  })
+})
+
+/**
+ * LOS HUECOS QUE DESTAPÓ LA MUTACIÓN. Ninguno cambia una regla: todos ejercitan una regla que YA
+ * ESTÁ DECLARADA en el contrato, con un fixture que su tabla no llegaba a distinguir.
+ */
+describe('los huecos que destapó la mutación', () => {
+  /**
+   * 🔴 LA REGLA DICE «lang ausente, DUPLICADO o distinto de es», y la tabla de @s15 NO PROBABA EL
+   * DUPLICADO DE VERDAD: su fila es `<html lang="xx" lang="es">`, y ahí el primero (`xx`) YA ES
+   * distinto de `es`, así que la caza el chequeo del VALOR — el del RECUENTO no hacía falta.
+   * Con `lang="es" lang="es"` el valor es correcto y lo único que acusa es el RECUENTO.
+   * Sin este test, quitar `langs.length !== UN_SOLO_LANG` NO ROMPÍA NADA: la mitad
+   * «DUPLICADO» de la regla se podía borrar en silencio.
+   * NO es una regla nueva: es la que el contrato ya declara, con el fixture que la aísla.
+   */
+  it('@s15 un lang DUPLICADO con los dos valores correctos SIGUE siendo violación', () => {
+    expect(
+      inspeccionarSitio([paginaCompleta('/', { elementoHtml: '<html lang="es" lang="es">' })], ['/']),
+    ).toEqual([{ ruta: '/', regla: 'lang ausente, duplicado o distinto de es', valor: 'es, es' }])
+  })
+
+  /**
+   * `typeof null === 'object'` [V]. Un `null` en el JSON-LD es JSON VÁLIDO, así que la puerta lo
+   * ve; si `esNodo` no lo descartara, `tiposDe(null)` REVENTARÍA. Reventar no es el fin del
+   * mundo (@s29 lo convierte en build roto), pero informaría por la rama equivocada: «la puerta
+   * no pudo completar la inspección» en vez de «address no es PostalAddress».
+   */
+  it('@s21 un address null se acusa como address no PostalAddress, y NO revienta la puerta', () => {
+    const violaciones = inspeccionarSitio(
+      [paginaCompleta('/', { jsonLd: jsonLdModificado((n) => (n.address = null as never)) })],
+      ['/'],
+    )
+
+    expect(violaciones).toHaveLength(1)
+    expect(violaciones[0].regla).toBe('address no es PostalAddress')
+  })
+
+  it('@s21 un geo null se acusa como geo ausente, y NO revienta la puerta', () => {
+    const violaciones = inspeccionarSitio(
+      [paginaCompleta('/', { jsonLd: jsonLdModificado((n) => (n.geo = null as never)) })],
+      ['/'],
+    )
+
+    expect(violaciones).toHaveLength(1)
+    expect(violaciones[0].regla).toBe('geo ausente')
+  })
+
+  /**
+   * El `||` de «address no es un nodo O su tipo no es PostalAddress» son DOS caminos al MISMO
+   * fallo, y la tabla de @s21 solo ejercitaba el primero (el `Text` del cliente). Sin la fila de
+   * abajo, cambiar ese `||` por `&&` no rompía nada: un `address` que ES objeto pero declara
+   * OTRO tipo (o ninguno) se colaría — y ese es el caso realista, no el string suelto.
+   */
+  it.each([
+    ['un objeto SIN @type', { streetAddress: 'Av. de Atenas 75' }],
+    ['un objeto con OTRO @type', { '@type': 'Place', streetAddress: 'Av. de Atenas 75' }],
+  ])('@s21 un address que es %s no es PostalAddress: violación', (_situacion, address) => {
+    const violaciones = inspeccionarSitio(
+      [paginaCompleta('/', { jsonLd: jsonLdModificado((n) => (n.address = address as never)) })],
+      ['/'],
+    )
+
+    expect(violaciones).toHaveLength(1)
+    expect(violaciones[0].regla).toBe('address no es PostalAddress')
+  })
+
+  // El `typeof … !== 'string'` de streetAddress: la tabla solo prueba la cadena vacía. Un
+  // streetAddress que NO es texto (un número, un objeto) es igual de incompleto.
+  it('@s21 un streetAddress que no es texto es address incompleta', () => {
+    const violaciones = inspeccionarSitio(
+      [
+        paginaCompleta('/', {
+          jsonLd: jsonLdModificado(
+            (n) => ((n.address as unknown as Record<string, unknown>).streetAddress = 42),
+          ),
+        }),
+      ],
+      ['/'],
+    )
+
+    expect(violaciones).toHaveLength(1)
+    expect(violaciones[0].regla).toBe('address incompleta')
+  })
+
+  // Idem para `name`: la tabla prueba «no hay» y «vacío». Un name que no es texto es lo mismo.
+  it('@s21 un name que no es texto es JSON-LD sin name', () => {
+    const violaciones = inspeccionarSitio(
+      [paginaCompleta('/', { jsonLd: jsonLdModificado((n) => (n.name = 42 as never)) })],
+      ['/'],
+    )
+
+    expect(violaciones).toHaveLength(1)
+    expect(violaciones[0].regla).toBe('JSON-LD sin name')
+  })
+})
+
+/**
+ * LA PUERTA ACUSA, NO GRUÑE — Y EL `valor` ES LA MITAD DE LA ACUSACIÓN (@s13, @s15, @s21, @s25).
+ *
+ * La mutación destapó que casi ningún test miraba el `valor`: se podía vaciar TODOS los `valor`
+ * del informe y la suite seguía verde. Un informe que dice «geo distinto de la constante» sin
+ * decir QUÉ geo encontró obliga a abrir el dist a mano — y a las 3 de la mañana nadie lo abre.
+ */
+describe('el informe acusa el VALOR encontrado, no solo la regla', () => {
+  it.each([
+    [
+      'geo distinto de la constante',
+      () => jsonLdModificado((n) => ((n.geo as unknown as Record<string, number>).latitude = 40.5179876)),
+      '40.5179876, -3.9226688',
+    ],
+    [
+      'address no es PostalAddress',
+      () => jsonLdModificado((n) => (n.address = 'AV.ATENAS 75 LOCAL 41 C.C.ZOCO MONTE ROZAS' as never)),
+      'AV.ATENAS 75 LOCAL 41 C.C.ZOCO MONTE ROZAS',
+    ],
+    ['JSON-LD sin name', () => jsonLdModificado((n) => (n.name = 42 as never)), '42'],
+  ])('la violación "%s" declara el valor encontrado', (regla, construir, esperado) => {
+    const violaciones = inspeccionarSitio([paginaCompleta('/', { jsonLd: construir() })], ['/'])
+
+    expect(violaciones[0].regla).toBe(regla)
+    expect(violaciones[0].valor).toContain(esperado)
+  })
+
+  it('la violación del JSON-LD no parseable acusa EL CRUDO que no pudo parsear', () => {
+    const violaciones = inspeccionarSitio([paginaCompleta('/', { jsonLd: '{ esto no es json' })], ['/'])
+
+    expect(violaciones[0].regla).toBe('JSON-LD no parseable')
+    expect(violaciones[0].valor).toBe('{ esto no es json')
+  })
+
+  it('la violación de la section acusa el aria-labelledby que no resolvió', () => {
+    const violaciones = inspeccionarSitio(
+      [
+        paginaCompleta('/', {
+          secciones: '<section aria-labelledby="no-existe"><h2 id="otro">S</h2></section>',
+        }),
+      ],
+      ['/'],
+    )
+
+    expect(violaciones[0].regla).toBe('section sin aria-labelledby a un heading real')
+    expect(violaciones[0].valor).toBe('no-existe')
+  })
+
+  it('la violación del h1 acusa CUÁNTOS encontró', () => {
+    const violaciones = inspeccionarSitio([paginaCompleta('/', { cuantosH1: 3 })], ['/'])
+
+    expect(violaciones[0].regla).toBe('h1 ausente o más de uno')
+    expect(violaciones[0].valor).toBe('3')
+  })
+
+  it('la violación de reseñas acusa la clave Y la ruta del nodo', () => {
+    const violaciones = inspeccionarSitio(
+      [
+        paginaCompleta('/', {
+          jsonLd: jsonLdModificado((n) => (n.aggregateRating = { ratingValue: 4.9 } as never)),
+        }),
+      ],
+      ['/'],
+    )
+
+    expect(violaciones[0].valor).toBe('"aggregateRating" en $')
+  })
+
+  it('la violación del horario acusa la clave Y la ruta del nodo', () => {
+    const violaciones = inspeccionarSitio(
+      [paginaCompleta('/', { jsonLd: jsonLdModificado((n) => (n.openingHours = 'Mo-Fr' as never)) })],
+      ['/'],
+    )
+
+    expect(violaciones[0].valor).toBe('"openingHours" en $')
+  })
+
+  it('la violación de la ruta ausente acusa la ruta esperada que no encontró', () => {
+    const resultado = ejecutarPuertaDelCascaron({
+      artefacto: artefactoCon(ficheroDe('dist/index.html')),
+      rutasEsperadas: ['/', '/servicios'],
+    })
+
+    expect(resultado.lineas.join('\n')).toContain('/servicios')
+    expect(resultado.lineas.join('\n')).toContain('ruta esperada sin HTML en dist/')
+  })
+
+  // El formato de la línea del informe: ruta + regla + valor. Es lo que lo hace DIFFABLE y
+  // grepeable. Sin fijarlo, el separador y el orden se pueden mutar sin que nada se entere.
+  it('cada línea del informe lleva la ruta, la regla y el valor, en ese orden', () => {
+    const resultado = ejecutarPuertaDelCascaron({
+      artefacto: artefactoCon(ficheroDe('dist/index.html', { cuantosH1: 0 })),
+      rutasEsperadas: ['/'],
+    })
+
+    expect(resultado.lineas).toEqual(['/ — h1 ausente o más de uno: "0"'])
   })
 })
