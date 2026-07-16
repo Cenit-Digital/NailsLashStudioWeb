@@ -194,6 +194,9 @@ No están cerradas. **No se dan por resueltas** y ninguna se resuelve adivinando
 | **A-7** | **Festivos y horario de agosto [NV]** → F-10 los modela como dato, pero el dato no existe | **Cliente** (P-8) |
 | **A-8** | **¿Cómo se protege la puerta de placeholders del «verde por vacuidad»?** Si el escáner apunta a un artefacto que no se generó, devuelve 0 violaciones y **el build pasa creyéndonos protegidos**. Ver F-01, caso límite 1 | Humano, en el Gherkin de F-01 |
 | **A-9** | **¿La comparación de patrones es literal o normalizada?** El patrón acordado es `600123456` pero el prototipo escribe `+34 600 123 456` **[V]**: literal **no lo caza**. Hay que decidirlo patrón por patrón. Ver F-01, caso límite 2 | Humano, en el Gherkin de F-01 |
+| **A-10** | **`waHref`: ¿host `wa.me` o `api.whatsapp.com/send`?** Ligada a **A-3**. Lo **testeable** de F-02 (número **E.164 sin `+`** + texto **`encodeURIComponent`**) es host-agnóstico; el host se **verifica a mano** (Android/iOS/WhatsApp Web) antes de F-13 y se trata como constante configurable. Ver F-02, contrato | Nosotros, ligado a A-3 |
+| **A-11** | **¿El email entra en `site.ts` como registro `esPlaceholder: true` desde F-02** (rompiendo ya el build de producción, que es lo correcto por D-6) **o se difiere a F-12?** `centroesteticarozas@gmail.com` solo consta en el JSON-LD oculto de la web actual y **[NV]** si se atiende **[V]**. Ver F-02, alcance | Humano, en el Gherkin de F-02 |
+| **A-12** | **¿F-02 cablea `registros` en `tools/puerta-placeholders.ts`** (hoy `never[] = []`) **o es paso posterior?** El TODO del humilde dice que F-02 alimenta la vía por flag **[V: código]**. Recomendación: sí, es de F-02 (cambio de una línea en el humilde, sin TDD ni mutación). Ver F-02, alcance | Humano/lead, en la puerta de aprobación de F-02 |
 
 **Y lo que no es una pregunta sino un aviso con valor legal:** hay que decirle al cliente
 **ya**, sin esperar a la web nueva, que **su aviso legal actual da 404** y que su política
@@ -313,7 +316,188 @@ la puerta no vigila nada.
 
 ---
 
-### Las 19 features restantes
+### Feature 2: `datos_negocio_fuente_unica` — el NAP canónico
+
+> Feature `#2` de `feature_list.json`. Depende de F-01 (`puerta_placeholders`, ya `done`).
+> Es la primera implementación de **I-7** («los datos viven fuera del JSX, en una fuente
+> única»), aplicada al dato **más peligroso** del prototipo: el teléfono.
+
+#### Propósito
+
+Un **único módulo** `src/lib/site.ts`, fuente canónica del **NAP** (Nombre, Dirección,
+Teléfono) y de los *href* que se derivan de él, tal que **cambiar un dato en un solo sitio lo
+cambia en todas sus apariciones** y el texto visible y el `href` **no puedan divergir**.
+
+#### Por qué va segunda (el bug que mata)
+
+El prototipo escribe el teléfono **7 veces** y el `href` está **a mano**, aparte del texto que
+se muestra **[V, I-7]**: bastaría un descuido para **enseñar `625 22 33 66` y marcar otro
+número** — y nadie lo vería hasta que una clienta llama a quien no es. Si `telHref` y `waHref`
+se **derivan** de una sola constante, texto y `href` salen del **mismo** dato y **no pueden**
+desincronizarse. Es el caso de libro de I-7, y por eso F-02 va justo detrás de la puerta.
+
+#### Alcance — qué es F-02 y qué no (decisión de troceado)
+
+El `feature_list` describe F-02 como **«un solo módulo `src/lib/site.ts`»** y la regla del
+arnés es **una feature a la vez**. De ahí tres decisiones de alcance a fijar:
+
+- **La lógica testeable y mutada de F-02 = `telHref`, `waHref` y el array `registros`**, más
+  las **constantes verificadas** del NAP. Es lo único que lleva TDD y mutación. El JSON-LD
+  (`BeautySalon`) es **F-04** (T-6) y la **lógica de horario** (`estaAbierto`, franjas) es
+  **F-10**: F-02 **no** los implementa, solo **custodia los datos** que ellos consumirán.
+  *Recomendación:* sembrar ya en `site.ts` los datos **verificados** que otras features
+  necesitarán —geo `40.5179875, −3.9226688` **[V]**, Instagram `@nailslash.studio_` **[V]**,
+  Facebook **[V]**—, porque son la misma fuente única y están verificados; pero **la carga de
+  test de F-02 recae solo en `telHref`/`waHref`/`registros`**. Marcarlo así impide que F-02
+  crezca hacia F-04/F-10. **[ASUNCIÓN a confirmar]**
+
+- **¿F-02 cablea los `registros` en la puerta?** Hoy `tools/puerta-placeholders.ts` tiene
+  `const registros: never[] = []` con un TODO que dice, literalmente, que **F-02 alimentará la
+  vía por FLAG** y que «inventar aquí un árbol de datos sería invadir F-02» **[V: código]**.
+  → **Decisión propuesta: el cableado sí es de F-02.** Motivo: un array de `registros` que
+  nadie consume es código muerto, y F-01 dejó la vía por flag **«cableada pero sin alimentar
+  hasta F-02»** a propósito; **F-02 es la feature que cierra ese lazo**. El cambio en `tools/`
+  es **una sola línea** (sustituir `never[] = []` por el `import` del array de `site.ts`) en el
+  **humilde**, que por contrato **no lleva tests ni mutación** **[V: código]** — así que **no**
+  añade superficie de TDD y **no** rompe «una feature a la vez»: toda la lógica nueva vive en
+  `src/lib/site.ts`. *Alternativa descartada:* dejar el cableado para un paso posterior — deja
+  F-02 sin efecto observable en la puerta y obliga a reabrir el humilde más tarde. **Queda como
+  A-12 para la puerta de aprobación.**
+
+- **Email y precios NO son NAP y NO son reales todavía.** Los **precios** son **F-09**
+  (catálogo, `bloqueada_para_publicar`), no F-02. El **email**
+  (`centroesteticarozas@gmail.com` aparece **solo** en el JSON-LD oculto de la web actual,
+  nunca visible, y **[NV]** si se atiende **[V: datos-redes §2.1]**) entra —si entra— como
+  **registro `esPlaceholder: true`**, no como valor real presentado como real: así la **puerta
+  de F-01 bloquea el build de producción** hasta que el cliente lo confirme (D-6). Si ese
+  registro placeholder vive **ya** en `site.ts` o se difiere a **F-12** (contacto, su
+  consumidor) es **A-11**.
+
+#### Comportamiento esperado
+
+1. Existe **`src/lib/site.ts`** como **única** fuente del NAP. Ningún componente escribe el
+   nombre, la dirección o el teléfono a mano: los **importa**.
+2. Las **constantes verificadas [V]** que expone, al menos:
+   - **Nombre**: `Nails Lash Studio`.
+   - **Dirección**, estructurada (no una cadena suelta): `C.C. El Zoco` · `Av. de Atenas 75` ·
+     `Local 41` · `Planta 0` · `28232` · `Las Rozas de Madrid`. *(El `Local 41` y la
+     `Planta 0` desambiguan frente a **Acosta Nails**, otro salón en el mismo edificio,
+     Local 1 **[V: datos-redes §2.8]**; F-11 los mostrará.)*
+   - **Teléfono** (forma legible): `625 22 33 66`.
+   - **Horario** (dato, no copy): L–V 10:00–20:00 · S 10:00–14:00 · D cerrado. *(La **lógica**
+     que lo interpreta es F-10; F-02 solo lo guarda.)*
+   - **Geo** `40.5179875, −3.9226688`; **Instagram** `@nailslash.studio_`; **Facebook**
+     `https://www.facebook.com/nailslashstudiorozas/`. **TikTok: no existe** — no se expone
+     handle alguno **[V]**.
+3. **`telHref(tel)`** devuelve el `tel:` URI **normalizado a E.164**:
+   `telHref('625 22 33 66') → 'tel:+34625223366'`. Es **puro** y **determinista**.
+4. **`waHref(tel, texto)`** devuelve el enlace **click-to-chat** con el número en **E.164 sin
+   el `+`** y el **texto `encodeURIComponent`-ado**:
+   `waHref('625 22 33 66', 'Hola, quiero cita') → 'https://wa.me/34625223366?text=Hola%2C%20quiero%20cita'`.
+   Es **puro**.
+5. **Fuente única, comprobable:** el texto visible del teléfono, `telHref` y `waHref` derivan
+   **todos** de la **misma** constante. Cambiarla en `site.ts` cambia el texto **y** ambos
+   `href` en **todas** sus apariciones (criterio de aceptación 4).
+6. **`registros`**: un `readonly RegistroDatos[]` (el tipo de `src/lib/placeholders.ts`,
+   `{ ubicacion, valor, esPlaceholder }`) que la **puerta de F-01 consume por la vía por
+   flag**. Los datos **verificados** van con `esPlaceholder: false`; lo **no confirmado**
+   (email), con `esPlaceholder: true`.
+
+#### Contrato
+
+| | |
+| - | - |
+| **`telHref(tel: string): string`** | **Entrada:** un teléfono en cualquier forma humana (`625 22 33 66`, `625-22-33-66`, `+34 625 223 366`, `0034625223366`). **Salida:** `tel:` + número **E.164** (`tel:+34625223366`). **Puro**: no lee reloj, ficheros ni entorno. **Idempotente:** una entrada ya en E.164 sale igual, sin doble prefijo |
+| **`waHref(tel: string, texto: string): string`** | **Entrada:** teléfono (como arriba) + texto libre ya compuesto. **Salida:** URL click-to-chat con el número **E.164 sin `+`** y `?text=` con `encodeURIComponent(texto)`. **Puro** |
+| **`registros: readonly RegistroDatos[]`** | La proyección del NAP a la forma que consume la puerta de F-01. `ubicacion` = ruta del campo (p. ej. `site.telefono`); `valor` = la cadena; `esPlaceholder` = `false` para lo verificado, `true` para lo no confirmado |
+| **Constantes** | Nombre, dirección estructurada, teléfono, horario, geo, redes. Inmutables (`as const`/`readonly`). Son **la** fuente; nadie las duplica |
+| **Determinismo** | Misma entrada → misma salida. `telHref`/`waHref` son puras; las constantes son literales |
+
+**Estándares que fijan el formato** (para el Gherkin):
+
+- **`tel:` URI → RFC 3966** (*The tel URI for Telephone Numbers*, IETF): un número **global**
+  se escribe con **`+` inicial** seguido del número en forma **E.164** **[V: estándar público;
+  confirmar el § exacto en `datatracker.ietf.org/doc/html/rfc3966` antes de citarlo en el
+  Gherkin — no consultado en esta sesión]**.
+- **E.164 → ITU-T E.164**: número internacional = código de país + número nacional, **máx. 15
+  dígitos**; **España = +34** **[V: estándar público]**.
+- **WhatsApp click-to-chat → `https://wa.me/<E164_sin_+>?text=<urlencoded>`**, documentado en
+  `faq.whatsapp.com` (*Cómo usar el enlace de clic para chatear*): número en formato
+  internacional **completo, sin ceros, paréntesis, guiones ni `+`**, y `text` **urlencoded**.
+  **⚠️ [NV] contra fuente primaria — es exactamente A-3**: el Help Center se renderiza con JS y
+  no se pudo leer en crudo. **Consecuencia de diseño (A-10):** lo **testeable y mutable** de
+  `waHref` es que el número va **en E.164 sin `+`** y el texto **`encodeURIComponent`-ado**; el
+  **host/prefijo** (`wa.me` vs `api.whatsapp.com/send?phone=…&text=…`) se trata como una
+  **constante configurable** que se **verifica a mano en Android, iOS y WhatsApp Web antes de
+  F-13** (A-3). El test de F-02 asevera las dos propiedades, **no ata el host**.
+
+**Mutantes que deben morir** (I-6, y criterio de aceptación 5):
+
+- Quitar el `+` en `telHref` (`tel:34625223366`) → rompe.
+- Quitar la anteposición de `+34` o el compactado de separadores (`tel:+34625 22 33 66`) →
+  rompe.
+- Dejar el `+` en el número de `waHref` (`wa.me/+34625223366`) → rompe.
+- `encodeURIComponent` → `encodeURI` (deja `&` y `#` sin escapar) → rompe (ver caso límite 4).
+- Perder la **idempotencia** del prefijo (doble `+34`) → rompe (caso límite 1).
+
+#### Casos límite debatidos
+
+1. **Teléfono ya en E.164** (`+34625223366` o `34625223366`): `telHref` es **idempotente** →
+   `tel:+34625223366`, **nunca** `tel:+34+34625223366` ni `tel:+3434625223366`. La
+   normalización detecta el prefijo ya presente. Conviene **alinear los prefijos con
+   `placeholders.ts`**, que ya declara `PREFIJOS_INTERNACIONALES = ['+34', '0034']`
+   **[V: código]**: una sola regla de normalización, no dos que puedan divergir.
+2. **Separadores** (espacios, guiones): `625 22 33 66`, `625-22-33-66` → **misma** salida; se
+   compactan. `placeholders.ts` usa `SEPARADORES_DE_TELEFONO = /[ -]/g` (solo espacio y guion,
+   **deliberadamente estrecho**, para no unir dígitos de líneas distintas) **[V: código]**.
+   **[PREGUNTA]** ¿F-02 acepta también el punto (`625.22.33.66`) o la barra? Por defecto,
+   **solo espacio y guion**, como la puerta; decidir en el Gherkin.
+3. **Prefijo `0034`** → `+34`. Cubierto por la regla anterior si se comparte con la puerta.
+4. **`waHref` con texto de acentos, `·`, emoji, `&`, `#`**: `encodeURIComponent` los codifica
+   **todos** (`á`→`%C3%A1`, `·`→`%C2%B7`, emoji→UTF-8 percent-encoded, `&`→`%26`, `#`→`%23`).
+   **Por qué `encodeURIComponent` y no `encodeURI`:** `encodeURI` **no** escapa `&` ni `#`; un
+   `#` crudo cortaría la URL en un *fragment* y un `&` crudo inyectaría un parámetro → mensaje
+   roto. Es el **gemelo primitivo** de `componerMensajeWhatsApp` (F-13): **F-02 codifica un
+   texto ya compuesto; F-13 compone el texto y llama a `waHref`** — sin solaparse.
+5. **El teléfono real NO es el patrón placeholder.** `625223366` ≠ `600123456` (el número
+   inventado del prototipo, patrón de F-01) **[V]**: el registro del teléfono real **pasa** la
+   vía por patrón de la puerta sin falso positivo. Es la prueba de que F-02 y F-01 **encajan**.
+6. **`waHref` con texto vacío**: **[PREGUNTA]** ¿`https://wa.me/34625223366` **sin** `?text`, o
+   `…?text=`? Recomendación: **omitir `?text=`** con texto vacío (no pre-rellenar un mensaje en
+   blanco). Decidir en el Gherkin.
+7. **Anti-tautología (regla del arnés):** el test **no** compara la constante de producción
+   contra sí misma; compara la salida contra el **literal escrito a mano** `'tel:+34625223366'`
+   / `'34625223366'`. Si el test importara la constante y la reflejara, un teléfono equivocado
+   pasaría verde.
+
+#### Modos de error
+
+- **Entrada sin dígitos suficientes para un número ES válido** (`''`, `'abc'`, `'625'`):
+  **[PREGUNTA/ASUNCIÓN]** ¿`telHref`/`waHref` **lanzan** (falla ruidosa, coherente con «falla
+  cerrada» del proyecto) o devuelven la mejor normalización posible? *Recomendación:* como el
+  dato canónico **siempre** viene del single source verificado, la ruta normal nunca ve basura;
+  aun así, ante una entrada inválida **conviene lanzar** antes que emitir un `tel:+34` a medias
+  que parezca válido. Decidir en el Gherkin.
+- **Número fuera del rango E.164** (>15 dígitos): mismo criterio que el anterior.
+- **`site.ts` con un dato mal escrito** (p. ej. el teléfono con un dígito de más): F-02 **no**
+  lo detecta —una mentira bien escrita no la caza ninguna puerta (ver F-01, caso límite 7)—; lo
+  cubren I-7 (dato único, revisable) y la puerta humana sobre el `.feature`.
+
+#### Preguntas abiertas de esta feature
+
+- **A-10**: ¿host de `waHref` = `wa.me` o `api.whatsapp.com/send`? Ligada a **A-3 [NV]**. Lo
+  testeable de F-02 (E.164 sin `+`, `encodeURIComponent`) es **host-agnóstico**; el host se
+  confirma a mano antes de F-13.
+- **A-11**: ¿el **email** entra en `site.ts` como registro `esPlaceholder: true` **desde F-02**
+  —rompiendo ya el build de producción, que es lo correcto (D-6)— o se difiere a **F-12**?
+- **A-12**: ¿F-02 **cablea** `registros` en `tools/puerta-placeholders.ts` (hoy `never[]`), o
+  es un paso posterior? *(Recomendación en «Alcance»: sí, es de F-02.)*
+- **[PREGUNTA]** separadores aceptados por la normalización (caso límite 2) y **texto vacío**
+  en `waHref` (caso límite 6): se cierran en el Gherkin.
+
+---
+
+### Las 18 features restantes
 
 **No se especifican aquí a propósito.** Están troceadas, con sus criterios de aceptación,
 sus dependencias, su puerta legal, su flag `mutable` y su estado, en **`feature_list.json`**;
