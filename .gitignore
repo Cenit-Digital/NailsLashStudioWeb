@@ -46,3 +46,6 @@ Thumbs.db
 *.log
 .idea/
 .vscode/
+
+# Experimentos de build de @s32/@s33 (F-04): artefactos temporales, nunca versionados.
+.experimentos-tmp/

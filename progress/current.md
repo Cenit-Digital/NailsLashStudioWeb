@@ -6,6 +6,24 @@
 
 - **Feature en curso:** `4 — cascaron_semantico` (`in_progress`) — la cáscara
   HORNEADA, el JSON-LD de cero y la puerta que mira `dist/`.
+  → **TDD terminado: 35/35 escenarios, 313 tests verdes.** Bitácora:
+  `progress/tdd_cascaron_semantico.md`. **PENDIENTE DE `judge` + `mutation_tester`.**
+  🔴 **TRES COSAS ESPERAN DECISIÓN DEL LEAD/HUMANO** (detalle en la bitácora, §1-§3):
+  1. **`pnpm build` SALE ROJO (exit 1) — y es lo que @s34 ORDENA**, no un fallo:
+     `✗ flag esPlaceholder en seo.origenCanonica`. Es la decisión 9 funcionando y la
+     «consecuencia buscada» que el contrato escribe 5 veces. **Pero el radio es del
+     proyecto entero: `bin/harness init`, `verify` y la CI se quedan ROJOS, y F-05…F-20
+     se desarrollarían contra un rojo permanente** (un rojo que siempre está rojo deja de
+     ser señal). Alternativa con precedente EXACTO en el repo: **diferirlo como F-02 hizo
+     con el email (A-11)** — pero eso deja @s34 inerte. **No lo decido yo.**
+  2. **@s32 tiene un ERROR DE HECHO en su `Then`**, medido sobre un build real: dice «el
+     HTML CRUDO de dist/ NO contiene ningún `<title>`» y **es falso** — `renderToString`
+     emite la metadata de React 19 **dentro del `<body>`**; lo que sale vacío es **el
+     `<head>`**. La decisión es correcta, la letra es falsa (el patrón del proyecto).
+     **Casi me cuesta la feature**: mi puerta escaneaba el documento entero y era **tan
+     ciega como jsdom** al bug. Corregido; el `.feature` necesita puerta humana.
+  3. **@s18 promete «a un heading real» y ninguna de sus 3 filas lo prueba** → el coladero
+     del `<div id="x">` sigue abierto. Cerrarlo exige **una fila nueva** (puerta humana).
 - **Fase:** TDD (`tdd_craftsman`) sobre `features/cascaron_semantico.feature`,
   **aprobado por el humano en la puerta el 2026-07-16** (35 escenarios `@s1..@s35`).
   **A-17…A-22 cerradas** en su redacción: **0 preguntas abiertas**. Fuente de verdad

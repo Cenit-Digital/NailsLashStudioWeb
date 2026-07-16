@@ -14,6 +14,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import process from 'node:process'
 
 import { ejecutarPuerta, type SistemaDeFicheros } from '../src/lib/puerta.ts'
+import { registrosSeo } from '../src/lib/seo.ts'
 import { registros } from '../src/lib/site.ts'
 
 const sistemaDeFicherosReal: SistemaDeFicheros = {
@@ -29,11 +30,23 @@ const sistemaDeFicherosReal: SistemaDeFicheros = {
 
 /**
  * A-12: los `registros` verificados de F-02 (`src/lib/site.ts`) alimentan la vía por FLAG que
- * F-01 dejó cableada. Todos son esPlaceholder:false, así que no producen violaciones y el build
- * de producción sigue verde; el día que entre un dato sin confirmar (email, A-11 en F-12/F-16)
- * como esPlaceholder:true, la puerta romperá el build a propósito (D-6).
+ * F-01 dejó cableada. Todos son esPlaceholder:false.
+ *
+ * 🔴 F-04 (A-21, @s34) AÑADE `registrosSeo`, Y AHÍ VIVE EL ORIGEN DE LA CANÓNICA CON
+ * `esPlaceholder: true`. ESO ROMPE EL BUILD DE PRODUCCIÓN A PROPÓSITO, y es la DECISIÓN 9 del
+ * proyecto funcionando: *el contenido no verificado vive en una capa explícita y es
+ * ESTRUCTURALMENTE IMPOSIBLE publicarlo por accidente*. El dominio final NO ESTÁ DECIDIDO [NV]
+ * —migrar `nailslashlasrozas.es` con 301 es decisión del CLIENTE— y NO SE INVENTA.
+ *   → Cuando el cliente lo decida: se cambia el DATO y el flag en `src/lib/seo.ts`. SIN TOCAR
+ *     CÓDIGO, y el build vuelve a verde solo.
+ * Cada feature declara SUS registros y aquí se CONCATENAN: F-04 no toca los de F-02, cuyo
+ * contrato (@s10 de datos_negocio_fuente_unica) fija que los suyos no producen violaciones.
  */
-const resultado = ejecutarPuerta({ modo: 'produccion', registros, ficheros: sistemaDeFicherosReal })
+const resultado = ejecutarPuerta({
+  modo: 'produccion',
+  registros: [...registros, ...registrosSeo],
+  ficheros: sistemaDeFicherosReal,
+})
 
 for (const linea of resultado.lineas) {
   console.error(`  ✗ ${linea}`)

@@ -1,6 +1,7 @@
-// Punto de entrada de los estilos globales. Los parciales _reset y _base llegan
-// con la feature de maquetación; _tokens es de F-03 y ya está aquí.
+// Punto de entrada de los estilos globales. El parcial _reset llega con la feature de
+// maquetación; _tokens es de F-03 y _base es la cáscara global de F-04 (@s11).
 @use 'tokens';
+@use 'base';
 
 // Un solo esquema de color: este proyecto no tiene tema oscuro (decisión 5).
 :root {

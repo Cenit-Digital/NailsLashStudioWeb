@@ -1,0 +1,38 @@
+// La cáscara GLOBAL (F-04, @s11). Contrato: features/cascaron_semantico.feature.
+//
+// Lo que vive aquí es lo GLOBAL de la cáscara. La maquetación (cabecera, secciones, tarjetas)
+// llega con sus propias features; no la adelantes aquí.
+
+// ---------------------------------------------------------------------------
+// Foco visible — SC 2.4.7 (AA)
+// ---------------------------------------------------------------------------
+// SEPARACIÓN DE EJES: `SC 2.4.7` exige foco VISIBLE, y nada más. `G165` (foco por defecto) y
+// `C45` (`:focus-visible`) son AMBAS técnicas SUFICIENTES. TIENE CERO REQUISITO DE CONTRASTE O
+// GROSOR [V]: el 3:1 / 2px es `SC 2.4.13`, y es AAA. Los valores de abajo son CRITERIO DE
+// PROYECTO —generosos a propósito—, y NO se le atribuyen a 2.4.7. Es la trampa GEMELA del
+// 1.4.11 de F-03, donde el audit ya se equivocó una vez.
+//
+// Se usa `:focus-visible` y NO `:focus` para no castigar al puntero: el navegador decide cuándo
+// el foco merece indicador. El `:focus:not(:focus-visible)` NO se apaga aquí a propósito —
+// apagar el foco es justo el fallo que esta regla existe para evitar.
+:focus-visible {
+  outline: 3px solid var(--border-interactive);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+// ---------------------------------------------------------------------------
+// scroll-padding-top — la técnica C43 (F-04 LA PONE, F-06 VIGILA QUE FUNCIONE)
+// ---------------------------------------------------------------------------
+// A-18 (cerrada por el lead 2026-07-16): `SC 2.4.11 Focus Not Obscured` (AA, nuevo en WCAG 2.2)
+// ES DE F-06, NO DE F-04 — F-04 no puede testear que la cabecera no tape el foco cuando LA
+// CABECERA LA MONTA F-06. Su Understanding nombra LITERALMENTE los sticky headers y su técnica
+// suficiente es `C43` Using CSS scroll-padding to un-obscure content [V].
+//
+// 🔴 EL VALOR DEPENDE DE LA ALTURA DE LA CABECERA STICKY, QUE ES DE F-06. Este 5rem es un
+// SUELO razonable puesto por la cáscara, NO un número verificado: @s11 fija que la declaración
+// EXISTE y es > 0, NUNCA el número — fijarlo hoy sería INVENTARLO. F-06 es quien puede
+// ajustarlo, porque es quien conoce la altura, y quien debe VIGILAR que funcione.
+html {
+  scroll-padding-top: 5rem;
+}

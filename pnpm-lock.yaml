@@ -81,6 +81,9 @@ importers:
       prettier:
         specifier: ^3.4.0
         version: 3.9.5
+      react-helmet-async:
+        specifier: ^1.3.0
+        version: 1.3.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       sass:
         specifier: ^1.80.0
         version: 1.101.0
