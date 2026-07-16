@@ -4,14 +4,11 @@
 > (regla anti-teléfono-descompuesto). Al cerrar la sesión, mueve el resumen a
 > `history.md` y deja este archivo con solo esta plantilla.
 
-- **Feature en curso:** `1 — puerta_placeholders` (`in_progress`)
-- **Fase:** TDD (`tdd_craftsman`) sobre `features/puerta_placeholders.feature`
-  (aprobado en la puerta humana). 26 escenarios `@s1..@s26`, en el orden del
-  fichero: `@s1 @s2 @s24 @s3` (flag) · `@s4 @s5 @s6 @s7` (patrón) ·
-  `@s8 @s23 @s9 @s25 @s10 @s11` (contar/ordenar) · `@s12 @s13 @s14 @s15`
-  (puerta prod/dev) · `@s16 @s17 @s18 @s19` (lo que esquiva a cada vía) ·
-  `@s20 @s21 @s26 @s22` (falla cerrada).
-- **Bitácora del ciclo:** `progress/tdd_puerta_placeholders.md`
+- **Feature en curso:** ninguna. `1 — puerta_placeholders` cerrada como `done`.
+- **Siguiente:** F-02 `datos_negocio_fuente_unica` (`pending`), la fuente única
+  de datos que alimenta la vía por FLAG de la puerta ya construida.
+- **Bitácora del ciclo cerrado:** `progress/tdd_puerta_placeholders.md`
+  (+ `progress/judge_puerta_placeholders.md`, `progress/mutation_puerta_placeholders.md`)
 
 ## Bitácora
 
@@ -223,3 +220,81 @@ más peligroso escaparía por comparación literal.
 **Pendiente del humano (no bloquea el código):** elegir dominio (¿migrar
 `nailslashlasrozas.es` con 301?) y plataforma de reseñas (Treatwell 1.231 vs
 Google 226).
+
+## 2026-07-16 — F-01 CERRADA. Las dos puertas del arnés en verde.
+
+**Se completaron los 3 escenarios que faltaban** (`@s20`, `@s21`, `@s26` — el
+bloque «falla cerrada / A-8»), por TDD estricto. La feature estaba a 23/26, no
+«a medias»: faltaban justo los que impiden el *verde por vacuidad*. Ahora 26/26.
+
+- **`judge`: APROBADO**, 26/26 cubiertos (contados por título de `it()`, no por
+  comentario), 0 bloqueantes. Un único hallazgo **menor** no bloqueante: falta un
+  test de integración del adaptador real `node:fs` contra un `dist/` temporal
+  (CHECKPOINTS C4 / `verification.md` Nivel 2), mitigado por el smoke de
+  `pnpm build` en verde. → candidato para una feature de arnés, no de esta.
+- **Mutación: 100% con 0 supervivientes REALES y 1 equivalente excluido — pero NO a la
+  primera, y la historia es la lección más importante de este cierre.** El primer informe
+  del `mutation_tester` dijo «100%, 0 survived» y era **falso por enmascaramiento**: corrió
+  bajo carga (los agentes del workflow competían por CPU), 134 de 147 mutantes hicieron
+  *timeout*, y Stryker cuenta el timeout como muerto. Su razonamiento —«un superviviente
+  real termina, no cuelga»— era **justo el error**: un superviviente que además hace timeout
+  se cuenta como muerto y desaparece. Correr la mutación **a baja concurrencia** (tranquila)
+  destapó **tres** hallazgos que tapaba:
+  1. `puerta.ts` — superviviente real: `motivoDelReventon` vaciado sobrevivía porque `@s22`
+     solo exigía «…contenga "no pudo completar la inspección"», y «…: undefined» lo cumple.
+     Cerrado: `@s22` ancla ahora la **causa concreta** (`toContain(MOTIVO_DEL_REVENTON)`).
+  2. `placeholders.ts` — superviviente real: el `+` de `[ -]+` (regex del teléfono) no estaba
+     fijado; `[ -]` dejaba escapar `+34  600  123  456` con doble espacio. Cerrado **con tu
+     aprobación**: `@s5` gana la fila `| 600  123  456 |` (contrato modificado, puerta humana).
+  3. `placeholders.ts` — mutante **equivalente** `toLowerCase→toUpperCase`: el plegado se
+     aplica a ambas caras de la comparación y el `valor` sale del contenido original; solo un
+     carácter asimétrico (`ß`) los distinguiría y ningún patrón lo tiene. Excluido quirúrgica
+     y justificadamente (política `docs/mutation-testing.md` §78-80). Detalle completo y
+     reproducción en `progress/mutation_puerta_placeholders.md`.
+  → Estado final, reconfirmado a `--concurrency 2`: `placeholders.ts` 100% (87 killed, 0
+    survived, 1 ignored); `puerta.ts` 100% (0 survived).
+  → **Lección: un informe de mutación con muchos timeouts NO es de fiar. La puerta se corre
+    en tranquilo o a baja concurrencia; si no, enmascara supervivientes reales.**
+- **Suite: 47 tests verdes** (43 → 46 con `@s20/@s21/@s26`, → 47 con el caso nuevo de `@s5`).
+  `typecheck` + `lint` limpios, 0 warnings.
+- **Build end-to-end verde en Node 24**: `pnpm build` compila la SSG y el *humble object*
+  real (`node:fs`, `--experimental-strip-types`) escanea el `dist/` real → «✓ …no tiene
+  placeholders», exit 0. Cubre por ejecución el hallazgo menor del `judge`.
+
+### Decisiones de diseño de este cierre (para no volver a discutirlas)
+
+1. **`@s20` se resolvió en el PUERTO, no con un doble mentiroso.** `SistemaDeFicheros`
+   gana `existeDirectorio()` y **documenta que `listarFicheros` LANZA** sobre un
+   directorio inexistente (como `readdirSync`). La puerta pregunta antes de listar;
+   el humilde lo honra con `existsSync`; el doble de test lanza ENOENT igual que el
+   real. Sin esto, `@s20` habría pasado con producción tomando el camino de `@s22`.
+2. **`@s21` NO tiene guarda propio: lo subsume el guarda de `index.html` de `@s26`.**
+   Un `dist/` vacío no tiene `index.html`, luego el mismo `if` lo caza. Un guarda
+   `length===0` separado resultó **mutante inmortal** (el contrato prohíbe fijarle
+   mensaje: «no fija cuál de las dos razones se informa»). Un solo guarda mata `@s21`
+   y `@s26` a la vez.
+3. **El fixture de `@s18-coladero` recibió un `dist/index.html` limpio** (no se tocó
+   su `toEqual` ni el `.feature`): un artefacto de producción real siempre trae su
+   HTML de entrada, así que el doble es ahora **más fiel**, no más permisivo.
+4. **`@s5` gana una fila de separadores dobles (`600  123  456`) — ÚNICO cambio del
+   `.feature`, aprobado en puerta humana.** Fija el `+` de `[ -]+`: el teléfono no
+   escapa ni con espaciado irregular. Fue la mutación quien reveló que ese `+` no
+   estaba probado. Es la única modificación del contrato en todo el cierre.
+5. **Un mutante equivalente (`toLowerCase↔toUpperCase`) se excluye, no se «mata».** No
+   es pereza: es genuinamente equivalente (verificado a concurrencia 1 y 2) y el repo
+   lo permite con justificación escrita (`docs/mutation-testing.md` §78-80). Matarlo
+   exigiría inventar un patrón con `ß`, que ensuciaría el contrato.
+
+### Deuda anotada para una feature futura (NO se abrió aquí, Ley 1)
+
+Cuando entren las imágenes, `dist/` tendrá binarios (`.png` de `ph-woman`, `.woff2`).
+Hoy la puerta lee **todo** bajo `dist/` con `readFileSync utf8`; un binario se
+decodifica a `U+FFFD` (no lanza) y es **falso positivo en potencia**. No se
+implementó filtro por extensión porque ningún escenario actual monta un binario y
+exige saltárselo (sería producción sin test rojo y mutante inmortal). **Hace falta
+un escenario nuevo en el `.feature` antes de cerrar ese hueco.**
+
+### Ruido fuera del commit
+
+`autoskills` sincronizó 10 skills durante la sesión (`skills-lock.json` +
+`.agents/skills/*`). No es de F-01; queda **fuera** de este commit.

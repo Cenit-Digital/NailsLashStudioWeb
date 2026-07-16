@@ -67,7 +67,15 @@ function normalizarTexto(texto: string): TextoNormalizado {
   const indiceOriginal: number[] = []
 
   for (let i = 0; i < texto.length; i++) {
-    const equivalente = texto[i].toLowerCase().normalize('NFD').replace(DIACRITICOS, '')
+    // El sentido del plegado de caja es indiferente: se aplica a AMBAS caras de la
+    // comparación (contenido y patrón pasan por esta misma función), así que toLowerCase
+    // y toUpperCase dan el mismo match, y el `valor` se toma del contenido ORIGINAL, no del
+    // normalizado. Solo un carácter de plegado asimétrico (ß→SS) los distinguiría, y ninguno
+    // de los 6 patrones del contrato lo tiene: mutante equivalente. Justificado en
+    // progress/mutation_puerta_placeholders.md (política docs/mutation-testing.md §78-80).
+    // Stryker disable next-line all
+    const enMinuscula = texto[i].toLowerCase()
+    const equivalente = enMinuscula.normalize('NFD').replace(DIACRITICOS, '')
 
     for (const caracter of equivalente) {
       normalizado += caracter

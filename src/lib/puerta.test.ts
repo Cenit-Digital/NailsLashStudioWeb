@@ -23,14 +23,33 @@ interface PaqueteNpm {
 const NOMBRE_DE_LA_PUERTA = 'puerta-placeholders'
 const GUION_DE_LA_PUERTA = `tools/${NOMBRE_DE_LA_PUERTA}.ts`
 
-function sistemaDeFicherosFalso(contenidos: Record<string, string>): SistemaDeFicheros {
+function sistemaDeFicherosFalso(
+  contenidos: Record<string, string>,
+  directoriosVacios: readonly string[] = [],
+): SistemaDeFicheros {
   const esRaiz = (directorio: string) => directorio === '.' || directorio === ''
 
+  const contenidoDe = (directorio: string) =>
+    Object.keys(contenidos).filter(
+      (ruta) => esRaiz(directorio) || ruta.startsWith(`${directorio}/`),
+    )
+
+  // Un directorio existe si cuelga algo de él o si se declara vacío a propósito: un
+  // `dist/` vacío es un estado real del disco (@s21) y el doble tiene que saber decirlo.
+  const existe = (directorio: string) =>
+    esRaiz(directorio) || directoriosVacios.includes(directorio) || contenidoDe(directorio).length > 0
+
   return {
-    listarFicheros: (directorio) =>
-      Object.keys(contenidos).filter(
-        (ruta) => esRaiz(directorio) || ruta.startsWith(`${directorio}/`),
-      ),
+    existeDirectorio: existe,
+    listarFicheros: (directorio) => {
+      // Fiel al real: `readdirSync` sobre un directorio inexistente LANZA ENOENT, no
+      // devuelve []. Un doble que devolviera [] haría pasar @s20 con producción rota.
+      if (!existe(directorio)) {
+        throw new Error(`ENOENT: no such file or directory, scandir '${directorio}'`)
+      }
+
+      return contenidoDe(directorio)
+    },
     leer: (ruta) => contenidos[ruta],
   }
 }
@@ -187,6 +206,10 @@ describe('la puerta — lo que esquiva a cada vía por separado', () => {
       registros: [],
       ficheros: sistemaDeFicherosFalso({
         'dist/assets/placeholders-BYbDMLiU.js': 'const t="Calle de la Belleza 24"',
+        // Un artefacto de producción real SIEMPRE trae su HTML de entrada (@s26): sin él,
+        // este doble describía un dist/ que no puede existir. El Given dice «un artefacto
+        // de producción limpio», y añadirlo lo hace más fiel, no más permisivo.
+        'dist/index.html': '<h1>Nails Lash Studio</h1>',
       }),
     })
 
@@ -233,16 +256,106 @@ describe('la puerta — enganchada SOLO al build de producción', () => {
 })
 
 describe('la puerta — falla cerrada', () => {
+  it('@s20 la puerta falla si el directorio del artefacto de producción no existe', () => {
+    // Un dist/ que no existe no es un dist/ limpio: es que el build no llegó a producir
+    // nada. Falla cerrada: ante la duda, build roto, nunca build verde.
+    const artefactoInexistente = sistemaDeFicherosFalso({})
+
+    // El Given, aseverado — y aquí está el filo del escenario: `readdirSync` sobre un
+    // directorio inexistente LANZA ENOENT. Si el doble devolviera [] tan tranquilo, este
+    // test pasaría mientras producción se va por el camino de @s22. El doble mentiría.
+    expect(() => artefactoInexistente.listarFicheros('dist')).toThrow()
+
+    const resultado = ejecutarPuerta({
+      modo: 'produccion',
+      registros: [],
+      ficheros: artefactoInexistente,
+    })
+
+    const salida = resultado.lineas.join('\n')
+
+    expect(resultado.codigoSalida).not.toBe(0)
+    expect(salida).toContain('no había nada que inspeccionar')
+    // Y no se felicita a sí misma. «0 violaciones sobre 0 ficheros» no es estar
+    // protegido: es no haber mirado.
+    expect(resultado.lineas).not.toEqual([])
+    expect(salida).not.toMatch(/sin violaciones|no hay violaciones|limpio/i)
+  })
+
+  it('@s21 la puerta falla si no ha inspeccionado ni un fichero', () => {
+    // Verde por vacuidad: 0 violaciones sobre 0 ficheros no es estar protegido, es no
+    // haber mirado.
+    const artefactoVacio = sistemaDeFicherosFalso({}, ['dist'])
+
+    // El Given, aseverado: el directorio EXISTE —si no, esto sería @s20 y este test no
+    // probaría lo suyo— y está vacío.
+    expect(artefactoVacio.existeDirectorio('dist')).toBe(true)
+    expect(artefactoVacio.listarFicheros('dist')).toEqual([])
+
+    const resultado = ejecutarPuerta({
+      modo: 'produccion',
+      registros: [],
+      ficheros: artefactoVacio,
+    })
+
+    const salida = resultado.lineas.join('\n')
+
+    // El contrato NO fija cuál de las dos razones se informa (este estado incumple
+    // también la regla de @s26): fija que el build rompe y que NO se reporta verde.
+    // Aseverar aquí un mensaje concreto ataría la implementación sin ganar nada.
+    expect(resultado.codigoSalida).not.toBe(0)
+    expect(resultado.lineas).not.toEqual([])
+    expect(salida).not.toMatch(/sin violaciones|no hay violaciones|limpio/i)
+  })
+
+  it('@s26 la puerta falla si no ha inspeccionado el HTML de entrada del artefacto', () => {
+    // Haber inspeccionado «algo» no basta: un dist/ con hojas de estilo y sin HTML
+    // devuelve 0 violaciones y pasaría «protegido». En un sitio SSG el HTML de entrada
+    // existe SIEMPRE; si falta, algo ha ido muy mal y el build debe romper en vez de
+    // felicitarnos.
+    const artefactoSinHtml = sistemaDeFicherosFalso({
+      'dist/assets/base-DxQ1a2we.css': 'body{margin:0}',
+      'dist/assets/tipografia-B7f3kd9s.css': "@font-face{font-family:'Cormorant Garamond'}",
+      'dist/assets/tema-C9k2mn4p.css': ':root{--tinta:#1a1a1a}',
+    })
+
+    // El Given, aseverado: 3 hojas de estilo inspeccionables y ningún "dist/index.html".
+    // Sin esto el test podría pasar por el guarda de @s21 (0 ficheros) y no probaría lo
+    // suyo: que inspeccionar «algo» no basta.
+    expect(artefactoSinHtml.listarFicheros('dist')).toHaveLength(3)
+    expect(artefactoSinHtml.listarFicheros('dist')).not.toContain('dist/index.html')
+
+    const resultado = ejecutarPuerta({
+      modo: 'produccion',
+      registros: [],
+      ficheros: artefactoSinHtml,
+    })
+
+    const salida = resultado.lineas.join('\n')
+
+    expect(resultado.codigoSalida).not.toBe(0)
+    expect(salida).toContain('no se inspeccionó')
+    expect(salida).toContain('dist/index.html')
+    expect(salida).not.toMatch(/sin violaciones|no hay violaciones|limpio/i)
+  })
+
   it('@s22 la puerta falla cerrada si ella misma revienta', () => {
     // Una puerta que se traga su excepción y devuelve [] es PEOR que no tener puerta,
     // porque además da confianza. Si puede fallar en silencio, D-9 es falsa.
+    //
+    // La causa concreta del reventón se nombra una sola vez y se usa en el Given (lo que
+    // se lanza) y en el Then (lo que la salida debe surfacer): así no hay literal mágico
+    // duplicado y el Then queda anclado a la excepción exacta que provoca el Given.
+    const MOTIVO_DEL_REVENTON = 'EISDIR: illegal operation on a directory, read'
+
     const resultado = ejecutarPuerta({
       modo: 'produccion',
       registros: [],
       ficheros: {
+        existeDirectorio: () => true,
         listarFicheros: () => ['dist/index.html'],
         leer: () => {
-          throw new Error('EISDIR: illegal operation on a directory, read')
+          throw new Error(MOTIVO_DEL_REVENTON)
         },
       },
     })
@@ -251,6 +364,12 @@ describe('la puerta — falla cerrada', () => {
 
     expect(resultado.codigoSalida).not.toBe(0)
     expect(salida).toContain('no pudo completar la inspección')
+    // Acusar, no gruñir (@s15), también cuando la que revienta es la propia puerta: no
+    // basta con decir «no pude», hay que decir POR QUÉ. Una puerta que oculta la causa
+    // concreta obliga a buscarla a mano, que es justo lo que la feature combate (D-9).
+    // Si el cuerpo de motivoDelReventon se vaciara, la causa se perdería en «undefined» y
+    // la línea seguiría gruñendo «no pudo completar la inspección» sin acusar el porqué.
+    expect(salida).toContain(MOTIVO_DEL_REVENTON)
     // Y no se felicita a sí misma: el modo de fallo que este escenario prohíbe es
     // reportar «0 violaciones» cuando lo que ha pasado es que no ha podido mirar.
     expect(resultado.lineas).not.toEqual([])

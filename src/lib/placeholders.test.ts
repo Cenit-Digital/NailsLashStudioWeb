@@ -74,6 +74,7 @@ describe('detectarPlaceholders — la vía por patrón', () => {
     ['600-123-456'],
     ['+34600123456'],
     ['0034 600 123 456'],
+    ['600  123  456'],
   ])('@s5 el teléfono inventado escrito "%s" no escapa', (contenido) => {
     const violaciones = detectarPlaceholders({
       ficheros: [{ ubicacion: 'dist/index.html', contenido }],

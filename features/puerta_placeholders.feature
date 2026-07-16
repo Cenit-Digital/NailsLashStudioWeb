@@ -132,6 +132,11 @@ Feature: Puerta de placeholders — el build de producción falla si queda un da
       | 600-123-456      |
       | +34600123456     |
       | 0034 600 123 456 |
+      | 600  123  456    |
+    # La última fila —separadores DOBLES— fija que el espaciado irregular tampoco deja
+    # escapar el teléfono (el separador es «uno o más», no «exactamente uno»). Sin ella, el
+    # regex podría estrecharse a un solo separador y este placeholder —el más peligroso de la
+    # lista— escaparía con un doble espacio accidental del maquetado. Aprobado en puerta humana.
 
   @s6
   Scenario: El teléfono real escrito con espacios no dispara el patrón del inventado

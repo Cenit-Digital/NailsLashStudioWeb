@@ -10,12 +10,15 @@
  * Se ejecuta con el type stripping de Node 22 (`--experimental-strip-types`), que exige la
  * extensión .ts explícita en el import. `tsconfig.json` ya trae `allowImportingTsExtensions`.
  */
-import { readdirSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import process from 'node:process'
 
 import { ejecutarPuerta, type SistemaDeFicheros } from '../src/lib/puerta.ts'
 
 const sistemaDeFicherosReal: SistemaDeFicheros = {
+  // Honra el contrato del puerto: responde sin lanzar. Es lo que permite a la puerta
+  // preguntar antes de listar y no provocar el ENOENT de `readdirSync` (@s20).
+  existeDirectorio: (directorio) => existsSync(directorio),
   listarFicheros: (directorio) =>
     readdirSync(directorio, { recursive: true, withFileTypes: true })
       .filter((entrada) => entrada.isFile())
