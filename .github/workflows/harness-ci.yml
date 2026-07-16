@@ -18,9 +18,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      # pnpm ANTES de setup-node: desde setup-node@v5 el caché automático
+      # (package-manager-cache, default true) detecta pnpm por el `packageManager`
+      # de package.json e intenta invocarlo para el caché. Si pnpm no está en el
+      # PATH todavía, setup-node aborta con «Unable to locate executable file:
+      # pnpm». La acción oficial de pnpm lo instala leyendo la versión (11.9.0) de
+      # ese mismo `packageManager`, así que el caché y el lockfile cuadran.
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v5
         with:
           node-version: "22"
+          cache: pnpm
       - run: node .harness/harness.mjs init
 
   python-example:
@@ -31,9 +39,13 @@ jobs:
         working-directory: examples/python-notes-cli
     steps:
       - uses: actions/checkout@v5
+      # Este ejemplo NO usa pnpm (solo Python + el motor Node del arnés). Se
+      # apaga el caché automático de setup-node para que no intente detectar el
+      # pnpm de la raíz e invocarlo (fallaría: pnpm no está instalado en este job).
       - uses: actions/setup-node@v5
         with:
           node-version: "22"
+          package-manager-cache: false
       - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
@@ -53,9 +65,13 @@ jobs:
         working-directory: examples/node-notes-cli
     steps:
       - uses: actions/checkout@v5
+      # Este ejemplo es cero-dependencias (Node stdlib). Mismo motivo que el de
+      # Python: se apaga el caché automático para que setup-node no intente usar
+      # el pnpm de la raíz, que no está instalado en este job.
       - uses: actions/setup-node@v5
         with:
           node-version: "22"
+          package-manager-cache: false
       - name: init (entorno + tests)
         run: node ../../.harness/harness.mjs init
       - name: mutación (los 3 módulos deben quedar en 100%)
