@@ -36,6 +36,20 @@
 #            aria-labelledby). La enumeración del spec tenía nueve por descuido. Es LA ÚNICA de
 #            las diez que mide SC 1.3.1 de verdad: las otras nueve son criterio de proyecto o
 #            requisito de Google. Lo detectó el gherkin_author y AVISÓ en vez de colarla
+#
+# DOS CORRECCIONES QUIRÚRGICAS APLICADAS EL 2026-07-17, CON APROBACIÓN HUMANA EN LA PUERTA. Las
+# levantó el `tdd_craftsman` implementando (`progress/tdd_cascaron_semantico.md` §2 y §3) y las dos
+# eran REALES. El contrato SIGUE APROBADO y SIGUE TENIENDO 35 ESCENARIOS: son un `Then` y una fila,
+# no escenarios nuevos.
+#   - @s32 → su `Then` tenía un ERROR DE HECHO: decía que el HTML crudo de dist/ no contiene ningún
+#            `<title>`, y SÍ LO CONTIENE — `renderToString` NO hoistea la metadata de React 19 al
+#            `<head>`: LA EMITE EN EL `<body>`. Lo que sale vacío es el `<head>`, que es lo único
+#            que importa. No es cosmético: una puerta que escanee el documento entero encuentra ese
+#            `<title>` y NO ACUSA — casi cuesta la feature (§2)
+#   - @s18 → le FALTABA la fila que prueba «a un heading real»: ninguna de las tres distinguía un
+#            `<h2 id="x">` de un `<div id="x">`, así que el coladero que la propia prosa prohíbe
+#            PASABA. Sin esa fila, la única regla del contrato que mide SC 1.3.1 de verdad no
+#            protegía el acceptance 1 (§3)
 # Razonamiento completo, con los cálculos y las citas: `progress/f04_verificacion_previa.md`.
 # Aquí no hay nada que adivinar: lo que no está escrito, no está decidido.
 #
@@ -827,10 +841,32 @@ Feature: Cáscara semántica horneada, JSON-LD escrito de cero y la puerta que m
     Then hay exactamente <violaciones> violación(es) por la regla "section sin aria-labelledby a un heading real"
 
     Examples:
-      | situacion                                                                       | violaciones |
-      | una <section aria-labelledby="x"> y un <h2 id="x">Servicios</h2> dentro         | 0           |
-      | una <section> sin aria-labelledby, titulada con un <div class="titulo">         | 1           |
-      | una <section aria-labelledby="x"> cuyo id "x" no existe en ningún elemento      | 1           |
+      | situacion                                                                                        | violaciones |
+      | una <section aria-labelledby="x"> y un <h2 id="x">Servicios</h2> dentro                          | 0           |
+      | una <section> sin aria-labelledby, titulada con un <div class="titulo">                          | 1           |
+      | una <section aria-labelledby="x"> cuyo id "x" no existe en ningún elemento                       | 1           |
+      | <section aria-labelledby="x"> con <div id="x">, id que resuelve a un elemento que NO es heading  | 1           |
+
+    # ✅ **CUARTA FILA AÑADIDA EL 2026-07-17 (aprobación humana en la puerta).** Las tres filas
+    # originales **prometían lo que ninguna probaba**: la regla se llama *«`section` sin
+    # `aria-labelledby` A UN HEADING REAL»* y la prosa es enfática (*«NO un `div` con `font-size`»*),
+    # pero solo distinguían **atributo ausente** (→1), **id que resuelve** (→0) e **id que no existe
+    # en ningún elemento** (→1). **NINGUNA distinguía un `<h2 id="x">` de un `<div id="x">`** → el
+    # coladero estaba abierto: `<section aria-labelledby="x">` + `<div id="x" class="titulo">`
+    # **PASABA**, que es **JUSTO LA FORMA QUE LA PROSA QUIERE PROHIBIR**. La fila **LA EXIGE LA
+    # PROPIA PROSA DE LA REGLA**, no un capricho: sin ella el nombre de la regla miente.
+    # 🔴 **POR QUÉ IMPORTA MÁS QUE NINGUNA OTRA FILA DE ESTE CONTRATO:** `@s18` es **LA ÚNICA de las
+    # DIEZ reglas que mide `SC 1.3.1` DE VERDAD** (las otras nueve son criterio de proyecto o
+    # requisito de Google). Sin esta fila, **el `acceptance` 1 NO ESTÁ PROTEGIDO**: la única regla
+    # normativa de la feature se cumplía en el papel y no en el código.
+    # **QUÉ CUENTA COMO HEADING: `h1`…`h6`.** El spec **NO fija nada más** — ni `role="heading"`, ni
+    # `aria-level`, ni ningún otro elemento — **y NO SE INVENTA**: lo que no está escrito, no está
+    # decidido. Si mañana hace falta `role="heading"`, se vuelve a la puerta y se añade una fila.
+    # ⚠️ El `tdd_craftsman` **NO lo implementó, Y CON RAZÓN**: sin esta fila sería **producción que
+    # ningún test rojo pide (Ley 1)** y un **MUTANTE INMORTAL** (nada lo mataría) → rompería el
+    # umbral de 1.0. **Cerrar el coladero exigía UNA FILA EN EL CONTRATO, no código a escondidas.**
+    # Precedente literal del repo: la rama de «texto grande» que F-03 **no** implementó por esto
+    # mismo. El craftsman avisó en vez de colarlo; el humano lo aprobó.
 
     # ✅ **ESTO SÍ ES `SC 1.3.1`**, y es lo único de esta feature que lo es: **una relación que el
     # diseño comunica VISUALMENTE debe existir EN EL CÓDIGO**. El título de sección tiene que ser un
@@ -1197,11 +1233,38 @@ Feature: Cáscara semántica horneada, JSON-LD escrito de cero y la puerta que m
   Scenario: la metadata NATIVA de React 19 deja el <head> de dist/ VACÍO, y jsdom da VERDE sobre ese mismo bug
     Given una página cuyo title y cuya description se declaran con la METADATA NATIVA DE REACT 19 (<title>/<meta> hoisteados por el propio React), sin <Head> de vite-react-ssg
     When se compara el <head> del HTML CRUDO de dist/ con el <head> que produce jsdom al renderizar ESA MISMA página
-    Then el HTML CRUDO de dist/ NO contiene ningún <title> ni ninguna <meta name="description">
+    Then el <head> del HTML CRUDO de dist/ no contiene ningún <title> ni ninguna <meta name="description"> — están en el <body>, donde no sirven para nada
     And la puerta emite violación por "title ausente o vacío" y por "description ausente o vacía"
     And el código de salida del build es distinto de 0
     And el <head> que produce jsdom SÍ contiene el title y la description, es decir, JSDOM DA VERDE SOBRE ESTA MISMA VIOLACIÓN
     # 🔴🔴 **ESTE ESCENARIO ES LA FEATURE ENTERA. NO LO BORRES «PORQUE ES RARO».**
+    # ✅ **`Then` CORREGIDO EL 2026-07-17 (aprobación humana en la puerta).** Decía «el HTML CRUDO de
+    # dist/ NO contiene ningún `<title>`». **ERA FALSO, Y ESTÁ MEDIDO** sobre un build SSG real
+    # (`.experimentos-tmp/react19-nativa/dist/index.html`):
+    #
+    #   <head><meta charset="UTF-8"><script type="module" src="/assets/app-ti4oL6dR.js"></script></head>
+    #   <body><div id="root" data-server-rendered="true"><title>Nails Lash Studio</title>
+    #   <meta name="description" content="…"><link rel="canonical" href="…">…
+    #
+    # (a) **EL `<title>` SÍ ESTÁ EN EL ARTEFACTO** — `renderToString` **NO hoistea** la metadata de
+    # React 19 al `<head>`: **LA EMITE DENTRO DEL `<body>`**, donde está el componente. Lo que sale
+    # **VACÍO es el `<head>`**, que es exactamente lo que la verificación previa siempre dijo (*«el
+    # `<head>` del build sale VACÍO»*, `f04_verificacion_previa.md` §1) y **LO ÚNICO QUE IMPORTA**:
+    # un `<title>` en el `<body>` no es el título del documento para NADIE — ni buscador, ni pestaña,
+    # ni lector de pantalla. La decisión era correcta; la letra del `Then`, falsa. El patrón del
+    # proyecto, otra vez.
+    # (b) **POR ESO LA PUERTA ACOTA LAS REGLAS DEL `<head>` AL `<head>`** (`cabezaDe(html)`), y no al
+    # documento entero. **UNA PUERTA QUE ESCANEE EL DOCUMENTO ENTERO ES CIEGA A ESTE BUG**: encuentra
+    # el `<title>` en el `<body>` y **NO ACUSA**.
+    # (c) 🔴 **Y NO ES COSMÉTICO: @s32 SE PAGÓ A SÍ MISMO EN SU PRIMERA EJECUCIÓN.** La primera
+    # puerta del craftsman buscaba el `<title>` con regex **en el documento entero**, lo encontraba
+    # **en el `<body>` y NO acusaba**. Rompió **POR ACCIDENTE** (el JSON-LD del fixture estaba
+    # incompleto); **con un JSON-LD completo, EL BUG DE REACT 19 HABRÍA PASADO LA PUERTA EN VERDE** —
+    # o sea, la puerta habría sido **TAN CIEGA COMO JSDOM al único bug que F-04 existe para
+    # prevenir**. El escenario cazó a su propia puerta.
+    # (d) ⚠️ **QUE NADIE «SIMPLIFIQUE» `cabezaDe` DENTRO DE SEIS MESES.** Parece un envoltorio
+    # tonto sobre un regex y **ES LA DIFERENCIA ENTRE UNA PUERTA QUE VE Y UNA QUE NO**. Si lo
+    # borras, los tests siguen verdes y F-04 deja de existir. Lee (b) y (c) antes de tocarlo.
     # **EL PROJECT-SPEC LO EXIGE EXPLÍCITAMENTE** («debe existir un escenario que demuestre que
     # jsdom NO lo caza — o el próximo agente "simplificará" la puerta a un test de Testing Library
     # y LA DESACTIVARÁ SIN ENTERARSE»).

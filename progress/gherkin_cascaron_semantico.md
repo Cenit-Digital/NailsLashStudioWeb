@@ -4,8 +4,10 @@
 > cobertura completa del rango (verificado mecánicamente). `feature_list.json` id 4: `pending` →
 > **`spec_ready`**.
 >
-> ⏸ **PENDIENTE DE APROBACIÓN HUMANA.** Nadie lo ha aprobado. **NO lanzar el `tdd_craftsman`.**
-> La puerta la pasa el lead con el humano.
+> ✅ **APROBADO POR EL HUMANO EN LA PUERTA (2026-07-16).** (Esta línea decía «pendiente, no lanzar
+> el `tdd_craftsman`» — ya no es cierto y se corrige para no engañar al siguiente lector.)
+> **3ª pasada (2026-07-17): DOS CORRECCIONES QUIRÚRGICAS, aprobadas por el humano. SIGUEN SIENDO
+> 35 ESCENARIOS** (un `Then` y una fila, no escenarios nuevos). Ver §«Tercera pasada» al final.
 >
 > Fuente de los hechos: **`progress/f04_verificacion_previa.md`** (manda sobre el troceado).
 > Traza al **acceptance reescrito por A-17**, no al viejo. Modelo de calidad igualado:
@@ -138,3 +140,69 @@ schema.org y son **dos fuentes de verdad para el mismo hecho**, justo lo que I-7
   F-04, **para**: estás duplicando F-01 y las dos copias divergirán.
 - **`@s35` nace con una fila inerte a propósito** (la de `…Specification`): es el contrato que
   **F-10 hereda**. No la borres por «no aporta hoy» — aporta el día que F-10 empiece.
+
+## Tercera pasada — las DOS correcciones quirúrgicas (2026-07-17, aprobación humana)
+
+**Las levantó el `tdd_craftsman` IMPLEMENTANDO** (`progress/tdd_cascaron_semantico.md` §2 y §3), no
+una relectura de despacho. **Las dos eran reales.** El contrato **sigue aprobado** y **sigue
+teniendo 35 escenarios**: se tocó **un `Then` y se añadió una fila**. Verificado mecánicamente:
+**35 tags `@sN` únicos, 35 líneas `Scenario`, sin huecos ni duplicados.**
+
+| # | Escenario | Qué se cambió | Por qué |
+| - | --------- | ------------- | ------- |
+| 1 | **`@s32`** | El `Then` pasa de *«el HTML CRUDO de dist/ NO contiene ningún `<title>`»* a *«**el `<head>`** del HTML CRUDO de dist/ no contiene ningún `<title>` ni ninguna `<meta name="description">` — **están en el `<body>`, donde no sirven para nada**»*. Comentario ampliado con (a)…(d) | **ERROR DE HECHO, MEDIDO** sobre un build SSG real: `renderToString` **NO hoistea** la metadata de React 19 al `<head>` — **la emite en el `<body>`**. El `<title>` **SÍ está en el artefacto**. Lo vacío es **el `<head>`**, que es lo que la verificación previa siempre dijo y lo único que importa |
+| 2 | **`@s18`** | **Fila 4 añadida**: `<section aria-labelledby="x">` con `<div id="x">`, id que **resuelve a un elemento que NO es heading** → **1**. Tabla realineada. Comentario con el porqué | Las 3 filas **prometían lo que ninguna probaba**. Ninguna distinguía `<h2 id="x">` de `<div id="x">` → **el coladero que la propia prosa prohíbe PASABA** |
+
+### `@s32` — el error de hecho, y por qué casi cuesta la feature
+
+Medido en `.experimentos-tmp/react19-nativa/dist/index.html`:
+
+```html
+<head><meta charset="UTF-8"><script type="module" src="/assets/app-ti4oL6dR.js"></script></head>
+<body><div id="root" data-server-rendered="true"><title>Nails Lash Studio</title>
+<meta name="description" content="…"><link rel="canonical" href="…">…
+```
+
+**La decisión era correcta; la letra del `Then`, falsa.** El patrón del proyecto, otra vez.
+
+🔴 **Y NO ERA COSMÉTICO.** La primera puerta del craftsman buscaba el `<title>` con regex **en el
+documento entero**, **lo encontraba en el `<body>` y NO acusaba**. Rompió **por accidente** (el
+JSON-LD del fixture estaba incompleto); **con un JSON-LD completo, el bug de React 19 habría pasado
+la puerta EN VERDE** — la puerta habría sido **tan ciega como jsdom al único bug que F-04 existe
+para prevenir**. **`@s32` se pagó a sí mismo en su primera ejecución.** De ahí `cabezaDe(html)`, que
+acota las 4 reglas del `<head>` al `<head>`, y de ahí el aviso (d) en el escenario: **quien
+«simplifique» `cabezaDe` deja los tests verdes y borra la feature**.
+
+**Lección para el resto del proyecto:** una regla sobre el `<head>` que se asevere contra el
+documento entero **no es una regla sobre el `<head>`**. Vale para F-06 y F-16.
+
+### `@s18` — la fila que exige la propia prosa de la regla
+
+La regla se llama *«`section` sin `aria-labelledby` **a un heading real**»* y la prosa es enfática
+(*«NO un `div` con `font-size`»*). Las tres filas solo distinguían: atributo **ausente** (→1), id
+que **resuelve** (→0), id que **no existe en ningún elemento** (→1). **Ninguna distinguía un
+`<h2 id="x">` de un `<div id="x">`** → `<section aria-labelledby="x">` + `<div id="x" class="titulo">`
+**PASABA**, que es **justo la forma que la regla existe para prohibir**.
+
+**Importa más que ninguna otra fila del contrato:** `@s18` es **la ÚNICA de las diez reglas que mide
+`SC 1.3.1` de verdad** (las otras nueve son criterio de proyecto o requisito de Google). Sin la
+fila, **el `acceptance` 1 no estaba protegido**: la única regla normativa se cumplía en el papel.
+
+**Qué cuenta como heading: `h1`…`h6`.** El spec **no fija más** (ni `role="heading"` ni `aria-level`)
+y **no se inventa** — lo que no está escrito, no está decidido. Si hace falta, se vuelve a la puerta.
+
+⚠️ **El craftsman NO lo implementó, y con razón**: sin fila sería **producción que ningún test rojo
+pide (Ley 1)** y un **mutante INMORTAL** → rompería el umbral de 1.0. **Cerrar el coladero exigía
+una fila en el contrato, no código a escondidas.** Avisó en vez de colarlo; el humano lo aprobó.
+Precedente literal: la rama de «texto grande» que F-03 **no** implementó por esto mismo.
+
+### Lo que NO se tocó, a propósito
+
+- **Ningún otro escenario.** En particular **`@s33`** conserva su `Then` («el HTML CRUDO de dist/ NO
+  contiene ningún `<title>`…») **y es CORRECTO ahí**: su trampa es el `replace()` literal que **no
+  inyecta nada en ninguna parte** — no hay metadata en el `<body>` que rescatar, porque la vía es
+  `<Head>`, no la nativa de React 19. **Son dos bugs distintos y solo uno emite al `<body>`.**
+- **`feature_list.json`** — no lo toca el `gherkin_author`; la feature está `in_progress` con el
+  craftsman dentro y **no se devuelve a `pending`**: el contrato sigue **aprobado**.
+- **§1 de la bitácora del craftsman** (`pnpm build` en rojo por `@s34`) **no es cosa mía**: es
+  decisión del **lead/humano**, no una corrección del contrato. **Sigue abierta.**
