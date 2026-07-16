@@ -4,11 +4,16 @@
 > (regla anti-teléfono-descompuesto). Al cerrar la sesión, mueve el resumen a
 > `history.md` y deja este archivo con solo esta plantilla.
 
-- **Feature en curso:** ninguna. `2 — datos_negocio_fuente_unica` cerrada `done`
-  (12/12 escenarios, judge APROBADO, mutación 100% en `site.ts` + F-01 sin
-  regresión, `bin/harness verify` verde, `pnpm build` verde).
-- **Siguiente:** F-03 `tokens_paleta_contraste` (`pending`) — el sistema de
-  diseño (paleta AA). Camino hacia la UI visible que pidió el CEO para la reunión.
+- **Feature en curso:** `3 — tokens_paleta_contraste` (`in_progress`) — el sistema
+  de diseño (paleta AA). Camino hacia la UI visible que pidió el CEO para la reunión.
+- **Fase:** TDD (`tdd_craftsman`) sobre `features/tokens_paleta_contraste.feature`,
+  **aprobado por el humano en la puerta el 2026-07-16** (18 escenarios `@s1..@s18`).
+  A-13/A-14/A-15/A-16 cerradas en su redacción. Bitácora:
+  `progress/tdd_tokens_paleta_contraste.md`; verificación previa:
+  `progress/f03_verificacion_previa.md`.
+- **Anterior:** `2 — datos_negocio_fuente_unica` cerrada `done` (12/12 escenarios,
+  judge APROBADO, mutación 100% en `site.ts` + F-01 sin regresión,
+  `bin/harness verify` verde, `pnpm build` verde).
 - **Contexto del CEO (2026-07-16):** la web es un **demo** para una primera
   reunión; prioriza el **front visible**; WhatsApp/tel con **datos reales** (los
   provee F-02), citas como demo per diseño (sin backend, F-13). Guardado en la
@@ -228,18 +233,62 @@ omitía el token `{{target}}` de `docs/configuration.md:54`, así que
 `bin/harness mutate <fichero>` **descartaba el target en silencio**. Arreglado con
 `tools/mutate.mjs`.
 
+### 2026-07-16 — F-03: el default de A-15 no cumplía AA (cazado por cálculo)
+
+**El contrato de F-03 llegó a la puerta con un fallo real.** A-15 confesaba que el
+audit calculó la trampa `color-mix` con los tokens **viejos** y **no** re-verificó
+la corregida, y lo daba por bueno de palabra («casi seguro pasan»). Se **calculó**,
+validando antes la fórmula contra la tabla del audit §2.6(b) —los 6 fondos efectivos
+salen **hex a hex idénticos**—:
+
+- Al **82 %** la nav `--muted #6F525A` cae a **4,44** con «Negro Ónix» `#1B1B1D`
+  debajo (**color real de la carta**, `salon-data.js:90`) y a **4,22** con negro puro.
+- **El audit declaró como peor caso un `#303030` más claro que el negro de su propia
+  carta de esmaltes.**
+- `@s17` **no lo habría cazado**: declaraba «foto oscura» como under **solo para
+  `--ink` (logo)**, no para `--muted` (nav) — **y la nav es la que falla**. El logo
+  aguanta el negro puro incluso al 82 % (4,64). La asimetría escondía el fallo.
+- **Decisión del humano: 88 %.** Incondicionalmente AA (nav 4,89 · logo 5,38 contra
+  el peor under posible), conserva translucidez y `blur(14px)`, y **desacopla F-03 de
+  F-06 y F-17**.
+
+**Es el patrón de fallo de este proyecto, otra vez.** El informe de Fase 0 ya lo
+diagnosticó: *«WebEmpresa arrastra 3 bloqueantes AA en HEAD con las 3 puertas verdes
+porque ninguna feature los representaba → una auditoría sin puerta no existe»*. La
+lección se aplicó al stack base, pero **el propio audit heredó un número sin
+recalcularlo** y el contrato lo copió. Por eso existe `@s18`: el 88 % vive en el
+SCSS —que Stryker **no** muta—, así que ahí el único mutante posible es **humano**.
+
+**Verificación documental:** 14 subagentes (7 afirmaciones × verificar + refutar),
+501k tokens, 0 errores. Fórmula G17, ratio, `color-mix` premultiplicado y los
+mutadores de Stryker **confirmados contra fuente primaria**. Tres correcciones:
+la fuente citada (**wiki del WG**) está **desactualizada** (imprime `0.03928` con
+errata); y **dos justificaciones eran falsas** aunque sus decisiones fueran correctas
+(SC 1.4.11 no va de «bordes de control»; **WCAG no exige «el peor caso»** — F83 es
+*Quickcheck*, suficiente y no necesaria). **El lead se equivocó** al sospechar que
+«18,5 px negrita» era erróneo: es la cifra oficial; «18,66 px» no existe en `w3.org`.
+
+**A-16 (hallazgo propio):** el contrato **se contradecía**. `@s9` fija `componer` en
+coma flotante pero el **4,60** del pie salía de un cálculo **cuantizado a 8 bits**.
+Con el `componer` que el propio contrato manda, el ratio es **4,5913** y
+`toBeCloseTo(4.60)` **falla** por 0,0087: **el TDD se habría estrellado**. Vale **4.59**.
+
+**La puerta funcionó.** El `tdd_craftsman` se **negó a implementar** porque el
+contrato no constaba como aprobado (la marca `⏸` seguía puesta, `feature_list` en
+`spec_ready`), y se negó a editar la cabecera él mismo: habría sido **concederse la
+puerta a sí mismo**. Tenía razón. Aprobado por el humano y **registrado** antes de
+escribir una línea de código.
+
 ## Siguiente paso
 
-`project-spec.md` **cerrado**. En curso: `gherkin_author` destilando
-`features/puerta_placeholders.feature` (feature #1). Después: **puerta de
-aprobación humana** sobre el `.feature` (CLAUDE.md la declara innegociable) y solo
-entonces `tdd_craftsman`.
+`tdd_craftsman` sobre los 18 escenarios de F-03. Después: `judge` y `mutation_tester`
+(umbral **1.0** — no cierra si sobrevive un mutante), `bin/harness verify` en verde y
+cierre.
 
-**Dos agujeros de F-01 que levantó el `spec_partner` y que van al Gherkin sin
-darse por resueltos:** la puerta puede dar **verde por vacuidad** (si apunta a un
-artefacto que no se generó, devuelve 0 violaciones y el build pasa "protegido"), y
-el patrón `600123456` **no caza** `+34 600 123 456` con espacios — el placeholder
-más peligroso escaparía por comparación literal.
+**Pendiente del humano (no bloquea el código):** elegir dominio (¿migrar
+`nailslashlasrozas.es` con 301?), plataforma de reseñas (Treatwell 1.231 vs Google
+226) y **A-4** (si «Nails Lash Studio» es logotipo, SC 1.4.3 exime el par del
+`clamp`; **no se depende** de ello: se construye AA igual).
 
 **Pendiente del humano (no bloquea el código):** elegir dominio (¿migrar
 `nailslashlasrozas.es` con 301?) y plataforma de reseñas (Treatwell 1.231 vs

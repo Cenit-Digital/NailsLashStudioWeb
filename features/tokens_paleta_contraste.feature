@@ -3,9 +3,25 @@
 # puerta que recalcula». Es la primera implementación de I-3 («WCAG 2.2 AA con una puerta que
 # recalcula el contraste desde el SCSS») y encarna T-1 («NO copiar `_tokens.scss` de WebEmpresa»).
 #
-# ⏸  PENDIENTE de aprobación humana. AÚN NO aprobado en la puerta. Nada de esto se implementa
-#    hasta que el humano lo apruebe. Lo que no está escrito aquí, no está decidido.
-#    (A-15 SÍ está ya decidida por el humano: cabecera translúcida al 88 %. Ver más abajo.)
+# Aprobado por el humano en la puerta de aprobación (2026-07-16, sobre los 18 escenarios).
+# Cierra en su redacción:
+#   - A-15 → cabecera translúcida al 88 %, NO al 82 % (decisión de diseño del humano). El 82 %
+#            del prototipo NO cumple AA: la nav `--muted` cae a 4,44 con «Negro Ónix» #1B1B1D
+#            —color real de la carta, `salon-data.js:90`— y a 4,22 con negro puro. Al 88 % la
+#            cabecera es INCONDICIONALMENTE AA contra el peor under posible (@s17, @s18)
+#   - A-13 → matriz de uso DECLARADA, con mínimo de pares exigido (@s14) y aseveración del
+#            negativo «#C05576 nunca como texto» (@s13)
+#   - A-14 → Stryker 9.6 NO genera el mutante `0.04045 → 0.03928` (doc oficial): el riesgo del
+#            umbral 1.0 no existe. La constante sí es mutable vía su entorno sintáctico (@s5, @s6)
+#   - A-16 → `componer` devuelve FLOTANTES, sin cuantizar: la fila del pie vale 4.59, no 4.60
+#            (que es el valor cuantizado del audit). Sin esto el TDD se estrella (@s9, @s11)
+#   - C1   → fuente de verdad: el glosario de WCAG 2.2, NO el wiki del WG (que aún imprime
+#            0.03928 con su propia errata). Equivalencia acotada a 8 bits
+#   - C4/C7 → dos justificaciones del audit eran falsas; las decisiones sobreviven, el porqué
+#            se reescribió (SC 1.4.11 va de IDENTIFICAR el componente; F83 es Quickcheck)
+#   - C3   → «≥18,5 px negrita» es la cifra OFICIAL y se conserva; «18,66 px» no existe en w3.org
+# Razonamiento completo, con los cálculos y las citas: `progress/f03_verificacion_previa.md`.
+# Aquí no hay nada que adivinar: lo que no está escrito, no está decidido.
 #
 # ALCANCE MUTABLE (decisión del lead, cerrada): la lógica mutable es `src/lib/contraste.ts`
 # (`hexARgb`, `canalLineal`, `luminancia`, `ratio`, `componer`) MÁS el predicado de la puerta
