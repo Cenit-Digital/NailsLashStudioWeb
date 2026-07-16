@@ -197,6 +197,9 @@ No están cerradas. **No se dan por resueltas** y ninguna se resuelve adivinando
 | **A-10** | **`waHref`: ¿host `wa.me` o `api.whatsapp.com/send`?** Ligada a **A-3**. Lo **testeable** de F-02 (número **E.164 sin `+`** + texto **`encodeURIComponent`**) es host-agnóstico; el host se **verifica a mano** (Android/iOS/WhatsApp Web) antes de F-13 y se trata como constante configurable. Ver F-02, contrato | Nosotros, ligado a A-3 |
 | **A-11** | **¿El email entra en `site.ts` como registro `esPlaceholder: true` desde F-02** (rompiendo ya el build de producción, que es lo correcto por D-6) **o se difiere a F-12?** `centroesteticarozas@gmail.com` solo consta en el JSON-LD oculto de la web actual y **[NV]** si se atiende **[V]**. Ver F-02, alcance | Humano, en el Gherkin de F-02 |
 | **A-12** | **¿F-02 cablea `registros` en `tools/puerta-placeholders.ts`** (hoy `never[] = []`) **o es paso posterior?** El TODO del humilde dice que F-02 alimenta la vía por flag **[V: código]**. Recomendación: sí, es de F-02 (cambio de una línea en el humilde, sin TDD ni mutación). Ver F-02, alcance | Humano/lead, en la puerta de aprobación de F-02 |
+| **A-13** | **¿Dónde vive y cómo se mantiene honesta la «matriz de uso» de F-03?** (pares fg/bg + rol/umbral + tamaño efectivo del `clamp`). El SCSS solo tiene colores; el umbral 4,5/3,0 es información de **uso**, no de token. Incluye el **mínimo de pares exigido** (contra el verde por vacuidad) y **cómo asevera el negativo** «`#C05576` nunca como texto». Análogo a A-8/A-9. Ver F-03 | Humano, en el Gherkin de F-03 |
+| **A-14** | **El mutante `0.04045 → 0.03928` es EQUIVALENTE para color de 8 bits [V: audit §2.1]**: ningún canal `c/255` cae en el hueco, así que ningún hex lo distingue. Con umbral de mutación **1.0** un superviviente inmatable bloquea la feature. Confirmar qué mutantes genera Stryker 9.6 sobre la rama a trozos y **cubrir `canalLineal` con inputs sintéticos**. Ver F-03 | Nosotros/lead, antes del Gherkin de F-03 |
+| **A-15** | **¿La cabecera de F-03 se conserva translúcida (`color-mix 82%`) o se hace opaca?** El audit calculó la trampa `color-mix` con tokens **viejos** y **no** re-verificó la cabecera corregida; la decisión define qué pares (y qué peor `under`) entran en la matriz. Incluye el **inventario exacto de tokens** del `:root` (13 base + `--border-interactive` + estado `#186237`). Ver F-03 | Humano (diseño), en el Gherkin de F-03 |
 
 **Y lo que no es una pregunta sino un aviso con valor legal:** hay que decirle al cliente
 **ya**, sin esperar a la web nueva, que **su aviso legal actual da 404** y que su política
@@ -497,7 +500,236 @@ arnés es **una feature a la vez**. De ahí tres decisiones de alcance a fijar:
 
 ---
 
-### Las 18 features restantes
+### Feature 3: `tokens_paleta_contraste` — la paleta accesible con puerta que recalcula
+
+> Feature `#3` de `feature_list.json`. **No depende de F-01 ni F-02** (solo del arranque
+> F-00): es autónoma y va tercera por ser cimiento visual de F-04/F-07/F-09/F-13. Es la
+> primera implementación de **I-3** («WCAG 2.2 AA, con una puerta que recalcula el contraste
+> desde el SCSS») y encarna **T-1** («NO copiar `_tokens.scss` de WebEmpresa»).
+
+#### Propósito
+
+Los **13 tokens de la paleta Rosa** viven en un **`:root` real** —no en un `style` inline,
+como el prototipo (`Opcion-1-Rosa.dc.html:28`) **[V]**— con los **7 cambios obligatorios**
+que la hacen cumplir **WCAG 2.2 AA**, y una **puerta mecánica** que **recalcula el contraste
+desde el SCSS** y **rompe el build** si cualquier par en uso baja de su umbral.
+
+#### Por qué la puerta va EN la misma feature que los tokens (I-3, T-1)
+
+La paleta cerrada (decisión **D-5**, solo Rosa) **falla 32 de 68 combinaciones AA (47 %)**,
+incluido el **botón «Reservar»** (blanco sobre `#C05576` = **4,37:1** < 4,5), el **precio**
+(4,37:1), la **nav** (3,35:1) y **todo el pie** **[V: audit §2.5]**. Eso se arregla con 7
+cambios de token. Pero **corregirlos sin una puerta que los vigile es exactamente el error
+del stack base**: en WebEmpresa **3 bloqueantes de contraste AA vivían en HEAD con las tres
+puertas verdes** (tests, judge, mutación) **porque ninguna feature los representaba**, y su
+checklist afirmaba «AA validado» siendo falso **[V: `stack-aprendizajes.md`]**. **Una
+auditoría sin puerta no existe.** Alguien retoca un token dentro de seis meses y el fallo
+vuelve **en silencio**. Por eso `tokens` + `puerta_contraste` son **una sola feature**: los
+tokens son el estado; la puerta es lo que lo sostiene.
+
+Y por eso **NO se copia `_tokens.scss` de WebEmpresa** (T-1): su base arrastra
+`--color-accent` 3,78:1, `--color-tag-ink` 2,64:1 y `--color-text-faint` 2,78:1 **[V]**. Se
+recalcula todo uno mismo; **no se cree la documentación del base** —que además describe una
+paleta («Teal/Coral») que su código no usa **[V]**. Hoy `_tokens.scss` **no existe** en este
+repo: `src/styles/main.scss` deja escrito que «los parciales del sistema (`_tokens`,
+`_reset`, `_base`) llegan con la feature de diseño» **[V: código]**. **Esta es esa feature.**
+
+#### Alcance — qué es mutable y qué no
+
+- **Los tokens (SCSS) NO son mutables.** Stryker no ve CSS/SCSS y `src/styles/` **no** está
+  en la lista de `mutate` **[V]**. El `feature_list` marca la feature `mutable: true` **por
+  `src/lib/contraste.ts`**, no por los tokens.
+- **La lógica mutable = `src/lib/contraste.ts`** (parseo, linealización, luminancia, ratio,
+  composición alfa) **más el predicado de la puerta** (comparar ratio contra umbral). Ahí
+  muerden los mutantes de la acceptance 7.
+- **La corrección de los 7 tokens es un cambio de valores en el SCSS**; lo que la convierte
+  en feature verificable —no en una recomendación olvidable— es la puerta.
+
+#### Los 7 cambios obligatorios (verbatim del audit §5.1 / feature_list, con su porqué)
+
+Todos los ratios son **[V]** del audit (`contrast.py`/`contrast2.py`, fórmula W3C G17
+ejecutada). «Antes» = paleta cerrada; «después» = corregida. Ojo a la distinción **valor**
+(cambia el hex del token) vs **uso** (el token no cambia; cambia qué token se usa dónde):
+
+| # | Cambio | Antes → Después | Por qué |
+| - | ------ | --------------- | ------- |
+| 1 | `--muted` **(valor)** | `#9C7F89` → **`#6F525A`** | `#9C7F89` es **inservible como texto**: 3,35:1 sobre `--bg`, 3,61:1 sobre `--surface` → causa **11 de los 32 fallos**. `#6F525A` da 6,42:1 / 6,93:1 |
+| 2 | `--accent` **como texto/borde (uso)** | usar `#C05576` → usar **`--accent-dark #A23E5F`** | `#C05576` da 4,05:1 como texto sobre `--bg` (< 4,5). `--accent-dark` **ya existe** en la paleta y pasa en los 4 fondos (mín. **4,86:1**). No se cambia el token: se **cambia el uso** |
+| 3 | `--accent` **como relleno con texto blanco (uso)** | `#C05576` → **`--accent-dark #A23E5F`** | Blanco sobre `#C05576` = **4,37:1** → **el botón «Reservar», la CTA del negocio, falla**. Blanco sobre `#A23E5F` = **6,19:1** |
+| 4 | `--accent-2` **(valor: texto blanco/icono)** | `#E38AAE` → **`#B3316E`** | Blanco sobre `#E38AAE` = **2,47:1** (badges de oferta y **estrellas** de reseña). `#B3316E` da 5,86:1 |
+| 5 | `--border-interactive` **(token NUEVO)** | — → **`#AB5F79`** | `--line rgba(176,70,106,.16)` da **1,26:1**: vale como decorativo, **no** para delimitar controles (SC 1.4.11, 3:1). Se **parte** el token: `--line` decorativo se queda; los bordes de swatch/día/input usan `#AB5F79` (peor caso **3,54:1** sobre `--accent-soft`) |
+| 6 | `--ink` **como fondo del pie (valor)** | `#B0466A` → **`#8E3355`** | Con `#B0466A`, **ninguna** opacidad de blanco < 1.0 alcanza 4,5:1 (`.82` cae a 4,15:1) — **límite matemático [V]**. Con `#8E3355`, `rgba(255,255,255,.70)` = **4,60:1** y `.82` = 5,68:1 |
+| 7 | «en línea» del chat **(valor)** | `#2f9d5f` → **`#186237`** | `#2f9d5f` sobre `--accent-soft` = **2,69:1**. `#186237` = 5,79:1 |
+
+**`#C05576` se CONSERVA** como color de marca en **rellenos grandes y decorativos**
+(`--accent`, `--brush`): el problema **nunca fue la estética rosa**, sino que la paleta
+**confundía «color de marca para rellenos» con «color de texto»** **[V, audit §2.7]**. La
+regla dura (audit §5.2): **prohibido `#C05576` como texto pequeño o como relleno con texto
+blanco** — «se reintroduce solo». Cómo asevera la puerta ese negativo es **A-13**.
+
+#### Comportamiento esperado
+
+1. Existe **`src/styles/_tokens.scss`** con un **`:root` real** que declara los 13 tokens de
+   la paleta Rosa **con los 7 cambios aplicados**, más `--border-interactive #AB5F79` y el
+   color de estado `#186237`. *(Inventario exacto de tokens en A-15.)*
+2. Existe **`src/lib/contraste.ts`**: funciones **puras** que implementan W3C **G17** —parseo
+   `#RRGGBB` → canales 0–255, **linealización** con umbral **0.04045**, **luminancia**
+   `L = 0.2126·R + 0.7152·G + 0.0722·B`, **ratio** `(L1+0.05)/(L2+0.05)` con L1 el más
+   claro— **y composición alfa** (para `--line` translúcido y para el `color-mix()` de la
+   cabecera).
+3. Existe una **puerta**: un test que **lee `_tokens.scss`**, extrae el hex de cada token, y
+   para **cada par en uso** recalcula el ratio y lo compara con **su** umbral; si alguno
+   baja, **el test falla y el build se rompe**. El molde ya existe en el base
+   (`src/styles/tokens.test.ts`: `readFileSync` del SCSS + regex sobre `:root`) **[V]**; aquí
+   se **sube un escalón**: en vez de asever*ar* un hex fijo, **se recalcula el ratio**.
+4. La puerta cubre **los dos casos que un chequeo ingenuo de la paleta NO ve**: el `clamp()`
+   («Studio») y el `color-mix()` de la cabecera (casos límite (a) y (b)).
+5. La puerta aplica **tres umbrales** según el par: SC 1.4.3 → **texto normal 4,5:1**, **texto
+   grande 3:1** (≥24 px, o ≥18,5 px negrita); SC 1.4.11 → **componente/borde de control 3:1**.
+   **El umbral NO está en el SCSS**: viene de una **matriz de uso** declarada (Contrato, A-13).
+
+#### Contrato
+
+**`src/lib/contraste.ts` — funciones puras (mutables):**
+
+| Función | Contrato |
+| ------- | -------- |
+| `hexARgb(hex): [r,g,b]` | `#RRGGBB` (y `#RGB`) → tres enteros 0–255. **Pura.** Entrada inválida → **lanza** (falla cerrada; ver Modos de error) |
+| `canalLineal(c8: number): number` | `c = c8/255`; **si `c <= 0.04045` → `c/12.92`; si no → `((c+0.055)/1.055)^2.4`**. El umbral es **0.04045** (WCAG 2.2; el `0.03928` es el valor anterior, sin efecto práctico en 8 bits). **Pura** |
+| `luminancia([r,g,b]): number` | `0.2126·canalLineal(r) + 0.7152·canalLineal(g) + 0.0722·canalLineal(b)`. **Pura** |
+| `ratio(colorA, colorB): number` | `(L1 + 0.05) / (L2 + 0.05)`, con **L1 = max**, L2 = min de las dos luminancias. Simétrica: `ratio(a,b) === ratio(b,a)`. **Pura** |
+| `componer(rgba, fondoRgb): [r,g,b]` | Composición sobre fondo opaco: `canal = α·fg + (1−α)·bg`. Cubre `--line` (α=.16) y el `color-mix(in srgb, --bg 82%, transparent)` de la cabecera (equivale a `--bg` con α=.82 sobre lo que scrollee debajo). **Pura** |
+
+Como en F-01: **la función es pura; el `exit ≠ 0` vive en la puerta** (test + hook de build),
+no en la función. Por eso `contraste.ts` es testeable y mutable, y por eso `dev` no falla.
+
+**La puerta (test que lee el SCSS) — pares comprobados y umbral de cada uno.** La lista de
+pares es la **matriz de uso** (las combinaciones que la página **usa de verdad** — las 68 del
+audit, no el producto cartesiano de tokens; ver A-13). Representativos **[V, audit §2.7]**:
+
+| Par (fg / bg) | Rol | Umbral | Ratio corregido |
+| ------------- | --- | ------ | --------------- |
+| `--muted #6F525A` / `--bg`, `--surface` | texto | 4,5 | 6,42 · 6,93 |
+| `--accent-dark #A23E5F` / `--bg`, `--surface`, `--surface2`, `--accent-soft` | texto | 4,5 | 5,74 · 6,19 · 5,24 · **4,86** |
+| `#FFF` / `--accent-dark` (relleno botón «Reservar») | texto | 4,5 | 6,19 |
+| `#FFF` / `--accent-2 #B3316E` (badge/icono estrellas) | texto/icono | 4,5 | 5,86 |
+| `--ink #8E3355` / `--bg`, `--surface2`, `--accent-soft` | texto/grande | 4,5/3 | 7,06 · 6,45 · 5,98 |
+| `--text #5E404A` / `--bg`, `--surface2` | texto | 4,5 | 8,43 · 7,70 |
+| `rgba(#FFF,.70)` / `--ink #8E3355` (pie) | texto | 4,5 | 4,60 |
+| `--border-interactive #AB5F79` / `--accent-soft` (peor fondo) | **componente** | **3** | 3,54 |
+| `#186237` / `--accent-soft` («en línea») | texto | 4,5 | 5,79 |
+
+**Determinismo:** misma entrada → misma salida, **mismo orden** de violaciones (informe
+diffable, como F-01). **Anti-tautología (regla del arnés):** el test compara la salida contra
+**ratios/veredictos escritos a mano** (`toBeCloseTo(6.19)`), **nunca** contra el resultado de
+la misma función que vigila; y los umbrales (4,5 / 3,0) son **literales del test**. Si el test
+recomputa el esperado con la función de producción, **un formula rota pasaría verde**.
+
+#### Casos límite debatidos
+
+1. **(a) La trampa de `clamp()` — el ratio no cambia, el UMBRAL sí.** «Studio»
+   (`font-size: clamp(14px, 2.2vw, 24px)`, `--ink` sobre `--accent-soft`) da **4,19:1
+   constante** **[V]**: a **24 px** (escritorio) es *texto grande* → umbral 3,0 → **pasa**; a
+   **14 px** (móvil) es *texto normal* → umbral 4,5 → **falla**. Se detecta **sin navegador**
+   porque es cálculo, no render: la matriz de uso registra el **tamaño efectivo mínimo** del
+   `clamp` (14 px) y la puerta aplica el umbral del **peor caso** (4,5), no el del máximo. Con
+   la paleta corregida el `--ink #8E3355` sube este par a **5,98:1**, que pasa **incluso a
+   14 px** — la trampa queda cerrada por el cambio 6, pero la puerta debe **modelar el mínimo**
+   para que la clase de bug no vuelva. *(Escape de negocio: si «Nails Lash Studio» es
+   **logotipo**, SC 1.4.3 lo exime y este par decae — es **A-4**, decisión del humano; se
+   construye AA igual, no se depende de esa exención.)*
+2. **(b) La trampa de `color-mix()` — la cabecera translúcida cambia de contraste al hacer
+   scroll.** `background: color-mix(in srgb, var(--bg) 82%, transparent)` → el fondo real es
+   **82 % `--bg` + 18 % de lo que pase por debajo** **[V]**. Se testea **sin navegador**
+   porque `color-mix` es composición determinista: `componer(--bg@.82, under)` para cada
+   `under` posible (los fondos de sección que pueden scrollear bajo la cabecera, y el peor
+   caso de foto oscura), y se recalculan `--muted` (nav) y `--ink` (logo) contra cada uno. Con
+   los tokens **viejos** el logo `--ink` caía a **3,88:1 / 3,96:1** cuando el pie o un botón
+   pasaban por debajo **[V, audit §2.6]**. **⚠️ El audit calculó esta trampa con los tokens
+   ANTIGUOS y NO re-verificó la cabecera con la paleta corregida** → si la cabecera sigue
+   translúcida en producción, **la puerta es quien decide** si los `--muted #6F525A` / `--ink
+   #8E3355` sobreviven el peor `under`; la alternativa de diseño (cabecera **opaca**) elimina
+   la trampa entera. Esto es **A-15**.
+3. **El umbral 4,5 vs 3,0 sale del ROL del par, no del SCSS.** El token file solo tiene
+   colores; «esto es texto / esto es texto grande / esto es un borde de control» es
+   información de **uso**. Por eso hace falta la matriz de uso (A-13): sin ella la puerta **no
+   puede** elegir umbral y es teatro. Análogo al «verde por vacuidad» de F-01 (A-8).
+4. **`--line` decorativo vs `--border-interactive`.** El mismo color de línea es **conforme**
+   como separador decorativo (SC 1.4.11 **no** le aplica) y **no conforme** delimitando un
+   control **[V, audit Nota A]**. La puerta **solo** exige 3:1 a los usos **interactivos**
+   (swatch #11, botón de día #19, input #26); el `--line` decorativo **no entra en la
+   matriz**. Meterlo daría un **falso fallo**.
+5. **Par en gris puro (canales iguales).** Los coeficientes 0.2126/0.7152/0.0722 no se
+   distinguen si `R=G=B`: un mutante de coeficiente **sobreviviría** a un test que solo use
+   grises. La matriz debe incluir pares **cromáticos con aporte de los tres canales** (los
+   rosas y el verde `#186237` lo garantizan) para que los mutantes de coeficiente mueran.
+6. **Color de 3 dígitos / mayúsculas-minúsculas / con o sin `#`.** `hexARgb` normaliza; el
+   Gherkin fija qué formas acepta el parser del SCSS (los tokens se escriben `#RRGGBB` en
+   minúscula/mayúscula indistinta). **[PREGUNTA]** menor, se cierra en el Gherkin.
+
+#### Modos de error
+
+- **Par por debajo de su umbral** → la puerta devuelve una **violación** (qué par, qué ratio,
+  qué umbral) → **exit ≠ 0** + informe legible, una línea por par. La puerta debe **acusar**
+  el par exacto, no decir «hay un fallo de contraste».
+- **`_tokens.scss` ilegible, token ausente, o hex malformado** → **falla cerrada**: build
+  roto, nunca verde (derivación de I-3, igual que F-01). Una puerta que se traga la excepción
+  y devuelve «0 fallos» es **peor que ninguna**, porque da confianza falsa — es literalmente
+  cómo se evaporaron los 3 bloqueantes del base.
+- **Matriz de uso apuntando a un token que ya no existe / regex que no casa nada** → **verde
+  por vacuidad**: si la puerta no comprueba **ningún** par, pasa creyéndonos protegidos.
+  Mismo peligro que A-8 en F-01. La puerta debe **exigir** haber evaluado un mínimo conocido
+  de pares. Parte de **A-13**.
+
+#### Mutantes que deben morir (acceptance 7, I-6 umbral 1.0)
+
+- **Rama a trozos de `canalLineal` forzada** (Stryker: condición `<=` → `<`, o forzar la
+  condición a `true`/`false`): un color vivo (p. ej. `--accent`) da luminancia muy distinta
+  según la rama → **muere** con cualquier par cromático.
+- **Coeficientes de luminancia** (`0.2126·R + 0.7152·G + 0.0722·B`): mutar el `+` que une los
+  tres términos por `-`, o el `·` por `/` → **muere** con pares cromáticos (caso límite 5).
+- **`4.5` vs `3.0`** (selección de umbral): mutar el umbral de un par **componente** (3,0 →
+  4,5) hace fallar `--border-interactive` (3,54) → **muere**. Para matar el sentido inverso
+  (4,5 → 3,0 en un par de texto) hace falta un **fixture de par malo conocido** con ratio en
+  `(3,0 · 4,5)` —p. ej. el botón viejo `#FFF/#C05576` = **4,37**— y **asever que la puerta lo
+  marca**. Sin fixtures negativos, este mutante y los de fórmula **sobreviven**.
+- **`+0.05`** del numerador/denominador del ratio: mutarlo por `-0.05` o eliminarlo cambia
+  todos los ratios → **muere**.
+- **`/` del ratio → `·`** → **muere**.
+
+> ⚠️ **Sutileza que hay que resolver ANTES del Gherkin (A-14): el mutante `0.04045 →
+> 0.03928` es EQUIVALENTE para color de 8 bits.** No existe ningún canal entero `c/255` en el
+> hueco `(0.03928, 0.04045)` (10/255 = 0,0392 queda por debajo; 11/255 = 0,0431, por
+> encima), así que **ningún token hex distingue los dos umbrales** — lo dice el propio audit
+> §2.1. Con umbral de mutación **1.0**, un superviviente inmatable **bloquea la feature para
+> siempre**. Se resuelve por dos vías, a fijar en el Gherkin: (1) confirmar que **Stryker no
+> genera** ese swap concreto (sus mutadores numéricos por defecto no cambian literal→literal;
+> mutan operador/condición, que **sí** mueren, arriba); y (2) **testear `canalLineal` con
+> inputs sintéticos** que straddlen el punto de corte, no solo a través de hex, para que la
+> rama esté cubierta de verdad.
+
+#### Preguntas abiertas de esta feature
+
+- **A-13** — **¿Dónde vive y cómo se mantiene honesta la «matriz de uso»** (pares fg/bg +
+  rol/umbral + tamaño efectivo del `clamp`)? El SCSS solo tiene colores; el umbral es
+  información de uso. Recomendación: matriz **declarada en el test** (las combinaciones reales
+  del audit) + un **mínimo de pares exigido** para evitar el verde por vacuidad + **cómo se
+  asevera el negativo** «`#C05576` nunca como texto» (caso límite 3, regla dura). Es el
+  análogo de F-03 a A-8/A-9 de F-01.
+- **A-14** — **El mutante `0.04045 → 0.03928` es equivalente en 8 bits**: confirmar qué
+  mutantes genera Stryker 9.6 sobre la rama a trozos y cubrir `canalLineal` con inputs
+  sintéticos para que la puerta no herede un superviviente inmatable (umbral 1.0).
+- **A-15** — **¿La cabecera se conserva translúcida (`color-mix 82%`) o se hace opaca?** El
+  audit calculó la trampa (b) con tokens **viejos** y **no** re-verificó la cabecera
+  corregida; la decisión de diseño define qué pares (y qué peor `under`) entran en la matriz.
+  Incluye el **inventario exacto de tokens** del `:root` (13 base + `--border-interactive` +
+  estado `#186237`).
+- **A-4** (ya abierta) — si «Nails Lash Studio» es **logotipo**, SC 1.4.3 exime el par del
+  `clamp` (caso límite (a)). Decisión de negocio del humano; **no se depende** de ella.
+
+---
+
+### Las 17 features restantes
 
 **No se especifican aquí a propósito.** Están troceadas, con sus criterios de aceptación,
 sus dependencias, su puerta legal, su flag `mutable` y su estado, en **`feature_list.json`**;
