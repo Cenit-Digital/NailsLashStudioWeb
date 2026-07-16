@@ -4,9 +4,14 @@
 > (regla anti-teléfono-descompuesto). Al cerrar la sesión, mueve el resumen a
 > `history.md` y deja este archivo con solo esta plantilla.
 
-- **Feature en curso:** _(ninguna todavía — Fase 0: investigación y spec)_
-- **Fase:** spec (conversación previa a `project-spec.md`)
-- **Estado:** repo en plantilla virgen. Investigación en curso. Sin código aún.
+- **Feature en curso:** `1 — puerta_placeholders` (`in_progress`)
+- **Fase:** TDD (`tdd_craftsman`) sobre `features/puerta_placeholders.feature`
+  (aprobado en la puerta humana). 26 escenarios `@s1..@s26`, en el orden del
+  fichero: `@s1 @s2 @s24 @s3` (flag) · `@s4 @s5 @s6 @s7` (patrón) ·
+  `@s8 @s23 @s9 @s25 @s10 @s11` (contar/ordenar) · `@s12 @s13 @s14 @s15`
+  (puerta prod/dev) · `@s16 @s17 @s18 @s19` (lo que esquiva a cada vía) ·
+  `@s20 @s21 @s26 @s22` (falla cerrada).
+- **Bitácora del ciclo:** `progress/tdd_puerta_placeholders.md`
 
 ## Bitácora
 
