@@ -24,7 +24,7 @@ jobs:
       # PATH todavía, setup-node aborta con «Unable to locate executable file:
       # pnpm». La acción oficial de pnpm lo instala leyendo la versión (11.9.0) de
       # ese mismo `packageManager`, así que el caché y el lockfile cuadran.
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v5
         with:
           node-version: "22"
