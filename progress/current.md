@@ -4,15 +4,65 @@
 > (regla anti-teléfono-descompuesto). Al cerrar la sesión, mueve el resumen a
 > `history.md` y deja este archivo con solo esta plantilla.
 
-- **Feature en curso:** ninguna. `4 — cascaron_semantico` cerrada **`done`**
-  (35/35 escenarios, judge **APROBADO**, **450 tests**, mutación **100 %** en
-  `seo.ts` (50 mutantes) y `puerta-cascaron.ts` (482), **0 timeouts**,
-  **0 exclusiones**, `pnpm build` verde con las **TRES puertas**).
-- **Siguiente:** F-05 `cero_terceros` (`pending`) — `depends_on: []`, sin
-  bloqueos. Es la decisión de mayor apalancamiento del proyecto: sostener «cero
-  peticiones a terceros» convierte «no usamos cookies» de promesa en **hecho
-  verificado** y elimina banner, CMP y política de cookies de un plumazo.
-- **Proyecto:** **4 done · 12 pending · 4 blocked.**
+- **Feature en curso:** `5 — cero_terceros` (**`spec_ready`**) — **PARADA EN LA PUERTA HUMANA.**
+  Verificación previa, spec y contrato **hechos y commiteados**; **`src/` sin tocar**
+  (el TDD no ha empezado y no empieza hasta que la marca `⏸` caiga).
+- **Proyecto:** **4 done · 1 spec_ready · 11 pending · 4 blocked.**
+
+### 🔴 F-05 está esperándote a ti. Cuatro preguntas, y las cuatro son reales.
+
+**Lo hecho (5 commits: `e4bbe07` · `97f5def` · `76d5cca` · `aace39c` · `89c70f3`):**
+
+| Fase | Resultado |
+| --- | --- |
+| **Verificación previa** (`progress/f05_verificacion_previa.md`) | 16 subagentes, 799k tokens, **8/8 afirmaciones con algo tumbado, 0 refutadas de raíz** |
+| **Spec** (`project-spec.md` §Feature 5) | 555 líneas |
+| **Contrato** (`features/cero_terceros.feature`) | **40 escenarios** `@s1..@s40`, marca **`⏸`** puesta |
+| **Revisión adversarial del contrato** | 31 agentes, **2,14 M tokens**, 6 lentes → **25 alegados, 23 confirmados: 3 BLOQUEANTES**, 14 graves, 6 menores |
+| **Ronda de reparación** | 21 aplicadas, **2 rechazadas con medición** |
+
+**El patrón de F-04, otra vez y más fuerte: ninguna decisión de F-05 cae; los PORQUÉS sí.**
+Y uno de los porqués falsos **era mío** (`aace39c`).
+
+**Los 3 bloqueantes que la revisión cazó antes de tu puerta** — los tres del linaje exacto del
+`4,60` de F-03 y del `@s32` de F-04:
+
+1. **`@s24` / fila `Regex`: hecho INVERTIDO.** `regex-mutator.js` no tiene una línea sobre anclas:
+   delega el patrón entero en **weapon-regex**. Medido con **Stryker de verdad** sobre un
+   prototipo verde: **257 mutantes, 13 supervivientes `Regex`, ninguno un ancla, `@s24` mata 0.**
+2. **`@s26`:** el `Given` no declaraba `paresEsperados` → el TDD habría tenido que **inventarlo**
+   y las dos lecturas naturales dan **rojo contra una implementación correcta**.
+3. **`@s28`/`@s30`:** el contrato prohibía en absoluto importar `PARES_DE_FUENTE_ESPERADOS`, pero
+   **el precedente que invoca (`@s27` de F-04) sí lo importa** para anclarlo. Y afirmaba que
+   `@s30` mata a `ArrayDeclaration`: **falso** → con `break: 100` habría sido **inmortal** y
+   **la feature no habría cerrado jamás**.
+
+**Las 4 preguntas abiertas (`⏸`, ninguna cerrada por mí):**
+
+- **A-23** — el acceptance 2 es **insatisfacible** (10 orígenes externos medidos en `dist/` hoy,
+  **ninguno una petición**; borrarlos es imposible y **rompería F-04**) y el 5 es **inmedible**
+  (pide mutar `.includes`, **que Stryker 9.6.1 no muta**). Reformulada tras el bloqueante 1.
+- **A-24** — la **`puerta_legal` es una atribución normativa falsa**, y sigue en
+  `feature_list.json` §5 (y en la descripción de F-11).
+- **A-27** — F-05 es la primera feature que mete **binarios** en `dist/` → **activa la deuda
+  declarada de F-01**. ¿Reabrir una feature `done`?
+- **A-28** — `latin-400.css` **no tiene `unicode-range`** → un nombre con `Ł`/`ř`/`ğ` daría
+  **tofu silencioso**. ¿`latin-ext` (+6 woff2) o se acepta?
+
+### Hallazgos de F-05 que sobreviven a la feature
+
+- **El diseño NO usa las fuentes del base.** Son **Manrope + Gilda Display + Great Vibes**;
+  `@fontsource/dm-sans` y `@fontsource/outfit` llevan en `package.json` **sin un solo import**.
+  Es «no copiar de WebEmpresa» mordiendo **por tercera vez** (F-03 los tokens, F-04 el JSON-LD).
+- **Vite 7 NO exime a las fuentes del inlining** (4096 B). Hoy salva el tamaño (6.192 B):
+  **suerte, no garantía.**
+- **`base` reescribe todos los `url()` a un origen externo** y **ningún grep del CSS lo anticipa**
+  → la puerta asevera la **config**, no solo la salida.
+- **`prettier --check .` falla en 86 ficheros y ya fallaba en `HEAD~2`** — deuda preexistente del
+  repo, **no** regresión de F-05. `format:check` **no** es una puerta del arnés (`lint` =
+  `typecheck + eslint`). Anotado, no tocado.
+
+<!-- lo de abajo es el histórico de F-04, ya cerrada -->
 
 <!-- lo de abajo es el histórico de F-04, ya cerrada -->
 - ~~**Feature en curso:** `4 — cascaron_semantico` (`in_progress`)~~ — la cáscara
