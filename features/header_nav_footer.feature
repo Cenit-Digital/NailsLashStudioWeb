@@ -190,7 +190,7 @@ Feature: Cabecera, navegación, pie, y la PUERTA DE ANCLAS VIVAS que demuestra q
 
   @s3
   Scenario Outline: una sección navegable cuyo id ninguna ancla de la nav enlaza produce violación (inalcanzable)
-    Given el HTML CRUDO de la ruta "/" con una sección navegable identificada por el id "<id sección>" y una nav que NO enlaza "#<id sección>"
+    Given el HTML CRUDO de la ruta "/" con una sección navegable (una <section> con aria-labelledby que resuelve al heading real <h2 id="<id sección>">) y una nav que NO enlaza "#<id sección>"
     When se inspecciona esa página con la puerta de anclas vivas
     Then hay exactamente 1 violación
     And la violación declara la ruta "/", el id "<id sección>" y que la sección es inalcanzable desde la nav
@@ -204,11 +204,34 @@ Feature: Cabecera, navegación, pie, y la PUERTA DE ANCLAS VIVAS que demuestra q
     # existentes —ni una de más (@s1: ancla muerta) NI UNA DE MENOS (aquí: sección inalcanzable)—.
     # El conjunto se DERIVA DEL DOM, no de una lista fija: crece solo según cierran F-07/F-09/etc.,
     # sin que nadie tenga que subir un número (el argumento que ganó en F-04 con `RUTAS_ESPERADAS`).
-    # ⚠️ **[NV] PARA EL TDD:** QUÉ marca a una sección como «navegable» (el `id` en el `<section>`, o
-    # el `id` del `<h2>` referenciado por `aria-labelledby`) es la regla de derivación del DOM que el
-    # TDD FIJA al implementar sobre el primer `dist/` real —hoy los ids viven en los `<h2>` [V]—. Lo
-    # que este escenario FIJA es el COMPORTAMIENTO: sección navegable con id que la nav no enlaza →
-    # violación. Si al implementarlo la regla resultara ambigua, se VUELVE a la puerta humana.
+    # ⏸ **REGLA DE «SECCIÓN NAVEGABLE» — PROPUESTA MEDIDA, PENDIENTE DE PUERTA (parte de B-4). El
+    # `craftsman_lead` PROPONE; NO CIERRA:** navegable = una `<section>` con `aria-labelledby` que
+    # RESUELVE a un heading real (`h1`…`h6`); su `id` de anclaje es el del heading. Es **coherente con
+    # `REGLA_SECTION` de F-04** —`'section sin aria-labelledby a un heading real'`, `puerta-cascaron.ts:118`;
+    # el bucle de `:507-519` acusa toda `<section>` cuyo `aria-labelledby` no resuelva a un id de
+    # `idsDeHeadings` (`:505,:131`)—, así que la regla es DECIDIBLE YA en la puerta, sin depender de un
+    # `dist/` futuro desconocido. Antes esta nota decía «[NV], la FIJA el TDD»: era demasiado débil, y
+    # la revisión adversarial lo cazó —los dos Examples de arriba COLAPSAN sobre la MISMA forma del DOM
+    # (el id del `<h2>` == destino del `aria-labelledby`) y NINGUNO distingue una derivación de otra, de
+    # modo que un mutante «navegable = cualquier id» SOBREVIVÍA a @s1/@s2/@s3—. **@s20 añade el Example
+    # que la DISTINGUE** (un heading con id que NINGUNA `<section>` referencia → NO cuenta como
+    # inalcanzable). Si el humano prefiere otra derivación en la puerta, @s3/@s20 se reescriben.
+
+  # ⬇️ @s20 se define aquí (junto a @s3, su hermano) pero conserva el número 20 para NO renumerar
+  #    @s4..@s18, que la revisión adversarial ya cita por su tag. Añadido en la ronda de reparación.
+  @s20
+  Scenario: un heading con id que NINGUNA sección referencia por aria-labelledby NO es navegable — no produce violación de inalcanzable (DISTINGUE la regla de @s3)
+    Given el HTML CRUDO de la ruta "/" con un heading <h2 id="promociones-titulo"> que NINGUNA <section> referencia por aria-labelledby, y una nav que NO enlaza "#promociones-titulo"
+    When se inspecciona esa página con la puerta de anclas vivas
+    Then la lista de violaciones NO contiene ninguna violación de «sección inalcanzable» para el id "promociones-titulo"
+    # 🔴 EL EXAMPLE QUE DISTINGUE LA REGLA DE «SECCIÓN NAVEGABLE» (hallazgo GRAVE de la revisión). Los
+    # dos Examples de @s3 colapsan sobre la misma forma del DOM y NO separan «navegable = section con
+    # aria-labelledby→heading real» de «navegable = cualquier id». Aquí el heading tiene id pero
+    # NINGUNA `<section>` lo referencia: bajo la regla PROPUESTA (coherente con `REGLA_SECTION` de
+    # F-04) NO es navegable → 0 violaciones de inalcanzable. Un mutante «navegable = cualquier id»
+    # —que SOBREVIVE a @s1/@s2/@s3— aquí acusaría 1 y MUERE (@s18, fila añadida). Sin este escenario la
+    # mitad «ni una de menos» de B-4 queda anclada TAUTOLÓGICAMENTE a la implementación.
+    # ⏸ PENDIENTE DE PUERTA con @s3 (parte de B-4): si el humano fija otra derivación, se reescribe.
 
   @s4
   Scenario: la puerta de anclas vivas es DISTINTA y COMPLEMENTARIA de la anti-404 de F-04 (#x vs /x)
@@ -273,6 +296,33 @@ Feature: Cabecera, navegación, pie, y la PUERTA DE ANCLAS VIVAS que demuestra q
     # `dist/index.html`. Es razonable (la nav de F-06 los emite), pero NO está verificado sobre un
     # `dist/` real hasta el primer build [NV]. Si el artefacto saliera con 0 anclas, esta guarda NACE
     # EN ROJO y se VUELVE a la puerta humana, no se le baja el listón en silencio.
+    # ➡️ @s19 es el GEMELO de este escenario para el SEGUNDO extractor (las secciones navegables).
+
+  # ⬇️ @s19 se define aquí (junto a @s7, su gemelo) pero conserva el número 19 para NO renumerar
+  #    @s8..@s18, que la revisión adversarial ya cita por su tag. Añadido en la ronda de reparación.
+  @s19
+  Scenario: la puerta de anclas falla si no ha derivado ni una sola sección navegable — GEMELO de @s7 para el OTRO extractor
+    Given un dist/ con una index.html que contiene al menos una sección navegable en su HTML (una <section> con aria-labelledby que resuelve a un heading real)
+    And que la puerta deriva 0 secciones navegables de ese artefacto
+    When se ejecuta el build de producción
+    Then el código de salida es distinto de 0
+    And la salida declara que no se inspeccionó ninguna sección navegable
+    And la salida NO declara que no haya secciones inalcanzables
+    # 🔴🔴 ESCENARIO DE VACUIDAD OBLIGATORIO — LA GUARDA QUE FALTABA (BLOQUEANTE de la revisión
+    # adversarial). La puerta tiene DOS extractores independientes: (1) las anclas de nav (`href="#id"`,
+    # guardado por @s7) y (2) las SECCIONES NAVEGABLES (consulta DOM PROPIA y más estrecha, ver @s3).
+    # Solo (1) tenía guarda de vacuidad. Modo de fallo reproducido: si (2) se rompe y deriva 0 secciones
+    # mientras las anclas se extraen bien → @s7 verde, @s1/@s2 verdes, @s3 VACUO (0 «inalcanzables»),
+    # @s9 VACUAMENTE cierto → exit 0 habiendo inspeccionado CERO secciones. Es la mitad «ni una de
+    # menos» de B-4 certificando verde SIN MIRAR. Y lo peligroso: la mutación SIGUE alcanzando 100%
+    # (@s3 mata en su fixture al mutante que vacía el extractor de secciones), así que la brecha es
+    # INVISIBLE a la métrica de cierre — SOLO la cazan esta guarda y la puerta humana. Es @s28 de F-04
+    # («el objeto vigilado ES EL EXTRACTOR») aplicado al SEGUNDO extractor. Muere aquí un mutante que
+    # deje la derivación de secciones en `[]`; @s18 (fila «vaciar el extractor de SECCIONES») lo nombra.
+    # ⚠️ **PARA EL TDD:** igual que @s7, esta guarda EXIGE que la cáscara emita al menos una sección
+    # navegable en `dist/index.html` (la home de F-04 ya emite dos `<section aria-labelledby>` [V:
+    # home.tsx:71-77]). [NV] hasta el primer build real: si el artefacto saliera con 0 secciones, la
+    # guarda NACE EN ROJO y se VUELVE a la puerta humana, no se le baja el listón en silencio.
 
   @s8
   Scenario: la puerta de anclas falla cerrada si ella misma revienta
@@ -360,17 +410,12 @@ Feature: Cabecera, navegación, pie, y la PUERTA DE ANCLAS VIVAS que demuestra q
     # Cuando F-16 se desbloquee, aparecerán CON DESTINO REAL.
 
   @s14
-  Scenario Outline: los enlaces del pie a las redes sociales pasan las tres puertas de enlaces — coherencia con @s12 de F-05 y @s24 de F-04
-    Given un pie con un enlace "<href social>" (dato real de la fuente única de F-02)
+  Scenario: el enlace del pie a la red social pasa las tres puertas de enlaces — coherencia con @s12 de F-05 y @s24 de F-04
+    Given un pie con un enlace "https://www.facebook.com/nailslashstudiorozas/" (dato real de la fuente única de F-02 [V: site.ts:47, REDES.facebook])
     When se ejecuta el build de producción
     Then la puerta de terceros NO emite violación por ese enlace (es un hiperenlace, no una petición automática)
     And la puerta anti-404 de F-04 NO emite violación por ese enlace (es externo, no una ruta interna)
     And la puerta de anclas vivas NO emite violación por ese enlace (no es un ancla "#…")
-
-    Examples:
-      | href social                                     |
-      | https://www.facebook.com/nailslashstudiorozas/  |
-      | https://www.instagram.com/nailslash.studio_/    |
 
     # 🔴 COHERENCIA CON `@s12` DE F-05 y `@s24` DE F-04. Sin este escenario, alguien «endurece» una
     # puerta tratando el enlace de Facebook como interno o como petición, y ROMPE EL CONTACTO DEL
@@ -378,6 +423,17 @@ Feature: Cabecera, navegación, pie, y la PUERTA DE ANCLAS VIVAS que demuestra q
     # Fashion ID es la transmisión AUTOMÁTICA «regardless of whether … has clicked»). QUIÉN emite
     # estos `<a>` (F-06 en el pie o F-12 en contacto) es alcance de producto; lo que este escenario
     # FIJA es que, estén donde estén, NINGUNA puerta los caza.
+    # ✂️ **INSTAGRAM ELIDIDO A PROPÓSITO (reparación tras revisión adversarial), como en F-05
+    # (`cero_terceros.feature`, que usa SOLO la URL de Facebook por lo mismo).** `site.ts:46` guarda
+    # un HANDLE —`instagram: '@nailslash.studio_'`—, NO una URL, y NO existe `instagramHref` (a
+    # diferencia de `telHref`/`waHref`). La URL `https://www.instagram.com/nailslash.studio_/` NO vive
+    # en la fuente única (ni guardada ni derivada): rotularla «dato real de la fuente única de F-02»
+    # era una CITA FABRICADA. Un TDD que la tomara literal hornearía una URL HARDCODEADA, violando el
+    # invariante que F-02 existe para evitar (`site.ts:4`: «el texto visible y el href no puedan
+    # divergir») y la acceptance de F-12 («los href derivan del dato único de F-02, no están
+    # hardcodeados»). La fila de Facebook BASTA: su URL es verbatim de `site.ts:47` y el punto del
+    # escenario —ninguna puerta caza un enlace EXTERNO— queda cubierto. Emitir el enlace de Instagram
+    # (previo `instagramHref` en F-02) es alcance de F-02/F-12, NO de F-06.
 
   # ---------------------------------------------------------------------------
   # El menú móvil — PROPUESTA DEL LEAD (B-5/B-6/B-3), PENDIENTE DE PUERTA. Puede cambiar la mecánica.
@@ -444,11 +500,13 @@ Feature: Cabecera, navegación, pie, y la PUERTA DE ANCLAS VIVAS que demuestra q
     Then al menos un test pasa de verde a rojo
 
     Examples:
-      | mutación                                                                  | dónde muere                          |
-      | negar el predicado «el id del ancla está presente en la página»           | @s1 (ancla muerta) y @s2 (nav válida) |
-      | invertir la igualdad de conjuntos (dejar de acusar la sección inalcanzable)| @s3                                  |
-      | vaciar el conjunto de anclas/ids inspeccionados (verde por vacuidad)      | @s6, @s7                             |
-      | alterar el literal del breakpoint 820px                                   | @s17                                 |
+      | mutación                                                                            | dónde muere                          |
+      | negar el predicado «el id del ancla está presente en la página»                     | @s1 (ancla muerta) y @s2 (nav válida) |
+      | invertir la igualdad de conjuntos (dejar de acusar la sección inalcanzable)         | @s3                                  |
+      | «navegable = cualquier id» en vez de «section con aria-labelledby → heading real»   | @s20 (heading no referenciado → 0)   |
+      | vaciar el extractor de ANCLAS de nav (verde por vacuidad del 1.er extractor)        | @s7                                  |
+      | vaciar el extractor de SECCIONES navegables (verde por vacuidad del 2.º extractor)  | @s19                                 |
+      | alterar el literal del breakpoint 820px                                             | @s17                                 |
 
     # 🔴 EL CONJUNTO EXACTO DE MUTANTES **NO SE PUEDE PREDECIR**: el fichero de F-06 NO EXISTE
     # todavía; otra implementación tendrá otro conjunto. **SE MIDE CUANDO EXISTA, NO ANTES** (la
