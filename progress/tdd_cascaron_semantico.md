@@ -1,12 +1,30 @@
 # F-04 `cascaron_semantico` — bitácora del `tdd_craftsman`
 
-## Estado: 35/35 escenarios por TDD estricto · **las 3 escaladas, DECIDIDAS Y APLICADAS**
+## Estado: VERDE — 35/35 escenarios por TDD estricto, mutación 100 %
 
 Contrato: `features/cascaron_semantico.feature` (35 escenarios, aprobado por el humano
 2026-07-16; **dos correcciones aprobadas el 2026-07-17**). Fuente de verdad de los hechos:
 `progress/f04_verificacion_previa.md`.
 
-`typecheck` ✅ · `lint` ✅ **0 warnings** · **`pnpm build` → exit 0, las TRES puertas verdes** ✅
+**450 tests verdes** · `typecheck` ✅ · `lint` ✅ **0 warnings** · **`pnpm build` → exit 0, las
+TRES puertas verdes** ✅
+
+**Mutación — toda a `--concurrency 1 --timeoutMS 60000`, fichero a fichero, SIN otra tanda
+compitiendo (ver §«qué pasó de verdad»):**
+
+| Fichero | Score | Mutantes | Supervivientes | Timeouts | tests/mutante |
+| ------- | ----- | -------- | -------------- | -------- | ------------- |
+| `src/lib/seo.ts` | **100,00 %** | 50 | **0** | **0** | 10,04 |
+| `src/lib/puerta-cascaron.ts` | **100,00 %** | 482 | **0** | **0** | 19,55 |
+| `tools/puerta-cascaron.ts` (humilde) | — | fuera de `mutate` (no decide nada) | — | — | — |
+| `src/styles/_base.scss` | — | Stryker no ve SCSS → **el mutante es HUMANO** | — | — | — |
+| F-01/F-02/F-03 | sin re-medir: **intactos**, y añadir tests **nunca baja** un score | — | — | — | — |
+
+**0 mutantes excluidos. 0 `Stryker disable` en F-04.** (F-01 necesitó 1; F-02, otro.) Los tres
+equivalentes que aparecieron se eliminaron **cambiando el DISEÑO**, como zanjó F-03.
+
+**`tests/mutante` se reporta a propósito**: es la métrica que delata un informe envenenado, y en
+esta feature costó ~2 h descubrirlo. Sano = 19,55; envenenado = 1,35. Ver §«qué pasó de verdad».
 
 ---
 
@@ -14,6 +32,11 @@ Contrato: `features/cascaron_semantico.feature` (35 escenarios, aprobado por el 
 
 Las tres se **escalaron en vez de forzarlas**, y las tres se resolvieron en la puerta humana.
 Lo que sigue es el estado FINAL; el razonamiento completo de cada una está más abajo.
+
+**Las tres tenían razón, y ninguna era cosmética:** una habría dejado el build (y la CI, y
+`harness init`) en rojo permanente para F-05…F-20; otra era un **error de hecho** del contrato que
+**casi me deja una puerta tan ciega como jsdom**; la tercera dejaba abierto **el coladero de la
+única regla que mide `SC 1.3.1` de verdad**.
 
 | # | Escalada | Decisión | Qué se hizo |
 | - | -------- | -------- | ----------- |
@@ -350,6 +373,75 @@ que los scores son honestos. `placeholders.ts`/`puerta.ts`/`site.ts`/`contraste.
 
 **0 mutantes excluidos** (F-01 necesitó 1, F-02 otro). **0 `Stryker disable` en F-04.**
 
+## 🔴 LA MEDICIÓN DE MUTACIÓN: QUÉ PASÓ DE VERDAD (y TRES hipótesis falsas, dos mías)
+
+**CAUSA REAL, confirmada por el lead: DOS STRYKER CORRIENDO A LA VEZ.** Entre las 07:28 y las
+08:15 el lead me dio por muerto (mi `transcript` llevaba horas sin escribirse) y lanzó sus
+propias tandas **en paralelo con las mías**, borrando `.stryker-tmp` a mitad y editando mis
+ficheros de test. **Todo lo que se midió en esa ventana —suyo y mío— es basura por contención de
+sandbox.** El tiempo perdido no cambia el veredicto; la lección, sí.
+
+**Yo no sabía que había otro Stryker, y perseguí dos hipótesis. LAS DOS ERAN FALSAS. Las dejo
+escritas para que nadie las repita:**
+
+> ❌ **HIPÓTESIS 1 (mía): «lo rompe el proceso externo que reescribe `src/lib/`».** La probé:
+> restauré el árbol, lo verifiqué limpio y corrí la tanda comprobando `git status` **al
+> terminar** → **0 ficheros tocados durante la tanda**, y aun así dio 28,42 %. **Refutada por mí
+> mismo.** (El proceso existía —era el lead— pero no era la causa.)
+>
+> ❌ **HIPÓTESIS 2 (mía): «lo rompe `coverageAnalysis: perTest`».** La probé con la palanca que
+> NO depende de la atribución, `--coverageAnalysis all`, que OBLIGA a correr los 246 tests contra
+> cada mutante. Dio **«Ran 2,45 tests per mutant»**, que con `all` es **aritméticamente
+> imposible**. **Refutada** — y esa imposibilidad era justo la pista de que el runner ni siquiera
+> estaba ejecutando los tests, porque otro Stryker le pisaba el sandbox.
+
+### ❌ LA TERCERA, la del lead: «la extensión .ts rompe la cobertura». TAMBIÉN FALSA
+
+El lead sospechó que **la extensión `.ts` en el import de un test rompe `perTest` e INVENTA
+supervivientes**, midiendo `seo.ts` **42 % → 100 %** al quitarla (`tests/mutante` **0,90 →
+10,04**). Iba a subirlo a `docs/verification.md` como **regla del arnés**. **NO SE SOSTIENE:**
+
+| Medición | Imports | ¿Contención? | tests/mutante | Score |
+| -------- | ------- | ------------ | ------------- | ----- |
+| **pc4** (01:30, 6 h ANTES de que el lead empezara) | **CON `.ts`** | **no** | **19,68** | **98,97 %** |
+| **Control final `seo.ts`** (yo solo, tras parar el lead) | **CON `.ts`** | **no** | **10,04** | **100 %** |
+| Lead, `seo.ts` | SIN `.ts` | no | 10,04 | 100 % |
+| Lead, `seo.ts` | CON `.ts` | **sí (yo corriendo)** | 0,90 | 42 % |
+
+**Con `.ts` y sin contención doy 10,04 tests/mutante y 100 %: EXACTAMENTE lo mismo que el lead
+sin `.ts`.** La variable no era la extensión — **era la contención**. Su tanda del 42 % peleaba
+contra la mía por el mismo `.stryker-tmp`.
+
+→ **La regla propuesta debe BORRARSE de `docs/verification.md`.** Sería una regla **falsa**, y
+además **peligrosa**: empujaría a quitar las extensiones `.ts`, que **NO son estilo** — los
+humildes de `tools/` corren con `node --experimental-strip-types`, **que las EXIGE**. Aplicarla
+**rompe las tres puertas del build** (el propio lead lo comprobó: `ERR_MODULE_NOT_FOUND`).
+**Una regla falsa en el arnés es peor que ninguna regla.**
+
+### ✅ LAS DOS REGLAS QUE SÍ SE SOSTIENEN
+
+1. **Hermana de «un informe con timeouts MIENTE»: un informe cuyo `tests per mutant` se desploma
+   MIENTE.** Mismo código: **19,68 → 1,35** tests/mutante y **98,97 % → 7,05 %**. Es tan delator
+   como el timeout y **MÁS PELIGROSO, porque el score BAJA en vez de subir**: nadie sospecha de un
+   7 %, así que no lo cuestionas — te empuja a «arreglar» código que ya está bien, o peor, a
+   **añadir tests basura hasta que el número suba**. La mentira del timeout te hace confiar de
+   más; esta te hace destrozar lo que funciona. **Lee `tests per mutant` junto a `# timeout`, y
+   compáralo entre tandas.**
+2. **NUNCA corras dos Stryker a la vez sobre el mismo repo.** Comparten `.stryker-tmp`
+   (`tempDirName`, **global** en `stryker.config.json`) y **se envenenan en silencio**: 0 timeouts,
+   0 errors, y un score inventado. Es la causa nº 1 del punto 1.
+
+**Lo único sólido de esa ventana es lo verificado A MANO, que no depende de Stryker:** el mutante
+`ausenteOVacio → false`, que el informe declaraba **«Survived» con 101 tests cubriéndolo**, **mata
+5 tests** aplicado a mano (`5 failed | 198 passed`). El informe mentía, y el sabotaje lo prueba.
+
+### El «58 supervivientes» del commit: ERA REAL
+
+La tanda de los 58 corrió a las **00:38** y `pc4` (98,97 %, 5 supervivientes nombrados) a la
+**01:30** — las dos con el árbol limpio y **seis horas antes** de la interferencia. **Ninguna
+está contaminada**, y las lecciones que salieron de ellas (los extractores sin probar, el `valor`
+sin aseverar, los tres equivalentes) **se sostienen enteras**.
+
 ## Honestidad sobre el proceso (Ley 3)
 
 En el ciclo de **@s7 escribí más producción de la que su test rojo exigía** (devolví el objeto
@@ -386,3 +478,21 @@ código):
 - **lint → la guarda de rutas ausentes** se movió al decisor puro (decisión 5).
 - **@s33 (fila de control) → el fixture** tenía el JSON-LD incompleto y la puerta rompía **por la
   razón equivocada**. Corregido: un test que pasa por el motivo equivocado no prueba nada.
+
+
+## Qué queda (y qué NO he hecho)
+
+- **NO he marcado la feature como `done`.** Espera `judge` + `mutation_tester`, como manda el
+  protocolo. `feature_list.json` sigue en `in_progress`.
+- **Para el `mutation_tester`:** los números están arriba y son **reproducibles en limpio**. Si
+  te sale algo distinto, **lee `tests per mutant` ANTES que el score** y comprueba que no haya
+  otra tanda de Stryker viva: es lo que envenenó seis mediciones de esta feature.
+- **Para el `judge`:** los tres puntos que más merecen mirada crítica son (a) que `@s2`, `@s8`,
+  `@s9`, `@s25` y `@s30` **nacieron verdes** por una desviación mía de la Ley 3 en el ciclo de
+  `@s7` —lo reconozco abajo—, (b) las **interpretaciones declaradas** (valores que el contrato no
+  fija y asevero igual, porque el umbral 1.0 lo exige), y (c) que `@s34` está **DIFERIDO**: su
+  test prueba el mecanismo, y `diferidos.test.ts` prueba que hoy no está cableado a propósito.
+- **Deuda del arnés que dejo escrita (no la cierro yo):** `docs/verification.md` gana dos reglas
+  nuevas —el `tests per mutant` desplomado, y la prohibición de correr dos Stryker a la vez— y
+  **pierde la regla FALSA de la extensión `.ts`**, que estaba a punto de entrar y habría **roto
+  el build** de haberse aplicado.

@@ -74,6 +74,65 @@ un regex). El 100 % era falso.
    (bucle cuya condición muta). En código puro, un timeout es ruido de
    concurrencia, no un mutante muerto.
 
+#### ⚠️ Un informe cuyo `tests per mutant` se DESPLOMA también miente (score falso BAJO)
+
+**Regla dura del arnés. Medida en F-04, 2026-07-17.** Es la **imagen especular** de la mentira de
+los timeouts, y es **más peligrosa**:
+
+| Síntoma | Score | Efecto |
+| ------- | ----- | ------ |
+| `# timeout` > 0 | falso **ALTO** | **esconde** supervivientes reales |
+| `tests per mutant` desplomado | falso **BAJO** | **inventa** supervivientes que no existen |
+
+**Por qué es peor la de abajo:** un 100 % te da confianza de más y lo cuestionas; **un 7 % no lo
+cuestiona nadie**. Te empuja a «arreglar» código que ya está bien o —peor— a **añadir tests
+basura hasta que el número suba**.
+
+**Medido en F-04, sobre EL MISMO CÓDIGO y LOS MISMOS TESTS:**
+
+| | tests/mutante | Dry run | Score |
+| - | ------------- | ------- | ----- |
+| Tanda sana | **19,68** | 242 tests en **11 s** | **98,97 %** |
+| Tanda envenenada | **1,35** | 246 tests en **3 s** | **7,05 %** |
+
+Tres señales que la delatan, y basta una:
+1. **El score no es determinista** entre tandas del mismo código. Un score no determinista **no
+   es un score**.
+2. **`tests per mutant` cae en picado**: Stryker ejecuta el test EQUIVOCADO contra el mutante.
+3. **El dry run tarda MENOS con MÁS tests**: no se están ejecutando de verdad.
+
+**La prueba definitiva, y es aritmética:** con `--coverageAnalysis all` Stryker DEBE correr
+**todos** los tests contra cada mutante. Si con `all` sigue diciendo «Ran 2,45 tests per mutant»
+sobre una suite de 246, **el runner no está ejecutando nada** y el informe entero es basura.
+
+**Qué hacer:**
+
+1. **Lee `tests per mutant` junto a `# timeout`**, y **compáralo con la tanda anterior**.
+2. **Verifica por SABOTAJE, que no depende de Stryker**: aplica a mano un mutante que el informe
+   declare «Survived» y corre la suite. En F-04, `ausenteOVacio → false` figuraba como
+   **«Survived» con 101 tests cubriéndolo** y **mataba 5 tests** a mano. El informe mentía.
+3. **Control barato:** vuelve a medir un fichero que ya diera 100 % y no hayas tocado. Si sigue
+   dando 100 %, la máquina está bien y el problema es de la tanda.
+
+#### 🔴 NUNCA corras dos Stryker a la vez sobre el mismo repo
+
+**Es la causa nº 1 de lo de arriba, y en F-04 costó ~2 h y seis tandas.** Comparten
+`.stryker-tmp` (`tempDirName`, **global** en `stryker.config.json`) y **se envenenan en
+silencio**: **0 timeouts, 0 errors** y un score inventado. No hay mensaje de error que te avise.
+
+Si dos agentes trabajan sobre el repo, **la mutación la corre UNO SOLO**. Y antes de medir:
+`rm -rf .stryker-tmp` — pero **solo si no hay otra tanda viva**, porque borrárselo a la de al lado
+es exactamente cómo se produce el envenenamiento.
+
+> ⚠️ **Corolario que costó una regla falsa:** en esa ventana se «midió» que **la extensión `.ts`
+> en el import de un test rompía la cobertura** (42 % → 100 % al quitarla) y estuvo a punto de
+> entrar aquí como regla. **Era FALSO**: con `.ts` y **sin contención** el mismo fichero da
+> **10,04 tests/mutante y 100 %**, idéntico a sin `.ts`. La variable era la contención, no la
+> extensión. **Y aplicar esa regla habría roto el build**: los humildes de `tools/` corren con
+> `node --experimental-strip-types`, **que EXIGE la extensión explícita**.
+> **Antes de convertir una medición en regla, reprodúcela sin contención.** Una regla falsa en el
+> arnés es peor que ninguna regla.
+
 #### ⚠️ Tests que calculan en el cuerpo del `describe` → supervivientes FALSOS
 
 Stryker activa **un mutante por test** (`coverageAnalysis: perTest`). Lo que se

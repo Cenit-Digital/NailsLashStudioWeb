@@ -6,24 +6,34 @@
 
 - **Feature en curso:** `4 — cascaron_semantico` (`in_progress`) — la cáscara
   HORNEADA, el JSON-LD de cero y la puerta que mira `dist/`.
-  → **TDD terminado: 35/35 escenarios, 313 tests verdes.** Bitácora:
-  `progress/tdd_cascaron_semantico.md`. **PENDIENTE DE `judge` + `mutation_tester`.**
-  🔴 **TRES COSAS ESPERAN DECISIÓN DEL LEAD/HUMANO** (detalle en la bitácora, §1-§3):
-  1. **`pnpm build` SALE ROJO (exit 1) — y es lo que @s34 ORDENA**, no un fallo:
-     `✗ flag esPlaceholder en seo.origenCanonica`. Es la decisión 9 funcionando y la
-     «consecuencia buscada» que el contrato escribe 5 veces. **Pero el radio es del
-     proyecto entero: `bin/harness init`, `verify` y la CI se quedan ROJOS, y F-05…F-20
-     se desarrollarían contra un rojo permanente** (un rojo que siempre está rojo deja de
-     ser señal). Alternativa con precedente EXACTO en el repo: **diferirlo como F-02 hizo
-     con el email (A-11)** — pero eso deja @s34 inerte. **No lo decido yo.**
-  2. **@s32 tiene un ERROR DE HECHO en su `Then`**, medido sobre un build real: dice «el
-     HTML CRUDO de dist/ NO contiene ningún `<title>`» y **es falso** — `renderToString`
-     emite la metadata de React 19 **dentro del `<body>`**; lo que sale vacío es **el
-     `<head>`**. La decisión es correcta, la letra es falsa (el patrón del proyecto).
-     **Casi me cuesta la feature**: mi puerta escaneaba el documento entero y era **tan
-     ciega como jsdom** al bug. Corregido; el `.feature` necesita puerta humana.
-  3. **@s18 promete «a un heading real» y ninguna de sus 3 filas lo prueba** → el coladero
-     del `<div id="x">` sigue abierto. Cerrarlo exige **una fila nueva** (puerta humana).
+  → **VERDE: 35/35 escenarios, 450 tests, mutación 100 % en los dos ficheros nuevos
+  (`seo.ts` 50 mutantes · `puerta-cascaron.ts` 482), 0 timeouts, 0 exclusiones.**
+  `typecheck` · `lint` (0 warnings) · `pnpm build` **exit 0** con las TRES puertas.
+  Bitácora: `progress/tdd_cascaron_semantico.md`. **PENDIENTE DE `judge` +
+  `mutation_tester`** (no marco `done` yo).
+  **Las 3 escaladas se cerraron en la puerta humana (2026-07-17), y las 3 eran reales:**
+  1. **A-21 → DIFERIR CON ANCLA.** El humilde NO cablea `registrosSeo` → build verde,
+     CI verde, F-05…F-20 pueden cerrar. Y `src/lib/diferidos.test.ts` fija el conjunto
+     diferido contra un **literal a mano** (`['seo.origenCanonica', 'site.email']`): si
+     alguien difiere un tercero, **rojo**. Verificado **por sabotaje** (2 sabotajes, cada
+     uno mata exactamente su test). **@s34 está DIFERIDO, NO MUERTO.**
+  2. **@s32 → el `.feature` se corrigió** (tenía un error de hecho, medido sobre un build
+     SSG real: React 19 emite la metadata en el `<body>`, no la borra). Producción no
+     cambió: `cabezaDe()` ya era lo correcto. **Casi me cuesta la feature** — mi primera
+     puerta era **tan ciega como jsdom** al único bug que F-04 existe para prevenir.
+  3. **@s18 → fila nueva**, implementada por TDD (rojo primero): `idsDeHeadings` (h1…h6).
+
+### 🔴 Deuda del arnés que deja F-04 (para el lead)
+
+- **`docs/verification.md` gana DOS reglas y PIERDE una falsa** (ya aplicado, sin commitear
+  por mí en `done`): (a) *un informe cuyo `tests per mutant` se desploma MIENTE* — es la
+  imagen especular del timeout y **más peligrosa, porque el score BAJA** y nadie sospecha de
+  un 7 %; (b) **nunca dos Stryker a la vez sobre el mismo repo**: comparten `.stryker-tmp` y
+  se envenenan **en silencio** (0 timeouts, 0 errors, score inventado).
+- **La regla de «la extensión `.ts` rompe la cobertura» era FALSA y se descartó.** Con `.ts`
+  y **sin contención**: 10,04 tests/mutante y 100 % — idéntico a sin `.ts`. La variable era
+  la contención. **Aplicarla habría roto el build**: los humildes corren con
+  `node --experimental-strip-types`, que **exige** la extensión.
 - **Fase:** TDD (`tdd_craftsman`) sobre `features/cascaron_semantico.feature`,
   **aprobado por el humano en la puerta el 2026-07-16** (35 escenarios `@s1..@s35`).
   **A-17…A-22 cerradas** en su redacción: **0 preguntas abiertas**. Fuente de verdad
