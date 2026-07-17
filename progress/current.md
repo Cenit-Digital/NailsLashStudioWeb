@@ -4,7 +4,18 @@
 > (regla anti-teléfono-descompuesto). Al cerrar la sesión, mueve el resumen a
 > `history.md` y deja este archivo con solo esta plantilla.
 
-- **Feature en curso:** `4 — cascaron_semantico` (`in_progress`) — la cáscara
+- **Feature en curso:** ninguna. `4 — cascaron_semantico` cerrada **`done`**
+  (35/35 escenarios, judge **APROBADO**, **450 tests**, mutación **100 %** en
+  `seo.ts` (50 mutantes) y `puerta-cascaron.ts` (482), **0 timeouts**,
+  **0 exclusiones**, `pnpm build` verde con las **TRES puertas**).
+- **Siguiente:** F-05 `cero_terceros` (`pending`) — `depends_on: []`, sin
+  bloqueos. Es la decisión de mayor apalancamiento del proyecto: sostener «cero
+  peticiones a terceros» convierte «no usamos cookies» de promesa en **hecho
+  verificado** y elimina banner, CMP y política de cookies de un plumazo.
+- **Proyecto:** **4 done · 12 pending · 4 blocked.**
+
+<!-- lo de abajo es el histórico de F-04, ya cerrada -->
+- ~~**Feature en curso:** `4 — cascaron_semantico` (`in_progress`)~~ — la cáscara
   HORNEADA, el JSON-LD de cero y la puerta que mira `dist/`.
   → **VERDE: 35/35 escenarios, 450 tests, mutación 100 % en los dos ficheros nuevos
   (`seo.ts` 50 mutantes · `puerta-cascaron.ts` 482), 0 timeouts, 0 exclusiones.**
