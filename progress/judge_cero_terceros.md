@@ -280,3 +280,127 @@ prohíbe.** Hizo bien: manda el contrato.
 **F-05 NO se marca `done` hasta que el `mutation_tester` cierre C7 con score 1.0 y 0 exclusiones
 (A-23).** Si sobrevive un mutante —incluido cualquier `Regex`— **se ESCALA AL HUMANO**: no se
 excluye, no se justifica, no se baja el umbral.
+
+---
+
+# Review del delta (ronda 2) — 2026-07-17
+
+**Veredicto:** ✅ **APROBADO** — **43/43 cubiertos, 0 bloqueantes, 2 menores** (los **mismos 2** de la
+ronda 1, ninguno tocado por el delta).
+
+> **El veredicto de los 40 sigue en pie y este delta no lo mueve.** Reviso **solo** `0794e8e..HEAD`.
+> **No corrí Stryker** (había una tanda cerrada al 100 %; mantuve el repo sin nada corriendo).
+> **No edité código**: los sabotajes se aplican al fichero real y se restauran **siempre** en un
+> `finally` — `git status` limpio antes y después, comprobado.
+
+## 1. 🔴 «0 líneas de producción tocadas» — COMPROBADO, NO CREÍDO
+
+`git diff 0794e8e..HEAD -- src/lib/terceros.ts src/lib/puerta-terceros.ts tools/` → **VACÍO**.
+Y lo aprieto más, por si la lista de ficheros se quedaba corta:
+`git diff 0794e8e..HEAD -- 'src/**' ':(exclude)*.test.ts'` → **VACÍO TAMBIÉN**.
+El delta entero son **6 ficheros**: 2 de test, 1 `.feature`, 3 de `progress/`. **Ni una línea de
+producción.** ✅ **El humano aprobó el CÓDIGO; lo que creció fue el CONTRATO. Se respetó.**
+**Corroboración independiente**: los totales de mutantes **no se movieron** (183 y 110, idénticos a
+la tanda de la escalada) — la firma medida de «solo tests».
+
+## 2. Cobertura — 43/43 por título de `it()`
+
+Contado con un parser que **acepta `it.each(...)` multilínea** (el fallo de mi primera pasada, que
+dio huecos falsos): **@s1..@s43, ninguno sin test**. @s41→1, @s42→1, @s43→1, @s9→4 `it()`.
+
+## 3. 🔴 ¿NACIERON ROJOS? — LOS 10 SABOTAJES, REPRODUCIDOS POR MÍ
+
+Aquí **la producción YA EXISTÍA**: un test nuevo puede nacer verde y **no significar nada**. Así que
+no juzgo el orden, juzgo **si muerde**. Mutante aplicado al fichero real → suite → restaurado.
+
+| # | Mutante | ejecutados | rojos | Veredicto |
+| - | ------- | ---------- | ----- | --------- |
+| 1 | `:257` Cond `(rel&&href)`→`true` | 82 | 2 | ✅ MUERTO |
+| 2 | `:257` Cond `rel!==undefined`→`true` | 82 | 1 | ✅ MUERTO |
+| 3 | `:257` LogicalOperator **PARENTIZADO** | 82 | **2** | ✅ MUERTO |
+| 4 | `:258` Cond `href!==undefined`→`true` | 82 | 1 | ✅ MUERTO |
+| 5 | `:240` Cond `if(href!==undefined)`→`if(true)` | 82 | 1 | ✅ MUERTO |
+| 6 | `:241` OptionalChaining `?.href`→`.href` | 82 | 1 | ✅ MUERTO |
+| 7 | `:278` Cond `nombre===SRCSET`→`true` | 82 | 1 | ✅ MUERTO |
+| 8 | `:299` Cond `url===null`→`false` | 82 | 1 | ✅ MUERTO |
+| 9 | `:58` Regex `\s*=`→`\S*=` | 82 | 1 | ✅ MUERTO |
+| 10 | `puerta:159` `if(tipo===TIPO_CSS)`→`if(true)` | **44** | 1 | ✅ MUERTO |
+
+**10/10 MUERTOS**, y **cada rojo es EL TEST DISEÑADO PARA ÉL** — no daño colateral. El #3 saca **2**
+(@s41 filas 1 y 2), el #7 saca **la fila `a b.png`**, el #9 **la fila `src = "…"`**, el #10 **@s43**.
+**Cuadra con el informe del `mutation_tester` a la unidad.**
+
+**Las tres trampas, neutralizadas y MEDIDAS por mí:**
+1. **Precedencia**: el #3 se aplicó **CON PARÉNTESIS** (`(a||b)&&c&&d`). El literal da otro mutante.
+2. **Barras invertidas**: el #9 se construyó con `String.fromCharCode(92)`, sin barras en el heredoc.
+3. 🔴 **`--reporter=basic` NO EXISTE en Vitest 4.1.10 — LO REPRODUJE**: `Failed to load custom
+   Reporter from basic`, **exit 1, CERO tests ejecutados**. Un script ingenuo lo lee como «0 fallos =
+   sobrevive». **Mi arnés usa `--reporter=json` y ASEVERA `numTotalTests > 0`**: por eso la columna
+   `ejecutados` está en la tabla — **82 y 44, nunca 0**. Baseline verde exigido antes de medir.
+   *(Y la trampa volvió a morder: mi primera sonda falló **uniformemente** en los 6 casos y habría
+   leído «indistinguible = decorado». La cacé porque llevaba **controles SIN mutante**.)*
+
+## 4. 🔴 @s41 y @s42: ¿PORTANTES o DECORADO? — contrafactual medido
+
+No me creo el comentario: **quito la pieza y miro si el mutante sobrevive**.
+
+| Fixture | sin mutante | con mutante | ¿Distingue? |
+| ------- | ----------- | ----------- | ----------- |
+| **@s41 f2 REAL** `<base TERCERO>` + `<link rel>` sin href | `[]` | `["cdn.tercero.com"]` | ✅ **MATA** |
+| débil: **sin** `<base>` | `[]` | `[]` | 🔴 **SOBREVIVE** |
+| débil: `<base>` a la **propia** | `[]` | `[]` | 🔴 **SOBREVIVE** |
+| **@s42 REAL** `<base><base href=TERCERO><img>` | `["cdn.tercero.com"]` | `[]` | ✅ **MATA** |
+| débil: **un solo** `<base>` | `[]` | `[]` | 🔴 **SOBREVIVE** |
+
+✅ **CONFIRMADO: los dos son PORTANTES, no decorado.** El `<base>` **a un tercero** de @s41 f2 y
+**los DOS `<base>`** de @s42 son **imprescindibles**: sin ellos el mutante es **indistinguible**.
+**Nada que ver con la fila inerte de @s14 en F-03.** Y @s42 exhibe **el falso negativo literal**:
+`["cdn.tercero.com"]` → `[]`, **la petición al tercero se vuelve invisible**. Es el peor de los 10 y
+merece su escenario.
+⚠️ **Queda escrito para quien venga**: **quien «simplifique» esos dos fixtures desactiva los tests**
+y reabre el falso negativo. Los comentarios que lo avisan **están medidos y son correctos**.
+
+## 5. La fila del espacio (@s1) — su `Then` asevera `valor` ✅
+
+`expect(detectados[0]).toEqual({ubicacion, construccion, origen, valor})` — **el objeto entero**, no
+un conteo. **Y está demostrado que hacía falta**: el mutante `:278` **no mueve la cuenta** y solo lo
+caza el aserto sobre `valor` (sabotaje #7 → rojo). **La lección de @s24 aplicada.**
+
+## 6. Anti-tautología ✅ · perTest ✅
+
+- **Esperados a mano**: `a%20b.png`, `cdn.tercero.com`, `[]`, `'Impostora'`. La **única** importación
+  de `PARES_DE_FUENTE_ESPERADOS` como valor esperado sigue siendo **@s38**, el ancla legítima.
+  `paresEscritosAMano()` es un literal a mano; @s43 lo usa como **entrada**, no como esperado.
+- **perTest**: en el delta, **toda** llamada a producción vive **dentro de un `it()`**. Mi heurístico
+  marcó 5 líneas: las 5 son **falsos positivos** (2 dentro de `function` que solo se invocan desde
+  `it()`; 1 tabla literal sin producción) **y las 5 son PREEXISTENTES** — ninguna es del delta.
+
+## 7. Build y A-27 ✅
+
+`pnpm build` → **exit REAL 0** con **las CUATRO puertas** (cascarón, placeholders, contraste,
+terceros). **A-27**: `git diff` confirma que **NO** se tocó `tools/puerta-placeholders.ts` **ni**
+`features/puerta_placeholders.feature`. **La deuda de F-01 sigue declarada y F-05 no la reabre.**
+`bin/harness init` → **exit 0**. Suite **576/576** (`numTotalTests` = **576**: cuadra con el
+craftsman y con el dry run de Stryker, 126 + 44).
+
+## 8. Mis 2 menores de la ronda 1 — estado
+
+1. 🟡 **SIGUE ABIERTO** — `puerta-terceros.test.ts` `toContain('A-27')` con **2 ocurrencias** en el
+   humilde: borrar una no pone rojo nada. **El delta no lo toca y no tenía por qué.** No bloquea: es
+   la forma declarada del repo.
+2. 🟡 **SIGUE ABIERTO** — `progress/history.md` **sin entrada de F-05** (C5). **Tarea del lead al
+   cerrar sesión**, ahora ya sin excusa: C7 está cerrado.
+
+## Checkpoints
+
+- **C1** [x] `bin/harness init` exit 0 · **C2** [x] 1 sola `in_progress` · **C3** [x] arquitectura
+  intacta (**0 líneas de producción**) · **C4** [x] **576/576** · **C5** [ ] **pendiente del lead**
+  (history.md + paso a `done`, ya desbloqueado) · **C6** [x] **43/43** por título de `it()`, sin
+  producción que ningún test exija · **C7** [x] **cerrado por el `mutation_tester`**: 100 % en los
+  dos ficheros, **0 timeouts, 0 exclusiones** — reproduje **10/10** sabotajes y **cuadran**.
+
+## Cambios requeridos
+
+**Ninguno.** El delta hace exactamente lo que el humano aprobó: **el contrato creció de 40 a 43, la
+producción no se tocó, y los 3 escenarios nuevos MUERDEN** (medido, no declarado).
+**F-05 queda lista para `done`** — solo falta que el lead cierre C5.

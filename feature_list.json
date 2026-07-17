@@ -133,8 +133,9 @@
       "depends_on": [],
       "mutable": true,
       "sdd": true,
-      "status": "in_progress",
-      "puerta_humana": "APROBADO por el humano el 2026-07-17. A-23: reescritos los acceptance 2 y 5 (el 2 era INSATISFACIBLE, el 5 INMEDIBLE) — umbral 1.0 INTACTO, sin supervivientes Regex preaprobados: si uno resiste, el tdd_craftsman ESCALA, no excluye. A-24: puerta_legal de F-05 y de F-11 corregidas (atribucion normativa falsa). A-27: la deuda de binarios se queda DECLARADA — F-05 NO toca tools/puerta-placeholders.ts (Ley 1); F-05 filtra por extension en SU propia puerta. A-28: solo subset latin (cubre U+0000-00FF: todo el espanol); el limite queda declarado y latin-ext entrara el dia que exista un nombre real que lo exija."
+      "status": "done",
+      "puerta_humana": "APROBADO por el humano el 2026-07-17. A-23: reescritos los acceptance 2 y 5 (el 2 era INSATISFACIBLE, el 5 INMEDIBLE) — umbral 1.0 INTACTO, sin supervivientes Regex preaprobados: si uno resiste, el tdd_craftsman ESCALA, no excluye. A-24: puerta_legal de F-05 y de F-11 corregidas (atribucion normativa falsa). A-27: la deuda de binarios se queda DECLARADA — F-05 NO toca tools/puerta-placeholders.ts (Ley 1); F-05 filtra por extension en SU propia puerta. A-28: solo subset latin (cubre U+0000-00FF: todo el espanol); el limite queda declarado y latin-ext entrara el dia que exista un nombre real que lo exija.",
+      "cierre": "CERRADA 2026-07-17. 43/43 escenarios (40 aprobados + 3 que la mutacion revelo que faltaban, aprobados por el humano). 576 tests. judge APROBADO (43/43 cubiertos, 0 bloqueantes, 2 menores no bloqueantes, 40 sabotajes reproducidos entre las dos rondas). Mutacion 100% en terceros.ts (183 mutantes) y puerta-terceros.ts (110), 0 timeouts, 0 exclusiones. pnpm build exit 0 con las CUATRO puertas. MEDIDO sobre el artefacto: 6 woff2 + 6 woff en dist/assets, todos los url() /assets/… sin esquema http(s), cero googleapis/gstatic, pesos 400/500/600/700 (el wght@300 no se cuela), cero subsets no-latin."
     },
     {
       "id": 6,
