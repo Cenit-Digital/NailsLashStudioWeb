@@ -13,7 +13,7 @@
   "scripts": {
     "dev": "vite",
     "dev:ssr": "vite-react-ssg dev",
-    "build": "vite-react-ssg build && node --experimental-strip-types --disable-warning=ExperimentalWarning tools/puerta-cascaron.ts && node --experimental-strip-types --disable-warning=ExperimentalWarning tools/puerta-placeholders.ts && node --experimental-strip-types --disable-warning=ExperimentalWarning tools/puerta-contraste.ts",
+    "build": "vite-react-ssg build && node --experimental-strip-types --disable-warning=ExperimentalWarning tools/puerta-cascaron.ts && node --experimental-strip-types --disable-warning=ExperimentalWarning tools/puerta-placeholders.ts && node --experimental-strip-types --disable-warning=ExperimentalWarning tools/puerta-contraste.ts && node --experimental-strip-types --disable-warning=ExperimentalWarning tools/puerta-terceros.ts",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
@@ -26,8 +26,9 @@
     "mutation": "stryker run"
   },
   "dependencies": {
-    "@fontsource/dm-sans": "^5.0.0",
-    "@fontsource/outfit": "^5.0.0",
+    "@fontsource/gilda-display": "^5.2.8",
+    "@fontsource/great-vibes": "^5.2.8",
+    "@fontsource/manrope": "^5.2.8",
     "autoskills": "^0.3.6",
     "radix-ui": "^1.6.0",
     "react": "^19.2.0",

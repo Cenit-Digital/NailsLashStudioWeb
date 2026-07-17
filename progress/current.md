@@ -531,3 +531,27 @@ un escenario nuevo en el `.feature` antes de cerrar ese hueco.**
 
 `autoskills` sincronizó 10 skills durante la sesión (`skills-lock.json` +
 `.agents/skills/*`). No es de F-01; queda **fuera** de este commit.
+
+---
+
+## Feature en curso: 5 — cero_terceros (tdd_craftsman, 2026-07-17)
+
+**Puerta verificada ANTES de escribir nada**, las dos mitades que exige el arranque:
+`features/cero_terceros.feature:6` → «APROBADO POR LA PUERTA HUMANA EL 2026-07-17» ·
+`feature_list.json` §5 → `status: in_progress` + campo `puerta_humana` con el acta (A-23, A-24,
+A-27, A-28). Cuadran. Sin la marca `⏸` de F-03. **Se implementa.**
+
+**Escenarios a recorrer, en orden:** @s1..@s40 (40, el contrato aprobado; no se añade, no se
+borra, no se reinterpreta).
+
+- @s1..@s9    — el detector: lo que SÍ detecta (petición automática)
+- @s10..@s18  — el detector: lo que NO (hiperenlace, dato, namespace, `disabled`, `data:`, propio)
+- @s19..@s25  — allowlist, mutantes e informe determinista
+- @s26..@s27  — la puerta: lista blanca de esquemas + la config `base`
+- @s28..@s31  — guarda anti-vacuidad (conjunto exacto de `@font-face`)
+- @s32..@s33  — falla cerrada: los dos puertos LANZAN
+- @s34..@s37  — el humilde, el build, `dev`, y el [I] del CSS minificado
+- @s38..@s39..@s40 — las constantes de producción y las decisiones del humilde, ancladas
+
+Bitácora del ciclo: `progress/tdd_cero_terceros.md`. Umbral 1.0, **0 exclusiones** (A-23): un
+superviviente **se escala**, no se excluye.

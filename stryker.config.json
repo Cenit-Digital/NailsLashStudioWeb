@@ -22,7 +22,9 @@
     "src/lib/contraste.ts",
     "src/lib/puerta-contraste.ts",
     "src/lib/seo.ts",
-    "src/lib/puerta-cascaron.ts"
+    "src/lib/puerta-cascaron.ts",
+    "src/lib/terceros.ts",
+    "src/lib/puerta-terceros.ts"
   ],
   "thresholds": {
     "high": 100,
