@@ -121,19 +121,20 @@
       "id": 5,
       "name": "cero_terceros",
       "title": "Cero peticiones a terceros: fuentes autohospedadas y allowlist vacía",
-      "description": "La decisión de mayor apalancamiento del proyecto. @fontsource con woff2 subsetado a latin, cero peticiones a fonts.googleapis.com/gstatic. Sostener este invariante en cada build convierte 'no usamos cookies' de promesa en hecho verificado y elimina banner, CMP y política de cookies de un plumazo. El prototipo pide wght@300 y no lo usa ni una vez.",
+      "description": "La decision de mayor apalancamiento del proyecto. @fontsource con woff2 subsetado a latin, cero peticiones a fonts.googleapis.com/gstatic. Autoalojamos para que el sitio NO HAGA NINGUNA PETICION A DOMINIOS DE TERCEROS: asi ningun tercero recibe la IP del visitante y no hace falta ningun analisis juridico. El diseno usa Manrope (400/500/600/700) + Gilda Display (400) + Great Vibes (400) [V, medido sobre el prototipo]: NO dm-sans ni outfit, que estan en package.json como herencia muerta de WebEmpresa, sin un solo import. El prototipo pide wght@300 y no lo usa ni una vez [V, medido].",
       "acceptance": [
         "detectarOrigenesExternos(html|css) devuelve los orígenes externos encontrados, con allowlist vacía",
-        "El build falla si el artefacto contiene CUALQUIER origen externo",
+        "El build de produccion falla si el artefacto contiene una PETICION AUTOMATICA a un origen externo. NO «cualquier origen externo»: MEDIDO, dist/ ya trae 10 origenes externos y NINGUNO es una peticion (namespaces XML de React, react.dev/errors, fb.me, el @context de F-04, la canonica). La distincion es la del HTML Living Standard: «external resource link» (el UA lo pide solo) vs «hyperlink» (lo pide el usuario). Exigir cero origenes seria insatisfacible y romperia F-04, que esta done",
         "No hay ni una petición a fonts.googleapis.com ni a fonts.gstatic.com en el build",
         "No se solicita wght@300 (no se usa)",
-        "Mutar la comparación de origen o el predicado de allowlist rompe un test"
+        "Los mutantes se nombran por su mutador REAL de Stryker 9.6.1, verificado contra el registro allMutators del instrumenter instalado (16 mutadores): ArrayDeclaration, FilterRemoval, BooleanLiteral (quitar el !), EqualityOperator, StringLiteral y Regex (weapon-regex nivel 1 sobre el patron ENTERO: Quantifier removal, Predefined character class negation, Character class negation, ^ y $ removal). PROHIBIDO pedir que se mute .includes: ese mutador NO EXISTE en Stryker 9.6.1"
       ],
-      "puerta_legal": "RGPD (evita el análisis de corresponsabilidad de Fashion ID) + art. 22.2 LSSI (sin cookies → sin banner)",
+      "puerta_legal": "CRITERIO DE PROYECTO, NO UNA NORMA (corregido 2026-07-17 en la puerta humana, A-24; ver progress/f05_verificacion_previa.md §6). Cero peticiones a terceros => ningun tercero recibe la IP del visitante => no hace falta ningun analisis juridico. Es decision del editor, basta por si sola y no cuelga de ninguna cita. || LO QUE DECIA ANTES ERA UNA ATRIBUCION NORMATIVA FALSA: «art. 22.2 LSSI (sin cookies -> sin banner)» y «elimina banner, CMP y politica de cookies de un plumazo». El art. 22.2 NO dice «cookies» [V]: regula «dispositivos de almacenamiento Y RECUPERACION de datos» y es un permiso condicionado. Si el cacheo de un .woff2 lo activa es NO_VERIFICABLE EN LOS DOS SENTIDOS (CEPD 2/2023 par. 50 dice «does constitute storage, at the very least through the caching mechanism», pero de tracking pixels y sobre una letra DISYUNTIVA; la AEPD exige almacenar Y recuperar, Guia §1 pag. 8 y §2.1 pag. 11). Y MEDIDO 2026-07-17: gstatic NO manda Set-Cookie pero SI Cache-Control public max-age=31536000, asi que «Google Fonts no almacena nada» es FALSO. En ninguna rama el 22.2 obliga a banner por cargar una fuente. || Fashion ID (TJUE C-40/17): [I] POR ANALOGIA RAZONADA, NO re-verificable en fuente primaria el 2026-07-17 (EUR-Lex devuelve 202 + challenge AWS-WAF; publications.europa.eu 404; curia sirve shell SPA). El ap. 84 declara la corresponsabilidad y el ap. 85 la AFIRMA Y LUEGO LA LIMITA («That liability is, however, limited to the operation ... in respect of which it actually determines the purposes and means»): quien cite el 85 DEBE reproducir esa segunda frase. La palabra «jointly» solo esta en el 84. La analogia fuente<->boton social es NUESTRA: font/typeface = 0 ocurrencias en la sentencia [V]. El propio repo ya la marcaba [I] (docs/research/legal-rgpd.md:410-416: «un tribunal podria distinguir ambos casos»). Autohospedar es TECNICA SUFICIENTE, no obligacion. Y F-05 NO prohibe el <a href> a Facebook: el predicado factico del ap. 27 es la transmision AUTOMATICA «regardless of whether or not he or she has clicked».",
       "depends_on": [],
       "mutable": true,
       "sdd": true,
-      "status": "spec_ready"
+      "status": "in_progress",
+      "puerta_humana": "APROBADO por el humano el 2026-07-17. A-23: reescritos los acceptance 2 y 5 (el 2 era INSATISFACIBLE, el 5 INMEDIBLE) — umbral 1.0 INTACTO, sin supervivientes Regex preaprobados: si uno resiste, el tdd_craftsman ESCALA, no excluye. A-24: puerta_legal de F-05 y de F-11 corregidas (atribucion normativa falsa). A-27: la deuda de binarios se queda DECLARADA — F-05 NO toca tools/puerta-placeholders.ts (Ley 1); F-05 filtra por extension en SU propia puerta. A-28: solo subset latin (cubre U+0000-00FF: todo el espanol); el limite queda declarado y latin-ext entrara el dia que exista un nombre real que lo exija."
     },
     {
       "id": 6,
@@ -244,13 +245,13 @@
       "id": 11,
       "name": "mapa_como_llegar",
       "title": "Mapa como imagen estática autohospedada + enlace Cómo llegar",
-      "description": "Es la decisión que por sí sola evita el banner de cookies: incrustar el iframe de Google Maps rompe 'cero terceros' y arrastra la EU User Consent Policy de Google. Imagen estática autohospedada + enlace que abre Maps en pestaña nueva. Mencionar Planta 0, Local 41.",
+      "description": "Incrustar el iframe de Google Maps rompe 'cero terceros' (F-05) y arrastra la EU User Consent Policy de Google, cuya responsabilidad NO es desplazable por contrato (Guia AEPD §4.2 pag. 33) [V]. Imagen estatica autohospedada + enlace que abre Maps en pestana nueva. Mencionar Planta 0, Local 41.",
       "acceptance": [
         "No hay iframe de Google Maps ni ninguna petición a un tercero",
         "El enlace Cómo llegar abre Maps en pestaña nueva con la dirección correcta",
         "La dirección menciona Planta 0, Local 41"
       ],
-      "puerta_legal": "art. 22.2 LSSI (sostiene el cero cookies)",
+      "puerta_legal": "CRITERIO DE PROYECTO, heredado de F-05 (corregido 2026-07-17, A-24): sostiene el invariante «cero peticiones a terceros», asi que ningun tercero recibe la IP del visitante. NO se justifica por el art. 22.2 LSSI: ver la puerta_legal de F-05 y progress/f05_verificacion_previa.md §6 — que el 22.2 se active por un recurso de tercero es NO_VERIFICABLE en los dos sentidos, y «evita el banner» es una consecuencia PROBABLE, no una obligacion normativa que se pueda citar. Los Google Maps Platform ToS SI reconocen «Services that store and access Cookies on End Users devices» [V], lo que hace el analisis INNECESARIO en vez de resuelto.",
       "depends_on": [
         "cero_terceros"
       ],

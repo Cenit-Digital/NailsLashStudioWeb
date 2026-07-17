@@ -1,7 +1,10 @@
 # F-05 `cero_terceros` — destilación Gherkin (gherkin_author, 2026-07-17)
 
-> **Entregable:** `features/cero_terceros.feature` — **37 escenarios, `@s1`..`@s37`**.
-> **Estado:** `pending` → **`spec_ready`**. ⏸ **NO APROBADO. NO SE IMPLEMENTA.**
+> **Entregable:** `features/cero_terceros.feature` — **40 escenarios, `@s1`..`@s40`**.
+> **Estado:** ✅ **APROBADO POR LA PUERTA HUMANA EL 2026-07-17.** Las **cuatro** preguntas
+> (A-23, A-24, A-27, A-28) **cerradas por el humano**; **las 21 marcas `⏸` retiradas del
+> `.feature`**; **el `tdd_craftsman` está LIBERADO**. Ver **§Puerta humana (2026-07-17)** al final.
+> *(El «37 escenarios» de antes era previo a la ronda de reparación, que añadió @s38/@s39/@s40.)*
 >
 > **Fuentes leídas, en este orden:** `project-spec.md` §Feature 5 (la FUENTE) ·
 > `progress/f05_verificacion_previa.md` (los HECHOS; **manda donde contradiga**) ·
@@ -10,7 +13,11 @@
 
 ---
 
-## 1. ⏸ EL CONTRATO NO ESTÁ APROBADO — y por qué eso está escrito en la cabecera del `.feature`
+## 1. ~~EL CONTRATO NO ESTÁ APROBADO~~ — **HISTÓRICO: aprobado el 2026-07-17**
+
+> ⚠️ **Todo lo que sigue en esta sección (y en §2 y §5) describe el estado ANTES de la puerta.
+> Se conserva como rastro de por qué se paró.** **El estado vigente es §Puerta humana (2026-07-17)**,
+> al final: **las 4 preguntas cerradas, las 21 marcas `⏸` retiradas del `.feature`, TDD liberado.**
 
 **A-23 bloquea este contrato.** Los **acceptance 2 y 5** de `feature_list.json` §5 son
 **insatisfacible** e **inmedible**. **No se destilan tal cual.** Lo que el `.feature` destila es
@@ -106,16 +113,23 @@ negó a implementar con la marca puesta, y tenía razón.**
 - **Toda la `puerta_legal` heredada**: cero apariciones de «art. 22.2 LSSI», «sin cookies → sin
   banner», «elimina banner/CMP», «Fashion ID obliga», «autoalojar = cero almacenamiento».
 
-## 5. Avisos al lead (5)
+## 5. Avisos al lead (5) — ✅ **LOS 4 PRIMEROS, RESUELTOS EN LA PUERTA DEL 2026-07-17**
 
-1. ⏸ **A-23 bloquea.** Destilada la propuesta del lead. **El contrato no está aprobado.**
-2. ⏸ **A-24**: la `puerta_legal` de `feature_list.json` §5 **sigue diciendo la frase falsa**, y la
+*Histórico. El estado vigente está en §Puerta humana, al final.*
+
+1. ~~**A-23 bloquea.** Destilada la propuesta del lead. **El contrato no está aprobado.**~~
+   → ✅ **APROBADA la propuesta: acceptance 2 y 5 reescritos. Umbral 1.0, 0 exclusiones.**
+2. ~~**A-24**: la `puerta_legal` de `feature_list.json` §5 **sigue diciendo la frase falsa**, y la
    **descripción de F-11 también** («la decisión que por sí sola evita el banner de cookies»). **El
    `.feature` no las hereda, pero el `feature_list.json` sigue mintiendo hasta que la puerta lo
-   corrija.**
-3. ⏸ **A-27**: @s34 declara la deuda; **no la cierra**.
-4. ⏸ **A-28**: si la puerta añade `latin-ext`, **la tabla de @s28 cambia** y este contrato **se
-   re-aprueba**.
+   corrija.**~~
+   → ✅ **CORREGIDO: la `puerta_legal` de F-05 Y la de F-11 ya dicen CRITERIO DE PROYECTO.**
+   **`feature_list.json` ya no miente.**
+3. ~~**A-27**: @s34 declara la deuda; **no la cierra**.~~
+   → ✅ **APROBADO que se quede DECLARADA. F-05 no toca F-01. @s34/@s40 anclan el filtro propio.**
+4. ~~**A-28**: si la puerta añade `latin-ext`, **la tabla de @s28 cambia** y este contrato **se
+   re-aprueba**.~~
+   → ✅ **SOLO `latin`. @s28 y @s38 NO cambian. Límite declarado; `latin-ext` exigiría escenario.**
 5. 🔴 **Nada más de la spec me pareció mal.** La verificación previa y `project-spec.md` §Feature 5
    son **coherentes entre sí** en todo lo que este contrato destila; las tres contradicciones que
    quedan son **con `feature_list.json`**, y son exactamente A-23 y A-24. **Verifiqué de primera
@@ -239,16 +253,17 @@ no muerden.** Queda escrito en @s7 y @s24 para que nadie las reintroduzca «de m
    *(Y `url( … )` con espacios **no mata `\s*`→`\S*` del cierre**, como se afirmaba: `[^)]*` ya se
    come el espacio final. Sí mata el `\s*` de **apertura** y `[^)]`→`[)]`. La fila entra por eso.)*
 
-## A-23 reformulada (🔴 CAMBIA — y sigue ⏸ del humano)
+## A-23 reformulada (🔴 CAMBIA) — ✅ **CERRADA: el humano eligió (a) el 2026-07-17**
 
 Con **umbral 1.0 y 0 exclusiones** (`harness.config.json`; `stryker.config.json` → `break: 100`),
 **habrá mutantes `Regex` sí o sí**. La pregunta que el contrato **no formulaba** ya está escrita:
 
-- **(a) PROPUESTA DEL LEAD:** @s24 crece con filas que **muerden de verdad** y **asevera el origen,
-  no la cuenta**. **Es lo que hizo F-03** (19 % → 100 % **sin tocar producción, solo arreglando los
-  tests**) **y lo que ya funcionó en F-04** (58 supervivientes, **0 exclusiones**).
-- **(b)** el contrato acepta **por escrito** que algún superviviente `Regex` se justifique en
-  `progress/mutation_cero_terceros.md`, y el umbral de F-05 no es 1.0.
+- ✅ **(a) ELEGIDA POR EL HUMANO. PROPUESTA DEL LEAD:** @s24 crece con filas que **muerden de
+  verdad** y **asevera el origen, no la cuenta**. **Es lo que hizo F-03** (19 % → 100 % **sin tocar
+  producción, solo arreglando los tests**) **y lo que ya funcionó en F-04** (58 supervivientes,
+  **0 exclusiones**).
+- ❌ **(b) RECHAZADA:** *no* se acepta justificar supervivientes `Regex` en
+  `progress/mutation_cero_terceros.md`, y **el umbral de F-05 NO baja: sigue siendo 1.0.**
 
 ⚠️ **HONESTIDAD, Y ESTÁ ESCRITA EN EL CONTRATO:** los **13 supervivientes** y el **78,99 %** están
 medidos sobre **un prototipo desechable**, **no sobre el código real de F-05, que NO EXISTE**. **Otra
@@ -257,14 +272,11 @@ real.** **Superviviente conocido y declarado:** `\s*`→`\S*` del cierre **puede
 equivalente** con una extracción `[^)]*`. **Si algún `Regex` resiste, el `tdd_craftsman` ESCALA AL
 HUMANO — no lo excluye en silencio ni baja el umbral por su cuenta.**
 
-## Lo que NO se cerró (sigue ⏸ del humano)
+## ~~Lo que NO se cerró~~ → ✅ **CERRADO TODO EL 2026-07-17. Ver §Puerta humana al final.**
 
-**A-23, A-24, A-27 y A-28 siguen abiertas. La marca ⏸ se queda y el contrato NO está aprobado.**
-
-- **A-27**: @s40 ancla **el filtro de F-05**; **no cierra** la deuda de `tools/puerta-placeholders.ts`,
-  que es de **F-01 (`done`)** y exige escenario propio en su feature. **Reabrir una `done` es del
-  humano.**
-- **A-28**: si la puerta añade `latin-ext`, cambian **@s28 y @s38**, y el contrato **se re-aprueba**.
+*Sección histórica: decía «A-23, A-24, A-27 y A-28 siguen abiertas; la marca ⏸ se queda y el
+contrato NO está aprobado». **Ya no.** El humano las cerró las cuatro. Se conserva el rastro
+porque el razonamiento de arriba es lo que leyó para decidir.*
 
 ## Fuentes primarias remedidas por mí en esta ronda
 
@@ -285,3 +297,49 @@ separados por espacio»), `:229` (el glob inútil del grep de `woff`) y `:233` (
 
 **Lección reutilizable: una verificación NO PUEDE medir un ámbito que no existe en disco; si no está
 instalado, se instala (como sí se hizo para el 119.540) o se marca NO VERIFICADO.**
+
+---
+
+# ✅ Puerta humana (2026-07-17)
+
+**LA PUERTA SE ABRIÓ.** El humano decidió **las cuatro preguntas** y aprobó **este** contrato, con
+**los 40 escenarios TAL CUAL**. **No las cerró el lead ni el `gherkin_author`: las cerró el humano.**
+Aquí se **registra el hecho**. El acta vive en `feature_list.json` §5 → campo **`puerta_humana`**;
+**donde este fichero y ese campo se leyeran distinto, MANDA `feature_list.json`.**
+
+## Las 4 decisiones
+
+| # | Decisión del humano | Efecto |
+|---|---|---|
+| **A-23** | ✅ **APROBADA la propuesta del lead.** Acceptance **2** y **5** **REESCRITOS** en `feature_list.json` §5: el 2 → *«una **PETICIÓN AUTOMÁTICA** a un origen externo»*; el 5 nombra **mutadores REALES** y **PROHÍBE** pedir que se mute `.includes`. 🔴 **Eligió la opción (a): SIN supervivientes `Regex` preaprobados.** | **UMBRAL 1.0 INTACTO, 0 EXCLUSIONES.** La opción (b) —justificar supervivientes y bajar el umbral— **RECHAZADA**. **Si un `Regex` resiste → el `tdd_craftsman` ESCALA AL HUMANO.** El contrato ya no destila una *propuesta*: destila **el acceptance vigente**. |
+| **A-24** | ✅ **APROBADA.** `puerta_legal` de **F-05 y de F-11** corregidas en `feature_list.json`. | **La justificación de F-05 es CRITERIO DE PROYECTO, NO una norma.** Las prohibiciones de vocabulario del `.feature` pasan de lectura del lead a **letra del `feature_list`**. |
+| **A-27** | ✅ **APROBADA la postura del lead: la deuda se queda DECLARADA.** | **F-05 NO toca `tools/puerta-placeholders.ts` ni `features/puerta_placeholders.feature` (Ley 1).** F-05 **sí** filtra por extensión en **su propia** puerta (@s34, @s40). **La deuda de F-01 sigue VIVA y DECLARADA.** |
+| **A-28** | ✅ **APROBADA la propuesta del lead: SOLO subset `latin`** (`U+0000-00FF`, todo el español). | **`PARES_DE_FUENTE_ESPERADOS` NO CAMBIA: los 6 pares se quedan.** @s28 y @s38 intactos. **Límite DECLARADO por escrito:** `Ł`/`ř`/`ğ` → **TOFU sin error**; **`latin-ext` entrará el día que exista un nombre REAL que lo exija, CON SU ESCENARIO.** |
+
+## Lo que hice, y lo que NO
+
+- **21 marcas `⏸` retiradas**, una por una, **reescritas según su decisión** — incluidas las que
+  citaba el lead: `:6` (cabecera), `:115`, `:558` (F-11: **ya corregida en `feature_list.json`**),
+  `:590`, `:675` (A2), `:681` (A5), **`:1501` (la escalada — REFORZADA)**, `:1692` y `:2109`
+  (A-28, **conservando la nota de que `latin-ext` exigiría un escenario**), `:1930`/`:1935`/`:2163`
+  (A-27), `:1987`. **Quedan 0** (`grep -c "⏸"` → **0**).
+- **El bloque de congelación se invirtió:** donde decía «MIENTRAS ESTA MARCA ⏸ SIGA PUESTA, NO
+  ESCRIBAS NI UN TEST», ahora dice 🟢 **«LA PUERTA ESTÁ ABIERTA. PUEDES IMPLEMENTAR F-05»**, con
+  **5 condiciones no negociables**: Ley 1 · los 40 escenarios son el contrato aprobado (si uno es
+  imposible, **PARA**) · **umbral 1.0, 0 exclusiones, escalar** · **no tocar F-01/A-27** · **nada
+  de vocabulario normativo falso (A-24)**.
+- **NO toqué ni un escenario.** Verificado mecánicamente: `diff` de **todas las líneas
+  no-comentario** contra `HEAD` → **IDÉNTICO, 0 líneas ejecutables tocadas**. 40 `Scenario`,
+  40 tags `@sN`. Solo cabecera, comentarios y marcas.
+- **NO toqué `feature_list.json`** (ya lo había aplicado el lead).
+- **NO reintroduje** ninguna atribución normativa falsa.
+
+## Lo que el `tdd_craftsman` debe leer antes de escribir la primera línea
+
+1. La **cabecera** del `.feature`: las 4 decisiones y las 5 condiciones.
+2. **@s24 y su bloque de escalada** (la marca de `:1501`, ahora reforzada): **el superviviente
+   conocido `\s*`→`\S*` del cierre NO está preaprobado.** Nombrarlo **no es licencia para
+   excluirlo**: es un aviso de dónde va a doler.
+3. **Honestidad de medición, que sigue en pie:** los **13 supervivientes** y el **78,99 %** están
+   medidos sobre **un prototipo desechable**, **no sobre el código real de F-05, que NO EXISTE**.
+   **Otra implementación tendrá otro conjunto. Se mide cuando exista, no antes.**

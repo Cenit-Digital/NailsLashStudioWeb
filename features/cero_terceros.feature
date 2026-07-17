@@ -3,7 +3,10 @@
 # puerta que lo demuestra».
 #
 # =============================================================================================
-# ⏸  ESTE CONTRATO **NO ESTÁ APROBADO**. NO SE IMPLEMENTA HASTA QUE LA PUERTA HUMANA LO ABRA.
+# ✅ **APROBADO POR LA PUERTA HUMANA EL 2026-07-17.** El humano cerró **las cuatro preguntas**
+#    (A-23, A-24, A-27, A-28) y aprobó **ESTE** contrato, con **estos 40 escenarios, tal cual**.
+#    El registro vive también en `feature_list.json` §5 → campo **`puerta_humana`**. **Donde este
+#    fichero y ese campo se leyeran distinto, MANDA `feature_list.json`: es el acta.**
 # =============================================================================================
 # 🔧 **RONDA DE REPARACIÓN (2026-07-17) — TRAS UNA REVISIÓN ADVERSARIAL DE 31 AGENTES / 6 LENTES.**
 #    **23 hallazgos confirmados (3 BLOQUEANTES, 14 GRAVES, 6 MENORES): 21 aplicados, 2 RECHAZADOS
@@ -25,18 +28,43 @@
 #    **NO matan `\s+`→`\s`** (equivalente para la pertenencia al conjunto) y `url('a"b')` **NO mata
 #    `[^']`→`[']`** (espera 0: la mutación no mueve la cuenta). **Ver @s7 y @s24.**
 # =============================================================================================
-# ⏸  **A-23 BLOQUEA ESTE CONTRATO.** Los acceptance **2** y **5** de `feature_list.json` §5 son
-#    **INSATISFACIBLE** e **INMEDIBLE**, y este fichero **NO los destila tal cual**: destila **LA
-#    PROPUESTA DEL LEAD**, que **cambia los criterios de aceptación** y por tanto **es la puerta
-#    humana quien la cierra, no el lead y no el gherkin_author**.
-# ⏸  **A-24**, **A-27** y **A-28** **esperan también la puerta humana**. Ninguna se finge cerrada
-#    aquí; cada una está declarada abajo con lo que este contrato hace mientras tanto.
+# ✅ **LAS CUATRO DECISIONES DEL HUMANO, LITERALES (2026-07-17)**
+# =============================================================================================
+# ✅ **A-23 — APROBADA la propuesta del lead.** Los acceptance **2** y **5** quedan **REESCRITOS en
+#    `feature_list.json` §5** (ya aplicado; **es la letra vigente, léela allí**): el **2** pasa a
+#    *«una **PETICIÓN AUTOMÁTICA** a un origen externo»* y el **5** nombra **mutadores REALES** y
+#    **PROHÍBE** pedir que se mute `.includes`. **Este contrato ya destilaba esa propuesta: ahora
+#    NO destila una propuesta, destila EL ACCEPTANCE VIGENTE.**
+#    🔴🔴 **EL HUMANO ELIGIÓ LA OPCIÓN (a) — SIN supervivientes `Regex` preaprobados: EL UMBRAL DE
+#    F-05 SIGUE SIENDO 1.0, CON 0 EXCLUSIONES.** La opción (b) —justificar supervivientes por
+#    escrito y bajar el umbral— **FUE RECHAZADA**. **NO HAY LICENCIA PARA EXCLUIR NADA.**
+#    **Si un mutante `Regex` resiste, el `tdd_craftsman` ESCALA AL HUMANO** — **NO lo excluye, NO
+#    lo justifica por su cuenta, NO baja el umbral.** *Es lo que ya funcionó en F-03 (19 %→100 %
+#    sin tocar producción) y en F-04 (58 supervivientes, 0 exclusiones).*
+# ✅ **A-24 — APROBADA.** La `puerta_legal` de **F-05 Y la de F-11** están **corregidas en
+#    `feature_list.json`** (ya aplicado). **La justificación de F-05 es CRITERIO DE PROYECTO, NO
+#    UNA NORMA.** Las prohibiciones de vocabulario de este fichero **siguen vigentes y ahora son
+#    la letra del `feature_list`, no una propuesta**.
+# ✅ **A-27 — APROBADA la postura del lead: LA DEUDA SE QUEDA DECLARADA.** F-05 **NO TOCA**
+#    `tools/puerta-placeholders.ts` **ni** `features/puerta_placeholders.feature` (**Ley 1**).
+#    F-05 **SÍ** filtra por extensión en **SU PROPIA** puerta (@s34, @s40). **La deuda de F-01
+#    sigue VIVA y DECLARADA**, y cerrarla es otra feature, del humano.
+# ✅ **A-28 — APROBADA la propuesta del lead: SOLO subset `latin`.** Cubre `U+0000-00FF` (todo el
+#    español). **`PARES_DE_FUENTE_ESPERADOS` NO CAMBIA: los 6 pares se quedan.** **EL LÍMITE QUEDA
+#    DECLARADO POR ESCRITO:** un nombre con `Ł`/`ř`/`ğ` **pinta TOFU, sin error**; **`latin-ext`
+#    entrará el día que exista un nombre REAL que lo exija, y entrará CON SU ESCENARIO.**
 #
-# 🔴 **PARA EL `tdd_craftsman`: MIENTRAS ESTA MARCA ⏸ SIGA PUESTA, NO ESCRIBAS NI UN TEST NI UNA
-#    LÍNEA DE PRODUCCIÓN DE F-05.** Es el precedente de F-03, y el craftsman que se negó tenía
-#    razón: implementar sobre un contrato cuyos criterios de aceptación están en disputa es
-#    construir sobre algo que el humano todavía puede cambiar. Si lees esto y la marca sigue,
-#    **para y devuelve el control al lead**.
+# 🟢 **PARA EL `tdd_craftsman`: LA PUERTA ESTÁ ABIERTA. PUEDES IMPLEMENTAR F-05.** Ya no hay
+#    ningún criterio de aceptación en disputa. **BAJO ESTAS CONDICIONES, QUE NO SON NEGOCIABLES:**
+#      1. **Ley 1**: ni una línea de producción sin un test rojo que la exija.
+#      2. **Los 40 escenarios de este fichero son el contrato APROBADO.** No se añaden, no se
+#         borran y no se reinterpretan. Si al implementar descubres que uno es **imposible o
+#         falso**, **PARAS y devuelves el control al lead** — es el precedente de F-03.
+#      3. **UMBRAL 1.0, 0 EXCLUSIONES (A-23).** **Un superviviente NO se excluye ni se justifica:
+#         SE ESCALA AL HUMANO.** Vale para `Regex` y **para cualquier otro mutador**.
+#      4. **F-05 NO TOCA `tools/puerta-placeholders.ts` (A-27)** ni ninguna feature `done`.
+#      5. **PROHIBIDO el vocabulario normativo falso (A-24)** en el código, en los tests y en los
+#         mensajes de violación. Ver el bloque «PROHIBIDO EN ESTE FICHERO».
 #
 # =============================================================================================
 # FUENTE DE VERDAD DE LOS HECHOS: `progress/f05_verificacion_previa.md`
@@ -112,17 +140,22 @@
 #     «These are links to other resources that are **generally exposed to the user** by the user
 #     agent **so that the user can cause the user agent to navigate** to those resources…»
 # → **SIN ESTA DISTINCIÓN, F-05 ES INSATISFACIBLE.** Este contrato destila el eje **«petición
-#   automática»** — **PROPUESTA DEL LEAD, ⏸ PENDIENTE DE PUERTA HUMANA**.
+#   automática»** — ✅ **APROBADO POR LA PUERTA HUMANA EL 2026-07-17 (A-23): es la letra vigente
+#   del acceptance 2 en `feature_list.json` §5.**
 #
 # =============================================================================================
-# ⏸ LAS CUATRO PREGUNTAS ABIERTAS — NINGUNA LA CIERRA ESTE FICHERO
+# ✅ LAS CUATRO PREGUNTAS — **LAS CUATRO CERRADAS POR EL HUMANO EL 2026-07-17**
 # =============================================================================================
-# ⏸ **A-23** — 🔴 **LA QUE BLOQUEA ESTE GHERKIN.** Acceptance 2 (*«CUALQUIER origen externo»*) es
-#   **insatisfacible** y acceptance 5 (*«mutar … el predicado de allowlist»*) es **inmedible**:
-#   **nombra «el predicado» sin decir qué mutador lo ataca**. **Propuesta del lead, que es lo que
-#   este fichero destila:** reescribir el 2 como *«ninguna **PETICIÓN AUTOMÁTICA** a un origen
+# *Se conserva el razonamiento entero, con sus mediciones, porque es lo que el humano leyó para
+# decidir. Lo que cambia es el estado: ya no son preguntas, son **decisiones registradas**.*
+#
+# ✅ **A-23 — CERRADA: APROBADA la propuesta del lead.** Acceptance 2 (*«CUALQUIER origen
+#   externo»*) era **insatisfacible** y acceptance 5 (*«mutar … el predicado de allowlist»*) era
+#   **inmedible**: **nombraba «el predicado» sin decir qué mutador lo ataca**. **Los DOS quedan
+#   REESCRITOS en `feature_list.json` §5**: el 2 como *«una **PETICIÓN AUTOMÁTICA** a un origen
 #   externo»* y el 5 **nombrando mutadores REALES** (`ArrayDeclaration`, `FilterRemoval`,
-#   `BooleanLiteral`, `EqualityOperator`, `StringLiteral`, `MethodExpression`, `Regex`).
+#   `BooleanLiteral`, `EqualityOperator`, `StringLiteral`, `MethodExpression`, `Regex`) y
+#   **prohibiendo** pedir que se mute `.includes`.
 #   **Subordinada a A-23 y NO destilada aquí:** la regla de `font-display: swap` (hoy **fuera del
 #   acceptance**; es hecho **MEDIDO** —**164/164 `@font-face` en las TRES FAMILIAS QUE F-05 HORNEA**
 #   (`@fontsource` 5.2.8), `swap` único valor presente, **0 sin `font-display`**— **pero NO
@@ -133,17 +166,24 @@
 #   no cambia** (`swap` es el único valor en las dos lecturas), pero el ámbito no estaba escrito.*
 #   **Si el humano la quiere, entra con su escenario; hoy NO está y no se finge que esté.**
 #
-#   🔴 **A-23 CAMBIA POR LA REVISIÓN ADVERSARIAL — LA PREGUNTA QUE ESTE CONTRATO NO FORMULABA:**
+#   🔴 **LA SUB-PREGUNTA DE A-23 QUE LEVANTÓ LA REVISIÓN ADVERSARIAL — TAMBIÉN CERRADA:**
 #   **el mapa mutante modelaba `Regex` como «las anclas `^`/`$`» y declaraba @s24 «condicional al
 #   diseño». Es FALSO Y AL REVÉS** (ver el mapa mutante). Con **`mutation.threshold` = 1.0 y 0
 #   exclusiones** [V: `harness.config.json`; `stryker.config.json` → `break: 100`], **habrá mutantes
-#   `Regex` sí o sí**, y hay que decidir **por escrito, en la puerta**:
-#     **(a) — LA PROPUESTA DEL LEAD:** **@s24 crece con filas que MUERDAN de verdad**, y el escenario
-#         **asevera el ORIGEN, no solo la cuenta** (ver @s24: **medido, las filas de hoy matan CERO**).
-#         **Es lo que hizo F-03**, que pasó de 19 % a 100 % **sin tocar producción, solo arreglando
-#         los tests**. Y **es lo que ya funcionó en F-04**: 58 supervivientes, **0 exclusiones**.
-#     **(b)** el contrato acepta **POR ESCRITO** que algún superviviente `Regex` se **justifique** en
-#         `progress/mutation_cero_terceros.md`, y **el umbral de F-05 no es 1.0**.
+#   `Regex` sí o sí**. El humano decidió **por escrito, en la puerta**:
+#     ✅ **(a) — ELEGIDA. LA PROPUESTA DEL LEAD.** **@s24 crece con filas que MUERDAN de verdad**, y
+#         el escenario **asevera el ORIGEN, no solo la cuenta** (ver @s24: **medido, las filas de
+#         hoy matan CERO**). **Es lo que hizo F-03**, que pasó de 19 % a 100 % **sin tocar
+#         producción, solo arreglando los tests**. Y **es lo que ya funcionó en F-04**: 58
+#         supervivientes, **0 exclusiones**.
+#     ❌ **(b) — RECHAZADA POR EL HUMANO.** *No* se acepta que un superviviente `Regex` se
+#         **justifique** en `progress/mutation_cero_terceros.md`, y **el umbral de F-05 NO baja**.
+#
+#   🔴🔴 **CONSECUENCIA OPERATIVA, Y ES LA LÍNEA QUE EL `tdd_craftsman` NO PUEDE NO LEER:**
+#   **EL UMBRAL DE F-05 ES 1.0. NO HAY NI UN SUPERVIVIENTE `Regex` PREAPROBADO. CERO EXCLUSIONES.**
+#   **SI UN MUTANTE `Regex` RESISTE → SE ESCALA AL HUMANO.** No se excluye en `stryker.config.json`,
+#   no se justifica en `progress/`, no se baja el umbral, no se declara «equivalente» por cuenta
+#   propia. **La única salida autorizada es: una fila más en el contrato, o el humano.**
 #   ⚠️ **HONESTIDAD DE MEDICIÓN, Y ES OBLIGATORIA AQUÍ:** los **13 supervivientes `Regex`** y el
 #   **78,99 %** que motivan esta pregunta están **MEDIDOS SOBRE UN PROTOTIPO DESECHABLE** de la
 #   revisión (que pasa @s1..@s25 en verde, 67/67), **NO sobre el código real de F-05, QUE NO EXISTE**
@@ -152,12 +192,15 @@
 #   **Si al implementar algún mutante `Regex` resiste, el `tdd_craftsman` ESCALA AL HUMANO** —
 #   **NO lo excluye en silencio, NO baja el umbral por su cuenta.** *Excluir un mutante que no se
 #   sabe matar es exactamente lo que este fichero llama fraudulento en @s21.*
-# ⏸ **A-24** — 🔴 La **`puerta_legal` de F-05 es una ATRIBUCIÓN NORMATIVA FALSA** y la descripción
-#   promete «elimina banner, CMP y política de cookies **de un plumazo**». **Este contrato NO
-#   hereda ninguna de las dos frases** (ver el bloque siguiente). Corregir `feature_list.json` —y
-#   de paso la descripción de **F-11**, que arrastra la misma atribución— **toca el contrato Y el
-#   feature_list**: es la puerta.
-# ⏸ **A-27** — 🔴 **F-05 es la PRIMERA feature que mete BINARIOS en `dist/`** → **activa la deuda
+# ✅ **A-24 — CERRADA: APROBADA.** La **`puerta_legal` de F-05 era una ATRIBUCIÓN NORMATIVA FALSA**
+#   y la descripción prometía «elimina banner, CMP y política de cookies **de un plumazo**».
+#   **Este contrato nunca heredó ninguna de las dos frases** (ver el bloque siguiente), y ahora
+#   **tampoco las tiene `feature_list.json`: la `puerta_legal` de F-05 Y la de F-11 están
+#   CORREGIDAS** (ya aplicado el 2026-07-17). **La justificación de F-05 es CRITERIO DE PROYECTO,
+#   NO UNA NORMA** — y eso ya no es la lectura del lead: **es la letra del `feature_list`.**
+#   **Las prohibiciones de vocabulario de este fichero son ahora NORMATIVAS para el TDD.**
+# ✅ **A-27 — CERRADA: APROBADA la postura del lead — LA DEUDA SE QUEDA DECLARADA.**
+#   🔴 **F-05 es la PRIMERA feature que mete BINARIOS en `dist/`** → **activa la deuda
 #   declarada de F-01**. Medido, sin suponer nada [V]: `tools/puerta-placeholders.ts` lista
 #   **todos** los ficheros **sin filtro de extensión** y hace `readFileSync(ruta, 'utf8')`; leyendo
 #   los 108 `.woff`/`.woff2` reales de `@fontsource` con utf8 **no lanza**, da **554.818 U+FFFD**,
@@ -167,11 +210,13 @@
 #   observado un fallo real** — pero *«0 violaciones»* **no significa que el hueco esté cerrado**:
 #   los ficheros que entran en `dist/` tras el pipeline de Vite **no son byte a byte** los de
 #   `node_modules`.
-#   🔴 **F-05 NO TOCA `tools/puerta-placeholders.ts`, Y ESTE CONTRATO NO TIENE NI UN ESCENARIO
-#   SOBRE ÉL.** La deuda es **de F-01** (feature **`done`**), y `progress/current.md:477-478` ya
+#   🔴 **DECIDIDO POR EL HUMANO: F-05 NO TOCA `tools/puerta-placeholders.ts` NI
+#   `features/puerta_placeholders.feature`, Y ESTE CONTRATO NO TIENE NI UN ESCENARIO SOBRE ELLOS.**
+#   La deuda es **de F-01** (feature **`done`**), y `progress/current.md:477-478` ya
 #   declara que cerrarla **exige un escenario nuevo en `features/puerta_placeholders.feature`**.
 #   Hacerlo dentro de F-05 sin ese escenario sería **producción sin test rojo: violación de la
-#   Ley 1**. **Reabrir una feature `done` es decisión del humano.**
+#   Ley 1**. **Reabrir una feature `done` es decisión del humano, y HOY NO LA HA TOMADO: la deuda
+#   de F-01 SIGUE VIVA Y DECLARADA.**
 #   **Lo que F-05 SÍ hace, y está en @s34 Y @s40:** su **propio** humilde **filtra por extensión**
 #   (`/\.(html|css)$/i`), como `ES_HTML = /\.html$/i` en `tools/puerta-cascaron.ts:23` — cuyo
 #   comentario **ya cita el riesgo `.woff2` por su nombre** [V]. **Leer binarios sería un falso
@@ -182,13 +227,17 @@
 #   contenido**, así que **un humilde SIN filtro pasaba las 4 filas**— y **el contrato no nombraba en
 #   ningún punto el mecanismo de anclaje del humilde**. **Ahora @s34 nace rojo si el filtro se rompe,
 #   y @s40 ancla la decisión en el fichero donde vive** (forma `diferidos.test.ts:89-96`).
-# ⏸ **A-28** — `latin-400.css` **NO tiene `unicode-range`** [V] → ese `@font-face` **aplica a TODO
-#   el rango**: un carácter fuera del subset latin **no cae al fallback**, pinta **TOFU, sin
-#   error**. El latin cubre `U+0000-00FF` (ñ, vocales acentuadas, ¿, ¡) → **suficiente para
-#   español**; **un nombre con `Ł`, `ř`, `ğ` daría tofu**. ¿Se añade `latin-ext` (**+6 woff2**) o se
-#   acepta? **Propuesta del lead:** aceptar y declararlo. **Es decisión de PRODUCTO** (¿qué nombres
-#   de clienta se esperan?), no del lead. **Si la puerta añade `latin-ext`, la tabla de @s28 cambia
-#   y este contrato se re-aprueba.**
+# ✅ **A-28 — CERRADA: APROBADA la propuesta del lead — SOLO subset `latin`.** `latin-400.css` **NO
+#   tiene `unicode-range`** [V] → ese `@font-face` **aplica a TODO el rango**: un carácter fuera del
+#   subset latin **no cae al fallback**, pinta **TOFU, sin error**. El latin cubre `U+0000-00FF`
+#   (ñ, vocales acentuadas, ¿, ¡) → **suficiente para español**. **El humano decidió ACEPTARLO**:
+#   `latin-ext` (**+6 woff2**) **NO entra**. **`PARES_DE_FUENTE_ESPERADOS` NO CAMBIA: los 6 pares se
+#   quedan, y la tabla de @s28 se queda tal cual.**
+#   ⚠️ **EL LÍMITE QUEDA DECLARADO POR ESCRITO, QUE ES LA OTRA MITAD DE LA DECISIÓN: un nombre con
+#   `Ł`, `ř` o `ğ` DARÁ TOFU, sin error y sin aviso.** Es **decisión de PRODUCTO tomada a
+#   conciencia**, no un descuido. **`latin-ext` entrará el día que exista un nombre REAL que lo
+#   exija — y entrará CON SU ESCENARIO**, que actualizará @s28 y @s38. **Hoy no existe ese nombre,
+#   así que no hay escenario, y NO SE FINGE QUE LO HAYA.**
 #
 # =============================================================================================
 # 🔴 A-24: POR QUÉ EXISTE F-05 — Y LO QUE ESTE CONTRATO TIENE PROHIBIDO DECIR
@@ -555,8 +604,10 @@
 #   | **F-11** `mapa_como_llegar` | «No hay iframe de Google Maps ni ninguna petición a un tercero»
 #   |   [V: acceptance de F-11] | **CIERRA EN F-11.** F-05 no crea el mapa ni lo prohíbe: cuando
 #   |   F-11 lo intente, **la puerta de F-05 YA ESTARÁ AHÍ** y el `<iframe src>` externo **romperá
-#   |   el build** (@s1). *⏸ La descripción de F-11 arrastra la MISMA atribución falsa que A-24 («la
-#   |   decisión que por sí sola evita el banner de cookies»): al cerrar A-24 hay que corregirla.*
+#   |   el build** (@s1). *✅ La descripción de F-11 arrastraba la MISMA atribución falsa que A-24
+#   |   («la decisión que por sí sola evita el banner de cookies»): **CORREGIDA en la puerta humana
+#   |   del 2026-07-17 — la `puerta_legal` de F-11 ya dice CRITERIO DE PROYECTO, heredado de F-05**.
+#   |   **Que nadie la reintroduzca «de memoria» cuando toque implementar F-11.***
 #   | **F-12** `contacto` | el `<a href>` a Facebook e Instagram | **CIERRA EN F-12.** F-05 **NO LOS
 #   |   TOCA**: son **hiperenlaces**, no piden nada [V] (@s12)
 #   | **F-14** `resenas_agregado_enlace` | el enlace a Treatwell, sin `aggregateRating` | En F-14
@@ -587,7 +638,8 @@
 #   lista) [V, medido]. **Lo mata cualquier escenario con ≥1 origen detectado (@s21). EXCLUIRLO
 #   SERÍA FRAUDULENTO.**
 #
-# **EL MAPA MUTANTE → ESCENARIO (acceptance 5 reescrito por A-23, ⏸ pendiente de puerta):**
+# **EL MAPA MUTANTE → ESCENARIO (acceptance 5 ✅ REESCRITO por A-23, APROBADO EN LA PUERTA HUMANA
+# DEL 2026-07-17 y ya vigente en `feature_list.json` §5):**
 #   | `FilterRemoval` (`.filter(p)` → `origenes`)            | **@s20 y la 1ª fila de @s23**   |
 #   |   [V: medido POR SABOTAJE — los DOS son «allowlist NO vacía que tapa un origen realmente
 #   |   presente», que es el predicado que el propio @s20 enuncia. **«@s20 Y SOLO @s20» era FALSO**
@@ -672,17 +724,20 @@
 #   A1 (`detectarOrigenesExternos(html|css)` devuelve los orígenes externos, con allowlist vacía)
 #      → @s1, @s2, @s3, @s4, @s5, @s6, @s7, @s8, @s9, @s19, @s25, @s34, **@s40** (el filtro
 #      `(html|css)` ANCLADO donde vive), **@s39** (la allowlist `[]` de producción)
-#   A2 ⏸ **NO SE DESTILA TAL CUAL — ES INSATISFACIBLE (A-23).** Se destila la PROPUESTA DEL LEAD:
-#      *«el build falla si el artefacto contiene alguna **PETICIÓN AUTOMÁTICA** a un origen
-#      externo»* → @s26, @s27, @s35 (positivo) y @s10..@s18 (**el negativo, que es lo que hace la
-#      propuesta satisfacible SIN romper F-04 ni F-02, las dos `done`**)
+#   A2 ✅ **REESCRITO Y APROBADO EN LA PUERTA HUMANA (A-23, 2026-07-17).** El texto viejo
+#      (*«CUALQUIER origen externo»*) era **INSATISFACIBLE** y **ya no existe**. La letra vigente de
+#      `feature_list.json` §5 es *«el build falla si el artefacto contiene una **PETICIÓN
+#      AUTOMÁTICA** a un origen externo»* → @s26, @s27, @s35 (positivo) y @s10..@s18 (**el negativo,
+#      que es lo que la hace satisfacible SIN romper F-04 ni F-02, las dos `done`**)
 #   A3 (ni una petición a fonts.googleapis.com ni a fonts.gstatic.com) → @s4, @s26, @s29, **@s39**
 #   A4 (no se solicita `wght@300`) → @s4, @s28, @s29, **@s38**
-#   A5 ⏸ **NO SE DESTILA TAL CUAL — ES INMEDIBLE (A-23)**: pide **un mutante que no existe**. Se
-#      destila la PROPUESTA DEL LEAD, **nombrando mutadores REALES** → @s20 **y la 1ª fila de @s23**
-#      (`FilterRemoval`), @s21 (`BooleanLiteral`), @s23 (`EqualityOperator`, `StringLiteral`,
-#      `MethodExpression`), **@s38 (`ArrayDeclaration` — NO @s30)**, @s24 (`Regex`),
-#      @s7 (`MethodExpression`)
+#   A5 ✅ **REESCRITO Y APROBADO EN LA PUERTA HUMANA (A-23, 2026-07-17).** El texto viejo era
+#      **INMEDIBLE** —pedía **un mutante que no existe** (`.includes`)— y **ya no existe**: la letra
+#      vigente **nombra mutadores REALES** y **prohíbe expresamente pedir que se mute `.includes`**
+#      → @s20 **y la 1ª fila de @s23** (`FilterRemoval`), @s21 (`BooleanLiteral`), @s23
+#      (`EqualityOperator`, `StringLiteral`, `MethodExpression`), **@s38 (`ArrayDeclaration` — NO
+#      @s30)**, @s24 (`Regex`), @s7 (`MethodExpression`). **Umbral 1.0, 0 exclusiones: un
+#      superviviente SE ESCALA AL HUMANO.**
 #   Guarda anti-«verde por vacuidad» + falla cerrada → @s28, @s29, @s30, @s31, @s32, @s33, **@s38**
 #   **Las dos CONSTANTES DE PRODUCCIÓN, que antes no aseveraba NINGÚN escenario** → **@s38**
 #      (`PARES_DE_FUENTE_ESPERADOS`) y **@s39** (la allowlist `[]` del humilde). *Los 34 pasos que
@@ -1496,11 +1551,17 @@ Feature: Cero peticiones automáticas a terceros, fuentes autohospedadas y la pu
     #   - **`url( … )` con espacios NO mata `\s*`→`\S*` del CIERRE**: `[^)]*` ya se come el espacio
     #     final, así que `\s*` casa vacío en las dos ramas. **Sí mata el `\s*` de APERTURA y
     #     `[^)]`→`[)]`.** La fila entra por eso, no por lo que se decía.
-    # 🔴 **SUPERVIVIENTE CONOCIDO Y DECLARADO, NO TAPADO:** `\s*`→`\S*` **del cierre** puede ser
-    # **genuinamente equivalente** con una extracción `[^)]*`. **Si sobrevive, NO SE EXCLUYE EN
-    # SILENCIO: se ESCALA AL HUMANO** (⏸ **A-23**) y se justifica **por escrito** en
-    # `progress/mutation_cero_terceros.md`. *Excluir un mutante que no se sabe matar es lo que este
-    # fichero llama fraudulento en @s21.*
+    # 🔴🔴 **SUPERVIVIENTE CONOCIDO Y DECLARADO, NO TAPADO:** `\s*`→`\S*` **del cierre** puede ser
+    # **genuinamente equivalente** con una extracción `[^)]*`. **Si sobrevive, SE ESCALA AL HUMANO.**
+    # ✅ **A-23 CERRADA EN LA PUERTA DEL 2026-07-17, Y SE CERRÓ POR EL LADO DURO — LEE ESTO DESPACIO,
+    # `tdd_craftsman`:** el humano eligió **(a)** y **RECHAZÓ (b)**. **EL UMBRAL DE F-05 ES 1.0 CON 0
+    # EXCLUSIONES, Y NO HAY NI UN SUPERVIVIENTE `Regex` PREAPROBADO — TAMPOCO ÉSTE.**
+    # **Que este comentario lo nombre NO es una licencia para excluirlo**: es un aviso de dónde va a
+    # doler. **NO se excluye en `stryker.config.json`. NO se justifica en
+    # `progress/mutation_cero_terceros.md`. NO se declara «equivalente» por cuenta propia. NO se baja
+    # el umbral.** **Las dos únicas salidas autorizadas son: (1) una fila más que lo mate —como en
+    # F-03 y F-04, sin tocar producción—, o (2) PARAR Y ESCALAR AL HUMANO.**
+    # *Excluir un mutante que no se sabe matar es lo que este fichero llama fraudulento en @s21.*
     # ⚠️ **Y NADA DE ESTO ES UNA PROMESA DE 100 %:** los 13 supervivientes están medidos sobre **un
     # prototipo desechable**, **no sobre el código real de F-05, que NO EXISTE**. **Otra
     # implementación tendrá otro conjunto.** **Se mide cuando exista, no antes.**
@@ -1689,11 +1750,15 @@ Feature: Cero peticiones automáticas a terceros, fuentes autohospedadas y la pu
     # → **El ancla vive en @s38, y es OBLIGATORIA: sin ella, `ArrayDeclaration` sobre la constante
     # es INMORTAL con `break: 100` — o la lista se saca de `mutate` y su valor de producción no lo
     # asevera nadie, que es LA DEUDA 2 DE F-03 REINTRODUCIDA.**
-    # ⏸ **SI LA PUERTA HUMANA CIERRA A-28 AÑADIENDO `latin-ext`, ESTA LISTA CAMBIA** (+6 woff2) **y
-    # este contrato se re-aprueba.** Hoy se destila la propuesta del lead: **aceptar latin y
-    # declararlo**. **`latin-400.css` NO tiene `unicode-range`** [V] → aplica a **TODO** el rango: un
-    # nombre con `Ł`/`ř`/`ğ` **pinta TOFU, sin error**. El latin cubre `U+0000-00FF` (ñ, vocales
-    # acentuadas, ¿, ¡) → **suficiente para español**.
+    # ✅ **A-28 CERRADA EN LA PUERTA DEL 2026-07-17: SOLO `latin`, Y PUNTO. `latin-ext` NO ENTRA, ASÍ
+    # QUE ESTA LISTA NO CAMBIA: LOS 6 PARES SE QUEDAN TAL CUAL.** El humano aprobó la propuesta del
+    # lead: **aceptar latin y declararlo**.
+    # ⚠️ **EL LÍMITE, DECLARADO — Y LA NOTA SE CONSERVA A PROPÓSITO:** **`latin-400.css` NO tiene
+    # `unicode-range`** [V] → aplica a **TODO** el rango: un nombre con `Ł`/`ř`/`ğ` **pinta TOFU, sin
+    # error**. El latin cubre `U+0000-00FF` (ñ, vocales acentuadas, ¿, ¡) → **suficiente para
+    # español**. **`latin-ext` entrará el día que exista un nombre REAL que lo exija, y ese día
+    # ENTRARÁ CON SU ESCENARIO** (+6 woff2), **que actualizará esta lista y la de @s38**. **Nadie la
+    # amplía sin ese escenario.**
 
   @s29
   Scenario Outline: un conjunto de @font-face DISTINTO del declarado rompe el build, acusando el par
@@ -1927,17 +1992,22 @@ Feature: Cero peticiones automáticas a terceros, fuentes autohospedadas y la pu
     # *(También decía «Son CUATRO de las diez URL que hacen INSATISFACIBLE el acceptance 2»: tampoco
     # cuadraba — los `.js` cargan NUEVE de las diez distintas. Ver la cabecera, donde la prueba de
     # A-23 está ahora separada por alcances.)*
-    # 🔴 **LA FILA DEL `.woff2` ES LA OTRA MITAD, Y ES A-27** ⏸: **F-05 es la PRIMERA feature que
+    # 🔴 **LA FILA DEL `.woff2` ES LA OTRA MITAD, Y ES A-27** ✅ (**CERRADA el 2026-07-17**): **F-05
+    # es la PRIMERA feature que
     # mete BINARIOS en `dist/`**. **Leer binarios sería un FALSO POSITIVO ESPERANDO A OCURRIR**:
     # medido sobre los 108 `.woff`/`.woff2` reales de `@fontsource` leídos con utf8 → **no lanza**,
     # **554.818 U+FFFD**, **0 violaciones HOY**, pero **50.100 SECUENCIAS CANDIDATAS** al regex del
     # teléfono en ese ruido binario [V]. **La puerta de F-05 se protege sola con este filtro.**
-    # ⏸ **LO QUE ESTE ESCENARIO NO HACE, Y ES A-27 — PENDIENTE DE PUERTA HUMANA:**
+    # ✅ **LO QUE ESTE ESCENARIO NO HACE, Y ES A-27 — DECIDIDO POR EL HUMANO EL 2026-07-17: LA DEUDA
+    # SE QUEDA DECLARADA.**
     # **`tools/puerta-placeholders.ts` lista TODOS los ficheros SIN FILTRO DE EXTENSIÓN y hace
-    # `readFileSync(ruta, 'utf8')`** [V]. **F-05 NO LO TOCA, Y ESTE CONTRATO NO TIENE NI UN ESCENARIO
-    # SOBRE ÉL**: la deuda es **de F-01, feature `done`**, y `progress/current.md:477-478` ya declara
+    # `readFileSync(ruta, 'utf8')`** [V]. **F-05 NO LO TOCA —NI ÉL NI
+    # `features/puerta_placeholders.feature`— Y ESTE CONTRATO NO TIENE NI UN ESCENARIO SOBRE ÉL**:
+    # la deuda es **de F-01, feature `done`**, y `progress/current.md:477-478` ya declara
     # que cerrarla **exige un escenario nuevo en `features/puerta_placeholders.feature`**. **Hacerlo
     # dentro de F-05 sin ese escenario sería PRODUCCIÓN SIN TEST ROJO: violación de la Ley 1.**
+    # 🔴 **PARA EL `tdd_craftsman`: NO «arregles de paso» la puerta de placeholders. Está decidido
+    # que NO. La deuda de F-01 sigue VIVA y DECLARADA, y es de otra feature.**
     # *Comprobado end-to-end inyectando un `.woff2` real en `dist/assets/`: **las tres puertas pasan,
     # exit 0** [V]. El falso positivo es **POTENCIAL, no determinista**, y **no se ha observado un
     # fallo real** — pero «0 violaciones» **NO significa que el hueco esté cerrado**: los ficheros que
@@ -1983,8 +2053,10 @@ Feature: Cero peticiones automáticas a terceros, fuentes autohospedadas y la pu
     # A-16 (F-03)**. **Se queda MARCADO como lo que es: F-12 lo añadirá**, y **este escenario es lo
     # que garantiza que, cuando lo haga, el build siga verde**. *Preventivo, no descriptivo.*
     # **LAS OTRAS SIETE de las diez viven en `dist/assets/*.js`, que la puerta NO lee (@s34).**
-    # **CON EL ACCEPTANCE 2 ESCRITO COMO ESTÁ («CUALQUIER origen externo»), ESTE ESCENARIO ES
-    # IMPOSIBLE Y F-04 Y F-02 —LAS DOS `done`— SE ROMPEN.** ⏸ **A-23.**
+    # **CON EL ACCEPTANCE 2 VIEJO («CUALQUIER origen externo») ESTE ESCENARIO ERA IMPOSIBLE Y F-04 Y
+    # F-02 —LAS DOS `done`— SE ROMPÍAN.** ✅ **A-23 CERRADA EL 2026-07-17: el acceptance 2 está
+    # REESCRITO en `feature_list.json` §5 («una PETICIÓN AUTOMÁTICA a un origen externo») y este
+    # escenario es SATISFACIBLE. Es exactamente el escenario que la reescritura vino a salvar.**
     # **Se encadena en `pnpm build` DESPUÉS de `vite-react-ssg build`**, como F-01/F-03/F-04 [V:
     # `package.json`].
 
@@ -2106,9 +2178,12 @@ Feature: Cero peticiones automáticas a terceros, fuentes autohospedadas y la pu
     # existiría — y su valor de producción no lo aseveraría nadie: la deuda 2, otra vez.*
     # ⚠️ **@s38 y @s30 SON DISTINTOS Y LOS DOS HACEN FALTA:** @s38 fija **el VALOR** de la constante;
     # @s30 fija **el COMPORTAMIENTO** de la puerta ante una lista vacía, **venga de donde venga**.
-    # ⏸ **SI LA PUERTA HUMANA CIERRA A-28 AÑADIENDO `latin-ext`, ESTA LISTA CAMBIA** (+6 woff2) **y
-    # este escenario se actualiza con ella** — que es exactamente la gracia de anclarla: **el cambio
-    # es VISIBLE y hay que venir aquí a escribirlo.**
+    # ✅ **A-28 CERRADA EN LA PUERTA DEL 2026-07-17: SOLO `latin`. ESTA LISTA NO CAMBIA — LOS 6 PARES
+    # SE QUEDAN, Y EL LITERAL ESCRITO A MANO DE ESTE ESCENARIO ES EL DEFINITIVO.**
+    # ⚠️ **NOTA CONSERVADA (el límite declarado):** si algún día entra `latin-ext` —**solo cuando
+    # exista un nombre REAL que lo exija, y CON SU PROPIO ESCENARIO**— **esta lista cambiaría** (+6
+    # woff2) **y este escenario se actualizaría con ella**. Que es exactamente la gracia de anclarla:
+    # **el cambio es VISIBLE y hay que venir aquí a escribirlo.**
 
   @s39
   Scenario: 🔴 el humilde pasa la allowlist VACÍA, y lo declara por escrito
@@ -2160,6 +2235,8 @@ Feature: Cero peticiones automáticas a terceros, fuentes autohospedadas y la pu
     # humilde, **se ancla desde un test que lee el fichero**»*] — forma `diferidos.test.ts:89-96`,
     # `readFileSync('tools/puerta-terceros.ts','utf8')`, **aserción contra literal escrito a mano**, y
     # **la referencia «A-27» ESCRITA EN EL PROPIO HUMILDE**, como F-01 escribe «A-21».
-    # ⏸ **A-27 SIGUE ABIERTA Y ESTE ESCENARIO NO LA CIERRA:** ancla **el filtro de F-05**, no la deuda
-    # de `tools/puerta-placeholders.ts`, que es **de F-01 (feature `done`)** y **exige un escenario
-    # nuevo en `features/puerta_placeholders.feature`**. **Reabrir una feature `done` es del humano.**
+    # ✅ **A-27 CERRADA EL 2026-07-17, Y SE CERRÓ ASÍ: LA DEUDA SE QUEDA DECLARADA.** Este escenario
+    # ancla **el filtro de F-05** —que es **lo que F-05 SÍ hace**, y el humano lo aprobó— y **NO** la
+    # deuda de `tools/puerta-placeholders.ts`, que es **de F-01 (feature `done`)** y **exige un
+    # escenario nuevo en `features/puerta_placeholders.feature`**. **El humano decidió NO reabrir
+    # F-01 hoy: la deuda sigue viva y declarada, y F-05 no la toca.**
