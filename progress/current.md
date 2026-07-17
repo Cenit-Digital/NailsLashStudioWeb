@@ -4,11 +4,62 @@
 > (regla anti-teléfono-descompuesto). Al cerrar la sesión, mueve el resumen a
 > `history.md` y deja este archivo con solo esta plantilla.
 
-- **Feature en curso:** ninguna. `5 — cero_terceros` cerrada **`done`** el 2026-07-17
+- **Feature en curso:** `6 — header_nav_footer` (**`spec_ready`**) — **PARADA EN LA PUERTA
+  HUMANA.** Verificación previa, spec y contrato **hechos y commiteados**; **`src/` sin tocar** (el
+  TDD no empieza hasta que caiga la marca `⏸`). `5 — cero_terceros` quedó `done` (resumen en
+  `history.md`).
+- **Proyecto:** **5 done · 1 spec_ready · 10 pending · 4 blocked.**
+
+### 🔴 F-06 está esperándote. SIETE preguntas (B-1..B-7), y las siete son reales.
+
+**Lo hecho (7 commits):** verificación previa (`f06_verificacion_previa.md`, 8 afirmaciones ×
+verificar+refutar, ~1,77 M tokens, **1 recuperación por sobrecarga 529**) · spec
+(`project-spec.md` §Feature 6, 409 líneas) · contrato (`features/header_nav_footer.feature`,
+**20 escenarios**, marca `⏸`) · **revisión adversarial del contrato** (5 lentes, 15 agentes,
+1,18 M tokens → **10 alegados, 4 confirmados: 1 BLOQUEANTE + 3 GRAVES**, 6 falsos) · ronda de
+reparación (5 correcciones, 0 rechazadas).
+
+**El patrón de F-04/F-05, otra vez: ninguna decisión de fondo cae; caen TRES de los cinco criterios
+de aceptación y la `puerta_legal`.**
+
+**El bloqueante que la revisión cazó antes de tu puerta:** la puerta de anclas vivas tiene **dos**
+extractores (anclas + secciones) y **solo el de anclas tenía guarda de vacuidad** → el de secciones
+podía derivar 0 y pasar en verde **con la mutación aún al 100 %** (invisible a la métrica). Añadida
+la guarda gemela.
+
+**Las 7 preguntas abiertas (`⏸`, ninguna cerrada por el lead):**
+
+- **B-1** — la `puerta_legal` (*«SC 2.4.11 foco no oscurecido»*) **roza el AAA**: el listón AA es
+  *«not entirely hidden»*; *«no part hidden»* es el 2.4.12 (AAA). Trampa gemela por **3ª vez**.
+- **B-2** — acceptance @2 (*«scroll-margin no actúa al tabular»*) es **falso** (scroll al Tab es
+  UA-defined) y @4 (*«se deriva de la altura real»*) es **insostenible bajo SSG**.
+- **B-3** — el breakpoint **767 es herencia muerta**; el medido es **793–806px** → propuesta 820px.
+- **B-4** — acceptance @1 (*«TODAS las secciones, no 7 de 11»*) es **insatisfacible** (hoy 2
+  secciones) → igualdad de conjuntos + **puerta de anclas vivas nueva** (el entregable central).
+  Incluye la propuesta de la **regla de «sección navegable»** (reutilizar `REGLA_SECTION` de F-04).
+- **B-5** — 🔴 **¿menú móvil y con qué mecánica?** Propuesta: CSS puro + `aria-expanded` (evita el
+  patrón de memoria, no necesita Radix). Es la bifurcación de la que cuelgan B-3 y B-6.
+- **B-6** — Radix `Dialog` vs `<button aria-expanded>`. Propuesta: **no Radix** (`Portal` deja ciega
+  la anti-404; cero usos en `src/` → sale de `dependencies`).
+- **B-7** — `destacados`/`ofertas` son **huérfanos** (0 features los construyen).
+
+### Hallazgos de F-06 que sobreviven a la feature
+
+- **«No copiar del base» mordió por CUARTA vez**: el **767** es de WebEmpresa (0 en `src/`); el
+  diseño no tiene ni una `@media`.
+- **Un `className={cond?'a':'b'}` en TSX es INMATABLE** bajo la regla anti-clase-CSS (medido: solo
+  muere con `toHaveClass`, prohibido) → estado en `aria-current`/`data-*`.
+- **`Dialog.Portal` de Radix emite CERO en prerender** → dejaría la anti-404 **ciega** («miente por
+  omisión»).
+- **La cabecera tiene CINCO alturas** (231/190/149/108/70px); los **5rem de F-04 son insuficientes
+  <821px**.
+- **Los `.tsx` van a DOS listas**: `mutate` (stryker) **y** `coverage.include` (vitest).
+
+<!-- lo de abajo es el histórico de F-05, ya cerrada -->
+- ~~**Feature en curso:** ninguna. `5 — cero_terceros` cerrada **`done`** el 2026-07-17~~
   (43/43 escenarios, judge **APROBADO**, **576 tests**, mutación **100 %** en `terceros.ts`
   (183 mutantes) y `puerta-terceros.ts` (110), **0 timeouts**, **0 exclusiones**, `pnpm build`
   verde con las **CUATRO puertas**). Resumen completo en `progress/history.md`.
-- **Proyecto:** **5 done · 11 pending · 4 blocked.**
 - **Siguiente:** F-06 `header_nav_footer` (`pending`) — `depends_on: ["cascaron_semantico"]`,
   ya `done`, sin bloqueos. Es el siguiente del camino crítico hacia la UI visible del demo.
   ⚠️ Aquí muerde el patrón de la memoria organizacional **`red-css-para-rama-solo-js-en-ssg`**:
