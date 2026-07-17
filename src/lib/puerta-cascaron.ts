@@ -129,7 +129,15 @@ const ATRIBUTO_LABELLEDBY = /\baria-labelledby\s*=\s*"([^"]*)"/i
 const HEADING_CON_ID = /<h[1-6]\b[^>]*\bid\s*=\s*"([^"]*)"[^>]*>/gi
 
 export function idsDeHeadings(html: string): Set<string> {
-  return new Set([...html.matchAll(HEADING_CON_ID)].map((heading) => heading[1]))
+  return new Set(
+    [...html.matchAll(HEADING_CON_ID)]
+      .map((heading) => heading[1])
+      // Un `id=""` NO identifica a nadie: se descarta. No es cosmético — es lo que permite que
+      // la regla de abajo compare con `?? ''` SIN una condición redundante de `undefined`, que
+      // sería un MUTANTE EQUIVALENTE (ningún test puede distinguir `x === undefined` de
+      // `!ids.has(undefined)` cuando `ids` nunca contiene `undefined`).
+      .filter((id) => id !== ''),
+  )
 }
 
 export const REGLA_JSONLD_AUSENTE = 'JSON-LD ausente'
@@ -497,13 +505,17 @@ function violacionesDeLaPagina(
   const ids = idsDeHeadings(pagina.html)
 
   for (const seccion of pagina.html.matchAll(SECCION)) {
-    const referencia = ATRIBUTO_LABELLEDBY.exec(seccion[1])?.[1]
+    // `?? ''` y NO una rama de `undefined`: `''` no puede ser un id (`idsDeHeadings` los filtra),
+    // así que «sin atributo» y «atributo vacío» caen solos en el `!ids.has(...)`. Una condición
+    // `referencia === undefined || …` sería REDUNDANTE y por tanto un mutante EQUIVALENTE.
+    const referencia = ATRIBUTO_LABELLEDBY.exec(seccion[1])?.[1] ?? ''
 
-    // Las DOS condiciones son la MISMA regla porque son el mismo fallo: la sección no declara en
-    // el CÓDIGO cuál es su título. Y un id que no resuelve es PEOR que no poner el atributo:
-    // promete una relación que el árbol de accesibilidad no puede construir.
-    if (referencia === undefined || !ids.has(referencia)) {
-      acusar(REGLA_SECTION, referencia ?? '')
+    // UNA SOLA condición para los TRES fallos, porque son EL MISMO: la sección no declara en el
+    // CÓDIGO cuál es su título. Sin atributo → `''`; con atributo que no resuelve a un heading →
+    // no está en `ids`. Y un id que no resuelve es PEOR que no poner el atributo: promete una
+    // relación que el árbol de accesibilidad no puede construir.
+    if (!ids.has(referencia)) {
+      acusar(REGLA_SECTION, referencia)
     }
   }
 
@@ -760,12 +772,12 @@ function inspeccionarArtefacto(peticion: PeticionPuertaCascaron): ResultadoPuert
   // vacuidad de la guarda anterior, un nivel más abajo. Cuenta TODOS los href (internos,
   // externos, `tel:`, anclas) porque lo que detecta es que EL EXTRACTOR ESTÁ ROTO, no que el
   // sitio tenga pocos enlaces.
-  const cuantosEnlaces = paginas.reduce(
-    (total, pagina) => total + extraerEnlaces(pagina.html).length,
-    0,
-  )
+  // `.some()` y NO una suma: con `total + …` el mutante `total - …` es EQUIVALENTE —restar de 0
+  // nunca vuelve a 0 salvo que TODO sea 0, que es exactamente el mismo veredicto— y un mutante
+  // equivalente no se mata: solo se excluye. Así, en cambio, `> 0` → `>= 0` MUERE en @s28.
+  const seInspeccionoAlgunEnlace = paginas.some((pagina) => extraerEnlaces(pagina.html).length > 0)
 
-  if (cuantosEnlaces === 0) {
+  if (!seInspeccionoAlgunEnlace) {
     return {
       codigoSalida: CODIGO_FALLO,
       lineas: [

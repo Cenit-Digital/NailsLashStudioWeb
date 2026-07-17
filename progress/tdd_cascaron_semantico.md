@@ -1,18 +1,118 @@
 # F-04 `cascaron_semantico` — bitácora del `tdd_craftsman`
 
-## Estado: 35/35 escenarios implementados por TDD estricto — **CON 3 COSAS QUE DECIDE EL LEAD/HUMANO**
+## Estado: 35/35 escenarios por TDD estricto · **las 3 escaladas, DECIDIDAS Y APLICADAS**
 
 Contrato: `features/cascaron_semantico.feature` (35 escenarios, aprobado por el humano
-2026-07-16). Fuente de verdad de los hechos: `progress/f04_verificacion_previa.md`.
+2026-07-16; **dos correcciones aprobadas el 2026-07-17**). Fuente de verdad de los hechos:
+`progress/f04_verificacion_previa.md`.
 
-**313 tests verdes** · `typecheck` ✅ · `lint` ✅ **0 warnings** · `pnpm build` → **exit 1 A
-PROPÓSITO** (ver §1).
+`typecheck` ✅ · `lint` ✅ **0 warnings** · **`pnpm build` → exit 0, las TRES puertas verdes** ✅
 
 ---
 
-## 🔴 LO QUE TIENE QUE DECIDIR EL LEAD (no lo decido yo)
+## ✅ LAS TRES ESCALADAS, Y CÓMO SE CERRARON (humano, 2026-07-17)
 
-### 1. `pnpm build` AHORA SALE ROJO — y es lo que @s34 ORDENA, no un fallo
+Las tres se **escalaron en vez de forzarlas**, y las tres se resolvieron en la puerta humana.
+Lo que sigue es el estado FINAL; el razonamiento completo de cada una está más abajo.
+
+| # | Escalada | Decisión | Qué se hizo |
+| - | -------- | -------- | ----------- |
+| 1 | **A-21 / build rojo** | **DIFERIR CON ANCLA** | El humilde **no cablea** `registrosSeo` → build **VERDE**. Y el conjunto diferido queda **ANCLADO** contra literal a mano en `src/lib/diferidos.test.ts`. **@s34 se queda: DIFERIDO, NO MUERTO.** |
+| 2 | **@s32, error de hecho** | **SE CORRIGE EL `Then`** | El `.feature` se puso al día con la medición. **Producción NO cambió**: `cabezaDe()` ya era lo correcto. |
+| 3 | **@s18, promesa sin fila** | **SE AÑADE LA FILA** | 4ª fila en el contrato → implementada **por TDD, rojo primero**: `idsDeHeadings` (h1…h6). |
+
+### 1. A-21 → DIFERIR **CON ANCLA** (y el ancla es lo que lo salva de ser un cajón)
+
+**El conflicto que escalé:** @s34 ordena que el build de producción rompa (*«el código de salida
+es distinto de 0»*, «CONSECUENCIA BUSCADA» ×5). **Medido, funcionaba exactamente así**:
+
+```
+$ pnpm build ; echo $?
+✓ Puerta del cascarón: … horneados el idioma, el title, la description, la canónica…
+  ✗ flag esPlaceholder en seo.origenCanonica: "https://example.invalid"
+✗ Puerta de placeholders: el build de producción NO puede publicarse.
+1
+```
+
+Pero el **radio era del proyecto entero**: `harness init`, `verify` y la **CI en rojo
+permanente**, y F-05…F-20 desarrollándose contra ese rojo — *y un rojo que siempre está rojo
+deja de ser señal*. Es el «verde por vacuidad» del revés.
+
+**Decisión del humano: (b) diferir**, con el precedente exacto de **A-11** (F-02 dejó el email
+fuera de `registros` por lo mismo) — **y con el ancla que yo mismo eché en falta**: mi aviso era
+que diferir dejaba @s34 en **teatro**. El ancla es lo que lo convierte en guarda de verdad:
+
+- `tools/puerta-placeholders.ts` **no cablea** `registrosSeo` → **`pnpm build` exit 0**.
+- **`src/lib/diferidos.test.ts`** fija el conjunto diferido EXACTO contra un **literal escrito a
+  mano**: `['seo.origenCanonica', 'site.email']`. **Si alguien difiere un tercero, ROJO.**
+  Anti-tautología: el literal a mano, **nunca** derivado de `registrosSeo`.
+- Es **la lección de `MINIMO_DE_PARES`** (deuda 2 del judge en F-03) aplicada por delante: *una
+  guarda que nadie ancla se desactiva en silencio*. Sin ancla, «diferido» es un cajón donde cabe
+  todo.
+- **@s34 SE QUEDA y está DIFERIDO, NO MUERTO**: prueba el MECANISMO (F-01 + `registrosSeo` →
+  exit ≠ 0 nombrando `seo.origenCanonica`), y `diferidos.test.ts` prueba que hoy **no está
+  cableado a propósito**. Cuando el cliente elija dominio, **el placeholder desaparece solo**
+  (se cambia el dato y el flag en `seo.ts`): **no hay que acordarse de recablear nada**.
+
+**VERIFICADO POR SABOTAJE, no por fe** (el método de `MINIMO_DE_PARES`):
+
+| Sabotaje | Qué cae |
+| -------- | ------- |
+| Difiero un **tercer** dato (`seo.tercerDato`, placeholder) | ✗ `el conjunto de datos DIFERIDOS es exactamente el aprobado` (1 failed / 4 passed) |
+| **Cableo** `registrosSeo` en el humilde | ✗ `el humilde de F-01 NO cablea registrosSeo, y lo declara por escrito` (1 failed / 4 passed) |
+| Restaurado | **5/5 verdes** |
+
+Cada sabotaje mata **exactamente su test**, ni uno más: el ancla muerde donde dice que muerde.
+
+### 2. @s32 → EL CONTRATO SE PUSO AL DÍA CONMIGO (producción no cambió)
+
+**Lo que escalé, y era un ERROR DE HECHO del contrato.** Su `Then` decía:
+
+> *«el HTML CRUDO de dist/ NO contiene ningún `<title>` ni ninguna `<meta name="description">»*
+
+**Falso, y lo medí sobre un build SSG real** (`.experimentos-tmp/react19-nativa/dist/index.html`):
+
+```html
+<head><meta charset="UTF-8"><script type="module" src="/assets/app-ti4oL6dR.js"></script></head>
+<body><div id="root" data-server-rendered="true"><title>Nails Lash Studio</title>
+<meta name="description" content="…"><link rel="canonical" href="…">…
+```
+
+`renderToString` **NO hoistea** la metadata de React 19 al `<head>`: **LA EMITE EN EL `<body>`**.
+El artefacto **SÍ contiene** el `<title>`; lo que sale **VACÍO es el `<head>`** — que es lo que
+el mecanismo verificado siempre dijo (`f04_verificacion_previa.md` §1) y lo único que importa.
+**La decisión era correcta; la letra, falsa.** El patrón del proyecto, otra vez.
+
+🔴 **Y ES EL HALLAZGO MÁS VALIOSO DE LA FEATURE, PORQUE CASI ME LA CUESTA:** mi primera puerta
+buscaba el `<title>` con regex **en el documento entero**. Lo encontraba **en el `<body>`** y
+**NO acusaba**. **Rompió por accidente** —el JSON-LD del fixture estaba incompleto y saltó por
+`JSON-LD sin name`—; **con un JSON-LD completo, el bug de React 19 habría pasado la puerta EN
+VERDE**. Es decir: **mi puerta era TAN CIEGA COMO JSDOM al único bug que F-04 existe para
+prevenir**, y la suite entera lo habría certificado. **@s32 se pagó a sí mismo en su primera
+ejecución.**
+
+→ `cabezaDe(html)` acota las 4 reglas del `<head>` al `<head>`, y hay un test que **fija el
+hallazgo** (`@s32 el <title> SÍ está en el artefacto, pero DENTRO DEL <body>`) para que nadie
+«simplifique» `cabezaDe` dentro de seis meses. El `Then` corregido ya está en el `.feature`.
+
+### 3. @s18 → LA FILA NUEVA, IMPLEMENTADA POR TDD
+
+La regla se llamaba *«section sin aria-labelledby A UN HEADING REAL»* y **ninguna de sus 3 filas
+lo probaba**: ninguna distinguía un `<h2 id="x">` de un `<div id="x">` → **el coladero estaba
+abierto justo en la forma que la prosa quiere prohibir**. **No lo implementé sin fila** (habría
+sido producción que ningún test rojo pide + **mutante inmortal**).
+
+El humano añadió la 4ª fila → implementado **rojo primero** (cayó **solo** la fila nueva):
+`idsDeHeadings` = ids que cuelgan de `h1`…`h6`, **y nada más**: el contrato **no** fija
+`role="heading"` ni `aria-level`, y **no se inventan**. `idsDe` se eliminó: quedó muerta.
+Importa más que ninguna otra fila porque **@s18 es la ÚNICA de las diez reglas que mide
+`SC 1.3.1` de verdad**: sin ella, el acceptance 1 no estaba protegido.
+
+---
+
+## Apéndice: el razonamiento original de la escalada 1 (se conserva)
+
+### `pnpm build` salía ROJO — y era lo que @s34 ORDENA, no un fallo
 
 El objetivo que me diste dice «`pnpm build` verde, 0 warnings». **Es incompatible con @s34**, y
 gana el contrato. Medido:
@@ -200,6 +300,55 @@ ancla). La guarda **NO nace en rojo**. No hubo que volver a la puerta.
    necesita `HelmetProvider` porque la cáscara emite con `<Head>`. pnpm es estricto y no deja
    importar una transitiva. Está documentado en el propio test que **ese test NO vigila el SEO y
    no puede**: es jsdom.
+
+## Lo que enseñó la mutación (y no fue poco)
+
+Los ficheros nuevos son `src/lib/seo.ts` y `src/lib/puerta-cascaron.ts`. **Toda la medición a
+`--concurrency 1 --timeoutMS 60000`**, fichero a fichero, y **leyendo `# timeout` ANTES que el
+score** (regla dura del arnés, `docs/verification.md`): **0 timeouts en todas las tandas**, así
+que los scores son honestos. `placeholders.ts`/`puerta.ts`/`site.ts`/`contraste.ts`/
+`puerta-contraste.ts` **no se re-miden**: están intactos y **añadir tests nunca baja un score**.
+
+**`seo.ts`: 13 supervivientes → 0.** Y ninguno exigía tocar el contrato: **eran todos míos**.
+- **8** eran valores que yo mismo declaré como «interpretación» y **no aseveré** (`@context`,
+  `telephone`, `streetAddress`, y los mensajes de error partidos en tres literales).
+- **2** eran mensajes de error sin anclar: es **el superviviente exacto de F-01** (`@s22`, un
+  motivo vaciado cumplía «…contenga la frase»). La puerta **acusa**, no gruñe.
+- **3** eran del regex `/^https?:\/\/[^/?#\s]+$/` — quitar el `^`, el `$` y el `?`. **El `^` es
+  literalmente el superviviente que apareció en F-03.** Matarlos habría exigido **filas nuevas**
+  en @s6 (puerta humana). **Se eliminaron POR DISEÑO**, no excluyéndolos: `URL.canParse(x) &&
+  new URL(x).origin === x`. No hay ancla que quitar → no hay mutante. Y de paso murió el
+  **equivalente** `catch { return false }` → `catch {}` (undefined es falsy igual que false):
+  sin `catch`, no hay equivalente que excluir. **Es la lección 4 de F-03 aplicada dos veces.**
+
+**`puerta-cascaron.ts`: 58 supervivientes → 0.** Tres lecciones:
+1. **La ruta feliz no prueba a los extractores.** Los escenarios los ejercitaban solo por el
+   camino bueno: **su ROBUSTEZ no la fijaba nadie** (la caja, el espaciado del `=`, los atributos
+   de más, `<h10>` vs `<h1>`, un `<meta>` sin `name`). Un extractor que deja de casar hace que la
+   puerta pase **«protegidos» sin haber mirado** — el verde por vacuidad de @s28 un nivel más
+   abajo. → Se prueban **directamente**, como F-03 hizo con `extraerTokens`/`hexARgb`.
+2. **Casi ningún test miraba el `valor`.** Se podían **vaciar TODOS los `valor` del informe** y
+   la suite seguía verde: «la puerta acusa, no gruñe» es media feature y no lo fijaba nadie.
+3. **Tres equivalentes, los tres eliminados cambiando el DISEÑO** (nunca excluidos):
+   - `referencia === undefined || !ids.has(referencia)` → la primera condición era **redundante**
+     (`Set<string>.has(undefined)` siempre es `false`). Se filtran los `id=""` en
+     `idsDeHeadings` y queda `!ids.has(referencia ?? '')`.
+   - `total + …` → `total - …` en la cuenta de enlaces: **equivalente**, porque restar de 0 nunca
+     vuelve a 0 salvo que todo sea 0 — el mismo veredicto. Se cambió a `.some(… > 0)`, y así
+     `> 0` → `>= 0` **muere**.
+   - El `catch` de `esOrigenAbsoluto` (arriba).
+
+**Y dos huecos REALES que la mutación destapó, no cosméticos:**
+- 🔴 **La mitad «DUPLICADO» de la regla del `lang` se podía borrar en silencio.** La fila de @s15
+  es `<html lang="xx" lang="es">`, y ahí el primero **ya es distinto de `es`** → lo cazaba el
+  chequeo del VALOR, y el del RECUENTO **no hacía falta**. Con `lang="es" lang="es"` (duplicado,
+  ambos correctos) **solo acusa el recuento**. Sin ese test, `langs.length !== UN_SOLO_LANG` se
+  podía quitar sin romper nada. **No es regla nueva: la regla ya dice «duplicado».**
+- 🔴 **Dos páginas SIN canónica no son dos páginas con la misma canónica.** Sin el `continue` del
+  `null`, todas se registraban bajo la clave `null` y la puerta habría acusado «canónica
+  repetida» **encima** de «canónica ausente» — una violación **inventada**.
+
+**0 mutantes excluidos** (F-01 necesitó 1, F-02 otro). **0 `Stryker disable` en F-04.**
 
 ## Honestidad sobre el proceso (Ley 3)
 

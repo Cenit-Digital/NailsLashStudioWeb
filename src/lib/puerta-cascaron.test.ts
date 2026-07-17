@@ -1318,3 +1318,239 @@ describe('el informe acusa el VALOR encontrado, no solo la regla', () => {
     expect(resultado.lineas).toEqual(['/ — h1 ausente o más de uno: "0"'])
   })
 })
+
+/**
+ * EL `valor` DE CADA VIOLACIÓN, ANCLADO UNA A UNA.
+ *
+ * La mutación destapó que se podían VACIAR casi todos los `valor` del informe y la suite seguía
+ * verde: los escenarios contaban violaciones y miraban la regla, pero no lo que la puerta ACUSA.
+ * «La puerta acusa, no gruñe» es media feature (@s13, @s15, @s21, @s25) y no la fijaba nadie.
+ * El `valor` vacío es SIGNIFICATIVO: dice «no había nada», que es distinto de «había esto malo».
+ */
+describe('el valor de cada violación está anclado', () => {
+  it('sin name, el valor es la cadena vacía: no había nada que enseñar', () => {
+    const violaciones = inspeccionarSitio(
+      [paginaCompleta('/', { jsonLd: jsonLdModificado((n) => delete n.name) })],
+      ['/'],
+    )
+
+    expect(violaciones).toEqual([{ ruta: '/', regla: 'JSON-LD sin name', valor: '' }])
+  })
+
+  it('sin address, el valor es la cadena vacía', () => {
+    const violaciones = inspeccionarSitio(
+      [paginaCompleta('/', { jsonLd: jsonLdModificado((n) => delete n.address) })],
+      ['/'],
+    )
+
+    expect(violaciones).toEqual([{ ruta: '/', regla: 'JSON-LD sin address', valor: '' }])
+  })
+
+  it('con streetAddress ausente, el valor es la cadena vacía', () => {
+    const violaciones = inspeccionarSitio(
+      [
+        paginaCompleta('/', {
+          jsonLd: jsonLdModificado(
+            (n) => delete (n.address as unknown as Record<string, unknown>).streetAddress,
+          ),
+        }),
+      ],
+      ['/'],
+    )
+
+    expect(violaciones).toEqual([{ ruta: '/', regla: 'address incompleta', valor: '' }])
+  })
+
+  it('sin geo, el valor es la cadena vacía', () => {
+    const violaciones = inspeccionarSitio(
+      [paginaCompleta('/', { jsonLd: jsonLdModificado((n) => delete n.geo) })],
+      ['/'],
+    )
+
+    expect(violaciones).toEqual([{ ruta: '/', regla: 'geo ausente', valor: '' }])
+  })
+
+  it('sin JSON-LD, el valor es la cadena vacía', () => {
+    expect(inspeccionarSitio([paginaCompleta('/', { jsonLd: null })], ['/'])).toEqual([
+      { ruta: '/', regla: 'JSON-LD ausente', valor: '' },
+    ])
+  })
+
+  it('sin nodo del tipo acordado, el valor es la cadena vacía', () => {
+    expect(
+      inspeccionarSitio([paginaCompleta('/', { jsonLd: jsonLdConTipo('LocalBusiness') })], ['/']),
+    ).toEqual([{ ruta: '/', regla: 'ningún nodo con tipo efectivo BeautySalon', valor: '' }])
+  })
+
+  it('una section SIN aria-labelledby acusa el valor vacío: no había atributo', () => {
+    expect(
+      inspeccionarSitio(
+        [paginaCompleta('/', { secciones: '<section><div class="titulo">S</div></section>' })],
+        ['/'],
+      ),
+    ).toEqual([
+      { ruta: '/', regla: 'section sin aria-labelledby a un heading real', valor: '' },
+    ])
+  })
+
+  // Un `aria-labelledby=""` es «sin atributo» a efectos de la regla: no identifica a nadie.
+  it('una section con aria-labelledby vacío también es violación', () => {
+    expect(
+      inspeccionarSitio(
+        [paginaCompleta('/', { secciones: '<section aria-labelledby=""><h2 id="x">S</h2></section>' })],
+        ['/'],
+      ),
+    ).toHaveLength(1)
+  })
+
+  it('la ruta esperada ausente acusa con el valor vacío', () => {
+    expect(inspeccionarSitio([], ['/'])).toEqual([
+      { ruta: '/', regla: 'ruta esperada sin HTML en dist/', valor: '' },
+    ])
+  })
+})
+
+/**
+ * LOS HUECOS QUE QUEDABAN EN EL RECORRIDO Y EN LAS GUARDAS, todos destapados por la mutación.
+ */
+describe('los huecos del recorrido y de las guardas', () => {
+  // `langsDe` sobre un documento SIN <html>: la rama del `null` no la ejercitaba nadie porque
+  // TODOS los fixtures traen <html>. Sin ella, `elemento[1]` reventaría.
+  it('langsDe sobre un fragmento SIN elemento html devuelve [] y no revienta', () => {
+    expect(langsDe('<p>ni html ni nada</p>')).toEqual([])
+    expect(langsDe('')).toEqual([])
+  })
+
+  /**
+   * 🔴 DOS PÁGINAS SIN CANÓNICA NO SON DOS PÁGINAS CON LA MISMA CANÓNICA.
+   * El `continue` del `null` no lo fijaba nadie: sin él, las páginas sin canónica se registrarían
+   * TODAS bajo la misma clave `null` y la puerta acusaría «canónica repetida» ENCIMA de «canónica
+   * ausente» — una violación INVENTADA sobre un fallo que ya se acusa por su vía.
+   */
+  it('dos rutas SIN canónica acusan «canónica ausente» cada una, y NUNCA «canónica repetida»', () => {
+    const violaciones = inspeccionarSitio(
+      [paginaCompleta('/', { canonica: null }), paginaCompleta('/servicios', { canonica: null })],
+      ['/', '/servicios'],
+    )
+
+    expect(violaciones).toHaveLength(2)
+    expect(violaciones.map((una) => una.regla)).toEqual(['canónica ausente', 'canónica ausente'])
+  })
+
+  // El flag `i` de los landmarks: el HTML no es sensible a la caja y `<MAIN>` es un main.
+  it.each([['<MAIN>x</MAIN>', 'main'], ['<NAV>x</NAV>', 'nav'], ['<FOOTER>x</FOOTER>', 'footer']])(
+    'el landmark %s cuenta aunque venga en mayúsculas',
+    (etiqueta, landmark) => {
+      const html = htmlCrudo({ landmarks: ['main', 'nav', 'footer'] }).replace(
+        new RegExp(`<${landmark}[^>]*>`, 'i'),
+        etiqueta.split('>')[0] + '>',
+      )
+
+      expect(inspeccionarSitio([{ ruta: '/', html }], ['/'])).toEqual([])
+    },
+  )
+
+  /**
+   * EL ESPACIADO ALREDEDOR DEL `=` ES OPCIONAL EN HTML (`rel="x"` ≡ `rel = "x"`). Los extractores
+   * lo toleran, y la mutación destapó que NINGÚN test lo fijaba: se podía romper la tolerancia y
+   * la suite seguía verde. Un extractor que deja de casar hace que la puerta pase «protegidos»
+   * sin haber mirado — el verde por vacuidad de @s28, un nivel más abajo.
+   */
+  it('canonicaDeLaPagina tolera el espaciado alrededor del = en rel y en href', () => {
+    expect(
+      canonicaDeLaPagina(cabezaDe('<head><link rel = "canonical" href = "https://example.invalid/"></head>')),
+    ).toBe('https://example.invalid/')
+  })
+
+  it('extraerEnlaces tolera el espaciado alrededor del = en href', () => {
+    expect(extraerEnlaces('<a href = "/servicios">x</a>')).toEqual(['/servicios'])
+  })
+
+  it('idsDeHeadings tolera el espaciado alrededor del = en id', () => {
+    expect([...idsDeHeadings('<h2 id = "x">T</h2>')]).toEqual(['x'])
+  })
+
+  it('un id="" en un heading NO identifica a nadie: se descarta', () => {
+    expect([...idsDeHeadings('<h2 id="">T</h2>')]).toEqual([])
+  })
+
+  it('la section tolera el espaciado alrededor del = en aria-labelledby', () => {
+    expect(
+      inspeccionarSitio(
+        [paginaCompleta('/', { secciones: '<section aria-labelledby = "x"><h2 id="x">S</h2></section>' })],
+        ['/'],
+      ),
+    ).toEqual([])
+  })
+
+  it('leerJsonLd tolera el espaciado alrededor del = en type', () => {
+    expect(leerJsonLd('<script type = "application/ld+json">{"a":1}</script>').estado).toBe('leido')
+  })
+
+  /**
+   * El `$` de `/(^|\/)index\.html$/`: SOLO el `index.html` FINAL es el fichero de entrada de una
+   * ruta. Sin el ancla, `index.html.html` se destroza («/.html») en vez de tratarse como lo que
+   * es: un fichero cualquiera. Es el mismo `^`/`$` que fue el superviviente REAL de F-03.
+   */
+  it('rutaDelFichero solo trata como entrada el index.html FINAL', () => {
+    expect(rutaDelFichero('dist/index.html.html')).toBe('/index.html.html')
+    expect(rutaDelFichero('dist/mi-index.html')).toBe('/mi-index.html')
+  })
+})
+
+/**
+ * LOS TRES ÚLTIMOS HUECOS, todos destapados por la mutación y todos del mismo tipo: código
+ * defensivo o tolerante que la ruta feliz nunca ejercita. Es donde se esconde el verde por
+ * vacuidad: si el extractor deja de casar, la puerta pasa «protegidos» sin haber mirado.
+ */
+describe('los últimos huecos de los extractores', () => {
+  /**
+   * El `?.` de la lectura de atributos. El `index.html` REAL trae `<meta charset="UTF-8">`, que
+   * NO tiene atributo `name` [V: index.html del repo]. Sin el `?.`, `exec(...)` devuelve `null`
+   * y `null[1]` REVIENTA la puerta al leer la description de CUALQUIER página real.
+   */
+  it('descripcionDe no revienta con metas que no tienen atributo name (el charset del index real)', () => {
+    expect(
+      descripcionDe(cabezaDe('<head><meta charset="UTF-8"><meta name="description" content="x"></head>')),
+    ).toBe('x')
+  })
+
+  it('canonicaDeLaPagina no revienta con links que no tienen atributo rel', () => {
+    expect(
+      canonicaDeLaPagina(cabezaDe('<head><link href="/a.css"><link rel="canonical" href="https://example.invalid/"></head>')),
+    ).toBe('https://example.invalid/')
+  })
+
+  /**
+   * El `[^>]*` que va DESPUÉS del `type`: el dist real escribe `<script data-rh="true"
+   * type="application/ld+json">` —con el atributo ANTES—, así que la cola no se ejercitaba nunca
+   * y se podía romper sin que nada se enterara. El orden de los atributos no lo fija nadie.
+   */
+  it('leerJsonLd casa el script con atributos DESPUÉS del type', () => {
+    expect(leerJsonLd('<script type="application/ld+json" data-x="1">{"a":1}</script>').estado).toBe(
+      'leido',
+    )
+  })
+
+  /**
+   * 🔴 LA GUARDA DEL EXTRACTOR VIGILA AL EXTRACTOR, NO AL SITIO (@s28). Con `.every()` en vez de
+   * `.some()`, una página legítima SIN enlaces —perfectamente posible— rompería el build entero
+   * aunque el extractor funcione de sobra en las demás. Lo que detecta la guarda es que el
+   * extractor ESTÁ ROTO, y para eso basta con que UNA página tenga enlaces.
+   */
+  it('@s28 una página sin enlaces no rompe el build si OTRA sí los tiene: el extractor funciona', () => {
+    const resultado = ejecutarPuertaDelCascaron({
+      artefacto: artefactoCon(
+        ficheroDe('dist/index.html', { canonica: 'https://example.invalid/', enlaces: ['/'] }),
+        ficheroDe('dist/servicios/index.html', {
+          canonica: 'https://example.invalid/servicios',
+          enlaces: [],
+        }),
+      ),
+      rutasEsperadas: ['/', '/servicios'],
+    })
+
+    expect(resultado.codigoSalida).toBe(0)
+    expect(resultado.lineas).toEqual([])
+  })
+})

@@ -345,6 +345,13 @@ describe('el origen de la canónica es un PLACEHOLDER (@s34)', () => {
   // El 2º `And` del escenario es lo que IMPIDE LA DUPLICACIÓN: si la violación la emitiera la
   // puerta del cascarón, alguien habría reimplementado F-01 dentro de F-04.
   it('@s34 la puerta del CASCARÓN no dice nada del origen: no duplica la de F-01', () => {
+    // 🔴 EL ANCLA VA PRIMERO, Y NO ES ADORNO: con `REGLAS_DEL_CASCARON = []` los dos `not
+    // .toContain` de abajo pasarían VACUAMENTE — un verde por vacuidad DENTRO del test que
+    // persigue la duplicación. Lo destapó la mutación (el mutante `[]` sobrevivía).
+    expect(REGLAS_DEL_CASCARON.length).toBeGreaterThanOrEqual(10)
+    expect(REGLAS_DEL_CASCARON).toContain('title ausente o vacío')
+    expect(REGLAS_DEL_CASCARON).toContain('href interno sin fichero en dist/')
+
     expect(REGLAS_DEL_CASCARON.join(' ')).not.toContain('placeholder')
     expect(REGLAS_DEL_CASCARON.join(' ')).not.toContain('origen')
   })
