@@ -1253,7 +1253,564 @@ violaciones → build verde → «protegidos».*
 
 ---
 
-### Las 16 features restantes
+### Feature 5: `cero_terceros` — la petición que nunca sale, y la puerta que lo demuestra
+
+> Feature `#5` de `feature_list.json`. `depends_on: []` **[V]** — no depende de nada y nada la
+> bloquea. Entrega un **invariante** que **F-11** (mapa), **F-12** (contacto) y **F-14**
+> (reseñas) **heredan** pero **cierran en su propia feature** (ver «Alcance»).
+>
+> **Toda esta sección es coherente con `progress/f05_verificacion_previa.md`** (16 subagentes,
+> 8 afirmaciones × verificar + refutar: **0 refutadas de raíz, 8 de 8 con algo tumbado**).
+> Donde `feature_list.json` §5, el troceado de `docs/research/00-fase0-informe.md` o esta
+> sección contradigan a esa verificación, **manda la verificación**. Se contradicen en **tres
+> puntos graves**: el **acceptance 2**, la **`puerta_legal`** y la **descripción** → **A-23** y
+> **A-24**.
+>
+> Es el patrón de F-04, otra vez y más fuerte: **la decisión es correcta; el porqué escrito es
+> falso.** Ninguna decisión de F-05 cae. Lo que cae son los porqués.
+
+#### Cómo se acordó esta sección — **declarado por escrito, sin fingir nada**
+
+**No hubo conversación de spec con el humano para F-05, y esta sección no la simula.** El humano
+**delegó** esta fase en el `craftsman_lead` **hasta la puerta de aprobación del `.feature`**, que
+sigue **en pie** y es donde entran las cuatro preguntas abiertas. La contraparte humana la
+sostienen **decisiones ya registradas** —`progress/current.md` §«Decisiones tomadas con el
+humano» (**6**: solo fuentes públicas; **9**: el build de producción falla si queda contenido no
+verificado) y `docs/research/00-fase0-informe.md`— **más la verificación previa**, que es quien
+ha hecho de adversario en lugar del humano: tumbó algo en las ocho afirmaciones.
+
+**Lo que esta sección NO puede cerrar** —y no cierra— es lo que cambia los criterios de
+aceptación o `feature_list.json`. Eso es la puerta.
+
+#### Propósito
+
+Que **el artefacto de producción no contenga ninguna construcción que provoque, sin acción del
+usuario, una petición a un origen que no sea el propio sitio**; y que una **puerta mecánica** lo
+demuestre en cada build sobre el **HTML y el CSS crudos de `dist/`**, con **allowlist vacía**.
+
+#### Por qué existe — y **por qué la justificación heredada es una atribución normativa falsa**
+
+`feature_list.json` §5 dice hoy `"puerta_legal": "RGPD (evita el análisis de corresponsabilidad
+de Fashion ID) + art. 22.2 LSSI (sin cookies → sin banner)"`, y su descripción promete que
+sostener el invariante «**elimina banner, CMP y política de cookies de un plumazo**». **Este
+contrato no hereda ninguna de las dos frases.**
+
+- **El art. 22.2 LSSI no dice «cookies»** **[V]**. Regula «**dispositivos de almacenamiento y
+  recuperación** de datos en equipos terminales», y está redactado como **permiso condicionado**,
+  no como prohibición.
+- **«Google Fonts no almacena nada en el equipo» es FALSO como hecho** **[V, medido
+  2026-07-17]**: ni `fonts.googleapis.com` ni `fonts.gstatic.com` devuelven `Set-Cookie` —
+  **pero** el `.woff2` devuelve `Cache-Control: public, max-age=31536000`. **La caché es
+  almacenamiento.**
+- **Si ese cacheo activa el 22.2 es [NV], y en los DOS sentidos** (las dos ramas están **[V]**):
+  a favor, CEPD *Directrices 2/2023* v2.0 párr. 50 («does constitute storage, at the very least
+  through the caching mechanism») — dicho de *tracking pixels*, sobre el art. 5(3) ePD, cuya
+  letra es **disyuntiva**; en contra, la transposición española y la **Guía de cookies de la
+  AEPD (mayo 2024)** lo formulan en **conjuntivo y con finalidad** (§1 pág. 8: «…**para almacenar
+  y recuperar datos** de un equipo terminal»), y **la caché de un `.woff2` almacena pero no
+  recupera datos del terminal**. **No hay pronunciamiento de AEPD ni de CEPD sobre CDNs de
+  fuentes** **[V]**.
+- **Autoalojar ≠ cero almacenamiento.** El `.woff2` **propio también se cachea**. Lo que
+  autoalojar da es **cero terceros**, que es otra cosa.
+- Lo único que se sostiene sin inferencia: **el art. 22.2 no obliga a poner banner por cargar una
+  fuente** — o porque no entra en su ámbito, o porque entraría en la excepción del párrafo 3.º.
+  **En ninguna de las dos ramas justifica F-05.**
+
+> **La justificación correcta de F-05 es un CRITERIO DE PROYECTO, no una norma:**
+>
+> **«Autoalojamos las fuentes para que el sitio no haga ninguna petición a dominios de terceros;
+> así ningún tercero recibe la IP del visitante y no hace falta ningún análisis jurídico.»**
+>
+> Es **decisión del editor**, **es suficiente por sí sola**, y **no cuelga de ninguna cita**.
+
+**Y por eso es «la decisión de mayor apalancamiento»** — pero no por lo que decía el troceado. No
+deroga ninguna obligación (no puede). Lo que hace es **sustituir un análisis jurídico por un
+hecho mecánico verificable en cada build**: un invariante que la puerta sostiene **no hay que
+volver a discutirlo**, y **F-11, F-12 y F-14 lo heredan sin repetir el razonamiento**. El
+apalancamiento es **de proceso**, no normativo.
+
+**PROHIBIDO en este contrato, en el Gherkin y en el código** (§6 de la verificación): «art. 22.2
+LSSI» como justificación · «sin cookies → sin banner» · «elimina banner, CMP y política de
+cookies» · «lo exige la AEPD» · «Google Fonts no pone cookies → fuera del 22.2» · «autoalojar =
+cero almacenamiento» · «Fashion ID obliga a autohospedar» · **«obligatorio» sin sujeto explícito**
+(todo «obligatorio» se lee «obligatorio **para** \<quién\>»). *Es la misma regla que F-04 ya
+tuvo que escribir para schema.org ≠ Google.*
+
+##### Fashion ID: lo que sí se puede decir, y con qué marca
+
+**[I] por analogía razonada — y NO se pudo re-verificar en fuente primaria el 2026-07-17.**
+EUR-Lex devuelve **HTTP 202 / 2.035 B de challenge AWS-WAF** en las tres variantes,
+`publications.europa.eu` da **404** sobre el `cellar:`, y curia sirve un shell SPA **[V: medido
+hoy]**. *El repo ya lo tenía resuelto y marcado antes que nadie:* `docs/research/legal-rgpd.md:410-416`
+dice literalmente que el salto **botón social → fuente tipográfica** es «**una analogía razonada,
+no un pronunciamiento**… **Un tribunal podría distinguir ambos casos. [I]**», y `:575` lo tabula
+como «discutible [I]». **Nadie puede ascender esa [I] a certeza.**
+
+Cuando se pueda releer, el **ap. 85 afirma Y LUEGO limita**, y **quien lo cite debe reproducir
+las dos frases**: «…**can be considered to be a controller** […] **That liability is, however,
+limited to** the operation … in respect of which it **actually determines the purposes and
+means**…». `jointly` (corresponsabilidad) aparece **solo en el ap. 84** **[V]**. Y
+**`font`/`typeface` = 0 ocurrencias** en la sentencia (64.423 caracteres, EN y ES) **[V]** → **la
+analogía es NUESTRA, no de la sentencia**.
+
+→ Autohospedar es una **TÉCNICA SUFICIENTE** elegida por el proyecto, **nunca una obligación**.
+→ **F-05 NO prohíbe ni condiciona el `<a href>` a Facebook de `site.ts:47`** invocando Fashion
+ID: el predicado fáctico del ap. 27 es la transmisión **automática**, «regardless of whether or
+not he or she … **has clicked**», y `hyperlink` = **0 ocurrencias** en la sentencia **[V]**.
+→ No citar «art. 2(d) Directiva 95/46»: **derogada**; vigente **RGPD art. 26** **[V]**.
+
+#### 🔴 La distinción técnica que ES la feature: **petición automática ≠ hiperenlace**
+
+**Esta es la mitad de F-05, y el HTML Living Standard la nombra él mismo** (§4.6.1), clasificando
+los `<link>` en **external resource link** frente a **hyperlink** **[V, literal]**:
+
+> «These are links to resources that are to be used to augment the current document, generally
+> automatically processed by the user agent. **All external resource links have a fetch and
+> process the linked resource algorithm** which describes how the resource is obtained.»
+
+> «These are links to other resources that are **generally exposed to the user** by the user
+> agent **so that the user can cause the user agent to navigate** to those resources…»
+
+**Sin esta distinción, F-05 es insatisfacible.** Medido sobre el `dist/` real de HEAD hay **diez
+orígenes externos**, y **ni uno solo es una petición a un tercero** **[V, §0 de la
+verificación]**: cuatro namespaces XML del bundle de React, dos URLs de mensajes de error de
+React, `schema.org` del JSON-LD de **F-04** (feature **`done`**), `example.invalid` (la canónica,
+TLD reservado RFC 2606, deliberado) y el `<a href>` a Facebook. **El acceptance 2 escrito como
+«CUALQUIER origen externo» no se puede satisfacer jamás y rompería F-04** → **A-23**.
+
+##### Qué DEBE detectarse (provoca una petición sin que el usuario haga nada)
+
+| Construcción | Fundamento |
+| --- | --- |
+| `<link rel="stylesheet">`, **incluido `rel="alternate stylesheet"`** | §4.6.8.23: «stylesheet […] **creates an external resource link**» **[V]** |
+| `<link rel="preload"/"modulepreload"/"prefetch"/"icon"/"manifest">` | *External resource links* **[V]** |
+| `<script src>`, `<img src>`, `<img srcset>`, `<source src>`, `<source srcset>`, `<track src>`, `<iframe src>`, `<embed src>`, `<object data>`, `<use href>` | Subrecursos: se piden al procesar el documento **[V]** |
+| `@import` y **cualquier `url()`** del CSS (incluido el `src` de `@font-face`) | El `url()` de `@font-face` es **letra normativa**: css-fonts-4 §4.8.1 **[V]** |
+| `<link rel="preconnect">` y `<link rel="dns-prefetch">` | ⚠️ **CRITERIO DE PROYECTO, no letra** (ver abajo) |
+| `url()` en reglas CSS **no aplicadas** (p. ej. `background-image`) | ⚠️ **CRITERIO DE PROYECTO, no letra** (ver abajo) |
+
+##### Qué NO debe detectarse (y por qué marcarlo sería un **falso positivo sostenido por spec**)
+
+| Construcción | Fundamento |
+| --- | --- |
+| `<a href="https://www.facebook.com/…">` | **NO pide nada antes del clic**: solo al *follow the hyperlink* — **acción del usuario** **[V]** |
+| `<link rel="canonical">` | §4.6.8.4: «This keyword creates **a hyperlink**». Tabla normativa: `canonical — Effect on link: Hyperlink` **[V]** |
+| `xmlns="http://www.w3.org/2000/svg"` | *Namespaces in XML* §3: «**It is not a goal that it be directly usable for retrieval** of a schema» **[V]** |
+| `"https://schema.org"` en el JSON-LD de F-04 | HTML Standard: un `<script type="application/ld+json">` es «**a data block, which is not processed by the user agent**» **[V]**. **El navegador ni lo parsea** → no puede originar conexión alguna |
+| `"https://react.dev/errors/"`, `"http://fb.me/…"` en un `.js` | Un **literal de cadena no es una construcción de fetch** **[V: `react.react-server.production.js:14` lo concatena en un mensaje de error]** |
+| `<link rel="stylesheet" disabled>` | §4.6.8.23, *linked resource fetch setup steps*: «If el's disabled attribute is set, then **return false**» **[V]** |
+
+> **Nota sobre `schema.org`:** quien **sí** puede dereferenciar el `@context` es un **procesador
+> JSON-LD** (Googlebot, un validador, `jsonld.js`) — **nunca el navegador que renderiza**. La
+> invariante complementaria **real** es prohibir cargar en cliente cualquier librería que ejecute
+> el *Context Processing Algorithm*; **medido: este repo no carga ninguna** **[V]**. Y `schema.org`
+> viaja en el bundle **por el grafo de imports** (`home.tsx:3` importa `construirJsonLd` con un
+> import **estático** → Rollup inlinea `const Wi="https://schema.org"`), **no por la hidratación**
+> **[V, medido]**.
+
+##### 🔴 La regla del **conjunto tokenizado** de `rel` — el falso negativo que casi se cuela
+
+Deducir «`rel="alternate"` es *Hyperlink*, luego no detectar» **de la fila-resumen de la tabla**
+es **falso**, y habría dejado pasar **una petición real a un tercero**. La letra que la desarrolla
+manda, §4.6.8.1 **[V, literal]**:
+
+> «If the element is a link element and the rel attribute **also contains the keyword
+> stylesheet** […] The alternate keyword **modifies the meaning of the stylesheet keyword** […]
+> **The alternate keyword does not create a link of its own.**»
+
+→ **`<link rel="alternate stylesheet" href="https://cdn.tercero.com/x.css">` SÍ SE PIDE.**
+
+> **REGLA DURA de F-05:** la clasificación se hace sobre el **conjunto tokenizado** de `rel`
+> (tokens separados por espacio, *ASCII case-insensitive*), **nunca sobre la cadena completa ni
+> sobre un solo token**. **La tabla de §4.6.8 es un RESUMEN; cuando la sección del keyword
+> desarrolla su significado, manda la sección.**
+
+##### Los dos ejes que la spec NO decide → **criterio de proyecto, y se declara como tal**
+
+1. **`preconnect` / `dns-prefetch` CUENTAN** como origen externo. Son *external resource links*
+   pero **no descargan recurso**: abren TCP/TLS o resuelven DNS. **Ninguna spec decide el eje por
+   nosotros; hay que elegir uno y no mezclarlos.** El eje de F-05 es **«contacto con un origen
+   externo sin acción del usuario»** — porque **el tercero recibe la IP igual**, que es
+   exactamente lo que esta feature previene. *Alternativa descartada:* el eje «petición HTTP de un
+   recurso» → dejaría pasar un `preconnect` a un CDN, que entrega la IP sin descargar un byte.
+2. **`url()` en reglas CSS no aplicadas SE MARCA.** **Solo `@font-face` tiene letra normativa**
+   (css-fonts-4 §4.8.1: «user agents **must only download** those fonts that are referred to
+   within the style rules **applicable** to a given page» **[V]**). Para `background-image`
+   **ninguna spec dice CUÁNDO se pide** — css-values-4 §4.5.4 y css-images-4 §2.3 solo definen
+   **CÓMO** **[V]**. Que Chrome no lo pida es **comportamiento observado, NO letra**. Y **un
+   analizador estático no puede evaluar qué reglas aplican** → **criterio conservador**.
+   *Alternativa descartada:* fiarse del comportamiento observado de un motor → convierte la puerta
+   en rehén de una implementación no escrita.
+
+##### `<base href>` es un **MODIFICADOR**, no un origen
+
+`<base href="https://cdn.tercero.com/">` **no pide nada**, pero convierte `<img src="a.png">` en
+una petición a un tercero **[V]**. → **Las URL se resuelven contra `base` ANTES de clasificarlas.**
+
+#### Alcance — qué entra, qué NO entra, y **el hueco conocido**
+
+**Entra en F-05:**
+
+- Los **6 imports** de `@fontsource` autohospedados (abajo), y la **baja** de las dos
+  dependencias muertas.
+- **`src/lib/terceros.ts`** (detector puro) + **`src/lib/puerta-terceros.ts`** (decisor puro) +
+  **`tools/puerta-terceros.ts`** (el humilde), encadenada en `pnpm build`.
+
+**NO entra en F-05** (alcance mínimo; decisión del humano ya tomada: **una feature a la vez**):
+
+| Feature | Qué hereda | Dónde cierra |
+| --- | --- | --- |
+| **F-11** `mapa_como_llegar` | «No hay iframe de Google Maps ni ninguna petición a un tercero» **[V: acceptance de F-11]** | **En F-11.** F-05 no crea el mapa ni lo prohíbe: cuando F-11 lo intente, **la puerta de F-05 ya estará ahí** y el `<iframe src>` externo romperá el build. *La descripción de F-11 arrastra la MISMA atribución falsa que A-24 («la decisión que por sí sola evita el banner de cookies»): al cerrar A-24 hay que corregirla también.* |
+| **F-12** `contacto` | El `<a href>` a Facebook e Instagram | **En F-12.** F-05 **no los toca**: son **hiperenlaces**, no piden nada **[V]** |
+| **F-14** `resenas_agregado_enlace` | El enlace a Treatwell, sin `aggregateRating` | **En F-14** |
+| **F-06/F-07** | **Aplicar** las familias a los elementos | **En F-06/F-07.** F-05 **hornea los `@font-face`; no escribe ni un `font-family` de uso.** *Consecuencia declarada, no oculta:* mientras nada referencie una familia, **el navegador no descarga su woff2** (css-fonts-4 §4.8.1 **[V]**). **No afecta al invariante** —cero terceros se cumple igual— y la puerta sigue midiendo lo que debe: que los `@font-face` **horneados** no apuntan a ningún origen externo |
+
+##### 🔴 El HUECO CONOCIDO — se declara, **no se cierra**
+
+El acceptance dice **`(html|css)`**. Por tanto: **un `fetch('https://tercero…')` desde el JS del
+bundle NO lo cazaría esta puerta.** **Hoy no existe ninguno** **[V, medido §0: las únicas URL de
+los `.js` son literales de cadena de mensajes de error y namespaces XML]**. **Es deuda declarada,
+no un problema resuelto.** *Alternativa descartada:* extender la puerta al JS de `dist/assets/` →
+la verificación lo desaconseja expresamente (**«NO grepear `https?://` sobre `dist/assets/*.js`:
+falsos positivos garantizados»** **[V]**), y distinguir un `fetch` real de un literal exige
+analizar el AST de un bundle minificado. **Eso es otra feature, con sus escenarios.**
+
+##### 🔴 La deuda de binarios es de **F-01**, no de F-05 → **A-27**
+
+**F-05 es la primera feature que mete binarios en `dist/`.** Medido, sin suponer nada:
+
+- **NO rompe** la puerta del cascarón (`tools/puerta-cascaron.ts:23` filtra `ES_HTML = /\.html$/i`,
+  y su comentario **ya cita el riesgo `.woff2` por su nombre** **[V]**) ni la de contraste (solo
+  lee `_tokens.scss`).
+- **SÍ activa el camino de la deuda en `tools/puerta-placeholders.ts`**, que lista **todos** los
+  ficheros **sin filtro de extensión** y hace `readFileSync(ruta, 'utf8')` **[V]**. Leyendo los
+  108 `.woff`/`.woff2` reales de `@fontsource` con utf8: **no lanza**, **554.818 U+FFFD**,
+  **0 violaciones HOY**, pero **50.100 secuencias candidatas** al regex del teléfono en ese ruido
+  binario **[V]**. Comprobado además **end-to-end** inyectando un `.woff2` real en `dist/assets/`:
+  **las tres puertas pasan, exit 0** **[V]**.
+
+> **El falso positivo es POTENCIAL, no determinista, y no se ha observado un fallo real.** Pero
+> «0 violaciones» **no significa que el hueco esté cerrado**: los ficheros que entran en `dist/`
+> tras el pipeline de Vite **no son byte a byte** los de `node_modules`.
+>
+> 🔴 **F-05 NO TOCA `tools/puerta-placeholders.ts`.** La deuda es **de F-01**, y
+> `progress/current.md:477-478` ya declara que cerrarla **exige un escenario nuevo en
+> `features/puerta_placeholders.feature`** — feature **`done`**. Hacerlo dentro de F-05 sin ese
+> escenario sería **producción sin test rojo: violación de la Ley 1**. → **A-27**.
+
+**Lo que F-05 sí hace:** **su propio humilde filtra por extensión** (`/\.(html|css)$/i`), como
+`ES_HTML` en `tools/puerta-cascaron.ts:23`. **Leer binarios sería un falso positivo esperando a
+ocurrir**, y eso es justo lo que valida el alcance `(html|css)` del acceptance.
+
+#### Las fuentes — **el diseño NO usa las del base**
+
+**Medido sobre el prototipo (`Opcion-1-Rosa.dc.html`), no heredado** **[V]**:
+
+| Familia | Uso real | Pesos | Import exacto |
+| --- | --- | --- | --- |
+| **Manrope** | cuerpo, botones, nav | 400, 500, 600, 700 | `@fontsource/manrope/latin-400.css` · `latin-500.css` · `latin-600.css` · `latin-700.css` |
+| **Gilda Display** | todos los `h2`/`h3`, precios | 400 | `@fontsource/gilda-display/latin-400.css` |
+| **Great Vibes** | el «Nails Lash» del hero | 400 | `@fontsource/great-vibes/latin-400.css` |
+
+**6 imports, 6 woff2, 119.540 bytes** **[V, verificado instalando de verdad: `@fontsource` 5.2.8;
+las tres familias existen; OFL-1.1 permite autohospedar — «to use, study, copy, merge, embed,
+modify, redistribute»]**. **`font-weight: 300` → 0 ocurrencias** en el prototipo, que sin embargo
+pide `Manrope:wght@300;400;500;600;700`: **el 300 no se usa jamás** **[V, medido]** → acceptance 4.
+
+> 🔴 **`@fontsource/dm-sans` y `@fontsource/outfit` están en `package.json` y NO se importan en
+> ningún sitio** **[V]**. Son **herencia muerta de WebEmpresa** — la lección «no copiar del base»
+> mordiendo **por tercera vez**: F-03 los tokens, F-04 el JSON-LD, F-05 las fuentes. **F-05 les da
+> de baja.** *(No es «producción sin test»: quitar una dependencia no es código. Lo ancla el
+> escenario del conjunto exacto de `@font-face`, abajo.)*
+
+**Por qué NO `index.css` ni `400.css`** — **es la TRAMPA INVERSA a la que sugiere el nombre**
+**[V, medido]**: `import '@fontsource/manrope'` **no trae todos los pesos**: trae **solo el 400, en
+los 6 subsets**. Faltarían 500/600/700 **en silencio** (faux-bold sintético, **sin error en
+consola**). Y `400.css` **también** trae los 6 subsets. **Solo `latin-<peso>.css` trae uno**
+(medido: 1 `@font-face`, 0 `unicode-range`).
+
+**Por qué NO `@fontsource-variable`** **[V, medido]** — **el fallo silencioso más caro de la
+lista**: (a) solo existe para **Manrope** (las otras dos dan **404**); (b) **no tiene `latin.css`**
+→ en variable no se puede importar solo-latin y `dist` se comería los 6 subsets; (c) **renombra la
+familia a `'Manrope Variable'`** → si el SCSS dice `'Manrope'`, **la fuente no carga y cae al
+fallback sin ningún error**.
+
+**Otros hechos medidos que el diseño tiene que respetar:**
+
+- **`font-display: swap` sale por defecto: 176/176 `@font-face`**, y es el único valor presente —
+  **pero es un hecho MEDIDO, no documentado** **[V]**: la doc oficial no lo menciona, y un bump de
+  versión podría cambiarlo sin romper ninguna promesa escrita. → **si se vigila, se mide; no se
+  fía.** *(No está en el acceptance: propuesta subordinada a **A-23**.)*
+- **0 referencias a `googleapis`/`gstatic`** en todo el árbol de los paquetes **[V]** → acceptance 3.
+- **Cada `@font-face` emite `woff2` Y `woff`** (`url(…woff2) format('woff2'), url(…woff)
+  format('woff')`) y **Vite emite los dos** → **12 ficheros en `dist` para 6 usados** **[V]**.
+  Coste de `dist`, **no de red**.
+
+#### Contrato
+
+**`src/lib/terceros.ts` — el detector PURO (mutable):**
+
+| | |
+| - | - |
+| **Entrada** | `detectarOrigenesExternos(recursos, allowlist)`. `recursos` = `{ubicacion, tipo: 'html'\|'css', contenido: string}[]` — **los BYTES de `dist/`**. **No lee ficheros, ni el reloj, ni `process.env`** |
+| **Salida** | `OrigenExterno[]`: `{ubicacion, construccion, origen, valor}`. Vacío = no se detectó ninguno. **La puerta ACUSA, no gruñe** (precedente F-01/F-03/F-04) |
+| **`allowlist`** | 🔴 **PARÁMETRO. Es la única NECESIDAD del diseño** (ver «Mutantes»). **Sin `default`** |
+| **Determinismo** | Misma entrada → misma salida, **mismo orden**. Informe diffable |
+
+**La aserción del CSS es NEGATIVA y por LISTA BLANCA DE ESQUEMAS** **[V, §4]**: ningún `url()`
+del CSS de `dist` puede tener esquema `http(s)` **ni ser protocol-relative (`//host/…`)** — solo
+rutas **root-absolutas** `/assets/…` o `data:`. Tres razones medidas, y las tres importan:
+
+1. **La ruta es ROOT-ABSOLUTA** (`url(/assets/…woff2)`), **no relativa** **[V]**. *Una puerta que
+   exigiera `url(./…)` da falso negativo.* (`vite.config.ts` **no declara `base`** → `base = '/'`
+   **[V]**.)
+2. **Vite 7 NO exime a las fuentes del inlining** **[V]**: `build.assetsInlineLimit` = **4096 B**;
+   el único opt-out por extensión es `.html` y `.svg` con `#`; **`grep -rn 'woff'` sobre la lógica
+   de assets de Vite 7 → cero resultados**. Un `.woff2` de <4096 B se vuelve
+   `data:font/woff2;base64,…` y **NO deja fichero en `dist/assets`**. Hoy no ocurre **solo porque
+   el `.woff2` más pequeño mide 6.192 B**: es un **hecho de tamaño, no una garantía**. → **La
+   puerta NO puede asumir que existe un fichero `.woff2` en disco.**
+3. Una **lista negra** (`grep https?://`) es **exactamente lo que la verificación prohíbe**: sobre
+   `dist/assets/*.js` da falsos positivos garantizados (`fb.me`, `react.dev`, `w3.org`) y sobre
+   `dist/*.html` casa `example.invalid` **[V]**. *Alternativa descartada.*
+
+**`src/lib/puerta-terceros.ts` — el decisor PURO (mutable):**
+
+| | |
+| - | - |
+| **Entrada** | `ejecutarPuertaDeTerceros(peticion)` con `{leerArtefacto, leerConfigVite, allowlist, paresDeFuenteEsperados}` |
+| **Salida** | `{codigoSalida, lineas}`. `CODIGO_EXITO = 0` / `CODIGO_FALLO = 1` |
+| **Quién decide el exit code** | **No la función.** `tools/puerta-terceros.ts` es el **humilde**: cablea `node:fs`, `node:process` y el `exit`; **filtra por extensión** `/\.(html\|css)$/i`; **imprime `  ✗ <línea>` por stderr** y `✓ …` por stdout si exit 0; **sin lógica, sin fichero de test propio, fuera de `mutate`**. Se encadena en `pnpm build` **después** de `vite-react-ssg build`, como F-01/F-03/F-04 **[V: `package.json`]**. **`dev` no la invoca** |
+
+##### 🔴 El puerto: **decidido a conciencia — F-05 NO lleva `existe*`**
+
+**«Las tres puertas comparten un patrón exacto» es FALSO: es 2 de 3** **[V]**. **F-03 no tiene
+interfaz de puerto ni ningún `existe*`**: su puerto es **un campo suelto** en la petición
+(`readonly leerScss: () => string`) con contrato de **una sola mitad** («LANZA si el fichero no
+existe, que es lo que hace `readFileSync`»).
+
+> **El `existe*` es CONDICIONAL, no dogma:** solo hace falta cuando la puerta necesita
+> **distinguir «el artefacto no está» de «el artefacto está y está mal»** para informar por la
+> rama correcta. **F-04 lo necesita** (@s26 exige acusar **qué ruta falta**). **F-05 no**: si
+> `dist/` no existe, `readdirSync` lanza, el `catch` **falla cerrada** con «la puerta de terceros
+> no pudo completar la inspección: <motivo>», y **eso ya es informativo y correcto** — no hay
+> ningún escenario que exija una línea distinta. **Y sin escenario que la exija, `existe*` sería
+> producción sin test rojo y un mutante inmortal.** Prescribírselo a F-05 «porque las otras lo
+> tienen» sería atribuir a un patrón algo que el patrón no dice.
+
+→ **Puerto de F-05, forma F-03:** dos campos sueltos, **`leerArtefacto()`** y
+**`leerConfigVite()`**, **los dos LANZAN si el fichero/directorio no existe** (es lo que hacen
+`readdirSync`/`readFileSync`). **Lo INVARIANTE y lo único que se copia sin pensar:** el contrato
+del puerto va **escrito junto al puerto**, y **el doble del test lo honra — lanza donde el real
+lanza** (lección @s20 de F-01).
+
+##### 🔴 La puerta asevera la **config `base`**, además de la salida
+
+**`base` es la vía nº1 por la que un tercero entra sin que nadie lo escriba** **[V, medido con un
+build real]**: `base: 'https://cdn.evil.example/x/'` reescribe **todos** los `url()` →
+`url(https://cdn.evil.example/x/assets/…woff2)`. **Un solo campo de config invalida el «nunca
+externo».**
+
+→ **Regla:** `leerConfigVite()` devuelve **el texto** de `vite.config.ts` (forma F-03:
+`leerScss`), y una función **pura** decide: **`base` no declarada** (hoy **[V]**) o declarada
+**exactamente `'/'`** → pasa; cualquier otra cosa → **violación**.
+
+**Las dos aserciones son complementarias, y ninguna sobra** — hay que escribirlo o alguien
+borrará una por «redundante»:
+
+- **La de la salida** cubre `--base` por CLI y `experimental.renderBuiltUrl`, que **no viven en
+  `vite.config.ts`**: la puerta corre **después** del build y ve el `url()` ya reescrito, con
+  esquema `http(s)` → lo caza.
+- **La de la config** cubre el commit: deja **rastro en el diff** y rompe el build **en el sitio
+  donde está la causa**, no tres capas más abajo. *Una puerta que solo dice «hay un origen
+  externo en `dist/assets/x.css`» manda al siguiente a buscar el porqué.*
+
+##### 🔴 La guarda anti-vacuidad: **lista declarada, no mínimo mágico**
+
+*Sin guarda, `dist/` vacío → 0 orígenes → build verde → «protegidos».* Es A-8 en F-01, @s14/@s15
+en F-03, @s26/@s27 en F-04. **Aquí es obligatoria.** Hay dos formas en el repo y **se elige la de
+F-04**:
+
+```
+PARES_DE_FUENTE_ESPERADOS = [
+  ['Manrope', 400], ['Manrope', 500], ['Manrope', 600], ['Manrope', 700],
+  ['Gilda Display', 400], ['Great Vibes', 400],
+]
+```
+
+La puerta exige que **el conjunto de `@font-face` del CSS de `dist` sea EXACTAMENTE éste** —
+ni uno más, ni uno menos.
+
+**Por qué esta forma y no `MINIMO_DE_PARES = 18` (F-03):**
+
+1. **Crece con el diseño**: nadie tiene que acordarse de subir un número. Es el argumento que ya
+   ganó en F-04 (`RUTAS_ESPERADAS`).
+2. **Un mínimo aquí sería frágil por una razón ajena a la feature**: el número de ficheros CSS de
+   `dist` es un detalle de **chunking y hash de Vite**; subirlo o bajarlo por un cambio de
+   bundler no dice nada sobre terceros.
+3. 🔴 **Contra Stryker, el literal numérico no ancla nada.** **Medido hoy sobre el registro
+   autoritativo `allMutators` (`mutate.js`) del instrumenter 9.6.1 instalado: 16 mutadores, y
+   ninguno muta literales numéricos** **[V]**. `MINIMO_DE_PARES = 18` **no genera mutante**: su
+   valor en F-03 es **anclar contra humanos** (borrar una fila rompe el build y hay que venir a
+   bajar el número a mano), que es real pero es otra cosa. **`ArrayDeclaration`, en cambio, SÍ
+   ataca la lista** (`['a','b']` → `[]` **[V: `array-declaration-mutator.js`]**) → y la **guarda
+   de la guarda** (lista vacía → **FALLO**, precedente @s27) **lo mata**. **La forma elegida es la
+   que se puede demostrar viva.**
+4. **Mata dos pájaros**: es la guarda anti-vacuidad **y** es el escenario del **acceptance 4** (el
+   `wght@300` entraría como un `@font-face` de peso 300 en `dist` → **conjunto distinto →
+   violación**). *Y se asevera sobre el **artefacto**, no sobre los imports de `src/`: la
+   filosofía de F-04.*
+
+**Anti-tautología (regla dura del arnés):** la lista esperada del **escenario** se escribe **a
+mano** (`'Manrope'`, `400`), **jamás** se importa `PARES_DE_FUENTE_ESPERADOS` de producción ni se
+recomputa con la función vigilada. *Si el test importa la constante que debería vigilar, no
+vigila nada.*
+
+**[I] declarado, que el TDD debe medir en su primer test:** que el nombre de familia sobrevive al
+CSS **minificado** de `dist` (Vite no renombra identificadores CSS, pero **puede quitar las
+comillas**) → la comparación es sobre el nombre **destokenizado y sin comillas**, y **eso se mide,
+no se supone**.
+
+#### Casos límite debatidos
+
+1. **`rel="alternate stylesheet"` a un tercero → SE DETECTA.** El falso negativo que la
+   fila-resumen de la tabla induce. **Escenario obligatorio**, o la regla del conjunto tokenizado
+   no está anclada en ningún sitio.
+2. **`rel="stylesheet" disabled` → NO se detecta.** Marcarlo sería **falso positivo sostenido por
+   spec** **[V]**. **Escenario obligatorio**: sin él, «detectar todo stylesheet» pasa igual.
+3. **`<a href>` a Facebook → NO se detecta.** Es el dato real de `site.ts:47` **[V]** y es de
+   **F-12**. Sin escenario, alguien «endurece» la puerta y **rompe el contacto del salón**.
+4. **`<link rel="canonical" href="https://example.invalid/">` → NO se detecta.** Es la canónica
+   **deliberada** de F-04 (feature **`done`**, TLD reservado RFC 2606) **[V]**. **Sin este
+   escenario, F-05 rompe F-04.**
+5. **`schema.org` en el JSON-LD → NO se detecta.** Idem: es F-04, `done`, y es un **data block**
+   **[V]**.
+6. **`xmlns="http://www.w3.org/2000/svg"` en un SVG en línea del HTML → NO se detecta** **[V]**.
+7. **`<base href="https://cdn.tercero.com/">` + `<img src="a.png">` → SE DETECTA** (la petición
+   es al tercero). **Resolver contra `base` antes de clasificar** **[V]**.
+8. **`preconnect`/`dns-prefetch` a un tercero → SE DETECTA** (criterio de proyecto declarado).
+9. **`url()` protocol-relative `//cdn.tercero.com/x.woff2` → SE DETECTA.** *Es el hueco clásico de
+   toda lista blanca escrita como «empieza por `http`».*
+10. **`url(data:font/woff2;base64,…)` → NO se detecta.** No es una petición: es el propio byte. Y
+    **puede aparecer solo por el `assetsInlineLimit` de 4096 B** **[V]** — sin este escenario, un
+    `.woff2` que adelgace por debajo del límite **rompería el build sin motivo**.
+11. **`dist/` sin ningún `@font-face` → FALLO** (guarda anti-vacuidad), **no «0 orígenes, verde»**.
+12. **`PARES_DE_FUENTE_ESPERADOS` vacío → FALLO** (la guarda de la guarda, @s27 de F-04): con la
+    lista vacía, «el conjunto coincide» se satisface **vacuamente** y la guarda **se desactiva
+    sola**.
+13. **`base` declarada distinta de `/` → FALLO**, aunque el CSS de `dist` esté limpio.
+14. **Allowlist NO vacía que tapa un origen realmente presente → NO se reporta.** Es el escenario
+    que **mata a `FilterRemoval`** (ver abajo). **No es una concesión: es lo que hace medible el
+    invariante «allowlist vacía».**
+15. **`dist/` inexistente → falla cerrada** por el `catch`, con el motivo. **Nunca `[]` ni verde.**
+    *Una puerta que se traga su excepción y devuelve «0 violaciones» es **peor que ninguna**: es
+    literalmente cómo se evaporaron los 3 bloqueantes AA del stack base* **[V]**.
+
+#### Modos de error
+
+- **Origen externo detectado** → **exit ≠ 0** + informe legible: **una línea por origen**, con
+  **ubicación, construcción, origen y valor**.
+- **Conjunto de `@font-face` distinto del declarado** (incluido el vacío) → **exit ≠ 0**, acusando
+  **qué par sobra o falta**.
+- **`PARES_DE_FUENTE_ESPERADOS` vacío** → **exit ≠ 0** con línea propia.
+- **`base` declarada distinta de `/`** → **exit ≠ 0** con línea propia, **nombrando `vite.config.ts`**.
+- **Error de la propia puerta** (incluido `dist/` o `vite.config.ts` ausentes) → **build roto,
+  nunca build verde** (derivación de D-9/I-8, **[I]**, igual que F-01, F-03 y F-04).
+
+#### Mutantes que deben morir (I-6, umbral 1.0)
+
+**Lo que es NECESIDAD y lo que es TÉCNICA SUFICIENTE — separado, porque soldarlos es la cadena
+causal falsa que la verificación tumbó:**
+
+- 🔴 **NECESIDAD, y es lo único necesario: la allowlist entra como PARÁMETRO.** Si se cablea
+  (`const ALLOWLIST = []` dentro del fichero mutado), **ningún test puede pasar una no vacía** y
+  **`FilterRemoval` es genuinamente inmatable** **[V, medido ejecutando node]**.
+- **TÉCNICA SUFICIENTE (una entre varias, NO una necesidad): que no haya literal de array en el
+  fichero mutado** → **parámetro sin `default`**, y **el `[]` lo pasan el humilde y los tests**
+  (los tests **no se mutan**). *No es la única salida: `array-declaration-mutator.js` solo dispara
+  sobre `isArrayExpression()` o un callee llamado exactamente `Array`, así que un default
+  `new Set<string>()` **tampoco** genera el mutante* **[V]**. **Un default `= []` es la PEOR
+  opción**: el literal sigue ahí, `ArrayDeclaration` lo **RELLENA** con `["Stryker was here"]`
+  (🔴 **contraintuitivo: sobre array vacío rellena, sobre array no vacío quita** **[V]**), y el
+  100 % **solo se alcanzaría con un fixture grotesco** cuyo origen sea el token literal `Stryker
+  was here`. *No es «inalcanzable» — eso era demasiado fuerte —, es indefendible.*
+- 🔴 **Lo que mata a `FilterRemoval` NO es el diseño del parámetro: es el ESCENARIO** (allowlist
+  **no vacía** que tape un origen **realmente presente**, caso límite 14). **Son dos cosas
+  independientes.**
+- 🔴 **Quitar el `!` de `!allowlist.includes(o)` NO es equivalente** (devuelve `[]` en vez de la
+  lista) **[V, medido]**. **Lo mata cualquier escenario con ≥1 origen detectado. Excluirlo sería
+  FRAUDULENTO.**
+
+**Mutantes que los escenarios tienen que matar:**
+
+- **`ArrayDeclaration` sobre `PARES_DE_FUENTE_ESPERADOS`** (`[…]` → `[]`) → **muere en la guarda
+  de la guarda** (caso 12).
+- **`BooleanLiteral`** (el `!` del predicado de allowlist) → **muere en cualquier escenario con un
+  origen detectado**.
+- **`FilterRemoval`** (`.filter(p)` → `origenes`) → **muere solo en el caso 14**.
+- **`EqualityOperator` y `StringLiteral`** en la comparación de origen/esquema → **mueren en el
+  escenario de comparación exacta** (casos 9 y 10).
+- **`MethodExpression`**: los únicos pares reales que aplican aquí son
+  **`endsWith`⇄`startsWith`**, **`every`⇄`some`**, **`filter`→(eliminado)** y
+  **`toLowerCase`⇄`toUpperCase`** **[V: `method-expression-mutator.js`, 22 claves]**.
+- **`Regex`**: si la tokenización de `rel` o la extracción de `url()` usa anclas, **`^`/`$` se
+  mutan** → escenario de anclas. *Precedente medido: en F-03 el `^` fue **el único superviviente
+  real del repo**.*
+
+> 🔴 **DOS AVISOS SOBRE EL ACCEPTANCE 5, que hoy es INMEDIBLE** → **A-23**:
+> 1. **`.includes` NO es mutado por Stryker 9.6.1** **[V, por dos vías independientes: el mapa
+>    `replacements` de `method-expression-mutator.js` tiene 22 claves y ninguna es `includes`; y
+>    la página oficial no contiene la palabra «includes»]**. **`.some` solo** existe como destino
+>    de `every`→`some`.
+> 2. *«Mutar la comparación de origen **o el predicado de allowlist** rompe un test»* **nombra «el
+>    predicado» sin decir qué mutador lo ataca** → **no se puede medir**. La redacción tiene que
+>    **nombrar mutadores reales**.
+>
+> Y: **«exactamente dos equivalentes» sería una PREDICCIÓN, no una medición.** El fichero de F-05
+> **no existe** (`grep -rln "allowlist|detectarOrigenes" src/` → nada **[V]**). **Otra
+> implementación tendrá otro conjunto. Se mide cuando exista, no antes.**
+
+**Higiene de medición, no negociable** (`docs/verification.md`): añadir **`src/lib/terceros.ts` y
+`src/lib/puerta-terceros.ts`** a la lista `mutate` de `stryker.config.json` · **todo cálculo
+dentro del `it`**, nunca en el `describe` (`perTest`) · leer **`# timeout` y `tests per mutant`
+ANTES que el score** · **una sola tanda** de Stryker a la vez · acotar con `--mutate <fichero>`,
+**JAMÁS con `--testFiles`**.
+
+#### Preguntas abiertas de esta feature — **PENDIENTE DE PUERTA HUMANA**
+
+**Las cuatro van a la puerta. El lead propone; NO cierra ninguna.**
+
+- **A-23** — 🔴 **la que bloquea el Gherkin.** Los **acceptance 2 y 5** son insatisfacible e
+  inmedible: *«el build falla si el artefacto contiene CUALQUIER origen externo»* (10 orígenes
+  medidos hoy, **ninguno una petición**; borrarlos es imposible y **rompería F-04, que está
+  `done`**) y *«mutar … el predicado de allowlist»* (pide **un mutante que no existe**).
+  **Propuesta del lead:** reescribir el 2 como *«ninguna **PETICIÓN AUTOMÁTICA** a un origen
+  externo»* y el 5 **nombrando mutadores reales** (`ArrayDeclaration`, `FilterRemoval`,
+  `BooleanLiteral`, `EqualityOperator`). *Y, si el humano quiere, añadir la regla de
+  `font-display: swap` (hoy fuera del acceptance).* **NO destilar los acceptance 2 y 5 tal cual.**
+  **PENDIENTE DE PUERTA HUMANA** — *cambia los criterios de aceptación.*
+- **A-24** — 🔴 La **`puerta_legal` de F-05 es una atribución normativa falsa**, y la descripción
+  promete «elimina banner, CMP y política de cookies **de un plumazo**». **Propuesta del lead:**
+  sustituirlas por el **criterio de proyecto** («ningún tercero recibe la IP del visitante → no
+  hace falta análisis jurídico»), con **Fashion ID marcado `[I]` y declarado no re-verificado hoy
+  (EUR-Lex 202 + AWS-WAF)**; **y corregir de paso la descripción de F-11**, que arrastra la misma
+  atribución. **PENDIENTE DE PUERTA HUMANA** — *toca el contrato **y** `feature_list.json`.*
+- **A-27** — 🔴 F-05 es la primera feature que mete **binarios** en `dist/` → **activa la deuda
+  declarada de F-01** (**0 violaciones hoy**, **50.100 secuencias candidatas** **[V]**). ¿Se deja
+  **declarada** (postura del lead: sí — F-05 **no toca** `tools/puerta-placeholders.ts`, Ley 1) o
+  se abre **escenario nuevo** en `features/puerta_placeholders.feature`? **PENDIENTE DE PUERTA
+  HUMANA** — *reabrir una feature `done` es decisión del humano.*
+- **A-28** — `latin-400.css` **no tiene `unicode-range`** **[V]** → ese `@font-face` **aplica a
+  TODO el rango**: un carácter fuera del subset latin **no cae al fallback**, pinta **tofu, sin
+  error**. El latin cubre `U+0000-00FF` (ñ, vocales acentuadas, ¿, ¡) → **suficiente para
+  español**; **un nombre con `Ł`, `ř`, `ğ` daría tofu**. ¿Se añade `latin-ext` (**+6 woff2**) o se
+  acepta? **Propuesta del lead:** aceptar y declararlo, hasta que exista un nombre real que lo
+  exija. **PENDIENTE DE PUERTA HUMANA** — *decisión de **producto**: ¿qué nombres de clienta se
+  esperan?*
+
+---
+
+### Las 15 features restantes
 
 **No se especifican aquí a propósito.** Están troceadas, con sus criterios de aceptación,
 sus dependencias, su puerta legal, su flag `mutable` y su estado, en **`feature_list.json`**;
