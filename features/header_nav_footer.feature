@@ -3,17 +3,37 @@
 # el pie, y la PUERTA DE ANCLAS VIVAS que hoy no existe».
 #
 # =============================================================================================
-# ⏸⏸ **ESTE CONTRATO NO ESTÁ APROBADO. B-1..B-7 ESPERAN LA PUERTA HUMANA.** ⏸⏸
-#    A diferencia de F-05 —cuya cabecera ya lleva la marca ✅ porque el humano cerró A-23/A-24/A-27/
-#    A-28— aquí **NO HA HABIDO PUERTA**. El `craftsman_lead` **propone**; NO cierra ninguna de las
-#    SIETE preguntas abiertas. **NADA de este fichero se implementa hasta que el humano apruebe.**
-#    Precedente de proceso: F-05 (donde A-23 reescribió los acceptance 2 y 5 EN LA PUERTA).
+# ✅✅ **APROBADO POR LA PUERTA HUMANA EL 2026-07-17. B-1..B-7 CERRADAS POR EL HUMANO.** ✅✅
+#    Como F-05 (A-23/A-24/A-27/A-28), este contrato YA PASÓ LA PUERTA: el humano decidió las SIETE
+#    preguntas el 2026-07-17, TODAS como proponía el lead. **EL `tdd_craftsman` PUEDE IMPLEMENTAR**
+#    los 20 escenarios: donde antes se leía «nada se implementa hasta que el humano apruebe», ahora
+#    se lee «el humano aprobó ESTE contrato; adelante con el Rojo-Verde-Refactor». `feature_list.json`
+#    §6 lleva las 7 decisiones aplicadas (acceptance reescritos, `puerta_legal` corregida, campo
+#    `puerta_humana`) y ESTE contrato NO las contradice. Precedente: F-05 (A-23 reescribió acceptance
+#    EN LA PUERTA). LAS 7 DECISIONES, LITERALES (todas como proponía el lead):
+#      · B-1 → `puerta_legal` reescrita a SC 2.4.11 AA «not entirely hidden» (no «foco no oscurecido»,
+#              que roza el 2.4.12 AAA); C43 técnica SUFICIENTE del proyecto; CERO números a la norma.
+#      · B-2 → @s11 en DOS CAPAS: (1) suelo CSS estático RE-MEDIDO ≥ altura máxima; (2) afinado JS
+#              OPCIONAL, fuera del acceptance. La razón de `scroll-padding` (no `scroll-margin`) es que
+#              va en el CONTENEDOR; «scroll-margin no actúa al tabular» era FALSO.
+#      · B-3 → breakpoint **820px** [criterio de proyecto MEDIDO], NUNCA el 767 heredado.
+#      · B-4 → @s1 como IGUALDAD DE CONJUNTOS + la PUERTA DE ANCLAS VIVAS. «Sección navegable» =
+#              `<section>` con `aria-labelledby` que resuelve a un heading real (reutiliza
+#              `REGLA_SECTION` de F-04). ESA REGLA YA NO ES [NV]: el humano la FIJÓ (ver @s3/@s20).
+#      · B-5 → menú móvil SÍ, mecánica CSS puro (`@media`) + `aria-expanded`. Sin rama de viewport en
+#              JS (evita el patrón de memoria). La nav viaja HORNEADA; el menú hornea «cerrado».
+#      · B-6 → NO Radix. `radix-ui` SALE de `dependencies` (0 usos en `src/` [V]). Lo ejecuta el
+#              `tdd_craftsman` en `package.json`; aquí solo queda REGISTRADO como decisión.
+#      · B-7 → `destacados`/`ofertas` son HUÉRFANOS: la nav NO los enlaza (igualdad de conjuntos) y
+#              quedan ANOTADOS COMO DEUDA, sin construirse ni descartarse formalmente.
 # =============================================================================================
 # 🔴 A-23 REDUX — TRES CRITERIOS DE ACEPTACIÓN DE `feature_list.json` §6 NO SE DESTILAN TAL CUAL.
 #    La verificación previa (`progress/f06_verificacion_previa.md`, workflow adversarial, ~1,77 M
 #    tokens, 8 afirmaciones × verificar+refutar: **1 refutada de raíz, 6 matizadas, 1 confirmada**)
 #    demostró que @1, @2 y @4 son **INSATISFACIBLE / FALSO / INSOSTENIBLE**, y que la `puerta_legal`
-#    **roza el AAA**. Este contrato destila **LA PROPUESTA DEL LEAD**, no los criterios originales:
+#    **roza el AAA**. El humano APROBÓ (2026-07-17) reescribir estos criterios, TAL COMO proponía el
+#    lead: `feature_list.json` §6 YA los lleva reescritos, y este contrato destila **LAS DECISIONES
+#    APROBADAS EN LA PUERTA**, no los criterios originales:
 #      - **@1** («cubre TODAS las secciones, no 7 de 11») → **INSATISFACIBLE [V]**: hoy la home tiene
 #        **2 secciones** y sus ids viven en los `<h2>` (`servicios-titulo`, `contacto-titulo`), NO en
 #        los `<section>` [V: home.tsx:38-39,72,77]. «TODAS las secciones» de una página que aún no
@@ -32,7 +52,7 @@
 #        horneado no lleva esa custom property hasta que hidrata —justo cuando el usuario llega desde
 #        un `#ancla`—. → **B-2 (Capa 1)**: un `scroll-padding-top` **estático, suelo seguro ≥ altura
 #        máxima RE-MEDIDA**, que **SUSTITUYE** el `5rem` de F-04 (@s11). Capa 2 (afinado JS) es
-#        OPCIONAL y [I], y no entra en el acceptance salvo decisión humana.
+#        OPCIONAL y [I], y el humano decidió (B-2) que NO entra en el acceptance.
 #      - **`puerta_legal`** («SC 2.4.11 foco no oscurecido») → **ROZA EL AAA [V]**: el listón de AA
 #        es *«not entirely hidden»*; *«no part hidden»* es el **2.4.12 (AAA)**, que NO se persigue.
 #        → **B-1**: se reescribe a *«ningún componente que reciba foco de teclado queda ENTERAMENTE
@@ -51,9 +71,10 @@
 # decisión de fondo cae. Caen TRES acceptance y la puerta legal.*
 #
 # NO HUBO CONVERSACIÓN DE SPEC CON EL HUMANO PARA F-06, y ni la spec ni este contrato la simulan.
-# El humano DELEGÓ la fase en el `craftsman_lead` **hasta esta puerta de aprobación**, que sigue EN
-# PIE. Quien hizo de adversario en lugar del humano fue la verificación previa. **Eso NO sustituye a
-# la puerta.**
+# El humano DELEGÓ la fase en el `craftsman_lead` hasta la puerta de aprobación, y esa **PUERTA YA SE
+# CERRÓ EL 2026-07-17**: el humano decidió las 7 preguntas (todas como proponía el lead). Quien hizo
+# de adversario ANTES de la puerta fue la verificación previa —eso no sustituía a la puerta, y por eso
+# HUBO puerta—; ahora la aprobación humana está registrada y el `tdd_craftsman` puede implementar.
 #
 # =============================================================================================
 # 🔴 EL ENTREGABLE CENTRAL: UNA PUERTA DE ANCLAS VIVAS QUE HOY NO EXISTE (B-4)
@@ -77,18 +98,20 @@
 #   [V]). Si el `.tsx` no está en `mutate`, Stryker ni lo mira y la tanda da 100% sin medir nada.
 #
 # =============================================================================================
-# 🔴 EL MENÚ MÓVIL — LOS ESCENARIOS @s15/@s16/@s17 DESTILAN LA PROPUESTA DEL LEAD (B-5, B-6, B-3)
+# 🔴 EL MENÚ MÓVIL — @s15/@s16/@s17 REGISTRAN LAS DECISIONES DEL HUMANO (B-5, B-6, B-3), YA FIRMES
 # =============================================================================================
 # Hoy `src/` NO tiene ni `useIsMobile`, ni `matchMedia`, ni `useSyncExternalStore`, ni una sola
 # `@media` [V]; el prototipo resuelve el responsive con `flex-wrap: wrap`. La **primera decisión de
-# F-06 es una BIFURCACIÓN (B-5)**, y de ella cuelgan B-3 y B-6. **PROPUESTA DEL LEAD, PENDIENTE DE
-# PUERTA:** CSS puro para el eje responsive + estado abierto/cerrado en **atributo consultable**
-# (`aria-expanded`), SIN Radix (`radix-ui` tiene CERO usos en `src/` [V] → SALE de `dependencies`).
-# 🔴 **EL HUMANO PUEDE CAMBIAR LA MECÁNICA (Radix, o sin menú móvil):** en ese caso estos tres
-# escenarios se reescriben. Si elige Radix, DEBE decidir `Portal` sí/no —con `Portal`, el menú
-# **emite CERO en prerender** (125 bytes, solo el `<button>` trigger [V, `renderToString`]) y
-# dejaría las puertas de anclas **CIEGAS** (no se rompe: MIENTE POR OMISIÓN) → @s16 pasa a ser el
-# escenario OBLIGATORIO que asevera los enlaces del menú en el HTML de `dist/`—.
+# F-06 era una BIFURCACIÓN (B-5)**, y de ella colgaban B-3 y B-6. **EL HUMANO DECIDIÓ (2026-07-17):**
+# menú móvil SÍ, con CSS puro (`@media`) para el eje responsive —SIN rama de viewport en JS, evita el
+# patrón de memoria `red-css-para-rama-solo-js-en-ssg`— + estado abierto/cerrado en **atributo
+# consultable** (`aria-expanded`), **SIN Radix** (`radix-ui` tiene CERO usos en `src/` [V] → SALE de
+# `dependencies`; lo ejecuta el `tdd_craftsman` en `package.json`, aquí solo queda registrado).
+# 🔴 **LA MECÁNICA YA NO ES NEGOCIABLE:** la nav viaja HORNEADA en el HTML y el menú hornea «cerrado».
+# @s16 sigue siendo OBLIGATORIO —asevera los enlaces del menú en el HTML de `dist/`— porque blinda por
+# adelantado contra CUALQUIER regresión futura que sacara los enlaces del prerender (era la trampa de
+# un `Dialog.Portal` de Radix, ya descartado: emite CERO en prerender —125 bytes, solo el `<button>`
+# trigger [V, `renderToString`]— y dejaría la puerta de anclas CIEGA; no se rompe: MIENTE POR OMISIÓN).
 #
 # =============================================================================================
 # 🔴 EL CHOQUE CON LAS CUATRO PUERTAS (E1) — MEDIDO, con un BLOQUEANTE de diseño
@@ -132,14 +155,14 @@
 #    RE-MEDIR sobre la nav definitiva.
 #
 # =============================================================================================
-# 🔴 LO QUE F-06 NO CONSTRUYE, Y LOS HUÉRFANOS (B-7)
+# 🔴 LO QUE F-06 NO CONSTRUYE, Y LOS HUÉRFANOS (B-7, DECIDIDO EL 2026-07-17)
 # =============================================================================================
 # F-06 **NO construye secciones**: su alcance es **cabecera + nav + pie + la puerta de anclas vivas
 # + el `scroll-padding-top` derivado**. Las secciones (`top`, `unas`, `faq`, …) las montan
 # F-07/F-09/F-15/etc.; la nav crece enlazando a las que van existiendo, y la puerta impide que
 # enlace a las que aún no. **`destacados` y `ofertas` son HUÉRFANOS** —0 features los construyen
-# [V]—: la igualdad de conjuntos de B-4 los deja fuera solo; si deben registrarse como features o en
-# `no_se_construyen` es **B-7, PENDIENTE DE PUERTA**.
+# [V]—: **el humano DECIDIÓ (B-7)** que la igualdad de conjuntos de B-4 los deja fuera sola (la nav NO
+# los enlaza) y quedan **ANOTADOS COMO DEUDA**, sin construirse ni descartarse formalmente por ahora.
 # =============================================================================================
 
 Feature: Cabecera, navegación, pie, y la PUERTA DE ANCLAS VIVAS que demuestra que ningún enlace de la nav apunta a una sección que no existe en el artefacto
@@ -204,18 +227,18 @@ Feature: Cabecera, navegación, pie, y la PUERTA DE ANCLAS VIVAS que demuestra q
     # existentes —ni una de más (@s1: ancla muerta) NI UNA DE MENOS (aquí: sección inalcanzable)—.
     # El conjunto se DERIVA DEL DOM, no de una lista fija: crece solo según cierran F-07/F-09/etc.,
     # sin que nadie tenga que subir un número (el argumento que ganó en F-04 con `RUTAS_ESPERADAS`).
-    # ⏸ **REGLA DE «SECCIÓN NAVEGABLE» — PROPUESTA MEDIDA, PENDIENTE DE PUERTA (parte de B-4). El
-    # `craftsman_lead` PROPONE; NO CIERRA:** navegable = una `<section>` con `aria-labelledby` que
-    # RESUELVE a un heading real (`h1`…`h6`); su `id` de anclaje es el del heading. Es **coherente con
-    # `REGLA_SECTION` de F-04** —`'section sin aria-labelledby a un heading real'`, `puerta-cascaron.ts:118`;
+    # ✅ **REGLA DE «SECCIÓN NAVEGABLE» — FIJADA POR LA PUERTA HUMANA EL 2026-07-17 (parte de B-4). YA
+    # NO ES [NV] PARA EL TDD; LA IMPLEMENTA TAL CUAL:** navegable = una `<section>` con `aria-labelledby`
+    # que RESUELVE a un heading real (`h1`…`h6`); su `id` de anclaje es el del heading. El humano la fijó
+    # **coherente con `REGLA_SECTION` de F-04** —`'section sin aria-labelledby a un heading real'`, `puerta-cascaron.ts:118`;
     # el bucle de `:507-519` acusa toda `<section>` cuyo `aria-labelledby` no resuelva a un id de
-    # `idsDeHeadings` (`:505,:131`)—, así que la regla es DECIDIBLE YA en la puerta, sin depender de un
-    # `dist/` futuro desconocido. Antes esta nota decía «[NV], la FIJA el TDD»: era demasiado débil, y
-    # la revisión adversarial lo cazó —los dos Examples de arriba COLAPSAN sobre la MISMA forma del DOM
-    # (el id del `<h2>` == destino del `aria-labelledby`) y NINGUNO distingue una derivación de otra, de
-    # modo que un mutante «navegable = cualquier id» SOBREVIVÍA a @s1/@s2/@s3—. **@s20 añade el Example
-    # que la DISTINGUE** (un heading con id que NINGUNA `<section>` referencia → NO cuenta como
-    # inalcanzable). Si el humano prefiere otra derivación en la puerta, @s3/@s20 se reescriben.
+    # `idsDeHeadings` (`:505,:131`)—, así que la regla es DECIDIBLE en la puerta y el TDD la implementa
+    # SIN depender de un `dist/` futuro desconocido ni de una decisión posterior. Antes esta nota decía
+    # «[NV], la FIJA el TDD»: era demasiado débil, y la revisión adversarial lo cazó —los dos Examples de
+    # arriba COLAPSAN sobre la MISMA forma del DOM (el id del `<h2>` == destino del `aria-labelledby`) y
+    # NINGUNO distingue una derivación de otra, de modo que un mutante «navegable = cualquier id»
+    # SOBREVIVÍA a @s1/@s2/@s3—. **@s20 añade el Example que la DISTINGUE** (un heading con id que NINGUNA
+    # `<section>` referencia → NO cuenta como inalcanzable) y SE CONSERVA como parte del contrato aprobado.
 
   # ⬇️ @s20 se define aquí (junto a @s3, su hermano) pero conserva el número 20 para NO renumerar
   #    @s4..@s18, que la revisión adversarial ya cita por su tag. Añadido en la ronda de reparación.
@@ -227,11 +250,12 @@ Feature: Cabecera, navegación, pie, y la PUERTA DE ANCLAS VIVAS que demuestra q
     # 🔴 EL EXAMPLE QUE DISTINGUE LA REGLA DE «SECCIÓN NAVEGABLE» (hallazgo GRAVE de la revisión). Los
     # dos Examples de @s3 colapsan sobre la misma forma del DOM y NO separan «navegable = section con
     # aria-labelledby→heading real» de «navegable = cualquier id». Aquí el heading tiene id pero
-    # NINGUNA `<section>` lo referencia: bajo la regla PROPUESTA (coherente con `REGLA_SECTION` de
-    # F-04) NO es navegable → 0 violaciones de inalcanzable. Un mutante «navegable = cualquier id»
+    # NINGUNA `<section>` lo referencia: bajo la regla FIJADA POR LA PUERTA (coherente con `REGLA_SECTION`
+    # de F-04) NO es navegable → 0 violaciones de inalcanzable. Un mutante «navegable = cualquier id»
     # —que SOBREVIVE a @s1/@s2/@s3— aquí acusaría 1 y MUERE (@s18, fila añadida). Sin este escenario la
     # mitad «ni una de menos» de B-4 queda anclada TAUTOLÓGICAMENTE a la implementación.
-    # ⏸ PENDIENTE DE PUERTA con @s3 (parte de B-4): si el humano fija otra derivación, se reescribe.
+    # ✅ FIJADO POR LA PUERTA HUMANA con @s3 (parte de B-4, 2026-07-17): la derivación «section con
+    # aria-labelledby → heading real» es FIRME; este Example DISTINGUE la regla y SE CONSERVA.
 
   @s4
   Scenario: la puerta de anclas vivas es DISTINTA y COMPLEMENTARIA de la anti-404 de F-04 (#x vs /x)
@@ -377,8 +401,8 @@ Feature: Cabecera, navegación, pie, y la PUERTA DE ANCLAS VIVAS que demuestra q
     # (oscurecimiento PARCIAL es CONFORME); «no part hidden» es el 2.4.12 AAA y NO se persigue. C43
     # (`scroll-padding`) es la técnica suficiente ELEGIDA POR EL PROYECTO, no una imposición de la
     # norma. El SCSS NO ES MUTABLE (Stryker no ve CSS): aquí el mutante es HUMANO y la puerta de
-    # aprobación es su única defensa. Capa 2 (afinado JS con `ResizeObserver`) es OPCIONAL, [I], y
-    # NO entra en el acceptance salvo que el humano lo decida en B-2.
+    # aprobación es su única defensa. Capa 2 (afinado JS con `ResizeObserver`) es OPCIONAL, [I], y el
+    # humano DECIDIÓ en B-2 (2026-07-17) que NO entra en el acceptance: solo mejora post-hidratación.
 
   # ---------------------------------------------------------------------------
   # El marcado de cabecera / nav / pie — SSR-safe, sobre el HTML CRUDO de dist/, NUNCA jsdom.
@@ -436,7 +460,8 @@ Feature: Cabecera, navegación, pie, y la PUERTA DE ANCLAS VIVAS que demuestra q
     # (previo `instagramHref` en F-02) es alcance de F-02/F-12, NO de F-06.
 
   # ---------------------------------------------------------------------------
-  # El menú móvil — PROPUESTA DEL LEAD (B-5/B-6/B-3), PENDIENTE DE PUERTA. Puede cambiar la mecánica.
+  # El menú móvil — DECIDIDO POR LA PUERTA HUMANA (B-5/B-6/B-3, 2026-07-17): CSS puro + aria-expanded
+  # + 820px, SIN Radix. La mecánica es FIRME; el TDD la implementa tal cual, no es «propuesta».
   # ---------------------------------------------------------------------------
 
   @s15
@@ -452,8 +477,9 @@ Feature: Cabecera, navegación, pie, y la PUERTA DE ANCLAS VIVAS que demuestra q
     # atributo consultable (`aria-expanded`, `aria-current`, `aria-pressed`, `data-*`); el `className`
     # es constante o derivado. Es el mismo eje que I-5: consultar por rol/nombre/texto/`data-*`,
     # NUNCA por clase CSS.
-    # ⏸ **PROPUESTA (B-5/B-6):** CSS puro + `aria-expanded`, SIN Radix. Si el humano elige Radix o
-    # «sin menú móvil», la MECÁNICA cambia y este escenario se reescribe.
+    # ✅ **DECIDIDO (B-5/B-6, 2026-07-17):** CSS puro + `aria-expanded`, SIN Radix. La mecánica es
+    # FIRME; el `tdd_craftsman` implementa este escenario tal cual (nada de Radix, nada de className
+    # condicional para el estado abierto/cerrado).
 
   @s16
   Scenario: el HTML CRUDO de dist/ hornea el menú «cerrado» — estado seguro de primera carga (SSR)
@@ -463,13 +489,13 @@ Feature: Cabecera, navegación, pie, y la PUERTA DE ANCLAS VIVAS que demuestra q
     And los enlaces de la navegación están presentes en el HTML horneado (no dependen de la hidratación)
     # 🔴 SSR-SAFE, SOBRE LOS BYTES DE `dist/`, NO EN JSDOM (I-8). El estado horneado por SSR es
     # «cerrado» (el estado seguro de primera carga). La segunda aserción es la que MATA por adelantado
-    # la trampa de Radix: si el humano eligiera `Dialog.Portal`, el menú emite CERO en prerender —125
-    # bytes, solo el `<button>` trigger [V, `renderToString`]— y los enlaces NO estarían en el HTML,
-    # dejando la puerta de anclas CIEGA (no se rompe: MIENTE POR OMISIÓN). Este escenario los exige en
-    # el HTML de `dist/`.
-    # ⏸ **PROPUESTA (B-5/B-6):** aplica si hay menú móvil con botón. Si el humano elige «sin menú
-    # móvil» (todo por CSS, sin botón), la aserción de `aria-expanded` se retira y queda solo la de
-    # los enlaces horneados.
+    # la trampa de Radix (DESCARTADO en B-6, pero la guarda persiste): un `Dialog.Portal` emitiría CERO
+    # en prerender —125 bytes, solo el `<button>` trigger [V, `renderToString`]— y los enlaces NO
+    # estarían en el HTML, dejando la puerta de anclas CIEGA (no se rompe: MIENTE POR OMISIÓN). Este
+    # escenario los exige en el HTML de `dist/`, contra Radix o cualquier regresión futura equivalente.
+    # ✅ **DECIDIDO (B-5/B-6, 2026-07-17):** hay menú móvil con botón → este escenario aplica ENTERO,
+    # con su aserción de `aria-expanded="false"` horneado Y la de los enlaces presentes en el HTML. La
+    # trampa de Radix/Portal quedó descartada (B-6), pero @s16 sigue blindando el prerender igual.
 
   @s17
   Scenario: el breakpoint del menú es exactamente el literal 820px, leído del SCSS y anclado contra el literal escrito a mano
@@ -486,8 +512,8 @@ Feature: Cabecera, navegación, pie, y la PUERTA DE ANCLAS VIVAS que demuestra q
     # 🔴 RE-MEDIR sobre la nav definitiva: el número se mueve ±12px según fuentes y al reetiquetar la
     # nav. Si hay rama JS de viewport (vía B-5), el `@media` del SCSS y la constante JS son EL MISMO
     # LITERAL, y el test lee el SCSS y lo ancla contra el literal a mano (anti-tautología).
-    # ⏸ **PROPUESTA (B-3/B-5):** aplica SOLO si hay menú móvil. Si el humano elige «sin menú», no hay
-    # breakpoint y este escenario NO aplica.
+    # ✅ **DECIDIDO (B-3/B-5, 2026-07-17):** hay menú móvil → este escenario aplica. El breakpoint es
+    # el literal `820px` [criterio de proyecto MEDIDO], NUNCA el 767 heredado; el TDD lo implementa.
 
   # ---------------------------------------------------------------------------
   # Los mutantes que deben morir (I-6, umbral 1.0). El conjunto exacto se MIDE cuando el fichero exista.
