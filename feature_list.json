@@ -133,7 +133,7 @@
       "depends_on": [],
       "mutable": true,
       "sdd": true,
-      "status": "pending"
+      "status": "spec_ready"
     },
     {
       "id": 6,
