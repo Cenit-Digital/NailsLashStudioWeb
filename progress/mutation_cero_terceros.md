@@ -1,5 +1,168 @@
 # Mutación — feature 5 `cero_terceros`
 
+**Veredicto:** ✅ **PASS — TANDA DE CIERRE (2026-07-17)**
+**Score:** `terceros.ts` **183/183 = 100,00 %** · `puerta-terceros.ts` **110/110 = 100,00 %** ·
+**feature 293/293 = 100,00 %** (umbral `harness.config.json` → `mutation.threshold: 1.0`;
+`stryker.config.json` → `break: 100`). **0 supervivientes. 0 exclusiones. 0 justificaciones de
+equivalencia.** La licencia que A-23 **no** dio **no ha hecho falta**: los 10 se mataron **con
+contrato**, no con excusas.
+
+> **La escalada de la tanda anterior era CORRECTA y ha dado su fruto**: los 10 supervivientes reales
+> no eran código de más, eran **contrato de menos** (40 → 43 escenarios). El `tdd_craftsman` los mató
+> **sin tocar una línea de producción**. Esta tanda lo **confirma de forma independiente**.
+
+---
+
+## 1. Salud del informe — SE LEE ANTES QUE EL SCORE
+
+> «Un informe con timeouts MIENTE» (`docs/verification.md` §52); «un `tests per mutant` desplomado
+> miente al revés» (§77). **Un 100 % NO se reporta hasta que estas dos columnas están sanas** — mi
+> propia tanda #1 dio «100 %, 0 survived» **y era FALSA**.
+
+| Tanda de cierre | Concurrencia | `# timeout` | tests/mutante | dry run | `# errors` | `# no cov` | ¿Vale? |
+| --------------- | ------------ | ----------- | ------------- | ------- | ---------- | ---------- | ------ |
+| `terceros.ts` | `--concurrency 1` | **0** ✅ | **10,02** ✅ | **126** | 0 | 0 | ✅ **sí** |
+| `puerta-terceros.ts` | `--concurrency 1 --timeoutMS 60000` | **0** ✅ | **7,34** ✅ | **44** | 0 | 0 | ✅ **sí** |
+
+**Las tres columnas de salud, contra sus precedentes medidos:**
+
+1. **`# timeout` = 0 en las dos.** `terceros.ts` es **código puro sin un solo bucle**: un timeout ahí
+   es **imposible por construcción** y sería ruido de contención contado como MUERTO. La tanda #1
+   traía **152/183** y tapaba 9 supervivientes reales. **Aquí no hay ni uno.**
+2. **tests/mutante 10,02 y 7,34** — clavados en los de la tanda honesta (**10,85** y **7,24**) y
+   lejísimos del envenenado (**1,59**; el de F-04, **1,35**). *El leve descenso 10,85 → 10,02 es
+   coherente y esperado: con `perTest` + bail, un mutante **muerto** corta al primer rojo y ejecuta
+   MENOS tests que uno que sobrevive. Convertir 9 supervivientes en muertos **baja** la media. Sube
+   el score y baja el promedio: las dos cosas apuntan al mismo sitio.*
+3. 🔴 **El dry run CORROBORA al `tdd_craftsman` sin creerle nada.** Es la comprobación de «cuántos
+   tests corrieron **de verdad**» que exige la regla nº 6:
+
+| Fichero mutado | Dry run ANTES | Dry run AHORA | Cuadra con |
+| -------------- | ------------- | ------------- | ---------- |
+| `src/lib/terceros.ts` | 118 (75+43) | **126** | `terceros.test.ts` (**82**) + `puerta-terceros.test.ts` (**44**) ✓ |
+| `src/lib/puerta-terceros.ts` | 43 | **44** | `puerta-terceros.test.ts` (**44**) ✓ — `terceros.test.ts` NO lo importa |
+
+**118 + 8 tests nuevos = 126**, y **43 + 1 (`@s43`) = 44**. Cuadra **a la unidad** con los «576 tests
+(568 → +8)» del `tdd_craftsman`, **medido por Stryker, no contado por él**. Los tests nuevos existen
+y **se ejecutan**.
+
+**Higiene:** baseline **576/576 verde** antes de medir · `rm -rf .stryker-tmp` **entre** las dos
+tandas · **una sola tanda viva a la vez** (comprobado con `Get-CimInstance Win32_Process`) ·
+acotado **solo** con `--mutate`, **jamás** `--testFiles` · `src/lib/` **git-clean antes y después**
+· suite **576/576 verde** al cierre.
+
+```bash
+pnpm exec stryker run --mutate src/lib/terceros.ts        --concurrency 1
+pnpm exec stryker run --mutate src/lib/puerta-terceros.ts --concurrency 1 --timeoutMS 60000
+```
+
+---
+
+## 2. Informe por fichero — el score, ya con derecho a leerse
+
+| Fichero | `# timeout` | tests/mutante | Total | Killed | **Survived** | Score |
+| ------- | ----------- | ------------- | ----- | ------ | ------------ | ----- |
+| `src/lib/terceros.ts` | **0** | 10,02 | **183** | **183** | **0** | **100,00 %** |
+| `src/lib/puerta-terceros.ts` | **0** | 7,34 | **110** | **110** | **0** | **100,00 %** |
+| **Feature** | **0** | — | **293** | **293** | **0** | **100,00 %** |
+
+**Los totales de mutantes NO se han movido** (183 y 110, idénticos a la tanda de la escalada): la
+ronda 2 **no añadió ni quitó producción**, solo tests. Es la firma de «0 líneas de producción
+tocadas», **medida**, no declarada. Stryker sale con **código 0** en las dos y el `break: 100` pasa.
+
+---
+
+## 3. Los 10 de la tanda anterior — estado uno a uno
+
+**Los 10 mutantes que escalé están MUERTOS**, los 3 verificados abajo **por sabotaje manual propio**
+y los 10 por Stryker (0 survived sobre el mismo total de 183/110).
+
+| # | Mutante | Estado | Test que lo mata |
+| - | ------- | ------ | ---------------- |
+| 1 | `terceros.ts:257` `ConditionalExpression` `(rel && href)` → `true` | ✅ **MUERTO** | @s41 filas 1 y 2 |
+| 2 | `terceros.ts:257` `ConditionalExpression` `rel !== undefined` → `true` | ✅ **MUERTO** | @s41 fila 1 |
+| 3 | `terceros.ts:257` `LogicalOperator` `(rel \|\| href) && …` | ✅ **MUERTO** 🔬 | @s41 filas 1 y 2 (**2 rojos, verificado**) |
+| 4 | `terceros.ts:258` `ConditionalExpression` `href !== undefined` → `true` | ✅ **MUERTO** | @s41 fila 2 (`<base>` al tercero) |
+| 5 | `terceros.ts:240` `ConditionalExpression` `if (href !== undefined)` → `if (true)` | ✅ **MUERTO** | @s42 |
+| 6 | `terceros.ts:241` `OptionalChaining` `URL.parse(…)?.href` | ✅ **MUERTO** | @s9 fila 4 |
+| 7 | `terceros.ts:278` `ConditionalExpression` `nombre === ATRIBUTO_SRCSET ? …` → `true ? …` | ✅ **MUERTO** | @s1 fila `a b.png` |
+| 8 | `terceros.ts:299` `ConditionalExpression` `url === null \|\| …` → `false \|\| …` | ✅ **MUERTO** | @s41 fila 3 |
+| 9 | `terceros.ts:58` `Regex` de `\s*=\s*` a `\S*=\s*` | ✅ **MUERTO** 🔬 | @s1 fila `src = "…"` (**1 rojo, verificado**) |
+| 10 | `puerta-terceros.ts:159` `ConditionalExpression` `if (tipo === TIPO_CSS)` → `if (true)` | ✅ **MUERTO** 🔬 | @s43 (**1 rojo, verificado**) |
+
+🔬 = **re-verificado a mano por este agente en la tanda de cierre** (no heredado del `tdd_craftsman`).
+
+### 3.1 Sabotaje manual de cierre — 3/10, los tres de más riesgo
+
+**Un 100 % es exactamente el resultado que a todo el mundo le conviene**, y hoy han caído **tres**
+mediciones rotas que apuntaban «en la dirección cómoda». Así que el 100 % **también** se verifica.
+Se eligieron los 3 mutantes donde el método ya mordió: el de la **precedencia**, el de las **barras
+invertidas** y el de la **puerta**. Mutante aplicado al fichero real → suite → **fichero restaurado
+siempre** (`finally`) → `git status` limpio.
+
+| Sabotaje | `ejecutados` | Rojos | Veredicto |
+| -------- | ------------ | ----- | --------- |
+| #9 `:58` `Regex` (construido con `String.fromCharCode(92)`, **sin barras en heredoc**) | **82** | **1** | ✅ **MUERTO** |
+| #10 `puerta:159` `if (true)` | **44** | **1** | ✅ **MUERTO** |
+| #3 `:257` `LogicalOperator` **PARENTIZADO** | **82** | **2** | ✅ **MUERTO** |
+
+**Los tres rojos son EL TEST QUE SE DISEÑÓ PARA CADA UNO**, no daño colateral. El #3 lo dice con
+nombre y apellidos:
+
+```
+ROJO: @s41 <link href="https://cdn.tercero.com/x.css"> … (<link> SIN rel: no declara qué es, y NADA lo pide)
+ROJO: @s41 <base href="https://cdn.tercero.com/"><link rel="stylesheet"> … (LA BASE ES A UN TERCERO A PROPÓSITO)
+```
+
+**Las tres trampas de método, neutralizadas otra vez y por eso se dejan escritas:**
+
+1. **La precedencia**: el #3 se aplicó **CON PARÉNTESIS** — `(a || b) && c && d`, porque
+   `a && b && c && d` parsea `((a&&b)&&c)&&d`. El diff literal de Stryker da otro mutante, más
+   fuerte (sin paréntesis `&&` liga más que `||`), que mata 5 tests: un falso «muerto por goleada»
+   que **no demostraría** que @s41 muerde. Parentizado da **2 rojos y los dos son @s41**: el test
+   **apunta al mutante real**.
+2. **Las barras invertidas**: el #9 se construyó con `String.fromCharCode(92)` y el script **PARA si
+   el patrón no se encuentra**. Un «patrón no encontrado» **no es** un «muerto».
+3. **`ejecutados > 0` es la mitad del veredicto**: el script lee el **informe JSON**, no el código de
+   salida (`--reporter=basic` **no existe en Vitest 4** y fue la medición rota nº 3 del día). Los
+   **82** y **44** ejecutados **cuadran con el dry run de Stryker**: la suite corrió de verdad.
+
+---
+
+## 4. Lo que este agente NO ha hecho, a propósito
+
+- **No ha tocado `src/` ni los tests.** Los 3 sabotajes se revirtieron en `finally`; **`git status`
+  del repo entero: LIMPIO** al cierre, y suite **576/576 verde**. La afirmación «0 líneas de
+  producción tocadas» del `tdd_craftsman` queda **confirmada por dos vías independientes**:
+  `git status src/lib/` limpio **y** los totales de mutantes intactos (183/110).
+- **No ha excluido ni justificado ningún mutante como equivalente.** **A-23 (humano, 2026-07-17) no
+  dio licencia, y no ha hecho falta**: ni el `:278` (el más cercano a un equivalente) ni el `:58`
+  necesitaron excusa. **El catálogo entero de Stryker 9.6.1 muere sobre los dos ficheros.**
+- **No ha marcado `done`.** Eso es del `craftsman_lead`.
+
+## 5. Lecciones que este informe deja escritas
+
+1. **El orden de lectura es la lección, no el score.** «100 %, 0 survived» ha aparecido **dos veces**
+   en esta feature: la primera **era mentira** (152 timeouts, 1,59 tests/mutante) y la segunda es
+   verdad (0 timeouts, 10,02). **El número es idéntico; lo que los distingue son las columnas que se
+   leen ANTES.** Sin esa regla, F-05 habría cerrado con 10 agujeros y nadie se habría enterado.
+2. **La mutación encontró CONTRATO DE MENOS, no código de más.** Los 10 supervivientes eran **guardas
+   defensivas correctas que ningún escenario ejercitaba**. El humano amplió el contrato (+3
+   escenarios) y **la producción se quedó tal cual**. *La prueba de mutación no solo valida tests:
+   **encuentra huecos en la especificación**.*
+3. **El `:58` es el que más enseña**: un **comentario que prometía** («el espaciado alrededor del `=`
+   es OPCIONAL… el extractor lo tolera») **sin ninguna puerta que lo sostuviera**. Hoy `@s1` lo fija
+   y el mutante muere. **Una promesa en un comentario no es un contrato hasta que un test la muerde.**
+
+---
+---
+
+# HISTÓRICO — la tanda de la ESCALADA (2026-07-17, superada por la de cierre)
+
+> Se conserva **íntegra y a propósito**: es la evidencia de por qué existen los 3 escenarios nuevos y
+> de que la regla del arnés se aplicó. **Su veredicto FAIL está SUPERADO** por la tanda de cierre de
+> arriba; sus 10 supervivientes están **todos muertos** (§3).
+
 **Veredicto:** 🔴 **FAIL — ESCALADA AL LEAD**
 **Umbral:** `harness.config.json` → `mutation.threshold: 1.0` · `stryker.config.json` → `break: 100`.
 **10 mutantes sobrevivientes REALES**, los 10 **verificados por sabotaje manual** contra la suite
