@@ -224,6 +224,54 @@ describe('el conjunto EXACTO de @font-face esperado deja el build en verde (@s28
 })
 
 /**
+ * 🔴🔴 ESCENARIO NUEVO — LA AMPLIACIÓN DEL 2026-07-17, Y LA TRAE LA MUTACIÓN. MATA EL
+ * `ConditionalExpression` de puerta-terceros.ts:159 (`if (recurso.tipo === TIPO_CSS)` →
+ * `if (true)`), EL ÚNICO SUPERVIVIENTE DE `puerta-terceros.ts` (99,09 %).
+ * `paresDelCss` PROMETE «del CSS» Y NADA LO COMPROBABA: ningún recurso `html` de los tests llevaba
+ * un `@font-face`, así que EL FILTRO POR TIPO NO LO ASEVERABA NADIE — otra PROMESA SIN PUERTA, la
+ * misma especie que el `:58` de @s1.
+ * CON EL MUTANTE, EL `@font-face` DEL HTML ENTRA EN EL CONJUNTO → «sobra el par ("Impostora",
+ * 400)» → BUILD ROTO POR UN FALSO POSITIVO.
+ * 🔴 EL ASERTO NO SE QUEDA EN EL CÓDIGO DE SALIDA, Y ES DELIBERADO (lección de esta tanda): acusar
+ * EL PAR CONCRETO es lo que lo hace específico DEL MUTANTE y no de cualquier otro fallo que también
+ * diera exit 0. LA PUERTA ACUSA, NO GRUÑE (@s25).
+ * `'Impostora'` es un FIXTURE escrito A MANO y elegido para que NO PUEDA CONFUNDIRSE con ninguna de
+ * las 3 familias reales (anti-tautología: jamás se importa `PARES_DE_FUENTE_ESPERADOS` como valor
+ * esperado — el ancla de la constante es @s38, y sigue siendo la única que la importa).
+ * ⚠️ UN `@font-face` inline en el HTML NO ES HIPOTÉTICO: es exactamente lo que emite un `<style>`
+ * crítico en línea, y `dist/index.html` SÍ pasa por esta puerta (@s34: el filtro del humilde deja
+ * entrar `.html` Y `.css`). El `url(/assets/…)` es propio: no hay origen externo que detectar aquí,
+ * y por eso el único eje que este escenario mide es EL CONJUNTO DE PARES.
+ * NO ENCAJA EN @s28 NI EN @s29: @s28 no es un Outline (no admite filas) y el `Then` de @s29 exige
+ * código de salida DISTINTO de 0. Éste exige 0: es un camino feliz, y es su contrario.
+ */
+describe('un @font-face dentro de un recurso html NO cuenta como par: los pares son DEL CSS (@s43)', () => {
+  it('@s43 el @font-face inline de dist/index.html no entra en el conjunto: código 0 y ninguna violación', () => {
+    const resultado = ejecutarPuertaDeTerceros(
+      peticion({
+        recursos: [
+          {
+            ubicacion: 'dist/assets/x.css',
+            tipo: 'css',
+            contenido: cssDePares(paresEscritosAMano()),
+          },
+          {
+            ubicacion: 'dist/index.html',
+            tipo: 'html',
+            contenido:
+              "<style>@font-face{font-family:'Impostora';font-weight:400;src:url(/assets/i.woff2)}</style>",
+          },
+        ],
+      }),
+    )
+
+    expect(resultado.codigoSalida).toBe(0)
+    expect(resultado.lineas).toEqual([])
+    expect(resultado.lineas.join('\n')).not.toContain('("Impostora", 400)')
+  })
+})
+
+/**
  * 🔴 ES LA GUARDA ANTI-VACUIDAD Y EL ACCEPTANCE 4, A LA VEZ. MATA DOS PÁJAROS.
  * 1ª FILA — ACCEPTANCE 4: el prototipo pide `Manrope:wght@300;400;500;600;700` y `font-weight: 300`
  * → 0 OCURRENCIAS [V, medido]. Si alguien importara el 300, entraría como `@font-face` de peso 300

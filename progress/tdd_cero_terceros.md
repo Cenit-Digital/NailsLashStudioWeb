@@ -1,12 +1,94 @@
 # F-05 `cero_terceros` — bitácora del TDD (tdd_craftsman, 2026-07-17)
 
-> **Estado: VERDE, a la espera del `judge` y del `mutation_tester`.**
+> **Estado: VERDE tras la RONDA 2, a la espera del `judge` y de la REMEDICIÓN del `mutation_tester`.**
 > **NO se ha marcado `done`, y NO se ha corrido Stryker** (lo corre el `mutation_tester`: nunca dos
 > tandas a la vez).
 >
-> `pnpm typecheck` ✅ 0 errores · `pnpm lint` ✅ 0 errores 0 warnings · `pnpm test` ✅ **568/568**
-> (partían de 450 → **118 nuevos**) · `pnpm build` ✅ **exit 0 con las CUATRO puertas** ·
-> `bin/harness init` ✅ **Entorno listo**.
+> **RONDA 2 (2026-07-17):** `pnpm typecheck` ✅ 0 errores · `pnpm lint` ✅ 0 errores 0 warnings ·
+> `pnpm test` ✅ **576/576** (partían de **568** → **8 nuevos**) · `pnpm build` ✅ **exit 0 con las
+> CUATRO puertas**. **43/43 escenarios cubiertos.**
+
+---
+
+# 🔴 RONDA 2 — LOS 10 SUPERVIVIENTES, MUERTOS CON CONTRATO Y CON PRODUCCIÓN INTACTA
+
+**La mutación NO encontró código de más: encontró CONTRATO DE MENOS.** El humano amplió el contrato
+de **40 a 43 escenarios** (3 filas nuevas + `@s41`/`@s42`/`@s43`) y **decidió expresamente que las
+guardas defensivas SON CORRECTAS Y SE QUEDAN**. Esta ronda **no ha tocado ni una línea de `src/`**:
+solo tests. `git status` de producción: **LIMPIO** (verificado tras cada sabotaje).
+
+## Qué se ha añadido — SOLO lo nuevo
+
+| `@s` | Dónde | Tests |
+| --- | --- | --- |
+| **@s1** (+2 filas) | `src/lib/terceros.test.ts` | `<img src="…/a b.png">` (**espacio en la URL**) y `<img src = "…">` (**espacios en el `=`**) → el `it.each` pasa de **14 a 16 filas** |
+| **@s9** (+1 fila) | `src/lib/terceros.test.ts` | `@s9 con <base href="http://[">, la base NO PARSEA…` |
+| **@s41** (nuevo) | `src/lib/terceros.test.ts` | `@s41 %s no lanza y no detecta ningún origen (%s)` (**3 filas**) |
+| **@s42** (nuevo) | `src/lib/terceros.test.ts` | `@s42 con <base> seguido de <base href> a un tercero, a.png es una petición al tercero` |
+| **@s43** (nuevo) | `src/lib/puerta-terceros.test.ts` | `@s43 el @font-face inline de dist/index.html no entra en el conjunto…` |
+
+## 🔴 ROJO PRIMERO, DE VERDAD: los 10 mutantes, uno a uno
+
+**La producción YA EXISTÍA, así que un test nuevo PUEDE NACER VERDE Y NO SIGNIFICAR NADA.** Por eso
+el criterio no es «el test pasa», sino **«el test SE PONE ROJO con su mutante aplicado a mano»**.
+Cada mutante: aplicado al fichero real → suite del fichero → **revertido**. **10/10 muertos, y cada
+uno POR EL TEST QUE SE DISEÑÓ PARA ÉL** (ni uno por casualidad ni por daño colateral):
+
+| # | Mutante | Test que se pone ROJO | Rojos |
+| - | ------- | --------------------- | ----- |
+| 1 | `terceros.ts:257` `ConditionalExpression` `(rel!==undefined && href!==undefined)` → `true` | @s41 filas 1 **y** 2 | **2** |
+| 2 | `terceros.ts:257` `ConditionalExpression` `rel !== undefined` → `true` | @s41 fila 1 | **1** |
+| 3 | `terceros.ts:257` `LogicalOperator` `(rel!==undefined \|\| href!==undefined) && …` | @s41 filas 1 **y** 2 | **2** |
+| 4 | `terceros.ts:258` `ConditionalExpression` `href !== undefined` → `true` | @s41 **fila 2** (la del `<base>` al tercero) | **1** |
+| 5 | `terceros.ts:240` `ConditionalExpression` `if (href !== undefined)` → `if (true)` | **@s42** | **1** |
+| 6 | `terceros.ts:241` `OptionalChaining` `URL.parse(href, RAIZ_PROPIA)?.href` → `.href` | **@s9 fila 4** | **1** |
+| 7 | `terceros.ts:278` `ConditionalExpression` `nombre === ATRIBUTO_SRCSET ? …` → `true ? …` | **@s1 fila `a b.png`** | **1** |
+| 8 | `terceros.ts:299` `ConditionalExpression` `url === null \|\| …` → `false \|\| …` | **@s41 fila 3** | **1** |
+| 9 | `terceros.ts:58` `Regex` `ATRIBUTO` `\s*=\s*` → `\S*=\s*` | **@s1 fila `src = "…"`** | **1** |
+| 10 | `puerta-terceros.ts:159` `ConditionalExpression` `if (recurso.tipo === TIPO_CSS)` → `if (true)` | **@s43** | **1** |
+
+**Las tres trampas de método del informe (§3), confirmadas al reproducirlas:**
+
+1. **La precedencia**: el mutante nº 3 se aplicó **PARENTIZADO** (`(a || b) && c && d`), como manda
+   el informe. Copiar el diff literal de Stryker habría dado otro mutante, más fuerte, que mata 5
+   tests y habría «desmentido» un superviviente real.
+2. **Las barras invertidas**: el mutante nº 9 se construyó con `String.fromCharCode(92)`, no con un
+   literal en heredoc. **Y el script PARA si el patrón no se encuentra** — un «patrón no encontrado»
+   **no es** un «no sobrevive».
+3. **El `<base>` a un tercero de @s41 fila 2 y los DOS `<base>` de @s42 NO son decoración**: medido,
+   con la base propia o con un solo `<base>` los mutantes 4 y 5 son **indistinguibles**.
+
+### 🔴🔴 LA REGLA DEL ARNÉS MORDIÓ POR CUARTA VEZ — Y ESTA VEZ EN MI PROPIO SABOTAJE
+
+**La primera tanda de sabotajes cantó «0/10, SOBREVIVEN LOS DIEZ», con `rojos: 0` en los diez —
+incluidos mutantes que provocan un `TypeError` seguro. ERA FALSO, Y POR UNA MEDICIÓN ROTA:**
+`--reporter=basic` **NO EXISTE en Vitest 4** (se eliminó). El reporter no cargaba, `vitest` salía
+con código ≠ 0 **sin ejecutar NI UN TEST**, y el script leía «0 fallos» → «SOBREVIVE».
+
+**Es la misma especie exacta que el «100 %, 0 survived» con 152 timeouts de la tanda #1**: *una
+medición rota que parece un resultado*, y **que además apuntaba en la dirección cómoda** («no hay
+nada que hacer»). Se cazó **porque el resultado era imposible por construcción**, no porque el
+script avisara. **Remedio, ya aplicado en el script**: reporter `json` a fichero, el veredicto se
+lee **del informe y no del código de salida**, y **PARA si `casos.length === 0`**. Con la medición
+honesta: **10/10 muertos**, y **82 / 44 tests ejecutados** en cada tanda.
+
+> **La lección, por si vuelve:** *un sabotaje que da el resultado que te conviene se verifica igual
+> de duro que uno que no.* **`ejecutados > 0` es la mitad del veredicto.**
+
+## Lo que esta ronda NO ha hecho, a propósito
+
+- **NO ha tocado `src/`.** Las guardas se quedan **tal cual**: el humano aprobó **el código**; lo que
+  creció es **el contrato**. `git status` de `src/lib/terceros.ts` y `src/lib/puerta-terceros.ts`:
+  **limpio**.
+- **NO ha corrido Stryker.** La remedición la hace el `mutation_tester`, **solo** y a
+  `--concurrency 1`.
+- **NO ha excluido ni justificado ningún mutante.** Umbral **1.0, 0 exclusiones** (A-23), y **no ha
+  hecho falta ninguna licencia: los 10 se matan CON CONTRATO.**
+- **NO ha marcado `done`.**
+
+---
+
+# RONDA 1 — la implementación original (40 escenarios)
 
 ## La puerta, verificada antes de escribir nada
 
@@ -32,6 +114,10 @@ Cuadran, y la marca `⏸` de F-03 no está. **Se implementa.**
 ## Trazabilidad `@s → test` (por título de `it()`)
 
 Los 40 escenarios del contrato tienen test. Ni uno añadido, ni uno borrado, ni uno reinterpretado.
+
+> **RONDA 2:** el contrato es ahora **@s1..@s43**, y **@s41/@s42/@s43 + las 3 filas nuevas de
+> @s1/@s9 están en la tabla de la ronda 2, arriba**. Las cuentas de tests de esta sección son las de
+> la ronda 1 (**75** en el detector, **43** en la puerta); tras la ronda 2 son **82** y **44**.
 
 ### `src/lib/terceros.test.ts` — el detector (75 tests)
 

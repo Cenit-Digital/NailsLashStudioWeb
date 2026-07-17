@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { detectarOrigenesExternos, type RecursoDeArtefacto } from './terceros.ts'
+import {
+  detectarOrigenesExternos,
+  type OrigenExterno,
+  type RecursoDeArtefacto,
+} from './terceros.ts'
 
 /**
  * F-05 — el DETECTOR de orígenes externos (decisor puro). Contrato:
@@ -99,6 +103,34 @@ describe('los subrecursos del HTML a un origen externo se detectan (@s1)', () =>
       '<use href="https://cdn.tercero.com/s.svg#i"></use>',
       '<use href="https://cdn.tercero.com/s.svg#i">',
       'https://cdn.tercero.com/s.svg#i',
+    ],
+    // 🔴 LAS DOS ÚLTIMAS FILAS LAS AÑADE LA AMPLIACIÓN DEL 2026-07-17, Y LAS TRAE LA MUTACIÓN.
+    // Precedente exacto: el `+` del regex del teléfono en @s5 de F-01. LA MUTACIÓN NO ENCONTRÓ
+    // CÓDIGO DE MÁS: ENCONTRÓ CONTRATO DE MENOS.
+    //
+    // UN ESPACIO EN LA URL, Y NO ES `srcset`: mata el `ConditionalExpression` de terceros.ts:278
+    // (`nombre === ATRIBUTO_SRCSET ? … : valor` → `true ? …`). Con el mutante se le aplica
+    // `split(' ')[0]` a TODO atributo y el valor sale TRUNCADO (`…/a`). 🔴 EL ORIGEN SE DETECTA
+    // IGUAL Y LA CUENTA NO SE MUEVE: SOLO LO CAZA EL ASERTO SOBRE `valor`, que este escenario YA
+    // TIENE. Es la lección literal de la tanda: un `Then` que solo cuenta es ciego a las
+    // mutaciones de VALOR. Sin espacio en la URL, `split(' ')[0] === valor` y el mutante es
+    // INDISTINGUIBLE: por eso ninguna de las otras 14 filas lo mata.
+    [
+      '<img src="https://cdn.tercero.com/a b.png">',
+      '<img src="https://cdn.tercero.com/a b.png">',
+      'https://cdn.tercero.com/a%20b.png',
+    ],
+    // ESPACIOS ALREDEDOR DEL `=`: mata el `Regex` de terceros.ts:58 (`([a-z-]+)\s*=\s*"([^"]*)"` →
+    // `([a-z-]+)\S*=\s*"([^"]*)"`). ✅ DECISIÓN 2 DEL HUMANO (2026-07-17): el espaciado alrededor
+    // del `=` es OPCIONAL en HTML (`src="x"` ≡ `src = "x"`) [V], así que TOLERARLO ES CORRECTO y el
+    // código se queda. El comentario de terceros.ts:57 ASEVERABA esa tolerancia y NINGÚN test la
+    // sostenía: una PROMESA SIN PUERTA. Ahora es un HECHO VIGILADO.
+    // ⚠️ NO CONFUNDIR con el `\s*`→`\S*` que @s24 nombra: aquél es de `URL_CSS`, y el diseño lo
+    // EVITÓ eligiendo `url\(([^)]*)\)` — ése NO ha aparecido. Éste es OTRO, en OTRO regex.
+    [
+      '<img src = "https://cdn.tercero.com/a.png">',
+      '<img src = "https://cdn.tercero.com/a.png">',
+      'https://cdn.tercero.com/a.png',
     ],
   ])(
     '@s1 %s se detecta como petición automática a cdn.tercero.com',
@@ -336,6 +368,95 @@ describe('<base href> a un tercero convierte una URL relativa en una petición a
   it('@s9 el valor declarado es la URL RESUELTA, no el "a.png" literal', () => {
     const detectados = detectarOrigenesExternos([conBase('https://cdn.tercero.com/')], [])
 
+    expect(detectados[0].valor).toBe('https://cdn.tercero.com/a.png')
+  })
+
+  /**
+   * 🔴 LA 4ª FILA LA AÑADE LA AMPLIACIÓN DEL 2026-07-17, Y LA TRAE LA MUTACIÓN. MATA EL
+   * `OptionalChaining` de terceros.ts:241 (`URL.parse(href, RAIZ_PROPIA)?.href` → `.href`).
+   * `http://[` es una URL INVÁLIDA —host IPv6 sin cerrar, la forma más corta que hace que el parser
+   * WHATWG devuelva `null`— así que el `?.` + `?? RAIZ_PROPIA` cae con gracia en el propio sitio;
+   * CON EL MUTANTE, `null.href` → TypeError y la puerta REVIENTA ante un HTML malformado.
+   * ✅ DECISIÓN 1 DEL HUMANO: LA GUARDA ES CORRECTA Y SE QUEDA. LO QUE FALTABA ERA EL ESCENARIO,
+   * NO EL CÓDIGO. NADA en la suite metía una URL QUE NO PARSEE.
+   * Su HERMANO EXACTO es la 3ª fila de @s41 (`<img src="http://[">`): van juntos a propósito, y son
+   * la misma lección por las dos ramas — la de la `base` y la del subrecurso.
+   */
+  it('@s9 con <base href="http://[">, la base NO PARSEA: se cae con gracia en la raíz propia y NO LANZA', () => {
+    function detectar(): readonly OrigenExterno[] {
+      return detectarOrigenesExternos([conBase('http://[')], [])
+    }
+
+    expect(detectar).not.toThrow()
+    expect(detectar()).toEqual([])
+  })
+})
+
+/**
+ * 🔴🔴 ESCENARIO NUEVO — LA AMPLIACIÓN DEL 2026-07-17, Y LA TRAE LA MUTACIÓN.
+ * EL PATRÓN DE LOS 10 SUPERVIVIENTES ES UNO SOLO: el contrato cubría muy bien LO QUE EL ARTEFACTO
+ * SÍ TRAE, y NO FIJABA QUÉ PASA CON LO MALFORMADO. Estas 3 filas matan los 4 mutantes del grupo A
+ * (terceros.ts:257-258) y el `ConditionalExpression` de :299.
+ * ✅ DECISIÓN 1 DEL HUMANO: LAS GUARDAS SON CORRECTAS Y SE QUEDAN. Quien «mate» estos mutantes
+ * BORRANDO las guardas ROMPE LA FEATURE: sin ellas el detector LANZA ante un HTML malformado
+ * (filas 1 y 3) o INVENTA UN TERCERO QUE NADIE PIDE (fila 2). AQUÍ NO SOBRABA CÓDIGO: FALTABA
+ * CONTRATO.
+ * 🔴🔴 LA FILA 2 LLEVA EL `<base>` A UN TERCERO, Y NO ES DECORACIÓN: CON LA BASE PROPIA EL MUTANTE
+ * ES INDISTINGUIBLE (ambos caen del lado propio → 0 = 0 → SOBREVIVE). MEDIDO, no deducido [V]:
+ * `URL.parse(undefined, 'https://cdn.tercero.com/')` → host `cdn.tercero.com` (→ 1 ≠ 0 → MUERE),
+ * frente a `URL.parse(undefined, 'https://propio.invalid/')` → host `propio.invalid` (→ 0 = 0 →
+ * sobrevive). NADIE QUITE ESE `<base>` POR «SIMPLIFICAR EL FIXTURE»: LO DESACTIVA.
+ * ⚠️ NO ENCAJABA EN NINGUNO DE LOS 40: @s2/@s3/@s7 fijan `rel` EN EL PROPIO Given (no hay forma de
+ * quitarlo por una fila), @s18 es «las URL que RESUELVEN AL PROPIO SITIO» —y esto NO resuelve al
+ * propio sitio: es un tercero QUE SENCILLAMENTE NO SE PIDE— y @s1 exige EXACTAMENTE 1 origen.
+ */
+describe('HTML malformado: la puerta NO lanza y NO inventa un origen que nadie pide (@s41)', () => {
+  it.each([
+    [
+      '<link href="https://cdn.tercero.com/x.css">',
+      '<link> SIN rel: no declara qué es, y NADA lo pide',
+    ],
+    [
+      '<base href="https://cdn.tercero.com/"><link rel="stylesheet">',
+      '<link rel> SIN href: no hay nada que pedir. LA BASE ES A UN TERCERO A PROPÓSITO',
+    ],
+    ['<img src="http://[">', 'URL INVÁLIDA en un subrecurso: URL.parse → null'],
+  ])('@s41 %s no lanza y no detecta ningún origen (%s)', (marcado) => {
+    function detectar(): readonly OrigenExterno[] {
+      return detectarOrigenesExternos([recursoHtml(marcado)], [])
+    }
+
+    expect(detectar).not.toThrow()
+    expect(detectar()).toEqual([])
+  })
+})
+
+/**
+ * 🔴🔴 ESCENARIO NUEVO — LA AMPLIACIÓN DEL 2026-07-17. MATA EL `ConditionalExpression` de
+ * terceros.ts:240 (`if (href !== undefined)` → `if (true)`), Y ES EL PEOR DE LOS 10: EL MUTANTE
+ * PRODUCE UN FALSO NEGATIVO. Con él, el primer `<base>` (el que NO tiene `href`) devuelve
+ * `…/undefined` Y CORTA EL BUCLE: el `<base href>` del tercero NO SE CONSULTA JAMÁS, `a.png`
+ * resuelve al sitio propio y LA PETICIÓN AL TERCERO SE VUELVE INVISIBLE. Un falso negativo es el
+ * peor fallo posible para F-05: la puerta diría «limpio» mientras la visitante entrega su IP.
+ * LA LETRA, Y ESTE TEST LA FIJA [V, HTML Living Standard §4.6.5]: GANA EL PRIMER `<base>` QUE
+ * TENGA `href`, no el primer `<base>` a secas.
+ * 🔴🔴 UN `<base>` SIN HREF A SECAS NO LO MATA, Y POR ESO ESTE FIXTURE LLEVA LOS DOS `<base>`
+ * [V, medido: `<base><img src="a.png">` → 0 orígenes CON Y SIN mutante, porque `…/undefined` y
+ * `…/` son AMBOS host propio → INDISTINGUIBLE]. Quien «simplifique» este fixture a un solo `<base>`
+ * deja el mutante vivo y el falso negativo abierto.
+ * ⚠️ NO ENCAJA EN @s9: su Given inyecta UN `<base href>` por plantilla — no hay fila que pueda meter
+ * DOS elementos `<base>`, y uno de ellos SIN atributo. ES LA HERMANA DE @s9: las dos existen por lo
+ * mismo — hay vías por las que un tercero entra SIN QUE NADIE ESCRIBA SU NOMBRE.
+ */
+describe('un <base> sin href NO corta la búsqueda: gana el primer <base href> VÁLIDO (@s42)', () => {
+  it('@s42 con <base> seguido de <base href> a un tercero, a.png es una petición al tercero', () => {
+    const detectados = detectarOrigenesExternos(
+      [recursoHtml('<base><base href="https://cdn.tercero.com/"><img src="a.png">')],
+      [],
+    )
+
+    expect(detectados).toHaveLength(1)
+    expect(detectados[0].origen).toBe('cdn.tercero.com')
     expect(detectados[0].valor).toBe('https://cdn.tercero.com/a.png')
   })
 })
