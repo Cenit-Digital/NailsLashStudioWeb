@@ -4,11 +4,14 @@
 > (regla anti-teléfono-descompuesto). Al cerrar la sesión, mueve el resumen a
 > `history.md` y deja este archivo con solo esta plantilla.
 
-- **Feature en curso:** `6 — header_nav_footer` (**`spec_ready`**) — **PARADA EN LA PUERTA
-  HUMANA.** Verificación previa, spec y contrato **hechos y commiteados**; **`src/` sin tocar** (el
-  TDD no empieza hasta que caiga la marca `⏸`). `5 — cero_terceros` quedó `done` (resumen en
-  `history.md`).
-- **Proyecto:** **5 done · 1 spec_ready · 10 pending · 4 blocked.**
+- **Feature en curso:** `6 — header_nav_footer` (**`in_progress`**) — **PUERTA HUMANA ABIERTA
+  (2026-07-17), TDD EN CURSO.** El `tdd_craftsman` verificó las dos condiciones (contrato aprobado
+  + `status: in_progress` + campo `puerta_humana`) y arrancó el Rojo-Verde-Refactor. Mapa `@s → test`
+  y diario de ciclos en `progress/tdd_header_nav_footer.md`. `5 — cero_terceros` quedó `done`.
+- **Escenarios a recorrer (20):** @s1..@s20. Orden: puerta de anclas (decisor puro: @s1,@s2,@s3,@s20,
+  @s5) → puerta (humilde: @s6,@s7,@s19,@s8,@s9,@s10) → deslindes de puertas (@s4,@s13,@s14) →
+  cabecera/nav/pie horneados (@s12,@s16) → menú (@s15,@s17) → scroll-padding (@s11) → mutación (@s18).
+- **Proyecto:** **5 done · 1 in_progress · 10 pending · 4 blocked.**
 
 ### 🔴 F-06 está esperándote. SIETE preguntas (B-1..B-7), y las siete son reales.
 

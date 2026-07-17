@@ -1,0 +1,84 @@
+// La cabecera sticky, la nav y el pie de F-06. Contrato: features/header_nav_footer.feature.
+//
+// 🔴 EL EJE RESPONSIVE LO DECIDE CSS PURO (`@media`), NO JS: evita el patrón de memoria
+// `red-css-para-rama-solo-js-en-ssg` (bajo SSG un `useIsMobile` hornea la rama de escritorio y en
+// móvil desborda hasta que hidrata). El estado abierto/cerrado va en `aria-expanded` (atributo
+// CONSULTABLE), NUNCA en un className condicional (medido INMATABLE bajo la regla anti-clase-CSS).
+
+.cabecera {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 1rem;
+  padding-inline: 1.5rem;
+  background: var(--surface);
+  font-family: 'Manrope', system-ui, sans-serif;
+}
+
+.marca {
+  font-weight: 700;
+  font-size: 1.25rem;
+  line-height: 1.4;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.lista {
+  display: flex;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// El disparador (hamburguesa) toma el tamaño de destino táctil recomendado (2,75rem = 44px). Solo
+// aparece en móvil; en escritorio la nav es horizontal (lo decide el `@media`).
+.disparador {
+  display: none;
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  padding-block: 2rem;
+  padding-inline: 1.5rem;
+  font-family: 'Manrope', system-ui, sans-serif;
+}
+
+// 🔴 EL BREAKPOINT: el literal 820px [criterio de proyecto MEDIDO: la nav envuelve en la banda
+// 793–806px → 820px da margen sobre toda la banda]. NUNCA el 767 de WebEmpresa (herencia muerta, 0
+// en `src/`). NUNCA atribuido a WCAG (SC 1.4.10 solo exige 320px, y la cabecera ya lo cumple).
+//
+// A <= 820px: aparece el botón hamburguesa y la lista se pliega; la abre `aria-expanded="true"` del
+// botón (selector de hermano), NO un className condicional. Por encima: nav horizontal, sin botón.
+// Así el eje responsive es CSS PURO y la nav viaja HORNEADA con la lista siempre en el DOM (@s16).
+@media (max-width: 820px) {
+  .disparador {
+    display: inline-flex;
+  }
+
+  .lista {
+    display: none;
+    flex-direction: column;
+  }
+
+  .disparador[aria-expanded='true'] + .lista {
+    display: flex;
+  }
+}

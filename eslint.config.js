@@ -5,7 +5,9 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
-  { ignores: ['dist', 'coverage', 'reports', '.stryker-tmp', 'node_modules', 'design'] },
+  // `.experimentos-tmp` es scratch gitignored: la genera `trampas-del-horneado.test.tsx` (builds SSG
+  // efímeros) y la dejó la verificación previa de F-06. Como `dist`/`.stryker-tmp`, no se lintea.
+  { ignores: ['dist', 'coverage', 'reports', '.stryker-tmp', '.experimentos-tmp', 'node_modules', 'design'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],

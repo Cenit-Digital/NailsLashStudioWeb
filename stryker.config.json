@@ -24,7 +24,11 @@
     "src/lib/seo.ts",
     "src/lib/puerta-cascaron.ts",
     "src/lib/terceros.ts",
-    "src/lib/puerta-terceros.ts"
+    "src/lib/puerta-terceros.ts",
+    "src/lib/puerta-anclas.ts",
+    "src/components/Cabecera.tsx",
+    "src/components/MenuNavegacion.tsx",
+    "src/components/Pie.tsx"
   ],
   "thresholds": {
     "high": 100,

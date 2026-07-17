@@ -1,5 +1,7 @@
 import { Head } from 'vite-react-ssg'
 
+import { Cabecera } from '../components/Cabecera'
+import { Pie } from '../components/Pie'
 import { canonicaDe, componerTitulo, construirJsonLd, ORIGEN_CANONICA } from '../lib/seo'
 import { DIRECCION, GEO, NOMBRE, TELEFONO, telHref } from '../lib/site'
 
@@ -57,10 +59,7 @@ export default function Home() {
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Head>
 
-      <nav aria-label="Principal">
-        <a href={`#${ID_SERVICIOS}`}>Servicios</a>
-        <a href={`#${ID_CONTACTO}`}>Contacto</a>
-      </nav>
+      <Cabecera />
 
       <main>
         <h1>{NOMBRE}</h1>
@@ -83,14 +82,9 @@ export default function Home() {
         </section>
       </main>
 
-      {/* EL PIE NO EMITE ENLACES LEGALES TODAVÍA, y es DELIBERADO (A-17): las rutas, los enlaces
-          y el contenido legal son de F-16, y hoy NO EXISTEN razón social ni NIF válido [V].
-          Suena incómodo y es lo correcto: UN PIE QUE ENLAZA A LA NADA ES LITERALMENTE EL BUG DEL
-          CLIENTE (su /es/aviso-legal da 404 [V]), y la puerta anti-404 lo hace ESTRUCTURALMENTE
-          IMPOSIBLE. Cuando F-16 se desbloquee, los enlaces aparecerán CON DESTINO REAL. */}
-      <footer>
-        <p>{NOMBRE}</p>
-      </footer>
+      {/* El pie de F-06: la marca, el `tel:` y Facebook (derivados de F-02). NO emite enlaces
+          legales (los cazaría la anti-404 —el bug del cliente—; son F-16). Ver src/components/Pie.tsx. */}
+      <Pie />
     </>
   )
 }

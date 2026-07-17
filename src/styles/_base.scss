@@ -29,10 +29,14 @@
 // CABECERA LA MONTA F-06. Su Understanding nombra LITERALMENTE los sticky headers y su técnica
 // suficiente es `C43` Using CSS scroll-padding to un-obscure content [V].
 //
-// 🔴 EL VALOR DEPENDE DE LA ALTURA DE LA CABECERA STICKY, QUE ES DE F-06. Este 5rem es un
-// SUELO razonable puesto por la cáscara, NO un número verificado: @s11 fija que la declaración
-// EXISTE y es > 0, NUNCA el número — fijarlo hoy sería INVENTARLO. F-06 es quien puede
-// ajustarlo, porque es quien conoce la altura, y quien debe VIGILAR que funcione.
+// 🔴 F-06 RE-MIDIÓ Y SUSTITUYÓ EL 5rem (contrato @s11, B-2). Va en el CONTENEDOR (`html`) y por eso
+// cubre TODA operación de scroll-into-view [V]. La cabecera de F-06 es UNA SOLA FILA en todo el
+// rango (a <=820px hay botón hamburguesa; por encima, marca + 2 enlaces horizontales), así que NO
+// envuelve como el prototipo (que llegaba a 231px con 6 enlaces). Altura máxima RE-MEDIDA sobre
+// `cabecera.module.scss`: padding-block 1rem×2 (32px) + destino táctil 2.75rem (44px) = 76px. Se
+// pone 6rem = 96px: SUELO SEGURO con margen. CERO números atribuidos a SC 2.4.11 (B-1): el listón
+// AA es «not entirely hidden»; los px son criterio de proyecto. `src/styles/scroll-padding-cabecera.test.ts`
+// lo vigila (el SCSS no es mutable: el mutante aquí es HUMANO y la puerta de aprobación su defensa).
 html {
-  scroll-padding-top: 5rem;
+  scroll-padding-top: 6rem;
 }
