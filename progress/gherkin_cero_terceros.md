@@ -1,9 +1,10 @@
 # F-05 `cero_terceros` — destilación Gherkin (gherkin_author, 2026-07-17)
 
-> **Entregable:** `features/cero_terceros.feature` — **40 escenarios, `@s1`..`@s40`**.
-> **Estado:** ✅ **APROBADO POR LA PUERTA HUMANA EL 2026-07-17.** Las **cuatro** preguntas
-> (A-23, A-24, A-27, A-28) **cerradas por el humano**; **las 21 marcas `⏸` retiradas del
-> `.feature`**; **el `tdd_craftsman` está LIBERADO**. Ver **§Puerta humana (2026-07-17)** al final.
+> **Entregable:** `features/cero_terceros.feature` — **43 escenarios, `@s1`..`@s43`**.
+> **Estado:** ✅ **APROBADO POR LA PUERTA HUMANA EL 2026-07-17** (40 escenarios) **+ AMPLIACIÓN
+> APROBADA POR EL HUMANO EL 2026-07-17** (→ **43**), **tras la escalada de la prueba de mutación**.
+> Las **cuatro** preguntas (A-23, A-24, A-27, A-28) **cerradas**; **las 21 marcas `⏸` retiradas**.
+> **El estado vigente es §Ampliación por mutación (2026-07-17)**, al final del fichero.
 > *(El «37 escenarios» de antes era previo a la ronda de reparación, que añadió @s38/@s39/@s40.)*
 >
 > **Fuentes leídas, en este orden:** `project-spec.md` §Feature 5 (la FUENTE) ·
@@ -343,3 +344,106 @@ Aquí se **registra el hecho**. El acta vive en `feature_list.json` §5 → camp
 3. **Honestidad de medición, que sigue en pie:** los **13 supervivientes** y el **78,99 %** están
    medidos sobre **un prototipo desechable**, **no sobre el código real de F-05, que NO EXISTE**.
    **Otra implementación tendrá otro conjunto. Se mide cuando exista, no antes.**
+
+---
+
+# Ampliación por mutación (2026-07-17) — **DE 40 A 43 ESCENARIOS** · ESTADO VIGENTE
+
+> ✅ **APROBADA POR EL HUMANO EL 2026-07-17**, tras la **escalada** de
+> `progress/mutation_cero_terceros.md` (**10 supervivientes REALES**, los 10 verificados **por
+> sabotaje manual**, **0 exclusiones** — A-23 no daba licencia para excluir nada, así que **se midió
+> y se escaló**: exactamente lo que el contrato mandaba).
+
+## 🔴 EL PORQUÉ, EN UNA LÍNEA
+
+**LA MUTACIÓN NO ENCONTRÓ CÓDIGO DE MÁS. ENCONTRÓ CONTRATO DE MENOS.**
+
+**Precedente exacto: `@s5` de F-01**, donde la mutación reveló que el escenario **no fijaba el `+`
+del regex del teléfono** y **el humano aprobó una fila más** (`| 600  123  456 |`): la salida fue
+**una FILA EN EL CONTRATO, con la producción SIN TOCAR**. Igual que **F-03** (19 %→100 %, solo
+arreglando los tests) y **F-04** (58 supervivientes, **0 exclusiones**). **Van cuatro seguidas.**
+
+**El patrón de los 10, y es lo que hay que llevarse:** salvo el `:58`, **todos son guardas
+defensivas contra entradas que NINGÚN escenario metía** (`rel`/`href` ausentes, una URL que no
+parsea, un `@font-face` en un HTML). **El contrato cubría MUY BIEN lo que el artefacto SÍ trae y no
+fijaba NADA de lo malformado.** El `:58` es de otra especie y es el más grave: **un comentario que
+aseveraba una tolerancia que ningún test sostenía** — «una promesa sin puerta».
+
+## Las dos decisiones del humano
+
+1. ✅ **SE AÑADEN LAS FILAS/ESCENARIOS QUE MATAN LOS 10. LAS GUARDAS SON CORRECTAS Y SE QUEDAN.**
+   Sin ellas el detector **LANZA TypeError** ante HTML malformado y —lo peor— **un `<base>` sin
+   `href` seguido de uno válido a un tercero haría la petición al tercero INVISIBLE**: **un FALSO
+   NEGATIVO, el peor fallo posible para F-05** (@s42). **Faltaban los escenarios, no el código.**
+   🔴 **Un `tdd_craftsman` que «matara» estos mutantes BORRANDO las guardas rompería la feature.**
+2. ✅ **EL `:58` (`ATRIBUTO`) SE FIJA CON UN TEST.** El espaciado alrededor del `=` **es opcional en
+   HTML** [V] → tolerarlo **es correcto**: `<img src = "https://cdn.tercero.com/a.png">` **DEBE
+   detectarse**. El comentario de `terceros.ts:57` pasa de **promesa sin puerta** a **hecho vigilado**.
+
+## Qué cambió, exactamente — **3 filas nuevas + 3 escenarios nuevos**
+
+**Filas nuevas en escenarios que YA existen** (la forma que ya usó F-01 con `@s5`):
+
+| Escenario | Fila añadida | Mata | Medido [V] |
+| --- | --- | --- | --- |
+| **@s1** | `<img src="https://cdn.tercero.com/a b.png">` | `terceros.ts:278` `ConditionalExpression` | `valor` = `…/a%20b.png`; el mutante da `…/a` |
+| **@s1** | `<img src = "https://cdn.tercero.com/a.png">` | `terceros.ts:58` `Regex` (`\s*`→`\S*`) | 1 origen; `construccion` conserva los espacios |
+| **@s9** | `\| http://[ \| 0 \| … no parsea y NO LANZA \|` | `terceros.ts:241` `OptionalChaining` | 0 orígenes, **sin excepción** |
+
+**Escenarios nuevos — y SOLO porque no encajaban en ninguno de los 40** (se comprobó uno a uno):
+
+| Nuevo | Qué fija | Mata | Por qué NO encajaba |
+| --- | --- | --- | --- |
+| **@s41** | HTML malformado: `<link>` sin `rel`; `<link rel>` sin `href` **con la base a un tercero**; `<img src="http://[">` | **los 4 del grupo A** (`:257-258`) **y el `:299`** | @s2/@s3/@s7 fijan `rel` **en el `Given`** (no hay fila que lo quite); **@s18 es «resuelven al PROPIO sitio»** y esto **no** resuelve al propio sitio: es un tercero **que no se pide**; @s1 exige **exactamente 1** |
+| **@s42** | `<base>` sin href **seguido de** `<base href>` a un tercero → **1 origen** (HTML LS §4.6.5: gana el primer `<base>` **con href**) | `terceros.ts:240` | el `Given` de **@s9 inyecta UN solo `<base href="<base>">` por plantilla**: no hay fila que meta **DOS** `<base>`, uno sin atributo |
+| **@s43** | un recurso **`html` con `@font-face` inline** → **exit 0**, y **NO** acusa `("Impostora", 400)` | `puerta-terceros.ts:159` | **@s28 no es Outline** (no admite filas) y el `Then` de **@s29 exige exit ≠ 0**; éste exige **0** |
+
+## 🔴 Los dos hechos que se pierden al copiar — **MEDIDOS, y escritos donde duelen**
+
+1. **La fila 2 de @s41 NECESITA el `<base>` A UN TERCERO.** [V, medido]
+   `URL.parse(undefined, 'https://cdn.tercero.com/')` → **`https://cdn.tercero.com/undefined`**, host
+   `cdn.tercero.com` → **1 ≠ 0 → MUERE**. Con la base propia → host `propio.invalid` → **0 = 0 →
+   SOBREVIVE**. **Quien «simplifique» el fixture desactiva el escenario.**
+2. **El fixture de @s42 NECESITA LOS DOS `<base>`.** [V, medido] `<base><img src="a.png">` a secas →
+   **0 orígenes CON y SIN mutante** (`…/undefined` y `…/` son **ambos host propio**) →
+   **INDISTINGUIBLE**.
+
+**Y la lección literal de la tanda, aplicada:** el `Then` de la fila del espacio **ASEVERA EL
+`valor`, no la cuenta** — «@s24 mataba CERO porque su `Then` solo aseveraba conteos, **ciegos a las
+mutaciones de valor**». El origen se detecta igual con el mutante: **solo el aserto sobre `valor` lo
+caza**. Por lo mismo, el `Then` de **@s43 acusa el par concreto**, no solo el código de salida.
+
+## Método — **NO se ha inventado ninguna fila**
+
+- **Cada fila sale del informe §4-§5**, y **las 8 del detector + la de la puerta se REMIDIERON
+  contra el código real de `src/lib/` el 2026-07-17** (script efímero con
+  `node --experimental-strip-types`, **borrado; `src/` y los tests intactos**). **0 discrepancias con
+  el informe: los 10 son reales y el análisis del `mutation_tester` se sostiene entero.**
+- **Fila medida y NO añadida, y queda escrito para que nadie la proponga «de memoria»:** un
+  **`<base>` sin href A SECAS** — **no mata `:240`** (ver arriba). Va **en el comentario de @s42**,
+  no como fila. *Es la misma disciplina que @s24 y @s7 ya escribieron.*
+- **`http://[` no es un capricho:** es un host IPv6 sin cerrar, **la forma más corta que hace que el
+  parser WHATWG devuelva `null`**. Un `.invalid` **no serviría: parsea perfectamente.**
+
+## Lo que NO se ha tocado
+
+- ❌ **NI UN escenario de los 40 se ha modificado, borrado ni reinterpretado. Solo se han AÑADIDO
+  FILAS** (@s1 +2, @s9 +1). **Verificado:** 43 tags `@s1..@s43`, **43 `Scenario`**, **0 duplicados**,
+  **todas las tablas consistentes en nº de columnas**. **NI UNA DECISIÓN DE F-05 CAE.**
+- ❌ **NO se ha tocado `src/` ni los tests** (es trabajo del `tdd_craftsman`).
+- ❌ **NO se excluye ni se justifica NI UN mutante.** **EL UMBRAL SIGUE SIENDO 1.0 CON 0
+  EXCLUSIONES: A-23 sigue vigente ENTERA.** Esta ampliación los mata **con contrato**.
+- ❌ **NO se ha reintroducido ninguna atribución normativa falsa (A-24).** Las dos citas nuevas son
+  **HTML LS §4.6.5** (@s42) y **«el espaciado del `=` es opcional en HTML»** (@s1): **las dos son
+  letra de la norma técnica, ninguna es jurídica.**
+
+## Para el `tdd_craftsman`
+
+1. **6 tests rojos matan los 10** (`mutation_cero_terceros.md` §7). El mapa fila→mutante está en el
+   comentario de cada escenario: **@s1 (2 filas), @s9 (1 fila), @s41 (3 filas), @s42, @s43.**
+2. **NO borres las guardas para «matar» los mutantes**: son la decisión 1 del humano. **El mutante
+   muere porque el test nuevo lo distingue, no porque el código se simplifique.**
+3. **Después: vuelta al `judge` y REMEDICIÓN a `--concurrency 1`.** Añadir tests no puede bajar un
+   score, **pero el informe honesto hay que volver a emitirlo** — y **la tanda #1 de `terceros.ts`
+   dio «100 %, 0 supervivientes» Y ERA FALSO** (152 timeouts, 1,59 tests/mutante). **Se lee
+   `# timeout` y `tests per mutant` ANTES que el score.**

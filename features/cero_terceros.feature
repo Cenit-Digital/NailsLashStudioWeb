@@ -8,6 +8,53 @@
 #    El registro vive también en `feature_list.json` §5 → campo **`puerta_humana`**. **Donde este
 #    fichero y ese campo se leyeran distinto, MANDA `feature_list.json`: es el acta.**
 # =============================================================================================
+# ✅✅ **AMPLIACIÓN APROBADA POR LA PUERTA HUMANA EL 2026-07-17 — DE 40 A 43 ESCENARIOS.**
+#    **Tras la ESCALADA de la prueba de mutación** (`progress/mutation_cero_terceros.md`: **10
+#    supervivientes REALES**, verificados **uno a uno por sabotaje manual**, con **0 exclusiones** —
+#    A-23 no daba licencia para excluir nada, así que **se midió y se escaló**, que es exactamente
+#    lo que el contrato mandaba hacer).
+#
+#    🔴🔴 **EL PORQUÉ, Y ES LA LECCIÓN ENTERA DE LA TANDA: LA MUTACIÓN NO ENCONTRÓ CÓDIGO DE MÁS.
+#    ENCONTRÓ CONTRATO DE MENOS.** **PRECEDENTE EXACTO — `@s5` DE F-01**, donde la mutación reveló
+#    que el escenario **no fijaba el `+` del regex del teléfono** y **el humano aprobó una fila más**
+#    (`| 600  123  456 |`): **la salida fue una FILA EN EL CONTRATO, con la producción SIN TOCAR.**
+#    Es también lo que ya pasó en **F-03** (19 %→100 %, solo arreglando los tests) y en **F-04**
+#    (58 supervivientes, **0 exclusiones**). **Van cuatro features seguidas con el mismo patrón.**
+#
+#    ✅ **DECISIÓN 1 DEL HUMANO — SE AÑADEN LAS FILAS/ESCENARIOS QUE MATAN LOS 10. LAS GUARDAS
+#    DEFENSIVAS SON CORRECTAS Y SE QUEDAN.** Sin ellas el detector **LANZA TypeError** ante HTML
+#    malformado y —lo peor— **un `<base>` sin `href` seguido de uno válido a un tercero haría que la
+#    petición al tercero fuera INVISIBLE: un FALSO NEGATIVO, el peor fallo posible para esta
+#    feature** (@s42). **LO QUE FALTABAN ERAN LOS ESCENARIOS, NO EL CÓDIGO.** **Un `tdd_craftsman`
+#    que «matara» estos mutantes borrando las guardas ROMPERÍA LA FEATURE.**
+#    ✅ **DECISIÓN 2 DEL HUMANO — EL `:58` (`ATRIBUTO`) SE FIJA CON UN TEST.** **El espaciado
+#    alrededor del `=` es OPCIONAL en HTML** [V], así que **tolerarlo es CORRECTO**: un
+#    `<img src = "https://cdn.tercero.com/a.png">` **DEBE detectarse** (@s1, última fila). **El
+#    comentario de `terceros.ts:57` pasa de PROMESA SIN PUERTA a HECHO VIGILADO.**
+#
+#    **QUÉ CAMBIA, EXACTAMENTE — Y NO CAMBIA NADA MÁS:**
+#      - **3 FILAS NUEVAS en escenarios que ya existen** (la forma que ya usó F-01 con `@s5`):
+#        **@s1** +2 (`src` con un ESPACIO en la URL → mata `:278`; `src = "…"` con espacios en el
+#        `=` → mata `:58`) y **@s9** +1 (`<base href="http://[">`, URL inválida → mata `:241`).
+#      - **3 ESCENARIOS NUEVOS, y SOLO porque no encajaban en ninguno de los 40**: **@s41**
+#        (HTML malformado: `<link>` sin `rel`, `<link rel>` sin `href` con la base a un tercero,
+#        `<img src>` inválido → mata los 4 del grupo A y el `:299`), **@s42** (`<base>` sin href
+#        seguido de `<base href>` a un tercero → mata `:240`) y **@s43** (un recurso `html` con
+#        `@font-face` inline → mata `puerta-terceros.ts:159`).
+#      - 🔴 **NINGUNO DE LOS 40 ESCENARIOS APROBADOS SE HA TOCADO, BORRADO NI REINTERPRETADO.**
+#        **Solo se les han AÑADIDO FILAS.** **NI UNA DECISIÓN DE F-05 CAE.**
+#      - 🔴 **EL UMBRAL SIGUE SIENDO 1.0 CON 0 EXCLUSIONES.** Esta ampliación **NO excluye ni
+#        justifica NI UN mutante**: los mata **con contrato**. **A-23 sigue vigente ENTERA.**
+#
+#    ⚠️ **CADA FILA DE ESTA AMPLIACIÓN SALE DEL INFORME DE MUTACIÓN §4-§5 Y ESTÁ REMEDIDA CONTRA EL
+#    CÓDIGO REAL DE `src/lib/` EL 2026-07-17 — NO SE HA INVENTADO NINGUNA, Y NINGUNA SE SUSCRIBE «DE
+#    MEMORIA».** Los dos hechos que **más fácilmente se pierden al copiar** van escritos donde
+#    duelen: **la fila 2 de @s41 y el fixture de @s42 NECESITAN el `<base>` A UN TERCERO / los DOS
+#    `<base>`** — **con la base propia o con un solo `<base>`, el mutante es INDISTINGUIBLE y
+#    SOBREVIVE** [V, medido]. **Y el `Then` de la fila del espacio ASEVERA EL `valor`, no la cuenta:
+#    es la lección literal de la tanda** («@s24 mataba CERO porque su `Then` solo aseveraba conteos,
+#    ciegos a las mutaciones de valor»).
+# =============================================================================================
 # 🔧 **RONDA DE REPARACIÓN (2026-07-17) — TRAS UNA REVISIÓN ADVERSARIAL DE 31 AGENTES / 6 LENTES.**
 #    **23 hallazgos confirmados (3 BLOQUEANTES, 14 GRAVES, 6 MENORES): 21 aplicados, 2 RECHAZADOS
 #    CON MEDICIÓN.** Detalle completo en `progress/gherkin_cero_terceros.md` §Ronda de reparación.
@@ -723,14 +770,17 @@
 # =============================================================================================
 #   A1 (`detectarOrigenesExternos(html|css)` devuelve los orígenes externos, con allowlist vacía)
 #      → @s1, @s2, @s3, @s4, @s5, @s6, @s7, @s8, @s9, @s19, @s25, @s34, **@s40** (el filtro
-#      `(html|css)` ANCLADO donde vive), **@s39** (la allowlist `[]` de producción)
+#      `(html|css)` ANCLADO donde vive), **@s39** (la allowlist `[]` de producción), **@s42** (el
+#      `<base href>` VÁLIDO gana: sin él, la petición al tercero es INVISIBLE — ampliación 2026-07-17)
 #   A2 ✅ **REESCRITO Y APROBADO EN LA PUERTA HUMANA (A-23, 2026-07-17).** El texto viejo
 #      (*«CUALQUIER origen externo»*) era **INSATISFACIBLE** y **ya no existe**. La letra vigente de
 #      `feature_list.json` §5 es *«el build falla si el artefacto contiene una **PETICIÓN
 #      AUTOMÁTICA** a un origen externo»* → @s26, @s27, @s35 (positivo) y @s10..@s18 (**el negativo,
-#      que es lo que la hace satisfacible SIN romper F-04 ni F-02, las dos `done`**)
+#      que es lo que la hace satisfacible SIN romper F-04 ni F-02, las dos `done`**), **@s41** (el
+#      negativo de LO MALFORMADO: ni lanza ni inventa un origen — ampliación 2026-07-17)
 #   A3 (ni una petición a fonts.googleapis.com ni a fonts.gstatic.com) → @s4, @s26, @s29, **@s39**
-#   A4 (no se solicita `wght@300`) → @s4, @s28, @s29, **@s38**
+#   A4 (no se solicita `wght@300`) → @s4, @s28, @s29, **@s38**, **@s43** (los pares son **DEL CSS**:
+#      un `@font-face` de un recurso `html` NO cuenta — ampliación 2026-07-17)
 #   A5 ✅ **REESCRITO Y APROBADO EN LA PUERTA HUMANA (A-23, 2026-07-17).** El texto viejo era
 #      **INMEDIBLE** —pedía **un mutante que no existe** (`.includes`)— y **ya no existe**: la letra
 #      vigente **nombra mutadores REALES** y **prohíbe expresamente pedir que se mute `.includes`**
@@ -738,7 +788,12 @@
 #      (`EqualityOperator`, `StringLiteral`, `MethodExpression`), **@s38 (`ArrayDeclaration` — NO
 #      @s30)**, @s24 (`Regex`), @s7 (`MethodExpression`). **Umbral 1.0, 0 exclusiones: un
 #      superviviente SE ESCALA AL HUMANO.**
-#   Guarda anti-«verde por vacuidad» + falla cerrada → @s28, @s29, @s30, @s31, @s32, @s33, **@s38**
+#   Guarda anti-«verde por vacuidad» + falla cerrada → @s28, @s29, @s30, @s31, @s32, @s33, **@s38**,
+#      **@s43** (el filtro por tipo de `paresDelCss`, que **prometía «del CSS» y nada comprobaba**)
+#   **LO MALFORMADO, que NINGUNO de los 40 metía** (ampliación 2026-07-17, tras los 10
+#      supervivientes) → **@s41** (`rel`/`href` ausentes, URL que no parsea), **@s42** (el `<base>`
+#      sin href que NO corta la búsqueda), **@s9 fila 4** (`<base href>` inválido), **@s1 filas 15-16**
+#      (el espacio en la URL de un `src`, y el espaciado alrededor del `=`)
 #   **Las dos CONSTANTES DE PRODUCCIÓN, que antes no aseveraba NINGÚN escenario** → **@s38**
 #      (`PARES_DE_FUENTE_ESPERADOS`) y **@s39** (la allowlist `[]` del humilde). *Los 34 pasos que
 #      las mencionaban las INYECTAN desde el test: sin @s38/@s39, «allowlist vacía» —la letra del
@@ -785,7 +840,40 @@ Feature: Cero peticiones automáticas a terceros, fuentes autohospedadas y la pu
       | <track src="https://cdn.tercero.com/a.vtt">                     | <track src="https://cdn.tercero.com/a.vtt">              | https://cdn.tercero.com/a.vtt      |
       | <input type="image" src="https://cdn.tercero.com/b.png">        | <input type="image" src="https://cdn.tercero.com/b.png"> | https://cdn.tercero.com/b.png      |
       | <use href="https://cdn.tercero.com/s.svg#i"></use>              | <use href="https://cdn.tercero.com/s.svg#i">             | https://cdn.tercero.com/s.svg#i    |
+      | <img src="https://cdn.tercero.com/a b.png">                     | <img src="https://cdn.tercero.com/a b.png">              | https://cdn.tercero.com/a%20b.png  |
+      | <img src = "https://cdn.tercero.com/a.png">                     | <img src = "https://cdn.tercero.com/a.png">              | https://cdn.tercero.com/a.png      |
 
+    # 🔴🔴 **LAS DOS ÚLTIMAS FILAS LAS AÑADE LA AMPLIACIÓN DEL 2026-07-17, Y LAS TRAE LA MUTACIÓN.**
+    # **PRECEDENTE EXACTO: el `+` del regex del teléfono en F-01, donde la mutación reveló que `@s5`
+    # no fijaba el `+` y el humano aprobó la fila `| 600  123  456 |`. LA MUTACIÓN NO ENCONTRÓ CÓDIGO
+    # DE MÁS: ENCONTRÓ CONTRATO DE MENOS.**
+    #
+    # **FILA `a b.png` — MATA `terceros.ts:278` `ConditionalExpression`** (`nombre ===
+    # ATRIBUTO_SRCSET ? urlDeSrcset(valor) : valor` → `true ? …`). **UN ESPACIO EN LA URL, Y NO ES
+    # `srcset`.** Con el mutante se le aplica `split(' ')[0]` a **TODO** atributo → el `valor` sale
+    # **TRUNCADO**. 🔴 **EL ORIGEN SE DETECTA IGUAL Y LA CUENTA NO SE MUEVE: SOLO LO CAZA EL ASERTO
+    # SOBRE `valor`, que este escenario YA TIENE.** **ES LA LECCIÓN LITERAL DE ESTA TANDA** — «@s24
+    # mataba CERO porque su `Then` solo aseveraba conteos, ciegos a las mutaciones de valor».
+    # **MEDIDO CONTRA EL CÓDIGO REAL, no deducido** [V, 2026-07-17]: el detector devuelve
+    # `valor = "https://cdn.tercero.com/a%20b.png"` (**el parser WHATWG codifica el espacio**), y el
+    # mutante devuelve `"https://cdn.tercero.com/a"`. **Sin espacio en la URL, `split(' ')[0] ===
+    # valor` y el mutante es INDISTINGUIBLE: por eso ninguna de las otras 14 filas lo mata.**
+    # ⚠️ **NO es el límite declarado nº 2 del `tdd` (`srcset` multi-candidato): aquí el hueco es
+    # `src`, no `srcset`.** **Y NO ES UN EQUIVALENTE** —el informe lo llama «el más cercano a uno»—:
+    # **esta fila lo distingue por el `valor`, y está medido.**
+    #
+    # **FILA `src = "…"` — MATA `terceros.ts:58` `Regex`** (`ATRIBUTO`: `([a-z-]+)\s*=\s*"([^"]*)"`
+    # → `([a-z-]+)\S*=\s*"([^"]*)"`). ✅ **ES LA DECISIÓN 2 DEL HUMANO (2026-07-17): SE FIJA CON UN
+    # TEST.** **El espaciado alrededor del `=` es OPCIONAL en HTML** (`src="x"` ≡ `src = "x"`) [V],
+    # **así que tolerarlo es CORRECTO y el código se queda**: un `<img src = "https://cdn.tercero
+    # .com/a.png">` **DEBE detectarse**. **El comentario de `terceros.ts:57` ASEVERABA esa tolerancia
+    # y NINGÚN test la sostenía: una PROMESA SIN PUERTA.** Con `\S*` la tolerancia desaparece y la
+    # suite **ni se enteraba**. **Ahora es un HECHO VIGILADO.** [V, medido hoy: 1 origen,
+    # `construccion = '<img src = "https://cdn.tercero.com/a.png">'`, `valor` = la URL.]
+    # ⚠️ **NO CONFUNDIR CON EL `\s*`→`\S*` QUE @s24 NOMBRA: aquél es de `URL_CSS`, y el diseño lo
+    # EVITÓ eligiendo `url\(([^)]*)\)` — ése NO ha aparecido: el diseño de @s24 FUNCIONÓ.** **Éste
+    # es OTRO, en OTRO regex, y NO estaba preaprobado por nadie.**
+    #
     # **A1.** Fundamento [V]: **son SUBRECURSOS — se piden AL PROCESAR EL DOCUMENTO**, sin que el
     # usuario haga nada. Es el eje entero de F-05: *«contacto con un origen externo SIN ACCIÓN DEL
     # USUARIO»*.
@@ -1054,7 +1142,22 @@ Feature: Cero peticiones automáticas a terceros, fuentes autohospedadas y la pu
       | https://cdn.tercero.com/    | 1          | el origen detectado declara el origen "cdn.tercero.com"           |
       | /                           | 0          | no se detecta ningún origen: a.png resuelve al propio sitio       |
       | https://cdn.tercero.com/    | 1          | el valor declarado es la URL RESUELTA, no el "a.png" literal      |
+      | http://[                    | 0          | la base NO PARSEA: se cae con gracia en la raíz propia y NO LANZA |
 
+    # 🔴🔴 **LA 4ª FILA LA AÑADE LA AMPLIACIÓN DEL 2026-07-17, Y LA TRAE LA MUTACIÓN** (precedente
+    # exacto: el `+` del teléfono en `@s5` de F-01 — **la mutación no encontró código de más:
+    # encontró CONTRATO DE MENOS**). **MATA `terceros.ts:241` `OptionalChaining`**
+    # (`URL.parse(href, RAIZ_PROPIA)?.href` → `.href`). **`http://[` es una URL INVÁLIDA:
+    # `URL.parse` devuelve `null`** → el `?.` + `?? RAIZ_PROPIA` **cae con gracia en el propio
+    # sitio**; **con el mutante, `null.href` → TypeError** y la puerta **revienta ante un HTML
+    # malformado**. [V, medido hoy contra el código real: **0 orígenes, sin excepción**.]
+    # ✅ **ES LA DECISIÓN 1 DEL HUMANO: LA GUARDA ES CORRECTA Y SE QUEDA. LO QUE FALTABA ERA EL
+    # ESCENARIO, NO EL CÓDIGO.** **NADA en la suite metía una URL QUE NO PARSEE** — es el patrón de
+    # los 10 supervivientes: *el contrato cubría muy bien lo que el artefacto SÍ trae, y no fijaba
+    # qué pasa con lo malformado*. **Su HERMANO EXACTO es la 3ª fila de @s41** (`<img src="http://[">`,
+    # el `:299`): **van juntos a propósito, y son la misma lección por las dos ramas** — la de la
+    # `base` y la del subrecurso.
+    #
     # 🔴 **`<base href>` ES UN MODIFICADOR, NO UN ORIGEN** [V]. **No pide nada por sí mismo** —por
     # eso la 1ª fila detecta **1 y no 2**: el origen es **el `<img>`**, no el `<base>`— **pero
     # convierte `<img src="a.png">` en una petición a un tercero**.
@@ -2240,3 +2343,127 @@ Feature: Cero peticiones automáticas a terceros, fuentes autohospedadas y la pu
     # deuda de `tools/puerta-placeholders.ts`, que es **de F-01 (feature `done`)** y **exige un
     # escenario nuevo en `features/puerta_placeholders.feature`**. **El humano decidió NO reabrir
     # F-01 hoy: la deuda sigue viva y declarada, y F-05 no la toca.**
+
+  # ---------------------------------------------------------------------------
+  # 🔴 LO MALFORMADO — LA AMPLIACIÓN APROBADA POR EL HUMANO EL 2026-07-17 (@s41..@s43)
+  #
+  # **NINGÚN ESCENARIO DE LOS 40 METÍA UNA ENTRADA MALFORMADA**, y por eso la mutación dejó **10
+  # supervivientes**: `rel`/`href` ausentes, una URL que NO PARSEA, un `@font-face` en un HTML.
+  # **El contrato cubría MUY BIEN lo que el artefacto SÍ trae, y no fijaba NADA de lo que pasa con
+  # lo malformado.** **Las guardas defensivas del código SON CORRECTAS Y SE QUEDAN** (decisión 1 del
+  # humano): sin ellas el detector **LANZA TypeError** ante HTML malformado y —lo peor— **un `<base>`
+  # sin `href` seguido de uno válido a un tercero haría que la petición al tercero fuera INVISIBLE**:
+  # **un FALSO NEGATIVO, el peor fallo posible para esta feature. LO QUE FALTABAN ERAN LOS
+  # ESCENARIOS, NO EL CÓDIGO.**
+  # ---------------------------------------------------------------------------
+
+  @s41
+  Scenario Outline: HTML malformado: la puerta NO lanza y NO inventa un origen que nadie pide
+    Given un recurso "dist/index.html" de tipo html que contiene <marcado>
+    When se llama a detectarOrigenesExternos con ese recurso y la allowlist []
+    Then la llamada NO lanza ninguna excepción
+    And no se detecta ningún origen externo
+
+    Examples:
+      | marcado                                                                | por qué                                                             |
+      | <link href="https://cdn.tercero.com/x.css">                            | 🔴 `<link>` SIN `rel`: no declara qué es, y NADA lo pide            |
+      | <base href="https://cdn.tercero.com/"><link rel="stylesheet">          | 🔴 `<link rel>` SIN `href`: no hay nada que pedir. LA BASE ES A UN TERCERO A PROPÓSITO |
+      | <img src="http://[">                                                   | 🔴 URL INVÁLIDA en un subrecurso: `URL.parse` → `null`              |
+
+    # 🔴🔴 **ESCENARIO NUEVO — LA AMPLIACIÓN DEL 2026-07-17. LAS TRES FILAS SALEN DEL INFORME DE
+    # MUTACIÓN (`progress/mutation_cero_terceros.md` §4), Y LAS TRES ESTÁN MEDIDAS CONTRA EL CÓDIGO
+    # REAL** [V, 2026-07-17: **0 orígenes y sin excepción en las tres**].
+    # **NO ENCAJABAN EN NINGUNO DE LOS 40**: @s2/@s3/@s7 fijan `rel` **en el propio `Given`** (no hay
+    # forma de quitarlo por una fila), @s18 es «las URL que **resuelven al propio sitio**» —y esto
+    # **NO** resuelve al propio sitio: es un tercero **que sencillamente no se pide**— y @s1 exige
+    # **exactamente 1** origen. **Por eso es escenario nuevo, y solo por eso.**
+    #
+    # **FILAS 1 y 2 — MATAN LOS 4 MUTANTES DEL GRUPO A** (`terceros.ts:257-258`), **y se cubren entre
+    # sí**: `ConditionalExpression` `rel !== undefined && href !== undefined` → `true`,
+    # `ConditionalExpression` `rel !== undefined` → `true`, `LogicalOperator`
+    # `(rel !== undefined || href !== undefined) && …`, y `ConditionalExpression`
+    # `href !== undefined` → `true`.
+    #   - **FILA 1** (sin `rel`): con el mutante, `contactaConElOrigen(undefined)` hace
+    #     `undefined.split` → **TypeError**. Mata `rel !== undefined → true`, el `&&`→`||` y el
+    #     colapso a `true`.
+    #   - **FILA 2** (sin `href`): con el mutante se hace **`yield undefined`**, que **resuelve contra
+    #     la base** → **`https://cdn.tercero.com/undefined`: UN FALSO POSITIVO INVENTADO**, un origen
+    #     que **nadie escribió y que nadie pide**. Mata `href !== undefined → true`.
+    # 🔴🔴 **LA FILA 2 TIENE QUE LLEVAR EL `<base>` A UN TERCERO, Y NO ES DECORACIÓN: CON LA BASE
+    # PROPIA EL MUTANTE ES INDISTINGUIBLE** (ambos caen del lado propio → 0 = 0 → **SOBREVIVE**).
+    # **MEDIDO, no deducido** [V, 2026-07-17]: `URL.parse(undefined, 'https://cdn.tercero.com/')` →
+    # **`https://cdn.tercero.com/undefined`, host `cdn.tercero.com`** (→ 1 ≠ 0 → **MUERE**), frente a
+    # `URL.parse(undefined, 'https://propio.invalid/')` → host `propio.invalid` (→ 0 = 0 →
+    # **sobrevive**). **NADIE QUITE ESE `<base>` POR «SIMPLIFICAR EL FIXTURE»: LO DESACTIVA.**
+    #
+    # **FILA 3 — MATA `terceros.ts:299` `ConditionalExpression`** (`url === null || …` → `false || …`).
+    # Con el mutante: `null.protocol` → **TypeError**. **Es el HERMANO EXACTO del `OptionalChaining`
+    # de `:241`** (la 4ª fila de @s9): **NADA en la suite metía una URL QUE NO PARSEE**, ni por la
+    # rama de la `base` ni por la del subrecurso. **Las dos filas van juntas a propósito.**
+    # ⚠️ **`http://[` NO ES UN CAPRICHO**: es un host IPv6 sin cerrar, **la forma más corta que hace
+    # que el parser WHATWG devuelva `null`** — y `.invalid` **no serviría**: parsea perfectamente.
+    #
+    # ✅ **DECISIÓN 1 DEL HUMANO (2026-07-17): LAS GUARDAS SON CORRECTAS Y SE QUEDAN.** **Un
+    # `tdd_craftsman` que «matara» estos mutantes BORRANDO las guardas rompería la feature**: sin
+    # ellas, un HTML malformado **revienta la puerta** (filas 1 y 3) o **inventa un tercero que no
+    # existe** (fila 2). **AQUÍ NO SOBRABA CÓDIGO: FALTABA CONTRATO.**
+
+  @s42
+  Scenario: 🔴 un <base> sin href NO corta la búsqueda: gana el primer <base href> VÁLIDO
+    Given un recurso "dist/index.html" de tipo html que contiene <base><base href="https://cdn.tercero.com/"><img src="a.png">
+    When se llama a detectarOrigenesExternos con ese recurso y la allowlist []
+    Then hay exactamente 1 origen externo detectado
+    And el origen detectado declara el origen "cdn.tercero.com" y el valor "https://cdn.tercero.com/a.png"
+
+    # 🔴🔴 **ESCENARIO NUEVO — LA AMPLIACIÓN DEL 2026-07-17. MATA `terceros.ts:240`
+    # `ConditionalExpression`** (`if (href !== undefined)` → `if (true)`).
+    # **ES EL PEOR DE LOS 10, Y POR ESO TIENE ESCENARIO PROPIO: EL MUTANTE PRODUCE UN FALSO
+    # NEGATIVO.** Con él, el **primer `<base>` (el que NO tiene `href`)** devuelve `…/undefined` **y
+    # CORTA EL BUCLE**: el `<base href>` del tercero **no se consulta JAMÁS**, `a.png` resuelve al
+    # sitio propio y **LA PETICIÓN AL TERCERO SE VUELVE INVISIBLE**. **Un falso negativo es el peor
+    # fallo posible para F-05: la puerta diría «limpio» mientras el visitante entrega su IP.**
+    # **LA LETRA, Y ESTE ESCENARIO LA FIJA** [V, HTML Living Standard §4.6.5]: **gana el PRIMER
+    # `<base>` que TENGA `href`**, no el primer `<base>` a secas. [V, medido hoy contra el código
+    # real: **1 origen, valor `https://cdn.tercero.com/a.png`**.]
+    # 🔴🔴 **UN `<base>` SIN HREF A SECAS **NO** LO MATA, Y ESO ES LO QUE HACE QUE ESTE FIXTURE TENGA
+    # QUE LLEVAR LOS DOS `<base>`** [V, medido: `<base><img src="a.png">` → **0 orígenes con y sin
+    # mutante**, porque `…/undefined` y `…/` **son AMBOS host propio → INDISTINGUIBLE**]. **Quien
+    # «simplifique» este fixture a un solo `<base>` deja el mutante vivo y el falso negativo abierto.**
+    # **NO ENCAJA EN @s9**: su `Given` inyecta **UN** `<base href="<base>">` por plantilla — **no hay
+    # fila que pueda meter DOS elementos `<base>`, y uno de ellos sin atributo**. Por eso va aparte.
+    # ⚠️ **ES LA HERMANA DE @s9**, y las dos existen por lo mismo: **hay vías por las que un tercero
+    # entra SIN QUE NADIE ESCRIBA SU NOMBRE en la construcción** que pide.
+
+  @s43
+  Scenario: 🔴 un @font-face dentro de un recurso html NO cuenta como par: los pares son DEL CSS
+    Given un artefacto de producción cuyo "dist/assets/x.css" declara exactamente los 6 @font-face esperados, todos con url(/assets/…woff2)
+    And ese mismo artefacto tiene un "dist/index.html" que contiene en línea "<style>@font-face{font-family:'Impostora';font-weight:400;src:url(/assets/i.woff2)}</style>"
+    And la lista de pares de fuente esperados [("Manrope",400), ("Manrope",500), ("Manrope",600), ("Manrope",700), ("Gilda Display",400), ("Great Vibes",400)]
+    And un vite.config.ts que no declara base
+    When se ejecuta la puerta de terceros sobre ese artefacto con la allowlist []
+    Then el código de salida es 0
+    And no se emite ninguna violación
+    And la salida NO declara que sobre el par ("Impostora", 400)
+
+    # 🔴🔴 **ESCENARIO NUEVO — LA AMPLIACIÓN DEL 2026-07-17. MATA `puerta-terceros.ts:159`
+    # `ConditionalExpression`** (`if (recurso.tipo === TIPO_CSS)` → `if (true)`), **el ÚNICO
+    # superviviente de `puerta-terceros.ts` (99,09 %)**.
+    # **`paresDelCss` PROMETE «del CSS» Y NADA LO COMPROBABA**: **ningún recurso `html` de los tests
+    # llevaba un `@font-face`**, así que **el filtro por tipo no lo aseveraba nadie** — otra **promesa
+    # sin puerta**, la misma especie que el `:58` de @s1.
+    # **CON EL MUTANTE, EL `@font-face` DEL HTML ENTRA EN EL CONJUNTO** → «**sobra el par
+    # ("Impostora", 400)**» → **BUILD ROTO POR UN FALSO POSITIVO**. [V, medido hoy contra el código
+    # real: **código de salida 0 y ninguna violación**.]
+    # 🔴 **EL `Then` NO SE QUEDA EN EL CÓDIGO DE SALIDA, Y ES DELIBERADO** (lección de esta tanda):
+    # acusar **el par concreto** es lo que hace el aserto **específico del mutante** y no de cualquier
+    # otro fallo que también diera exit 0. **LA PUERTA ACUSA, NO GRUÑE** (@s25).
+    # **`'Impostora'` es un FIXTURE**, escrito **A MANO** y **elegido para que NO PUEDA CONFUNDIRSE con
+    # ninguna de las 3 familias reales** (anti-tautología: **jamás se importa
+    # `PARES_DE_FUENTE_ESPERADOS` como valor esperado** — el ancla de la constante es **@s38**, y sigue
+    # siendo la única que la importa).
+    # **NO ENCAJA EN @s28 NI EN @s29**: @s28 **no es un Outline** (no admite filas) y el `Then` de @s29
+    # exige **código de salida DISTINTO de 0**. **Éste exige 0: es un camino feliz, y es su contrario.**
+    # ⚠️ **UN `@font-face` inline en el HTML NO ES HIPOTÉTICO**: es exactamente lo que emite un
+    # `<style>` crítico en línea, y `dist/index.html` **SÍ pasa por esta puerta** (@s34: el filtro del
+    # humilde deja entrar `.html` **y** `.css`). **El `url(/assets/…)` es propio: no hay origen externo
+    # que detectar aquí, y por eso el único eje que este escenario mide es EL CONJUNTO DE PARES.**
