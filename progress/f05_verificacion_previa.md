@@ -36,7 +36,31 @@ $ grep -roh "https\?://[^\"' )>]*" dist/ | sort | uniq -c | sort -rn
 **Diez orígenes externos en el artefacto de hoy. Ni uno solo es una petición a un tercero.**
 Cuatro son **namespaces XML dentro del bundle de React**; dos son URLs de **mensajes de error**
 de React; `schema.org` es el `@context` del JSON-LD de **F-04**; `example.invalid` es la
-canónica (TLD reservado RFC 2606, deliberado); Facebook es un `<a href>` de `site.ts`.
+canónica (TLD reservado RFC 2606, deliberado).
+
+> 🔴 **CORREGIDO 2026-07-17 — este párrafo tenía un ERROR DE HECHO propio, cazado por la revisión
+> adversarial del contrato y remedido por el lead.** Decía: *«Facebook es un `<a href>` de
+> `site.ts`»*. **Es falso.** Medido:
+>
+> ```
+> $ grep -rlo "facebook" dist/          →  dist/assets/app-BPAduMZD.js   (SOLO el bundle)
+> $ grep -o "<a[^>]*facebook[^>]*>" dist/index.html   →  (nada)
+> ```
+>
+> **No hay ningún `<a href>` a Facebook en `dist/index.html`**: el sitio **todavía no tiene pie**
+> (lo monta F-06). La URL está **solo en el bundle JS, como literal de cadena** —
+> `facebook: "https://www.facebook.com/nailslashstudiorozas/"` — porque `home.tsx` importa
+> `site.ts` **estáticamente** y Rollup inlinea el objeto `REDES`. Es decir: cae en **la misma
+> categoría que `react.dev/errors/`** — literal inerte en un `.js`, **no** un hiperenlace.
+>
+> **La conclusión no cambia, se refuerza**: no es una petición, y `detectarOrigenesExternos` no
+> debe marcarlo. **Lo que cambia es el porqué** — y es, otra vez, el patrón que esta verificación
+> existe para cazar: *la decisión es correcta, el porqué escrito es falso*. Esta vez el porqué
+> falso **era mío**.
+>
+> **Consecuencia para el contrato:** el escenario del `<a href>` a Facebook sigue siendo válido
+> **como contrato de futuro** (F-06 montará el pie con ese enlace y entonces sí será un `<a>`),
+> pero **NO describe el `dist/` de hoy** y no puede presentarse como tal.
 
 `feature_list.json` §5 exige literalmente: *«El build falla si el artefacto contiene **CUALQUIER**
 origen externo»* con *«allowlist vacía»*. **Escrito así, la puerta no se puede satisfacer jamás:
