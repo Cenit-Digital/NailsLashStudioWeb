@@ -4,18 +4,59 @@
 > (regla anti-teléfono-descompuesto). Al cerrar la sesión, mueve el resumen a
 > `history.md` y deja este archivo con solo esta plantilla.
 
-- **Feature en curso:** ninguna. `6 — header_nav_footer` cerrada **`done`** el 2026-07-18
+- **Feature en curso:** `7 — hero_marca` (**`spec_ready`**) — **PARADA EN LA PUERTA HUMANA.**
+  Verificación previa, spec y contrato (16 escenarios) hechos y commiteados; **`src/` sin tocar**.
+  `6 — header_nav_footer` quedó `done` (resumen en `history.md`).
+- **Proyecto:** **6 done · 1 spec_ready · 9 pending · 4 blocked.**
+
+### 🔴 F-07 está esperándote. CINCO preguntas (C-1, C-2, C-3, C-5, C-7).
+
+**Lo hecho (5 commits):** verificación previa (`f07_verificacion_previa.md`, 8 afirmaciones ×
+verificar+refutar + 3 agentes con **build SSG real y motor Chrome/CDP**, ~1,1 M tokens) · spec
+(`project-spec.md` §Feature 7, 369 líneas) · contrato (`features/hero_marca.feature`, **16
+escenarios**, marca `⏸`) · **revisión adversarial del contrato** (5 lentes, 11 agentes → **6
+alegados, 5 confirmados: 0 bloqueantes, 4 graves, 1 menor**) · ronda de reparación (5 correcciones).
+
+**El patrón de siempre: la decisión de fondo es correcta; el «cómo» del troceado tenía errores.**
+Y esta feature **estrena verificación EN VIVO con Chrome** (la extensión que aportó el humano),
+porque el **LCP** y si el **`clip-path` oculta del LCP** son **NO_VERIFICABLE en fuente primaria de
+texto**.
+
+**Las 5 preguntas abiertas (`⏸`):**
+
+- **C-1** — el **acceptance 6 (IntersectionObserver) NO aplica** al hero (above-the-fold; es del
+  patrón B de F-08+). **Propuesta: retirarlo** (medido: `grep IntersectionObserver src/` = 0).
+- **C-2** — el acceptance del **LCP mezcla** ≤1,2s (duración animación, **testeable**) con LCP ≤2,5s
+  (norma, **[NV]/en-vivo con Chrome**). **Propuesta: separarlos.**
+- **C-3** — 🔴 **DECISIÓN DE PRODUCTO:** el estado base visible **NO acorta el reveal** (medido con
+  Chrome/CDP); con la animación del prototipo el LCP del titular se retrasa a **~5,3s**. **¿Se
+  ACORTA la animación (a ≤1,2s, para un LCP bueno) o se mantiene el reveal largo de marca?**
+- **C-5** — el indicador **«desliza» (`bob infinite`)** incumple SC 2.2.2 (A). **Propuesta: si F-07
+  lo hornea, con duración total ≤5s; o aplazarlo a F-08** (depende de que haya scroll).
+- **C-7** — el **eyebrow** no tiene fuente de datos hoy (categorías = F-09). **Propuesta: aplazar el
+  contenido a F-09** (solo estructura `<p>` en F-07) o reutilizar `RECLAMO`. NUNCA «Facial».
+
+### Hallazgos de F-07 que sobreviven a la feature
+
+- **La «animación de pincel» es el `paintReveal` (CSS puro), NO el `brush.png`** (adorno, se aplaza).
+- **El estado base visible protege el REPOSO pero NO acorta el reveal** — es necesario pero no
+  suficiente para un LCP bueno (medido con Chrome/CDP).
+- **`prefers-reduced-motion` es CRITERIO DE PROYECTO, no WCAG A/AA** (2.2.2 solo el bob >5s; 2.3.3 es
+  AAA; el AUTOR debe poner la `@media`).
+- **El `clip-path` es NO_VERIFICABLE**: ¿oculta el titular del LCP como el `opacity:0`? La spec de
+  Element Timing mide por *border box ∩ viewport* (que no cambia con clip-path) → solo Chrome lo
+  dirime. **F-07 estrena verificación EN VIVO con Chrome.**
+- **Un `animation` HORNEADO INLINE gana en especificidad al `@media(reduce)` de la hoja** → la
+  animación va SIEMPRE en el SCSS module, nunca inline (lo cazó la revisión adversarial).
+- **El h1: dos `<span>` + un text node `{' '}` REAL** (pegados dan «Nails LashStudio»; jsdom miente
+  sobre `display`). Titular con **`--ink`** (nunca `--accent`: 4,05<4,5).
+
+<!-- lo de abajo es el histórico de F-06, ya cerrada -->
+- ~~**Feature en curso:** ninguna. `6 — header_nav_footer` cerrada **`done`** el 2026-07-18~~
   (27/27 escenarios, judge **APROBADO** en las 2 rondas, **629 tests**, mutación **100 %** en los
   cuatro ficheros —`puerta-anclas.ts` (149), `Cabecera.tsx`, `MenuNavegacion.tsx`, `Pie.tsx`—,
   **0 timeouts**, **0 EXCLUSIONES**, `pnpm build` verde con las **CINCO puertas**). Resumen completo
   en `progress/history.md`.
-- **Proyecto:** **6 done · 10 pending · 4 blocked.**
-- **Siguiente (camino crítico):** F-07 `hero_marca` (`pending`) — `depends_on: ["tokens_paleta_contraste",
-  "cascaron_semantico"]`, las dos `done`. Es donde el patrón de memoria `estado-base-visible-ssg-
-  reduced-motion` decide el diseño: el prototipo hace **exactamente lo prohibido** (`paintReveal`
-  arranca desde `clip-path:inset(0 100% 0 0)` con el nombre del salón en `opacity:0` hasta t=4,4s →
-  bajo SSG se hornea INVISIBLE, y bajo `prefers-reduced-motion` se queda congelado invisible). Además
-  `bob 2.4s infinite` incumple SC 2.2.2. **El LCP hoy es ~5,3s; objetivo ≤1,2s.**
 
 ## Lo que F-06 deja al siguiente (leer antes de abrir F-07)
 
