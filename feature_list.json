@@ -246,7 +246,7 @@
       "mutable": true,
       "bloqueada_para_publicar": "Las excepciones (festivos, agosto) no están verificadas con el salón.",
       "sdd": true,
-      "status": "spec_ready",
+      "status": "in_progress",
       "puerta_humana": "APROBADO por el humano el 2026-07-18 (lote A). Contrato features/horario.feature (15 escenarios) + borrador progress/spec_draft_horario.md. Revision adversarial: 1 BLOQUEANTE reparado (openingHoursSpecification se compone en el SITIO DE EMISION home.tsx, NO en construirJsonLd, para no romper el @s9 de F-04 done que asevera 6 claves exactas) + 1 grave + 6 menores. Decisiones: sin badge 'Abierto/Cerrado ahora' en la demo (estaAbierto se construye para F-13), franjas semiabiertas [abre,cierra) Europe/Madrid, excepciones vacias (sin inventar festivos), openingHoursSpecification aditivo al JSON-LD."
     },
     {

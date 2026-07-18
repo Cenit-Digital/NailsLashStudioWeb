@@ -225,3 +225,31 @@ de `dist/`, fallando cerrada para **los dos** extractores.
   dura; no lo causa `@s17`) — revisar antes de publicar / al meter enrutado multipágina (F-16). (2) el
   `body` global **no fija `font-family`** → el cuerpo sale en la serif por defecto del UA; candidato a
   su propia feature de tipografía global.
+
+## 2026-07-18 — LOTE A (camino crítico enseñable para la DEMO). Puerta humana en LOTE.
+
+**Contexto:** el humano pidió «toda la web con el prototipo antes del lunes». Investigación (3 agentes):
+publicar EN VIVO es imposible (falta razón social/NIF del cliente, LSSI art. 10); objetivo real =
+**prototipo DEMO con placeholders**. Decisiones: demo/placeholders · «yo preparo, tú apruebas en lotes»
+(rigor completo) · camino crítico enseñable. **Lote A = tipografía + F-10 + F-09 + F-12.**
+
+**Preparación (spec_partner → gherkin_author → revisión adversarial → reparación):** 4 contratos, 56
+escenarios. La **revisión adversarial (5 lentes) cazó 2 BLOQUEANTES antes de escribir código**: (1)
+`horario @s14` habría roto `seo.test.ts` de F-04 (`done`) → se compone en `home.tsx`, no en
+`construirJsonLd`; (2) `contacto` tenía verde-por-vacuidad → ancla positiva. **Lote A APROBADO** el
+2026-07-18. `feature_list.json`: F-09/F-10/F-12 → spec_ready; añadida #21 tipografia_global.
+
+### feature `tipografia_global` (id 21, NUEVA) → **`done`**
+- Nace de la deuda de F-07 (el `body` global no fijaba `font-family` → Times New Roman).
+- **TDD @s1–@s7** (leen el SCSS): partial nuevo `src/styles/_tipografia.scss` (`body` Manrope; `h2, h3`
+  Gilda Display, regla conjunta, selector de tipo que no toca el `h1` del hero) + `@use 'tipografia'` en
+  `main.scss`. Test `tipografia-global.test.ts` (15 tests). 6 sabotajes muerden.
+- **judge** APROBADO (0 bloqueantes, 2 menores). **Mutación** N/A (SCSS, `mutable:false`, declarado).
+  **679 tests**, typecheck/lint 0, build 5 puertas (Gilda Display horneado sin romper terceros).
+- **VERIFICACIÓN EN VIVO con Chrome:** `body` computed = Manrope (era Times New Roman), `h2` «Servicios»
+  = Gilda Display, `document.fonts.check` = true + `loaded`; **regresión F-07 OK** (hero Great Vibes);
+  **0 terceros**. Resultado: `done`. Cierra la deuda #2 de F-07.
+
+### F-10 `horario` · F-09 `catalogo_servicios` · F-12 `contacto`
+- Contratos aprobados y abiertos (✅). Se implementan uno a uno tras tipografía (orden: horario →
+  contacto → catálogo). Estado al escribir esto: `spec_ready`.
