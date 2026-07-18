@@ -179,7 +179,7 @@
       ],
       "mutable": true,
       "sdd": true,
-      "status": "pending"
+      "status": "spec_ready"
     },
     {
       "id": 8,
