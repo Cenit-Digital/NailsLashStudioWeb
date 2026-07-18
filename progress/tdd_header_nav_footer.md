@@ -207,3 +207,90 @@ ficheros de producción **VACÍO** al terminar. Baseline y cierre: suite verde.
   fixture tautológico, **NO se excluyó**, **NO se puso `// Stryker disable`, NO se bajó el umbral.**
   Se **ESCALA al lead** para decisión humana (marcar equivalente, exactamente el camino que la @s23
   NOTA HONESTA y el gherkin_author pre-autorizaron). Los otros **20/21** mueren con test rojo.
+
+# =============================================================================================
+# RONDA 3 (2026-07-18) — refactor anti-equivalente: ELIMINAR el mutante de raíz, no excluirlo
+# =============================================================================================
+
+> El humano verificó que el 21.º (`:89:69` `?? ''` → `"Stryker was here!"`) es equivalente GENUINO y
+> decidió **eliminarlo por refactorización** (filosofía F-05: preferir código que no genere el mutante
+> antes que excluir; mantiene el «0 exclusiones» de F-03/F-04/F-05). Refactor puro: **el comportamiento
+> observable NO cambia** — los 629 tests parten verdes y siguen verdes. Se toca SOLO
+> `seccionesNavegables` en `src/lib/puerta-anclas.ts`. No se añadió ningún test (todos los mutantes de
+> la forma nueva ya los matan tests existentes; se verificó por sabotaje manual, uno a uno).
+
+## Forma vieja (generaba el equivalente)
+
+```ts
+const referencia = ATRIBUTO_LABELLEDBY.exec(seccion[1])?.[1] ?? ''
+if (headings.has(referencia)) {
+  navegables.push(referencia)
+}
+```
+
+`?? ''` normaliza a un LITERAL el caso «sin aria-labelledby». Stryker muta `''` → `"Stryker was here!"`
+y, como `headings.has('')` y `headings.has('Stryker was here!')` son AMBOS siempre false, el mutante
+es EQUIVALENTE.
+
+## Por qué la forma «orientativa» del encargo (`referencia !== undefined && …`) NO sirve
+
+Verifiqué el comportamiento EXACTO del ConditionalExpression mutator leyendo su fuente instalada
+(`@stryker-mutator/instrumenter@9.6.1/.../conditional-expression-mutator.ts`, líneas 31-47): **cuando
+el operando izquierdo de un `&&` es una expresión booleana, genera el mutante `true && <derecha>`**. Con
+la forma sugerida `referencia !== undefined && headings.has(referencia)`, ese mutante es
+`true && headings.has(referencia)` = `headings.has(referencia)`, y como `headings.has(undefined)` es
+siempre false, **vuelve a ser EQUIVALENTE** — el `!== undefined` es redundante con que `.has` ya
+devuelva false para `undefined`. Es EXACTAMENTE la trampa que advierte el comentario de
+`puerta-cascaron.ts:135-139`. La forma naíf **cambia un equivalente por otro**. NO se usó.
+
+## Forma nueva (elegida): el guard PROTEGE UN THROW real, así ningún mutante es redundante
+
+```ts
+const coincidencia = ATRIBUTO_LABELLEDBY.exec(seccion[1])
+if (coincidencia === null) {
+  continue
+}
+const referencia = coincidencia[1]
+if (headings.has(referencia)) {
+  navegables.push(referencia)
+}
+```
+
+Clave anti-equivalente: se elimina `?.` y `?? ''`. El guard `coincidencia === null` **no es
+redundante** — protege `coincidencia[1]`, que sobre `null` LANZA `TypeError`. Cualquier mutante que
+lo debilite (invertir, `if(false)`, vaciar el `continue`) hace que una `<section>` sin
+`aria-labelledby` reviente en `null[1]`, y **@s23 fila 1** (`expect(...).not.toThrow()`) lo MATA. Es el
+mismo idioma que el hermano `anclasDeNav` (`href !== undefined && href.startsWith(...)`, donde el guard
+protege `undefined.startsWith`). No hay literal `''` mutable [V grep], no hay `?.` (0 mutante
+OptionalChaining), y el `!== undefined &&` redundante NO aparece.
+
+## Los mutantes que genera la forma nueva y cómo muere cada uno (sabotaje manual verificado)
+
+| # | Mutante (mutador) | Forma saboteada | Test que lo mata | Sabotaje |
+| - | ----------------- | --------------- | ---------------- | -------- |
+| 1 | EqualityOperator `===`→`!==` (guard) | `if (coincidencia !== null) continue` | @s23 f1 (TypeError) + @s3 + @s9 | **ROJO (4)** |
+| 2 | ConditionalExpression → `true` (guard) | `if (true) continue` | @s3 + @s9 (secciones nunca derivadas → []) | **ROJO (3)** |
+| 3 | ConditionalExpression → `false` (guard) | `if (false) continue` | @s23 f1 (`coincidencia[1]`=`null[1]` → TypeError) | **ROJO (1)** |
+| 4 | BlockStatement (vacía `{ continue }`) | `if (coincidencia === null) {}` | @s23 f1 (idéntico a #3: cae a `null[1]`) | **ROJO (1)** |
+| 5 | ConditionalExpression → `true` (has) | `if (true) navegables.push(...)` | @s23 f2 (section «fantasma» pasa a navegable → inalcanzable) | **ROJO (1)** |
+| 6 | ConditionalExpression → `false` / BlockStatement (has) | `if (false) …` / cuerpo vacío | @s3 + @s9 + @s19 (nunca navegable → []) | **ROJO (3)** |
+
+- **Higiene:** cada sabotaje se aplicó con el editor (reemplazo literal), se corrió SOLO su escenario
+  (`vitest run src/lib/puerta-anclas.test.ts -t "@sNN"`), se comprobó el ROJO y se **revirtió al
+  literal original** antes del siguiente. Al cierre, la función está en la forma nueva.
+- **Mutantes que DESAPARECEN respecto a la forma vieja:** `:89:69` `?? ''`→`"Stryker was here!"` (el
+  EQUIVALENTE, eliminado de raíz) y `:89:24` OptionalChaining `?.[1]`→`[1]` (ya no hay `?.`; su
+  responsabilidad — la `<section>` sin `aria-labelledby` sin reventar — la asume ahora el guard
+  `coincidencia === null`, matado por @s23 f1 vía #1/#3/#4).
+- **NO se generó ningún equivalente nuevo:** los 6 mutantes de arriba tienen test ROJO verificado por
+  sabotaje. El único operando izquierdo de `&&` que habría dado `true && …` equivalente (la forma
+  naíf) se evitó a propósito.
+
+## Verificación de cierre (ronda 3)
+
+- `pnpm typecheck` **0 errores** · `pnpm lint` **0 warnings**.
+- `pnpm test` **629 passed** (parten de 629; refactor sin cambio de comportamiento) → los tests viejos
+  de `seccionesNavegables` (@s3/@s5/@s9/@s19/@s20/@s23/@s24/@s25/@s26) siguen **VERDES**.
+- `pnpm build` **exit 0 con las CINCO puertas** (incluida «anclas vivas»).
+- **Stryker NO se corrió** (lo corre el `mutation_tester` después). `git diff` toca SOLO
+  `seccionesNavegables` de `src/lib/puerta-anclas.ts` (+ esta bitácora).

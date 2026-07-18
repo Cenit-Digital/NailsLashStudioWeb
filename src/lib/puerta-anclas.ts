@@ -86,7 +86,18 @@ export function seccionesNavegables(html: string): string[] {
   const navegables: string[] = []
 
   for (const seccion of html.matchAll(SECCION)) {
-    const referencia = ATRIBUTO_LABELLEDBY.exec(seccion[1])?.[1] ?? ''
+    // Una `<section>` sin `aria-labelledby` NO es navegable: se SALTA de raíz, no se normaliza a un
+    // literal. Con `?? ''` (la forma vieja) el mutante `?? "Stryker was here!"` era EQUIVALENTE,
+    // porque `idsDeHeadings` filtra `''` y `headings.has('')` es siempre false igual que
+    // `headings.has('Stryker was here!')`. Aquí el guard PROTEGE UN THROW real (`coincidencia[1]`
+    // sobre `null` revienta), así que quitarlo o debilitarlo LANZA y @s23 fila 1 lo MATA.
+    const coincidencia = ATRIBUTO_LABELLEDBY.exec(seccion[1])
+
+    if (coincidencia === null) {
+      continue
+    }
+
+    const referencia = coincidencia[1]
 
     if (headings.has(referencia)) {
       navegables.push(referencia)
