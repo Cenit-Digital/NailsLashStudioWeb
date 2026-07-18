@@ -11,6 +11,7 @@ import {
 } from './puerta-cascaron.ts'
 import { detectarOrigenesExternos } from './terceros.ts'
 import {
+  anclasDeNav,
   describir,
   ejecutarPuertaDeAnclas,
   inspeccionarAnclas,
@@ -97,6 +98,23 @@ function html(opciones: OpcionesFixture = {}): string {
     <nav aria-label="Principal">${linksNav}</nav>
     <main>${bloquesSeccion}${sueltos}${extras}</main>
     <footer>${fuera}</footer>
+  </body>
+</html>`
+}
+
+/**
+ * Envuelve un nav-inner y un main-inner CRUDOS (tal cual, sin normalizar) en el esqueleto de una
+ * página de `dist/`. Para los fixtures de la ronda 2 que `html()` no produce: un `<a>` sin `href`
+ * (@s21), un `id=""` (@s22), una `<section>` sin/`aria-labelledby` que no resuelve (@s23) o un `=`
+ * rodeado de espacios (@s26, HTML válido). Los BYTES de `dist/`, nunca un render del árbol.
+ */
+function paginaCruda(navInterno: string, mainInterno = ''): string {
+  return `<!doctype html>
+<html lang="es">
+  <head></head>
+  <body>
+    <nav aria-label="Principal">${navInterno}</nav>
+    <main>${mainInterno}</main>
   </body>
 </html>`
 }
@@ -478,5 +496,210 @@ describe('@s10 la puerta de anclas está enganchada al build de PRODUCCIÓN, no 
 
   it.each([['dev'], ['dev:ssr']])('@s10 el script "%s" NO invoca la puerta de anclas', (guion) => {
     expect(scripts()[guion]).not.toContain('puerta-anclas')
+  })
+})
+
+// =============================================================================================
+// AMPLIACIÓN RONDA 2 (aprobada por la puerta humana el 2026-07-18) — los escenarios que EXIGEN las
+// guardas y extracciones ya CORRECTAS que la mutación destapó sin cubrir (contrato de menos, no
+// código de más). La producción NO se toca. Ver progress/mutation_header_nav_footer.md §3/§4.
+// =============================================================================================
+
+/**
+ * @s21 — GRUPO A: un `<a>` de la nav SIN atributo `href` no aporta ancla y NO revienta la inspección.
+ * Hoy toda `<a>` de fixture lleva `href`, así que `ATRIBUTO_HREF.exec(...)?.[1]` nunca da `undefined`
+ * y la guarda `href !== undefined` nunca se ejerce. Con los mutantes (`?.[1]`→`[1]`,
+ * `href !== undefined`→`true`), un `<a>` sin `href` provoca `null[1]` o `undefined.startsWith` →
+ * TypeError. Una `<a>` sin `href` es HTML legítimo (un logo, un ancla de nombre): la extracción DEBE
+ * ignorarla SIN reventar. La aserción «no lanza» es MEDIBLE: la llamada RETORNA en vez de propagar.
+ */
+describe('@s21 un <a> de la nav sin href no aporta ancla ni hace reventar la inspección', () => {
+  function paginaConAnclaSinHref() {
+    return {
+      ruta: '/',
+      html: paginaCruda(
+        '<a href="#servicios-titulo">Servicios</a><a>Logo del salón</a>',
+        '<div id="servicios-titulo"></div>',
+      ),
+    }
+  }
+
+  it('@s21 la inspección NO lanza y la lista de violaciones queda vacía', () => {
+    expect(() => inspeccionarAnclas([paginaConAnclaSinHref()])).not.toThrow()
+    expect(inspeccionarAnclas([paginaConAnclaSinHref()])).toEqual([])
+  })
+
+  it('@s21 el <a> sin href NO se cuenta como ancla: solo la <a> con href aporta ancla', () => {
+    expect(anclasDeNav(paginaConAnclaSinHref().html)).toEqual([
+      { ancla: '#servicios-titulo', id: 'servicios-titulo' },
+    ])
+  })
+})
+
+/**
+ * @s22 — GRUPO B: un `id=""` (vacío) NO cuenta como destino de anclaje; un `href="#"` apunta al id
+ * "" (`"#".slice(1) === ""`), así que es un ancla muerta. El comentario de producción PROMETE que un
+ * `id=""` se descarta, pero ningún test lo fijaba — promesa sin puerta, IDÉNTICO al `:58` de F-05.
+ * Con el filtro `id !== ''` mutado (quitado, `=> true`, o comparado con otra cadena), el `id=""`
+ * entraría en el conjunto y `#` resolvería → 0 violaciones. Los esperados (ancla "#", id "") van A MANO.
+ */
+describe('@s22 un id="" no cuenta como destino: un href="#" es un ancla muerta', () => {
+  it('@s22 nav con <a href="#"> y una página con id="" y ningún otro id → 1 ancla muerta (ancla "#", id "")', () => {
+    const violaciones = inspeccionarAnclas([
+      { ruta: '/', html: paginaCruda('<a href="#">Inicio</a>', '<div id=""></div>') },
+    ])
+
+    expect(violaciones).toHaveLength(1)
+    expect(violaciones[0].regla).toBe(REGLA_ANCLA_MUERTA)
+    expect(violaciones[0].ruta).toBe('/')
+    expect(violaciones[0].ancla).toBe('#')
+    expect(violaciones[0].id).toBe('')
+  })
+})
+
+/**
+ * @s23 — GRUPO C, GEMELO simétrico de @s20: una `<section>` cuyo `aria-labelledby` NO resuelve a un
+ * heading real NO es navegable → sin violación de inalcanzable y SIN lanzar. @s20 prueba el heading
+ * suelto (un heading que ninguna `<section>` referencia); aquí, la sección cuya referencia no resuelve.
+ * Fila 1 (sin `aria-labelledby`): `ATRIBUTO_LABELLEDBY.exec(...)` da `null` → con `:89` (`?.[1]`→`[1]`)
+ * revienta; lo correcto es `undefined ?? '' → ''`, no navegable, sin lanzar. Fila 2 (`labelledby` a un
+ * id que NO es heading): con `:91` (`if (headings.has(ref))`→`if (true)`) la marcaría navegable y
+ * acusaría 1 inalcanzable → MUERE. Es la línea que DISTINGUE navegable=sección-con-heading-real.
+ */
+describe('@s23 una section cuyo aria-labelledby no resuelve a un heading no es navegable', () => {
+  it.each([
+    ['una <section> SIN aria-labelledby', '<section><p>sin aria-labelledby</p></section>'],
+    [
+      'una <section aria-labelledby="fantasma"> sin heading "fantasma"',
+      '<section aria-labelledby="fantasma"><p>no resuelve a un heading</p></section>',
+    ],
+  ])('@s23 %s → no lanza y sin violación de inalcanzable', (_caso, seccionCruda) => {
+    const pagina = { ruta: '/', html: paginaCruda('', seccionCruda) }
+
+    expect(() => inspeccionarAnclas([pagina])).not.toThrow()
+    expect(
+      inspeccionarAnclas([pagina]).filter((violacion) => violacion.regla === REGLA_INALCANZABLE),
+    ).toEqual([])
+  })
+})
+
+/**
+ * @s24 — GRUPO D: la línea que la puerta ACUSA para cada regla tiene el TEXTO EXACTO. @s5 comprueba
+ * que cada violación nombra ruta/ancla/id y qué-falta y que el informe es determinista, pero NO fija
+ * el LITERAL: un `Then` que solo cuenta líneas es CIEGO a las mutaciones de valor (la lección de @s24
+ * de F-05, que mataba CERO). Aquí la inspección PASA POR EL PIPELINE (`inspeccionarAnclas` →
+ * `describir`): la fila «ancla muerta» exige el nombre de la regla y el formato `ancla "x" → id "y"`;
+ * la fila «inalcanzable» exige el nombre de la regla, el `ancla: ''` de la violación y la rama `id "y"`
+ * que ese `ancla` vacío selecciona. ANTI-TAUTOLOGÍA: las dos líneas exactas van A MANO; JAMÁS se
+ * importan REGLA_ANCLA_MUERTA/REGLA_INALCANZABLE para compararse contra sí mismas.
+ */
+describe('@s24 la línea que describe cada violación tiene el texto exacto', () => {
+  it('@s24 ancla muerta: describir() da la línea exacta con nombre de regla y formato ancla→id', () => {
+    const violaciones = inspeccionarAnclas([
+      { ruta: '/', html: paginaCruda('<a href="#facial">Facial</a>') },
+    ])
+
+    expect(violaciones).toHaveLength(1)
+    expect(describir(violaciones[0])).toBe(
+      '/ — ancla de la nav sin destino en la página: ancla "#facial" → id "facial"',
+    )
+  })
+
+  it('@s24 inalcanzable: describir() da la línea exacta con nombre de regla y formato id', () => {
+    const violaciones = inspeccionarAnclas([
+      {
+        ruta: '/',
+        html: paginaCruda('', '<section aria-labelledby="faq"><h2 id="faq">FAQ</h2></section>'),
+      },
+    ])
+
+    expect(violaciones).toHaveLength(1)
+    expect(describir(violaciones[0])).toBe(
+      '/ — sección navegable inalcanzable desde la nav: id "faq"',
+    )
+  })
+})
+
+/**
+ * @s25 — GRUPO E: un artefacto MULTI-PÁGINA mixto SIN violaciones termina en exit 0. Las guardas de
+ * vacuidad miran el CONJUNTO (`.some`), no cada página (`.every`). @s7 y @s19 usan UNA sola página
+ * vacía, donde `.some` y `.every` dan el MISMO veredicto y no se distinguen. Solo un artefacto MIXTO
+ * los separa: con `.some`, la página "/" (con anclas y sección) basta para saber que SÍ se inspeccionó;
+ * con `.every`, la página "/otra" (0 anclas, 0 secciones) haría gritar vacuidad habiendo inspeccionado.
+ */
+describe('@s25 un artefacto multi-página mixto sin violaciones termina en exit 0', () => {
+  function artefactoMixto(): ArtefactoDeProduccion {
+    return {
+      existe: () => true,
+      listarHtml: (): readonly FicheroHtml[] => [
+        {
+          ubicacion: 'dist/index.html',
+          contenido: html({
+            anclasNav: ['#faq'],
+            secciones: [{ labelledby: 'faq', headingId: 'faq' }],
+          }),
+        },
+        {
+          ubicacion: 'dist/otra/index.html',
+          contenido: paginaCruda('', '<h1 id="otra">Otra página</h1>'),
+        },
+      ],
+    }
+  }
+
+  it('@s25 exit 0 y la salida NO declara vacuidad de anclas ni de secciones', () => {
+    const resultado = ejecutarPuertaDeAnclas({ artefacto: artefactoMixto() })
+
+    expect(resultado.codigoSalida).toBe(0)
+    expect(resultado.lineas.join('\n')).not.toContain('no se inspeccionó ningún ancla de la nav')
+    expect(resultado.lineas.join('\n')).not.toContain('no se inspeccionó ninguna sección navegable')
+  })
+})
+
+/**
+ * @s26 — GRUPO F (el más grave): un atributo con ESPACIOS alrededor del `=` (HTML válido) se reconoce
+ * igual que sin espacios, en `href`, `id` y `aria-labelledby`. Los tres regex de extracción usan
+ * `\s*=\s*`, que TOLERA el espaciado, pero ningún fixture lo ejercía. DECISIÓN 2 DEL HUMANO
+ * (2026-07-18): el espacio alrededor del `=` es OPCIONAL en HTML válido, así que tolerarlo es CORRECTO
+ * — el comentario pasa a HECHO VIGILADO (como el `:58` de F-05). Cada fila AÍSLA un atributo con un
+ * observable DISTINTO (un fixture único «0 violaciones» enmascararía mutantes). Los esperados van A MANO.
+ */
+describe('@s26 un atributo con espacios alrededor del "=" se reconoce igual que sin espacios', () => {
+  it('@s26 href espaciado: <a href = "#facial"> se reconoce → 1 ancla muerta (ancla "#facial", id "facial")', () => {
+    const violaciones = inspeccionarAnclas([
+      { ruta: '/', html: paginaCruda('<a href = "#facial">Facial</a>') },
+    ])
+
+    expect(violaciones).toHaveLength(1)
+    expect(violaciones[0].regla).toBe(REGLA_ANCLA_MUERTA)
+    expect(violaciones[0].ancla).toBe('#facial')
+    expect(violaciones[0].id).toBe('facial')
+  })
+
+  it('@s26 id espaciado: <p id = "servicios-titulo"> se reconoce → el ancla RESUELVE (lista vacía)', () => {
+    const violaciones = inspeccionarAnclas([
+      {
+        ruta: '/',
+        html: paginaCruda(
+          '<a href="#servicios-titulo">Servicios</a>',
+          '<p id = "servicios-titulo">Título</p>',
+        ),
+      },
+    ])
+
+    expect(violaciones).toEqual([])
+  })
+
+  it('@s26 aria-labelledby espaciado: <section aria-labelledby = "faq"> es navegable → 1 inalcanzable (id "faq")', () => {
+    const violaciones = inspeccionarAnclas([
+      {
+        ruta: '/',
+        html: paginaCruda('', '<section aria-labelledby = "faq"><h2 id="faq">FAQ</h2></section>'),
+      },
+    ])
+
+    expect(violaciones).toHaveLength(1)
+    expect(violaciones[0].regla).toBe(REGLA_INALCANZABLE)
+    expect(violaciones[0].id).toBe('faq')
   })
 })

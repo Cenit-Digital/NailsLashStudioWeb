@@ -120,3 +120,90 @@ ejecutor se añadieron uno a uno, cada uno con su escenario rojo.
 - Umbral 1.0, 0 exclusiones. Si un mutante resiste: **escalar al humano**, NO excluir, NO bajar el
   umbral (A-23). Si aparece un superviviente de extracción por un `^`/`$` de regex, se añade su
   escenario CON SU FILA (contrato de menos, no código de más), como en F-05.
+
+# =============================================================================================
+# RONDA 2 (2026-07-18) — los 7 escenarios nuevos que EXIGEN las guardas ya CORRECTAS
+# =============================================================================================
+
+> La prueba de mutación escaló **21 supervivientes REALES** (135/156) y el humano **aprobó ampliar el
+> contrato** (@s21..@s27 + 7 filas a @s18). No era código de más: era **contrato de menos**. La
+> producción **NO se tocó** (`git diff src/lib/puerta-anclas.ts src/components/MenuNavegacion.tsx`
+> VACÍO al cierre). Solo se añadieron TESTS. Método: como la producción YA EXISTE, un test nuevo puede
+> nacer verde y no probar nada → **por cada mutante del informe se aplicó el sabotaje A MANO, se
+> comprobó que el test SE PONE ROJO y se revirtió** (Ley 3 honrada aunque la producción preexista).
+
+## Resultado ronda 2
+
+- **27/27 escenarios cubiertos** (@s1..@s27; @s18 es meta-mutación, sus 16 filas mapeadas al test que
+  las mata). **+12 tests nuevos** → **629 tests** verdes (16 ficheros).
+- `pnpm typecheck` **0 errores** · `pnpm lint` **0 warnings** · `pnpm build` **exit 0 con las CINCO
+  puertas** (cascarón, placeholders, contraste, terceros, **anclas vivas**).
+- **20/21 mutantes con test ROJO verificado por sabotaje manual**; **1 EQUIVALENTE ESCALADO** (el
+  `:89:69`, ya pre-marcado en @s23 NOTA HONESTA): mi @s23 fila 1 lo **CUBRE** (deja de ser NoCoverage),
+  pero es indistinguible sin tautología → NO se fabricó, **se escala** (regla dura, umbral 1.0).
+
+## Mapa `@s21..@s27 → test`
+
+- **@s21** (`<a>` sin href → 0 anclas, sin lanzar) → `puerta-anclas.test.ts` › `@s21 la inspección NO
+  lanza y la lista de violaciones queda vacía` + `@s21 el <a> sin href NO se cuenta como ancla …`
+- **@s22** (`id=""` no es destino; `#` es ancla muerta) → `@s22 nav con <a href="#"> y una página con
+  id="" y ningún otro id → 1 ancla muerta (ancla "#", id "")`
+- **@s23** (section cuyo `aria-labelledby` no resuelve → no navegable, sin lanzar; gemelo de @s20) →
+  `@s23 %s → no lanza y sin violación de inalcanzable` (it.each: «sin aria-labelledby», «labelledby a
+  un id que no es heading»)
+- **@s24** (texto EXACTO de `describir()`) → `@s24 ancla muerta: describir() da la línea exacta …` +
+  `@s24 inalcanzable: describir() da la línea exacta …` (oráculos A MANO, con `—` y `→` verbatim de
+  producción; NUNCA se importan REGLA_*)
+- **@s25** (multi-página mixto → exit 0; `.some` no `.every`) → `@s25 exit 0 y la salida NO declara
+  vacuidad de anclas ni de secciones`
+- **@s26** (espacios alrededor del `=`) → `@s26 href espaciado …` + `@s26 id espaciado …` + `@s26
+  aria-labelledby espaciado …` (cada fila con observable DISTINTO: 1 muerta / lista vacía / 1 inalcanzable)
+- **@s27** (`aria-controls` botón ↔ `id` `<ul>` == "menu-navegacion", no vacío) → `cabecera.test.tsx`
+  › `@s27 aria-controls del botón == id del <ul> == "menu-navegacion" (no vacío) …`
+
+## Los 21 sabotajes ROJO-PRIMERO (mutante a mutante, cada uno aplicado a mano y revertido)
+
+| # | Mutante (informe §3/§4) | Test que lo mata | Veredicto |
+| - | ----------------------- | ---------------- | --------- |
+| A1 | `:51:20` `?.[1]` → `[1]` | @s21 (TypeError sobre `<a>` sin href) | **ROJO (2)** |
+| A2 | `:53:11` `href !== undefined && …` → `true && …` | @s21 | **ROJO (2)** |
+| B1 | `:71:5` elimina `.filter((id) => id !== '')` | @s22 | **ROJO** |
+| B2 | `:71:83` `id !== ''` → `true` | @s22 | **ROJO** |
+| B3 | `:71:90` `''` → `"Stryker was here!"` | @s22 | **ROJO** |
+| C1 | `:89:24` `?.[1]` → `[1]` | @s23 fila 1 (section sin aria-labelledby → TypeError) | **ROJO** |
+| C2 | `:89:69` `?? ''` → `?? "Stryker was here!"` | @s23 (CUBIERTO, no matable) | **VERDE — EQUIVALENTE, ESCALADO** |
+| C3 | `:91:9` `if (headings.has(ref))` → `if (true)` | @s23 filas 1 y 2 | **ROJO (2)** |
+| D1 | `:30:35` `REGLA_ANCLA_MUERTA` → `''` | @s24 ancla muerta | **ROJO** |
+| D2 | `:31:35` `REGLA_INALCANZABLE` → `''` | @s24 inalcanzable | **ROJO** |
+| D3 | `:127:16` `ancla: ''` → `"Stryker was here!"` | @s24 inalcanzable | **ROJO** |
+| D4 | `:143:5` `violacion.ancla === ''` → `false` | @s24 inalcanzable | **ROJO** |
+| D5 | `:143:25` `=== ''` → `=== "Stryker was here!"` | @s24 inalcanzable | **ROJO** |
+| E1 | `:215:35` `.some` → `.every` (guarda anclas) | @s25 (multi-página mixto) | **ROJO** |
+| E2 | `:227:33` `.some` → `.every` (guarda secciones) | @s25 | **ROJO** |
+| F1 | `:36:23` `\bhref\s*=` → `\bhref\S*=` | @s26 href espaciado | **ROJO** |
+| F2 | `:36:23` `\s*=\s*` → `\s*=\S*` (href) | @s26 href espaciado | **ROJO** |
+| F3 | `:67:21` `\sid\s*=` → `\sid\S*=` | @s26 id espaciado | **ROJO** |
+| F4 | `:82:29` `\baria-labelledby\s*=` → `\S*=` | @s26 aria-labelledby espaciado | **ROJO** |
+| F5 | `:82:29` `\s*=\s*` → `\s*=\S*` (labelledby) | @s26 aria-labelledby espaciado | **ROJO** |
+| M1 | `MenuNavegacion.tsx:5:18` `ID_LISTA` → `''` | @s27 | **ROJO** |
+
+**Higiene de los sabotajes:** cada mutante se aplicó con el editor (replazo LITERAL, sin heredoc → 0
+problema de barras invertidas comidas), se corrió SOLO su escenario (`vitest run … -t "@sNN"`), se
+comprobó el ROJO y se **revirtió al literal original** antes del siguiente. `git diff` de los DOS
+ficheros de producción **VACÍO** al terminar. Baseline y cierre: suite verde.
+
+## El EQUIVALENTE escalado — `puerta-anclas.ts:89:69` (`?? ''` → `?? "Stryker was here!"`)
+
+- **Confirmado por sabotaje:** con el mutante aplicado, **@s23 queda VERDE (2 passed)** → el defecto
+  vive dentro y ningún test lo distingue.
+- **Por qué es equivalente (no un hueco de contrato):** el `?? ''` solo se activa cuando una
+  `<section>` NO tiene `aria-labelledby` (la cadena opcional da `undefined`). Su valor luego SOLO se
+  usa en `headings.has(referencia)`. Como `idsDeHeadings` **filtra `''`** (`puerta-cascaron.ts:139`),
+  `headings.has('')` es **siempre false**, y `headings.has('Stryker was here!')` es también **siempre
+  false** (ningún heading legítimo lleva esa cadena). Ambas ramas dan el MISMO resultado. El ÚNICO
+  input distinguidor sería un heading con `id="Stryker was here!"`: **una tautología atada a la cadena
+  interna de Stryker**, PROHIBIDA (anti-tautología, regla dura).
+- **Acción tomada:** @s23 fila 1 **CUBRE** la línea (deja de ser NoCoverage). **NO se fabricó** un
+  fixture tautológico, **NO se excluyó**, **NO se puso `// Stryker disable`, NO se bajó el umbral.**
+  Se **ESCALA al lead** para decisión humana (marcar equivalente, exactamente el camino que la @s23
+  NOTA HONESTA y el gherkin_author pre-autorizaron). Los otros **20/21** mueren con test rojo.

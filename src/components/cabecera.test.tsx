@@ -97,6 +97,31 @@ describe('@s15 el estado abierto/cerrado del menú vive en aria-expanded, consul
 })
 
 /**
+ * @s27 — LA ASOCIACIÓN A11Y BOTÓN↔LISTA (ampliación ronda 2, aprobada por la puerta humana el
+ * 2026-07-18). El `aria-controls` del botón es igual al `id` del `<ul>`, y ese id es EXACTAMENTE
+ * "menu-navegacion" y NO vacío. Con el mutante `ID_LISTA = ''`, el botón queda con `aria-controls=""`
+ * y el `<ul>` con `id=""`: siguen siendo IGUALES (ambos ''), así que una aserción de SOLA igualdad los
+ * deja pasar — por eso se exige ADEMÁS que el identificador sea EXACTAMENTE "menu-navegacion" y NO
+ * vacío: con el mutante el botón deja de anunciar qué lista controla y `@s15` (que solo mira el toggle
+ * de `aria-expanded`) no se entera. ANTI-TAUTOLOGÍA: el literal "menu-navegacion" va ESCRITO A MANO;
+ * jamás se importa ID_LISTA para compararse contra sí mismo.
+ */
+describe('@s27 el botón del menú declara aria-controls igual al id de su lista, y ese id es "menu-navegacion"', () => {
+  it('@s27 aria-controls del botón == id del <ul> == "menu-navegacion" (no vacío), consultado por rol y nombre', () => {
+    render(<MenuNavegacion />)
+
+    const boton = screen.getByRole('button', { name: /menú/i })
+    const lista = screen.getByRole('list')
+    const idLista = lista.getAttribute('id')
+
+    expect(boton.getAttribute('aria-controls')).toBe(idLista)
+    // El literal "menu-navegacion" va ESCRITO A MANO, jamás importado de ID_LISTA (anti-tautología).
+    expect(idLista).toBe('menu-navegacion')
+    expect(idLista).not.toBe('')
+  })
+})
+
+/**
  * @s17 — EL BREAKPOINT ES EL LITERAL 820px, LEÍDO DEL SCSS Y ANCLADO CONTRA EL LITERAL A MANO
  * (patrón `doble-de-test-anclado-al-literal-no-al-simbolo`). Criterio de PROYECTO MEDIDO: la nav
  * envuelve en la banda 793–806px → 820px da margen sobre toda la banda. NUNCA el 767 de WebEmpresa
