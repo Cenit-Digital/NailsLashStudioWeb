@@ -1,20 +1,79 @@
 # Mutacion — feature 6 `header_nav_footer`
 
-**Veredicto:** FAIL — ESCALADA AL LEAD
-**Score feature:** killed/total = **135/156 = 86,54 %** (umbral `harness.config.json` ->
-`mutation.threshold: 1.0` · `stryker.config.json` -> `break: 100`). **21 mutantes sin matar** (20
-Survived + 1 NoCoverage), **los 4 mas nucleares verificados por SABOTAJE MANUAL** contra la suite
-completa (617 tests) siguen verdes -> **son REALES, no artefactos de medicion**. **0 exclusiones, 0
-`// Stryker disable`, 0 justificaciones de equivalencia.**
+**Veredicto:** **PASS** — cierre limpio, 0 supervivientes, 0 exclusiones.
+**Score feature:** killed/total = **157/157 = 100,00 %** (umbral `harness.config.json` ->
+`mutation.threshold: 1.0` · `stryker.config.json` -> `break: 100`). Los **21 huecos** de la ronda de
+escalada (20 Survived + 1 NoCoverage) **estan CERRADOS**: el humano eligio **refactorizar** el unico
+equivalente (`?? ''` -> guard `if (coincidencia === null) continue`) en vez de excluirlo, y el
+`tdd_craftsman` aniadio los escenarios @s21..@s27. **0 exclusiones, 0 `// Stryker disable`, 0
+justificaciones de equivalencia** — como exige el umbral 1.0.
 
-> El umbral 1.0 **no da licencia para excluir nada** (regla dura de la sesion; A-23 la cerro para
-> F-05). Se **mide y se escala**. **Los mata el `tdd_craftsman`.** Igual que F-05: esto es
-> **contrato de menos** (escenarios que faltan), no codigo de mas — los 21 huecos son guardas y
-> extracciones CORRECTAS que **ningun escenario ejercita**. La produccion NO se toca.
+> El refactor **elimino el equivalente de raiz**: la tanda de cierre confirma que **no quedo ningun
+> superviviente, ni siquiera otro equivalente**. Ni produccion ni tests se tocaron en esta tanda de
+> medicion (`git status src/` limpio antes y despues).
 
 ---
 
-## 1. Salud del informe — SE LEE ANTES QUE EL SCORE
+## 0. TANDA DE CIERRE (2026-07-18) — la que vale
+
+**Solo se re-midieron los DOS ficheros que cambiaron desde la ronda de escalada**
+(`src/lib/puerta-anclas.ts` y `src/components/MenuNavegacion.tsx`). `Cabecera.tsx` y `Pie.tsx` **NO
+se re-miden**: ya estaban **100 % sin supervivientes** y **ni produccion ni tests se tocaron** ->
+aniadir tests nunca baja un score y aqui ni se rozaron. Baseline **629/629 verde** antes de medir.
+
+### Salud del informe — SE LEE ANTES QUE EL SCORE
+
+| Fichero | Concurrencia | `# timeout` | tests/mutante (vs ronda anterior) | dry run (tests que cubren) | `# errors` | Vale? |
+| ------- | ------------ | ----------- | --------------------------------- | -------------------------- | ---------- | ----- |
+| `src/lib/puerta-anclas.ts` | `--concurrency 1` | **0** | **4,17** (subio desde 3,64) | **39** (subio desde 28) | 0 | **si** |
+| `src/components/MenuNavegacion.tsx` | `--concurrency 1` | **0** | **2,33** (bajo desde 3,00) | **12** (subio desde 11) | 0 | **si** |
+
+1. **`# timeout` = 0 en los dos** -> el score se puede leer. `puerta-anclas.ts` es codigo puro sin
+   bucles largos; `MenuNavegacion.tsx` renderiza con Testing Library. Ni un timeout -> no hay mentira
+   de contencion (la de F-05: «100 %» con 152 timeouts, falsa).
+2. **`tests/mutante` NO desplomado, en ninguna direccion peligrosa.**
+   - `puerta-anclas.ts`: **4,17 (subio desde 3,64)** y el pool que lo cubre **crecio 28 -> 39** al
+     aniadir @s21..@s26. Mas cobertura, no menos -> el desplome-que-inventa-supervivientes **no mordio**.
+   - `MenuNavegacion.tsx`: **2,33 (bajo desde 3,00)** pero es el **descenso SANO**: el superviviente
+     `:5 ID_LISTA` que en la ronda anterior corria TODOS sus tests de cobertura sin morir (inflando la
+     media) ahora **muere pronto** con @s27 (bail-out al primer test que mata). El pool que cubre el
+     fichero **crecio 11 -> 12** (el test @s27). Menos media = mas asesinos tempranos, **lo contrario**
+     de un desplome que invente supervivientes. Confirmado: **dry run corrio 12 tests, 0 errores, 6/6
+     muertos**.
+3. **Cuantos tests corrieron (regla 6):** dry run **39** (anclas) y **12** (MenuNav), ambos > 0 y
+   coherentes con el baseline crecido -> la suite corrio de verdad, no es el 0-tests-leido-como-sobrevive.
+
+**Higiene:** baseline **629/629 verde** · `rm -rf .stryker-tmp` **entre las dos tandas** · **una sola
+tanda viva a la vez** (0 procesos `stryker run` al arrancar) · acotado **solo** con `--mutate`,
+**jamas** `--testFiles` · **sin sabotaje en esta tanda** (solo medicion; el `judge` ya reprodujo por
+sabotaje los 4 mutantes del guard y el @s27) · `src/` **git-clean antes y despues**.
+
+```
+pnpm exec stryker run --mutate src/lib/puerta-anclas.ts          --concurrency 1   # EXIT 0
+pnpm exec stryker run --mutate src/components/MenuNavegacion.tsx  --concurrency 1   # EXIT 0
+```
+
+### El score — ya con derecho a leerse
+
+| Fichero | `# timeout` | tests/mut | Total | Killed | **Survived** | **NoCov** | `# errors` | Score |
+| ------- | ----------- | --------- | ----- | ------ | ------------ | --------- | ---------- | ----- |
+| `src/lib/puerta-anclas.ts` | **0** | 4,17 | **149** | 149 | **0** | **0** | 0 | **100,00 %** |
+| `src/components/MenuNavegacion.tsx` | **0** | 2,33 | **6** | 6 | **0** | **0** | 0 | **100,00 %** |
+| `src/components/Cabecera.tsx` (sin cambios) | — | — | **1** | 1 | **0** | 0 | 0 | **100,00 %** |
+| `src/components/Pie.tsx` (sin cambios) | — | — | **1** | 1 | **0** | 0 | 0 | **100,00 %** |
+| **Feature** | **0** | — | **157** | **157** | **0** | **0** | 0 | **100,00 %** |
+
+Stryker salio con **codigo 0** en los dos ficheros re-medidos («Final mutation score of 100.00 is
+greater than or equal to break threshold 100»). **Ni un superviviente, ni un equivalente**: el
+refactor cerro el hueco sin abrir otro. **Nada que escalar.**
+
+> Nota: el total de mutantes de `puerta-anclas.ts` paso de 148 a **149** por el refactor
+> (`?? ''` fuera, guard `if (coincidencia === null) continue` dentro); el NoCoverage de `:89:69` que
+> apuntaba al `?? ''` **desaparecio con la linea**. Feature total 156 -> **157** por esa misma razon.
+
+---
+
+## 1. Salud del informe — SE LEE ANTES QUE EL SCORE (ronda de ESCALADA, historico)
 
 > «Un informe con timeouts MIENTE» (`docs/verification.md` s.52). «Un `tests per mutant` desplomado
 > miente al reves e INVENTA supervivientes» (s.77). **Ninguna de las dos mordio aqui, y esta probado.**
