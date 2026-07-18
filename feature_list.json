@@ -165,21 +165,22 @@
       "title": "Hero con h1 real y animación de pincel con estado base visible",
       "description": "La feature donde el patrón de memoria decide el diseño. El prototipo hace exactamente lo prohibido: paintReveal arranca desde clip-path:inset(0 100% 0 0) (base oculto) y 'Studio' está en opacity:0 hasta t=4,4s. Bajo SSG el nombre del salón se hornea INVISIBLE, y bajo prefers-reduced-motion se queda congelado invisible. Además bob 2.4s infinite incumple SC 2.2.2.",
       "acceptance": [
-        "El estado base en CSS es el estado final VISIBLE; el estado oculto vive solo en el 0% del keyframe",
-        "Con prefers-reduced-motion: reduce el hero se ve completo y legible",
-        "El HTML prerenderizado (sin JS) muestra el nombre del salón visible: se verifica con fetch del HTML crudo del build, no con jsdom",
-        "La animación bob no es infinite (SC 2.2.2 Pause Stop Hide, nivel A)",
-        "El elemento LCP no tiene opacity:0 en ningún momento y es legible en ≤1,2s (hoy ~5,3s)",
-        "El hook de IntersectionObserver es SSR-safe y arma el flag en useEffect, no en render"
+        "El estado base del titular en el SCSS es el estado final VISIBLE (clip-path:inset(0 0 0 0), opacity:1); el estado OCULTO vive SOLO en el 0% del keyframe. La animacion vive en un SCSS module, NUNCA horneada inline (un animation inline gana en especificidad al @media(reduce){animation:none} de la hoja y derrotaria reduced-motion — lo cazo la revision adversarial). Se asevera leyendo el .module.scss",
+        "Por CRITERIO DE PROYECTO (NO WCAG A/AA — 2.2.2 solo aplica a movimiento >5s; 2.3.3 es AAA y solo interaccion; el AUTOR debe poner la @media), bajo @media (prefers-reduced-motion: reduce){ animation:none } el hero se presenta en su estado final VISIBLE y legible sin movimiento residual",
+        "El HTML CRUDO prerenderizado de dist/ muestra el nombre del salon VISIBLE sin ejecutar JavaScript, sin opacity:0 ni clip-path ni animation OCULTANTE horneados inline: readFileSync + asercion de string, NUNCA jsdom. Es UN solo <h1> (F-04 ya lo exige) con dos <span> (nunca <div>, invalido) y un text node de espacio REAL entre ellos → nombre accesible «Nails Lash Studio»; derivado de NOMBRE por lastIndexOf con guarda; titular con --ink (NUNCA --accent como texto: 4,05<4,5 rompe F-03)",
+        "ACORTADO EN LA PUERTA (C-3, 2026-07-18): la animacion del hero dura <=1,2s TOTAL (delay + duracion), leido del SCSS, para que el LCP del titular no supere el umbral bueno. La animacion del prototipo (delay 0,5s + 4,8s = ~5,3s) suspendia el LCP; el estado base visible protege el reposo pero NO acorta el reveal (medido con Chrome/CDP), por eso hay que acortar la duracion",
+        "El LCP se separa en DOS ejes (C-2, 2026-07-18): (a) TESTEABLE por test unitario — el CSS estatico (sin opacity:0/clip-path/animation ocultante en la base) + la duracion acotada <=1,2s; (b) NO_VERIFICABLE en test unitario / VERIFICACION EN VIVO CON CHROME tras el TDD — el numero LCP real (<=2,5s p75 [V: web.dev]) y si el clip-path del paintReveal deja el titular fuera del LCP (la spec de Element Timing mide por border box ∩ viewport, que no cambia con clip-path → solo Chrome lo dirime). PROHIBIDO fingir medir el LCP con jsdom",
+        "Si F-07 hornea el indicador «desliza», su animacion tiene DURACION TOTAL <= 5s (iteration-count × duracion por iteracion), NO basta con quitar «infinite» (iteration-count:3 sobre bob 2.4s = 7,2s es finito y SIGUE incumpliendo SC 2.2.2 nivel A). APLAZADO A F-08 en la puerta (C-5, 2026-07-18): depende de que haya scroll (no lo hay hoy). NO hay IntersectionObserver en el hero (C-1: el acceptance 6 original se retira — el hero es above-the-fold, el observer es el patron B de F-08+)"
       ],
-      "puerta_legal": "WCAG SC 2.2.2 (A) · LCP ≤ 2,5s p75",
+      "puerta_legal": "WCAG SC 2.2.2 Pause Stop Hide (nivel A) para el indicador de movimiento: la LETRA exige un mecanismo de pausa/parada/ocultacion para movimiento que arranca automatico, dura >5s y va en paralelo; se cumple con DURACION TOTAL <=5s (tecnica suficiente). El paintReveal (<=1,2s tras C-3) NO lo dispara. || LCP <=2,5s p75 [V: web.dev/articles/lcp] es la norma de rendimiento, pero NO es puerta unitaria (jsdom no tiene layout/paint): se verifica EN VIVO con Chrome tras el TDD (C-2). || prefers-reduced-motion es CRITERIO DE PROYECTO, no obligacion WCAG A/AA (2.3.3 es AAA). Corregido en la puerta 2026-07-18; ver progress/f07_verificacion_previa.md.",
       "depends_on": [
         "tokens_paleta_contraste",
         "cascaron_semantico"
       ],
       "mutable": true,
       "sdd": true,
-      "status": "spec_ready"
+      "status": "in_progress",
+      "puerta_humana": "APROBADO por el humano el 2026-07-18. C-3 (decision de producto): ACORTAR la animacion a <=1,2s total, para un LCP bueno (el estado base visible protege el reposo pero NO acorta el reveal; el prototipo tardaba ~5,3s). C-1: retirar el acceptance del IntersectionObserver (el hero es above-the-fold; grep src/ = 0). C-2: separar el LCP en testeable (CSS estatico + duracion) vs [NV]/verificacion EN VIVO CON CHROME (el numero real + si el clip-path oculta del LCP). C-5: el indicador «desliza» (bob) se APLAZA a F-08 (depende de scroll); si algun dia se hornea, duracion total <=5s, no solo quitar infinite. C-7: el eyebrow deja solo su estructura (<p>) en F-07; el contenido de categorias es F-09 (nunca «Facial»). Revision adversarial cazo 4 graves + 1 menor, ya reparados. F-07 estrena verificacion EN VIVO con Chrome (extension del humano)."
     },
     {
       "id": 8,

@@ -3,28 +3,27 @@
 # base visible, y el LCP que NO es puerta unitaria».
 #
 # =============================================================================================
-# ⏸⏸ ESTE CONTRATO **NO ESTÁ APROBADO**. ESPERA LA PUERTA DE APROBACIÓN HUMANA. ⏸⏸
-#    CINCO preguntas van a la puerta con la PROPUESTA DEL LEAD; el lead PROPONE, NO CIERRA ninguna
-#    (precedente F-05/F-06, A-23 redux). Hasta que el humano decida, el `tdd_craftsman` NO implementa:
-#      · ⏸ C-1 — RETIRAR el acceptance 6 (IntersectionObserver): NO aplica al hero (above-the-fold;
-#                es del patrón B de F-08+; `grep -rin IntersectionObserver src/` = 0 [V]). Cambia un
-#                criterio de aceptación. → Cubierto NEGATIVAMENTE por @s5 (visible sin JS).
-#      · ⏸ C-2 — SEPARAR el acceptance 5: mezcla ≤1,2s (DURACIÓN de animación, testeable) con LCP
-#                ≤2,5s (norma). El CSS estático (base visible + duración acotada + HTML crudo sin JS)
-#                es PUERTA UNITARIA (@s1/@s4/@s5); el NÚMERO LCP real y el clip-path vs LCP son
-#                [NV] / VERIFICACIÓN EN VIVO CON CHROME (ver el bloque «EL LCP, DOS EJES»). Define
-#                qué es puerta vs en-vivo.
-#      · ⏸ C-3 — DECISIÓN DE PRODUCTO: el estado base visible NO acorta el reveal; con la animación
-#                del prototipo (delay 0,5s + duración 4,8s) el titular-LCP se retrasa a ~5,3s [V,
-#                medido]. ¿Se ACORTA a ≤1,2s totales (delay ~0,1s + duración ~1s, propuesta del audit)
-#                o se mantiene el reveal largo de marca? El NÚMERO de @s4 lo fija ESTA decisión.
-#      · ⏸ C-5 — El indicador «desliza» (`bob 2.4s infinite`) incumple SC 2.2.2 (A) [V]. Si F-07 lo
-#                hornea → SIN `infinite` (iteración finita); o APLAZARLO a F-08 (que sí introduce
-#                scroll). Alcance + a11y. → @s14 aplica SOLO si C-5 decide hornearlo en F-07.
-#      · ⏸ C-7 — El EYEBROW no tiene fuente de datos hoy (las categorías son F-09, pending). Aplazar
-#                el CONTENIDO a F-09 y dejar en F-07 solo la ESTRUCTURA (`<p>`), o reutilizar RECLAMO
-#                (`src/lib/seo.ts:17` = «Uñas, pestañas y cejas en Las Rozas de Madrid»). NUNCA
-#                hardcodear «Facial». → @s10 fija la ESTRUCTURA; el texto queda ⏸.
+# ✅✅ APROBADO POR LA PUERTA HUMANA EL 2026-07-18. EL `tdd_craftsman` QUEDA LIBERADO PARA IMPLEMENTAR. ✅✅
+#    Las CINCO preguntas que fueron a la puerta con la propuesta del lead están CERRADAS por el humano
+#    (precedente F-05/F-06, A-23 redux). El lead PROPONÍA; el humano DECIDIÓ. Las cinco decisiones,
+#    LITERALES, tal como las cerró la puerta:
+#      · ✅ C-3 (decisión de producto) — ACORTAR la animación del hero a ≤1,2s TOTAL (delay + duración),
+#                leído del SCSS, para un LCP bueno. El estado base visible protege el REPOSO pero NO
+#                acorta el reveal (medido con Chrome/CDP); el prototipo tardaba ~5,3s. → @s4 deja de estar
+#                pendiente: el límite es ≤1,2s.
+#      · ✅ C-1 — RETIRAR el acceptance 6 original (IntersectionObserver): NO hay observer en el hero. Es
+#                above-the-fold; el observer es el patrón B de F-08+ (`grep -rin IntersectionObserver
+#                src/` = 0 [V]). → Cubierto NEGATIVAMENTE por @s5 (visible sin JS).
+#      · ✅ C-2 — SEPARAR el LCP en DOS ejes: (a) TESTEABLE por test unitario = el CSS estático (base
+#                visible, sin opacity:0/clip-path/animation ocultante) + la duración ≤1,2s (@s1/@s2/@s4/@s5);
+#                (b) [NV] / VERIFICACIÓN EN VIVO CON CHROME tras el TDD = el NÚMERO LCP real y si el
+#                clip-path deja el titular fuera del LCP. PROHIBIDO fingir medir el LCP con jsdom.
+#      · ✅ C-5 — El indicador «desliza» (`bob`) se APLAZA a F-08 (depende de que haya scroll; hoy no lo
+#                hay). → @s14 deja de estar pendiente: se APLAZA A F-08 y el `tdd_craftsman` NO lo implementa en
+#                F-07 (se conserva por trazabilidad, sin renumerar). Si algún día se hornea, su duración
+#                total ≤5s (no basta quitar `infinite`).
+#      · ✅ C-7 — El EYEBROW deja SOLO su ESTRUCTURA (`<p>`) en F-07; el CONTENIDO de categorías es F-09
+#                (nunca hardcodear «Facial»). → @s10 fija la estructura; el contenido, aplazado a F-09.
 #
 # =============================================================================================
 # DECIDIDO Y DECLARADO por el lead (medido o criterio de proyecto) — NO va a la puerta, pero el
@@ -65,10 +64,10 @@
 # **Ninguna decisión de fondo cae.**
 #
 # NO HUBO CONVERSACIÓN DE SPEC CON EL HUMANO PARA F-07, y ni la spec ni este contrato la simulan. El
-# humano DELEGÓ la fase en el `craftsman_lead` HASTA la puerta de aprobación, que sigue EN PIE. Quien
-# hizo de adversario en lugar del humano fue la verificación previa (medición en build SSG real + CDP,
-# reproducible en `.experimentos-tmp/f07-a3/` y `.experimentos-tmp/veredictos-f07/`) — eso NO sustituye
-# a la puerta, y por eso HAY puerta.
+# humano DELEGÓ la fase en el `craftsman_lead` HASTA la puerta de aprobación, CELEBRADA Y CERRADA el
+# 2026-07-18. Quien hizo de adversario en lugar del humano fue la verificación previa (medición en
+# build SSG real + CDP, reproducible en `.experimentos-tmp/f07-a3/` y `.experimentos-tmp/veredictos-f07/`)
+# — eso NO sustituyó a la puerta, y por eso HUBO puerta (cerrada el 2026-07-18).
 #
 # =============================================================================================
 # 🔴 EL CORAZÓN: EL ESTADO BASE VISIBLE BAJO SSG (I-4) — sobre el SCSS y el HTML CRUDO de dist/
@@ -88,7 +87,7 @@
 #   .heroStudio { opacity: 1; animation: fadeUp <DUR> <DELAY> both; }
 #   @keyframes fadeUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
 #   @media (prefers-reduced-motion: reduce) { .heroMarca, .heroStudio { animation: none; } }  ← C-4
-# <DUR>/<DELAY> los fija C-3 (⏸). El SCSS NO ES MUTABLE (Stryker no ve CSS): lo aseveran los tests
+# <DUR>/<DELAY> los fija C-3 (APROBADO 2026-07-18: ≤1,2s TOTAL delay+duración). El SCSS NO ES MUTABLE (Stryker no ve CSS): lo aseveran los tests
 # que LEEN el SCSS (como `tokens.test.ts` de F-03 y el `scroll-padding` de F-06), y su otra defensa es
 # la puerta de aprobación humana. NO «arreglar» el delay con `fill-mode: forwards` (salto visible→oculto)
 # ni con delay negativo (arranca ya en el oculto) [V, trampas medidas A3 §7].
@@ -127,7 +126,7 @@
 # =============================================================================================
 # ANTI-TAUTOLOGÍA (regla dura) Y LO PROHIBIDO EN ESTE FICHERO, LOS TESTS Y LOS MENSAJES
 # =============================================================================================
-# TODO esperado se escribe A MANO: «Nails Lash» / «Studio», el número de la duración (⏸ C-3, RE-LEÍDO
+# TODO esperado se escribe A MANO: «Nails Lash» / «Studio», el número de la duración (C-3 APROBADO 2026-07-18: ≤1,2s, RE-LEÍDO
 # del SCSS definitivo, JAMÁS importado como símbolo para compararse contra sí mismo — patrón
 # `doble-de-test-anclado-al-literal-no-al-simbolo`). NOMBRE (`site.ts:13`) es la ENTRADA de la
 # derivación (fuente única F-02, legítima de importar); los ESPERADOS de la partición son a mano.
@@ -220,19 +219,19 @@ Feature: El nombre del salón como un <h1> real, VISIBLE horneado en dist/ y baj
     # CSS medido (A3 §6) describe la TÉCNICA DEL PROYECTO, no una cita normativa.
 
   @s4
-  Scenario: la duración total de la animación del hero está ACOTADA ≤ el límite que fije C-3, leída del SCSS
-    Given el SCSS module del hero y el límite de duración total (delay + duración) que fije C-3
+  Scenario: la duración total de la animación del hero está ACOTADA ≤ 1,2 s TOTAL (delay + duración), leída del SCSS — límite fijado por C-3 en la puerta 2026-07-18
+    Given el SCSS module del hero y el límite de duración total (delay + duración) de 1,2 segundos que fijó C-3 (APROBADO 2026-07-18)
     When un test lee las declaraciones "animation" de ".heroMarca" y ".heroStudio" y suma delay + duración de cada una
-    Then la duración total (delay + duración) de cada elemento resuelta a segundos es menor o igual que ese límite
-    And el test compara contra el límite escrito A MANO (⏸ pendiente de C-3), no contra un símbolo importado
-    # ⏸ EL NÚMERO LO FIJA C-3 (PENDIENTE DE PUERTA), y por eso es [NV] hoy: NO se hornea aquí. CASO
+    Then la duración total (delay + duración) de cada elemento resuelta a segundos es menor o igual que 1,2 s
+    And el test compara contra el límite 1,2 s escrito A MANO (C-3 APROBADO 2026-07-18), no contra un símbolo importado
+    # ✅ EL NÚMERO LO FIJÓ LA PUERTA (C-3, APROBADO 2026-07-18): ≤ 1,2 s TOTAL (delay + duración). CASO
     # LÍMITE 8 + la parte testeable del acceptance 5 (el ≤1,2s, que C-2 separa del LCP ≤2,5s). MEDIDO
     # [V, A3 §7]: la base visible NO acorta el reveal para quien acepta movimiento; con delay 0,5s +
-    # duración 4,8s el titular-LCP se retrasa a ~5,3s. Propuesta del lead (C-3): acortar a ≤1,2s
-    # totales (delay ~0,1s + duración ~1s, como recomienda `docs/research/audit-perf.md §3.6`).
-    # Alternativa: mantener el reveal largo de marca (reduced-motion ya da contenido instantáneo). El
-    # `<DUR>`/`<DELAY>` del SCSS los fija ESTA decisión → el número esperado del test se escribe A MANO
-    # cuando C-3 cierre. Este eje (la DURACIÓN) SÍ es puerta unitaria; el NÚMERO LCP real NO (C-2).
+    # duración 4,8s el titular-LCP se retrasaba a ~5,3s → POR ESO la puerta ACORTA a ≤1,2s totales
+    # (delay ~0,1s + duración ~1s, como recomienda `docs/research/audit-perf.md §3.6`). El
+    # `<DUR>`/`<DELAY>` del SCSS los fija ESTA decisión → el número esperado del test (1,2 s) se escribe
+    # A MANO, RE-LEÍDO del SCSS definitivo, JAMÁS importado como símbolo. Este eje (la DURACIÓN) SÍ es
+    # puerta unitaria; el NÚMERO LCP real NO (C-2, verificación EN VIVO con Chrome).
 
   @s5
   Scenario: el HTML CRUDO prerenderizado de dist/ muestra el nombre del salón PRESENTE en los bytes y SIN ocultación inline (ni opacity/clip-path ni animation horneados) sin ejecutar JavaScript — readFileSync + string, NUNCA jsdom
@@ -322,17 +321,16 @@ Feature: El nombre del salón como un <h1> real, VISIBLE horneado en dist/ y baj
     # que F-03 evitó a propósito. #C05576 sí vale como relleno grande/decorativo, NUNCA como texto.
 
   @s10
-  Scenario: el eyebrow es un <p>, NUNCA un heading; F-07 fija su estructura, no su contenido (⏸ C-7)
+  Scenario: el eyebrow es un <p>, NUNCA un heading; F-07 fija su estructura, no su contenido (C-7 APROBADO 2026-07-18: contenido aplazado a F-09)
     Given un hero con un eyebrow (la línea sobre el titular)
     When se inspecciona el marcado del eyebrow
     Then el eyebrow es un elemento <p> (párrafo), NUNCA un heading (h1…h6)
     And el hero no introduce ningún heading aparte del único <h1> del titular
     And el eyebrow NO contiene el literal «Facial» (no existe en este negocio)
-    # ⏸ C-7 (PENDIENTE DE PUERTA): el CONTENIDO del eyebrow no tiene fuente de datos hoy —las categorías
-    # (Uñas · Pestañas · Cejas) son F-09 (pending); `site.ts` no las tiene. Propuesta del lead: aplazar
-    # el contenido a F-09, o reutilizar RECLAMO (`src/lib/seo.ts:17`). F-07 fija SOLO la ESTRUCTURA: un
-    # `<p>`, jamás un heading (un `<h2>` rompería «un h1» y sembraría un heading sin `<section>`).
-    # NUNCA hardcodear «Facial» [V]. Este escenario NO fija un texto: destila la estructura.
+    # ✅ C-7 (APROBADO POR LA PUERTA 2026-07-18): el CONTENIDO del eyebrow se APLAZA a F-09 —las
+    # categorías (Uñas · Pestañas · Cejas) son F-09 (pending); `site.ts` no las tiene—. F-07 fija SOLO
+    # la ESTRUCTURA: un `<p>`, jamás un heading (un `<h2>` rompería «un h1» y sembraría un heading sin
+    # `<section>`). NUNCA hardcodear «Facial» [V]. Este escenario NO fija un texto: destila la estructura.
 
   @s11
   Scenario: el hero como h1 + p SIN <section> no activa la puerta de anclas de F-06 — deslinde declarado
@@ -437,18 +435,22 @@ Feature: El nombre del salón como un <h1> real, VISIBLE horneado en dist/ y baj
     # `src/components/**/*.tsx` y `src/lib/**/*.ts`, MEDIDO [V]) → NO hay que tocarlo.
 
   # ---------------------------------------------------------------------------
-  # ⏸ @s14 — El indicador «desliza» (bob). APLICA SOLO SI C-5 DECIDE HORNEARLO EN F-07. PENDIENTE.
+  # @s14 — El indicador «desliza» (bob). APLAZADO A F-08 POR LA PUERTA (C-5, APROBADO 2026-07-18): el
+  # bob depende de que haya scroll y hoy NO lo hay. El `tdd_craftsman` NO lo implementa en F-07. Se
+  # CONSERVA este escenario como contrato de trazabilidad para F-08 (NO se renumeran los demás: es un
+  # hueco documentado, mismo precedente con el que F-05 dejó escenarios). Si algún día se hornea, la
+  # exigencia ya queda escrita aquí: iteración FINITA Y duración total ≤ 5 s (no basta quitar «infinite»).
   # ---------------------------------------------------------------------------
 
-  @s14
-  Scenario: si F-07 hornea el indicador «desliza», su movimiento total dura ≤ CINCO segundos — iteración FINITA Y duración total (count × duración por iteración) acotada, NO solo «≠ infinite» (SC 2.2.2, nivel A)
-    Given el SCSS del indicador «desliza» del hero, EN EL SUPUESTO de que C-5 decida hornearlo en F-07
+  @s14 @aplazado-f08
+  Scenario: [APLAZADO A F-08 — el `tdd_craftsman` NO lo implementa en F-07] si algún día se hornea el indicador «desliza», su movimiento total dura ≤ CINCO segundos — iteración FINITA Y duración total (count × duración por iteración) acotada, NO solo «≠ infinite» (SC 2.2.2, nivel A)
+    Given el SCSS del indicador «desliza» del hero, EN EL SUPUESTO de que F-08 lo hornee (C-5 lo APLAZÓ a F-08 el 2026-07-18; F-07 NO lo hornea)
     When un test lee su "animation-iteration-count" y la duración por iteración de su "animation", y calcula la duración TOTAL del movimiento (iteration-count × duración por iteración) resuelta a segundos
     Then (TÉCNICA) el número de iteraciones es FINITO — NO "infinite"
     And (LETRA, la propiedad normativa de SC 2.2.2) la duración TOTAL del movimiento (iteration-count × duración por iteración) es menor o igual que CINCO segundos — espejo de cómo @s4 suma delay + duración, aquí el «5» es el LITERAL de la norma
     And un iteration-count finito NO basta por sí solo: "iteration-count: 3" sobre "bob 2,4s" = 7,2 s es FINITO y SIGUE incumpliendo (> 5 s); por eso el test mide la DURACIÓN, no solo la finitud
     And con "infinite" —o con cualquier duración total > 5 s— el movimiento arrancaría automático y en paralelo con el resto del hero → incumpliría SC 2.2.2 (A)
-    # ⏸ C-5 (PENDIENTE DE PUERTA). CASO LÍMITE 6 + acceptance 4. A1, CONFIRMADO por vía adversarial: el
+    # ✅ C-5 (APROBADO POR LA PUERTA 2026-07-18: APLAZADO A F-08). CASO LÍMITE 6 + acceptance 4. A1, CONFIRMADO por vía adversarial: el
     # `bob 2.4s ease-in-out infinite` del prototipo cumple las TRES condiciones del bullet «Moving,
     # blinking, scrolling» de SC 2.2.2 (A) [V: w3.org/TR/WCAG22/]: (1) arranca automático, (2) `infinite`
     # → dura > 5s, (3) va en paralelo; no es esencial y no tiene mecanismo de pausa → incumplimiento
@@ -460,7 +462,8 @@ Feature: El nombre del salón como un <h1> real, VISIBLE horneado en dist/ y baj
     # El `<button>↺ Repetir` del prototipo es control de REPETICIÓN, NO de parada. 🔴 El `paintReveal`
     # (4,8s < 5s) NO dispara 2.2.2 [V]: el único gancho de nivel A es el `bob` infinito. **PROHIBIDO**
     # atribuir a SC 2.2.2 un umbral distinto de los «cinco segundos» LITERALES (aquí el «5» es ESE
-    # literal WCAG, no un número horneado de C-3). Propuesta del lead (C-5): si se hornea en F-07 →
-    # iteración finita Y duración total ≤ 5s; o APLAZARLO a F-08 (que sí introduce scroll) → entonces
-    # este escenario NO aplica a F-07. Higiene: `docs/research/audit-a11y.md:386` dice «para cumplir SC
-    # 2.2.2 en AA» — 2.2.2 es nivel A, no AA (error de nivel en ESE doc, no en el troceado).
+    # literal WCAG, no un número horneado de C-3). DECISIÓN DE LA PUERTA (C-5, APROBADO 2026-07-18):
+    # APLAZADO A F-08 (que sí introduce scroll; hoy no lo hay) → este escenario NO se implementa en F-07;
+    # se conserva por trazabilidad para F-08. Si algún día se hornea, la exigencia queda fijada aquí:
+    # iteración FINITA Y duración total ≤ 5s (no basta quitar «infinite»). Higiene: `docs/research/audit-a11y.md:386`
+    # dice «para cumplir SC 2.2.2 en AA» — 2.2.2 es nivel A, no AA (error de nivel en ESE doc, no en el troceado).
