@@ -226,7 +226,8 @@
       "bloqueada_para_publicar": "Precios reales sin verificar (el titular no los publica en su web) + ¿llevan IVA? + contradicción Treatwell↔pestañas. Se CONSTRUYE ya con datos placeholder tras la puerta F-01.",
       "riesgo": "Un campo libre precio_anterior editable a mano es una máquina de generar infracciones.",
       "sdd": true,
-      "status": "pending"
+      "status": "spec_ready",
+      "puerta_humana": "APROBADO por el humano el 2026-07-18 (lote A). Contrato features/catalogo_servicios.feature (17 escenarios) + borrador progress/spec_draft_catalogo_servicios.md. Revision adversarial: 0 bloqueantes, 2 graves + 6 menores reparados. Decisiones: Q-A DIFERIR+ANCLAR los precios placeholder (no cablear en vivo; anclar catalogo.precios en DIFERIDOS_APROBADOS); Q-B precios de muestra visibles + leyenda IVA incluido + aviso 'pendientes de confirmar'; corte DATO/LOGICA (src/lib/catalogo.ts dato FUERA de mutate, src/lib/catalogo-logica.ts + Catalogo.tsx EN mutate); categorias {Unas,Pestanas,Cejas} conjunto cerrado, nunca Facial/Depilacion; contradiccion pestanas = pregunta al cliente P-4."
     },
     {
       "id": 10,
@@ -245,7 +246,8 @@
       "mutable": true,
       "bloqueada_para_publicar": "Las excepciones (festivos, agosto) no están verificadas con el salón.",
       "sdd": true,
-      "status": "pending"
+      "status": "spec_ready",
+      "puerta_humana": "APROBADO por el humano el 2026-07-18 (lote A). Contrato features/horario.feature (15 escenarios) + borrador progress/spec_draft_horario.md. Revision adversarial: 1 BLOQUEANTE reparado (openingHoursSpecification se compone en el SITIO DE EMISION home.tsx, NO en construirJsonLd, para no romper el @s9 de F-04 done que asevera 6 claves exactas) + 1 grave + 6 menores. Decisiones: sin badge 'Abierto/Cerrado ahora' en la demo (estaAbierto se construye para F-13), franjas semiabiertas [abre,cierra) Europe/Madrid, excepciones vacias (sin inventar festivos), openingHoursSpecification aditivo al JSON-LD."
     },
     {
       "id": 11,
@@ -283,7 +285,8 @@
       "mutable": true,
       "bloqueada_para_publicar": "El email (centroesteticarozas@gmail.com aparece solo en el JSON-LD de la web actual, nunca visible) hay que confirmarlo con el cliente.",
       "sdd": true,
-      "status": "pending"
+      "status": "spec_ready",
+      "puerta_humana": "APROBADO por el humano el 2026-07-18 (lote A). Contrato features/contacto.feature (15 escenarios) + borrador progress/spec_draft_contacto.md. Revision adversarial: 1 BLOQUEANTE reparado (vacuidad en negativas de #contacto → ahora con ancla positiva; email/TikTok vigilados en TODA la pagina head+body, no solo #contacto) + 4 graves + 4 menores. Decisiones: instagramHref anadido a site.ts (derivacion pura), email OMITIDO en la demo hasta confirmar, frontera F-13 (F-12 da tel: accesible, NO el boton WhatsApp), reutiliza el stub #contacto-titulo (no rompe la puerta de anclas de F-06), TikTok NO."
     },
     {
       "id": 13,
@@ -444,6 +447,25 @@
       "nota_mutacion": "Es configuración de CI: no lleva mutate propio.",
       "sdd": false,
       "status": "pending"
+    },
+    {
+      "id": 21,
+      "name": "tipografia_global",
+      "title": "Tipografía global del documento: cuerpo Manrope, encabezados Gilda Display",
+      "description": "Deuda declarada en el cierre de F-07: el body global NO fija font-family (grep font-family src/styles = 0) y el cuerpo cae en la serif por defecto del UA (Times New Roman). Nuevo partial _tipografia.scss (@use desde main.scss): body = 'Manrope', system-ui, sans-serif (suelo heredable, idéntico al eyebrow/cabecera); h2, h3 = 'Gilda Display', serif (suelo de tipo). NO toca el <h1> del hero (F-07), ni cabecera/nav/pie (F-06), ni los precios (F-09). Usa SOLO fuentes ya horneadas por F-05.",
+      "acceptance": [
+        "_tipografia.scss declara body con font-family 'Manrope', system-ui, sans-serif y h2, h3 con 'Gilda Display', serif; se asevera leyendo el SCSS (Stryker no ve SCSS)",
+        "main.scss engancha el partial con @use 'tipografia' (sin esto es verde por vacuidad), y ninguno de los dos selectores queda sin font-family",
+        "Toda familia entrecomillada del partial está en la allowlist de familias ya horneadas {Manrope, Gilda Display, Great Vibes}: ninguna familia nueva, ningún @import ni @font-face (protege el cero-terceros de F-05)",
+        "Verificación EN VIVO con Chrome tras el TDD: font-family computado del body resuelve a Manrope (document.fonts.check('16px Manrope')) y el de un <h2> a Gilda Display (document.fonts.check('24px Gilda Display')); el woff2 de Gilda Display se descarga de /assets sin esquema http(s)",
+        "Regresión en vivo: el <h1> del hero sigue en Great Vibes/Manrope (F-07), cabecera/nav/pie siguen en Manrope (F-06), ningún color cambia (F-03) y no hay peticiones a googleapis/gstatic (F-05); pnpm build exit 0 con las CINCO puertas"
+      ],
+      "depends_on": ["cero_terceros", "cascaron_semantico", "hero_marca"],
+      "mutable": false,
+      "nota_mutacion": "Nada que mutar: es SCSS. Stryker no ve SCSS y src/styles/ no está en la lista mutate. No lleva mutate propio y se declara aquí en vez de fingir cobertura (igual que F-08).",
+      "sdd": true,
+      "status": "spec_ready",
+      "puerta_humana": "APROBADO por el humano el 2026-07-18 (lote A). Feature NUEVA nacida de la deuda de F-07 (el body global no fijaba font-family). Contrato features/tipografia_global.feature (9 escenarios) + borrador progress/spec_draft_tipografia_global.md. Revision adversarial: 0 bloqueantes, 2 graves (grep [V] impreciso; contradiccion h2,h3 una regla o dos) + 4 menores reparados. Decisiones: body Manrope, h2/h3 Gilda Display, partial nuevo _tipografia.scss (no tocar _base.scss de F-04), mutable:false (SCSS)."
     }
   ],
   "no_se_construyen": [
