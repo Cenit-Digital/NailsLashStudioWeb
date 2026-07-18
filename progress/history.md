@@ -111,3 +111,83 @@ AUTOMÁTICAS.** La distinción la da el HTML Living Standard (*external resource
 - **`prettier --check .` falla en 86 ficheros y ya fallaba antes de F-05.** Deuda preexistente;
   `format:check` **no** es puerta del arnés (`lint` = `typecheck + eslint`).
 - **Los 2 menores del `judge`**, no bloqueantes.
+
+## 2026-07-18 — feature `6 — header_nav_footer` · **CERRADA `done`**
+
+**Resultado: 27/27 escenarios · 629 tests · judge APROBADO (2 rondas) · mutación 100 % en los cuatro
+ficheros (`puerta-anclas.ts` 149 + `Cabecera.tsx` + `MenuNavegacion.tsx` + `Pie.tsx`), 0 timeouts,
+0 EXCLUSIONES · `pnpm build` exit 0 con las CINCO puertas.**
+
+`src/lib/puerta-anclas.ts` (decisor puro) + `tools/puerta-anclas.ts` (humilde) +
+`src/components/{Cabecera,MenuNavegacion,Pie}.tsx` + `cabecera.module.scss`.
+
+### La feature en una frase
+
+**El entregable central no fue la nav, sino una PUERTA DE ANCLAS VIVAS** que no existía: la anti-404
+de F-04 **excluye las anclas por diseño** (`RUTA_INTERNA = /^\/(?!\/)/`), así que una nav con 7
+anclas muertas pasaba las cuatro puertas en verde. Ahora *«todo `href="#id"` de la nav resuelve a un
+`id` presente Y cada sección navegable está enlazada (igualdad de conjuntos)»*, sobre el HTML crudo
+de `dist/`, fallando cerrada para **los dos** extractores.
+
+### Fases
+
+- **Verificación previa** (`f06_verificacion_previa.md`): 8 afirmaciones × verificar+refutar,
+  ~1,77 M tokens, **1 recuperación por sobrecarga 529**. 1 refutada de raíz, 6 matizadas, 1 confirmada.
+- **Spec** (`project-spec.md` §Feature 6, 409 líneas) → **Gherkin** 20 escenarios tras **revisión
+  adversarial del contrato** (5 lentes, 15 agentes, 1,18 M tokens → **10 alegados, 4 confirmados:
+  1 BLOQUEANTE + 3 GRAVES**).
+- **Puerta humana (2026-07-17)**: B-1..B-7, las siete como proponía el lead.
+- **TDD** 20/20 (617 tests). **judge APROBADO.**
+- **Mutación**: **ESCALADA — 21 supervivientes reales** (contrato de menos).
+- **Puerta humana (2ª, 2026-07-18)**: ampliar el contrato **20 → 27**.
+- **TDD ronda 2**: 20/21 muertos, producción intacta, **1 equivalente escalado**.
+- **Puerta humana (3ª)**: refactorizar el equivalente (no excluir).
+- **TDD ronda 3**: refactor de `seccionesNavegables`. **judge delta APROBADO.**
+- **Mutación de cierre**: **100 % / 100 %**, 0 exclusiones.
+
+### 🔴 Lo que esta feature enseña, y no estaba en ninguna otra
+
+1. **«No copiar del base» mordió por CUARTA vez.** El breakpoint **`767` era herencia muerta de
+   WebEmpresa** (0 ocurrencias en `src/`); el diseño no tiene ni una `@media`. El breakpoint real
+   **medido en Chrome** es 793–806px → 820px con margen.
+2. **La trampa gemela de WCAG, por TERCERA vez.** La `puerta_legal` (*«SC 2.4.11 foco no
+   oscurecido»*) rozaba el AAA: el listón AA es *«not entirely hidden»*; *«no part hidden»* es el
+   2.4.12, que es AAA. **Cero umbrales numéricos**: los 66/70/80px no son WCAG.
+3. **Tres criterios de aceptación no se podían destilar tal cual** (A-23 redux): @1 *«TODAS las
+   secciones, no 7 de 11»* insatisfacible (hoy 2 secciones, ids en los `<h2>`); @2 *«scroll-margin no
+   actúa al tabular»* **falso** (el scroll al Tab es UA-defined); @4 *«se deriva de la altura real»*
+   **insostenible bajo SSG** (en CSS puro no hay forma de leer la altura de un elemento).
+4. 🔴 **Un `className={cond?'a':'b'}` en TSX es INMATABLE** bajo la regla anti-clase-CSS del repo
+   (5 mutantes, solo mueren con `toHaveClass`, prohibido). **La salida medida: el estado va en un
+   atributo consultable** (`aria-current`/`aria-expanded`, muere 4/4). Es una **colisión entre dos
+   reglas del repo**, no un fallo de Stryker.
+5. **`Dialog.Portal` de Radix emite CERO en prerender** → dejaría la anti-404 **ciega** («miente por
+   omisión»). Y `radix-ui` tenía **cero usos en `src/`** → salió de `dependencies` (caso `dm-sans`).
+6. 🔴 **VERDE POR VACUIDAD EN UN SEGUNDO EXTRACTOR, invisible a la mutación.** La revisión del
+   contrato cazó que la puerta de anclas tiene **dos** extractores (anclas + secciones) y solo el de
+   anclas tenía guarda de vacuidad. El de secciones podía derivar 0 y pasar en verde **con la
+   mutación aún al 100 %** — la brecha no la caza la métrica de cierre, solo la puerta humana.
+7. 🔴 **LA MUTACIÓN ENCONTRÓ UN HUECO EN LA SPEC, por tercera vez** (F-01, F-05, F-06). Los 21
+   supervivientes eran **guardas defensivas correctas que ningún escenario ejercitaba**; producción
+   quedó **intacta** mientras el contrato crecía 20 → 27. El grupo F era **el `:58` de F-05 otra
+   vez**: un comentario que prometía tolerar `href = "#x"` con espacios sin que ningún test lo fijara.
+8. 🔴 **UN «MUTANTE EQUIVALENTE» SE ELIMINA POR REFACTOR, NO SIEMPRE SE EXCLUYE — pero el refactor
+   ingenuo RE-INTRODUCE el equivalente.** La forma orientativa del lead (`referencia !== undefined &&
+   headings.has(...)`) habría vuelto a ser equivalente: `true && headings.has(...)` = `headings.has(
+   undefined)` = siempre false (la trampa del `undefined` redundante). La forma correcta: **un guard
+   que protege un THROW real** (`coincidencia[1]` sobre `null` revienta), así **debilitar el guard
+   LANZA** y un test lo mata. El proyecto mantiene **0 exclusiones** desde F-03.
+9. **La mutación sobre TSX es territorio nuevo y benigno**: los mismos 6 mutadores de cualquier
+   `.ts`; los **atributos JSX literales NO se mutan** (`aria-label="Principal"` no está protegido por
+   la mutación — lo aseveran los tests o la puerta del cascarón). Los `.tsx` van a **DOS listas**:
+   `mutate` (Stryker) **y** `coverage.include` (Vitest).
+
+### Deuda declarada (NO cerrada aquí)
+
+- **El menor del judge** (`@s12`/`@s16` aseveran sobre `renderToString`, el motor de prerender, no
+  sobre `readFileSync` de `dist/`): honra el espíritu anti-jsdom; para F-07+ un test que lea
+  `dist/index.html` cerraría también la letra.
+- **`destacados`/`ofertas` son huérfanos** (0 features): la nav no los enlaza; anotados como deuda,
+  sin construirse ni descartarse (B-7).
+- **El scroll-padding-top (`6rem`) y el breakpoint (`820px`) se RE-MIDEN** cuando la nav definitiva
+  cambie las etiquetas (F-09 mete «Pestañas/Cejas»): mueven los saltos de envoltura.

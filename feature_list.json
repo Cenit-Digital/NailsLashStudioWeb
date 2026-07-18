@@ -155,8 +155,9 @@
       ],
       "mutable": true,
       "sdd": true,
-      "status": "in_progress",
-      "puerta_humana": "APROBADO por el humano el 2026-07-17. B-1/B-2/B-4: reescritos los tres criterios (@1 insatisfacible, @2 falso, @4 insostenible bajo SSG) y la puerta_legal (rozaba el AAA). El entregable central es la PUERTA DE ANCLAS VIVAS. B-5/B-6: menu movil con CSS puro + aria-expanded, SIN Radix (radix-ui sale de dependencies, como dm-sans/outfit en F-05). B-3: breakpoint 820px medido, nunca el 767 heredado. B-7: destacados/ofertas son huerfanos → la nav no los enlaza (igualdad de conjuntos) y quedan anotados como deuda, sin construirse. La revision adversarial cazo 1 bloqueante (verde por vacuidad en el 2o extractor, invisible a la mutacion) + 3 graves, ya reparados."
+      "status": "done",
+      "puerta_humana": "APROBADO por el humano el 2026-07-17. B-1/B-2/B-4: reescritos los tres criterios (@1 insatisfacible, @2 falso, @4 insostenible bajo SSG) y la puerta_legal (rozaba el AAA). El entregable central es la PUERTA DE ANCLAS VIVAS. B-5/B-6: menu movil con CSS puro + aria-expanded, SIN Radix (radix-ui sale de dependencies, como dm-sans/outfit en F-05). B-3: breakpoint 820px medido, nunca el 767 heredado. B-7: destacados/ofertas son huerfanos → la nav no los enlaza (igualdad de conjuntos) y quedan anotados como deuda, sin construirse. La revision adversarial cazo 1 bloqueante (verde por vacuidad en el 2o extractor, invisible a la mutacion) + 3 graves, ya reparados.",
+      "cierre": "CERRADA 2026-07-18. 27/27 escenarios (20 aprobados + 7 que la mutacion revelo que faltaban, aprobados por el humano). 629 tests. judge APROBADO en las dos rondas (0 bloqueantes, 1 menor no bloqueante). Mutacion 100% en puerta-anclas.ts (149), Cabecera.tsx, MenuNavegacion.tsx y Pie.tsx, 0 timeouts, 0 EXCLUSIONES (el unico equivalente se elimino por refactor, no se excluyo). pnpm build exit 0 con las CINCO puertas. Entregable central: la PUERTA DE ANCLAS VIVAS (todo href=#id resuelve a un id presente + igualdad de conjuntos), que la anti-404 de F-04 no cubria. Menu movil CSS puro + aria-expanded, sin Radix (fuera de dependencies). B-1..B-7 cerradas por el humano."
     },
     {
       "id": 7,
