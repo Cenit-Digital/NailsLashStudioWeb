@@ -4,6 +4,14 @@
 #
 # =============================================================================================
 # ✅✅ **APROBADO POR LA PUERTA HUMANA EL 2026-07-17. B-1..B-7 CERRADAS POR EL HUMANO.** ✅✅
+# ✅✅ **AMPLIACIÓN APROBADA POR LA PUERTA HUMANA EL 2026-07-18** (tras la escalada de la prueba de
+#    mutación sobre los ficheros ya implementados: 135/156 = 86,54 %, 21 supervivientes REALES
+#    verificados por SABOTAJE MANUAL contra la suite completa — `progress/mutation_header_nav_footer.md`
+#    §3/§4). Precedente EXACTO de F-01 (la fila `600 123 456` de @s5) y F-05 (+3 escenarios): **la
+#    mutación no encontró código de más, encontró CONTRATO DE MENOS.** Las guardas defensivas y las
+#    extracciones son CORRECTAS y SE QUEDAN (sin ellas la puerta revienta o miente); faltaban los
+#    escenarios que las EXIJAN. Se añaden **@s21..@s27** (7 escenarios) y **7 filas a @s18** (el mapa de
+#    mutantes). La producción NO se toca. El bloque de la ampliación vive al final del fichero, tras @s18.
 #    Como F-05 (A-23/A-24/A-27/A-28), este contrato YA PASÓ LA PUERTA: el humano decidió las SIETE
 #    preguntas el 2026-07-17, TODAS como proponía el lead. **EL `tdd_craftsman` PUEDE IMPLEMENTAR**
 #    los 20 escenarios: donde antes se leía «nada se implementa hasta que el humano apruebe», ahora
@@ -533,6 +541,13 @@ Feature: Cabecera, navegación, pie, y la PUERTA DE ANCLAS VIVAS que demuestra q
       | vaciar el extractor de ANCLAS de nav (verde por vacuidad del 1.er extractor)        | @s7                                  |
       | vaciar el extractor de SECCIONES navegables (verde por vacuidad del 2.º extractor)  | @s19                                 |
       | alterar el literal del breakpoint 820px                                             | @s17                                 |
+      | tratar un `<a>` de nav SIN href como si tuviera href (leer el grupo de un match nulo) | @s21 (a sin href → 0 anclas, sin lanzar) |
+      | contar un `id=""` (vacío) como destino de anclaje válido                            | @s22 (# a id="" → ancla muerta)      |
+      | tratar como navegable una `<section>` cuyo aria-labelledby NO resuelve a un heading  | @s23 (gemelo simétrico de @s20)      |
+      | vaciar el nombre de una regla o alterar el formato de `describir()`                  | @s24 (texto exacto de cada regla)    |
+      | cambiar el cuantificador de las guardas de vacuidad (`.some` → `.every`)             | @s25 (artefacto multi-página mixto)  |
+      | estrechar la tolerancia de espacios alrededor del `=` en href/id/aria-labelledby     | @s26 (HTML válido con espacios)      |
+      | vaciar el `id` que asocia el botón del menú con su lista (aria-controls ↔ id)        | @s27 (MenuNavegacion)                |
 
     # 🔴 EL CONJUNTO EXACTO DE MUTANTES **NO SE PUEDE PREDECIR**: el fichero de F-06 NO EXISTE
     # todavía; otra implementación tendrá otro conjunto. **SE MIDE CUANDO EXISTA, NO ANTES** (la
@@ -544,3 +559,172 @@ Feature: Cabecera, navegación, pie, y la PUERTA DE ANCLAS VIVAS que demuestra q
     # ⚠️ Si la extracción de anclas/ids usa un regex con anclas `^`/`$`, se mutan → hará falta un
     # escenario de extracción (en F-03 el `^` fue el ÚNICO superviviente real del repo). Se añadirá
     # CON SU FILA cuando la mutación lo revele, como en F-05 (contrato de menos, no código de más).
+    # ✅ MEDIDO EL 2026-07-18: el fichero YA EXISTE y se midió (135/156, 21 supervivientes reales). Honrando
+    # esta misma nota, se han añadido las SEIS filas de abajo (grupos A–F + MenuNavegacion), cada una con
+    # el escenario nuevo que la mata (@s21..@s27). Ver la ampliación al final del fichero.
+
+  # =============================================================================================
+  # 🔴 AMPLIACIÓN DEL CONTRATO — APROBADA POR LA PUERTA HUMANA EL 2026-07-18 (los 21 supervivientes)
+  # =============================================================================================
+  # Tras la primera tanda de mutación sobre los ficheros ya implementados, el humano APROBÓ (2026-07-18)
+  # AMPLIAR el contrato. Precedente EXACTO de F-01 (la fila `600 123 456` de @s5) y F-05 (+3 escenarios):
+  # **la mutación no encontró código de más, encontró CONTRATO DE MENOS.** Las guardas defensivas y las
+  # extracciones son CORRECTAS y SE QUEDAN (sin ellas la puerta revienta o miente); lo que faltaban eran
+  # los escenarios que las EXIJAN. La producción NO se toca. Los 6 grupos + 1 del informe
+  # (`progress/mutation_header_nav_footer.md` §3/§4) → un escenario cada uno:
+  #   · @s21 ← Grupo A: `<a>` de nav SIN href                       (mata `puerta-anclas.ts:51`,`:53`).
+  #   · @s22 ← Grupo B: `id=""` no cuenta como destino               (mata `:71` x3; gemelo del `:58` de F-05).
+  #   · @s23 ← Grupo C: `<section>` cuyo aria-labelledby no resuelve  (mata `:89` x2,`:91`; gemelo de @s20).
+  #   · @s24 ← Grupo D: TEXTO EXACTO de `describir()` (ambas reglas)  (mata `:30`,`:31`,`:127`,`:143` x2).
+  #   · @s25 ← Grupo E: artefacto MULTI-PÁGINA mixto → exit 0         (mata `:215`,`:227`; `.some`→`.every`).
+  #   · @s26 ← Grupo F: espacios alrededor del `=`                    (mata `:36` x2,`:67`,`:82` x2).
+  #   · @s27 ← MenuNavegacion: `aria-controls` del botón ↔ `id` lista (mata `MenuNavegacion.tsx:5`).
+  # 🔴 DECISIÓN 2 DEL HUMANO (2026-07-18), para el Grupo F: el espaciado alrededor del `=` es OPCIONAL en
+  #    HTML válido, así que TOLERARLO es CORRECTO — `<a href = "#servicios">` DEBE reconocerse. El
+  #    comentario pasa de promesa sin puerta a HECHO VIGILADO, exactamente como se decidió para el `:58`
+  #    de F-05. Las guardas del regex `\s*=\s*` se QUEDAN; se añade el escenario que las exige.
+  # 🔴 GRUPO E — SÍ ES REPRESENTABLE HOY. La puerta de anclas NO consulta `RUTAS_ESPERADAS` (['/'] es de
+  #    la anti-404 de F-04 [V: no se importa en puerta-anclas.ts]); inspecciona lo que `listarHtml()`
+  #    devuelva (`tools/puerta-anclas.ts:30-37`). Un artefacto de DOS páginas es un fixture (fake
+  #    `ArtefactoDeProduccion`), IGUAL que @s6/@s7 usan uno de 0/1 páginas. Que un `dist/` REAL traiga hoy
+  #    una sola ruta es deuda de F-16 y el caveat [NV]-hasta-el-primer-build que ya cargan @s6..@s9; NO
+  #    impide expresar ni medir el escenario contra el fixture. No se finge nada — se declara y se mide.
+
+  @s21
+  Scenario: un <a> de la nav SIN atributo href no aporta ninguna ancla y NO hace reventar la inspección
+    Given el HTML CRUDO de la ruta "/" con una nav que contiene un <a href="#servicios-titulo"> y un <a> SIN atributo href (p. ej. el logo de la marca), y una página con un elemento id "servicios-titulo"
+    When se inspecciona esa página con la puerta de anclas vivas
+    Then la inspección termina SIN lanzar ninguna excepción
+    And la lista de violaciones está vacía
+    And el <a> sin href NO se cuenta como ancla ni genera una violación de ancla muerta
+    # 🔴 GRUPO A (mata `puerta-anclas.ts:51` OptionalChaining `?.[1]` y `:53` ConditionalExpression
+    # `href !== undefined && …`). Hoy TODA `<a>` de los fixtures lleva `href`, así que
+    # `ATRIBUTO_HREF.exec(...)?.[1]` nunca devuelve `undefined` y la guarda `href !== undefined` nunca
+    # se ejerce. Con los mutantes, un `<a>` sin href provoca `null[1]` o `undefined.startsWith` →
+    # TypeError. Una `<a>` sin `href` es HTML legítimo (un ancla de nombre, un logo, un botón-enlace): la
+    # extracción DEBE ignorarla sin reventar. La aserción «no lanza» es MEDIBLE: la llamada RETORNA en
+    # vez de propagar la excepción.
+
+  @s22
+  Scenario: un id="" (vacío) NO cuenta como destino de anclaje — un href="#" es un ancla muerta
+    Given el HTML CRUDO de la ruta "/" con una nav que enlaza "#" (un <a href="#">) y una página que contiene un elemento con id="" (vacío) y NINGÚN otro id
+    When se inspecciona esa página con la puerta de anclas vivas
+    Then hay exactamente 1 violación de ancla muerta
+    And la violación declara la ruta "/", el ancla "#" y el id "" (vacío)
+    # 🔴 GRUPO B (mata `puerta-anclas.ts:71` x3: el `.filter((id) => id !== '')` — MethodExpression,
+    # ConditionalExpression y StringLiteral). El comentario de `:64-66` PROMETE que un `id=""` se
+    # descarta, pero NINGÚN test lo fija — promesa sin puerta, IDÉNTICO al `:58` de F-05. Un `href="#"`
+    # apunta al id "" (`"#".slice(1) === ""`); como el `id=""` de la página NO cuenta como destino, ese
+    # `#` es un ancla muerta. Con el filtro mutado (quitado, `=> true`, o comparado con otra cadena), el
+    # `id=""` SÍ entraría en el conjunto y `#` resolvería → 0 violaciones. El esperado (ancla "#",
+    # id "") se escribe A MANO.
+
+  @s23
+  Scenario Outline: una <section> cuyo aria-labelledby NO resuelve a un heading real NO es navegable — sin violación de inalcanzable y sin lanzar (GEMELO simétrico de @s20)
+    Given el HTML CRUDO de la ruta "/" con "<sección>" y una nav que NO enlaza a esa sección
+    When se inspecciona esa página con la puerta de anclas vivas
+    Then la inspección termina SIN lanzar ninguna excepción
+    And la lista de violaciones NO contiene ninguna violación de «sección navegable inalcanzable» para esa sección
+
+    Examples:
+      | sección                                                                                                 | por qué                                                                                                     |
+      | una <section> SIN atributo aria-labelledby                                                              | sin aria-labelledby ningún heading la titula: no es navegable; leer el grupo de un match NULO NO debe lanzar |
+      | una <section aria-labelledby="fantasma"> cuando NINGÚN heading (h1…h6) de la página tiene id "fantasma" | el aria-labelledby apunta a un id que no es un heading real → no resuelve → no es navegable                   |
+
+    # 🔴 GRUPO C (mata `puerta-anclas.ts:89:24` OptionalChaining y `:91:9` ConditionalExpression; y CUBRE
+    # el `:89:69` NoCoverage del `?? ''`). @s20 prueba el caso simétrico (un heading suelto que ninguna
+    # `<section>` referencia → no navegable); AQUÍ falta el gemelo: la SECCIÓN cuya referencia no resuelve.
+    # Fila 1: sin aria-labelledby, `ATRIBUTO_LABELLEDBY.exec(...)` da null → `?.[1]` mutado a `[1]`
+    # revienta; lo correcto → `undefined ?? '' → ''`, no navegable, sin lanzar. Fila 2: referencia a un id
+    # que no es heading → `headings.has(referencia)` es false; el mutante `if (true)` la marcaría navegable
+    # y acusaría 1 inalcanzable → MUERE. Es la línea que DISTINGUE navegable=sección-con-heading-real de
+    # navegable=cualquier-sección.
+    # ⚠️ NOTA HONESTA para el TDD y el mutation_tester: la fila 1 CUBRE el `:89:69` (`?? ''` → `?? "Stryker
+    # was here!"`, hoy NoCoverage), pero su ÚNICO input distinguidor sería un heading con id igual al
+    # literal de reemplazo de Stryker (porque `idsDeHeadings` filtra `''`, así que `''` y ese literal dan
+    # el MISMO `headings.has(...) === false`). Si al REMEDIR resiste, se ESCALA al humano (umbral 1.0, 0
+    # exclusiones) — NO se fabrica un fixture atado a la cadena interna de Stryker (sería tautología).
+
+  @s24
+  Scenario Outline: la línea que la puerta acusa para cada regla tiene el TEXTO EXACTO — nombre de la regla Y formato ancla/id
+    Given el HTML CRUDO de la ruta "/" con "<fixture mínimo>", que produce EXACTAMENTE una violación de tipo "<tipo>"
+    When se inspecciona esa página con la puerta de anclas vivas y se DESCRIBE con describir() su única violación
+    Then la línea descrita es, carácter a carácter, «<línea exacta>»
+
+    Examples:
+      | tipo         | fixture mínimo                                                                                            | línea exacta                                                                |
+      | ancla muerta | una nav con <a href="#facial"> y una página SIN ningún elemento con id "facial"                           | / — ancla de la nav sin destino en la página: ancla "#facial" → id "facial" |
+      | inalcanzable | una <section aria-labelledby="faq"> con <h2 id="faq"> como único heading, y una nav SIN anclas muertas que NO enlaza "#faq" | / — sección navegable inalcanzable desde la nav: id "faq"                    |
+
+    # 🔴 GRUPO D (mata `:30` y `:31` —los literales REGLA_ANCLA_MUERTA/REGLA_INALCANZABLE—, `:127`
+    # —el `ancla: ''` de la violación inalcanzable— y `:143` x2 —el `violacion.ancla === ''` que ELIGE el
+    # formato—). @s5 comprueba que CADA violación nombra ruta/ancla/id y qué-falta y que el informe es
+    # determinista, pero NO fija el LITERAL: un `Then` que solo cuenta líneas es CIEGO a las mutaciones de
+    # valor (la lección de @s24 de F-05, que mataba CERO). Aquí la inspección PASA POR EL PIPELINE
+    # (`inspeccionarAnclas` → `describir`), así que la fila «ancla muerta» exige el literal REGLA de `:30`
+    # y el formato `ancla "x" → id "y"`; la fila «inalcanzable» exige REGLA de `:31`, el `ancla: ''` de
+    # `:127` y la rama `id "y"` de `:143` (el `ancla` vacío ES la condición que selecciona ese formato).
+    # 🔴 ANTI-TAUTOLOGÍA (regla dura): las dos «línea exacta» se escriben A MANO; el fixture recorre las
+    # constantes REGLA_* DE PRODUCCIÓN (para que mutarlas a '' cambie la SALIDA y mueran `:30`/`:31`),
+    # pero el ORÁCULO —el literal esperado— es a mano; JAMÁS se importan REGLA_ANCLA_MUERTA/REGLA_INALCANZABLE
+    # para compararse contra sí mismas (patrón `doble-de-test-anclado-al-literal-no-al-simbolo`). El `—`
+    # (raya) y el `→` (flecha) son EXACTAMENTE los de `puerta-anclas.ts:147,145`.
+
+  @s25
+  Scenario: un artefacto MULTI-PÁGINA mixto SIN violaciones termina en exit 0 — las guardas de vacuidad miran el CONJUNTO, no cada página (.some, no .every)
+    Given un artefacto de producción con DOS páginas HTML: la ruta "/" con una nav cuyas anclas resuelven y una sección navegable enlazada por la nav, y la ruta "/otra" SIN ninguna ancla de nav y SIN ninguna sección navegable
+    And ninguna de las dos páginas produce violaciones de anclas
+    When se ejecuta la puerta de anclas vivas sobre ese artefacto
+    Then el código de salida es 0
+    And la salida NO declara que no se inspeccionara ningún ancla de la nav
+    And la salida NO declara que no se inspeccionara ninguna sección navegable
+    # 🔴 GRUPO E (mata `:215` y `:227`, `.some` → `.every` en las DOS guardas de vacuidad). @s7 y @s19
+    # usan UNA sola página vacía, donde `.some` y `.every` dan EL MISMO veredicto (ambos false → guarda
+    # dispara) y NO se distinguen. Solo un artefacto MIXTO los separa: con `.some`, la página "/" (con
+    # anclas y sección) basta para que la puerta sepa que SÍ inspeccionó → exit 0; con `.every`, la
+    # página "/otra" (0 anclas, 0 secciones) haría fallar las guardas y la puerta gritaría vacuidad
+    # habiendo inspeccionado de verdad. (El comentario de `:212-214` ya neutralizó el `> 0` → `>= 0`;
+    # ESTE es OTRO mutante, sobre el CUANTIFICADOR.)
+    # ✅ REPRESENTABLE HOY: la puerta de anclas NO consulta `RUTAS_ESPERADAS`; inspecciona lo que
+    # `listarHtml()` devuelva. El artefacto de dos páginas es un fixture (fake `ArtefactoDeProduccion`),
+    # como el de 0/1 páginas de @s6/@s7. Que un `dist/` REAL traiga hoy una sola ruta es deuda de F-16 y el
+    # caveat [NV]-hasta-el-primer-build de @s6..@s9; no impide expresar ni medir el escenario.
+
+  @s26
+  Scenario Outline: un atributo con ESPACIOS alrededor del "=" (HTML válido) se reconoce igual que sin espacios — href, id y aria-labelledby
+    Given el HTML CRUDO de la ruta "/" con "<fixture con espacios>" (el "=" del atributo va rodeado de espacios, HTML válido)
+    When se inspecciona esa página con la puerta de anclas vivas
+    Then las violaciones de la inspección son EXACTAMENTE «<violaciones esperadas>»
+
+    Examples:
+      | atributo        | fixture con espacios                                                                                        | violaciones esperadas                                                                              |
+      | href            | una nav con <a href = "#facial"> y una página SIN ningún elemento con id "facial"                            | 1 violación de ancla muerta: ancla "#facial" → id "facial"                                          |
+      | id              | una nav con <a href="#servicios-titulo"> y un <p id = "servicios-titulo"> en la página (sin secciones)       | lista vacía — el id con espacios se reconoce y el ancla "#servicios-titulo" RESUELVE                |
+      | aria-labelledby | una <section aria-labelledby = "faq"> con un <h2 id="faq"> como único heading, y una nav que NO enlaza "#faq" | 1 violación de sección inalcanzable: id "faq" — la sección con aria-labelledby espaciado SÍ es navegable |
+
+    # 🔴 GRUPO F (el más grave; mata `:36` x2 —ATRIBUTO_HREF—, `:67` —ATRIBUTO_ID— y `:82` x2
+    # —ATRIBUTO_LABELLEDBY—, todas `Regex` que estrechan el `\s*=\s*` a `\S*=\s*` o `\s*=\S*`). Los tres
+    # regex TOLERAN el espaciado y NINGÚN fixture lo ejerce. **DECISIÓN 2 DEL HUMANO (2026-07-18):** el
+    # espacio alrededor del `=` es OPCIONAL en HTML válido, así que tolerarlo es CORRECTO — `href = "#…"`
+    # DEBE reconocerse. El comentario pasa a HECHO VIGILADO, EXACTAMENTE como el `:58` de F-05. AVISO (del
+    # informe): los mutantes solo se distinguen CON espacios; sin espacios son indistinguibles → cada
+    # fixture LLEVA el espacio. Cada fila AÍSLA un atributo y su observable es DISTINTO (un fixture único
+    # «0 violaciones» ENMASCARARÍA mutantes): href reconocido → 1 ancla muerta; id reconocido → el ancla
+    # RESUELVE (lista vacía); aria-labelledby reconocido → la sección es navegable y, sin enlace, 1
+    # inalcanzable. Los esperados se escriben A MANO.
+
+  @s27
+  Scenario: el botón del menú móvil declara aria-controls igual al id de su lista, y ese id es exactamente "menu-navegacion" — la asociación a11y botón↔lista
+    Given el menú de navegación renderizado con su botón disparador y su lista <ul>
+    When se consulta el botón por su rol y su nombre accesible (nunca por clase CSS)
+    Then el atributo "aria-controls" del botón es EXACTAMENTE igual al atributo "id" del <ul> de la navegación
+    And ese identificador es exactamente el literal "menu-navegacion", escrito A MANO en el test
+    And ese identificador NO está vacío
+    # 🔴 MenuNavegacion (mata `MenuNavegacion.tsx:5`, `const ID_LISTA = 'menu-navegacion'` → `''`). Con
+    # `''`, el botón queda con `aria-controls=""` y el `<ul>` con `id=""`: siguen siendo IGUALES (ambos
+    # ''), así que una aserción de SOLA igualdad los deja pasar — por eso el `Then` exige ADEMÁS que el
+    # identificador sea EXACTAMENTE "menu-navegacion" y NO vacío: con el mutante el botón deja de anunciar
+    # qué lista controla (el disparador ya no la asocia) y `cabecera.test.tsx` (que solo comprueba el
+    # toggle de `aria-expanded`) no se entera.
+    # 🔴 ANTI-TAUTOLOGÍA: el literal "menu-navegacion" se escribe A MANO; NUNCA se importa `ID_LISTA` para
+    # compararse contra sí mismo (patrón `doble-de-test-anclado-al-literal-no-al-simbolo`).

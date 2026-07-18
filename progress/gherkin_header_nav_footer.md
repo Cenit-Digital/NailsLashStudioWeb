@@ -6,6 +6,9 @@
 > decisiones de destilación. **Fuente de los hechos:** `progress/f06_verificacion_previa.md` (MANDA
 > sobre el troceado). Destilado de `project-spec.md` §«Feature 6».
 
+> **AMPLIADO EL 2026-07-18 → 27 escenarios, @s1..@s27** (tras la escalada de mutación). Los 20 de abajo
+> quedan INTACTOS; @s21..@s27 + 7 filas en @s18 se detallan en §«Ampliación del contrato» al final.
+
 ## 20 escenarios, @s1..@s20  (18 originales + @s19/@s20 añadidos en la ronda de reparación)
 
 > **Numeración:** @s19 y @s20 se DEFINEN físicamente junto a sus hermanos (@s19 tras @s7; @s20 tras
@@ -197,3 +200,65 @@ tres criterios reescritos como APROBADOS. **NO se reintrodujo** ninguna atribuci
   preguntas.
 
 **El `tdd_craftsman` queda liberado: puede implementar los 20 escenarios por Rojo-Verde-Refactor.**
+
+## Ampliación del contrato — APROBADA POR LA PUERTA HUMANA el 2026-07-18 (los 21 supervivientes)
+
+**Total tras la ampliación: 27 escenarios, @s1..@s27** (20 previos INTACTOS + @s21..@s27 nuevos) **+ 7
+filas nuevas en @s18** (el mapa de mutantes). El humano APROBÓ el 2026-07-18 AMPLIAR el contrato tras la
+escalada de la prueba de mutación (`progress/mutation_header_nav_footer.md`: 135/156 = 86,54 %, 21
+supervivientes REALES verificados por SABOTAJE MANUAL). Precedente EXACTO: **F-01** (la fila `600 123 456`
+de @s5) y **F-05** (+3 escenarios) — *la mutación no encontró código de más, encontró CONTRATO DE MENOS*.
+Las guardas defensivas y las extracciones son CORRECTAS y SE QUEDAN; faltaban los escenarios que las
+EXIJAN. **La producción NO se tocó.**
+
+### Mapa: los 6 grupos + 1 del informe → escenario nuevo → mutantes que mata
+
+| Grupo (informe §3/§4) | Escenario nuevo | Mutantes de `puerta-anclas.ts` (o `.tsx`) que mata |
+| --- | --- | --- |
+| A — `<a>` de nav SIN href | **@s21** (Scenario) | `:51:20` OptionalChaining · `:53:11` ConditionalExpression |
+| B — `id=""` no es destino | **@s22** (Scenario) | `:71:5` MethodExpression · `:71:83` ConditionalExpression · `:71:90` StringLiteral |
+| C — `<section>` cuyo aria-labelledby no resuelve | **@s23** (Outline, 2 filas) | `:89:24` OptionalChaining · `:91:9` ConditionalExpression (+ CUBRE `:89:69` NoCoverage) |
+| D — texto EXACTO de `describir()` | **@s24** (Outline, 2 filas) | `:30:35` · `:31:35` StringLiteral · `:127:16` StringLiteral · `:143:5` ConditionalExpression · `:143:25` StringLiteral |
+| E — artefacto multi-página mixto | **@s25** (Scenario) | `:215:35` · `:227:33` MethodExpression (`.some`→`.every`) |
+| F — espacios alrededor del `=` | **@s26** (Outline, 3 filas) | `:36:23` x2 · `:67:21` · `:82:29` x2 (todas `Regex`) |
+| MenuNavegacion — `aria-controls` ↔ `id` | **@s27** (Scenario) | `MenuNavegacion.tsx:5:18` StringLiteral |
+
+Además, **@s18 (mapa de mutantes, Scenario Outline) recibe 7 filas nuevas**, una por grupo, cada una
+citando el escenario donde muere (honra su propia nota: «se añadirá CON SU FILA cuando la mutación lo
+revele», como en F-05).
+
+### Decisiones de destilación de la ampliación
+
+1. **Filas vs escenarios.** Ningún grupo ENCAJABA como fila en un escenario de comportamiento existente:
+   B no cabe en @s1 (@s1 exige que el id esté AUSENTE; grupo B exige que `id=""` esté PRESENTE pero no
+   cuente); C no cabe en @s3 (@s3 espera secciones navegables → violación; C espera secciones NO
+   navegables → 0); F no cabe en @s1 (el espaciado vive en el MARKUP, no en el valor `<ancla>` que @s1
+   abstrae). Por eso **7 escenarios nuevos** (@s21..@s27) + **7 filas** en @s18 (el ÚNICO Outline donde
+   encajan: es el mapa de mutantes). Se respetó «filas donde encajen, escenario nuevo si no».
+2. **Grupo D — texto EXACTO por el PIPELINE.** El `Then` asevera la línea de `describir()` carácter a
+   carácter (la lección: un `Then` que solo cuenta es ciego a mutaciones de valor). La inspección recorre
+   `inspeccionarAnclas → describir` para que las constantes `REGLA_*` de producción se ejerzan (matar
+   `:30`/`:31`); el ORÁCULO (el literal esperado) se escribe A MANO, jamás se importa `REGLA_*` para
+   compararse contra sí misma. El `—` y el `→` son verbatim de `puerta-anclas.ts:147,145`.
+3. **Grupo F — DECISIÓN 2 DEL HUMANO (2026-07-18):** el espaciado alrededor del `=` es OPCIONAL en HTML
+   válido → tolerarlo es CORRECTO; `<a href = "#servicios">` DEBE reconocerse. El regex `\s*=\s*` se
+   QUEDA; se añade el escenario que lo exige. Es EXACTAMENTE el `:58` de F-05 replicado en tres regex.
+   Cada fila aísla UN atributo con observable DISTINTO (un fixture único «0 violaciones» enmascararía).
+4. **Grupo E — SÍ REPRESENTABLE HOY, verificado.** La puerta de anclas NO importa ni consulta
+   `RUTAS_ESPERADAS` (['/'] es de la anti-404 de F-04) [V: `grep` en `puerta-anclas.ts` → 0 usos];
+   inspecciona lo que `listarHtml()` devuelva (`tools/puerta-anclas.ts:30-37`). Un artefacto de DOS
+   páginas es un fixture (fake `ArtefactoDeProduccion`), IGUAL que @s6/@s7 usan uno de 0/1 páginas. **NO
+   es deuda ni [NV] especial:** solo carga el mismo caveat [NV]-hasta-el-primer-build de @s6..@s9 (un
+   `dist/` real trae hoy una ruta; F-16 añadirá más). No se fingió nada.
+5. **Grupo C — nota honesta sobre `:89:69`.** La fila 1 de @s23 CUBRE el `?? ''` (hoy NoCoverage), pero
+   su único input distinguidor sería un heading con id igual al literal de reemplazo de Stryker (porque
+   `idsDeHeadings:139` filtra `''`). Registrado en el `.feature`: si al REMEDIR resiste, se ESCALA al
+   humano (umbral 1.0, 0 exclusiones); NO se fabrica un fixture atado a la cadena de Stryker.
+6. **20 escenarios previos INTACTOS.** Solo se añadieron filas a @s18 (permitido) y comentarios de
+   cabecera/remedición. Ningún Given/When/Then de @s1..@s20 cambió.
+
+### Después de que el `tdd_craftsman` los mate
+
+Vuelta al `judge` y **REMEDICIÓN a `--concurrency 1`** de los dos ficheros que fallaron
+(`puerta-anclas.ts`, `MenuNavegacion.tsx`). Añadir tests no baja un score, pero el informe honesto hay
+que volver a emitirlo (lo pide el propio `progress/mutation_header_nav_footer.md` §6).
