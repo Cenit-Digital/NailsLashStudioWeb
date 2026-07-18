@@ -188,9 +188,12 @@ export interface OpeningHoursSpecification {
 const TIPO_OPENING_HOURS = 'OpeningHoursSpecification'
 
 /**
- * Los grupos de días de schema.org (D4/D6): L-V AGRUPADO, Sábado solo, Domingo solo. `representante`
- * es el día del que se leen las franjas del grupo (L-V comparten franja). Un día sin franjas no emite
- * objeto → el Domingo cerrado se OMITE (idiomático).
+ * Los grupos de días de schema.org (D4/D6): L-V AGRUPADO y Sábado solo. `representante` es el día del
+ * que se leen las franjas del grupo (L-V comparten franja). Aquí SOLO se declaran los grupos de días
+ * que PUEDEN abrir: el Domingo (cerrado en el modelo, `[]`) no forma grupo — su cierre se representa
+ * por AUSENCIA (idiomático en schema.org). Listarlo aquí para luego filtrarlo por sus franjas vacías
+ * sería dato MUERTO (un `'Sunday'` inerte que ningún test podría matar). Además, el `.map` sobre las
+ * franjas del representante OMITE dinámicamente cualquier grupo cuyo día no tenga franjas.
  */
 const GRUPOS_SCHEMA: readonly {
   readonly dias: readonly DiaSemana[]
@@ -198,7 +201,6 @@ const GRUPOS_SCHEMA: readonly {
 }[] = [
   { dias: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], representante: 'Monday' },
   { dias: ['Saturday'], representante: 'Saturday' },
-  { dias: ['Sunday'], representante: 'Sunday' },
 ]
 
 /**

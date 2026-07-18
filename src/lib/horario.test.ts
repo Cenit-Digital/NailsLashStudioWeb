@@ -143,6 +143,21 @@ describe('@s5 una excepción de franjas vacías cierra un lunes laborable — la
   it('@s5 SIN esa excepción el mismo lunes 10:30 está ABIERTO: el semanal no se modifica, la excepción es un OVERRIDE', () => {
     expect(abiertoEn(lunesDiezYMedia, SOLO_LUNES_ABIERTO, [])).toBe(true)
   })
+
+  it('@s5 la excepción que MANDA es la que CASA POR FECHA, no la primera de la lista: una excepción de OTRA fecha no aplica', () => {
+    // Refuerza «si la fecha coincide, mandan» (@s5, conducta ya aprobada) probando su contrapositiva:
+    // el emparejamiento es por FECHA, no por POSICIÓN. La PRIMERA excepción es de OTRA fecha (un
+    // domingo 18-ene que ABRIRÍA de aplicarse) y la SEGUNDA es la del lunes consultado (franjas
+    // vacías → cierra). Manda la SEGUNDA → CERRADO. Un emparejamiento que ignorara la fecha
+    // (`find(() => true)`) devolvería la PRIMERA → «abierto», resultado EQUIVOCADO. Fechas y franjas
+    // A MANO (anti-tautología).
+    expect(
+      abiertoEn(lunesDiezYMedia, SOLO_LUNES_ABIERTO, [
+        { fecha: '2026-01-18', franjas: [{ abre: 600, cierra: 1200 }] },
+        { fecha: '2026-01-12', franjas: [] },
+      ]),
+    ).toBe(false)
+  })
 })
 
 /**

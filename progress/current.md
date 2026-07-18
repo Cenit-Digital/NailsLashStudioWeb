@@ -5,19 +5,24 @@
 > `history.md` y deja este archivo con solo esta plantilla.
 
 - **LOTE A en ejecución** (camino crítico enseñable para la DEMO del lunes; rigor completo, puertas en
-  lote). Orden: **tipografía ✅ → horario (siguiente) → contacto → catálogo.**
+  lote). Orden: **tipografía ✅ → horario ✅ → contacto (siguiente) → catálogo.**
 - **`21 — tipografia_global`: CERRADA `done`** el 2026-07-18. @s1–@s7 por TDD (partial `_tipografia.scss`:
   body Manrope, `h2,h3` Gilda Display; `@use` en `main.scss`), judge APROBADO (0 bloq., 2 menores),
   mutación N/A (SCSS), **679 tests**, build 5 puertas. **Verificación EN VIVO con Chrome:** body computed
   = Manrope (era Times New Roman), h2 «Servicios» = Gilda Display, hero de F-07 intacto (Great Vibes),
   0 terceros. Resumen en `history.md`.
-- **Feature en curso: `10 — horario`** (in_progress). **TDD VERDE @s1..@s15** — a la espera de `judge` +
-  `mutation_tester` (NO marcada `done`, Stryker NO corrido). `src/lib/horario.ts` (nuevo, en `mutate`),
-  `src/lib/horario.test.ts` (43), `src/pages/home.tsx` (compone `openingHoursSpecification`, sin tocar
-  `construirJsonLd`), `src/pages/home-horneado.test.ts` (6, build-based @s12/@s14). **728 tests** (679→+49),
-  typecheck/lint 0, `pnpm build` exit 0 (5 puertas), `seo.test.ts` (F-04) sigue verde. 6 sabotajes
-  confirmados. Ver `progress/tdd_horario.md`.
-- **Proyecto:** **8 done · 3 spec_ready (F-09/F-10/F-12 del lote A) · 6 pending · 4 blocked.**
+- **`10 — horario`: CERRADA `done`** el 2026-07-19. 15 escenarios por TDD. `src/lib/horario.ts`
+  (estaAbierto puro con reloj inyectado, franjas `[abre,cierra)`, excepciones vacías,
+  `openingHoursSpecification`, `horarioParaUI`). `openingHoursSpecification` compuesto en `home.tsx` sin
+  tocar `construirJsonLd` (F-04 verde). judge APROBADO. **Mutación 100%** (2 supervivientes cerrados:
+  ampliar test del predicado de excepción + refactor del dato muerto del domingo; 0 exclusiones). **729
+  tests**. Verificación EN VIVO: JSON-LD servido con L-V 10:00-20:00 + Sábado 10:00-14:00, domingo
+  omitido, 6 claves de F-04 intactas. Resumen en `history.md`.
+  🟡 **Deuda:** el horario VISIBLE (3 filas, `horarioParaUI`) NO se renderiza aún en la página; su sitio
+  natural es F-12 (contacto) — asegurar que la DEMO muestre las horas al implementar contacto.
+- **Feature en curso:** ninguna en TDD; **siguiente = `12 — contacto`** (`spec_ready`, contrato aprobado
+  `features/contacto.feature`, 15 escenarios).
+- **Proyecto:** **9 done · 2 spec_ready (F-09/F-12 del lote A) · 6 pending · 4 blocked.**
 - **Contratos del lote A ya aprobados y abiertos** (cabecera ✅): `features/horario.feature` (15),
   `features/contacto.feature` (15), `features/catalogo_servicios.feature` (17). El `tdd_craftsman` los
   implementa uno a uno; F-10 compone `openingHoursSpecification` en `home.tsx` (NO en `construirJsonLd`,
