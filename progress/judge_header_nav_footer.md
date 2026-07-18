@@ -87,3 +87,109 @@ Menores: 1.
 
 ## Cambios requeridos
 Ninguno. Se aprueba. La puerta C7 (mutación, umbral 1.0, 0 exclusiones) queda para el mutation_tester.
+
+# =============================================================================================
+# Review del delta (rondas 2-3) — 2026-07-18
+# =============================================================================================
+
+**Veredicto del delta:** APROBADO — 27/27 cubiertos, 0 bloqueantes, 1 menor (heredado, no reintroducido).
+
+> Alcance: `git diff da7a6de..HEAD`. Producción tocada = SOLO `src/lib/puerta-anclas.ts`
+> (refactor de `seccionesNavegables`). Tests nuevos = `puerta-anclas.test.ts` (+@s21..@s26) y
+> `cabecera.test.tsx` (+@s27). El veredicto APPROVED de los 20 originales SIGUE EN PIE. No me fié
+> de las bitácoras: MEDÍ. `bin/harness init` VERDE (lint 0, 629 tests, 16 ficheros). `pnpm build`
+> EXIT 0 con las CINCO puertas. Cada sabotaje: backup -> patch literal -> vitest -> restore; tree
+> git-clean tras cada uno.
+
+## 1. Cobertura @s21..@s27 (por título de it(), no por comentario) — 27/27
+
+- @s21: [x] `puerta-anclas.test.ts` «@s21 la inspección NO lanza y la lista de violaciones queda
+  vacía» + «@s21 el <a> sin href NO se cuenta como ancla …».
+- @s22: [x] «@s22 nav con <a href="#"> y una página con id="" … -> 1 ancla muerta (ancla "#", id "")».
+- @s23: [x] it.each x2 «@s23 %s -> no lanza y sin violación de inalcanzable» (fila 1: section SIN
+  aria-labelledby; fila 2: aria-labelledby="fantasma" sin heading). Gemelo simétrico de @s20.
+- @s24: [x] «@s24 ancla muerta: describir() da la línea exacta …» + «@s24 inalcanzable: describir()
+  da la línea exacta …» (oráculo A MANO).
+- @s25: [x] «@s25 exit 0 y la salida NO declara vacuidad de anclas ni de secciones» (artefacto
+  multi-página mixto; `.some` vs `.every`).
+- @s26: [x] 3 it «@s26 href/id/aria-labelledby espaciado …» (cada uno con observable DISTINTO).
+- @s27: [x] `cabecera.test.tsx` «@s27 aria-controls del botón == id del <ul> == "menu-navegacion"
+  (no vacío) …».
+
+Los 20 previos siguen cubiertos (mismo mapa del veredicto original). **27/27.**
+
+## 2. EL REFACTOR NO CAMBIÓ EL COMPORTAMIENTO (medido)
+
+Forma vieja `?.[1] ?? ''` -> forma nueva `const coincidencia = ...exec(); if (coincidencia === null)
+continue; const referencia = coincidencia[1]`. Los tres casos que pide el encargo, razonados y
+CONFIRMADOS idénticos vieja/nueva:
+
+- **section con `aria-labelledby` que RESUELVE** (heading real): vieja -> referencia=id, push;
+  nueva -> coincidencia!=null, referencia=id, push. IGUAL.
+- **section SIN `aria-labelledby`**: vieja -> exec=null, `null?.[1]`=undefined, `?? ''`='' ,
+  `headings.has('')`=false (no push); nueva -> coincidencia=null -> continue (no push). IGUAL.
+- **section con `aria-labelledby` que NO resuelve** (id no-heading): vieja -> referencia=id,
+  `headings.has(id)`=false (no push); nueva -> idem (no push). IGUAL.
+
+Hecho de carga verificado en fuente: `idsDeHeadings` FILTRA `''` (`puerta-cascaron.ts:139`), luego
+`headings.has('')` es SIEMPRE false -> la vieja jamás empujaba '' -> equivalencia total de salidas.
+Evidencia empírica: `bin/harness init` deja los tests preexistentes de `seccionesNavegables`
+(@s3/@s5/@s9/@s19/@s20/@s23/@s24) VERDES (629/629). Un refactor que cambia comportamiento habría
+puesto alguno rojo. No lo hizo.
+
+## 3. EL EQUIVALENTE VIEJO DESAPARECIÓ Y NO SE INTRODUJO OTRO (sabotaje manual)
+
+- Grep dentro de `seccionesNavegables` (líneas 84-108): NO queda `?? ''` vivo (el único `?? ''` es
+  un COMENTARIO en :90) ni `?.[1]` (el `?.[1]` de :51 está en `anclasDeNav`, otra función, cubierto
+  por @s21). El `:89:69` NoCoverage de la ronda 1 se eliminó DE RAÍZ.
+- Sabotajes a los mutantes NUEVOS del guard (cada uno backup->patch->vitest->restore):
+  - `=== null` -> `!== null`: **9 ROJOS** (@s23 f1, @s3 x2, @s9, …).
+  - `if (coincidencia === null)` -> `if (true)`: **8 ROJOS** (@s3 x2, @s5 x2, @s9, @s24, @s25, @s26).
+  - `if (coincidencia === null)` -> `if (false)`: **1 ROJO** (@s23 f1, TypeError `null[1]`).
+  - BlockStatement vacío (`continue` eliminado): **1 ROJO** (@s23 f1).
+  - (extra) `if (headings.has(referencia))` -> `if (true)`: **1 ROJO** (@s23 f2).
+  Ningún mutante del guard resiste -> el refactor mató el equivalente SIN crear otro. No hay que
+  rechazar.
+
+## 4. Los tests de la ronda 2 muerden (sabotaje manual)
+
+- Grupo D `REGLA_ANCLA_MUERTA` -> `''`: **@s24 ancla muerta ROJO**.
+- Grupo D `violacion.ancla === ''` -> `false`: **@s24 inalcanzable ROJO**.
+- Grupo F `ATRIBUTO_HREF` `\s*=\s*` -> `\S*=\s*`: **@s26 href espaciado ROJO**.
+- MenuNavegacion `ID_LISTA='menu-navegacion'` -> `''`: **@s27 ROJO** (sobre `cabecera.test.tsx`).
+
+## 5. Anti-tautología (confirmada)
+
+- @s24: mutar la constante de producción `REGLA_ANCLA_MUERTA` puso @s24 ROJO -> el oráculo esperado
+  está ESCRITO A MANO (si importara la constante, mutarla mutaría también el esperado y el test
+  quedaría verde). El literal `/ — ... : ancla "#facial" → id "facial"` va a mano, con `—` y `→`
+  verbatim de producción.
+- @s27: `ID_LISTA` es un `const` module-local NO exportado de `MenuNavegacion.tsx` -> el test no
+  puede importarlo; asevera contra el literal `'menu-navegacion'` a mano.
+
+## 6. Build y A-27
+
+- `pnpm build` **EXIT 0** con las CINCO puertas en cadena (cascarón, placeholders, contraste,
+  terceros, **anclas vivas** al final). Cada una imprime su ✓.
+- **A-27**: el delta (`git diff da7a6de..HEAD --name-only`) NO toca `tools/puerta-placeholders.ts`
+  ni `features/puerta_placeholders.feature`. Producción del delta = SOLO `src/lib/puerta-anclas.ts`.
+
+## 7. Cero exclusiones
+
+- `src/lib/puerta-anclas.ts` (y sus tests): **0** `// Stryker disable`, 0 exclusiones, 0
+  `.only`/`.skip`. Los dos `// Stryker disable` del repo (`placeholders.ts:76`, `site.ts:72`) son
+  PREEXISTENTES de otras features, FUERA de este delta.
+
+## 8. Hallazgos del delta
+
+- Bloqueantes: **0**.
+- Menores: **1, heredado y no reintroducido** — @s27 (como @s12/@s15/@s16 del veredicto base)
+  asevera sobre `render(<MenuNavegacion/>)` de Testing Library, no sobre `readFileSync` de
+  `dist/index.html`. Mismo mitigante del menor original: la puerta de anclas verifica la nav
+  horneada sobre los BYTES reales en cada build. NO bloquea.
+
+## Veredicto del delta
+
+**APROBADO.** 27/27 cubiertos, 0 bloqueantes, 1 menor heredado. El refactor de `seccionesNavegables`
+es behavior-preserving y elimina el equivalente sin crear otro. La puerta C7 (mutación, umbral 1.0,
+0 exclusiones) sigue para el `mutation_tester`, que REMEDIRÁ tras esta aprobación.
