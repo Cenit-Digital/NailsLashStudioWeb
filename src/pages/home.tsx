@@ -1,6 +1,7 @@
 import { Head } from 'vite-react-ssg'
 
 import { Cabecera } from '../components/Cabecera'
+import { Hero } from '../components/Hero'
 import { Pie } from '../components/Pie'
 import { canonicaDe, componerTitulo, construirJsonLd, ORIGEN_CANONICA } from '../lib/seo'
 import { DIRECCION, GEO, NOMBRE, TELEFONO, telHref } from '../lib/site'
@@ -62,7 +63,10 @@ export default function Home() {
       <Cabecera />
 
       <main>
-        <h1>{NOMBRE}</h1>
+        {/* El HERO de F-07: reestiliza el <h1>{NOMBRE} que F-04 dejó horneado. Sigue habiendo UN
+            <h1> (dos <span> + text node de espacio → «Nails Lash Studio»), con su paintReveal de
+            estado base VISIBLE en el SCSS module. Ver src/components/Hero.tsx. */}
+        <Hero />
 
         {/* El título de sección es un heading REAL referenciado por `aria-labelledby`, NUNCA un
             `div` con `font-size`: una relación que el diseño comunica VISUALMENTE tiene que

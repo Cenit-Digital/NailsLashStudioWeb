@@ -1,0 +1,68 @@
+// El hero de F-07. Contrato: features/hero_marca.feature.
+//
+// 🔴 EL ESTADO BASE ES EL ESTADO FINAL VISIBLE (I-4), MEDIDO con build SSG real + Chrome/CDP
+// (.experimentos-tmp/veredictos-f07/A3-estado-base.md §6). El estado OCULTO vive SOLO en el 0% del
+// keyframe. La animación va EN LA HOJA (nunca inline: un `animation` inline gana en especificidad al
+// `@media(reduce){animation:none}` y derrotaría reduced-motion). El SCSS NO lo ve Stryker: lo
+// aseveran los tests que lo LEEN (hero-estilos.test.ts) + la puerta de aprobación humana.
+
+// El eyebrow: la línea SOBRE el titular. F-07 fija SOLO su estructura (un <p>); su CONTENIDO de
+// categorías (Uñas · Pestañas · Cejas) y su estilo fino son F-09 (C-7). NUNCA un heading.
+.eyebrow {
+  margin: 0;
+  font-family: 'Manrope', system-ui, sans-serif;
+}
+
+// El <h1> del titular. Color --ink sobre --bg (par ya en MATRIZ_DE_USO, ratio 7,06 ≥ 4,5). NUNCA
+// --accent/--brush (#C05576) como texto: 4,05 < 4,5 rompería la puerta de contraste de F-03.
+.titulo {
+  margin: 0;
+  color: var(--ink);
+}
+
+// «Nails Lash» — paint reveal por clip-path. BASE = estado final VISIBLE.
+// C-3 (APROBADO 2026-07-18): duración total delay + duración ≤ 1,2 s → 1s + 0,1s = 1,1 s, para un
+// LCP bueno (el prototipo, delay 0,5s + 4,8s = ~5,3s, suspendía el LCP del titular). La animación
+// vive AQUÍ, en la hoja, NUNCA inline (inline ganaría al @media(reduce){animation:none}).
+.heroMarca {
+  clip-path: inset(0 0 0 0);
+  animation: paintReveal 1s cubic-bezier(0.5, 0, 0.25, 1) 0.1s both;
+}
+
+// «Studio» — fade up. BASE = VISIBLE (opacity 1), aunque el default ya sea 1, se declara explícito.
+// C-3: 0,9s + 0,2s = 1,1 s ≤ 1,2 s total.
+.heroStudio {
+  opacity: 1;
+  animation: fadeUp 0.9s 0.2s both;
+}
+
+// El OCULTO vive SOLO aquí, en el 0% del keyframe, jamás en la base.
+@keyframes paintReveal {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// C-4 (CRITERIO DE PROYECTO, NO WCAG A/AA): quien pide menos movimiento se queda en la BASE VISIBLE,
+// sin movimiento residual. Es justo lo que el prototipo NO tiene. `animation: none` deja el elemento
+// en su valor computado base (medido: getAnimations()==0, clip-path inset(0px), opacity 1).
+@media (prefers-reduced-motion: reduce) {
+  .heroMarca,
+  .heroStudio {
+    animation: none;
+  }
+}

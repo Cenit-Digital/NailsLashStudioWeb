@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import { HelmetProvider } from 'react-helmet-async'
+import { renderToString } from 'react-dom/server'
 
+import { cuantosH1 } from '../lib/puerta-cascaron'
 import Home from './home'
 
 /**
@@ -26,5 +28,26 @@ describe('Home', () => {
     )
 
     expect(screen.getByRole('heading', { level: 1, name: 'Nails Lash Studio' })).toBeVisible()
+  })
+})
+
+/**
+ * @s6 (F-07) — el hero REEMPLAZA el <h1>{NOMBRE} que F-04 dejó horneado (src/pages/home.tsx:65): la
+ * home hornea el hero (h1 con dos <span> + text node de espacio) y SIGUE teniendo EXACTAMENTE un
+ * <h1> (no se añade otro). Se asevera sobre el HTML del prerender (renderToString), no en jsdom.
+ */
+describe('@s6 la home hornea el hero y sigue teniendo exactamente un <h1>', () => {
+  it('@s6 la home prerenderiza exactamente 1 <h1>, con dos <span> y el text node de espacio', () => {
+    const horneado = renderToString(
+      <HelmetProvider>
+        <Home />
+      </HelmetProvider>,
+    )
+
+    expect(cuantosH1(horneado)).toBe(1)
+    // El h1 del hero: dos spans con un espacio REAL entre ellos → «Nails Lash Studio».
+    expect(horneado).toMatch(
+      /<h1\b[^>]*>.*<span[^>]*>Nails Lash<\/span>\s<span[^>]*>Studio<\/span>.*<\/h1>/s,
+    )
   })
 })
