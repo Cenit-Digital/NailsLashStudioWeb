@@ -191,3 +191,37 @@ de `dist/`, fallando cerrada para **los dos** extractores.
   sin construirse ni descartarse (B-7).
 - **El scroll-padding-top (`6rem`) y el breakpoint (`820px`) se RE-MIDEN** cuando la nav definitiva
   cambie las etiquetas (F-09 mete «Pestañas/Cejas»): mueven los saltos de envoltura.
+
+## 2026-07-18 — feature `hero_marca` (F-07) → **`done`**
+
+- **spec_partner + gherkin_author (fases previas):** verificación previa (`f07_verificacion_previa.md`,
+  8 afirmaciones × verificar/refutar con build SSG real + Chrome/CDP), `project-spec.md §Feature 7`,
+  contrato `features/hero_marca.feature` (16 escenarios), revisión adversarial (5 lentes/11 agentes).
+- **Puerta humana (2026-07-18):** las 5 preguntas (C-1, C-2, C-3, C-5, C-7) cerradas por el humano.
+- **tdd_craftsman (1.ª ronda):** 15/15 escenarios implementables por TDD (`@s14` aplazado a F-08).
+  `partir-nombre.ts` (lógica mutable) + `Hero.tsx` (h1, dos `<span>` + text node `{' '}`) +
+  `hero.module.scss` (base VISIBLE, oculto solo en el 0% del keyframe, `@media reduce`, duración
+  ≤1,2 s). 661 tests.
+- **judge (1.ª ronda):** APROBADO (15/15, 0 bloqueantes, 2 menores). **mutation_tester:** 100 %.
+- **🔴 F-07 estrenó VERIFICACIÓN EN VIVO con Chrome** (extensión del humano): cazó lo que ninguna
+  puerta unitaria podía ver — **el titular salía en la fuente por defecto («Times New Roman»), NO en
+  Great Vibes**: `hero.module.scss` no declaraba `font-family` para el titular (heredaba la del
+  cuerpo). «Verde ≠ funciona» (I-8) en estado puro. El `@font-face` de F-05 estaba, el hero no lo pedía.
+- **AMPLIACIÓN aprobada en la puerta:** arreglar la tipografía DENTRO de F-07 → acceptance 7 + `@s17`.
+  - **tdd_craftsman (2.ª ronda):** `@s17` por TDD (Rojo→Verde→Refactor + sabotaje A/B): 2 líneas
+    `font-family` (`.heroMarca` `'Great Vibes', cursive`; `.heroStudio` `'Manrope', sans-serif`).
+    **664 tests** (+3), typecheck/lint 0, `pnpm build` exit 0 (5 puertas).
+  - **judge (2.ª ronda):** APROBADO `@s17` (0 bloqueantes, 2 menores no bloqueantes).
+  - **mutation_tester (2.ª ronda):** 100 % — `partir-nombre.ts` (13/13), `Hero.tsx` (2/2), 0
+    supervivientes; `@s17` es SCSS → no-mutable (declarado, no fingido).
+  - **RE-VERIFICACIÓN EN VIVO con Chrome (extensión del humano + CDP headless):** `document.fonts.check
+    ('142px Great Vibes')` = **true** (era `false`); titular computa `'Great Vibes', cursive` /
+    `'Manrope', sans-serif`; Great Vibes 400 `loaded`; **LCP 136-216 ms** (`lcp_inH1: false`);
+    reduced-motion sin movimiento; reflow 320 sin desborde; **0 peticiones a terceros** (F-05 intacto);
+    consola limpia. Ver `progress/verificacion_viva_hero_marca.md`.
+- **Resultado: `done`.** 17/17 escenarios (16 + `@s17`; `@s14` aplazado a F-08).
+- **🟡 Deuda declarada (NO reparada — una feature a la vez):** (1) error de app en re-navegación SUAVE
+  de `vite-react-ssg` bajo `vite preview` (`JSON.parse` de un HTML; **NO** en carga completa ni recarga
+  dura; no lo causa `@s17`) — revisar antes de publicar / al meter enrutado multipágina (F-16). (2) el
+  `body` global **no fija `font-family`** → el cuerpo sale en la serif por defecto del UA; candidato a
+  su propia feature de tipografía global.

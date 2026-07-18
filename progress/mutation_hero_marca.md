@@ -105,3 +105,86 @@ mueren con el pool de 17 tests (`hero.test.tsx` + `home.test.tsx` sobre el HTML 
 - **No ha escrito `// Stryker disable`, no ha bajado el umbral, no ha rediseñado nada.**
 - **No ha marcado la feature `done`.** Eso lo decide el `craftsman_lead` (esta puerta PASA; queda la
   verificación EN VIVO con Chrome que el lead se reservó, C-2).
+
+---
+
+# APÉNDICE — RE-VALIDACIÓN tras `@s17` (acceptance 7, tipografía del titular) — 2026-07-18
+
+> Ronda de mutación gatillada por la AMPLIACIÓN `@s17` (Great Vibes en `.heroMarca`, Manrope en
+> `.heroStudio`). Objetivo doble: (1) declarar por escrito que `@s17` NO aporta lógica mutable, y
+> (2) confirmar que los DOS ficheros mutables de F-07 **siguen en 100 %** (no hay regresión). No se
+> tocó `src/` ni los tests en esta medición; acotado **solo** con `--mutate`, **jamás** `--testFiles`.
+
+**Veredicto de la ronda:** **PASS** — umbral **1.0 (100 %) MANTENIDO**. 0 supervivientes, 0 timeouts,
+0 errores, 0 exclusiones. Sin regresión frente al cierre previo (cifras idénticas).
+
+## A. `@s17` es NO-MUTABLE (SCSS) — declarado, no fingido
+
+El cambio de producción de `@s17` es **puramente SCSS**: dos declaraciones `font-family` en las reglas
+base `.heroMarca` (`'Great Vibes', cursive`) y `.heroStudio` (`'Manrope', sans-serif`) de
+`src/components/hero.module.scss`. **Stryker NO ve CSS/SCSS** (regla del repo:
+`feature_list.json` líneas 19 y 21; nota §7-174: la tipografía «se asevera leyendo el .module.scss»).
+
+Verificado en ESTA ronda:
+- `stryker.config.json` → lista `mutate` (15 entradas explícitas, líneas 12-28): **0 entradas
+  `*.module.scss`** y **0 ficheros de test**. `@s17` NO añade ningún fichero mutable nuevo. Los dos
+  mutables de F-07 siguen siendo exactamente `src/lib/partir-nombre.ts` (línea 23) y
+  `src/components/Hero.tsx` (línea 27).
+- `git --no-pager diff [--cached] src/lib/partir-nombre.ts src/components/Hero.tsx` → **VACÍO**
+  (antes y después de medir). `@s17` **no tocó** ninguno de los dos ficheros mutables.
+- `git status --short src/` → SOLO `src/components/hero.module.scss` (SCSS, no mutable) y
+  `src/components/hero-estilos.test.ts` (fichero de test, fuera de la lista `mutate`). Ni un fichero
+  mutable modificado.
+- El test nuevo (`hero-estilos.test.ts` › describe `@s17`, 3 `it`) LEE el SCSS y asevera las dos
+  `font-family` + su presencia; el eje [NV] «qué fuente PINTA el navegador» lo re-verifica el lead
+  EN VIVO con Chrome (`document.fonts.check`), NO jsdom. Es la misma vía de aseveración que
+  `@s1`/`@s3`/`@s9` (CSS leído del fichero). **No se finge cobertura de mutación sobre CSS.**
+
+**Conclusión A:** `@s17` es no-mutable (SCSS), como manda la nota del repo. Nada nuevo que mutar.
+
+## B. RE-VALIDACIÓN de los DOS ficheros mutables — SIN REGRESIÓN
+
+Medidos por separado, acotando **solo** con `--mutate` (`pnpm exec stryker run --mutate <fichero>
+--concurrency 1`), `rm -rf .stryker-tmp` entre tandas, una sola tanda viva a la vez. Baseline de
+apoyo: `pnpm test` = **654 passed | 10 skipped (664)**; la ÚNICA suite en rojo es
+`src/lib/trampas-del-horneado.test.tsx` por un `EBUSY: resource busy or locked` sobre
+`.experimentos-tmp/react19-nativa` (candado de FS de un servidor de experimentos residual, puerto
+:8901/:8907; sus 10 tests están **skipped** y **no cubren** ningún fichero mutable). Ese EBUSY es del
+working-tree real, **NO** del sandbox de Stryker: `.experimentos-tmp/` está gitignored (`.gitignore`
+línea 51) → Stryker no lo copia; ambos dry-runs salieron **«Initial test run succeeded»**.
+
+### Salud del informe (se lee ANTES que el score)
+
+| Fichero | Concurrencia | dry-run | tests/mut | `# timeout` | `# errors` | `# no cov` | EXIT | ¿Vale? |
+| ------- | ------------ | ------- | --------- | ----------- | ---------- | ---------- | ---- | ------ |
+| `src/lib/partir-nombre.ts` | `--concurrency 1` | «Initial test run succeeded. Ran **22** tests» | **2,77** | **0** | **0** | **0** | **0** | **sí** |
+| `src/components/Hero.tsx`  | `--concurrency 1` | «Initial test run succeeded. Ran **17** tests» | **1,50** | **0** | **0** | **0** | **0** | **sí** |
+
+0 timeouts en los dos (ningún `Timeout` inflando el score como falso-muerto), 0 `# errors` (ningún
+mutante sin evaluar), dry-run > 0 y coherente con el baseline → el score se puede leer, no hay mentira.
+
+### El score — ya con derecho a leerse
+
+| Fichero | Total | Killed | **Survived** | NoCov | Timeout | Errors | Score |
+| ------- | ----- | ------ | ------------ | ----- | ------- | ------ | ----- |
+| `src/lib/partir-nombre.ts` | **13** | 13 | **0** | 0 | 0 | 0 | **100,00 %** |
+| `src/components/Hero.tsx`  | **2**  | 2  | **0** | 0 | 0 | 0 | **100,00 %** |
+| **Feature (F-07)** | **15** | **15** | **0** | 0 | 0 | 0 | **100,00 %** |
+
+Stryker salió con **código 0** en los dos («Final mutation score of 100.00 is greater than or equal
+to break threshold 100»). Cifras **idénticas** a la ronda de cierre previa (13 + 2 mutantes, 2,77 y
+1,50 tests/mut, dry-run 22 y 17) → **cero regresión**. El mutante crítico `< → <=` de
+`partir-nombre.ts:22` sigue MUERTO por `@s16` (« Studio», corte===0), `killed 1`.
+
+## C. Mutantes sobrevivientes
+
+**Ninguno.** 0 supervivientes en los dos ficheros. Nada que escalar, nada que excluir (0 exclusiones,
+como desde F-03). El umbral **1.0** se cumple **con contrato**.
+
+## D. Lo que este agente NO ha hecho, a propósito (esta ronda)
+
+- No tocó `src/` ni los tests: los dos ficheros mutables `git diff` = VACÍO antes y después; solo
+  `@s17` (SCSS + test) queda en el working-tree, y no lo escribí yo.
+- No excluyó ningún mutante ni escribió `// Stryker disable`; no bajó el umbral; no rediseñó nada.
+- No fingió cobertura de mutación sobre el SCSS de `@s17`: lo DECLARÓ no-mutable (regla del repo).
+- No marcó la feature `done`: lo decide el `craftsman_lead`. Esta puerta de mutación **PASA**.

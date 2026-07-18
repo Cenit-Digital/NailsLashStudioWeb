@@ -8,8 +8,10 @@
 > están CERRADAS por el humano (todas como proponía el lead). El `tdd_craftsman` QUEDA LIBERADO para
 > implementar. Precedente F-05/F-06 (A-23 redux). Ver la sección «Puerta humana 2026-07-18» al final.
 
-## Escenarios: 16 (@s1..@s13, @s16, @s15, @s14; @s16 añadido en la ronda de reparación —partición
-## corte===0—; @s15/@s14 se definen tras el resto, junto a su condición C-5, para no renumerar)
+## Escenarios: 17 (@s1..@s13, @s16, @s15, @s17, @s14; @s16 añadido en la ronda de reparación —partición
+## corte===0—; @s15/@s14 se definen tras el resto, junto a su condición C-5, para no renumerar; @s17
+## AÑADIDO en la ampliación 2026-07-18 —tipografía del titular—, colocado ANTES del @s14 aplazado para
+## que la cola de trazabilidad F-08 siga siendo la última del fichero)
 
 ## Mapa acceptance de `feature_list.json §7` → @s
 
@@ -21,6 +23,7 @@
 | 4 | «La animación bob no es infinite (SC 2.2.2 A)» | ✅ C-5 (2026-07-18): **APLAZADO A F-08** (el bob depende de scroll, hoy no lo hay). @s14 se conserva por trazabilidad; el `tdd_craftsman` NO lo implementa en F-07 | **@s14** APLAZADO F-08 |
 | 5 | «El elemento LCP no tiene opacity:0 en ningún momento y es legible en ≤1,2s (hoy ~5,3s)» | ✅ C-2 (2026-07-18), SEPARADO en dos ejes: base sin `opacity:0`/`clip-path` oculto → @s1; DURACIÓN acotada ≤1,2s (C-3) → @s4; **NÚMERO LCP real → [NV] / verificación EN VIVO con Chrome (NO escenario unitario)** | **@s1, @s4** + nota LCP |
 | 6 | «El hook de IntersectionObserver es SSR-safe…» | ✅ C-1 (2026-07-18): **RETIRADO** (no aplica; above-the-fold; `grep`=0 [V]). Cubierto NEGATIVAMENTE por @s5 (visible sin JS) | **retirado** → @s5 |
+| 7 | **AMPLIACIÓN 2026-07-18** «La tipografía de marca del titular: `.heroMarca` («Nails Lash») en Great Vibes (fallback cursive), `.heroStudio` («Studio») en Manrope (fallback sans-serif); se lee el `.module.scss` y se RE-VERIFICA EN VIVO con Chrome» | Se lee el SCSS (bytes, como @s1/@s3/@s9): `font-family` de `.heroMarca` = `'Great Vibes'`+cursive, de `.heroStudio` = `'Manrope'`+sans-serif, nombres A MANO; el eje [NV] «qué fuente PINTA el navegador» → verificación EN VIVO con Chrome (`document.fonts.check` + `font-family` computado) | **@s17** + nota [NV] Chrome |
 
 ## Casos límite de la spec (§Feature 7) → @s
 
@@ -183,3 +186,32 @@ por el bloque `✅ APROBADO POR LA PUERTA HUMANA EL 2026-07-18`; se retiraron la
 (`grep ⏸` = 0); @s4 pasó de «≤ el límite que fije C-3» a «≤1,2s»; @s14 quedó marcado `@aplazado-f08`
 (NO se renumeró nada). **Ningún otro escenario de comportamiento cambió.** `feature_list.json` NO se
 tocó (el lead ya había aplicado las cinco decisiones a §7).
+
+## Ampliación 2026-07-18: tipografía del titular (acceptance 7 → @s17)
+
+**Origen: la VERIFICACIÓN EN VIVO con Chrome** (fase que F-07 estrena, TRAS el TDD de los 16 escenarios
+ya aprobados). Medido: `document.fonts.check('142px "Great Vibes"')` → **`false`**; el titular «Nails
+Lash» computaba `font-family: "Times New Roman"` (fallback serif del UA), **no Great Vibes**. Causa
+raíz (del CÓDIGO): `src/components/hero.module.scss` **no declaraba `font-family` para el titular** —
+`.heroMarca`/`.heroStudio` solo tenían `clip-path`/`opacity`/`animation` y **heredaban** la fuente del
+cuerpo—. El `@font-face` de Great Vibes YA estaba horneado (F-05) y su `.woff2` se servía (HTTP 200):
+el hero simplemente no lo pedía. Ninguna puerta lo cazó (los tests leen `clip-path`/`animation`/`@media`;
+el judge midió estructura/`--ink`/sin-inline; la mutación cubrió la derivación) — **ninguna mira qué
+fuente PINTA el titular**: solo un navegador que renderiza. «Verde ≠ funciona» (I-8) en estado puro.
+
+**Decisión del humano (puerta 2026-07-18, ya en `feature_list.json` §7 acceptance[6] y `puerta_humana`):**
+Great Vibes para «Nails Lash» (`.heroMarca`), Manrope para «Studio» (`.heroStudio`) — el diseño del
+prototipo Opcion-1-Rosa, y la razón misma de partir el nombre en dos `<span>` con dos fuentes distintas.
+
+**Lo que se hizo en el contrato:** se añadió **UN escenario `@s17`** (numerado tras `@s16`, colocado
+ANTES del `@s14 @aplazado-f08` para que la cola de trazabilidad F-08 siga siendo la última del fichero;
+NO se renumeró nada). `@s17` asevera **leyendo el `.module.scss`** (Stryker no ve SCSS — forma del repo,
+como @s1/@s3/@s9): `.heroMarca` declara `font-family` `'Great Vibes'` + fallback `cursive`; `.heroStudio`
+declara `font-family` `'Manrope'` + fallback `sans-serif`; los nombres esperados van **A MANO**
+(anti-tautología, no importados). Nota **[NV] / RE-VERIFICACIÓN EN VIVO con Chrome** tras el TDD
+(`document.fonts.check('...Great Vibes')` === true + `font-family` computado del titular resuelto a
+"Great Vibes"), mismo estatuto que el número LCP de C-2: jsdom no carga @font-face ni pinta, PROHIBIDO
+fingirlo. `@s17` **NACE APROBADO** (parte de la ampliación de la puerta): NO lleva ⏸. **No se tocó
+ningún escenario existente ni `feature_list.json`** (el acceptance 7 ya estaba). Total: **17 escenarios**
+(16 activos + 1 nuevo; @s14 sigue aplazado a F-08). El LCP medido en vivo (40 ms, un `<p>`, no el
+titular) aguanta Great Vibes en el camino crítico.

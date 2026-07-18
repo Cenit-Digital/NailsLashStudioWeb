@@ -249,3 +249,36 @@ describe('@s9 el titular se pinta con --ink, NUNCA con --accent/--brush como tex
     expect(MINIMO_DE_PARES).toBe(18)
   })
 })
+
+/**
+ * @s17 — AMPLIACIÓN 2026-07-18 (acceptance 7). La verificación EN VIVO con Chrome cazó que el titular
+ * salía en la fuente por defecto del UA («Times New Roman»), NO en Great Vibes: `.heroMarca`/
+ * `.heroStudio` NO declaraban `font-family` → HEREDABAN la del cuerpo. El `@font-face` de Great Vibes
+ * y Manrope YA está horneado por F-05 (`src/main.tsx`); el hero simplemente NO la pedía. ESTE test
+ * asevera SOLO que el SCSS PIDE la fuente (bytes del `.module.scss`, como @s1/@s3/@s9). Que el
+ * NAVEGADOR la APLIQUE se RE-VERIFICA EN VIVO con Chrome, NO aquí (jsdom no carga @font-face [V]).
+ *
+ * Anti-tautología: los nombres esperados «Great Vibes» y «Manrope» van ESCRITOS A MANO (como el 1,2 s
+ * de @s4), NUNCA importados de site.ts ni de ningún símbolo. Regex robusta a comillas simples/dobles
+ * y al whitespace de prettier.
+ */
+describe('@s17 el titular declara su tipografía de marca en el SCSS — Great Vibes (.heroMarca) y Manrope (.heroStudio)', () => {
+  it('@s17 la regla base de .heroMarca declara font-family con «Great Vibes» + fallback genérico cursive', () => {
+    // «Great Vibes» y «cursive» van ESCRITOS A MANO: la letra manuscrita de marca horneada en F-05.
+    expect(reglaBase('heroMarca')).toMatch(/font-family\s*:\s*['"]Great Vibes['"]\s*,\s*cursive/)
+  })
+
+  it('@s17 la regla base de .heroStudio declara font-family con «Manrope» + fallback genérico sans-serif', () => {
+    // «Manrope» y «sans-serif» van ESCRITOS A MANO, no importados de ningún símbolo.
+    expect(reglaBase('heroStudio')).toMatch(/font-family\s*:\s*['"]Manrope['"]\s*,\s*sans-serif/)
+  })
+
+  it('@s17 NINGUNA de las dos reglas base se queda SIN font-family (la ausencia fue el fallo cazado en vivo)', () => {
+    // Presencia EXPLÍCITA: es justo lo que faltaba (heredar la del cuerpo → «Times New Roman»).
+    for (const clase of ['heroMarca', 'heroStudio']) {
+      expect(reglaBase(clase), `${clase} debe NOMBRAR su propia font-family, no heredarla`).toMatch(
+        /font-family\s*:/,
+      )
+    }
+  })
+})

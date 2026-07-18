@@ -105,3 +105,100 @@ mutable. Los dos MUERDEN. bin/harness init VERDE (661 tests). pnpm build exit 0 
 
 ## Cambios requeridos
 Ninguno. La feature esta lista para la puerta de mutacion.
+
+---
+
+# APÉNDICE — Review de @s17 (acceptance 7, AMPLIACIÓN 2026-07-18): la tipografía de marca del titular
+
+**Veredicto:** APPROVED
+
+Juzgado por el `judge` el 2026-07-18 (segunda ronda, TRAS la ampliación de la puerta humana). Reviso
+SOLO `@s17` y confirmo NO-REGRESIÓN en lo ya aprobado. Reproduje a mano el sabotaje que predice el
+contrato (sobre el SCSS, `readFileSync`+string, jamás jsdom): MUERDE. `pnpm test` 664 verde,
+`typecheck`/`lint` 0, `pnpm build` exit 0 con las CINCO puertas. Árbol restaurado al estado en revisión.
+
+## Puerta humana confirmada (DOS vías)
+- `features/hero_marca.feature`: cabecera «APROBADO POR LA PUERTA HUMANA EL 2026-07-18» + bloque `@s17`
+  (líneas 451-468) con «Este escenario NACE APROBADO... no lleva ninguna marca de pendiente».
+- `feature_list.json` §7: `status: in_progress`, `acceptance[6]` (el 7º) = la tipografía de marca, y
+  campo `puerta_humana` con «AMPLIACION 2026-07-18 ... El humano aprobo arreglarlo en F-07».
+
+## Cobertura de escenarios (@s17 ↔ test)
+- @s17: [x] cubierto por `src/components/hero-estilos.test.ts` › describe `@s17` (3 `it`):
+  1. `.heroMarca` declara `font-family: 'Great Vibes', cursive` — regex a mano
+     `/font-family\s*:\s*['"]Great Vibes['"]\s*,\s*cursive/` (hero-estilos.test.ts:266-269).
+  2. `.heroStudio` declara `font-family: 'Manrope', sans-serif` — regex a mano
+     `/font-family\s*:\s*['"]Manrope['"]\s*,\s*sans-serif/` (hero-estilos.test.ts:271-274).
+  3. NINGUNA de las dos se queda SIN `font-family` (presencia explícita, hero-estilos.test.ts:276-283).
+  → Aseveradas LAS DOS reglas (Great Vibes+cursive y Manrope+sans-serif), leyendo el `.module.scss`
+  con `reglaBase()` (la regla BASE del elemento, NUNCA la del `@media` — verificado: el regex
+  `\.heroMarca\s*\{` no casa el `.heroMarca,` del @media; el `.heroStudio {` base está antes del @media
+  → `cuerpoDelBloque` devuelve la base).
+
+## El test MUERDE (no es vacuo) — sabotaje reproducido por MÍ
+- Reproduje el SABOTAJE A del `tdd_craftsman`: quité `font-family: 'Great Vibes', cursive;` de
+  `.heroMarca` en `hero.module.scss` y corrí `hero-estilos.test.ts` → **2 failed | 12 passed**: cayeron
+  el `it` específico de Great Vibes Y el de presencia; el de Manrope siguió VERDE (discrimina cuál
+  falta). Revertido. Confirma la bitácora (`progress/tdd_hero_marca.md`, SABOTAJE A/B): el test muerde
+  por CADA declaración por separado.
+- Nota de higiene: el `git checkout` con que revertí el sabotaje clobberó también las 2 líneas
+  `font-family` que el `tdd_craftsman` había entregado SIN commitear; las restauré al byte exacto
+  (blob `a1794d9`, idéntico al del diff en revisión) y re-verifiqué `hero-estilos.test.ts` = 14 passed.
+  Árbol final = los 6 ficheros en revisión, nada más.
+
+## Implementación == acceptance
+- `src/components/hero.module.scss` regla base `.heroMarca` (línea 28): `font-family: 'Great Vibes', cursive;`.
+  Regla base `.heroStudio` (línea 34): `font-family: 'Manrope', sans-serif;`. Las dos EN LA HOJA.
+- Los nombres de familia CASAN con los `@font-face` de F-05: `Great Vibes` (400) y `Manrope` (400-700),
+  confirmados en `src/lib/puerta-terceros.test.ts:631,636` y en `src/main.tsx:22` («Great Vibes 400 (el
+  «Nails Lash» del hero)»). `Great Vibes` sin comillas en el CSS horneado casa con `'Great Vibes'` del
+  @font-face (misma familia). El eyebrow ya usaba `'Manrope'` (línea 13) — coherente.
+
+## Anti-tautología
+- Los literales `'Great Vibes'`, `cursive`, `'Manrope'`, `sans-serif` van ESCRITOS A MANO en el test,
+  NO importados. El fichero de test importa SOLO `MATRIZ_DE_USO, MINIMO_DE_PARES` de `puerta-contraste`;
+  la única mención a `site.ts` es un COMENTARIO (línea 262), no un `import`. Como el 1,2 s de @s4.
+
+## Nada de más (alcance) — `git --no-pager diff`
+- SOLO: `src/components/hero.module.scss` (+2 líneas `font-family`), `src/components/hero-estilos.test.ts`
+  (+1 describe `@s17`, 3 `it`), y docs de contrato/progreso (`feature_list.json` acceptance[6]+puerta_humana,
+  `features/hero_marca.feature` bloque @s17, `progress/gherkin_hero_marca.md`, `progress/tdd_hero_marca.md`).
+- CERO cambios en `Hero.tsx`, `partir-nombre.ts`, otros escenarios, o F-01..F-06. No hay producción que
+  ningún test exija: las 2 líneas del SCSS las pide @s17.
+
+## Coherencia de método (NO es hueco)
+- @s17 lee el SCSS igual que @s1/@s3/@s9 (Stryker no ve CSS → lo aseveran el test que LEE el SCSS + la
+  puerta humana). El eje [NV] «qué fuente PINTA el navegador» (`document.fonts.check('142px "Great
+  Vibes"')` + `font-family` computado del `<span>`) queda para la RE-VERIFICACIÓN EN VIVO con Chrome del
+  lead, mismo estatuto que el número LCP de C-2. Correcto, no es un hueco.
+
+## Sin regresión
+- `pnpm typecheck` → 0 errores. `pnpm lint` → 0 warnings.
+- `pnpm test` → **664 passed** (19 ficheros) — la cuenta esperada.
+- `pnpm build` → **exit 0** con las CINCO puertas (cascarón, placeholders, contraste 18 pares, terceros
+  6 pares de fuente autohospedados, anclas). El CSS de `dist/` hornea las dos `font-family` (verificado
+  vía build; la bitácora lo midió sobre los bytes: `font-family:Great Vibes,cursive` /
+  `font-family:Manrope,sans-serif`).
+- Los 15 escenarios previos siguen VERDES e INTACTOS (`hero-estilos.test.ts` 14 passed; suite 664).
+
+## Checkpoints
+- C1 (arnés, build exit 0): [x] — 664 verde, typecheck/lint limpios, build 5 puertas.
+- C2 (1 sola in_progress): [x] — solo F-07.
+- C3 (arquitectura, sin deps nuevas): [x] — 2 líneas de CSS, cero asset, cero dependencia.
+- C4 (verificación real): [x] — `readFileSync` real del SCSS; sabotaje reproducido por mí.
+- C5 (sesión bien cerrada): [x] — árbol restaurado al estado en revisión (6 ficheros, mismos blobs).
+- C6 (Gherkin, mapa @s→test, sin producción sin test): [x] — @s17 mapeado; 16/16 implementables cubiertos.
+- C7 (mutación ≥ umbral 1.0): [ ] PENDIENTE del `mutation_tester` (@s17 no aporta lógica mutable: el
+  SCSS no lo ve Stryker; la cobertura de mutación sigue en `partir-nombre.ts`). Puerta distinta.
+
+## Menores (NO bloqueantes)
+1. El tercer `it` (presencia `/font-family\s*:/`) está subsumido para COBERTURA por los dos asertos
+   específicos (si `.heroMarca` casa `'Great Vibes', cursive`, obviamente tiene `font-family:`). No es
+   defecto: aporta un mensaje de fallo más claro para «falta del todo» y sirvió para discriminar en el
+   sabotaje. Se queda; solo lo anoto.
+2. Seguimiento (NO de este gate): la RE-VERIFICACIÓN EN VIVO con Chrome del titular pintando Great Vibes
+   (`document.fonts.check` === true + `font-family` computado resuelto a "Great Vibes") la debe cerrar el
+   lead tras esta aprobación — es el eje [NV]/C-2, fuera de la puerta unitaria del `judge`.
+
+## Cambios requeridos
+Ninguno. `@s17` APROBADO. Sin bloqueantes. Lista para la puerta de mutación.

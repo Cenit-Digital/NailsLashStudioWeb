@@ -66,3 +66,78 @@ F-07 pasó `judge` (APROBADO) y mutación (100 %, 0 exclusiones). **El único ha
 tipografía del titular**, y depende de una decisión del humano. `src/` intacto salvo lo ya
 commiteado; el servidor de `vite preview` y el experimento CDP están en `.experimentos-tmp/` (git-
 ignored).
+
+---
+
+# RE-VERIFICACIÓN EN VIVO 2026-07-18 — tras el fix de `@s17` (acceptance 7, aprobado en la puerta)
+
+> El humano aprobó en la puerta arreglar la tipografía DENTRO de F-07 (Great Vibes para «Nails Lash»,
+> Manrope para «Studio»). El `tdd_craftsman` lo implementó por TDD (`@s17`, 2 líneas de `font-family`
+> en `hero.module.scss`), el `judge` lo APROBÓ (0 bloqueantes) y el `mutation_tester` re-validó 100 %
+> (`@s17` es SCSS → no-mutable, declarado). Esta sección cierra el eje **[NV]/C-2** en vivo.
+
+**Método.** `pnpm build` fresco (exit 0, las 5 puertas) → `dist/` servido por `vite preview` (:4173)
+→ medido de DOS formas independientes que coinciden: (a) la **extensión de Chrome del humano** sobre
+la pestaña real; (b) **Chrome headless vía CDP con visibilidad forzada** (`.experimentos-tmp/f07-
+verificacion-viva/measure-lcp.mjs`, URL 8908→4173), que mide el LCP fiable que la pestaña de fondo no
+registra.
+
+## ✅ El eje [NV] que abrió la ampliación, ahora en verde
+
+| Eje | ANTES (el fallo cazado) | AHORA (medido en vivo) |
+| --- | --- | --- |
+| `document.fonts.check('142px "Great Vibes"')` | **`false`** | **`true`** ✅ |
+| `font-family` computado de «Nails Lash» (`.heroMarca`) | `"Times New Roman"` (fallback UA) | **`"Great Vibes", cursive`** ✅ |
+| `font-family` computado de «Studio» (`.heroStudio`) | heredado del cuerpo | **`Manrope, sans-serif`** ✅ |
+| `Great Vibes 400` en `document.fonts` | `unloaded` | **`loaded`** ✅ |
+| Nombre accesible del `<h1>` | — | **`Nails Lash Studio`** ✅ (text node `{' '}` real) |
+| CSS horneado en `dist/assets/*.css` | sin `font-family` en el titular | `._heroMarca{font-family:Great Vibes,cursive;…}` · `._heroStudio{font-family:Manrope,sans-serif;…}` ✅ |
+
+## ✅ Regresión / invariantes (Chrome real headless CDP, 3 ramas)
+
+| Escenario | Great Vibes | `font-family` | LCP | ¿LCP en `<h1>`? | reflow | anims |
+| --- | --- | --- | --- | --- | --- | --- |
+| normal 1280 | `true` | `"Great Vibes", cursive` | **216 ms** | `false` (`<P>`/`<H3>`) | `scrollW==clientW==1258` | `paintReveal: finished` |
+| reduced-motion 1280 | `true` | `"Great Vibes", cursive` | **156 ms** | `false` | `1258==1258` | **`[]`** (sin movimiento residual) |
+| reflow 320 | `true` | `"Great Vibes", cursive` | **136 ms** | `false` | **`320==320`** (sin desborde) | `paintReveal: finished` |
+
+- **LCP 136-216 ms** ≪ 2,5 s p75 [V: web.dev] con Great Vibes YA en el camino crítico (43 KB woff2,
+  status 200). El acceptance decía «el LCP medido (40 ms) aguanta Great Vibes»; ahora, con la fuente
+  REALMENTE cargada, se mide directo y **aguanta con holgura** (sube de ~40 ms a ~150-216 ms, sigue
+  «good»). **`lcp_inH1: false`** en las 3 ramas → el titular NO es el elemento LCP, así que la fuente
+  del titular no gobierna el LCP (el `clip-path` sigue siendo MOOT, como en la 1.ª verificación).
+- **`color: rgb(142,51,85)` = `--ink` (#8E3355)** en las 3 ramas → el contraste de F-03 intacto.
+- **Reduced-motion:** `clip-path: inset(0px)`, `opacity: 1`, `getAnimations() == []` → el hero se ve
+  COMPLETO y sin movimiento. El patrón de memoria sigue funcionando con la fuente añadida.
+
+## ✅ Red y consola (invariante F-05 + higiene)
+
+- **0 peticiones a orígenes web externos** (`PerformanceResourceTiming`, medido en las dos cargas):
+  `n_externas: 0`. El `great-vibes-latin-400-normal-*.woff2` carga **200** desde `localhost`, junto a
+  Manrope/Gilda. Ningún tercero recibe la IP: F-05 intacto.
+- **Consola limpia en carga:** el único mensaje es `Content Script: Initializing` de la PROPIA
+  extensión (`chrome-extension://…`), no de la app. 0 errores / 0 warnings de la página.
+- **Captura visual:** el `<h1>` muestra «Nails Lash» en la cursiva de marca (Great Vibes, rosa `--ink`)
+  + «Studio» en Manrope — el diseño Opcion-1-Rosa. La partición en dos `<span>` por fin aporta su
+  contraste tipográfico.
+
+## 🟡 Hallazgos FUERA DE ALCANCE de F-07 (reportados, NO tocados — una feature a la vez)
+
+1. **Error de la app en re-navegación SUAVE (no en carga real).** La 2.ª `navigate` de la extensión a
+   la misma URL dispara el fetch de loader-data cliente de `vite-react-ssg`, y bajo `vite preview` ese
+   fetch devuelve `index.html` → `Unexpected token '<', "<!DOCTYPE "... is not valid JSON` (error
+   boundary). **NO aparece en carga completa ni en recarga dura (Ctrl+Shift+R): ambas renderizan
+   perfecto.** NO lo causa `@s17` (una `font-family` no genera un error de JSON). El sitio es de UNA
+   ruta con nav por anclas (`#servicios`/`#contacto`), así que un usuario normal no dispara navegación
+   de ruta cliente. Candidato a investigar cuando entre enrutado multipágina (F-16) o antes de
+   publicar. **Deuda declarada, no reparada.**
+2. **El `body` global no fija `font-family`** en `src/styles/` (grep = 0): todo el texto que no lo
+   declare sale en la serif por defecto del UA (visible en la captura: «Servicios», el cuerpo). NO es
+   F-07 (el titular del hero SÍ queda correcto) y no hay feature/spec aprobada para la tipografía
+   global del cuerpo. Candidato a su propia feature. **Deuda declarada, no reparada.**
+
+## Veredicto de la fase EN VIVO
+**PASS.** El eje [NV] que abrió la ampliación (¿el navegador PINTA Great Vibes?) queda **cerrado en
+verde**, medido por la extensión de Chrome del humano Y por CDP headless. Sin regresión (LCP, reduced-
+motion, reflow, contraste, cero terceros, consola). Los 2 hallazgos fuera de alcance quedan DECLARADOS
+como deuda para el humano, no reparados (una feature a la vez). F-07 lista para cerrar `done`.

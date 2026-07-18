@@ -435,6 +435,39 @@ Feature: El nombre del salón como un <h1> real, VISIBLE horneado en dist/ y baj
     # `src/components/**/*.tsx` y `src/lib/**/*.ts`, MEDIDO [V]) → NO hay que tocarlo.
 
   # ---------------------------------------------------------------------------
+  # AMPLIACIÓN 2026-07-18 — La tipografía de marca del titular (acceptance 7). La VERIFICACIÓN EN VIVO
+  # con Chrome (extensión del humano, TRAS el TDD de los 16 escenarios ya aprobados) cazó que «Nails
+  # Lash» salía en la fuente por defecto del UA (`Times New Roman`), NO en Great Vibes: el `hero.module.scss`
+  # NO declaraba `font-family` para el titular, así que `.heroMarca`/`.heroStudio` HEREDABAN la fuente
+  # del cuerpo. El `@font-face` de Great Vibes YA está horneado (F-05) y su `.woff2` se sirve (HTTP 200);
+  # el hero simplemente NO la pedía. Decisión del humano en la puerta (feature_list.json §7 acceptance[6]):
+  # Great Vibes para «Nails Lash», Manrope para «Studio» —el diseño del prototipo Opcion-1-Rosa, y la
+  # razón misma de partir el nombre en dos <span>—. Se asevera LEYENDO el `.module.scss` (Stryker NO ve
+  # SCSS — forma del repo, como @s1/@s3/@s9); el eje [NV] —qué fuente PINTA el navegador— se RE-VERIFICA
+  # EN VIVO con Chrome. Este escenario NACE APROBADO (parte de la ampliación de la puerta); no lleva
+  # ninguna marca de pendiente.
+  # ---------------------------------------------------------------------------
+
+  @s17
+  Scenario: el titular declara su tipografía de marca en el SCSS — «Nails Lash» (.heroMarca) en Great Vibes (fallback cursive) y «Studio» (.heroStudio) en Manrope (fallback sans-serif) — acceptance 7, AMPLIACIÓN 2026-07-18
+    Given el SCSS module del hero con las reglas de los elementos del titular ".heroMarca" (el <span> «Nails Lash») y ".heroStudio" (el <span> «Studio»)
+    When un test lee la declaración "font-family" de cada una de esas dos reglas de elemento
+    Then la regla de ".heroMarca" declara "font-family" con la fuente de marca escrita A MANO "'Great Vibes'" (la letra manuscrita horneada en F-05) seguida de un fallback de familia genérica "cursive"
+    And la regla de ".heroStudio" declara "font-family" con la fuente escrita A MANO "'Manrope'" seguida de un fallback de familia genérica "sans-serif"
+    And cada una de las dos reglas NOMBRA su propia "font-family": ninguna se queda SIN declararla heredando la del cuerpo (la AUSENCIA de font-family fue exactamente el fallo que la verificación en vivo cazó → «Nails Lash» en "Times New Roman", no en Great Vibes)
+    And los nombres esperados "'Great Vibes'" y "'Manrope'" se escriben A MANO en el test, NO se importan de site.ts ni de ningún símbolo (anti-tautología, como el número 1,2 s de @s4 se escribe a mano y no se compara contra sí mismo)
+    # 🔴 EJE [NV] / RE-VERIFICACIÓN EN VIVO CON CHROME tras el TDD (mismo estatuto que el número LCP de
+    # C-2): que el titular PINTE realmente Great Vibes es NO_VERIFICABLE en test unitario —jsdom no carga
+    # @font-face, no descarga fuentes ni pinta [V]—. ESTE escenario asevera SOLO que el SCSS PIDE la
+    # fuente (bytes del `.module.scss`, como @s1/@s3/@s9). Que el NAVEGADOR la APLIQUE se RE-VERIFICA EN
+    # VIVO con Chrome, no en el test: `document.fonts.check('142px "Great Vibes"')` debe dar `true` y el
+    # `font-family` computado del <span> «Nails Lash» debe resolver a "Great Vibes" (la verificación
+    # previa lo midió en `false` / "Times New Roman" — ESE hallazgo abrió esta ampliación). El LCP medido
+    # en vivo (40 ms, un <p>, `lcp_inH1: false`) AGUANTA Great Vibes en el camino crítico. El SCSS NO lo
+    # ve Stryker (como @s1..@s4/@s9): lo aseveran el test que LEE el SCSS + la puerta de aprobación humana
+    # + la re-verificación en vivo con Chrome. PROHIBIDO fingir con jsdom que la fuente «está pintada».
+
+  # ---------------------------------------------------------------------------
   # @s14 — El indicador «desliza» (bob). APLAZADO A F-08 POR LA PUERTA (C-5, APROBADO 2026-07-18): el
   # bob depende de que haya scroll y hoy NO lo hay. El `tdd_craftsman` NO lo implementa en F-07. Se
   # CONSERVA este escenario como contrato de trazabilidad para F-08 (NO se renumeran los demás: es un

@@ -25,6 +25,7 @@
 // LCP bueno (el prototipo, delay 0,5s + 4,8s = ~5,3s, suspendía el LCP del titular). La animación
 // vive AQUÍ, en la hoja, NUNCA inline (inline ganaría al @media(reduce){animation:none}).
 .heroMarca {
+  font-family: 'Great Vibes', cursive;
   clip-path: inset(0 0 0 0);
   animation: paintReveal 1s cubic-bezier(0.5, 0, 0.25, 1) 0.1s both;
 }
@@ -32,6 +33,7 @@
 // «Studio» — fade up. BASE = VISIBLE (opacity 1), aunque el default ya sea 1, se declara explícito.
 // C-3: 0,9s + 0,2s = 1,1 s ≤ 1,2 s total.
 .heroStudio {
+  font-family: 'Manrope', sans-serif;
   opacity: 1;
   animation: fadeUp 0.9s 0.2s both;
 }

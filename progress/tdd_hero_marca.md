@@ -107,3 +107,82 @@ prefers-reduced-motion: reduce{ animation:none }` presentes. La animación vive 
   terceros, anclas).
 - **NO** corrí Stryker (lo hace el `mutation_tester`). **NO** usé Chrome (la verificación EN VIVO —
   LCP real, clip-path vs LCP, reduced-motion, reflow 320px — la hace el lead tras esta entrega, C-2).
+
+---
+
+# APÉNDICE — @s17 (acceptance 7, AMPLIACIÓN 2026-07-18): la tipografía de marca del titular
+
+**Puerta verificada por mí (de nuevo, antes de tocar nada):**
+- `features/hero_marca.feature` línea 6 = «✅✅ APROBADO POR LA PUERTA HUMANA EL 2026-07-18». `@s17`
+  presente (líneas 451-468) y línea 448 = «Este escenario NACE APROBADO... no lleva ninguna marca de
+  pendiente».
+- `feature_list.json` §7 = `status: "in_progress"` + `puerta_humana` con «AMPLIACION 2026-07-18... el
+  titular NO usaba Great Vibes... El humano aprobo arreglarlo en F-07».
+- Las dos cuadran → adelante. **El resto de F-07 (16 escenarios previos) NO se toca**: solo se añaden
+  DOS declaraciones `font-family` al SCSS y UN describe de test.
+
+**Bug verificado por mí:** en `hero.module.scss`, las reglas base `.heroMarca` (líneas 27-30) y
+`.heroStudio` (líneas 34-37) NO declaraban `font-family` → HEREDABAN la del cuerpo → el titular salía
+en la fuente por defecto del UA («Times New Roman»), NO en Great Vibes. Los `@font-face` de Great
+Vibes y Manrope YA están horneados por F-05 (`src/main.tsx:36-41`); el hero simplemente no los pedía.
+Nombres REALES de familia confirmados en `src/lib/puerta-terceros.test.ts:631,636`: `Manrope` y
+`Great Vibes`. El eyebrow ya usaba `font-family: 'Manrope', system-ui, sans-serif` (línea 13) — el
+titular no.
+
+## Ciclo Rojo → Verde → Refactor
+
+| @s | ROJO (test que falla) | VERDE (cambio mínimo) |
+| -- | --------------------- | --------------------- |
+| @s17 | 3 asertos nuevos en `hero-estilos.test.ts` (Great Vibes en `.heroMarca`, Manrope en `.heroStudio`, presencia de `font-family` en ambas) → ROJOS contra el SCSS actual sin `font-family`. Confirmado: **3 failed \| 11 passed** | `.heroMarca { font-family: 'Great Vibes', cursive; ... }` y `.heroStudio { font-family: 'Manrope', sans-serif; ... }`. NADA MÁS (no toqué clip-path/opacity/animation/@keyframes/@media). Confirmado: **14 passed** |
+
+- **REUTILICÉ** el helper existente `reglaBase(clase)` (línea 61): devuelve el cuerpo de la regla base
+  `.heroMarca {`/`.heroStudio {`, NUNCA la del `@media` (allí es `.heroMarca,` → el regex `\.heroMarca\s*\{` no casa).
+- **Anti-tautología:** los literales `'Great Vibes'`, `cursive`, `'Manrope'`, `sans-serif` van A MANO
+  en el test, NO importados de `site.ts` ni de ningún símbolo (como el 1,2 s de @s4).
+- **Regex robusta** a comillas simples/dobles y whitespace de prettier:
+  `/font-family\s*:\s*['"]Great Vibes['"]\s*,\s*cursive/` y `/font-family\s*:\s*['"]Manrope['"]\s*,\s*sans-serif/`.
+- **REFACTOR (en verde):** `prettier --write` sobre `hero.module.scss` y `hero-estilos.test.ts` →
+  **ambos `unchanged`** (las comillas simples y las regex sobreviven; el eyebrow ya usaba `'Manrope'`
+  con comillas simples y sobrevivió igual). Nombres reveladores, sin números mágicos.
+
+## Trazabilidad @s17 → test
+
+- **@s17** (el SCSS PIDE Great Vibes en `.heroMarca` y Manrope en `.heroStudio`, con fallback
+  genérico, ninguna sin declararla) → `hero-estilos.test.ts` › describe `@s17` (×3):
+  1. `.heroMarca` declara `font-family: 'Great Vibes', cursive`,
+  2. `.heroStudio` declara `font-family: 'Manrope', sans-serif`,
+  3. NINGUNA de las dos se queda SIN `font-family` (presencia explícita — el fallo cazado en vivo).
+- El eje [NV] «qué fuente PINTA el navegador» (`document.fonts.check('142px "Great Vibes"')` y el
+  `font-family` computado del `<span>`) lo RE-VERIFICA el lead EN VIVO con Chrome, NO este test
+  (jsdom no carga @font-face [V]). PROHIBIDO fingirlo con jsdom.
+
+## Verificaciones por SABOTAJE (método docs/verification.md — no dependen de Stryker)
+
+- **SABOTAJE A:** quitar `font-family` de `.heroMarca` → **2 asertos de @s17 ROJOS** (el específico de
+  Great Vibes + el de presencia); el de Manrope sigue verde. Revertido.
+- **SABOTAJE B:** quitar `font-family` de `.heroStudio` → **2 asertos de @s17 ROJOS** (el específico de
+  Manrope + el de presencia); el de Great Vibes sigue verde. Revertido.
+- Conclusión: el test MUERDE por CADA declaración por separado (asertos específicos discriminan cuál
+  falta; el aserto de presencia cubre la ausencia de cualquiera de las dos). Tras revertir: **14 passed**.
+
+## «Verde ≠ funciona» (I-8) — sobre los BYTES del CSS de `dist/` REAL tras `pnpm build`
+
+`._heroMarca_1y2fi_11{font-family:Great Vibes,cursive;clip-path:inset(0 0 0 0);animation:_paintReveal_1y2fi_1 1s cubic-bezier(.5,0,.25,1) .1s both}`
+`._heroStudio_1y2fi_17{font-family:Manrope,sans-serif;opacity:1;animation:_fadeUp_1y2fi_1 .9s .2s both}`
+— medido con `grep` sobre `dist/assets/app-*.css` (bytes, jamás jsdom): las DOS `font-family` viajan
+horneadas → el navegador AHORA pide Great Vibes / Manrope (antes heredaba «Times New Roman»). El
+`@media (prefers-reduced-motion: reduce){ animation:none }` sigue intacto; no toqué nada de @s1..@s4.
+
+## Verificación final
+
+- `pnpm typecheck` → **0 errores**.
+- `pnpm lint` → **0 warnings**.
+- `pnpm test` → **664 passed** (661 → 664, **+3** por @s17), 19 ficheros.
+- `pnpm build` → **exit 0** con las CINCO puertas (cascarón, placeholders, contraste 18 pares,
+  terceros [6 pares de fuente autohospedados], anclas).
+- **NO** corrí Stryker (lo hace el `mutation_tester`; el SCSS NO lo ve Stryker → @s17 se asevera por
+  el test que LEE el SCSS + la puerta humana, como @s1/@s3/@s9). **NO** usé Chrome (la RE-VERIFICACIÓN
+  EN VIVO — `document.fonts.check` + `font-family` computado del titular — la hace el lead, eje [NV]).
+- **NO** marqué `done` en `feature_list.json` (espera al `judge` y al `mutation_tester`).
+- Ficheros tocados en esta ampliación: `src/components/hero.module.scss` (+2 líneas `font-family`) y
+  `src/components/hero-estilos.test.ts` (+1 describe `@s17`, 3 `it`). Nada más.
