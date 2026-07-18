@@ -8,7 +8,8 @@
 > (C-1, C-2, C-3, C-5, C-7) van a la puerta con la propuesta del lead; el lead PROPONE, no cierra.
 > Precedente F-05/F-06 (A-23 redux). El `tdd_craftsman` NO implementa hasta la puerta.
 
-## Escenarios: 15 (@s1..@s15; @s14 se define tras @s15, junto a su condición C-5, para no renumerar)
+## Escenarios: 16 (@s1..@s13, @s16, @s15, @s14; @s16 añadido en la ronda de reparación —partición
+## corte===0—; @s15/@s14 se definen tras el resto, junto a su condición C-5, para no renumerar)
 
 ## Mapa acceptance de `feature_list.json §7` → @s
 
@@ -87,6 +88,51 @@ medir el LCP con jsdom** (spec, «Modos de error»: el número LCP no produce mo
   obligación WCAG · número LCP como aserción de build · «obligatorio» sin sujeto para reduced-motion ·
   `--accent`/`--brush` como texto del titular · rama «texto grande 3:1» · hardcodear «Facial» · mutar
   `.includes` (no existe en Stryker 9.6.1).
+
+## Ronda de reparación (revisión adversarial de 5 lentes / 11 agentes; 5 confirmados, 1 descartado)
+
+Todas las correcciones re-MEDIDAS o CITADAS antes de aplicar. **5 aplicadas, 0 rechazadas.** El
+escenario pasa de 15 a **16** (nuevo @s16). Las marcas ⏸ (C-1..C-8) se mantienen; @s4/@s14 siguen con
+número/condición pendiente.
+
+1. **🔴 GRAVE — @s5 no cazaba el mecanismo del fallo (A3 §2).** MEDIDO: el prototipo NO hornea
+   `opacity:0`/`clip-path` inline — hornea `style="animation:…both"` inline, cuyo `both`/`backwards`
+   proyecta el 0% oculto durante el delay (invisible SIN JS), gana en especificidad al
+   `@media(reduce){animation:none}` de @s3 (lo derrota) y esconde su duración de @s4 (que lee la HOJA).
+   → **Reforzado el negativo de @s5**: prohíbe TAMBIÉN un `animation`/`animation-*` HORNEADO INLINE en
+   el titular. La 3ª aserción se redactó como «texto presente + sin ocultación inline», NO «pintado»
+   (eso es el eje [NV]/Chrome). Título ajustado en la misma línea.
+
+2. **🔴 GRAVE — el mutante `corte < 0 → corte <= 0` sobrevivía a todo (MEDIDO, node).** Con corte 10,
+   7 y -1 (las 3 entradas de @s12/@s13) el mutante da salida idéntica → SOBREVIVE; @s13 (corte=-1) NO
+   lo mata (afirmación FALSA del contrato). SOLO corte===0 lo distingue.
+   → **Añadido @s16** (partición corte===0): nombre que EMPIEZA por espacio (« Studio», sintético),
+   esperados A MANO `marca=""`, `tipo="Studio"` con la guarda real `corte < 0`. En prosa (Gherkin
+   RECORTA las celdas → un espacio inicial no cabe en Examples). **@s15 fila 5 corregida**: su «dónde
+   muere» es @s16, no @s13. Comentario de @s13 corregido (no mata el cambio de operador).
+
+3. **🔴 GRAVE — error de hecho: coverage.include.** `vitest.config.ts:15` YA es
+   `['src/lib/**/*.ts', 'src/components/**/*.tsx']` desde F-06 (MEDIDO) — la premisa «hoy excluye todo
+   .tsx» era FALSA y contradecía la fuente de verdad (`f07_verificacion_previa.md:236`).
+   → **Eliminadas las DOS menciones** (cabecera ~línea 48 y nota de @s15). Queda solo lo cierto:
+   añadir a mano el fichero a la lista `mutate` de `stryker.config.json` (lista explícita, sin glob).
+
+4. **🔴 GRAVE — @s14 confundía LETRA (≤5s) con TÉCNICA (finitud).** `iteration-count:3` sobre `bob
+   2,4s` = 7,2s es finito y >5s → sigue incumpliendo SC 2.2.2 (A).
+   → El Then ahora asevera la **DURACIÓN TOTAL** (count × duración por iteración) ≤ 5s —espejo de @s4—,
+   además de la finitud; se separa (a) letra (≤5s) de (b) técnica (≠ infinite). El «5» es el LITERAL
+   WCAG, no un número horneado de C-3 (⏸ sigue en pie).
+
+5. **MENOR — @s15 fila 1: mutante fantasma.** Stryker 9.6.1 NO genera `lastIndexOf→indexOf` (MEDIDO:
+   0 hits en el method-expression-mutator; solo mapea charAt/slice/substring/trim/etc.).
+   → Fila 1 reformulada al mutante REAL `StringLiteral ' ' → ''` (muere en @s12:
+   `"Nails Lash Studio".lastIndexOf('') = 17` → marca = nombre completo ≠ «Nails Lash»). Nota de @s15
+   reconciliada: los sabotajes mapean a mutadores REALES; prohibidos los fantasma `.includes` y
+   `lastIndexOf→indexOf`.
+
+**Descartado (no aplicado):** el 6º hallazgo alegado, declarado falso por el verificador independiente;
+no llegó como corrección a aplicar. Re-verifiqué los 5 anteriores por medición propia y todos se
+sostienen → 0 rechazos.
 
 ## Verde ≠ funciona (I-8)
 

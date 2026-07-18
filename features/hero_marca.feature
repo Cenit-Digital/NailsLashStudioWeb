@@ -44,8 +44,10 @@
 #   · C-8 (deuda declarada): el `dist` preloadea 12 fuentes con `type="font/woff2"` incluso los 6
 #     `.woff` → «preload de todo = preload de nada», que puede dañar el LCP. Es territorio F-05/F-20;
 #     queda ANOTADO, F-07 NO lo toca.
-#   · `Hero.tsx` + la derivación pura se añaden a DOS listas: `mutate` de `stryker.config.json` Y
-#     `coverage.include` de `vitest.config.ts` (hoy `['src/lib/**/*.ts']`, que excluye todo `.tsx`).
+#   · `Hero.tsx` + la derivación pura se añaden A MANO a la lista `mutate` de `stryker.config.json`
+#     (lista explícita, SIN glob → riesgo de verde-por-vacuidad si falta). `coverage.include` de
+#     `vitest.config.ts` YA los cubre por glob desde F-06 (`vitest.config.ts:15` =
+#     `['src/lib/**/*.ts', 'src/components/**/*.tsx']`, MEDIDO [V]) → NO hay que tocarlo.
 #
 # =============================================================================================
 # FUENTE DE VERDAD DE LOS HECHOS: `progress/f07_verificacion_previa.md`
@@ -233,18 +235,28 @@ Feature: El nombre del salón como un <h1> real, VISIBLE horneado en dist/ y baj
     # cuando C-3 cierre. Este eje (la DURACIÓN) SÍ es puerta unitaria; el NÚMERO LCP real NO (C-2).
 
   @s5
-  Scenario: el HTML CRUDO prerenderizado de dist/ muestra el nombre del salón VISIBLE sin ejecutar JavaScript — readFileSync + string, NUNCA jsdom
+  Scenario: el HTML CRUDO prerenderizado de dist/ muestra el nombre del salón PRESENTE en los bytes y SIN ocultación inline (ni opacity/clip-path ni animation horneados) sin ejecutar JavaScript — readFileSync + string, NUNCA jsdom
     Given el HTML CRUDO prerenderizado de la ruta "/" del artefacto de producción
     When se inspeccionan sus BYTES sin ejecutar JavaScript
-    Then el HTML contiene el nombre del salón en el elemento del titular
+    Then el HTML contiene el nombre del salón en el elemento del titular (texto PRESENTE en los bytes)
     And el elemento del titular NO lleva "opacity:0" ni un "clip-path" que recorte HORNEADOS en su estilo inline (el oculto vive solo en el @keyframes de la hoja)
-    And el nombre es visible sin depender de la hidratación ni de ningún IntersectionObserver
+    And el elemento del titular NO lleva un "animation" (ni "animation-name"/"animation-fill-mode"/"animation-*") HORNEADO INLINE — la animación vive en la HOJA (SCSS module), NUNCA inline: un "animation:… both" inline proyecta el 0% oculto durante el delay → invisible al cargar SIN JS (MEDIDO, A3 §2), GANA en especificidad al "@media (reduce){ animation:none }" de @s3 (lo derrota) y esconde su duración del techo de @s4 (que lee la HOJA, no el inline)
+    And el nombre está PRESENTE en los bytes y SIN ocultación inline, sin depender de la hidratación ni de ningún IntersectionObserver (readFileSync+string prueba «texto presente + sin ocultación inline», NO que esté «pintado» — eso es el eje [NV]/verificación EN VIVO con Chrome)
     # 🔴 CASO LÍMITE 1 (ESCENARIO OBLIGATORIO) + acceptance 3. Es el fallo CENTRAL del prototipo:
-    # invisible al cargar, incluso SIN JS. Se asevera sobre los BYTES de `dist/` (readFileSync +
-    # aserción de string), NUNCA con jsdom (jsdom solo ve el estado post-hidratación — «Verde ≠
-    # funciona», I-8; F-04 lo pagó caro). La tercera aserción es a la vez la RED anti-C-1: un
-    # IntersectionObserver dejaría el titular invisible sin JS, y este escenario lo cazaría → cubre
-    # negativamente el acceptance 6 retirado. [NV] hasta el primer `pnpm build` real de F-07.
+    # invisible al cargar, incluso SIN JS. MECANISMO MEDIDO [V, A3 §2]: el prototipo NO hornea
+    # `opacity:0`/`clip-path` recortado inline — hornea `style="animation:paintReveal 4.8s … .5s both"`
+    # inline; la invisibilidad al cargar (SIN JS) la produce el `both`/`backwards`, que proyecta el
+    # keyframe `0%` oculto durante el `animation-delay` [V: CSS Animations L1, A3 §4]. Por eso el negativo
+    # NO basta prohibiendo solo `opacity:0`/`clip-path`: prohíbe TAMBIÉN `animation`/`animation-*`
+    # HORNEADO INLINE en el titular — A3 §6/§7 manda que la animación viva en la HOJA (SCSS module),
+    # NUNCA inline (el inline no admite base-visible ni @media, GANA en especificidad al
+    # `@media(reduce){animation:none}` → derrota @s3, y esconde su duración de @s4 que lee la HOJA). Se
+    # asevera sobre los BYTES de `dist/` (readFileSync + aserción de string), NUNCA con jsdom (jsdom solo
+    # ve el estado post-hidratación — «Verde ≠ funciona», I-8; F-04 lo pagó caro). readFileSync+string
+    # prueba «texto PRESENTE + sin ocultación inline», NO que esté «pintado» (eso es el eje [NV]/Chrome,
+    # C-2). La aserción anti-observer es la RED anti-C-1: un IntersectionObserver dejaría el titular
+    # invisible sin JS → cubre negativamente el acceptance 6 retirado. [NV] hasta el primer `pnpm build`
+    # real de F-07.
 
   # ---------------------------------------------------------------------------
   # El h1 real — UN h1, dos spans, un text node {' '} REAL. Estructura MEDIDA (A5). Los atributos JSX
@@ -369,7 +381,25 @@ Feature: El nombre del salón como un <h1> real, VISIBLE horneado en dist/ y baj
     # sola palabra; sin la guarda, `slice(0,-1)` recorta el último carácter y `slice(-1+1)=slice(0)`
     # duplica. La guarda `corte < 0` degrada a un solo `<span>` (sufijo vacío), FALLA CERRADA, jamás un
     # nombre accesible corrupto. Es un input SINTÉTICO («Estudio»): el dato real siempre tiene espacio,
-    # pero la guarda es lógica que Stryker muta (@s15).
+    # pero la guarda es lógica que Stryker muta (@s15). 🔴 OJO (MEDIDO [V, node]): con corte = -1 este
+    # escenario NO distingue `corte < 0` de `corte <= 0` (-1<0 y -1<=0 son ambos TRUE, misma salida);
+    # esa frontera la cubre @s16 (corte===0). @s13 mata la NEGACIÓN/forzado de la guarda (@s15 fila 4),
+    # NO el cambio de operador `<→<=` (@s15 fila 5, que muere en @s16).
+
+  @s16
+  Scenario: un NOMBRE que EMPIEZA por espacio (corte===0) parte por ese primer y único espacio — la partición que distingue la guarda `corte < 0` de `corte <= 0`
+    Given un nombre SINTÉTICO que empieza por un espacio y no tiene ningún otro: la cadena de siete caracteres formada por un espacio inicial seguido de "Studio", como entrada de la derivación
+    When se parte por el último espacio y lastIndexOf(' ') devuelve 0 (corte === 0)
+    Then la guarda real "corte < 0" es FALSE (0 < 0), así que NO degrada por la guarda: la marca es exactamente la cadena vacía "" y el tipo es exactamente "Studio"
+    And este es el ÚNICO input que distingue "corte < 0" de "corte <= 0": con la guarda mutada a "corte <= 0" la guarda sería TRUE (0 <= 0) y daría marca = " Studio" (con el espacio inicial) y tipo = "" — resultado DISTINTO → este escenario MATA ese mutante, que @s13 (corte = -1) NO mata
+    # 🔴 LA PARTICIÓN corte===0, añadida tras MEDICIÓN [V, node]: con las entradas de @s12/@s13
+    # (corte 10, 7 y -1) el mutante `corte < 0 → corte <= 0` (EqualityOperator de Stryker 9.6.1)
+    # SOBREVIVE (idéntica salida en las tres); SOLO corte===0 lo distingue. Input SINTÉTICO (el dato
+    # real, site.ts:13, NUNCA empieza por espacio), como «Estudio» en @s13. El espacio inicial NO cabe
+    # en una tabla de Examples (Gherkin RECORTA las celdas), por eso es un Scenario en prosa y no una
+    # fila de @s12. Los esperados (marca="", tipo="Studio") se escriben A MANO. Es el «dónde muere»
+    # REAL de @s15 fila 5 (NO @s13, cuya afirmación previa era FALSA). El nombre pegado corrupto sigue
+    # descartado: marca="" + tipo="Studio" compone «Studio», no «Nails LashStudio».
 
   # ---------------------------------------------------------------------------
   # Los mutantes que deben morir (I-6, umbral 1.0). El conjunto exacto se MIDE cuando el fichero exista.
@@ -382,43 +412,55 @@ Feature: El nombre del salón como un <h1> real, VISIBLE horneado en dist/ y baj
     Then al menos un test pasa de verde a rojo
 
     Examples:
-      | mutación                                                                       | dónde muere                                  |
-      | cambiar lastIndexOf(' ') por indexOf(' ')                                      | @s12 (fila «Uno Dos Tres»: marca «Uno»)      |
-      | alterar el índice del sufijo (slice(corte + 1) → slice(corte) o slice(corte - 1)) | @s12 (el tipo deja de ser «Studio»/«Tres»)   |
-      | alterar el corte de la marca (slice(0, corte) → slice(0, corte - 1) u otro)    | @s12 (la marca deja de ser «Nails Lash»)     |
-      | negar o forzar la guarda del predicado corte < 0                               | @s13 (el nombre sin espacio se compone mal)  |
-      | alterar el literal comparado en la guarda (corte < 0 → corte <= 0)             | @s13 (la rama sin espacio cambia de resultado) |
+      | mutación                                                                          | dónde muere                                                                            |
+      | sustituir el literal de espacio por cadena vacía en lastIndexOf (StringLiteral ' ' → '') | @s12 («Nails Lash Studio».lastIndexOf('') = 17 → marca = nombre completo, ≠ «Nails Lash») |
+      | alterar el índice del sufijo (slice(corte + 1) → slice(corte) o slice(corte - 1))  | @s12 (el tipo deja de ser «Studio»/«Tres»)                                             |
+      | alterar el corte de la marca (slice(0, corte) → slice(0, corte - 1) u otro)        | @s12 (la marca deja de ser «Nails Lash»)                                               |
+      | negar o forzar la guarda del predicado corte < 0                                  | @s13 (el nombre sin espacio se compone mal)                                            |
+      | alterar el operador de la guarda (EqualityOperator corte < 0 → corte <= 0)         | @s16 (corte===0, « Studio»: la guarda real da marca=«», tipo=«Studio»; con <= daría marca=« Studio», tipo=«») — @s13 (corte=-1) NO lo mata |
 
     # 🔴 EL CONJUNTO EXACTO DE MUTANTES **NO SE PUEDE PREDECIR**: el fichero de F-07 NO EXISTE todavía;
     # otra implementación tendrá otro conjunto. **SE MIDE CUANDO EXISTA, NO ANTES** (la lección de F-05
-    # con «exactamente dos equivalentes» sería una PREDICCIÓN, no una medición). Este escenario nombra
-    # sabotajes de COMPORTAMIENTO, no mutadores concretos; al medir se nombran los mutadores REALES de
-    # Stryker 9.6.1 (jamás `.includes`: NO existe ese mutador [V]). Si un mutante RESISTE, el
+    # con «exactamente dos equivalentes» sería una PREDICCIÓN, no una medición). Los sabotajes de esta
+    # tabla mapean a mutadores REALES de Stryker 9.6.1 (StringLiteral ' '→'', EqualityOperator <→<=,
+    # ArithmeticOperator ±1, negación de condicional/booleano); el CONJUNTO COMPLETO se nombra al medir.
+    # PROHIBIDO nombrar mutadores FANTASMA: ni `.includes` ni `lastIndexOf→indexOf` existen en Stryker
+    # 9.6.1 [V, MEDIDO: 0 hits en los ficheros de mutadores; el method-expression-mutator no los mapea].
+    # Si un mutante RESISTE, el
     # `tdd_craftsman` ESCALA AL HUMANO —NO lo excluye, NO baja el umbral, NO lo declara equivalente por
     # su cuenta— (umbral 1.0, 0 exclusiones). Cubre el acceptance «mutar la composición rompe un test».
     # 🔴 SOLO la DERIVACIÓN es mutable: el SCSS (@s1..@s4) NO lo ve Stryker, y los atributos/estructura
     # JSX del h1/eyebrow (@s5..@s11) son LITERALES que NO generan mutantes → los aseveran los tests, no
-    # Stryker. `Hero.tsx` + la derivación se añaden a `mutate` de `stryker.config.json` Y a
-    # `coverage.include` de `vitest.config.ts` (dos listas; hoy `coverage.include` excluye todo `.tsx`).
+    # Stryker. `Hero.tsx` + la derivación se añaden A MANO a `mutate` de `stryker.config.json` (lista
+    # explícita, SIN glob → riesgo de verde-por-vacuidad si falta). `coverage.include` de
+    # `vitest.config.ts` YA los cubre por glob desde F-06 (`vitest.config.ts:15` incluye
+    # `src/components/**/*.tsx` y `src/lib/**/*.ts`, MEDIDO [V]) → NO hay que tocarlo.
 
   # ---------------------------------------------------------------------------
   # ⏸ @s14 — El indicador «desliza» (bob). APLICA SOLO SI C-5 DECIDE HORNEARLO EN F-07. PENDIENTE.
   # ---------------------------------------------------------------------------
 
   @s14
-  Scenario: si F-07 hornea el indicador «desliza», su animación NO es infinite — el movimiento no dura más de cinco segundos (SC 2.2.2, nivel A)
+  Scenario: si F-07 hornea el indicador «desliza», su movimiento total dura ≤ CINCO segundos — iteración FINITA Y duración total (count × duración por iteración) acotada, NO solo «≠ infinite» (SC 2.2.2, nivel A)
     Given el SCSS del indicador «desliza» del hero, EN EL SUPUESTO de que C-5 decida hornearlo en F-07
-    When un test lee su declaración "animation-iteration-count"
-    Then el número de iteraciones es FINITO (no "infinite"), de modo que el movimiento no dura más de cinco segundos
-    And con "infinite" el movimiento duraría más de cinco segundos, arrancaría automático y en paralelo con el resto del hero → incumpliría SC 2.2.2 (A)
+    When un test lee su "animation-iteration-count" y la duración por iteración de su "animation", y calcula la duración TOTAL del movimiento (iteration-count × duración por iteración) resuelta a segundos
+    Then (TÉCNICA) el número de iteraciones es FINITO — NO "infinite"
+    And (LETRA, la propiedad normativa de SC 2.2.2) la duración TOTAL del movimiento (iteration-count × duración por iteración) es menor o igual que CINCO segundos — espejo de cómo @s4 suma delay + duración, aquí el «5» es el LITERAL de la norma
+    And un iteration-count finito NO basta por sí solo: "iteration-count: 3" sobre "bob 2,4s" = 7,2 s es FINITO y SIGUE incumpliendo (> 5 s); por eso el test mide la DURACIÓN, no solo la finitud
+    And con "infinite" —o con cualquier duración total > 5 s— el movimiento arrancaría automático y en paralelo con el resto del hero → incumpliría SC 2.2.2 (A)
     # ⏸ C-5 (PENDIENTE DE PUERTA). CASO LÍMITE 6 + acceptance 4. A1, CONFIRMADO por vía adversarial: el
     # `bob 2.4s ease-in-out infinite` del prototipo cumple las TRES condiciones del bullet «Moving,
     # blinking, scrolling» de SC 2.2.2 (A) [V: w3.org/TR/WCAG22/]: (1) arranca automático, (2) `infinite`
     # → dura > 5s, (3) va en paralelo; no es esencial y no tiene mecanismo de pausa → incumplimiento
-    # limpio de nivel A. La técnica suficiente: quitar `infinite` (iteración finita). El `<button>↺
-    # Repetir` del prototipo es control de REPETICIÓN, NO de parada. 🔴 El `paintReveal` (4,8s < 5s) NO
-    # dispara 2.2.2 [V]: el único gancho de nivel A es el `bob` infinito. **PROHIBIDO** atribuir a SC
-    # 2.2.2 un umbral distinto de los «cinco segundos» LITERALES. Propuesta del lead (C-5): si se
-    # hornea en F-07 → iteración finita; o APLAZARLO a F-08 (que sí introduce scroll) → entonces este
-    # escenario NO aplica a F-07. Higiene: `docs/research/audit-a11y.md:386` dice «para cumplir SC 2.2.2
-    # en AA» — 2.2.2 es nivel A, no AA (error de nivel en ESE doc, no en el troceado).
+    # limpio de nivel A. 🔴 SEPARA LETRA de TÉCNICA (hallazgo GRAVE corregido): la LETRA normativa es la
+    # DURACIÓN («lasts more than five seconds»), NO la finitud. Quitar `infinite` es NECESARIO pero NO
+    # suficiente: `iteration-count: 3` sobre `bob 2,4s` = 7,2s es FINITO y > 5s → SIGUE incumpliendo. Por
+    # eso el Then asevera la DURACIÓN TOTAL (count × duración por iteración) ≤ 5s —espejo exacto de cómo
+    # @s4 suma delay+duración— o exigiría un mecanismo real de pausa/parada; NO basta con `≠ "infinite"`.
+    # El `<button>↺ Repetir` del prototipo es control de REPETICIÓN, NO de parada. 🔴 El `paintReveal`
+    # (4,8s < 5s) NO dispara 2.2.2 [V]: el único gancho de nivel A es el `bob` infinito. **PROHIBIDO**
+    # atribuir a SC 2.2.2 un umbral distinto de los «cinco segundos» LITERALES (aquí el «5» es ESE
+    # literal WCAG, no un número horneado de C-3). Propuesta del lead (C-5): si se hornea en F-07 →
+    # iteración finita Y duración total ≤ 5s; o APLAZARLO a F-08 (que sí introduce scroll) → entonces
+    # este escenario NO aplica a F-07. Higiene: `docs/research/audit-a11y.md:386` dice «para cumplir SC
+    # 2.2.2 en AA» — 2.2.2 es nivel A, no AA (error de nivel en ESE doc, no en el troceado).
