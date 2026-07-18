@@ -3,6 +3,7 @@ import { Head } from 'vite-react-ssg'
 import { Cabecera } from '../components/Cabecera'
 import { Hero } from '../components/Hero'
 import { Pie } from '../components/Pie'
+import { HORARIO_SEMANAL, openingHoursSpecification } from '../lib/horario'
 import { canonicaDe, componerTitulo, construirJsonLd, ORIGEN_CANONICA } from '../lib/seo'
 import { DIRECCION, GEO, NOMBRE, TELEFONO, telHref } from '../lib/site'
 
@@ -42,12 +43,20 @@ const ID_SERVICIOS = 'servicios-titulo'
 const ID_CONTACTO = 'contacto-titulo'
 
 export default function Home() {
-  const jsonLd = construirJsonLd({
-    nombre: NOMBRE,
-    direccion: DIRECCION,
-    telefono: TELEFONO.legible,
-    geo: GEO,
-  })
+  // El JSON-LD de la home (F-04) + el `openingHoursSpecification` de F-10, COMPUESTO AQUÍ, EN EL SITIO
+  // DE EMISIÓN (D4): se esparce el objeto de `construirJsonLd` (INTACTO — su @s9 en seo.test.ts
+  // asevera EXACTAMENTE 6 claves y quedaría ROJO si se tocara) y se AÑADE la propiedad poblada por la
+  // función PURA de `horario.ts`. JAMÁS la clave `openingHours` (la puerta de cascarón de F-04 rompe
+  // el build). El bake en `dist/` (@s14) lo asevera el test build-based + la verificación del lead.
+  const jsonLd = {
+    ...construirJsonLd({
+      nombre: NOMBRE,
+      direccion: DIRECCION,
+      telefono: TELEFONO.legible,
+      geo: GEO,
+    }),
+    openingHoursSpecification: openingHoursSpecification(HORARIO_SEMANAL),
+  }
 
   return (
     <>
@@ -56,7 +65,8 @@ export default function Home() {
         <meta name="description" content={DESCRIPCION} />
         <link rel="canonical" href={canonicaDe(RUTA, ORIGEN_CANONICA)} />
         {/* El JSON-LD ESCRITO DE CERO (T-6): copiar el del cliente propagaría «Las Ceudas» y su
-            `vatID` malformado, que son los dos bugs [V] que F-04 existe para no heredar. */}
+            `vatID` malformado, que son los dos bugs [V] que F-04 existe para no heredar. F-10 añade
+            aquí `openingHoursSpecification` (compuesto en este sitio de emisión, NO en construirJsonLd). */}
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Head>
 

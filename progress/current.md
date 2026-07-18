@@ -11,8 +11,12 @@
   mutación N/A (SCSS), **679 tests**, build 5 puertas. **Verificación EN VIVO con Chrome:** body computed
   = Manrope (era Times New Roman), h2 «Servicios» = Gilda Display, hero de F-07 intacto (Great Vibes),
   0 terceros. Resumen en `history.md`.
-- **Feature en curso:** ninguna en TDD ahora mismo; **siguiente = `10 — horario`** (`spec_ready`,
-  contrato aprobado `features/horario.feature`).
+- **Feature en curso: `10 — horario`** (in_progress). **TDD VERDE @s1..@s15** — a la espera de `judge` +
+  `mutation_tester` (NO marcada `done`, Stryker NO corrido). `src/lib/horario.ts` (nuevo, en `mutate`),
+  `src/lib/horario.test.ts` (43), `src/pages/home.tsx` (compone `openingHoursSpecification`, sin tocar
+  `construirJsonLd`), `src/pages/home-horneado.test.ts` (6, build-based @s12/@s14). **728 tests** (679→+49),
+  typecheck/lint 0, `pnpm build` exit 0 (5 puertas), `seo.test.ts` (F-04) sigue verde. 6 sabotajes
+  confirmados. Ver `progress/tdd_horario.md`.
 - **Proyecto:** **8 done · 3 spec_ready (F-09/F-10/F-12 del lote A) · 6 pending · 4 blocked.**
 - **Contratos del lote A ya aprobados y abiertos** (cabecera ✅): `features/horario.feature` (15),
   `features/contacto.feature` (15), `features/catalogo_servicios.feature` (17). El `tdd_craftsman` los

@@ -21,6 +21,7 @@
     "src/lib/puerta-terceros.ts",
     "src/lib/puerta-anclas.ts",
     "src/lib/partir-nombre.ts",
+    "src/lib/horario.ts",
     "src/components/Cabecera.tsx",
     "src/components/MenuNavegacion.tsx",
     "src/components/Pie.tsx",
