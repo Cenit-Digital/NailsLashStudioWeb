@@ -2,12 +2,10 @@
 # Destilado de `progress/spec_draft_tipografia_global.md` (borrador para la puerta).
 #
 # =============================================================================================
-# ⏸⏸  PENDIENTE DE PUERTA HUMANA (LOTE 2026-07-18)  ⏸⏸
-#    Este `.feature` NO está aprobado todavía. Va al LOTE de aprobación del 2026-07-18 junto con el
-#    resto de propuestas pendientes. Hasta que el humano lo ratifique en la puerta:
-#      · el `craftsman_lead` NO añade la entrada id 21 a `feature_list.json` (la aplica DESPUÉS del OK),
-#      · el `tdd_craftsman` NO implementa ni una línea (nada de Rojo-Verde-Refactor),
-#      · NADIE toca `src/styles/`.
+# ✅✅  APROBADO POR LA PUERTA HUMANA EL 2026-07-18 (LOTE A) — el tdd_craftsman queda LIBERADO  ✅✅
+#    El humano aprobó el LOTE A completo el 2026-07-18. La entrada id 21 YA está en `feature_list.json`
+#    (status spec_ready/in_progress + puerta_humana). El `tdd_craftsman` implementa por TDD estricto
+#    (Rojo→Verde→Refactor) y PUEDE tocar `src/styles/` (partial nuevo `_tipografia.scss` + `@use` en `main.scss`).
 #    El `gherkin_author` PROPONE con recomendación cerrada por pregunta; el humano DECIDE (precedente
 #    F-05 A-23, F-06 B-x, F-07 C-x). Origen: deuda DECLARADA en el cierre de F-07
 #    (`progress/verificacion_viva_hero_marca.md` §«Hallazgos FUERA DE ALCANCE», punto 2): el `body`

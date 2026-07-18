@@ -1,0 +1,21 @@
+// Tipografía GLOBAL del documento (F-21). Contrato: features/tipografia_global.feature.
+//
+// Suelo HEREDABLE del cuerpo: el `body` fija la fuente que todo descendiente sin `font-family`
+// propia hereda. Arregla la deuda de F-07 (el cuerpo caía en la serif por defecto del UA). El
+// stack copia a mano el de la casa (eyebrow / cabecera / pie), pero cada feature es dueña de su
+// declaración: aquí NO se tocan ficheros `done`.
+//
+// Solo fuentes YA horneadas por F-05 (Manrope · Gilda Display · Great Vibes): ni @import ni
+// @font-face nuevos, ningún tercero.
+body {
+  font-family: 'Manrope', system-ui, sans-serif;
+}
+
+// Suelo de TIPO de los encabezados de sección. Regla CONJUNTA `h2, h3` (una sola, dos selectores),
+// no dos reglas. Es un selector de TIPO (0,0,1): NO matchea `h1` (el titular del hero, F-07, queda
+// intacto) y cualquier CLASE futura (p. ej. los precios de F-09) lo derrota. El `h3` se asevera por
+// lectura aunque hoy no exista ningún `<h3>` en el artefacto; se verifica en vivo el día que exista.
+h2,
+h3 {
+  font-family: 'Gilda Display', serif;
+}

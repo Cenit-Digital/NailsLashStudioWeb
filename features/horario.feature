@@ -4,8 +4,8 @@
 # `src/lib/site.ts` (`HORARIO`); F-10 lo LEE y lo PARSEA (D3), NO lo reescribe.
 #
 # =============================================================================================
-# ⏸⏸ PENDIENTE DE PUERTA HUMANA (lote 2026-07-18). EL `tdd_craftsman` NO IMPLEMENTA NADA HASTA QUE
-#    EL HUMANO APRUEBE ESTE `.feature`. Se respeta la puerta del `.feature` (memoria: «autonomía
+# ✅✅ APROBADO POR LA PUERTA HUMANA EL 2026-07-18 (lote A). EL `tdd_craftsman` QUEDA LIBERADO PARA
+#    IMPLEMENTAR. Se respetó la puerta del `.feature` (memoria: «autonomía
 #    hasta la puerta»): el borrador llega con TODO resuelto y una recomendación por decisión.
 # =============================================================================================
 #

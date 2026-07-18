@@ -1,7 +1,9 @@
 // Punto de entrada de los estilos globales. El parcial _reset llega con la feature de
-// maquetación; _tokens es de F-03 y _base es la cáscara global de F-04 (@s11).
+// maquetación; _tokens es de F-03 y _base es la cáscara global de F-04 (@s11). _tipografia es la
+// capa tipográfica global de F-21 (cuerpo Manrope, encabezados Gilda Display).
 @use 'tokens';
 @use 'base';
+@use 'tipografia';
 
 // Un solo esquema de color: este proyecto no tiene tema oscuro (decisión 5).
 :root {

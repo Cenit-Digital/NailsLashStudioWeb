@@ -6,8 +6,8 @@
 # de confiar en que quien edite los datos «tenga cuidado».
 #
 # =============================================================================================
-# ⏸ PENDIENTE DE PUERTA HUMANA (lote 2026-07-18). EL `tdd_craftsman` NO IMPLEMENTA HASTA LA
-#    APROBACIÓN. El `spec_partner` preparó el borrador y el `gherkin_author` lo destila con las
+# ✅ APROBADO POR LA PUERTA HUMANA EL 2026-07-18 (lote A). EL `tdd_craftsman` QUEDA LIBERADO PARA IMPLEMENTAR.
+#    El `spec_partner` preparó el borrador y el `gherkin_author` lo destiló con las
 #    RECOMENDACIONES incorporadas como decididas (Pablo delega la redacción, aprueba en lotes:
 #    «yo preparo, tú apruebas»). El humano puede REVOCAR cualquier decisión en la puerta.
 #    v2: ronda de reparación adversarial — G1 (fronteras de fecha), G2 (corte DATO/LÓGICA) y 6

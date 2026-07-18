@@ -4,11 +4,20 @@
 > (regla anti-teléfono-descompuesto). Al cerrar la sesión, mueve el resumen a
 > `history.md` y deja este archivo con solo esta plantilla.
 
-- **Feature en curso:** ninguna. `7 — hero_marca` cerrada **`done`** el 2026-07-18 (resumen en
-  `history.md`).
-- **Proyecto:** **7 done · 9 pending · 4 blocked.**
-- **Siguiente en el camino crítico:** `8 — rejilla_responsive` (`pending`) — feature de CSS
-  (`mutable: false`, se declara sin mutate propio); o `9 — catalogo_servicios`.
+- **LOTE A en ejecución** (camino crítico enseñable para la DEMO del lunes; rigor completo, puertas en
+  lote). Orden: **tipografía ✅ → horario (siguiente) → contacto → catálogo.**
+- **`21 — tipografia_global`: CERRADA `done`** el 2026-07-18. @s1–@s7 por TDD (partial `_tipografia.scss`:
+  body Manrope, `h2,h3` Gilda Display; `@use` en `main.scss`), judge APROBADO (0 bloq., 2 menores),
+  mutación N/A (SCSS), **679 tests**, build 5 puertas. **Verificación EN VIVO con Chrome:** body computed
+  = Manrope (era Times New Roman), h2 «Servicios» = Gilda Display, hero de F-07 intacto (Great Vibes),
+  0 terceros. Resumen en `history.md`.
+- **Feature en curso:** ninguna en TDD ahora mismo; **siguiente = `10 — horario`** (`spec_ready`,
+  contrato aprobado `features/horario.feature`).
+- **Proyecto:** **8 done · 3 spec_ready (F-09/F-10/F-12 del lote A) · 6 pending · 4 blocked.**
+- **Contratos del lote A ya aprobados y abiertos** (cabecera ✅): `features/horario.feature` (15),
+  `features/contacto.feature` (15), `features/catalogo_servicios.feature` (17). El `tdd_craftsman` los
+  implementa uno a uno; F-10 compone `openingHoursSpecification` en `home.tsx` (NO en `construirJsonLd`,
+  que rompería F-04); F-09 separa dato (`catalogo.ts`, fuera de mutate) de lógica (`catalogo-logica.ts`).
 
 ## Cierre de F-07 (para el siguiente, leer antes de abrir F-08)
 

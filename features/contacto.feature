@@ -3,8 +3,8 @@
 # recomendación). AÚN NO vive en `project-spec.md`: se traslada allí cuando el humano cierre la puerta.
 #
 # =============================================================================================
-# ⏸⏸ PENDIENTE DE PUERTA HUMANA (LOTE 2026-07-18). EL `tdd_craftsman` NO IMPLEMENTA NADA HASTA QUE
-#    EL HUMANO APRUEBE ESTOS ESCENARIOS. ⏸⏸
+# ✅✅ APROBADO POR LA PUERTA HUMANA EL 2026-07-18 (LOTE A). EL `tdd_craftsman` QUEDA LIBERADO PARA
+#    IMPLEMENTAR ESTOS ESCENARIOS. ✅✅
 #    A diferencia de F-05/F-06/F-07 (ya aprobadas), ESTE contrato llega a la puerta con TODO resuelto
 #    y una recomendación por decisión (patrón «autonomía hasta la puerta»: Pablo prepara, el humano
 #    aprueba en lotes). El lead PROPONE; el humano DECIDE. Mientras la puerta no cierre, este `.feature`
