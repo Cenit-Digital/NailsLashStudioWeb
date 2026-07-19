@@ -285,44 +285,30 @@ describe('@s17 el titular declara su tipografía de marca en el SCSS — Great V
 })
 
 /**
- * 🎨 DEMO — el pincel de caligrafía (`brushWrite`). Como el resto del hero, es SCSS (Stryker no lo
- * ve): lo aseveran ESTOS tests que LEEN la hoja + la verificación EN VIVO con Chrome (la sincronía
- * punta↔tinta y el ángulo se comprobaron cuadro a cuadro; jsdom no pinta ni anima). Invariantes:
- * el pincel usa `brush.png` autohospedado (cero terceros), aparece y se RETIRA (opacity 0 al inicio
- * y al final), recorre horizontalmente el titular, y BAJO reduced-motion NO EXISTE (display:none).
+ * 🎨 DEMO — «TRAZO DE PLUMA» (decisión de Pablo 2026-07-19): el aplicador de esmalte ESCRIBE «Nails
+ * Lash» recorriendo el trazo real de cada letra (sube la N, la montaña, los lazos), NO un barrido
+ * horizontal. El aplicador vive en un <svg> con viewBox (escala con el titular) y lo mueve SMIL
+ * `<animateMotion>` — su ESTRUCTURA se asevera en hero.test.tsx (render); AQUÍ, el invariante de HOJA
+ * (Stryker no ve SCSS): bajo prefers-reduced-motion el <svg> del pincel NO se muestra (display:none)
+ * y el titular no anima. La sincronía punta↔tinta se RE-VERIFICA EN VIVO con Chrome (jsdom no anima).
  */
-describe('@demo el pincel de caligrafía: brush.png autohospedado, anima brushWrite y se oculta bajo reduced-motion', () => {
-  it('@demo la regla base de .pincel usa brush.png de fondo (autohospedado) y anima brushWrite', () => {
-    const base = reglaBase('pincel')
-
-    // «brush.png» y «brushWrite» van ESCRITOS A MANO; el asset es local (cero terceros, F-05 intacto).
-    expect(base).toMatch(/background\s*:[^;]*brush\.png/)
-    expect(base).toMatch(/animation\s*:\s*brushWrite\b/)
-  })
-
-  it('@demo el @keyframes brushWrite APARECE (opacity 0 en 0%) y se RETIRA (opacity 0 en 100%), recorriendo left', () => {
-    const cuerpo = cuerpoKeyframe('brushWrite')
-
-    const cero = fotograma(cuerpo, '0%')
-    const cien = fotograma(cuerpo, '100%')
-
-    expect(cero, 'brushWrite necesita un fotograma 0%').not.toBeNull()
-    expect(cien, 'brushWrite necesita un fotograma 100%').not.toBeNull()
-    // Aparece de la nada y se va: opacity 0 al principio y al final (no queda un pincel «pegado»).
-    expect(cero as string).toMatch(/opacity\s*:\s*0/)
-    expect(cien as string).toMatch(/opacity\s*:\s*0/)
-    // Recorre horizontalmente el titular: hay desplazamiento en `left` dentro del keyframe.
-    expect(cuerpo).toMatch(/left\s*:\s*-?\d/)
-  })
-
-  it('@demo bajo prefers-reduced-motion el pincel NO se muestra (display: none) — sin movimiento residual', () => {
+describe('@demo el aplicador de esmalte se OCULTA bajo prefers-reduced-motion (sin movimiento residual)', () => {
+  it('@demo el @media (prefers-reduced-motion: reduce) oculta .pincelSvg (display:none) y para el titular (animation:none)', () => {
     const media = cuerpoDelBloque(
       scss(),
       /@media\s*\(\s*prefers-reduced-motion:\s*reduce\s*\)\s*\{/,
     )
 
     expect(media, 'falta el @media (prefers-reduced-motion: reduce)').not.toBeNull()
-    expect(media as string).toMatch(/\.pincel\b/)
-    expect(media as string).toMatch(/display\s*:\s*none/)
+    const cuerpo = media as string
+    // El <svg> del pincel desaparece por completo (no hay barrido) y el titular queda en su base.
+    expect(cuerpo).toMatch(/\.pincelSvg\b/)
+    expect(cuerpo).toMatch(/display\s*:\s*none/)
+    expect(cuerpo).toMatch(/animation\s*:\s*none/)
+  })
+
+  it('@demo la hoja del hero NO hornea ninguna petición a un origen externo http(s) (cero terceros, F-05 intacto)', () => {
+    // El aplicador es local; su imagen viaja como href en el render (no como url() de la hoja).
+    expect(scss()).not.toMatch(/url\(\s*['"]?https?:/i)
   })
 })

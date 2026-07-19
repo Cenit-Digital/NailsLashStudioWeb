@@ -4,10 +4,16 @@
 // estado OCULTO vive SOLO en el 0% del keyframe. La animación va EN LA HOJA (nunca inline). El SCSS
 // NO lo ve Stryker: lo aseveran los tests que lo LEEN (hero-estilos.test.ts) + la puerta humana.
 //
-// 🎨 DEMO (rama demo/lunes-prototipo): pincel de caligrafía que «escribe» el titular (Nails Lash +
-// STUDIO). El recorte que veía Pablo por arriba se arregla con PADDING vertical en `.heroMarca` (la
-// caja de recorte de `clip-path: inset(0 0 0 0)` es el border-box; con padding, las astas altas de
-// Great Vibes caben dentro y ya no se cortan) — SIN cambiar el valor del clip-path (@s1 intacto).
+// 🎨 DEMO (rama demo/lunes-prototipo): «TRAZO DE PLUMA». Un aplicador de esmalte ESCRIBE «Nails Lash»
+// recorriendo el trazo real de cada letra (sube la N, la montaña, los lazos), mientras la fuente
+// Great Vibes se revela justo detrás de la punta (paintReveal). El aplicador vive en un <svg> con
+// viewBox (escala con el titular responsive) y su recorrido lo mueve SMIL `<animateMotion>` sobre la
+// centerline de la marca — NO un barrido horizontal (lo que pedía Pablo). Bajo prefers-reduced-motion
+// el <svg> del pincel se OCULTA y el titular queda en su estado final visible.
+//
+// EL RECORTE que veía Pablo (la «L»/«N»/«h» seccionadas por arriba) se arregla dando ALTURA a la caja
+// del `clip-path` (border-box) con `padding` vertical y `line-height`, SIN tocar el valor del
+// clip-path (@s1 intacto): las astas altas de Great Vibes ya caben dentro y no se cortan.
 
 // El eyebrow: la línea SOBRE el titular. F-07 fija SOLO su estructura (un <p>); su CONTENIDO de
 // categorías y su estilo fino son F-09. NUNCA un heading.
@@ -31,24 +37,23 @@
 }
 
 // «Nails Lash» — paint reveal por clip-path. BASE = estado final VISIBLE (inset(0 0 0 0)).
-// 🎨 DEMO: `padding-top`/`padding-bottom` agrandan el border-box (= la caja del clip-path) para que
-// las astas altas y los rasgos bajos de Great Vibes NO se recorten. La duración se alarga (caligrafía
-// deliberada de dos líneas): total 0,1s + 1,4s = 1,5 s (el tope de @s4 se sube en la rama demo, con
-// el trade-off de LCP anotado). La animación vive AQUÍ, NUNCA inline.
+// 🎨 DEMO: `padding-top`/`padding-bottom` + `line-height` agrandan el border-box (= la caja del
+// clip-path) para que las astas altas de Great Vibes NO se recorten. La duración se sincroniza con el
+// recorrido del pincel (paintReveal 0,1s + 1,6s = 1,7 s). La animación vive AQUÍ, NUNCA inline.
 .heroMarca {
   display: block;
-  padding-top: 0.42em;
-  padding-bottom: 0.18em;
+  padding-top: 0.6em;
+  padding-bottom: 0.24em;
   font-family: 'Great Vibes', cursive;
   font-size: clamp(3.125rem, 11.5vw, 8.875rem); // 50 → 142px
-  line-height: 0.9;
+  line-height: 0.98;
   white-space: nowrap;
   clip-path: inset(0 0 0 0);
-  animation: paintReveal 1.4s cubic-bezier(0.5, 0, 0.25, 1) 0.1s both;
+  animation: paintReveal 1.6s cubic-bezier(0.5, 0, 0.25, 1) 0.1s both;
 }
 
-// «Studio» — fade up. BASE = VISIBLE (opacity 1). 🎨 DEMO: se RETRASA a la 2.ª fase (cuando el pincel
-// llega a la línea de STUDIO): total 1,4s delay + 0,6s = 2,0 s.
+// «Studio» — reveal L→R (clip, mismo keyframe que la marca). BASE = VISIBLE (opacity 1). Se pinta
+// cuando el pincel ya ha terminado «Nails Lash»: total 1,55 delay + 0,5 = 2,05 s.
 .heroStudio {
   display: block;
   font-family: 'Manrope', sans-serif;
@@ -60,27 +65,7 @@
   margin-top: 0.5rem;
   opacity: 1;
   clip-path: inset(0 0 0 0);
-  // Reveal IZQUIERDA→DERECHA (clip, mismo keyframe que la marca) sincronizado con el pincel al llegar
-  // a STUDIO: total 1,55 delay + 0,5 = 2,05 s. Se pinta como el resto, no con fundido.
   animation: paintReveal 0.5s cubic-bezier(0.5, 0, 0.25, 1) 1.55s both;
-}
-
-// El pincel de caligrafía (DEMO): decorativo (aria-hidden), absoluto sobre el titular. `brush.png`
-// (60×198, autohospedado en src/assets → sin terceros) de fondo. Recorre «Nails Lash» (fase 1) y
-// «STUDIO» (fase 2) siguiendo el frente de la tinta. Las coordenadas son % de la escena → responsive.
-.pincel {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 2.1rem;
-  height: 7rem;
-  background: url('../assets/brush.png') no-repeat center / contain;
-  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.26));
-  pointer-events: none;
-  z-index: 3;
-  // MISMA ventana temporal y MISMO easing que `paintReveal` en la fase 1 → la punta viaja PEGADA al
-  // frente de tinta (izquierda→derecha). Total 0,05 + 2,05 = 2,1 s.
-  animation: brushWrite 2.05s cubic-bezier(0.5, 0, 0.25, 1) 0.05s both;
 }
 
 // El OCULTO vive SOLO aquí, en el 0% del keyframe, jamás en la base.
@@ -93,68 +78,36 @@
   }
 }
 
-// El barrido del pincel (bote arriba, brocha abajo con `rotate(192deg)`): fase 1 recorre «Nails Lash»
-// (línea 1, ~top 31%) del 0% al 70% de la línea temporal —MISMA ventana que `paintReveal`, delay
-// 0,1s→1,5s, mismo easing → la punta va pegada al frente de tinta—; a 73-75% levanta la «pluma» (fade
-// a opacity 0) y baja a «STUDIO» (línea 2, ~top 66%); del 79% al 96% la recorre, sincronizada con el
-// `fadeUp` de STUDIO. `translate(-50%,-50%)` ancla la punta cerca del frente de escritura.
-@keyframes brushWrite {
-  0% {
-    left: -9%;
-    top: 34%;
-    opacity: 0;
-    transform: translate(-50%, -50%) rotate(192deg);
-  }
-  5% {
-    opacity: 1;
-  }
-  70% {
-    left: 98%;
-    top: 34%;
-    opacity: 1;
-    transform: translate(-50%, -50%) rotate(192deg);
-  }
-  73% {
-    left: 98%;
-    top: 55%;
-    opacity: 0;
-    transform: translate(-50%, -50%) rotate(192deg);
-  }
-  // Línea 2 (STUDIO): centrado y más estrecho → el pincel barre SU extensión real (~26→72%), no 0→100%,
-  // y baja a su altura (top ~75%). Así la punta va sobre STUDIO, no por el vacío ni sobre «Lash».
-  75% {
-    left: 26%;
-    top: 75%;
-    opacity: 0;
-    transform: translate(-50%, -50%) rotate(192deg);
-  }
-  79% {
-    opacity: 1;
-  }
-  96% {
-    left: 72%;
-    top: 75%;
-    opacity: 1;
-    transform: translate(-50%, -50%) rotate(192deg);
-  }
-  100% {
-    left: 80%;
-    top: 75%;
-    opacity: 0;
-    transform: translate(-45%, -53%) rotate(196deg);
-  }
+// El aplicador de esmalte (DEMO): decorativo (aria-hidden), absoluto sobre «Nails Lash». Vive en un
+// <svg> con viewBox → ESCALA con el titular responsive (offset-path en px no escalaría). El recorrido
+// lo mueve `<animateMotion>` (SMIL) dentro del SVG, no CSS. Las coordenadas de posición/tamaño alinean
+// el viewBox del pincel con las letras reales de Great Vibes (RE-MEDIDO en vivo con Chrome).
+.pincelSvg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  // MISMA escala que .heroMarca (el `em` de este SVG hereda 16px, NO los 142px del titular): sin
+  // esto el viewBox se aplasta. Con la misma `font-size`, `1.9em` cubre la caja de «Nails Lash» y el
+  // pincel escala con el titular responsive.
+  font-size: clamp(3.125rem, 11.5vw, 8.875rem);
+  height: 1.9em;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 3;
+  filter: drop-shadow(0 9px 11px rgba(0, 0, 0, 0.26));
 }
 
 // C-4 (CRITERIO DE PROYECTO, NO WCAG A/AA): quien pide menos movimiento se queda en la BASE VISIBLE,
-// sin movimiento residual, y el pincel se OCULTA (no hay barrido). `animation: none` deja el elemento
-// en su valor computado base (clip-path inset(0px), opacity 1).
+// sin movimiento residual, y el pincel se OCULTA (no hay barrido). `animation: none` deja el titular
+// en su valor computado base (clip-path inset(0px), opacity 1); el <svg> del pincel desaparece.
 @media (prefers-reduced-motion: reduce) {
   .heroMarca,
   .heroStudio {
     animation: none;
   }
 
-  .pincel {
+  .pincelSvg {
     display: none;
   }
 }

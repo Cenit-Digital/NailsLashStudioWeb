@@ -6,6 +6,25 @@
 
 - **LOTE A en ejecución** (camino crítico enseñable para la DEMO del lunes; rigor completo, puertas en
   lote). Orden: **tipografía ✅ → horario ✅ → contacto (siguiente) → catálogo.**
+- **🎨 DEMO hero «TRAZO DE PLUMA»** (2026-07-19, rama `demo/lunes-prototipo`, a petición de Pablo). Dos
+  quejas resueltas sobre el hero: (1) **el recorte** de «Nails Lash» (la «L»/«N»/«h» seccionadas por
+  arriba) — causa: `clip-path: inset(0 0 0 0)` (border-box) + `line-height:0.9` dejaban la caja más baja
+  que las astas de Great Vibes; arreglado dando ALTURA a la caja (`padding-top:0.6em`, `line-height:0.98`)
+  SIN tocar el valor del clip-path → **@s1 de F-07 intacto**. (2) **La animación**: Pablo eligió (puerta,
+  `AskUserQuestion`) «Trazo de pluma (SVG)» frente a «contorno» y «barrido». Se sustituyó el `brush.png`
+  que barría en horizontal por un **aplicador de esmalte que RECORRE el trazo real de cada letra**: un
+  `<svg viewBox>` (escala con el titular responsive) con `<image href=brush.png>` movido por SMIL
+  `<animateMotion>` sobre `TRAZO_MARCA` (centerline de «Nails Lash» calibrada en vivo con `measureText`),
+  mientras Great Vibes se revela detrás con `paintReveal` (F-07). Ficheros: `Hero.tsx`, `hero.module.scss`.
+  **F-07 (done) NO reabierto**: el `<h1>` (2 spans + text node), nombre accesible «Nails Lash Studio»,
+  `paintReveal`, `--ink`, fuentes y ≤2,5s siguen igual (28 tests núcleo verdes). Los 3 tests `@demo` del
+  mecanismo viejo (`brush.png`/`brushWrite`) se **reescribieron** al nuevo (5 tests: reduced-motion oculta
+  `.pincelSvg`, `<svg aria-hidden>` fuera del `<h1>`, `brush` autohospedado, `<animateMotion>` con path de
+  curvas y 2 subtrazos). **769 tests verdes**, typecheck/lint 0, `pnpm build` **5 puertas** (F-05 terceros
+  OK: el `href` del aplicador es local). **VERIFICADO EN VIVO con Chrome** cuadro a cuadro (líneas CSS+SMIL
+  conducidas por `getAnimations().currentTime` + `setCurrentTime`): el aplicador sube por la N, hace la
+  montaña, recorre los lazos y termina en la «h»; sin recorte; «STUDIO» visible; reduced-motion sin pincel.
+  Contrato en `features/hero.feature` (reescrito del viejo 4.8s/IntersectionObserver). 🟡 Sin commitear.
 - **`21 — tipografia_global`: CERRADA `done`** el 2026-07-18. @s1–@s7 por TDD (partial `_tipografia.scss`:
   body Manrope, `h2,h3` Gilda Display; `@use` en `main.scss`), judge APROBADO (0 bloq., 2 menores),
   mutación N/A (SCSS), **679 tests**, build 5 puertas. **Verificación EN VIVO con Chrome:** body computed
