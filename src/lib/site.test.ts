@@ -3,6 +3,7 @@ import {
   DIRECCION,
   GEO,
   HORARIO,
+  instagramHref,
   NOMBRE,
   REDES,
   registros,
@@ -221,5 +222,74 @@ describe('modos de error — entrada que no es un teléfono válido → falla ce
   it('@s12 waHref lanza igual ante una entrada que no es un teléfono válido', () => {
     // waHref comparte el normalizador a E.164 de telHref: una sola regla, no dos que diverjan.
     expect(() => waHref('abc', 'Hola, quiero cita')).toThrow('teléfono')
+  })
+})
+
+// =============================================================================================
+// F-12 (contacto) — instagramHref: derivación pura HERMANA de telHref/waHref. EXTIENDE site.ts sin
+// tocar el comportamiento de F-02 (los tests de arriba siguen verdes). Contrato:
+// features/contacto.feature @s1..@s3 (+ @s13 mutación). ANTI-TAUTOLOGÍA: cada URL esperada se escribe
+// A MANO; "@nailslash.studio_" entra como ENTRADA (fuente única F-02), NUNCA se re-ejecuta
+// instagramHref ni se importa su resultado como «esperado».
+// =============================================================================================
+describe('instagramHref — deriva la URL pública del perfil desde el handle canónico (F-12)', () => {
+  it('@s1 instagramHref("@nailslash.studio_") es exactamente "https://www.instagram.com/nailslash.studio_/"', () => {
+    // La URL esperada va ESCRITA A MANO. El handle correcto es el del GBP del negocio [V, §3.5].
+    expect(instagramHref('@nailslash.studio_')).toBe('https://www.instagram.com/nailslash.studio_/')
+  })
+
+  it('@s1 el resultado NO es el del handle alternativo NO VERIFICADO "@nail_lash_studio_"', () => {
+    // Blinda el handle correcto frente al `@nail_lash_studio_` del directorio del centro [V, §3.5].
+    expect(instagramHref('@nailslash.studio_')).not.toBe(
+      'https://www.instagram.com/nail_lash_studio_/',
+    )
+  })
+
+  it('@s1 el resultado antepone el host, quita el "@" inicial y cierra con "/"', () => {
+    const url = instagramHref('@nailslash.studio_')
+
+    // Tres aserciones que matan tres mutantes: no anteponer el host, no quitar el "@", no cerrar «/».
+    expect(url.startsWith('https://www.instagram.com/')).toBe(true)
+    expect(url).not.toContain('@')
+    expect(url.endsWith('/')).toBe(true)
+  })
+})
+
+// Devuelve la URL derivada, o el centinela 'LANZÓ' si instagramHref lanza. Así un solo valor codifica
+// a la vez «lanzó» (== 'LANZÓ') y «no emitió la URL a medias del perfil raíz» (!= '…instagram.com//').
+function resultadoODisparo(entrada: string): string {
+  try {
+    return instagramHref(entrada)
+  } catch {
+    return 'LANZÓ'
+  }
+}
+
+describe('@s2 instagramHref falla cerrada ante un handle vacío o inválido — no emite una URL a medias', () => {
+  // La columna-marcador <caso> del Scenario Outline, DECODIFICADA a la cadena literal EXACTA (G4): sin
+  // celdas vacías ni comillas dobladas. `cadena_vacia` → '' (cero caracteres, NO las dos comillas).
+  const CASOS: ReadonlyArray<readonly [string, string]> = [
+    ['cadena_vacia', ''],
+    ['solo_arroba', '@'],
+    ['arroba_con_espacio', '@nails lash'],
+  ]
+
+  it.each(CASOS)('@s2 el caso "%s" LANZA y no emite "https://www.instagram.com//"', (_caso, entrada) => {
+    // «lanza un error»: si por regresión devolviera en vez de lanzar, el centinela dejaría de ser 'LANZÓ'.
+    expect(resultadoODisparo(entrada)).toBe('LANZÓ')
+    // El borde "//" (perfil raíz) escrito A MANO: ante basura, NUNCA un enlace roto que parezca válido.
+    expect(resultadoODisparo(entrada)).not.toBe('https://www.instagram.com//')
+  })
+})
+
+describe('@s3 instagramHref ante un handle SIN el "@" inicial — falla cerrada (D-1a, RECOMENDADO en la puerta)', () => {
+  it('@s3 "nailslash.studio_" (sin "@") LANZA y NO deriva la URL de un handle no canónico', () => {
+    // El dato canónico de F-02 SIEMPRE trae el "@" (site.ts:46); la variante sin "@" es basura para la
+    // ruta real. Falla cerrada, coherente con numeroNacional: no derivar lo que no llegó en forma canónica.
+    expect(resultadoODisparo('nailslash.studio_')).toBe('LANZÓ')
+    // La URL derivada (escrita A MANO) es EXACTAMENTE lo que NO debe emitir a partir de un handle sin "@".
+    expect(resultadoODisparo('nailslash.studio_')).not.toBe(
+      'https://www.instagram.com/nailslash.studio_/',
+    )
   })
 })

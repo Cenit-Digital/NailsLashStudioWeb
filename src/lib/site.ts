@@ -107,6 +107,35 @@ export function waHref(tel: string, texto: string): string {
   return texto === '' ? enlace : `${enlace}?text=${encodeURIComponent(texto)}`
 }
 
+// F-12 (contacto): el host público de un perfil de Instagram. El dato canónico de F-02 es el HANDLE
+// (@nailslash.studio_), NO una URL: guardar la URL «sería HARDCODEARLA» (Pie.tsx:13-15) y reintroduciría
+// la divergencia texto/href que F-02 existe para matar. `instagramHref` deriva la URL desde el handle.
+const HOST_INSTAGRAM = 'https://www.instagram.com/'
+const PREFIJO_HANDLE = '@'
+
+// El cuerpo del usuario de Instagram: letras, dígitos, punto y guion bajo (así es «nailslash.studio_»).
+// El ancla ^…$ exige que TODO el cuerpo sea válido: un cuerpo vacío («@») o con un espacio en medio
+// («@nails lash») NO es plausible y se rechaza. Falla cerrada, hermana de NUMERO_NACIONAL_VALIDO.
+const USUARIO_INSTAGRAM_VALIDO = /^[a-zA-Z0-9._]+$/
+
+export function instagramHref(handle: string): string {
+  if (!handle.startsWith(PREFIJO_HANDLE)) {
+    // D-1a: el dato canónico SIEMPRE trae el "@"; sin él NO se deriva (no emitir algo que no llegó en
+    // su forma canónica). Es la exigencia del "@" inicial, un predicado propio y mutable (@s3, @s13).
+    throw new Error('el handle de Instagram debe empezar por "@"')
+  }
+
+  const usuario = handle.slice(PREFIJO_HANDLE.length)
+
+  if (!USUARIO_INSTAGRAM_VALIDO.test(usuario)) {
+    // Falla ruidosa: ante un cuerpo vacío o inválido se lanza en vez de emitir un
+    // "https://www.instagram.com//" a medias que parezca válido.
+    throw new Error('el handle de Instagram no es válido')
+  }
+
+  return `${HOST_INSTAGRAM}${usuario}/`
+}
+
 /**
  * Proyección del NAP a la forma que consume la puerta de F-01 (A-12): la vía por FLAG, hoy
  * alimentada desde el humilde tools/puerta-placeholders.ts. SOLO datos verificados, todos con

@@ -286,7 +286,7 @@
       "mutable": true,
       "bloqueada_para_publicar": "El email (centroesteticarozas@gmail.com aparece solo en el JSON-LD de la web actual, nunca visible) hay que confirmarlo con el cliente.",
       "sdd": true,
-      "status": "spec_ready",
+      "status": "in_progress",
       "puerta_humana": "APROBADO por el humano el 2026-07-18 (lote A). Contrato features/contacto.feature (15 escenarios) + borrador progress/spec_draft_contacto.md. Revision adversarial: 1 BLOQUEANTE reparado (vacuidad en negativas de #contacto → ahora con ancla positiva; email/TikTok vigilados en TODA la pagina head+body, no solo #contacto) + 4 graves + 4 menores. Decisiones: instagramHref anadido a site.ts (derivacion pura), email OMITIDO en la demo hasta confirmar, frontera F-13 (F-12 da tel: accesible, NO el boton WhatsApp), reutiliza el stub #contacto-titulo (no rompe la puerta de anclas de F-06), TikTok NO."
     },
     {

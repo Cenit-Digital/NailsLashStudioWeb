@@ -1,11 +1,19 @@
 import { Head } from 'vite-react-ssg'
 
 import { Cabecera } from '../components/Cabecera'
+import { Catalogo } from '../components/Catalogo'
+import { Contacto } from '../components/Contacto'
+import { Destacados } from '../components/Destacados'
+import { Faq } from '../components/Faq'
+import { Galeria } from '../components/Galeria'
 import { Hero } from '../components/Hero'
+import { Ofertas } from '../components/Ofertas'
 import { Pie } from '../components/Pie'
+import { PruebaColor } from '../components/PruebaColor'
+import { Reserva } from '../components/Reserva'
 import { HORARIO_SEMANAL, openingHoursSpecification } from '../lib/horario'
 import { canonicaDe, componerTitulo, construirJsonLd, ORIGEN_CANONICA } from '../lib/seo'
-import { DIRECCION, GEO, NOMBRE, TELEFONO, telHref } from '../lib/site'
+import { DIRECCION, GEO, NOMBRE, TELEFONO } from '../lib/site'
 
 /**
  * La CÁSCARA SEMÁNTICA de la home (F-04). Contrato: features/cascaron_semantico.feature.
@@ -39,9 +47,6 @@ const RUTA = '/'
 /** Solo datos [V]: las categorías son Uñas · Pestañas · Cejas — «Facial» NO EXISTE aquí. */
 const DESCRIPCION = `Estudio de uñas, pestañas y cejas en ${DIRECCION.localidad}. ${DIRECCION.via}, ${DIRECCION.centroComercial}.`
 
-const ID_SERVICIOS = 'servicios-titulo'
-const ID_CONTACTO = 'contacto-titulo'
-
 export default function Home() {
   // El JSON-LD de la home (F-04) + el `openingHoursSpecification` de F-10, COMPUESTO AQUÍ, EN EL SITIO
   // DE EMISIÓN (D4): se esparce el objeto de `construirJsonLd` (INTACTO — su @s9 en seo.test.ts
@@ -73,27 +78,49 @@ export default function Home() {
       <Cabecera />
 
       <main>
-        {/* El HERO de F-07: reestiliza el <h1>{NOMBRE} que F-04 dejó horneado. Sigue habiendo UN
-            <h1> (dos <span> + text node de espacio → «Nails Lash Studio»), con su paintReveal de
-            estado base VISIBLE en el SCSS module. Ver src/components/Hero.tsx. */}
-        <Hero />
-
-        {/* El título de sección es un heading REAL referenciado por `aria-labelledby`, NUNCA un
-            `div` con `font-size`: una relación que el diseño comunica VISUALMENTE tiene que
-            existir EN EL CÓDIGO (@s18 — lo único de F-04 que mide `SC 1.3.1` de verdad). */}
-        <section aria-labelledby={ID_SERVICIOS}>
-          <h2 id={ID_SERVICIOS}>Servicios</h2>
-          <p>Uñas, pestañas y cejas.</p>
-        </section>
-
-        <section aria-labelledby={ID_CONTACTO}>
-          <h2 id={ID_CONTACTO}>Contacto</h2>
-          <p>
-            {DIRECCION.via}, {DIRECCION.local}, {DIRECCION.centroComercial},{' '}
-            {DIRECCION.codigoPostal} {DIRECCION.localidad}
+        {/* 🎨 DEMO: el marco del hero (degradado, subtítulo, CTAs) envuelve el <Hero/> de F-07, que
+            sigue aportando EXACTAMENTE un <h1> (dos <span> → «Nails Lash Studio»). La sección del
+            hero NO lleva id ni aria-labelledby: no es «navegable», así que no entra en la igualdad
+            de conjuntos de la nav (F-06). */}
+        <div className="demo-hero">
+          <Hero />
+          <p className="demo-hero-sub">
+            Tu salón de belleza integral. Uñas, pestañas y cejas de la mano de un equipo que cuida
+            cada detalle.
           </p>
-          <a href={telHref(TELEFONO.legible)}>{TELEFONO.legible}</a>
-        </section>
+          <div className="demo-hero-cta">
+            <a className="demo-btn demo-btn--solido" href="#reserva-titulo">
+              Reservar cita
+            </a>
+            <a className="demo-btn demo-btn--ghost" href="#servicios-titulo">
+              Ver servicios
+            </a>
+          </div>
+        </div>
+
+        {/* 🎨 DEMO: el catálogo real (Uñas · Pestañas · Cejas) reemplaza el stub «Servicios».
+            Es la sección navegable #servicios-titulo (un solo <h2>, id que la nav espera). */}
+        <Catalogo />
+
+        {/* 🎨 DEMO: probador de color (12 tonos) — bloque NO navegable (div), como en el prototipo. */}
+        <PruebaColor />
+
+        {/* 🎨 DEMO: servicios destacados (#destacados-titulo) y ofertas (#ofertas-titulo). */}
+        <Destacados />
+        <Ofertas />
+
+        {/* 🎨 DEMO: galería de trabajos (carrusel) — bloque NO navegable (div). */}
+        <Galeria />
+
+        {/* 🎨 DEMO: reserva rápida (#reserva-titulo) — mini-calendario + chat guiado, front-end. */}
+        <Reserva />
+
+        {/* La sección de contacto (F-12) enriquecida para el DEMO: horario (F-10) + dirección +
+            Instagram + CTA WhatsApp/tel + mapa. Reutiliza #contacto-titulo — no crea sección nueva. */}
+        <Contacto />
+
+        {/* 🎨 DEMO: la FAQ en acordeón (#faq-titulo), respuestas siempre en el DOM. */}
+        <Faq />
       </main>
 
       {/* El pie de F-06: la marca, el `tel:` y Facebook (derivados de F-02). NO emite enlaces

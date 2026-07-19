@@ -1,0 +1,79 @@
+// Catálogo de servicios (capa visual del DEMO). Estilos derivados del prototipo Opcion-1-Rosa:
+// tarjeta con lista de precios + bloque de foto (aquí, placeholder rosa, sin fotos reales).
+
+.categoria {
+  margin-top: 3.5rem;
+
+  &:first-of-type {
+    margin-top: 2.5rem;
+  }
+}
+
+.categoriaCabecera {
+  max-width: 620px;
+  margin-bottom: 2rem;
+}
+
+.categoriaTitulo {
+  margin: 0 0 0.75rem;
+  font-family: 'Gilda Display', serif;
+  font-weight: 400;
+  font-size: clamp(1.625rem, 3vw, 2.25rem); // 26 → 36px
+  line-height: 1.08;
+  color: var(--ink);
+}
+
+// F-08: min() en el minmax evita el desborde a 320px sin recortar en silencio.
+.rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: 2.75rem;
+  align-items: center;
+}
+
+.carta {
+  padding: 0.75rem 1.625rem; // 12px 26px
+}
+
+.fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.9375rem 0; // 15px
+  border-bottom: 1px solid var(--line);
+}
+
+.nombre {
+  color: var(--text);
+  font-size: 0.96875rem; // 15.5px
+}
+
+// Precio en --accent-dark (AA); el prototipo lo ponía en --accent (4,05:1, falla como texto).
+.precio {
+  color: var(--accent-dark);
+  font-weight: 700;
+  font-size: 0.96875rem;
+  white-space: nowrap;
+}
+
+.reservar {
+  margin: 1.375rem 0 0.5rem;
+  padding: 0.75rem 1.625rem; // 12px 26px, algo más compacto que el CTA del hero
+  font-size: 0.90625rem;
+}
+
+// Bloque de «foto»: placeholder rosa como el estado vacío del prototipo (sin fotos reales todavía).
+.foto {
+  aspect-ratio: 4 / 5;
+  border-radius: 22px;
+  background: linear-gradient(160deg, var(--accent-soft), var(--surface2));
+  border: 1px solid var(--line);
+  min-height: 260px;
+}
+
+.leyenda {
+  margin: 2.5rem 0 0;
+  color: var(--muted);
+  font-size: 0.8125rem; // 13px
+}

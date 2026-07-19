@@ -1,0 +1,106 @@
+// El probador de color (capa visual del DEMO). Escaparate de uñas + rejilla de swatches.
+
+.rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: 3rem;
+  align-items: center;
+}
+
+.escaparate {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 0.6875rem;
+  padding: 3.375rem 1.875rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  min-height: 260px;
+}
+
+// Una uña: rectángulo redondeado con brillo. El color de fondo lo fija el JSX (tono activo).
+.una {
+  position: relative;
+  width: 3rem;
+  height: 6.5rem;
+  border-radius: 24px 24px 12px 12px / 50px 50px 10px 10px;
+  box-shadow:
+    inset 0 -10px 16px rgba(0, 0, 0, 0.14),
+    0 6px 14px rgba(0, 0, 0, 0.12);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0.625rem;
+    left: 0.6875rem;
+    width: 0.75rem;
+    height: 3.375rem;
+    border-radius: 8px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0));
+    transform: rotate(7deg);
+  }
+
+  &:nth-child(1),
+  &:nth-child(5) {
+    width: 2.875rem;
+    height: 5.375rem;
+  }
+
+  &:nth-child(3) {
+    width: 3.125rem;
+    height: 7.375rem;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .una {
+    transition: background 0.4s;
+  }
+}
+
+.etiqueta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.875rem;
+  margin-bottom: 1.375rem;
+}
+
+.nombre {
+  font-family: 'Gilda Display', serif;
+  font-size: 1.75rem; // 28px
+  color: var(--ink);
+}
+
+.hex {
+  color: var(--accent-dark);
+  letter-spacing: 0.1em;
+  font-size: 0.9375rem;
+}
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+  max-width: 440px;
+}
+
+.swatch {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid var(--border-interactive);
+  cursor: pointer;
+  padding: 0;
+}
+
+.anillo {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-dark);
+}
+
+.cta {
+  margin-top: 1.875rem;
+}

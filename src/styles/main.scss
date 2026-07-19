@@ -4,6 +4,8 @@
 @use 'tokens';
 @use 'base';
 @use 'tipografia';
+// Capa visual del DEMO (rama demo/lunes-prototipo): aplica el look del prototipo Opcion-1-Rosa.
+@use 'demo';
 
 // Un solo esquema de color: este proyecto no tiene tema oscuro (decisión 5).
 :root {

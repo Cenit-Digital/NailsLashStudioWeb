@@ -11,10 +11,10 @@ const ID_LISTA = 'menu-navegacion'
  * navegación. El eje móvil/escritorio lo decide CSS puro (`@media` de `cabecera.module.scss`), no
  * JS. El botón hornea «cerrado» (`aria-expanded="false"`, @s16); el toggle del estado llega en @s15.
  *
- * Los enlaces se escriben inline y EXACTAMENTE a las secciones que existen en la home
- * (`#servicios-titulo`, `#contacto-titulo`): la PUERTA DE ANCLAS VIVAS vigila en cada build que esa
- * igualdad de conjuntos se mantenga, así que la nav no puede enlazar a lo que no existe ni dejar de
- * enlazar una sección alcanzable.
+ * Los enlaces se escriben inline y EXACTAMENTE a las secciones navegables que existen en la home
+ * (`#servicios-titulo`, `#contacto-titulo`, `#faq-titulo`): la PUERTA DE ANCLAS VIVAS vigila en cada
+ * build que esa igualdad de conjuntos se mantenga. El botón «Reservar» apunta a `#contacto-titulo`
+ * (donde vive el CTA de WhatsApp/tel del demo), un id que EXISTE.
  */
 export function MenuNavegacion() {
   // El estado abierto/cerrado vive en `aria-expanded` (atributo CONSULTABLE), NUNCA en un className
@@ -39,9 +39,24 @@ export function MenuNavegacion() {
           <a href="#servicios-titulo">Servicios</a>
         </li>
         <li>
+          <a href="#destacados-titulo">Destacados</a>
+        </li>
+        <li>
+          <a href="#ofertas-titulo">Ofertas</a>
+        </li>
+        <li>
+          <a href="#reserva-titulo">Reserva</a>
+        </li>
+        <li>
           <a href="#contacto-titulo">Contacto</a>
         </li>
+        <li>
+          <a href="#faq-titulo">FAQ</a>
+        </li>
       </ul>
+      <a className={estilos.reservar} href="#reserva-titulo">
+        Reservar
+      </a>
     </nav>
   )
 }

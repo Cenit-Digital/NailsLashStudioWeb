@@ -20,8 +20,19 @@
   omitido, 6 claves de F-04 intactas. Resumen en `history.md`.
   🟡 **Deuda:** el horario VISIBLE (3 filas, `horarioParaUI`) NO se renderiza aún en la página; su sitio
   natural es F-12 (contacto) — asegurar que la DEMO muestre las horas al implementar contacto.
-- **Feature en curso:** ninguna en TDD; **siguiente = `12 — contacto`** (`spec_ready`, contrato aprobado
-  `features/contacto.feature`, 15 escenarios).
+- **Feature en curso: `12 — contacto`** (`in_progress`) — **TDD VERDE**, a la espera de `judge` +
+  `mutation_tester` (NO se marca `done` aquí). Diario completo en `progress/tdd_contacto.md`.
+  - 15/15 escenarios por TDD estricto (Rojo→Verde→Refactor). **765 tests** verdes (729 → +36), DOS corridas
+    completas seguidas (determinismo). typecheck 0 · lint 0 · `pnpm build` exit 0 con las CINCO puertas
+    (anclas de F-06 INTACTA: se reutiliza `#contacto-titulo`).
+  - Núcleo mutable: `instagramHref` AÑADIDO a `src/lib/site.ts` (F-02 intacto — no reabierto). Render:
+    `src/components/Contacto.tsx` + `contacto.module.scss` (extraído del stub de `home.tsx`).
+    `Contacto.tsx` añadido a `mutate` de stryker. `vitest.config.ts`: `fileParallelism: false` (dos tests
+    build-based comparten `dist/`; en paralelo eran flaky).
+  - Sabotajes OK (mutar instagramHref → @s1 rojo; hardcodear host en .tsx → @s15 rojo con bytes idénticos;
+    TikTok → @s7 rojo). Fronteras: sin WhatsApp (F-13), sin mapa (F-11), email omitido (D-3), sin TikTok.
+  - Frontera respetada: el horario VISIBLE (deuda de F-10) NO se añadió a #contacto — no está en los 15
+    escenarios del contrato; añadirlo sería improvisar alcance. Queda como deuda.
 - **Proyecto:** **9 done · 2 spec_ready (F-09/F-12 del lote A) · 6 pending · 4 blocked.**
 - **Contratos del lote A ya aprobados y abiertos** (cabecera ✅): `features/horario.feature` (15),
   `features/contacto.feature` (15), `features/catalogo_servicios.feature` (17). El `tdd_craftsman` los
