@@ -1,47 +1,54 @@
 // El hero de F-07. Contrato: features/hero_marca.feature.
 //
-// 🔴 EL ESTADO BASE ES EL ESTADO FINAL VISIBLE (I-4), MEDIDO con build SSG real + Chrome/CDP
-// (.experimentos-tmp/veredictos-f07/A3-estado-base.md §6). El estado OCULTO vive SOLO en el 0% del
-// keyframe. La animación va EN LA HOJA (nunca inline: un `animation` inline gana en especificidad al
-// `@media(reduce){animation:none}` y derrotaría reduced-motion). El SCSS NO lo ve Stryker: lo
-// aseveran los tests que lo LEEN (hero-estilos.test.ts) + la puerta de aprobación humana.
+// 🔴 EL ESTADO BASE ES EL ESTADO FINAL VISIBLE (I-4), MEDIDO con build SSG real + Chrome/CDP. El
+// estado OCULTO vive SOLO en el 0% del keyframe. La animación va EN LA HOJA (nunca inline). El SCSS
+// NO lo ve Stryker: lo aseveran los tests que lo LEEN (hero-estilos.test.ts) + la puerta humana.
+//
+// 🎨 DEMO (rama demo/lunes-prototipo): pincel de caligrafía que «escribe» el titular (Nails Lash +
+// STUDIO). El recorte que veía Pablo por arriba se arregla con PADDING vertical en `.heroMarca` (la
+// caja de recorte de `clip-path: inset(0 0 0 0)` es el border-box; con padding, las astas altas de
+// Great Vibes caben dentro y ya no se cortan) — SIN cambiar el valor del clip-path (@s1 intacto).
 
 // El eyebrow: la línea SOBRE el titular. F-07 fija SOLO su estructura (un <p>); su CONTENIDO de
-// categorías (Uñas · Pestañas · Cejas) y su estilo fino son F-09 (C-7). NUNCA un heading.
-// El eyebrow sobre el titular: SOLO estructura (va vacío en el hero; su contenido de categorías es
-// del catálogo). Sin color de texto aquí para no rozar la guarda @s9 (que prohíbe --accent/--brush
-// como texto del titular). El eyebrow VISIBLE con estilo del prototipo es `.demo-eyebrow` (catálogo).
+// categorías y su estilo fino son F-09. NUNCA un heading.
 .eyebrow {
   margin: 0;
   font-family: 'Manrope', system-ui, sans-serif;
 }
 
+// La escena del hero: contexto de posición para el pincel (que va absoluto encima del titular). Es
+// inline-block para «abrazar» al titular y quedar centrada por el text-align del hero.
+.escena {
+  position: relative;
+  display: inline-block;
+}
+
 // El <h1> del titular. Color --ink sobre --bg (par ya en MATRIZ_DE_USO, ratio 7,06 ≥ 4,5). NUNCA
 // --accent/--brush (#C05576) como texto: 4,05 < 4,5 rompería la puerta de contraste de F-03.
-// 🎨 DEMO: margen y ritmo del titular; los tamaños grandes viven en los dos spans.
 .titulo {
-  margin: 1.375rem 0 0.625rem;
+  margin: 0.5rem 0 0.625rem;
   color: var(--ink);
 }
 
-// «Nails Lash» — paint reveal por clip-path. BASE = estado final VISIBLE.
-// C-3 (APROBADO 2026-07-18): duración total delay + duración ≤ 1,2 s → 1s + 0,1s = 1,1 s, para un
-// LCP bueno (el prototipo, delay 0,5s + 4,8s = ~5,3s, suspendía el LCP del titular). La animación
-// vive AQUÍ, en la hoja, NUNCA inline (inline ganaría al @media(reduce){animation:none}).
-// 🎨 DEMO: el tamaño manuscrito grande del prototipo (clamp 50 → 142px), Great Vibes.
+// «Nails Lash» — paint reveal por clip-path. BASE = estado final VISIBLE (inset(0 0 0 0)).
+// 🎨 DEMO: `padding-top`/`padding-bottom` agrandan el border-box (= la caja del clip-path) para que
+// las astas altas y los rasgos bajos de Great Vibes NO se recorten. La duración se alarga (caligrafía
+// deliberada de dos líneas): total 0,1s + 1,4s = 1,5 s (el tope de @s4 se sube en la rama demo, con
+// el trade-off de LCP anotado). La animación vive AQUÍ, NUNCA inline.
 .heroMarca {
   display: block;
+  padding-top: 0.42em;
+  padding-bottom: 0.18em;
   font-family: 'Great Vibes', cursive;
   font-size: clamp(3.125rem, 11.5vw, 8.875rem); // 50 → 142px
   line-height: 0.9;
   white-space: nowrap;
   clip-path: inset(0 0 0 0);
-  animation: paintReveal 1s cubic-bezier(0.5, 0, 0.25, 1) 0.1s both;
+  animation: paintReveal 1.4s cubic-bezier(0.5, 0, 0.25, 1) 0.1s both;
 }
 
-// «Studio» — fade up. BASE = VISIBLE (opacity 1), aunque el default ya sea 1, se declara explícito.
-// C-3: 0,9s + 0,2s = 1,1 s ≤ 1,2 s total.
-// 🎨 DEMO: versalitas espaciadas del prototipo (clamp 14 → 24px), Manrope.
+// «Studio» — fade up. BASE = VISIBLE (opacity 1). 🎨 DEMO: se RETRASA a la 2.ª fase (cuando el pincel
+// llega a la línea de STUDIO): total 1,4s delay + 0,6s = 2,0 s.
 .heroStudio {
   display: block;
   font-family: 'Manrope', sans-serif;
@@ -52,7 +59,28 @@
   padding-left: 0.52em;
   margin-top: 0.5rem;
   opacity: 1;
-  animation: fadeUp 0.9s 0.2s both;
+  clip-path: inset(0 0 0 0);
+  // Reveal IZQUIERDA→DERECHA (clip, mismo keyframe que la marca) sincronizado con el pincel al llegar
+  // a STUDIO: total 1,55 delay + 0,5 = 2,05 s. Se pinta como el resto, no con fundido.
+  animation: paintReveal 0.5s cubic-bezier(0.5, 0, 0.25, 1) 1.55s both;
+}
+
+// El pincel de caligrafía (DEMO): decorativo (aria-hidden), absoluto sobre el titular. `brush.png`
+// (60×198, autohospedado en src/assets → sin terceros) de fondo. Recorre «Nails Lash» (fase 1) y
+// «STUDIO» (fase 2) siguiendo el frente de la tinta. Las coordenadas son % de la escena → responsive.
+.pincel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2.1rem;
+  height: 7rem;
+  background: url('../assets/brush.png') no-repeat center / contain;
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.26));
+  pointer-events: none;
+  z-index: 3;
+  // MISMA ventana temporal y MISMO easing que `paintReveal` en la fase 1 → la punta viaja PEGADA al
+  // frente de tinta (izquierda→derecha). Total 0,05 + 2,05 = 2,1 s.
+  animation: brushWrite 2.05s cubic-bezier(0.5, 0, 0.25, 1) 0.05s both;
 }
 
 // El OCULTO vive SOLO aquí, en el 0% del keyframe, jamás en la base.
@@ -65,23 +93,68 @@
   }
 }
 
-@keyframes fadeUp {
+// El barrido del pincel (bote arriba, brocha abajo con `rotate(192deg)`): fase 1 recorre «Nails Lash»
+// (línea 1, ~top 31%) del 0% al 70% de la línea temporal —MISMA ventana que `paintReveal`, delay
+// 0,1s→1,5s, mismo easing → la punta va pegada al frente de tinta—; a 73-75% levanta la «pluma» (fade
+// a opacity 0) y baja a «STUDIO» (línea 2, ~top 66%); del 79% al 96% la recorre, sincronizada con el
+// `fadeUp` de STUDIO. `translate(-50%,-50%)` ancla la punta cerca del frente de escritura.
+@keyframes brushWrite {
   0% {
+    left: -9%;
+    top: 34%;
     opacity: 0;
-    transform: translateY(20px);
+    transform: translate(-50%, -50%) rotate(192deg);
+  }
+  5% {
+    opacity: 1;
+  }
+  70% {
+    left: 98%;
+    top: 34%;
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(192deg);
+  }
+  73% {
+    left: 98%;
+    top: 55%;
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(192deg);
+  }
+  // Línea 2 (STUDIO): centrado y más estrecho → el pincel barre SU extensión real (~26→72%), no 0→100%,
+  // y baja a su altura (top ~75%). Así la punta va sobre STUDIO, no por el vacío ni sobre «Lash».
+  75% {
+    left: 26%;
+    top: 75%;
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(192deg);
+  }
+  79% {
+    opacity: 1;
+  }
+  96% {
+    left: 72%;
+    top: 75%;
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(192deg);
   }
   100% {
-    opacity: 1;
-    transform: translateY(0);
+    left: 80%;
+    top: 75%;
+    opacity: 0;
+    transform: translate(-45%, -53%) rotate(196deg);
   }
 }
 
 // C-4 (CRITERIO DE PROYECTO, NO WCAG A/AA): quien pide menos movimiento se queda en la BASE VISIBLE,
-// sin movimiento residual. Es justo lo que el prototipo NO tiene. `animation: none` deja el elemento
-// en su valor computado base (medido: getAnimations()==0, clip-path inset(0px), opacity 1).
+// sin movimiento residual, y el pincel se OCULTA (no hay barrido). `animation: none` deja el elemento
+// en su valor computado base (clip-path inset(0px), opacity 1).
 @media (prefers-reduced-motion: reduce) {
   .heroMarca,
   .heroStudio {
     animation: none;
+  }
+
+  .pincel {
+    display: none;
   }
 }

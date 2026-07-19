@@ -108,18 +108,14 @@ describe('@s1 el estado base del titular en el SCSS es el estado final VISIBLE �
  * esperados se escriben A MANO y se LEEN del SCSS, no se importan.
  */
 describe('@s2 el estado OCULTO del titular vive SOLO en el 0% del keyframe, jamás en la base', () => {
+  // 🎨 DEMO: STUDIO pasó de `fadeUp` (opacity) a `paintReveal` (clip L→R, como la marca) para que el
+  // pincel lo «pinte» de izquierda a derecha igual que «Nails Lash». `fadeUp` se retiró (dead CSS).
   it.each([
     {
       keyframe: 'paintReveal',
       ocultoEn0: /clip-path\s*:\s*inset\(\s*0\s+100%\s+0\s+0\s*\)/,
       visibleEn100: /clip-path\s*:\s*inset\(\s*0\s+0\s+0\s+0\s*\)/,
       ocultoLiteralEnBase: /clip-path[^;]*100%/,
-    },
-    {
-      keyframe: 'fadeUp',
-      ocultoEn0: /opacity\s*:\s*0\s*;/,
-      visibleEn100: /opacity\s*:\s*1\b/,
-      ocultoLiteralEnBase: /opacity\s*:\s*0\s*;/,
     },
   ])(
     '@s2 el @keyframes $keyframe oculta en el 0%, muestra el final en el 100%, y el oculto NO está en la base',
@@ -192,9 +188,14 @@ function segundosTotales(animacion: string): number {
  * 4,8s el titular-LCP se retrasaba a ~5,3s) → la puerta ACORTA a ≤1,2s. Este eje (la DURACIÓN) SÍ
  * es puerta unitaria; el NÚMERO LCP real NO (C-2, verificación EN VIVO con Chrome).
  */
-describe('@s4 la duración total (delay + duración) de la animación del hero está ACOTADA ≤ 1,2 s', () => {
-  // El límite 1,2 s va ESCRITO A MANO (C-3), RE-LEÍDO del SCSS, JAMÁS importado como símbolo.
-  const LIMITE_TOTAL_SEGUNDOS = 1.2
+describe('@s4 la duración total (delay + duración) de la animación del hero está ACOTADA ≤ 2,5 s (DEMO)', () => {
+  // 🎨 DEMO (rama demo/lunes-prototipo): el tope de F-07 era 1,2 s (C-3, decisión de LCP). Para la
+  // caligrafía DELIBERADA de dos líneas del hero del demo (el pincel «escribe» Nails Lash y luego
+  // STUDIO) se sube a 2,5 s, ACEPTANDO el trade-off de LCP (el titular tarda ~2 s en revelarse; sigue
+  // dentro del «bueno» ≤2,5 s p75 de web.dev, y bajo prefers-reduced-motion aparece instantáneo). El
+  // límite sigue ESCRITO A MANO, RE-LEÍDO del SCSS, JAMÁS importado como símbolo. La cota sigue viva:
+  // una animación descontrolada (p. ej. la de 5,3 s del prototipo) rompería este test igual.
+  const LIMITE_TOTAL_SEGUNDOS = 2.5
 
   it.each(['heroMarca', 'heroStudio'])(
     '@s4 %s declara un animation cuya suma delay + duración es ≤ 1,2 s',
@@ -280,5 +281,48 @@ describe('@s17 el titular declara su tipografía de marca en el SCSS — Great V
         /font-family\s*:/,
       )
     }
+  })
+})
+
+/**
+ * 🎨 DEMO — el pincel de caligrafía (`brushWrite`). Como el resto del hero, es SCSS (Stryker no lo
+ * ve): lo aseveran ESTOS tests que LEEN la hoja + la verificación EN VIVO con Chrome (la sincronía
+ * punta↔tinta y el ángulo se comprobaron cuadro a cuadro; jsdom no pinta ni anima). Invariantes:
+ * el pincel usa `brush.png` autohospedado (cero terceros), aparece y se RETIRA (opacity 0 al inicio
+ * y al final), recorre horizontalmente el titular, y BAJO reduced-motion NO EXISTE (display:none).
+ */
+describe('@demo el pincel de caligrafía: brush.png autohospedado, anima brushWrite y se oculta bajo reduced-motion', () => {
+  it('@demo la regla base de .pincel usa brush.png de fondo (autohospedado) y anima brushWrite', () => {
+    const base = reglaBase('pincel')
+
+    // «brush.png» y «brushWrite» van ESCRITOS A MANO; el asset es local (cero terceros, F-05 intacto).
+    expect(base).toMatch(/background\s*:[^;]*brush\.png/)
+    expect(base).toMatch(/animation\s*:\s*brushWrite\b/)
+  })
+
+  it('@demo el @keyframes brushWrite APARECE (opacity 0 en 0%) y se RETIRA (opacity 0 en 100%), recorriendo left', () => {
+    const cuerpo = cuerpoKeyframe('brushWrite')
+
+    const cero = fotograma(cuerpo, '0%')
+    const cien = fotograma(cuerpo, '100%')
+
+    expect(cero, 'brushWrite necesita un fotograma 0%').not.toBeNull()
+    expect(cien, 'brushWrite necesita un fotograma 100%').not.toBeNull()
+    // Aparece de la nada y se va: opacity 0 al principio y al final (no queda un pincel «pegado»).
+    expect(cero as string).toMatch(/opacity\s*:\s*0/)
+    expect(cien as string).toMatch(/opacity\s*:\s*0/)
+    // Recorre horizontalmente el titular: hay desplazamiento en `left` dentro del keyframe.
+    expect(cuerpo).toMatch(/left\s*:\s*-?\d/)
+  })
+
+  it('@demo bajo prefers-reduced-motion el pincel NO se muestra (display: none) — sin movimiento residual', () => {
+    const media = cuerpoDelBloque(
+      scss(),
+      /@media\s*\(\s*prefers-reduced-motion:\s*reduce\s*\)\s*\{/,
+    )
+
+    expect(media, 'falta el @media (prefers-reduced-motion: reduce)').not.toBeNull()
+    expect(media as string).toMatch(/\.pincel\b/)
+    expect(media as string).toMatch(/display\s*:\s*none/)
   })
 })
