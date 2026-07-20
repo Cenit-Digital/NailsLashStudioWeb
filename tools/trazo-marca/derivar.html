@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Derivar el trazo de «Nails Lash» — herramienta de desarrollo</title>
+    <style>
+      @font-face {
+        font-family: 'Great Vibes';
+        font-style: normal;
+        font-weight: 400;
+        font-display: block;
+        src: url('/node_modules/@fontsource/great-vibes/files/great-vibes-latin-400-normal.woff2')
+          format('woff2');
+      }
+      body {
+        margin: 0;
+        padding: 16px;
+        font:
+          13px/1.5 ui-monospace,
+          monospace;
+        background: #fff;
+        color: #222;
+      }
+      canvas {
+        display: block;
+        margin: 8px 0 16px;
+        border: 1px solid #ddd;
+        max-width: 100%;
+      }
+      textarea {
+        width: 100%;
+        height: 140px;
+        font:
+          11px/1.4 ui-monospace,
+          monospace;
+      }
+      h1 {
+        font-size: 15px;
+        margin: 0 0 4px;
+      }
+      .nota {
+        color: #666;
+        max-width: 62em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Derivar la línea central de «Nails Lash» (Great Vibes)</h1>
+    <p class="nota">
+      Herramienta de desarrollo, no entra en el bundle. Deriva la línea central del rótulo a partir
+      de los <strong>glifos reales</strong> —no a ojo—: rasteriza el texto, adelgaza el trazo con
+      Zhang-Suen, poda las barbas por número de cruce, trocea el esqueleto en arcos entre nudos,
+      siembra los lazos cerrados (que no tienen ningún nudo del que partir) y recorre el grafo
+      eligiendo siempre la continuación más recta, que es como se reconstruye el orden de plumada de
+      una escritura enlazada. Ábrela con el servidor de desarrollo:
+      <code>http://localhost:5173/tools/trazo-marca/derivar.html</code>
+    </p>
+    <div id="estado">Cargando la fuente…</div>
+    <canvas id="lienzo"></canvas>
+    <p class="nota">
+      Gris = tinta real · color = línea central derivada, coloreada por orden de recorrido (azul al
+      empezar, rojo al terminar).
+    </p>
+    <p><strong>d</strong> (pégalo en <code>src/lib/trazo-marca.ts</code>):</p>
+    <textarea id="salida" readonly></textarea>
+
+    <script type="module">
+      // ── Parámetros: TODOS en milésimas de em, con la línea base en y = 0 ──────────────
+      const TEXTO = 'Nails Lash'
+      const ESC = 0.25 // px por milésima de em al rasterizar (1 em = 250 px)
+      const CAJA = { x0: -60, x1: 4040, y0: -860, y1: 380 }
+      const PODA = 45 // ‰: barbas más cortas que esto se borran
+      const PASO = 10 // ‰: remuestreo uniforme por longitud de arco
+      const SUAVE = 3 // media móvil ±3 muestras
+      const TOL = 22 // ‰: tolerancia RDP. 22 compacta «d» a ~9,8 kB sin perder cobertura (97,8 %)
+      const SESGO = 0.35 // preferencia por avanzar hacia la derecha en los cruces
+
+      const W = Math.round((CAJA.x1 - CAJA.x0) * ESC)
+      const H = Math.round((CAJA.y1 - CAJA.y0) * ESC)
+      const aMilX = (px) => px / ESC + CAJA.x0
+      const aMilY = (py) => py / ESC + CAJA.y0
+
+      await document.fonts.load(`${1000 * ESC}px "Great Vibes"`)
+      await document.fonts.ready
+      document.getElementById('estado').textContent = 'Rasterizando…'
+
+      // ── 1. Rasterizar el rótulo con la fuente real ───────────────────────────────────
+      const cv = document.createElement('canvas')
+      cv.width = W
+      cv.height = H
+      const g2 = cv.getContext('2d', { willReadFrequently: true })
+      g2.fillStyle = '#fff'
+      g2.fillRect(0, 0, W, H)
+      g2.fillStyle = '#000'
+      g2.font = `${1000 * ESC}px "Great Vibes"`
+      g2.textBaseline = 'alphabetic'
+      g2.fillText(TEXTO, -CAJA.x0 * ESC, -CAJA.y0 * ESC)
+      const datos = g2.getImageData(0, 0, W, H).data
+      const tinta = new Uint8Array(W * H)
+      for (let i = 0; i < W * H; i++) tinta[i] = datos[i * 4] < 128 ? 1 : 0
+
+      // ── 2. Adelgazado Zhang-Suen: esqueleto conexo de 1 píxel ────────────────────────
+      const S = Uint8Array.from(tinta)
+      const at = (x, y) => (x < 0 || y < 0 || x >= W || y >= H ? 0 : S[y * W + x])
+      function pasada(par) {
+        const borrar = []
+        for (let y = 1; y < H - 1; y++)
+          for (let x = 1; x < W - 1; x++) {
+            if (!S[y * W + x]) continue
+            const p2 = at(x, y - 1)
+            const p3 = at(x + 1, y - 1)
+            const p4 = at(x + 1, y)
+            const p5 = at(x + 1, y + 1)
+            const p6 = at(x, y + 1)
+            const p7 = at(x - 1, y + 1)
+            const p8 = at(x - 1, y)
+            const p9 = at(x - 1, y - 1)
+            const v = [p2, p3, p4, p5, p6, p7, p8, p9]
+            const bn = v.reduce((a, b) => a + b, 0)
+            if (bn < 2 || bn > 6) continue
+            let a = 0
+            for (let i = 0; i < 8; i++) if (v[i] === 0 && v[(i + 1) % 8] === 1) a++
+            if (a !== 1) continue
+            if (par === 0) {
+              if (p2 * p4 * p6 !== 0 || p4 * p6 * p8 !== 0) continue
+            } else if (p2 * p4 * p8 !== 0 || p2 * p6 * p8 !== 0) continue
+            borrar.push(y * W + x)
+          }
+        for (const i of borrar) S[i] = 0
+        return borrar.length
+      }
+      for (let it = 0; it < 60; it++) if (pasada(0) + pasada(1) === 0) break
+
+      // ── 3. Número de cruce y poda de barbas ──────────────────────────────────────────
+      function cruce(j) {
+        const x = j % W
+        const y = (j - x) / W
+        const v = [
+          at(x, y - 1),
+          at(x + 1, y - 1),
+          at(x + 1, y),
+          at(x + 1, y + 1),
+          at(x, y + 1),
+          at(x - 1, y + 1),
+          at(x - 1, y),
+          at(x - 1, y - 1),
+        ]
+        let c = 0
+        for (let i = 0; i < 8; i++) if (v[i] === 0 && v[(i + 1) % 8] === 1) c++
+        return c
+      }
+      const vecinos = (j) => {
+        const x = j % W
+        const y = (j - x) / W
+        const r = []
+        for (let dy = -1; dy <= 1; dy++)
+          for (let dx = -1; dx <= 1; dx++) {
+            if (!dx && !dy) continue
+            const nx = x + dx
+            const ny = y + dy
+            if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue
+            const k = ny * W + nx
+            if (S[k]) r.push(k)
+          }
+        return r
+      }
+      const umbral = Math.round(PODA * ESC)
+      for (let ronda = 0; ronda < 12; ronda++) {
+        const extremos = []
+        for (let i = 0; i < W * H; i++) if (S[i] && cruce(i) === 1) extremos.push(i)
+        let borrados = 0
+        for (const e of extremos) {
+          if (!S[e]) continue
+          const rama = [e]
+          let ant = null
+          let act = e
+          while (rama.length <= umbral) {
+            const sig = vecinos(act).filter((k) => k !== ant)
+            if (sig.length !== 1) break
+            ant = act
+            act = sig[0]
+            if (cruce(act) !== 2) break
+            rama.push(act)
+          }
+          if (rama.length <= umbral && vecinos(act).filter((k) => k !== ant).length >= 1) {
+            for (const p of rama) S[p] = 0
+            borrados += rama.length
+          }
+        }
+        if (!borrados) break
+      }
+
+      // ── 4. Arcos entre nudos + siembra de lazos cerrados ─────────────────────────────
+      const nodo = new Set()
+      for (let i = 0; i < W * H; i++) if (S[i] && cruce(i) !== 2) nodo.add(i)
+      const arcos = []
+      const semilla = new Set()
+      for (const nd of nodo)
+        for (const v0 of vecinos(nd)) {
+          if (semilla.has(nd + '>' + v0)) continue
+          semilla.add(nd + '>' + v0)
+          const pix = [nd]
+          const dentro = new Set([nd])
+          let ant = nd
+          let act = v0
+          while (!nodo.has(act) && !dentro.has(act)) {
+            pix.push(act)
+            dentro.add(act)
+            const cand = vecinos(act).filter((k) => k !== ant && !dentro.has(k))
+            if (!cand.length) break
+            ant = act
+            act = cand[0]
+          }
+          if (!dentro.has(act)) pix.push(act)
+          semilla.add(act + '>' + ant)
+          arcos.push({ a: nd, b: act, pix, ciclo: false })
+        }
+      const cubierto = new Set()
+      for (const a of arcos) for (const p of a.pix) cubierto.add(p)
+      // Los lazos cerrados (el de la «N», el de la «l», la floritura de la «L») no tocan
+      // ningún nudo, así que ningún arco los alcanza: hay que sembrarlos aparte.
+      for (let i = 0; i < W * H; i++) {
+        if (!S[i] || cubierto.has(i)) continue
+        const ini = i
+        const pix = [ini]
+        const dentro = new Set([ini])
+        let ant = null
+        let act = vecinos(ini).find((k) => !cubierto.has(k))
+        if (act === undefined) continue
+        while (act !== undefined && !dentro.has(act)) {
+          pix.push(act)
+          dentro.add(act)
+          const cand = vecinos(act).filter((k) => k !== ant && !dentro.has(k) && !cubierto.has(k))
+          ant = act
+          act = cand[0]
+        }
+        pix.push(ini)
+        for (const p of pix) cubierto.add(p)
+        arcos.push({ a: ini, b: ini, pix, ciclo: true })
+      }
+
+      // ── 5. Componentes = plumadas (levantamientos de pluma) ──────────────────────────
+      const comp = new Int32Array(W * H).fill(-1)
+      let nc = 0
+      for (let i = 0; i < W * H; i++) {
+        if (!S[i] || comp[i] >= 0) continue
+        const id = nc++
+        const pila = [i]
+        comp[i] = id
+        while (pila.length) {
+          const j = pila.pop()
+          const x = j % W
+          const y = (j - x) / W
+          for (let dy = -1; dy <= 1; dy++)
+            for (let dx = -1; dx <= 1; dx++) {
+              if (!dx && !dy) continue
+              const nx = x + dx
+              const ny = y + dy
+              if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue
+              const k = ny * W + nx
+              if (S[k] && comp[k] < 0) {
+                comp[k] = id
+                pila.push(k)
+              }
+            }
+        }
+      }
+      for (const a of arcos) a.comp = comp[a.pix[0]]
+
+      // ── 6. Recorrido: continuación más recta, con sesgo suave hacia la derecha ───────
+      const XY = (j) => {
+        const x = j % W
+        return [x, (j - x) / W]
+      }
+      const dirDe = (pix, desdeA) => {
+        const p = desdeA ? pix : [...pix].reverse()
+        const k = Math.min(8, p.length - 1)
+        const [x0, y0] = XY(p[0])
+        const [x1, y1] = XY(p[k])
+        const n = Math.hypot(x1 - x0, y1 - y0) || 1
+        return [(x1 - x0) / n, (y1 - y0) / n]
+      }
+      function recorrer(arcsC, ini) {
+        for (const a of arcsC) a.usado = false
+        const inc = new Map()
+        for (const a of arcsC)
+          for (const nd of [a.a, a.b]) {
+            if (!inc.has(nd)) inc.set(nd, [])
+            inc.get(nd).push(a)
+          }
+        // Cuando el recorrido se queda sin arcos libres pero aún queda trazo por cubrir,
+        // NO se salta por el aire: RETROCEDE sobre tinta ya pintada (BFS por el grafo de
+        // arcos hasta el nudo libre más cercano), que es lo que haría una mano y además
+        // es invisible en la máscara porque ese trazo ya está revelado.
+        // BFS por PÍXELES del esqueleto (no por el grafo de arcos): dentro de una plumada
+        // los píxeles SIEMPRE están conectados, mientras que los arcos-ciclo quedan como
+        // islas sueltas. Así el retroceso nunca falla y jamás hay que levantar la pluma.
+        function retroceso(desde) {
+          const meta = new Set()
+          for (const a of arcsC) if (!a.usado) (meta.add(a.a), meta.add(a.b))
+          if (!meta.size) return null
+          const previo = new Map([[desde, null]])
+          const cola = [desde]
+          let cabeza = 0
+          while (cabeza < cola.length) {
+            const j = cola[cabeza++]
+            if (meta.has(j) && j !== desde) {
+              const camino = []
+              let cur = j
+              while (cur !== null && cur !== undefined) {
+                camino.unshift(cur)
+                cur = previo.get(cur)
+              }
+              return { destino: j, camino }
+            }
+            for (const k of vecinos(j))
+              if (!previo.has(k)) {
+                previo.set(k, j)
+                cola.push(k)
+              }
+          }
+          return null
+        }
+        let act = ini
+        let rumbo = null
+        const segmentos = [[]]
+        const salida = segmentos[0]
+        for (;;) {
+          let libres = (inc.get(act) || []).filter((a) => !a.usado)
+          if (!libres.length) {
+            const resto = arcsC.filter((a) => !a.usado)
+            if (!resto.length) break
+            const ret = retroceso(act)
+            if (ret) {
+              // Hay camino por tinta ya pintada: RETROCEDE, sin levantar la pluma.
+              segmentos[segmentos.length - 1].push(...ret.camino)
+              act = ret.destino
+            } else {
+              // Isla inalcanzable (un lazo cerrado suelto): LEVANTA LA PLUMA y abre un
+              // subtrazo nuevo. Jamás se dibuja una recta por el aire.
+              const [ax, ay] = XY(act)
+              let mej = null
+              let md = Infinity
+              for (const a of resto)
+                for (const nd of [a.a, a.b]) {
+                  const [x, y] = XY(nd)
+                  const dd = Math.hypot(x - ax, y - ay)
+                  if (dd < md) {
+                    md = dd
+                    mej = nd
+                  }
+                }
+              act = mej
+              segmentos.push([])
+            }
+            rumbo = null
+            libres = (inc.get(act) || []).filter((a) => !a.usado)
+            if (!libres.length) {
+              // El nudo alcanzado pertenece a un arco-ciclo cuyo extremo no es nudo:
+              // se toma directamente el primer arco libre que lo contenga.
+              const suelto = resto.find((a) => a.a === act || a.b === act) || resto[0]
+              act = suelto.a
+              libres = [suelto]
+            }
+          }
+          let mejor = null
+          let mc = Infinity
+          for (const a of libres) {
+            const desdeA = a.a === act
+            const d = dirDe(a.pix, desdeA)
+            const giro = rumbo ? 1 - (rumbo[0] * d[0] + rumbo[1] * d[1]) : 0
+            const c = giro + SESGO * Math.max(0, -d[0]) + (rumbo ? 0 : -a.pix.length / 10000)
+            if (c < mc) {
+              mc = c
+              mejor = { a, desdeA }
+            }
+          }
+          const { a, desdeA } = mejor
+          const p = desdeA ? a.pix : [...a.pix].reverse()
+          a.usado = true
+          segmentos[segmentos.length - 1].push(...p)
+          const k = Math.max(0, p.length - 9)
+          const [x0, y0] = XY(p[k])
+          const [x1, y1] = XY(p[p.length - 1])
+          const n = Math.hypot(x1 - x0, y1 - y0) || 1
+          rumbo = [(x1 - x0) / n, (y1 - y0) / n]
+          act = a.ciclo ? a.a : desdeA ? a.b : a.a
+        }
+        return segmentos.filter((s) => s.length)
+      }
+      const plumadas = []
+      for (const c of [...new Set(arcos.map((a) => a.comp))]) {
+        const arcsC = arcos.filter((a) => a.comp === c)
+        const grados = new Map()
+        for (const a of arcsC)
+          for (const nd of [a.a, a.b]) grados.set(nd, (grados.get(nd) || 0) + 1)
+        let cand = [...grados.keys()].filter((nd) => grados.get(nd) === 1)
+        if (!cand.length) cand = [...grados.keys()]
+        cand.sort((p, q) => XY(p)[0] - XY(q)[0]) // arranca por la IZQUIERDA
+        const segs = recorrer(arcsC, cand[0])
+        const xs = arcsC.flatMap((a) => a.pix.map((p) => XY(p)[0]))
+        plumadas.push({
+          comp: c,
+          xIni: Math.min(...xs),
+          segs,
+          arcos: arcsC.length,
+          usados: arcsC.filter((a) => a.usado).length,
+        })
+      }
+      plumadas.sort((a, b) => a.xIni - b.xIni)
+
+      // ── 7. Remuestreo → suavizado → RDP → Béziers ────────────────────────────────────
+      const remuestrear = (pts, paso) => {
+        const out = [pts[0]]
+        for (let i = 1; i < pts.length; i++) {
+          let [ax, ay] = out[out.length - 1]
+          const [bx, by] = pts[i]
+          let d = Math.hypot(bx - ax, by - ay)
+          while (d >= paso) {
+            const t = paso / d
+            ax += (bx - ax) * t
+            ay += (by - ay) * t
+            out.push([ax, ay])
+            d = Math.hypot(bx - ax, by - ay)
+          }
+        }
+        return out
+      }
+      const suavizar = (pts, v) =>
+        pts.map((_, i) => {
+          let sx = 0
+          let sy = 0
+          let n = 0
+          for (let k = -v; k <= v; k++) {
+            const j = i + k
+            if (j < 0 || j >= pts.length) continue
+            sx += pts[j][0]
+            sy += pts[j][1]
+            n++
+          }
+          return [sx / n, sy / n]
+        })
+      function rdp(pts, tol) {
+        if (pts.length < 3) return pts
+        let dmax = 0
+        let idx = 0
+        const [ax, ay] = pts[0]
+        const [bx, by] = pts[pts.length - 1]
+        const L = Math.hypot(bx - ax, by - ay) || 1
+        for (let i = 1; i < pts.length - 1; i++) {
+          const [px, py] = pts[i]
+          const d = Math.abs((bx - ax) * (ay - py) - (ax - px) * (by - ay)) / L
+          if (d > dmax) {
+            dmax = d
+            idx = i
+          }
+        }
+        return dmax > tol
+          ? [...rdp(pts.slice(0, idx + 1), tol).slice(0, -1), ...rdp(pts.slice(idx), tol)]
+          : [pts[0], pts[pts.length - 1]]
+      }
+      const r1 = (n) => Math.round(n * 10) / 10
+      function aBezier(pts) {
+        let d = `M ${r1(pts[0][0])} ${r1(pts[0][1])}`
+        for (let i = 0; i < pts.length - 1; i++) {
+          const p0 = pts[i - 1] || pts[i]
+          const p1 = pts[i]
+          const p2 = pts[i + 1]
+          const p3 = pts[i + 2] || pts[i + 1]
+          d += ` C ${r1(p1[0] + (p2[0] - p0[0]) / 6)} ${r1(p1[1] + (p2[1] - p0[1]) / 6)}`
+          d += ` ${r1(p2[0] - (p3[0] - p1[0]) / 6)} ${r1(p2[1] - (p3[1] - p1[1]) / 6)}`
+          d += ` ${r1(p2[0])} ${r1(p2[1])}`
+        }
+        return d
+      }
+      const trozos = []
+      for (const p of plumadas)
+        for (const seg of p.segs) {
+          const pts = seg.map((j) => [aMilX(XY(j)[0]), aMilY(XY(j)[1])])
+          // El punto de la «i» son 3 píxeles: si se descartara por corto, la máscara nunca
+          // lo revelaría y el punto NO APARECERÍA. Se emite como un segmento mínimo.
+          if (pts.length < 4) {
+            const [a, b] = [pts[0], pts[pts.length - 1]]
+            trozos.push(
+              `M ${r1(a[0])} ${r1(a[1])} C ${r1(a[0])} ${r1(a[1])} ${r1(b[0])} ${r1(b[1])} ${r1(b[0])} ${r1(b[1])}`,
+            )
+            continue
+          }
+          const suave = rdp(suavizar(remuestrear(pts, PASO), SUAVE), TOL)
+          if (suave.length >= 2) trozos.push(aBezier(suave))
+        }
+      const d = trozos.join(' ')
+
+      // ── 8. Puerta de calidad: ¿el trazo cae DENTRO de la tinta? ──────────────────────
+      const ns = 'http://www.w3.org/2000/svg'
+      const svg = document.createElementNS(ns, 'svg')
+      svg.setAttribute('width', 0)
+      svg.setAttribute('height', 0)
+      const pathEl = document.createElementNS(ns, 'path')
+      pathEl.setAttribute('d', d)
+      svg.appendChild(pathEl)
+      document.body.appendChild(svg)
+      const LTOT = pathEl.getTotalLength()
+      let dentro = 0
+      const N = 1500
+      for (let i = 0; i <= N; i++) {
+        const pt = pathEl.getPointAtLength((LTOT * i) / N)
+        const px = Math.round((pt.x - CAJA.x0) * ESC)
+        const py = Math.round((pt.y - CAJA.y0) * ESC)
+        if (px >= 0 && py >= 0 && px < W && py < H && tinta[py * W + px]) dentro++
+      }
+      svg.remove()
+
+      // ── 8bis. LA PUERTA QUE MANDA: ¿la máscara CUBRE toda la tinta al terminar? ──────
+      // Lo que no cubra el trazo grueso NO SE REVELA NUNCA: sería un trozo de letra que
+      // jamás aparece. Se rasteriza la máscara y se cuenta la tinta que queda fuera.
+      const GROSOR = 120 // ‰ de em (medido: plumada p90 = 51‰, máx 75‰)
+      const cvM = document.createElement('canvas')
+      cvM.width = W
+      cvM.height = H
+      const gm = cvM.getContext('2d', { willReadFrequently: true })
+      gm.fillStyle = '#000'
+      gm.fillRect(0, 0, W, H)
+      gm.strokeStyle = '#fff'
+      gm.lineWidth = GROSOR * ESC
+      gm.lineCap = 'round'
+      gm.lineJoin = 'round'
+      gm.setTransform(ESC, 0, 0, ESC, -CAJA.x0 * ESC, -CAJA.y0 * ESC)
+      gm.lineWidth = GROSOR
+      gm.stroke(new Path2D(d))
+      gm.setTransform(1, 0, 0, 1, 0, 0)
+      const mask = gm.getImageData(0, 0, W, H).data
+      let tintaTotal = 0
+      let tintaCubierta = 0
+      for (let i = 0; i < W * H; i++) {
+        if (!tinta[i]) continue
+        tintaTotal++
+        if (mask[i * 4] > 127) tintaCubierta++
+      }
+
+      // ── 9. Dibujo de verificación ───────────────────────────────────────────────────
+      const lienzo = document.getElementById('lienzo')
+      lienzo.width = W
+      lienzo.height = H
+      const g = lienzo.getContext('2d')
+      g.fillStyle = '#fff'
+      g.fillRect(0, 0, W, H)
+      const im = g.createImageData(W, H)
+      for (let i = 0; i < W * H; i++) {
+        const t = tinta[i]
+        im.data[i * 4] = t ? 226 : 255
+        im.data[i * 4 + 1] = t ? 214 : 255
+        im.data[i * 4 + 2] = t ? 219 : 255
+        im.data[i * 4 + 3] = 255
+      }
+      g.putImageData(im, 0, 0)
+      const total = plumadas.reduce((s, p) => s + p.segs.reduce((n, g2) => n + g2.length, 0), 0)
+      let k = 0
+      for (const p of plumadas)
+        for (const seg of p.segs)
+          for (const j of seg) {
+            const t = k++ / total
+            const [x, y] = XY(j)
+            g.fillStyle = `hsl(${240 - 240 * t},85%,45%)`
+            g.fillRect(x, y, 2, 2)
+          }
+
+      const stats = {
+        plumadas: plumadas.length,
+        subtrazos: trozos.length,
+        bytesD: d.length,
+        longitudTotal: +LTOT.toFixed(1),
+        porcentajeDentroDeLaTinta: +((dentro / (N + 1)) * 100).toFixed(2),
+        porcentajeDeTintaCubierta: +((tintaCubierta / tintaTotal) * 100).toFixed(2),
+        grosorMascara: GROSOR,
+        arcosPorPlumada: plumadas.map((p) => `${p.usados}/${p.arcos}`).join(' '),
+      }
+      document.getElementById('estado').textContent = JSON.stringify(stats)
+      document.getElementById('salida').value = d
+      window.RESULTADO = { d, stats }
+    </script>
+  </body>
+</html>

@@ -8,6 +8,15 @@ import estilos from './catalogo.module.scss'
  * no como secciones nuevas, para no tocar la igualdad de conjuntos de la nav.
  *
  * Categorías REALES (Uñas · Pestañas · Cejas) y precios de MUESTRA con leyenda, desde datos demo.
+ *
+ * ⚠️ El `<h2 id="servicios-titulo">Servicios</h2>` está OCULTO VISUALMENTE a propósito. Pablo retiró
+ * a mano el encabezado visible del catálogo y quiere que siga sin verse; el heading, en cambio, NO
+ * puede desaparecer del DOM porque de su `id` dependen tres cosas: (1) la puerta del cascarón, que
+ * exige que todo `aria-labelledby` resuelva a un heading real; (2) la puerta de anclas vivas, que
+ * compara los `href="#…"` de la nav con los ids de las secciones navegables; y (3) el CTA «Ver
+ * servicios» del hero, que enlaza a `#servicios-titulo`. Por eso se oculta con la técnica de
+ * *visually hidden* (`.tituloOculto`) y NUNCA con `display:none`/`visibility:hidden`, que lo
+ * sacarían del árbol de accesibilidad y dejarían la sección otra vez sin nombre accesible.
  */
 const ID_SERVICIOS = 'servicios-titulo'
 
@@ -15,15 +24,9 @@ export function Catalogo() {
   return (
     <section className={`demo-seccion ${estilos.catalogo}`} aria-labelledby={ID_SERVICIOS}>
       <div className="demo-contenedor">
-        <div className="demo-encabezado">
-          <p className="demo-eyebrow">Carta de servicios</p>
-          <h2 id={ID_SERVICIOS} className="demo-titulo">
-            Servicios
-          </h2>
-          <p className="demo-intro">
-            Uñas, pestañas y cejas de la mano de un equipo que cuida cada detalle.
-          </p>
-        </div>
+        <h2 id={ID_SERVICIOS} className={estilos.tituloOculto}>
+          Servicios
+        </h2>
 
         {CATALOGO_DEMO.map((categoria) => (
           <div key={categoria.clave} className={estilos.categoria}>
@@ -41,7 +44,7 @@ export function Catalogo() {
                   </div>
                 ))}
                 <a className={`demo-btn demo-btn--solido ${estilos.reservar}`} href="#reserva-titulo">
-                  Reservar {categoria.eyebrow.toLowerCase()}
+                  {categoria.textoBoton}
                 </a>
               </div>
               <div className={estilos.foto} aria-hidden="true" />

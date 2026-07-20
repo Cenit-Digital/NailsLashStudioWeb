@@ -1,19 +1,35 @@
-// El hero de F-07. Contrato: features/hero_marca.feature.
+// El hero de F-07 + demo «CALIGRAFÍA». Contrato: features/hero.feature.
 //
-// 🔴 EL ESTADO BASE ES EL ESTADO FINAL VISIBLE (I-4), MEDIDO con build SSG real + Chrome/CDP. El
-// estado OCULTO vive SOLO en el 0% del keyframe. La animación va EN LA HOJA (nunca inline). El SCSS
-// NO lo ve Stryker: lo aseveran los tests que lo LEEN (hero-estilos.test.ts) + la puerta humana.
+// 🔴 EL ESTADO BASE ES EL ESTADO FINAL VISIBLE (I-4). El estado OCULTO vive SOLO en el fotograma
+// de arranque del keyframe, jamás en la base. La animación va EN LA HOJA, nunca inline. El SCSS no
+// lo ve Stryker: lo aseveran los tests que lo LEEN (hero-estilos.test.ts) + la puerta humana.
 //
-// 🎨 DEMO (rama demo/lunes-prototipo): «TRAZO DE PLUMA». Un aplicador de esmalte ESCRIBE «Nails Lash»
-// recorriendo el trazo real de cada letra (sube la N, la montaña, los lazos), mientras la fuente
-// Great Vibes se revela justo detrás de la punta (paintReveal). El aplicador vive en un <svg> con
-// viewBox (escala con el titular responsive) y su recorrido lo mueve SMIL `<animateMotion>` sobre la
-// centerline de la marca — NO un barrido horizontal (lo que pedía Pablo). Bajo prefers-reduced-motion
-// el <svg> del pincel se OCULTA y el titular queda en su estado final visible.
+// 🎨 CÓMO SE ESCRIBE «Nails Lash» (los dos porqués están MEDIDOS en
+// `progress/hallazgos_hero_caligrafia.md`):
+//   · La tinta se revela con una MÁSCARA cuyo contenido es la línea central REAL de las letras,
+//     dibujada con `stroke-dashoffset`. Aparece SIGUIENDO EL TRAZO, no como una guillotina.
+//   · El aplicador recorre ESE MISMO path con `offset-path: url(#trazo-marca)` — lo REFERENCIA,
+//     no lo duplica (son 9,8 kB).
+//   · `pathLength="100"` (en el marcado) hace que dasharray/dashoffset y `offset-distance` sean
+//     AMBAS lineales en longitud de arco. Con idénticos duration/delay/easing la punta cae
+//     EXACTAMENTE sobre el borde de lo recién pintado: sincronía exacta por construcción, no
+//     ajustada a ojo. ⚠️ Por eso dasharray va en unidades de usuario y NO en %: los porcentajes de
+//     `stroke-dasharray` se resuelven contra la diagonal del viewport, que es OTRA métrica.
 //
-// EL RECORTE que veía Pablo (la «L»/«N»/«h» seccionadas por arriba) se arregla dando ALTURA a la caja
-// del `clip-path` (border-box) con `padding` vertical y `line-height`, SIN tocar el valor del
-// clip-path (@s1 intacto): las astas altas de Great Vibes ya caben dentro y no se cortan.
+// EL RECORTE de la «N» y la «h» desaparece por construcción: el `viewBox` encierra la tinta real
+// (x −15,6 → 3965,3 ‰) con margen, así que ya no existe ninguna caja capaz de seccionar los
+// swashes. Ningún `clip-path` recorta ya el rótulo.
+
+// LOS TIEMPOS VAN EN LITERALES, NO EN VARIABLES DE SASS, a propósito: los tests de @s4 LEEN los
+// bytes de este fichero y suman los valores de tiempo. Con `$duracion` verían un símbolo y la cota
+// dejaría de morder. El tope de 4,5 s (espera + duración) lo APROBÓ Pablo el 2026-07-20 por encima
+// del 2,5 s que tenía F-07 por LCP, para que la caligrafía se aprecie:
+//   · el trazo   → 0,1 s de espera + 3,6 s = 3,7 s
+//   · «STUDIO»   → 3,7 s de espera + 0,6 s = 4,3 s (entra EXACTAMENTE al terminar la marca:
+//     3,7 = 0,1 + 3,6. El contrato @s4 exige «no antes», y el judge cazó que antes entraba 0,3 s
+//     ANTES de tiempo mientras el comentario afirmaba lo contrario.)
+// No infringe WCAG 2.2.2 (exige MÁS de cinco segundos) ni 2.3.3 (AAA, y solo cubre animación
+// disparada por interacción). Bajo prefers-reduced-motion todo aparece al instante.
 
 // El eyebrow: la línea SOBRE el titular. F-07 fija SOLO su estructura (un <p>); su CONTENIDO de
 // categorías y su estilo fino son F-09. NUNCA un heading.
@@ -22,38 +38,112 @@
   font-family: 'Manrope', system-ui, sans-serif;
 }
 
-// La escena del hero: contexto de posición para el pincel (que va absoluto encima del titular). Es
-// inline-block para «abrazar» al titular y quedar centrada por el text-align del hero.
+// La escena del hero: inline-block para «abrazar» al rótulo y quedar centrada por el text-align.
 .escena {
   position: relative;
   display: inline-block;
 }
 
-// El <h1> del titular. Color --ink sobre --bg (par ya en MATRIZ_DE_USO, ratio 7,06 ≥ 4,5). NUNCA
+// El <svg> del rótulo. `overflow: visible` para que el aplicador pueda asomar fuera del viewBox
+// sin recortarse. El `em` de aquí fija la escala del rótulo, que sigue el mismo clamp() del
+// titular anterior; el ancho 4,12em es el del viewBox (4120 ‰) → el rótulo escala en móvil y
+// escritorio sin recalcular nada, porque el trazo vive en las MISMAS unidades.
+// ⚠️ NADA de `max-width: 100%` aquí: `.escena` es inline-block (se dimensiona por su contenido),
+// así que un porcentaje sobre el hijo se resuelve contra un contenedor que depende del propio
+// hijo → el rótulo colapsaba a 102 px y el hero entero a 48 px (medido). La respuesta responsive
+// la da el clamp() de `font-size`, que no necesita conocer al contenedor.
+.rotulo {
+  display: block;
+  // El rótulo mide 4,12 em de ancho (el viewBox), no los 3,895 em que medía el texto: el clamp se
+  // reescala para que el ANCHO PINTADO siga siendo el mismo de antes (194 px en móvil → 552 px en
+  // escritorio, frente a 195 → 553). 10,85vw × 4,12 = 44,7vw: nunca desborda.
+  font-size: clamp(2.95rem, 10.85vw, 8.375rem); // 47,2 → 134px
+  width: 4.12em;
+  height: auto;
+  overflow: visible;
+}
+
+// Las letras. Color --ink sobre --bg (par ya en MATRIZ_DE_USO, ratio 7,06 ≥ 4,5). NUNCA
 // --accent/--brush (#C05576) como texto: 4,05 < 4,5 rompería la puerta de contraste de F-03.
+.letras {
+  font-family: 'Great Vibes', cursive;
+  fill: var(--ink);
+}
+
+// La línea central que hace de máscara. BASE = trazo COMPLETO (dashoffset 0) = letras VISIBLES:
+// sin animaciones —o con ellas desactivadas— el rótulo se ve entero. El OCULTO (dashoffset 100)
+// vive SOLO en el fotograma de arranque.
+.trazo {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 0;
+  animation: escribir 3.6s cubic-bezier(0.45, 0, 0.25, 1) 0.1s both;
+}
+
+// El aplicador. BASE = final del recorrido y ya desvanecido: en reposo no estorba al rótulo.
+.aplicador {
+  offset-path: url('#trazo-marca');
+  offset-rotate: 0deg;
+  offset-distance: 100%;
+  opacity: 0;
+  animation:
+    recorrer 3.6s cubic-bezier(0.45, 0, 0.25, 1) 0.1s both,
+    aparecer 0.3s linear 0.1s both,
+    retirarse 0.5s linear 3.2s both;
+}
+
+// El OCULTO vive SOLO aquí, en el arranque de cada keyframe, jamás en la base.
+@keyframes escribir {
+  from {
+    stroke-dashoffset: 100;
+  }
+}
+
+@keyframes recorrer {
+  from {
+    offset-distance: 0%;
+  }
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes retirarse {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+// «Nails Lash» en el <h1>: PRESENTE para lectores de pantalla y para el HTML sin CSS, pero fuera
+// de la vista (el rótulo visible es el <svg>). Técnica `clip`/1px de la WAI. NO `display:none` ni
+// `visibility:hidden` (borrarían el nombre accesible «Nails Lash Studio», @s7).
+.heroMarca {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+// El <h1>. Solo aporta caja para «STUDIO»: la marca vive fuera de la vista, sobre el <svg>.
 .titulo {
-  margin: 0.5rem 0 0.625rem;
+  margin: 0;
   color: var(--ink);
 }
 
-// «Nails Lash» — paint reveal por clip-path. BASE = estado final VISIBLE (inset(0 0 0 0)).
-// 🎨 DEMO: `padding-top`/`padding-bottom` + `line-height` agrandan el border-box (= la caja del
-// clip-path) para que las astas altas de Great Vibes NO se recorten. La duración se sincroniza con el
-// recorrido del pincel (paintReveal 0,1s + 1,6s = 1,7 s). La animación vive AQUÍ, NUNCA inline.
-.heroMarca {
-  display: block;
-  padding-top: 0.6em;
-  padding-bottom: 0.24em;
-  font-family: 'Great Vibes', cursive;
-  font-size: clamp(3.125rem, 11.5vw, 8.875rem); // 50 → 142px
-  line-height: 0.98;
-  white-space: nowrap;
-  clip-path: inset(0 0 0 0);
-  animation: paintReveal 1.6s cubic-bezier(0.5, 0, 0.25, 1) 0.1s both;
-}
-
-// «Studio» — reveal L→R (clip, mismo keyframe que la marca). BASE = VISIBLE (opacity 1). Se pinta
-// cuando el pincel ya ha terminado «Nails Lash»: total 1,55 delay + 0,5 = 2,05 s.
+// «Studio» — se pinta cuando el aplicador ya ha terminado «Nails Lash». BASE = VISIBLE (opacity 1).
 .heroStudio {
   display: block;
   font-family: 'Manrope', sans-serif;
@@ -62,52 +152,28 @@
   letter-spacing: 0.52em;
   text-transform: uppercase;
   padding-left: 0.52em;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
   opacity: 1;
-  clip-path: inset(0 0 0 0);
-  animation: paintReveal 0.5s cubic-bezier(0.5, 0, 0.25, 1) 1.55s both;
+  animation: revelarStudio 0.6s cubic-bezier(0.45, 0, 0.25, 1) 3.7s both;
 }
 
-// El OCULTO vive SOLO aquí, en el 0% del keyframe, jamás en la base.
-@keyframes paintReveal {
-  0% {
-    clip-path: inset(0 100% 0 0);
-  }
-  100% {
-    clip-path: inset(0 0 0 0);
+@keyframes revelarStudio {
+  from {
+    opacity: 0;
   }
 }
 
-// El aplicador de esmalte (DEMO): decorativo (aria-hidden), absoluto sobre «Nails Lash». Vive en un
-// <svg> con viewBox → ESCALA con el titular responsive (offset-path en px no escalaría). El recorrido
-// lo mueve `<animateMotion>` (SMIL) dentro del SVG, no CSS. Las coordenadas de posición/tamaño alinean
-// el viewBox del pincel con las letras reales de Great Vibes (RE-MEDIDO en vivo con Chrome).
-.pincelSvg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  // MISMA escala que .heroMarca (el `em` de este SVG hereda 16px, NO los 142px del titular): sin
-  // esto el viewBox se aplasta. Con la misma `font-size`, `1.9em` cubre la caja de «Nails Lash» y el
-  // pincel escala con el titular responsive.
-  font-size: clamp(3.125rem, 11.5vw, 8.875rem);
-  height: 1.9em;
-  overflow: visible;
-  pointer-events: none;
-  z-index: 3;
-  filter: drop-shadow(0 9px 11px rgba(0, 0, 0, 0.26));
-}
-
-// C-4 (CRITERIO DE PROYECTO, NO WCAG A/AA): quien pide menos movimiento se queda en la BASE VISIBLE,
-// sin movimiento residual, y el pincel se OCULTA (no hay barrido). `animation: none` deja el titular
-// en su valor computado base (clip-path inset(0px), opacity 1); el <svg> del pincel desaparece.
+// C-4 (CRITERIO DE PROYECTO, NO WCAG A/AA): quien pide menos movimiento se queda en la BASE
+// VISIBLE, sin movimiento residual, y el aplicador se OCULTA. `animation: none` deja cada elemento
+// en su valor computado base: el trazo COMPLETO (letras enteras) y «STUDIO» a opacity 1.
 @media (prefers-reduced-motion: reduce) {
-  .heroMarca,
+  .trazo,
+  .aplicador,
   .heroStudio {
     animation: none;
   }
 
-  .pincelSvg {
+  .aplicador {
     display: none;
   }
 }
