@@ -489,7 +489,21 @@
           const suave = rdp(suavizar(remuestrear(pts, PASO), SUAVE), TOL)
           if (suave.length >= 2) trozos.push(aBezier(suave))
         }
-      const d = trozos.join(' ')
+      // ⚠️ UN SOLO SUBTRAZO CONTINUO, no cinco. Motivo VERIFICADO en vivo con Chrome
+      // (isPointInStroke): en SVG el `stroke-dasharray` SE REINICIA en cada `M`, así que cinco
+      // subtrazos se revelarían A LA VEZ (cada plumada a su 55 %) mientras el aplicador está en un
+      // solo punto → la incoherencia que reportó Pablo. Uniendo las plumadas en un subtrazo (los
+      // `M` interiores pasan a `L`) el dash revela un ÚNICO frente en orden de escritura y la punta
+      // va siempre a su cabeza. Los `L` son «viajes de pluma» por hueco vacío: no revelan tinta
+      // ajena (la cobertura final se mantiene) y el aplicador se desliza a la siguiente plumada,
+      // como una mano que levanta y reposa la pluma.
+      const d =
+        trozos[0] +
+        ' ' +
+        trozos
+          .slice(1)
+          .map((s) => s.replace(/^M/, 'L'))
+          .join(' ')
 
       // ── 8. Puerta de calidad: ¿el trazo cae DENTRO de la tinta? ──────────────────────
       const ns = 'http://www.w3.org/2000/svg'

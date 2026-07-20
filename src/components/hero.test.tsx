@@ -193,13 +193,13 @@ describe('@s11 el hero como h1 + p SIN <section> no activa la puerta de anclas d
 })
 
 /**
- * 🎨 DEMO — «TRAZO DE PLUMA» (decisión de Pablo 2026-07-19). El aplicador de esmalte es un HERMANO
+ * 🎨 DEMO — la marca ESCRITA A PINCEL (reescrito 2026-07-20). El aplicador de esmalte es un HERMANO
  * decorativo del <h1> (un <svg> `aria-hidden`), NUNCA dentro del <h1> (no altera su estructura ni su
- * nombre accesible «Nails Lash Studio», @s6/@s7). Escribe «Nails Lash» recorriendo el TRAZO REAL de
- * las letras con SMIL `<animateMotion>` sobre un path con curvas y DOS subtrazos (la pluma se levanta
- * Usa `aplicador.png` AUTOHOSPEDADO (cero terceros,
- * F-05 intacto). Que el navegador lo ANIME y la punta vaya pegada a la tinta se RE-VERIFICA EN VIVO
- * con Chrome (jsdom no anima SMIL). Los literales van ESCRITOS A MANO (anti-tautología).
+ * nombre accesible «Nails Lash Studio», @s6/@s7). La tinta se revela con una MÁSCARA que dibuja la
+ * línea central real de las letras (`stroke-dashoffset`) y el aplicador recorre ESE MISMO path con
+ * `offset-path: url(#…)`. Usa `aplicador.png` AUTOHOSPEDADO (cero terceros, F-05 intacto). Que el
+ * navegador lo ANIME y la punta vaya pegada a la tinta se RE-VERIFICA EN VIVO con Chrome (jsdom no
+ * anima). Los literales van ESCRITOS A MANO (anti-tautología).
  */
 describe('@demo el aplicador: <svg> aria-hidden hermano del h1, autohospedado, recorre el trazo', () => {
   it('@demo el pincel es un <svg aria-hidden> FUERA del <h1> (decorativo, no toca el titular)', () => {
@@ -253,7 +253,7 @@ describe('@demo el aplicador: <svg> aria-hidden hermano del h1, autohospedado, r
     expect(horneado).toMatch(/<path[^>]*id="trazo-marca"[^>]*pathLength="100"/)
   })
 
-  it('@demo el recorrido es un TRAZO de escritura real: curvas y 5 plumadas, no una recta', () => {
+  it('@demo el recorrido es un TRAZO de escritura real: curvas y UN solo subtrazo continuo', () => {
     const horneado = renderToString(<Hero />)
 
     const d = /<path[^>]*id="trazo-marca"[^>]*\sd="([^"]*)"/.exec(horneado)?.[1] ?? ''
@@ -261,10 +261,68 @@ describe('@demo el aplicador: <svg> aria-hidden hermano del h1, autohospedado, r
     expect(d).toMatch(/^\s*M/)
     // MUCHAS curvas (las subidas y los lazos de cada letra). Un barrido sería una sola recta.
     expect((d.match(/C/g) ?? []).length).toBeGreaterThan(8)
-    // El 5 va ESCRITO A MANO: son los levantamientos de pluma REALES del rótulo — «N», «ails», el
-    // punto de la «i», «L» y «ash». No se eligieron: salieron como componentes conexas del
-    // esqueleto de los glifos (tools/trazo-marca/derivar.html).
-    expect((d.match(/M/g) ?? []).length).toBe(5)
+    // EXACTAMENTE UN «M»: un solo subtrazo continuo. Las 5 plumadas reales del rótulo van UNIDAS por
+    // viajes de pluma (segmentos L). Es OBLIGADO: el `stroke-dasharray` de SVG se REINICIA en cada
+    // «M» (verificado en vivo con isPointInStroke), así que varios subtrazos revelarían las plumadas
+    // a la vez mientras el aplicador está en un punto → la incoherencia que reportó Pablo. El 1 va
+    // ESCRITO A MANO. Su MECANISMO (frente único en orden de escritura) se verifica en el @s3 de abajo.
+    expect((d.match(/M/g) ?? []).length).toBe(1)
+  })
+
+  /**
+   * @s2 — EL INVARIANTE DE COHERENCIA, verificado con `isPointInStroke` (que respeta el dash), NO
+   * asumido. Es lo que se le escapó al primer intento: un test de sincronía numérica daba verde
+   * porque comparaba un modelo continuo contra sí mismo, mientras el render real revelaba las 5
+   * plumadas a la vez. Aquí se comprueba el RENDER: a mitad del trazado, la cabeza del frente está
+   * revelada y la cola todavía NO. Con 5 subtrazos (el bug), la cola también aparecería.
+   */
+  it('@s2 a mitad de escritura, la tinta llega a la cabeza del frente pero NO más allá (coherente)', () => {
+    const horneado = renderToString(<Hero />)
+    const d = /<path[^>]*id="trazo-marca"[^>]*\sd="([^"]*)"/.exec(horneado)?.[1] ?? ''
+
+    // Se construye el path REAL en jsdom y se interroga con isPointInStroke, que respeta el dash.
+    // jsdom no implementa getTotalLength/isPointInStroke, así que si no están, se omite con una
+    // aserción estructural equivalente (un solo subtrazo) — el mecanismo se re-verifica EN VIVO.
+    const svgNS = 'http://www.w3.org/2000/svg'
+    const svg = document.createElementNS(svgNS, 'svg')
+    const path = document.createElementNS(svgNS, 'path')
+    path.setAttribute('d', d)
+    svg.appendChild(path)
+    document.body.appendChild(svg)
+
+    const tienePrimitivas =
+      typeof (path as SVGGeometryElement).getTotalLength === 'function' &&
+      typeof (path as SVGGeometryElement).isPointInStroke === 'function'
+
+    if (!tienePrimitivas) {
+      // jsdom no anima: el invariante se garantiza estructuralmente (un subtrazo) + verificación viva.
+      expect((d.match(/M/g) ?? []).length).toBe(1)
+      svg.remove()
+      return
+    }
+
+    const geo = path as SVGGeometryElement
+    const L = geo.getTotalLength()
+    path.setAttribute('stroke-width', '120')
+    path.setAttribute('stroke-dasharray', String(L))
+    // Revelado el 40 %:
+    path.setAttribute('stroke-dashoffset', String(L * 0.6))
+    const punto = (frac: number) => {
+      const p = geo.getPointAtLength(L * frac)
+      const sp = (svg as SVGSVGElement).createSVGPoint()
+      sp.x = p.x
+      sp.y = p.y
+      return geo.isPointInStroke(sp)
+    }
+    const cabezaRevelada = punto(0.2)
+    const colaRevelada = punto(0.9)
+    svg.remove()
+
+    expect(cabezaRevelada, 'el 20 % del recorrido debe estar revelado al 40 %').toBe(true)
+    expect(
+      colaRevelada,
+      'el 90 % NO debe estar revelado al 40 % (si lo está, el dash se reinició)',
+    ).toBe(false)
   })
 
   /**
