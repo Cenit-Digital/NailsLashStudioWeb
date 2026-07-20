@@ -15,6 +15,7 @@ export interface ServicioDemo {
 export interface CategoriaDemo {
   readonly clave: string
   readonly eyebrow: string
+  readonly titlebuttonfooter: string
   readonly titulo: string
   readonly intro: string
   readonly servicios: readonly ServicioDemo[]
@@ -23,42 +24,47 @@ export interface CategoriaDemo {
 export const CATALOGO_DEMO: readonly CategoriaDemo[] = [
   {
     clave: 'unas',
-    eyebrow: 'Uñas',
-    titulo: 'Manicura y uñas',
-    intro: 'Manicura, esmaltado permanente y extensiones para lucir unas manos cuidadas cada día.',
+    eyebrow: 'Servicio de Uñas',
+    titlebuttonfooter: 'Reservar Uñas',
+    titulo: 'Manos y pies de Revista',
+    intro: 'Manicura, pedicura, esculpido y nail art con producto premium y un acabado impecable que dura semanas.',
     servicios: [
-      { nombre: 'Manicura express', precio: '15 €' },
-      { nombre: 'Manicura con esmaltado permanente', precio: '25 €' },
-      { nombre: 'Uñas de gel', precio: '35 €' },
-      { nombre: 'Uñas acrílicas', precio: '38 €' },
-      { nombre: 'Relleno de uñas', precio: '28 €' },
-      { nombre: 'Retirada + manicura', precio: '20 €' },
+      { nombre: 'Manicura semipermanente', precio: '15 €' },
+      { nombre: 'Manicura rusa completa', precio: '25 €' },
+      { nombre: 'Uñas acrílicas o gel', precio: '35 €' },
+      { nombre: 'Relleno acrílico o gel', precio: '38 €' },
+      { nombre: 'Pedicura spa completa', precio: '28 €' },
+      { nombre: 'Nail art y diseño', precio: '20 €' },
     ],
   },
   {
-    clave: 'pestanas',
-    eyebrow: 'Pestañas',
-    titulo: 'Pestañas',
-    intro: 'Lifting y extensiones que abren la mirada, adaptadas a tu ojo y a tu ritmo de vida.',
+    clave: 'facial',
+    eyebrow: 'Servicio Facial',
+    titlebuttonfooter: 'Reservar Facial',
+    titulo: 'Tu piel, radiante',
+    intro: 'Tratamientos de limpieza, hidratación y luminosidad, más pestañas y cejas, adaptados a tu tipo de piel.',
     servicios: [
-      { nombre: 'Lifting de pestañas', precio: '35 €' },
-      { nombre: 'Lifting + tinte', precio: '42 €' },
-      { nombre: 'Extensiones pelo a pelo', precio: '45 €' },
-      { nombre: 'Volumen ruso', precio: '55 €' },
-      { nombre: 'Relleno de extensiones', precio: '30 €' },
+      { nombre: 'Limpieza facial profunda', precio: '35 €' },
+      { nombre: 'Tratamiento hidratante', precio: '42 €' },
+      { nombre: 'Peeling y luminosidad', precio: '45 €' },
+      { nombre: 'Lifting de pestañas', precio: '55 €' },
+      { nombre: 'Diseño de cejas', precio: '30 €' },
+      { nombre: 'Tinte de pestañas', precio: '30 €' },
     ],
   },
   {
-    clave: 'cejas',
-    eyebrow: 'Cejas',
-    titulo: 'Cejas',
-    intro: 'Diseño, laminado y tinte para dar forma y definición a tu mirada.',
+    clave: 'depilacion',
+    eyebrow: 'Servicio de Depilación',
+    titlebuttonfooter: 'Reservar Depilación',
+    titulo: 'Piel suave y cuidada',
+    intro: 'Depilación con cera tibia en un entorno higiénico y respetuoso, para una piel suave más tiempo.',
     servicios: [
-      { nombre: 'Diseño de cejas', precio: '12 €' },
-      { nombre: 'Diseño + tinte', precio: '18 €' },
-      { nombre: 'Laminado de cejas', precio: '30 €' },
-      { nombre: 'Laminado + tinte', precio: '35 €' },
-      { nombre: 'Depilación con hilo', precio: '10 €' },
+      { nombre: 'Cejas', precio: '12 €' },
+      { nombre: 'Labio superior', precio: '18 €' },
+      { nombre: 'Axilas', precio: '30 €' },
+      { nombre: 'Medias piernas', precio: '35 €' },
+      { nombre: 'Piernas completas', precio: '10 €' },
+      { nombre: 'Ingles o cavado', precio: '10 €' },
     ],
   },
 ]

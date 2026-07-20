@@ -31,7 +31,7 @@ export function Catalogo() {
                   </div>
                 ))}
                 <a className={`demo-btn demo-btn--solido ${estilos.reservar}`} href="#reserva-titulo">
-                  Reservar {categoria.eyebrow.toLowerCase()}
+                  {categoria.titlebuttonfooter}
                 </a>
               </div>
               <div className={estilos.foto} aria-hidden="true" />
