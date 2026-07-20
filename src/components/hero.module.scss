@@ -1,41 +1,71 @@
 // El hero de F-07. Contrato: features/hero_marca.feature.
 //
-// 🔴 EL ESTADO BASE ES EL ESTADO FINAL VISIBLE (I-4), MEDIDO con build SSG real + Chrome/CDP
-// (.experimentos-tmp/veredictos-f07/A3-estado-base.md §6). El estado OCULTO vive SOLO en el 0% del
-// keyframe. La animación va EN LA HOJA (nunca inline: un `animation` inline gana en especificidad al
-// `@media(reduce){animation:none}` y derrotaría reduced-motion). El SCSS NO lo ve Stryker: lo
-// aseveran los tests que lo LEEN (hero-estilos.test.ts) + la puerta de aprobación humana.
+// 🔴 EL ESTADO BASE ES EL ESTADO FINAL VISIBLE (I-4), MEDIDO con build SSG real + Chrome/CDP. El
+// estado OCULTO vive SOLO en el 0% del keyframe. La animación va EN LA HOJA (nunca inline). El SCSS
+// NO lo ve Stryker: lo aseveran los tests que lo LEEN (hero-estilos.test.ts) + la puerta humana.
+//
+// 🎨 DEMO (rama demo/lunes-prototipo): «TRAZO DE PLUMA». Un aplicador de esmalte ESCRIBE «Nails Lash»
+// recorriendo el trazo real de cada letra (sube la N, la montaña, los lazos), mientras la fuente
+// Great Vibes se revela justo detrás de la punta (paintReveal). El aplicador vive en un <svg> con
+// viewBox (escala con el titular responsive) y su recorrido lo mueve SMIL `<animateMotion>` sobre la
+// centerline de la marca — NO un barrido horizontal (lo que pedía Pablo). Bajo prefers-reduced-motion
+// el <svg> del pincel se OCULTA y el titular queda en su estado final visible.
+//
+// EL RECORTE que veía Pablo (la «L»/«N»/«h» seccionadas por arriba) se arregla dando ALTURA a la caja
+// del `clip-path` (border-box) con `padding` vertical y `line-height`, SIN tocar el valor del
+// clip-path (@s1 intacto): las astas altas de Great Vibes ya caben dentro y no se cortan.
 
 // El eyebrow: la línea SOBRE el titular. F-07 fija SOLO su estructura (un <p>); su CONTENIDO de
-// categorías (Uñas · Pestañas · Cejas) y su estilo fino son F-09 (C-7). NUNCA un heading.
+// categorías y su estilo fino son F-09. NUNCA un heading.
 .eyebrow {
   margin: 0;
   font-family: 'Manrope', system-ui, sans-serif;
 }
 
+// La escena del hero: contexto de posición para el pincel (que va absoluto encima del titular). Es
+// inline-block para «abrazar» al titular y quedar centrada por el text-align del hero.
+.escena {
+  position: relative;
+  display: inline-block;
+}
+
 // El <h1> del titular. Color --ink sobre --bg (par ya en MATRIZ_DE_USO, ratio 7,06 ≥ 4,5). NUNCA
 // --accent/--brush (#C05576) como texto: 4,05 < 4,5 rompería la puerta de contraste de F-03.
 .titulo {
-  margin: 0;
+  margin: 0.5rem 0 0.625rem;
   color: var(--ink);
 }
 
-// «Nails Lash» — paint reveal por clip-path. BASE = estado final VISIBLE.
-// C-3 (APROBADO 2026-07-18): duración total delay + duración ≤ 1,2 s → 1s + 0,1s = 1,1 s, para un
-// LCP bueno (el prototipo, delay 0,5s + 4,8s = ~5,3s, suspendía el LCP del titular). La animación
-// vive AQUÍ, en la hoja, NUNCA inline (inline ganaría al @media(reduce){animation:none}).
+// «Nails Lash» — paint reveal por clip-path. BASE = estado final VISIBLE (inset(0 0 0 0)).
+// 🎨 DEMO: `padding-top`/`padding-bottom` + `line-height` agrandan el border-box (= la caja del
+// clip-path) para que las astas altas de Great Vibes NO se recorten. La duración se sincroniza con el
+// recorrido del pincel (paintReveal 0,1s + 1,6s = 1,7 s). La animación vive AQUÍ, NUNCA inline.
 .heroMarca {
+  display: block;
+  padding-top: 0.6em;
+  padding-bottom: 0.24em;
   font-family: 'Great Vibes', cursive;
+  font-size: clamp(3.125rem, 11.5vw, 8.875rem); // 50 → 142px
+  line-height: 0.98;
+  white-space: nowrap;
   clip-path: inset(0 0 0 0);
-  animation: paintReveal 1s cubic-bezier(0.5, 0, 0.25, 1) 0.1s both;
+  animation: paintReveal 1.6s cubic-bezier(0.5, 0, 0.25, 1) 0.1s both;
 }
 
-// «Studio» — fade up. BASE = VISIBLE (opacity 1), aunque el default ya sea 1, se declara explícito.
-// C-3: 0,9s + 0,2s = 1,1 s ≤ 1,2 s total.
+// «Studio» — reveal L→R (clip, mismo keyframe que la marca). BASE = VISIBLE (opacity 1). Se pinta
+// cuando el pincel ya ha terminado «Nails Lash»: total 1,55 delay + 0,5 = 2,05 s.
 .heroStudio {
+  display: block;
   font-family: 'Manrope', sans-serif;
+  font-size: clamp(0.875rem, 2.2vw, 1.5rem); // 14 → 24px
+  font-weight: 600;
+  letter-spacing: 0.52em;
+  text-transform: uppercase;
+  padding-left: 0.52em;
+  margin-top: 0.5rem;
   opacity: 1;
-  animation: fadeUp 0.9s 0.2s both;
+  clip-path: inset(0 0 0 0);
+  animation: paintReveal 0.5s cubic-bezier(0.5, 0, 0.25, 1) 1.55s both;
 }
 
 // El OCULTO vive SOLO aquí, en el 0% del keyframe, jamás en la base.
@@ -48,23 +78,36 @@
   }
 }
 
-@keyframes fadeUp {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+// El aplicador de esmalte (DEMO): decorativo (aria-hidden), absoluto sobre «Nails Lash». Vive en un
+// <svg> con viewBox → ESCALA con el titular responsive (offset-path en px no escalaría). El recorrido
+// lo mueve `<animateMotion>` (SMIL) dentro del SVG, no CSS. Las coordenadas de posición/tamaño alinean
+// el viewBox del pincel con las letras reales de Great Vibes (RE-MEDIDO en vivo con Chrome).
+.pincelSvg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  // MISMA escala que .heroMarca (el `em` de este SVG hereda 16px, NO los 142px del titular): sin
+  // esto el viewBox se aplasta. Con la misma `font-size`, `1.9em` cubre la caja de «Nails Lash» y el
+  // pincel escala con el titular responsive.
+  font-size: clamp(3.125rem, 11.5vw, 8.875rem);
+  height: 1.9em;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 3;
+  filter: drop-shadow(0 9px 11px rgba(0, 0, 0, 0.26));
 }
 
 // C-4 (CRITERIO DE PROYECTO, NO WCAG A/AA): quien pide menos movimiento se queda en la BASE VISIBLE,
-// sin movimiento residual. Es justo lo que el prototipo NO tiene. `animation: none` deja el elemento
-// en su valor computado base (medido: getAnimations()==0, clip-path inset(0px), opacity 1).
+// sin movimiento residual, y el pincel se OCULTA (no hay barrido). `animation: none` deja el titular
+// en su valor computado base (clip-path inset(0px), opacity 1); el <svg> del pincel desaparece.
 @media (prefers-reduced-motion: reduce) {
   .heroMarca,
   .heroStudio {
     animation: none;
+  }
+
+  .pincelSvg {
+    display: none;
   }
 }

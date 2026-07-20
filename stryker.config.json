@@ -1,13 +1,13 @@
 {
   "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
-  "_comment": "Prueba de mutación (RF-CODE-001 / GU-HARNESS-001). Valida que los tests muerden. Umbral: 100% sobre las líneas tocadas por la feature. `mutate` es una lista EXPLÍCITA de ficheros (no un glob): cada feature añade los suyos (src/lib/*.ts y src/components/*.tsx). Quedan fuera por convención del stack: App.tsx, main.tsx, pages/* y styles/*. PROHIBIDO acotar con --testFiles (da 0% falso con este stack); acotar solo con --mutate <fichero>.",
+  "_comment": "Prueba de mutación (RF-CODE-001 / GU-HARNESS-001). Valida que los tests muerden. Umbral: 100% sobre las líneas tocadas por la feature. `mutate` es una lista EXPLÍCITA de ficheros (no un glob): cada feature añade los suyos (src/lib/*.ts y src/components/*.tsx). Quedan fuera por convención del stack: App.tsx, main.tsx, pages/* y styles/*. PROHIBIDO acotar con --testFiles (da 0% falso con este stack); acotar solo con --mutate <fichero>. `vitest.configFile` apunta a vitest.stryker.config.ts (NO a vitest.config.ts): esa config EXCLUYE los tests build-based `*-horneado.test.{ts,tsx}` de la MUTACIÓN (corren un `pnpm build` real por-mutante → 409 min); siguen corriendo en `pnpm test`/`bin/harness verify`. Ver el encabezado de vitest.stryker.config.ts.",
   "packageManager": "pnpm",
   "testRunner": "vitest",
   "plugins": ["@stryker-mutator/vitest-runner"],
   "reporters": ["html", "clear-text", "progress"],
   "coverageAnalysis": "perTest",
   "vitest": {
-    "configFile": "vitest.config.ts"
+    "configFile": "vitest.stryker.config.ts"
   },
   "mutate": [
     "src/lib/placeholders.ts",
@@ -25,7 +25,8 @@
     "src/components/Cabecera.tsx",
     "src/components/MenuNavegacion.tsx",
     "src/components/Pie.tsx",
-    "src/components/Hero.tsx"
+    "src/components/Hero.tsx",
+    "src/components/Contacto.tsx"
   ],
   "thresholds": {
     "high": 100,

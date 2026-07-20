@@ -191,3 +191,51 @@ describe('@s11 el hero como h1 + p SIN <section> no activa la puerta de anclas d
     expect(renderToString(<Hero />)).not.toMatch(/<section\b/i)
   })
 })
+
+/**
+ * 🎨 DEMO — «TRAZO DE PLUMA» (decisión de Pablo 2026-07-19). El aplicador de esmalte es un HERMANO
+ * decorativo del <h1> (un <svg> `aria-hidden`), NUNCA dentro del <h1> (no altera su estructura ni su
+ * nombre accesible «Nails Lash Studio», @s6/@s7). Escribe «Nails Lash» recorriendo el TRAZO REAL de
+ * las letras con SMIL `<animateMotion>` sobre un path con curvas y DOS subtrazos (la pluma se levanta
+ * entre «Nails» y «Lash») — NO un barrido horizontal. Usa `brush.png` AUTOHOSPEDADO (cero terceros,
+ * F-05 intacto). Que el navegador lo ANIME y la punta vaya pegada a la tinta se RE-VERIFICA EN VIVO
+ * con Chrome (jsdom no anima SMIL). Los literales van ESCRITOS A MANO (anti-tautología).
+ */
+describe('@demo el aplicador de esmalte: <svg> aria-hidden hermano del h1, brush.png autohospedado, recorre el trazo', () => {
+  it('@demo el pincel es un <svg aria-hidden> FUERA del <h1> (decorativo, no toca el titular)', () => {
+    const horneado = renderToString(<Hero />)
+
+    // Hay un <svg> decorativo (aria-hidden): no anuncia nada a un lector de pantalla.
+    expect(horneado).toMatch(/<svg[^>]*aria-hidden="true"/)
+
+    // Y NO vive dentro del <h1>: el titular conserva su estructura EXACTA (dos <span> + text node).
+    const h1 = /<h1\b[^>]*>([\s\S]*?)<\/h1>/.exec(horneado)?.[1] ?? ''
+    expect(h1).not.toContain('<svg')
+    expect(h1).not.toContain('<image')
+  })
+
+  it('@demo usa brush.png AUTOHOSPEDADO (href local con «brush», sin origen externo http)', () => {
+    const horneado = renderToString(<Hero />)
+
+    const href = /<image[^>]*\shref="([^"]*)"/.exec(horneado)?.[1] ?? ''
+    // «brush» va ESCRITO A MANO: el aplicador de esmalte, servido desde el propio sitio.
+    expect(href).toMatch(/brush/)
+    // Autohospedado (F-05, cero terceros): ninguna URL absoluta http(s) a un dominio ajeno.
+    expect(href).not.toMatch(/^https?:/)
+  })
+
+  it('@demo el aplicador RECORRE el trazo de las letras con <animateMotion> (no un barrido horizontal)', () => {
+    const horneado = renderToString(<Hero />)
+
+    const anim = /<animateMotion[^>]*\spath="([^"]*)"/.exec(horneado)
+    expect(anim, 'el pincel debe moverse con <animateMotion> sobre un path (no left/top)').not.toBeNull()
+
+    const trazo = (anim as RegExpExecArray)[1]
+    // Un TRAZO real de escritura, NO un barrido: empieza en un moveto (M), tiene MUCHAS curvas (C, las
+    // subidas/lazos de cada letra) y EXACTAMENTE DOS subtrazos (dos «M» = la pluma se levanta entre
+    // «Nails» y «Lash»). Un barrido horizontal sería una sola recta sin curvas.
+    expect(trazo).toMatch(/^\s*M/)
+    expect((trazo.match(/C/g) ?? []).length).toBeGreaterThan(8)
+    expect((trazo.match(/M/g) ?? []).length).toBe(2)
+  })
+})

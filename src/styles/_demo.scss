@@ -1,0 +1,173 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// CAPA VISUAL DEL DEMO  ·  rama demo/lunes-prototipo  ·  NO es una feature del pipeline
+// ─────────────────────────────────────────────────────────────────────────────
+// Aplica el LOOK del prototipo Opcion-1-Rosa (.experimentos-tmp/proto/.../Opcion-1-Rosa.dc.html)
+// con datos placeholder, para la DEMO del lunes. Los valores (padding 92px, container 1200px,
+// radios, sombras) salen MEDIDOS de los estilos inline del prototipo.
+//
+// 🔴 USO DE TOKENS AA-CORRECTO (F-03): el prototipo usa --accent (#C05576) como texto pequeño y
+// como relleno con blanco encima → 4,05/4,37:1, FALLA AA. Aquí el texto pequeño de acento y los
+// botones rellenos usan --accent-dark (#A23E5F). --accent queda para rellenos grandes/decorativos.
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+}
+
+// Scroll suave como el prototipo, pero respetando a quien pide menos movimiento.
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+// ── Primitivas de maquetación (clases globales, se usan como strings en className) ──────────────
+
+.demo-seccion {
+  padding-block: 5.75rem; // 92px
+  border-top: 1px solid var(--line);
+}
+
+.demo-seccion--alt {
+  background: var(--surface2);
+  border-top: none;
+}
+
+.demo-seccion--plain {
+  border-top: none;
+}
+
+.demo-contenedor {
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 2.5rem; // 40px
+}
+
+@media (max-width: 640px) {
+  .demo-contenedor {
+    padding-inline: 1.5rem; // 24px en móvil
+  }
+}
+
+// Cabecera de bloque: eyebrow + título + intro
+.demo-encabezado {
+  max-width: 620px;
+  margin-bottom: 2.375rem; // 38px
+}
+
+.demo-encabezado--centro {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.demo-eyebrow {
+  margin: 0 0 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  font-size: 0.75rem; // 12px
+  font-weight: 600;
+  color: var(--accent-dark); // AA: el prototipo usaba --accent (falla 4,5:1)
+}
+
+.demo-titulo {
+  margin: 0 0 0.875rem;
+  font-family: 'Gilda Display', serif;
+  font-weight: 400;
+  font-size: clamp(1.875rem, 4vw, 2.875rem); // 30 → 46px
+  line-height: 1.06;
+  color: var(--ink);
+}
+
+.demo-intro {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.65;
+  font-size: 1.0625rem; // 17px
+}
+
+// ── Tarjetas ────────────────────────────────────────────────────────────────────────────────
+.demo-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: 0 16px 34px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+// ── Hero (marco alrededor del <Hero/> de F-07) ───────────────────────────────────────────────
+.demo-hero {
+  position: relative;
+  text-align: center;
+  padding: 6rem 1.5rem 6.5rem; // 96px … 104px
+  background: radial-gradient(120% 120% at 50% 0%, var(--accent-soft), var(--bg) 62%);
+  overflow: hidden;
+}
+
+.demo-hero-sub {
+  max-width: 560px;
+  margin: 1rem auto 0;
+  color: var(--text);
+  font-size: clamp(1rem, 2vw, 1.1875rem); // 16 → 19px
+  line-height: 1.6;
+}
+
+.demo-hero-cta {
+  display: flex;
+  gap: 0.875rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 1.875rem;
+}
+
+// ── Botones ─────────────────────────────────────────────────────────────────────────────────
+.demo-btn {
+  display: inline-block;
+  padding: 0.9375rem 2rem; // 15px 32px
+  border-radius: 40px;
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 0.9375rem; // 15px
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+// Relleno: --accent-dark + blanco (AA). El prototipo usaba --accent (4,37:1, falla).
+.demo-btn--solido {
+  background: var(--accent-dark);
+  color: var(--on-accent);
+
+  &:hover {
+    background: var(--ink);
+    color: var(--on-accent);
+  }
+}
+
+// Contorno
+.demo-btn--ghost {
+  background: transparent;
+  border-color: var(--accent-dark);
+  color: var(--accent-dark);
+
+  &:hover {
+    background: var(--accent-soft);
+    color: var(--accent-dark);
+  }
+}
+
+// WhatsApp (color de marca; #08130c sobre #25D366 es alto contraste)
+.demo-btn--wa {
+  background: #25d366;
+  color: #08130c;
+
+  &:hover {
+    background: #1fb757;
+    color: #08130c;
+  }
+}

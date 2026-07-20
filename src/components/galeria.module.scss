@@ -1,0 +1,56 @@
+// La galería de trabajos (capa visual del DEMO). Carrusel scroll-snap nativo + flechas.
+
+.cabecera {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.flechas {
+  display: flex;
+  gap: 0.625rem;
+
+  button {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    border: 1px solid var(--border-interactive);
+    background: var(--surface);
+    color: var(--accent-dark);
+    font-size: 1.125rem;
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--accent-dark);
+    }
+  }
+}
+
+.pista {
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 0.5rem;
+  scrollbar-width: thin;
+}
+
+.tile {
+  flex: 0 0 auto;
+  width: 300px;
+  max-width: 80vw;
+  aspect-ratio: 4 / 3;
+  border-radius: 20px;
+  scroll-snap-align: start;
+  background: linear-gradient(160deg, var(--accent-soft), var(--surface2));
+  border: 1px solid var(--line);
+}
+
+.nota {
+  margin: 1.5rem 0 0;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}

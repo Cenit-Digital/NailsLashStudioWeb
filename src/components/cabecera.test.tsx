@@ -167,9 +167,13 @@ describe('el pie emite Facebook y tel:, y NO enlaces legales ni una URL de Insta
     expect(horneado).not.toContain('/privacidad')
   })
 
-  it('el pie NO hornea una URL de Instagram (site.ts guarda un HANDLE, no una URL)', () => {
+  it('(DEMO) el pie hornea la URL de Instagram DERIVADA del handle único (instagramHref de F-02, no hardcodeada)', () => {
+    // 🎨 Ajuste de la rama demo: el pie oscuro del prototipo añade Instagram. NO se hardcodea la URL:
+    // se DERIVA del handle @nailslash.studio_ con `instagramHref` (el mismo patrón que Contacto de
+    // F-12), así que la fuente única de F-02 sigue siendo el handle, no una URL.
     const horneado = renderToString(<Pie />)
 
-    expect(horneado).not.toContain('instagram.com')
+    expect(horneado).toContain('href="https://www.instagram.com/nailslash.studio_/"')
+    expect(horneado).toContain('@nailslash.studio_')
   })
 })

@@ -108,18 +108,14 @@ describe('@s1 el estado base del titular en el SCSS es el estado final VISIBLE �
  * esperados se escriben A MANO y se LEEN del SCSS, no se importan.
  */
 describe('@s2 el estado OCULTO del titular vive SOLO en el 0% del keyframe, jamás en la base', () => {
+  // 🎨 DEMO: STUDIO pasó de `fadeUp` (opacity) a `paintReveal` (clip L→R, como la marca) para que el
+  // pincel lo «pinte» de izquierda a derecha igual que «Nails Lash». `fadeUp` se retiró (dead CSS).
   it.each([
     {
       keyframe: 'paintReveal',
       ocultoEn0: /clip-path\s*:\s*inset\(\s*0\s+100%\s+0\s+0\s*\)/,
       visibleEn100: /clip-path\s*:\s*inset\(\s*0\s+0\s+0\s+0\s*\)/,
       ocultoLiteralEnBase: /clip-path[^;]*100%/,
-    },
-    {
-      keyframe: 'fadeUp',
-      ocultoEn0: /opacity\s*:\s*0\s*;/,
-      visibleEn100: /opacity\s*:\s*1\b/,
-      ocultoLiteralEnBase: /opacity\s*:\s*0\s*;/,
     },
   ])(
     '@s2 el @keyframes $keyframe oculta en el 0%, muestra el final en el 100%, y el oculto NO está en la base',
@@ -192,9 +188,14 @@ function segundosTotales(animacion: string): number {
  * 4,8s el titular-LCP se retrasaba a ~5,3s) → la puerta ACORTA a ≤1,2s. Este eje (la DURACIÓN) SÍ
  * es puerta unitaria; el NÚMERO LCP real NO (C-2, verificación EN VIVO con Chrome).
  */
-describe('@s4 la duración total (delay + duración) de la animación del hero está ACOTADA ≤ 1,2 s', () => {
-  // El límite 1,2 s va ESCRITO A MANO (C-3), RE-LEÍDO del SCSS, JAMÁS importado como símbolo.
-  const LIMITE_TOTAL_SEGUNDOS = 1.2
+describe('@s4 la duración total (delay + duración) de la animación del hero está ACOTADA ≤ 2,5 s (DEMO)', () => {
+  // 🎨 DEMO (rama demo/lunes-prototipo): el tope de F-07 era 1,2 s (C-3, decisión de LCP). Para la
+  // caligrafía DELIBERADA de dos líneas del hero del demo (el pincel «escribe» Nails Lash y luego
+  // STUDIO) se sube a 2,5 s, ACEPTANDO el trade-off de LCP (el titular tarda ~2 s en revelarse; sigue
+  // dentro del «bueno» ≤2,5 s p75 de web.dev, y bajo prefers-reduced-motion aparece instantáneo). El
+  // límite sigue ESCRITO A MANO, RE-LEÍDO del SCSS, JAMÁS importado como símbolo. La cota sigue viva:
+  // una animación descontrolada (p. ej. la de 5,3 s del prototipo) rompería este test igual.
+  const LIMITE_TOTAL_SEGUNDOS = 2.5
 
   it.each(['heroMarca', 'heroStudio'])(
     '@s4 %s declara un animation cuya suma delay + duración es ≤ 1,2 s',
@@ -280,5 +281,34 @@ describe('@s17 el titular declara su tipografía de marca en el SCSS — Great V
         /font-family\s*:/,
       )
     }
+  })
+})
+
+/**
+ * 🎨 DEMO — «TRAZO DE PLUMA» (decisión de Pablo 2026-07-19): el aplicador de esmalte ESCRIBE «Nails
+ * Lash» recorriendo el trazo real de cada letra (sube la N, la montaña, los lazos), NO un barrido
+ * horizontal. El aplicador vive en un <svg> con viewBox (escala con el titular) y lo mueve SMIL
+ * `<animateMotion>` — su ESTRUCTURA se asevera en hero.test.tsx (render); AQUÍ, el invariante de HOJA
+ * (Stryker no ve SCSS): bajo prefers-reduced-motion el <svg> del pincel NO se muestra (display:none)
+ * y el titular no anima. La sincronía punta↔tinta se RE-VERIFICA EN VIVO con Chrome (jsdom no anima).
+ */
+describe('@demo el aplicador de esmalte se OCULTA bajo prefers-reduced-motion (sin movimiento residual)', () => {
+  it('@demo el @media (prefers-reduced-motion: reduce) oculta .pincelSvg (display:none) y para el titular (animation:none)', () => {
+    const media = cuerpoDelBloque(
+      scss(),
+      /@media\s*\(\s*prefers-reduced-motion:\s*reduce\s*\)\s*\{/,
+    )
+
+    expect(media, 'falta el @media (prefers-reduced-motion: reduce)').not.toBeNull()
+    const cuerpo = media as string
+    // El <svg> del pincel desaparece por completo (no hay barrido) y el titular queda en su base.
+    expect(cuerpo).toMatch(/\.pincelSvg\b/)
+    expect(cuerpo).toMatch(/display\s*:\s*none/)
+    expect(cuerpo).toMatch(/animation\s*:\s*none/)
+  })
+
+  it('@demo la hoja del hero NO hornea ninguna petición a un origen externo http(s) (cero terceros, F-05 intacto)', () => {
+    // El aplicador es local; su imagen viaja como href en el render (no como url() de la hoja).
+    expect(scss()).not.toMatch(/url\(\s*['"]?https?:/i)
   })
 })
