@@ -15,16 +15,6 @@ export function Catalogo() {
   return (
     <section className={`demo-seccion ${estilos.catalogo}`} aria-labelledby={ID_SERVICIOS}>
       <div className="demo-contenedor">
-        <div className="demo-encabezado">
-          <p className="demo-eyebrow">Carta de servicios</p>
-          <h2 id={ID_SERVICIOS} className="demo-titulo">
-            Servicios
-          </h2>
-          <p className="demo-intro">
-            Uñas, pestañas y cejas de la mano de un equipo que cuida cada detalle.
-          </p>
-        </div>
-
         {CATALOGO_DEMO.map((categoria) => (
           <div key={categoria.clave} className={estilos.categoria}>
             <div className={estilos.categoriaCabecera}>
