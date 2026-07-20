@@ -197,11 +197,11 @@ describe('@s11 el hero como h1 + p SIN <section> no activa la puerta de anclas d
  * decorativo del <h1> (un <svg> `aria-hidden`), NUNCA dentro del <h1> (no altera su estructura ni su
  * nombre accesible «Nails Lash Studio», @s6/@s7). Escribe «Nails Lash» recorriendo el TRAZO REAL de
  * las letras con SMIL `<animateMotion>` sobre un path con curvas y DOS subtrazos (la pluma se levanta
- * entre «Nails» y «Lash») — NO un barrido horizontal. Usa `brush.png` AUTOHOSPEDADO (cero terceros,
+ * Usa `aplicador.png` AUTOHOSPEDADO (cero terceros,
  * F-05 intacto). Que el navegador lo ANIME y la punta vaya pegada a la tinta se RE-VERIFICA EN VIVO
  * con Chrome (jsdom no anima SMIL). Los literales van ESCRITOS A MANO (anti-tautología).
  */
-describe('@demo el aplicador de esmalte: <svg> aria-hidden hermano del h1, brush.png autohospedado, recorre el trazo', () => {
+describe('@demo el aplicador: <svg> aria-hidden hermano del h1, autohospedado, recorre el trazo', () => {
   it('@demo el pincel es un <svg aria-hidden> FUERA del <h1> (decorativo, no toca el titular)', () => {
     const horneado = renderToString(<Hero />)
 
@@ -214,28 +214,200 @@ describe('@demo el aplicador de esmalte: <svg> aria-hidden hermano del h1, brush
     expect(h1).not.toContain('<image')
   })
 
-  it('@demo usa brush.png AUTOHOSPEDADO (href local con «brush», sin origen externo http)', () => {
+  it('@demo usa el aplicador AUTOHOSPEDADO (href local, sin origen externo http)', () => {
     const horneado = renderToString(<Hero />)
 
     const href = /<image[^>]*\shref="([^"]*)"/.exec(horneado)?.[1] ?? ''
-    // «brush» va ESCRITO A MANO: el aplicador de esmalte, servido desde el propio sitio.
-    expect(href).toMatch(/brush/)
+
+    // ⚠️ VERDE ≠ FUNCIONA (I-8): aquí el import resuelve a `/src/assets/aplicador.png`, pero en el
+    // artefacto de PRODUCCIÓN Vite lo INCRUSTA como `data:image/png;base64,…` por ser < 4 kB
+    // (VERIFICADO sobre `dist/index.html`). Aseverar solo «aplicador» pasaría en verde describiendo
+    // algo que NO es cierto de lo que se publica. Se acepta cualquiera de las dos formas, y lo que
+    // se exige DE VERDAD —lo que protege F-05— es que jamás sea un origen externo.
+    expect(href, 'el aplicador viaja como ruta local o incrustado, nunca de un tercero').toMatch(
+      /aplicador|^data:image\//,
+    )
     // Autohospedado (F-05, cero terceros): ninguna URL absoluta http(s) a un dominio ajeno.
     expect(href).not.toMatch(/^https?:/)
+    expect(href).not.toMatch(/^\/\//)
   })
 
-  it('@demo el aplicador RECORRE el trazo de las letras con <animateMotion> (no un barrido horizontal)', () => {
+  it('@demo la tinta se revela con una MÁSCARA que traza la línea central, no con un barrido', () => {
     const horneado = renderToString(<Hero />)
 
-    const anim = /<animateMotion[^>]*\spath="([^"]*)"/.exec(horneado)
-    expect(anim, 'el pincel debe moverse con <animateMotion> sobre un path (no left/top)').not.toBeNull()
+    // El <mask> es lo que hace que la tinta aparezca SIGUIENDO el trazo. Un <clipPath> NO valdría:
+    // por especificación usa solo la geometría del relleno, «exclusive of … stroke».
+    expect(horneado).toMatch(/<mask[^>]*id="tinta-marca"/)
+    expect(horneado).toMatch(/<text[^>]*mask="url\(#tinta-marca\)"/)
+    expect(horneado, 'el <clipPath> ignora el stroke: no sirve para este revelado').not.toMatch(
+      /<clipPath/i,
+    )
+  })
 
-    const trazo = (anim as RegExpExecArray)[1]
-    // Un TRAZO real de escritura, NO un barrido: empieza en un moveto (M), tiene MUCHAS curvas (C, las
-    // subidas/lazos de cada letra) y EXACTAMENTE DOS subtrazos (dos «M» = la pluma se levanta entre
-    // «Nails» y «Lash»). Un barrido horizontal sería una sola recta sin curvas.
-    expect(trazo).toMatch(/^\s*M/)
-    expect((trazo.match(/C/g) ?? []).length).toBeGreaterThan(8)
-    expect((trazo.match(/M/g) ?? []).length).toBe(2)
+  it('@demo el trazo declara pathLength="100" — la métrica que sincroniza punta y tinta', () => {
+    const horneado = renderToString(<Hero />)
+
+    // Con pathLength="100", `stroke-dashoffset` (unidades de usuario) y `offset-distance` (% de la
+    // longitud del path) son AMBAS lineales en longitud de arco → la punta cae exactamente sobre
+    // el borde de lo recién pintado. Sin él, cada una avanzaría con su propia métrica.
+    expect(horneado).toMatch(/<path[^>]*id="trazo-marca"[^>]*pathLength="100"/)
+  })
+
+  it('@demo el recorrido es un TRAZO de escritura real: curvas y 5 plumadas, no una recta', () => {
+    const horneado = renderToString(<Hero />)
+
+    const d = /<path[^>]*id="trazo-marca"[^>]*\sd="([^"]*)"/.exec(horneado)?.[1] ?? ''
+
+    expect(d).toMatch(/^\s*M/)
+    // MUCHAS curvas (las subidas y los lazos de cada letra). Un barrido sería una sola recta.
+    expect((d.match(/C/g) ?? []).length).toBeGreaterThan(8)
+    // El 5 va ESCRITO A MANO: son los levantamientos de pluma REALES del rótulo — «N», «ails», el
+    // punto de la «i», «L» y «ash». No se eligieron: salieron como componentes conexas del
+    // esqueleto de los glifos (tools/trazo-marca/derivar.html).
+    expect((d.match(/M/g) ?? []).length).toBe(5)
+  })
+
+  /**
+   * LA GEOMETRÍA DEL APLICADOR. Es donde estaba el defecto MEDIDO del intento anterior: el
+   * `<image>` anclaba el punto del recorrido a y=−129 de height=150, o sea al 86 % de la imagen,
+   * que en `brush.png` (una BOTELLA de 60×198: cerdas en y 12–36, varilla, frasco negro en 105–197)
+   * cae DENTRO DEL FRASCO. Lo que «pintaba» las letras era el culo del bote.
+   *
+   * Los números van ESCRITOS A MANO (anti-tautología), NUNCA importados del componente: 15 y 93 son
+   * las dimensiones REALES de `aplicador.png` y 0,4667 la posición medida de la punta en su borde
+   * inferior (`tools/trazo-marca/aplicador.mjs` los imprime al generarlo).
+   */
+  describe('@s3 la PUNTA del aplicador —no el frasco— es lo que va sobre el recorrido', () => {
+    function atributosDelAplicador() {
+      const horneado = renderToString(<Hero />)
+      const img = /<image\b[^>]*>/.exec(horneado)?.[0] ?? ''
+      const num = (nombre: string) =>
+        Number(new RegExp(`\\s${nombre}="([^"]*)"`).exec(img)?.[1] ?? NaN)
+
+      return { img, x: num('x'), y: num('y'), ancho: num('width'), alto: num('height') }
+    }
+
+    it('@s3 el borde INFERIOR de la imagen cae en el (0,0) local: y = −alto', () => {
+      const { y, alto } = atributosDelAplicador()
+
+      expect(alto).toBeGreaterThan(0)
+      // Si y no fuera exactamente −alto, la punta quedaría flotando por encima o hundida bajo la
+      // tinta. Es la aserción que caza el defecto del intento anterior.
+      expect(y).toBe(-alto)
+    })
+
+    it('@s3 la imagen conserva la proporción REAL de aplicador.png (15 × 93)', () => {
+      const { ancho, alto } = atributosDelAplicador()
+
+      // 15/93 van ESCRITOS A MANO: deformar el aplicador lo delataría al instante.
+      expect(ancho / alto).toBeCloseTo(15 / 93, 4)
+    })
+
+    it('@s3 la punta se sitúa en el centro del borde inferior (0,4667 del ancho, medido)', () => {
+      const { x, ancho } = atributosDelAplicador()
+
+      // El desplazamiento en x lleva la punta —no la esquina de la imagen— al punto del recorrido.
+      expect(-x / ancho).toBeCloseTo(0.4667, 4)
+    })
+
+    it('@s3 el aplicador se INCLINA sobre su punta, como lo sostendría una mano', () => {
+      const { img } = atributosDelAplicador()
+
+      // `rotate(18)` sin centro gira alrededor del (0,0) del <g>, que ES la punta ya colocada
+      // sobre el recorrido. Con otro centro, la punta se despegaría de la tinta al inclinarse.
+      expect(img).toMatch(/transform="rotate\(18\)"/)
+    })
+  })
+
+  it('@demo la MÁSCARA cubre todo el viewBox del rótulo (si no, faltarían trozos de letra)', () => {
+    const horneado = renderToString(<Hero />)
+    const mask = /<mask\b[^>]*>/.exec(horneado)?.[0] ?? ''
+    const svg = /<svg\b[^>]*>/.exec(horneado)?.[0] ?? ''
+    const vista = /viewBox="([^"]*)"/.exec(svg)?.[1] ?? ''
+    const [x, y, ancho, alto] = vista.split(' ')
+
+    // La región del <mask> se DERIVA del viewBox (una sola fuente de verdad). Antes eran cuatro
+    // literales duplicados y el `judge` lo cazó: saboteando el viewBox, la máscara no se movía y
+    // los tests seguían verdes. Si se quedara corta, la parte de las letras que cayera fuera NO se
+    // revelaría nunca.
+    expect(mask).toMatch(/maskUnits="userSpaceOnUse"/)
+    expect(mask).toContain(`x="${x}"`)
+    expect(mask).toContain(`y="${y}"`)
+    expect(mask).toContain(`width="${ancho}"`)
+    expect(mask).toContain(`height="${alto}"`)
+  })
+
+  /**
+   * @s1 — LA PUERTA DEL RECORTE. Es el escenario que Pablo ha reportado DOS VECES y que hasta ahora
+   * no tenía ningún test: se podía encoger el viewBox a la caja que secciona la «N» y la «h» con la
+   * suite entera en verde (lo demostró el `judge` saboteando `VISTA_MARCA` a '0 -840 3895 1200').
+   *
+   * Los límites de la tinta van ESCRITOS A MANO, NUNCA importados: son la MEDICIÓN de
+   * `TextMetrics` sobre Great Vibes a 1000 px (progress/hallazgos_hero_caligrafia.md), en milésimas
+   * de em con la línea base en 0. La caja de AVANCE del texto solo llega a 3895 — por eso la cola
+   * de la «h» (3965,3) se salía y `clip-path` la seccionaba.
+   */
+  describe('@s1 el viewBox ENCIERRA la tinta real: ni la «N» ni la «h» pueden quedar seccionadas', () => {
+    const TINTA = { izq: -15.6, der: 3965.3, arriba: -796.9, abajo: 312.5 }
+
+    function vistaDelRotulo() {
+      const svg = /<svg\b[^>]*>/.exec(renderToString(<Hero />))?.[0] ?? ''
+      const [x, y, ancho, alto] = (/viewBox="([^"]*)"/.exec(svg)?.[1] ?? '').split(' ').map(Number)
+
+      return { x, y, ancho, alto }
+    }
+
+    it('@s1 el borde IZQUIERDO del viewBox queda por fuera del arranque de la «N»', () => {
+      const { x } = vistaDelRotulo()
+
+      expect(x).toBeLessThanOrEqual(TINTA.izq)
+    })
+
+    it('@s1 el borde DERECHO del viewBox queda por fuera de la cola de la «h»', () => {
+      const { x, ancho } = vistaDelRotulo()
+
+      // 3965,3 > 3895 (el ancho de avance): ESTE es el número que delataba el recorte.
+      expect(x + ancho).toBeGreaterThanOrEqual(TINTA.der)
+    })
+
+    it('@s1 los bordes SUPERIOR e INFERIOR quedan por fuera de las astas y los descendentes', () => {
+      const { y, alto } = vistaDelRotulo()
+
+      expect(y).toBeLessThanOrEqual(TINTA.arriba)
+      expect(y + alto).toBeGreaterThanOrEqual(TINTA.abajo)
+    })
+
+    it('@s1 el margen sobrante es holgado por los cuatro lados, no un empate al milímetro', () => {
+      const { x, y, ancho, alto } = vistaDelRotulo()
+
+      // Un viewBox que rozara la tinta dejaría el antialiasing del borde cortado. 40‰ = 0,04 em.
+      const MARGEN_MINIMO = 40
+
+      expect(TINTA.izq - x, 'margen izquierdo').toBeGreaterThanOrEqual(MARGEN_MINIMO)
+      expect(x + ancho - TINTA.der, 'margen derecho').toBeGreaterThanOrEqual(MARGEN_MINIMO)
+      expect(TINTA.arriba - y, 'margen superior').toBeGreaterThanOrEqual(MARGEN_MINIMO)
+      expect(y + alto - TINTA.abajo, 'margen inferior').toBeGreaterThanOrEqual(MARGEN_MINIMO)
+    })
+  })
+
+  it('@demo las letras se dibujan a 1000 unidades por em con la línea base en y=0', () => {
+    const horneado = renderToString(<Hero />)
+    const texto = /<text\b[^>]*>/.exec(horneado)?.[0] ?? ''
+
+    // 1000 y 0 van ESCRITOS A MANO: es el sistema de coordenadas en el que está calculada la línea
+    // central (milésimas de em, línea base en 0). Cambiar cualquiera desalinearía trazo y letras.
+    expect(texto).toMatch(/font-size="1000"/)
+    expect(texto).toMatch(/\sx="0"/)
+    expect(texto).toMatch(/\sy="0"/)
+  })
+
+  it('@demo el rótulo dibujado NO duplica el nombre para un lector de pantalla', () => {
+    const horneado = renderToString(<Hero />)
+
+    // «Nails Lash» aparece DOS veces en los bytes (el <text> del SVG y el <span> del <h1>), pero
+    // el <svg> es aria-hidden, así que solo se anuncia una. Si alguien le quitara el aria-hidden,
+    // un lector diría «Nails Lash» dos veces.
+    const svg = /<svg\b[^>]*>/.exec(horneado)?.[0] ?? ''
+    expect(svg).toContain('aria-hidden="true"')
   })
 })
