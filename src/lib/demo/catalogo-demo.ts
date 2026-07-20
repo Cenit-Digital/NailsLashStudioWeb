@@ -15,7 +15,7 @@ export interface ServicioDemo {
 export interface CategoriaDemo {
   readonly clave: string
   readonly eyebrow: string
-  readonly titlebuttonfooter: string
+  readonly textoBoton: string
   readonly titulo: string
   readonly intro: string
   readonly servicios: readonly ServicioDemo[]
@@ -25,7 +25,7 @@ export const CATALOGO_DEMO: readonly CategoriaDemo[] = [
   {
     clave: 'unas',
     eyebrow: 'Servicio de Uñas',
-    titlebuttonfooter: 'Reservar Uñas',
+    textoBoton: 'Reservar Uñas',
     titulo: 'Manos y pies de Revista',
     intro: 'Manicura, pedicura, esculpido y nail art con producto premium y un acabado impecable que dura semanas.',
     servicios: [
@@ -40,7 +40,7 @@ export const CATALOGO_DEMO: readonly CategoriaDemo[] = [
   {
     clave: 'facial',
     eyebrow: 'Servicio Facial',
-    titlebuttonfooter: 'Reservar Facial',
+    textoBoton: 'Reservar Facial',
     titulo: 'Tu piel, radiante',
     intro: 'Tratamientos de limpieza, hidratación y luminosidad, más pestañas y cejas, adaptados a tu tipo de piel.',
     servicios: [
@@ -55,7 +55,7 @@ export const CATALOGO_DEMO: readonly CategoriaDemo[] = [
   {
     clave: 'depilacion',
     eyebrow: 'Servicio de Depilación',
-    titlebuttonfooter: 'Reservar Depilación',
+    textoBoton: 'Reservar Depilación',
     titulo: 'Piel suave y cuidada',
     intro: 'Depilación con cera tibia en un entorno higiénico y respetuoso, para una piel suave más tiempo.',
     servicios: [

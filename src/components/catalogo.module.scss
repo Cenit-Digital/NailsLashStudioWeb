@@ -1,6 +1,23 @@
 // Catálogo de servicios (capa visual del DEMO). Estilos derivados del prototipo Opcion-1-Rosa:
 // tarjeta con lista de precios + bloque de foto (aquí, placeholder rosa, sin fotos reales).
 
+// El <h2> «Servicios» se oculta a la vista (decisión de Pablo) pero SIGUE en el árbol de
+// accesibilidad: es el nombre accesible de la sección y el destino de #servicios-titulo. Técnica
+// «visually hidden» estándar; display:none / visibility:hidden lo borrarían del árbol y romperían
+// la puerta del cascarón.
+.tituloOculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 .categoria {
   margin-top: 3.5rem;
 
