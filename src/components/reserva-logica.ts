@@ -11,3 +11,24 @@ export type ClaveBurbuja = 'burbujaBot' | 'burbujaUsuario'
 export function claveBurbuja(deBot: boolean): ClaveBurbuja {
   return deBot ? 'burbujaBot' : 'burbujaUsuario'
 }
+
+/**
+ * Los cuatro datos que la clienta contesta en el guion del chat (contrato @s23), ya listos para
+ * componer el mensaje de WhatsApp.
+ */
+export interface SolicitudReserva {
+  readonly servicio: string
+  readonly dia: string
+  readonly franja: string
+  readonly nombre: string
+}
+
+/**
+ * Compone, en castellano natural, la solicitud que la clienta enviará por WhatsApp al terminar el
+ * chat (features/reserva_chat.feature @s23/@s24, decisión de Pablo: «que acabe abriendo WhatsApp
+ * con la reserva ya escrita»). Función PURA: mismos cuatro argumentos, mismo texto siempre. El
+ * `.tsx` NUNCA compone este texto inline: solo llama a esta función y se lo pasa a `waHref`.
+ */
+export function mensajeReserva({ servicio, dia, franja, nombre }: SolicitudReserva): string {
+  return `Hola, quiero reservar: ${servicio} · ${dia} · ${franja}. Me llamo ${nombre} y os escribo desde la web. ¿Podéis confirmarme la hora exacta?`
+}

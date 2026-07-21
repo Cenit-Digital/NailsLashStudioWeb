@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { RESERVA_WHATSAPP_TEXTO } from '../lib/demo/reserva-demo'
 import { TELEFONO, telHref, waHref } from '../lib/site'
-import { claveBurbuja } from './reserva-logica'
+import { claveBurbuja, mensajeReserva } from './reserva-logica'
 import estilos from './reserva.module.scss'
 
 /**
@@ -37,6 +37,14 @@ const FLUJO_CHAT: readonly PasoChat[] = [
 
 function mensajeInicial(): MensajeChat[] {
   return [{ deBot: true, texto: FLUJO_CHAT[0].bot }]
+}
+
+/** El href del CTA que entrega la reserva ya redactada (@s24): junta el número de F-02 con el
+ * mensaje que compone la función PURA `mensajeReserva` a partir de las cuatro respuestas del guion. */
+function hrefReservaWhatsapp(respuestas: Record<string, string>): string {
+  const { servicio, dia, franja, nombre } = respuestas
+
+  return waHref(TELEFONO.legible, mensajeReserva({ servicio, dia, franja, nombre }))
 }
 
 export function Reserva() {
@@ -75,7 +83,6 @@ export function Reserva() {
   const enviarNombre = () => {
     const valor = borrador.trim()
     if (valor === '') return
-    setBorrador('')
     avanzar(valor)
   }
 
@@ -161,9 +168,14 @@ export function Reserva() {
               </div>
             )}
             {hecho && (
-              <button type="button" className={estilos.reiniciar} onClick={reiniciar}>
-                Reservar otra cita
-              </button>
+              <>
+                <a className="demo-btn demo-btn--wa" href={hrefReservaWhatsapp(respuestas)}>
+                  Enviar la reserva por WhatsApp
+                </a>
+                <button type="button" className={estilos.reiniciar} onClick={reiniciar}>
+                  Reservar otra cita
+                </button>
+              </>
             )}
           </div>
         </div>

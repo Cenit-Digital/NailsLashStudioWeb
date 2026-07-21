@@ -125,6 +125,12 @@
 - **Deuda anotada (`progress/deuda_precios_catalogo.md`):** los precios del catálogo quedaron
   descolocados en el commit `5a1345c` (p. ej. «Piernas completas 10 €» < «Medias piernas 35 €», y el
   catálogo anuncia «Facial»/«Depilación» que el salón no ofrece). Pablo pidió expresamente NO tocarlo.
+- **Feature en curso: `reserva_chat` (columna WhatsApp) — sesión 2026-07-21 (`tdd_craftsman`).** Puerta
+  humana abierta explícitamente (Pablo, vía `AskUserQuestion`): al terminar el chat, un enlace abre
+  WhatsApp con la reserva YA REDACTADA (servicio, día, franja, nombre). `features/reserva_chat.feature`
+  reescrito (v3): `@s22` restringido a la frontera con F-13 (disponibilidad/confirmación real), `@s23`
+  (nuevo, `mensajeReserva` pura) y `@s24` (nuevo, el enlace "Enviar la reserva por WhatsApp" antes de
+  "Reservar otra cita"). Diario: `progress/tdd_chat_whatsapp.md`. NO se marca `done` aquí.
 - **Proyecto:** **9 done · 2 spec_ready (F-09/F-12 del lote A) · 6 pending · 4 blocked.**
 - **Contratos del lote A ya aprobados y abiertos** (cabecera ✅): `features/horario.feature` (15),
   `features/contacto.feature` (15), `features/catalogo_servicios.feature` (17). El `tdd_craftsman` los
@@ -152,6 +158,73 @@
   lo declare sale en la serif por defecto del UA (visible en la captura de F-07: «Servicios», el
   cuerpo). No hay feature/spec aprobada para la tipografía global del cuerpo → **candidato a su propia
   feature**.
+
+- **🎨 FOTOS REALES en Equipo y Galería — TDD VERDE (2026-07-21, `tdd_craftsman`), a la espera de
+  `judge`/`mutation_tester` (no marcado `done`).** El lead ya seleccionó y commiteó 13 fotos de Pexels
+  en `src/assets/trabajos/` (fotos de TRABAJOS, sin rostro identificable — licencia Pexels + LO
+  1/1982); esta sesión solo las cablea. (A) `Equipo.tsx`: el monograma (inicial sobre rosa) se BORRA
+  ENTERO (`inicialDe` de `equipo-logica.ts`, sus 4 tests, la regla `.monograma` del SCSS y su test) y
+  cada una de las 7 tarjetas pasa a mostrar la foto real de su trabajo (`foto`+`alt` nuevos en
+  `ProfesionalDemo`, `equipo-demo.ts`), 800×600 + `loading="lazy"`. `LEYENDA_EQUIPO` pasa a declarar
+  también que las fotos son de banco de imágenes. `features/equipo_reservas.feature` @s7/@s8/@s26-@s31
+  reescritos (el monograma se sustituye por las fotos). (B) `Galeria.tsx` (sin tests hasta hoy) gana
+  las 6 fotos restantes + `src/components/galeria.test.tsx` nuevo (7 tests); NO se añade a
+  `stryker.config.json` (instrucción del encargo). **76/76 verdes en los ficheros tocados, 946/946 en
+  la suite completa (33 ficheros)**, typecheck 0, lint 0/0. `Reserva.tsx`/`reserva*`/`Contacto.tsx`/
+  `home.tsx`/`stryker.config.json`/`feature_list.json` NO se tocaron (fuera de alcance). Diario:
+  `progress/tdd_fotos_equipo_galeria.md`. 🟡 Pendiente: `pnpm build` (5 puertas) y mutación de
+  `Equipo.tsx`/`equipo-logica.ts` los corre el lead al cierre.
+
+- **✅ CIERRE DE SESIÓN — fotos + chat funcional + mutación (2026-07-21, verificado A MANO por el
+  lead, NO fiado del informe de los agentes).** Los tres puntos que pidió Pablo, cerrados:
+  1. **Fotos** (su punto 3). El lead buscó en Pexels, descargó y **MIRÓ una a una 24 candidatas**;
+     descartó 4 por mostrar **rostros identificables**, otras por fondo turquesa/azul fuera de paleta,
+     por navideña y por repetida. Quedaron **13** (7 equipo + 6 galería), 544 KB, ~42 KB de media.
+     🔴 **Corrección a la bitácora anterior: el ZIP del prototipo NO trae caras de IA.** Las 11
+     imágenes de `Opcion-1-Rosa` son placeholders grises con el literal «IMAGEN TEMPORAL» (por eso la
+     puerta 2 prohíbe `ph-woman` Y ese literal). No había ninguna foto que reutilizar.
+     🔴 **Por qué fotos de TRABAJOS y no retratos** (decisión con base legal, no estética): la
+     licencia OFICIAL de Pexels (leída hoy, `https://www.pexels.com/license/`) dice *«Don't imply
+     endorsement of your product by people or brands on the imagery»*. Una cara de banco en una
+     tarjeta que dice «Lucía · Especialista en uñas» implica que esa persona trabaja aquí → va contra
+     la licencia Y contra LO 1/1982. Con fotos de trabajo **el bloqueo de F-18 «para publicar» por
+     imagen de terceros DECAE** (siguen bloqueando los nombres/reseñas de ejemplo, con su leyenda).
+  2. **Chat funcional** (su punto 1). Pablo eligió por `AskUserQuestion` «que acabe abriendo
+     WhatsApp». Un agente se NEGÓ citando @s22 del contrato; **hizo bien en pararse, pero el contrato
+     lo había escrito otro agente esa misma mañana y la puerta humana es el humano**: se reabrió @s22
+     y se implementó. `mensajeReserva()` PURA en `reserva-logica.ts` + CTA «Enviar la reserva por
+     WhatsApp» con `waHref` de F-02.
+  3. **Mutación de `#reserva`** (su punto 2): `Reserva.tsx` y `reserva-logica.ts` ENTRAN en `mutate`.
+     Afloró **una línea muerta** (`setBorrador('')` redundante) que nadie había visto.
+  - 🔴 **LA MUTACIÓN SE PAGÓ SOLA, OTRA VEZ.** Con typecheck 0, lint 0, 950/950 tests y las 5 puertas
+    VERDES, la mutación destapó que meter las fotos (borrar el monograma y sus tests) había dejado
+    **12 mutantes vivos**: 4 en `equipo-logica.ts` —se podía **VACIAR `'Monday'`/`'Friday'`… de
+    `DIA_SEMANA`** sin que ningún test se enterara, y ese array traduce el día al horario de F-10— y
+    8 en `Equipo.tsx` (el lead estimó 2 leyendo mal el informe; medidos eran 8). Los 12, cerrados.
+  - **CIFRAS FINALES, medidas por el lead:** typecheck **0** · lint **0 errores / 0 warnings** ·
+    `pnpm test` **956/956** (33 ficheros) · `pnpm build` **exit 0 con las 5 puertas** · mutación
+    **100,00 %** en los CUATRO ficheros: `equipo-logica.ts` (38 muertos), `Equipo.tsx` (63),
+    `reserva-logica.ts` (5), `Reserva.tsx` (97). **0 supervivientes.**
+  - **1 exclusión NUEVA, revisada y aceptada por el lead** (3 en todo el repo): las deps `[]` del
+    `useEffect` de `Equipo.tsx`. React compara las deps con `Object.is` elemento a elemento; un
+    literal CONSTANTE (`[]` o `['Stryker was here']`) vale lo mismo en cada render → el efecto corre
+    exactamente una vez al montar en AMBOS casos, y `Equipo` no tiene props con las que forzar otra
+    cosa. Mutante EQUIVALENTE, no un test que falte. Verificado aplicando la mutación a mano.
+  - **VERIFICACIÓN EN VIVO con Chrome** (la lección de F-07): las 13 imágenes cargan, natural 800×600,
+    **pintadas 348×261 (4:3 exacto)**, 7 tarjetas, sección de 2637 px, todo `opacity:1`/`visible`.
+    El **chat se condujo de punta a punta** (Uñas → Entre semana → Por la mañana → «Marta») y el CTA
+    resultante es `wa.me/34625223366?text=Hola, quiero reservar: Uñas · Entre semana · Por la mañana.
+    Me llamo Marta…` — los 4 datos y el número REAL. ⚠️ **El capturador de pantalla de Chrome devolvía
+    fotogramas EN BLANCO** (y una vez timeout de CDP): NO era la página —se descartó midiendo el DOM—.
+    Si alguien repite la verificación, que no confunda el bug del capturador con un fallo de la web.
+  - 🟡 **Deuda viva:** (a) el chat sigue SIN decir en pantalla que es una demostración —ahora entrega
+    la solicitud de verdad, así que el riesgo baja, pero la leyenda sigue sin escenario—; (b)
+    `Galeria.tsx` tiene 7 tests pero NO está en `mutate`; (c) `features/galeria_carrusel.feature` @s24
+    (galería ANTES de «Reserva rápida») quedó obsoleto al dejarla donde está; (d) `features/
+    contacto.feature` @s11/@s12 reservan «Cómo llegar» a F-11 pero el botón YA existe en
+    `Contacto.tsx`, sin test, desde antes de esta sesión; (e) los huecos de foto del CATÁLOGO siguen
+    vacíos (Pablo no los marcó) y el catálogo sigue anunciando «Servicio facial» con precios, que el
+    salón NO ofrece (deuda `progress/deuda_precios_catalogo.md`, Pablo pidió no tocarla).
 
 ## Pendiente del humano (heredado, no bloquea el código)
 

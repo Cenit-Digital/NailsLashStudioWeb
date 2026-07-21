@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { EQUIPO_DEMO, LEYENDA_EQUIPO, type ProfesionalDemo } from '../lib/demo/equipo-demo'
-import { type DiaOfrecido, diasOfrecidos, franjasDe, inicialDe, indiceCircular } from './equipo-logica'
+import { type DiaOfrecido, diasOfrecidos, franjasDe, indiceCircular } from './equipo-logica'
 import estilos from './equipo.module.scss'
 
 /**
@@ -30,6 +30,11 @@ const CARGANDO_DIAS = 'Cargando días…'
 const BOTON_INCOMPLETO = 'Elige día y hora'
 const SUBTEXTO_CONFIRMA = 'Te confirmaremos por WhatsApp.'
 const ESTRELLAS_TEXTO = '5 de 5 estrellas'
+
+// Las 800×600 REALES de las fotos de `src/assets/trabajos/` (banco de imágenes, @s26-@s31): reservar
+// el espacio evita el salto de layout (CLS) antes de que la imagen cargue.
+const ANCHO_FOTO = 800
+const ALTO_FOTO = 600
 
 /** Una cita como VALOR: el día ofrecido y su franja. Es la propuesta antes de confirmar y la reserva
  *  después; modelarla como objeto (no como banderas coordinadas) elimina la guarda redundante. */
@@ -71,8 +76,14 @@ function TarjetaProfesional({ profesional, dias }: TarjetaProps) {
 
   return (
     <article className={estilos.tarjeta}>
-      <div className={estilos.foto} aria-hidden="true">
-        <span className={estilos.monograma}>{inicialDe(profesional.nombre)}</span>
+      <div className={estilos.foto}>
+        <img
+          src={profesional.foto}
+          alt={profesional.alt}
+          width={ANCHO_FOTO}
+          height={ALTO_FOTO}
+          loading="lazy"
+        />
       </div>
       <div className={estilos.cuerpo}>
         <div className={estilos.filaNombre}>
@@ -93,7 +104,9 @@ function TarjetaProfesional({ profesional, dias }: TarjetaProps) {
             <div className={estilos.circulo} aria-hidden="true">
               ✓
             </div>
-            <p className={estilos.mensaje}>{`Cita con ${profesional.nombre} el ${reserva.dia.dow} ${reserva.dia.day} a las ${reserva.hora}`}</p>
+            <p
+              className={estilos.mensaje}
+            >{`Cita con ${profesional.nombre} el ${reserva.dia.dow} ${reserva.dia.day} a las ${reserva.hora}`}</p>
             <p className={estilos.subtexto}>{SUBTEXTO_CONFIRMA}</p>
             <button type="button" className={estilos.cambiar} onClick={reiniciar}>
               Cambiar
@@ -106,9 +119,9 @@ function TarjetaProfesional({ profesional, dias }: TarjetaProps) {
               {dias.length === 0 && <span className={estilos.cargando}>{CARGANDO_DIAS}</span>}
               {dias.map((dia, indice) => (
                 <button
-                  key={`${dia.dow}-${dia.day}`}
+                  key={dia.day}
                   type="button"
-                  className={indice === diaIdx ? estilos.diaActivo : estilos.dia}
+                  className={estilos.dia}
                   aria-pressed={indice === diaIdx}
                   aria-label={`${dia.dow} ${dia.day}`}
                   onClick={() => elegirDia(indice)}
@@ -181,12 +194,28 @@ function TarjetaProfesional({ profesional, dias }: TarjetaProps) {
 export function Equipo() {
   const [dias, setDias] = useState<readonly DiaOfrecido[]>([])
 
-  useEffect(() => {
-    setDias(diasOfrecidos(new Date()))
-  }, [])
+  // MUTANTE EQUIVALENTE (ArrayDeclaration, deps → ['Stryker was here']), verificado a mano
+  // (progress/mutation_equipo_fotos.md): las dependencias de `useEffect` se comparan elemento a
+  // elemento con `Object.is`, nunca por referencia del array. Un literal CONSTANTE en las deps
+  // (aquí, o la cadena mutada) es el MISMO valor primitivo en cada render, así que React nunca
+  // detecta un cambio y el efecto se ejecuta EXACTAMENTE una vez al montar en ambos casos: con
+  // `[]` y con `['Stryker was here']`. `Equipo` no tiene props (no se puede forzar una key/prop
+  // distinta desde el test) y un remount SIEMPRE re-ejecuta el efecto sea cual sea el array, así
+  // que ningún test observable en este stack distingue las dos ramas. Comprobado a mano: con el
+  // mutante aplicado, la suite completa de equipo (75 tests) sigue en VERDE.
+  useEffect(
+    () => {
+      setDias(diasOfrecidos(new Date()))
+    },
+    // Stryker disable next-line all
+    [],
+  )
 
   return (
-    <section className={`demo-seccion demo-seccion--plain ${estilos.equipo}`} aria-labelledby={ID_EQUIPO}>
+    <section
+      className={`demo-seccion demo-seccion--plain ${estilos.equipo}`}
+      aria-labelledby={ID_EQUIPO}
+    >
       <div className="demo-contenedor">
         <div className="demo-encabezado demo-encabezado--centro">
           <p className="demo-eyebrow">Equipo</p>

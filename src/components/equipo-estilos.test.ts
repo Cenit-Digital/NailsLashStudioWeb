@@ -56,16 +56,6 @@ describe('equipo-estilos — el hueco de foto mantiene el aspect-ratio 4/3 del d
   })
 })
 
-describe('equipo-estilos — el monograma (D8): Gilda Display en --accent-dark, sobre el --accent-soft ya existente', () => {
-  it('el bloque .monograma usa la familia Gilda Display y el color var(--accent-dark)', () => {
-    const monograma = cuerpoDelBloque(scss(), /\.monograma\s*\{/)
-
-    expect(monograma, 'falta el bloque .monograma').not.toBeNull()
-    expect(monograma as string).toMatch(/font-family:\s*'Gilda Display',\s*serif/)
-    expect(monograma as string).toMatch(/color:\s*var\(--accent-dark\)/)
-  })
-})
-
 describe('equipo-estilos — corrección AA: los rellenos/texto pequeños van a --accent-dark, nunca --accent', () => {
   it('ningún "background:" ni "color:" usa var(--accent) a pelo (solo cabe dentro del color-mix de la sombra)', () => {
     // aviso 1 de la spec: --accent bajo texto blanco o como texto pequeño falla AA. Solo sobrevive en el
@@ -73,9 +63,14 @@ describe('equipo-estilos — corrección AA: los rellenos/texto pequeños van a 
     expect(scss()).not.toMatch(/(?:background|color):\s*var\(--accent\)\s*[;}]/)
   })
 
-  it('el relleno del día activo es var(--accent-dark)', () => {
-    // El bloque STANDALONE `.diaActivo` (no el encabezado agrupado `.dia, .diaActivo`) arranca con el relleno.
-    expect(scss()).toMatch(/\.diaActivo\s*\{\s*background:\s*var\(--accent-dark\)/)
+  it('el relleno del día ELEGIDO (derivado de aria-pressed, no de una clase) es var(--accent-dark)', () => {
+    // El estado activo del día NO vive en un `className` condicional (inmatable con css:false, igual
+    // que la hora): se colorea desde `&[aria-pressed='true']` DENTRO de `.dia`, la misma fuente que
+    // el árbol de accesibilidad.
+    const dia = cuerpoDelBloque(scss(), /\.dia\s*\{/)
+
+    expect(dia, 'falta el bloque .dia').not.toBeNull()
+    expect(dia as string).toMatch(/&\[aria-pressed='true'\]\s*\{\s*background:\s*var\(--accent-dark\)/)
   })
 
   it('el relleno de la hora ELEGIDA (derivado de aria-pressed, no de una clase) es var(--accent-dark)', () => {
@@ -100,7 +95,7 @@ describe('equipo-estilos — corrección AA: los rellenos/texto pequeños van a 
 
 describe('equipo-estilos — los bordes de controles usan --border-interactive (3:1), no --line (decorativo)', () => {
   it('el borde del botón de día usa var(--border-interactive)', () => {
-    const dia = cuerpoDelBloque(scss(), /\.dia,\s*\n?\s*\.diaActivo\s*\{/)
+    const dia = cuerpoDelBloque(scss(), /\.dia\s*\{/)
 
     expect(dia as string).toMatch(/border:\s*1px solid var\(--border-interactive\)/)
   })

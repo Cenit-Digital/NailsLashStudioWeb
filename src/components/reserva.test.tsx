@@ -5,7 +5,7 @@ import { renderToString } from 'react-dom/server'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { Reserva } from './Reserva'
-import { claveBurbuja } from './reserva-logica'
+import { claveBurbuja, mensajeReserva } from './reserva-logica'
 
 /**
  * Sección `#reserva` — la columna izquierda RESTAURADA al diseño (prototipo Opción-1-Rosa, L248-256)
@@ -372,7 +372,7 @@ describe('@s14 enviar el nombre vacío o solo espacios no añade NADA al hilo', 
 
 describe('@s15 completar el guion muestra el resumen interpolado y cierra el chat', () => {
   it('@s15 con Uñas · Entre semana · Por la mañana · "Marta", la última burbuja es el resumen EXACTO y el chat se cierra', () => {
-    render(<Reserva />)
+    const { container } = render(<Reserva />)
     avanzarHastaElNombre()
 
     fireEvent.change(screen.getByPlaceholderText('Escribe tu nombre…'), { target: { value: 'Marta' } })
@@ -387,6 +387,12 @@ describe('@s15 completar el guion muestra el resumen interpolado y cierra el cha
     // Solo el botón "Reservar otra cita" sigue en pie: ni chips ni input.
     expect(screen.getAllByRole('button')).toHaveLength(1)
     expect(screen.getByRole('button', { name: 'Reservar otra cita' })).toBeInTheDocument()
+
+    // Mutación (cierre de deuda D6): el resumen lo dice el BOT, no la usuaria — mata el mutante que
+    // invierte `deBot` en la burbuja final (Reserva.tsx), que de otro modo produce el mismo DOM salvo
+    // por este atributo, y ningún test previo lo comprobaba.
+    const burbujas = burbujasDe(container)
+    expect(burbujas[burbujas.length - 1]).toHaveAttribute('data-de', 'bot')
   })
 })
 
@@ -433,6 +439,21 @@ describe('@s17 "Reservar otra cita" reinicia el guion sin rastro de las respuest
     expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual(['Uñas', 'Pestañas', 'Cejas'])
     expect(screen.queryByRole('button', { name: 'Reservar otra cita' })).toBeNull()
     expect(screen.queryByPlaceholderText('Escribe tu nombre…')).toBeNull()
+  })
+
+  it('@s17 el "rastro" también cubre el campo de nombre: al volver a llegar al cuarto paso, está VACÍO, no con "Marta"', () => {
+    render(<Reserva />)
+    avanzarHastaElNombre()
+    fireEvent.change(screen.getByPlaceholderText('Escribe tu nombre…'), { target: { value: 'Marta' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Reservar otra cita' }))
+
+    avanzarHastaElNombre()
+
+    // Mutación (cierre de deuda D6): el reinicio limpia LOS CINCO estados, incluido el borrador del
+    // nombre. Sin este test, quitar ese `setBorrador('')` de `reiniciar` deja el test verde y una
+    // segunda visitante vería el nombre "Marta" ya escrito en el campo.
+    expect(screen.getByPlaceholderText('Escribe tu nombre…')).toHaveValue('')
   })
 })
 
@@ -523,5 +544,65 @@ describe('@s22 la sección NO compone la solicitud ni envía nada — eso sigue 
     fireEvent.click(screen.getByRole('button', { name: 'Enviar' }))
 
     expect(fetchEspiado).not.toHaveBeenCalled()
+  })
+})
+
+describe('@s23 mensajeReserva compone, en castellano natural, los cuatro datos de la clienta', () => {
+  it('@s23 con Uñas · Entre semana · Por la mañana · "Marta" devuelve el texto EXACTO', () => {
+    expect(
+      mensajeReserva({ servicio: 'Uñas', dia: 'Entre semana', franja: 'Por la mañana', nombre: 'Marta' }),
+    ).toBe(
+      'Hola, quiero reservar: Uñas · Entre semana · Por la mañana. Me llamo Marta y os escribo desde la web. ¿Podéis confirmarme la hora exacta?',
+    )
+  })
+
+  it('@s23 con otros cuatro valores (acentos, superíndice y "&") devuelve el texto EXACTO: mata al mutante que fija un valor o pierde un campo', () => {
+    expect(
+      mensajeReserva({
+        servicio: 'Cejas',
+        dia: 'Este fin de semana',
+        franja: 'Me es indiferente',
+        nombre: 'Mª Ángeles & Co.',
+      }),
+    ).toBe(
+      'Hola, quiero reservar: Cejas · Este fin de semana · Me es indiferente. Me llamo Mª Ángeles & Co. y os escribo desde la web. ¿Podéis confirmarme la hora exacta?',
+    )
+  })
+})
+
+describe('@s24 al terminar el chat aparece, ANTES de "Reservar otra cita", un enlace con la reserva ya escrita', () => {
+  it('@s24 no existe antes de terminar; al terminar, va ANTES de "Reservar otra cita" con nombre accesible, href y mensaje correctos', () => {
+    const { container } = render(<Reserva />)
+    // ANTES de terminar (recién montado): el enlace NO existe.
+    expect(screen.queryByText('Enviar la reserva por WhatsApp')).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Uñas' }))
+    // A MITAD del guion: sigue sin existir.
+    expect(screen.queryByText('Enviar la reserva por WhatsApp')).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Entre semana' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Por la mañana' }))
+    fireEvent.change(screen.getByPlaceholderText('Escribe tu nombre…'), { target: { value: 'Marta' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar' }))
+
+    // Solo "Reservar otra cita" sigue siendo un <button>; el nuevo CTA es un <a>.
+    expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual(['Reservar otra cita'])
+
+    const enlaceWa = screen.getByRole('link', { name: 'Enviar la reserva por WhatsApp' })
+    expect(enlaceWa).not.toHaveAttribute('target')
+
+    // "ANTES" en el DOM: su posición en el HTML precede a la del botón de reinicio.
+    const html = container.innerHTML
+    expect(html.indexOf('Enviar la reserva por WhatsApp')).toBeLessThan(html.indexOf('Reservar otra cita'))
+
+    const href = enlaceWa.getAttribute('href') ?? ''
+    expect(href).toContain('34625223366')
+    const texto = decodeURIComponent(href.split('?text=')[1] ?? '')
+    // Decodificado con el inverso NATIVO (ningún código de producción llama a decodeURIComponent):
+    // evita transcribir a mano el urlencoded largo sin reintroducir la tautología de reejecutar
+    // mensajeReserva/waHref contra su propio resultado.
+    expect(texto).toBe(
+      'Hola, quiero reservar: Uñas · Entre semana · Por la mañana. Me llamo Marta y os escribo desde la web. ¿Podéis confirmarme la hora exacta?',
+    )
   })
 })

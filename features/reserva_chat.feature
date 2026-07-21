@@ -1,6 +1,9 @@
 # =============================================================================================
-# CONTRATO — sección #reserva: columna izquierda RESTAURADA al diseño + chat guiado que SE MANTIENE.
-# Fichero REESCRITO ENTERO (v2). Estado: PROPUESTA hasta la puerta humana.
+# CONTRATO — sección #reserva: columna izquierda RESTAURADA al diseño + chat guiado que SE MANTIENE
+# y que ahora SÍ entrega lo contestado por WhatsApp.
+# v2: REESCRITO ENTERO, aprobado por la puerta humana (@s1-@s21 implementados y en HEAD).
+# v3 (2026-07-21): AMPLIACIÓN puntual con puerta humana YA ABIERTA (ver bloque "ACTUALIZACIÓN v3"
+# más abajo) — `@s22` acotado + `@s23`/`@s24` nuevos. El resto de v2 NO se reabre.
 #
 # 🔴 POR QUÉ SE REESCRIBE: LA v1 MENTÍA. Contrastado contra `src/components/Reserva.tsx` (leído hoy):
 #   · v1 @s1 decía que las opciones eran «Uñas», «Facial», «Depilación» y «Pestañas». FALSO por
@@ -35,13 +38,34 @@
 # `telHref` sobre `TELEFONO.legible`. Copiarlo mataría el build.
 #
 # =============================================================================================
-# FRONTERA CON F-13 (`solicitud_whatsapp`, id 13, `pending`) — SIGUE INTACTA
+# 🔴 ACTUALIZACIÓN v3 (2026-07-21) — LA FRONTERA CON F-13 SE MUEVE: EL CHAT SÍ COMPONE LA SOLICITUD
 # =============================================================================================
-# Esta sección NO compone la solicitud. El enlace de WhatsApp de la columna izquierda lleva un
-# mensaje DEMO **fijo** (sin servicio, sin fecha, sin hora, sin profesional), igual que el CTA de
-# `#contacto` y que el botón flotante. LA COMPOSICIÓN REAL DE LA SOLICITUD SIGUE SIENDO F-13, que
-# NO se cierra ni se marca `spec_ready` con este contrato (@s22). El chat, por su parte, NO ENVÍA
-# NADA a ningún sitio: es estado local del navegador (Reserva.tsx:78-123).
+# v2 (más abajo) declaraba esta frontera "SIGUE INTACTA": el chat no componía nada, solo prometía
+# "te confirmamos por WhatsApp" sin poder cumplirlo por sí mismo. El craftsman_lead preguntó a
+# Pablo explícitamente (herramienta `AskUserQuestion`) qué debía pasar al terminar el chat, y Pablo
+# eligió, literalmente:
+#   «Que acabe abriendo WhatsApp — Al terminar las 4 preguntas, un botón abre WhatsApp con la
+#   reserva ya escrita (servicio, día, franja y nombre) para que la clienta la envíe. Así la frase
+#   deja de ser mentira y el chat funciona de verdad, sin backend.»
+# ESTE CONTRATO SE REESCRIBE (`@s22` acotado + `@s23`/`@s24` nuevos) para reflejar esa decisión: la
+# puerta humana YA ESTÁ ABIERTA para esta pieza concreta. NO reabre el resto de v2 (columna
+# izquierda, copy verbatim, cinco puertas, guion fijo de 4 pasos): eso sigue exactamente igual.
+#
+# =============================================================================================
+# FRONTERA CON F-13 (`solicitud_whatsapp`, id 13, `pending`) — SE ESTRECHA, NO DESAPARECE
+# =============================================================================================
+# Esta sección SÍ compone, desde este contrato en adelante, una solicitud: al terminar el guion de
+# 4 pasos aparece un enlace ("Enviar la reserva por WhatsApp") cuyo texto lleva servicio, día,
+# franja y nombre interpolados por la función PURA `mensajeReserva` (@s23). Sigue siendo "sin
+# backend": el enlace SOLO abre WhatsApp con el texto puesto, y es LA CLIENTA quien pulsa enviar
+# (@s24) — nadie en el estudio recibe nada hasta que ella lo hace. El enlace FIJO de la columna
+# izquierda ("WhatsApp", @s2/@s3) NO cambia: sigue con `RESERVA_WHATSAPP_TEXTO`, un texto genérico
+# que invita a escribir SIN pasar por el chat, para quien prefiere no rellenar el guion. Lo que
+# SIGUE siendo F-13, íntegro: la disponibilidad REAL por profesional y franja
+# (`franjasDisponibles`, que hoy el chat NO consulta: puede ofrecer "Por la tarde" un día que el
+# salón cierra), la asignación de profesional, y la CONFIRMACIÓN real (de servidor, no un mensaje
+# que la clienta puede no llegar a enviar). El chat sigue sin enviar NADA por sí mismo: no hay
+# `fetch`, no hay navegación automática al terminar el guion (@s22).
 #
 # =============================================================================================
 # FUENTES LEÍDAS (no inventadas)
@@ -116,12 +140,18 @@
 # meter estado en un `className` condicional · hornear el número o el host en el `.tsx` · emitir
 # «Facial» o «Depilación» · tocar `#equipo` (su calendario ya está entregado) · tocar la galería
 # «Nuestros trabajos» (decisión de Pablo: se queda donde está) · cambiar el id `reserva-titulo`.
+# ❌ TAMBIÉN PROHIBIDO (v3, @s23/@s24) importar `mensajeReserva` como valor esperado o reejecutarla
+# para comparar con su propio resultado: el mensaje completo se escribe A MANO. Por ser una frase
+# más larga que el texto FIJO de @s3, @s24 decodifica el `href` con `decodeURIComponent` (el inverso
+# NATIVO, que ningún código de producción llama) y compara el resultado con el literal escrito a
+# mano — evita transcribir a mano un «%C3%B1»/«%C2%B7» propenso a error sin reintroducir la
+# tautología (production solo llama a `encodeURIComponent`, nunca a su inverso).
 #
 # =============================================================================================
 # ARTEFACTOS QUE ESTE CONTRATO TOCA (nombres fijados aquí para que el tdd_craftsman no elija)
 # =============================================================================================
 #   src/components/Reserva.tsx                 (MODIFICADO: fuera el mini-calendario, copy del diseño)
-#   src/components/reserva-logica.ts           (NUEVO: guion, avance, resumen y clave de burbuja PUROS)
+#   src/components/reserva-logica.ts           (guion, avance, resumen, clave de burbuja y, desde v3, mensajeReserva PUROS)
 #   src/components/reserva.module.scss         (MODIFICADO: mueren los bloques del calendario)
 #   src/components/reserva.test.tsx            (NUEVO: SSR + árbol de accesibilidad + interacción)
 #   src/components/reserva-estilos.test.ts     (NUEVO: BYTES del .module.scss)
@@ -136,13 +166,17 @@
 #   NO HAY mini-calendario (la regresión a impedir)→ @s6, @s7
 #   el chat sigue funcionando al 100%             → @s8..@s20
 #   las 5 puertas siguen verdes                   → @s21
-#   frontera con F-13 (no se compone la solicitud)→ @s22
+#   frontera con F-13 (disponibilidad/confirmación real siguen siendo F-13) → @s22
+#   mensajeReserva compone servicio+día+franja+nombre, función PURA         → @s23
+#   el enlace "Enviar la reserva por WhatsApp" aparece SOLO al terminar,
+#   antes de "Reservar otra cita", con href derivado de F-02               → @s24
 # =============================================================================================
 
-Feature: Reserva rápida — la columna izquierda vuelve al diseño (texto + WhatsApp + llamar, SIN calendario) y el chat guiado de la derecha sigue funcionando igual
+Feature: Reserva rápida — la columna izquierda vuelve al diseño (texto + WhatsApp + llamar, SIN calendario) y el chat guiado de la derecha sigue funcionando igual, y ahora SÍ entrega lo contestado
   Como visitante quiero, en la sección de reserva, una invitación clara a escribir por WhatsApp o a
   llamar al estudio, y un asistente de chat que me pregunte servicio, día, franja y nombre en cuatro
-  pasos; y como responsable del proyecto quiero que los dos enlaces deriven del teléfono único de
+  pasos y que, al terminar, me ofrezca un enlace con la reserva ya redactada para enviarla yo misma
+  por WhatsApp; y como responsable del proyecto quiero que los enlaces deriven del teléfono único de
   F-02, que la columna izquierda NO vuelva a llenarse de un mini-calendario que el diseño no tiene y
   que sobrevive en `#equipo`, y que la sección siga pasando las cinco puertas del build.
 
@@ -458,18 +492,50 @@ Feature: Reserva rápida — la columna izquierda vuelve al diseño (texto + Wha
     # ese es justo el cambio que rompe el build en silencio, y por eso se reutilizan las utilidades.
 
   @s22
-  Scenario: La sección NO compone la solicitud ni envía nada — eso sigue siendo F-13
+  Scenario: El enlace FIJO de la izquierda sigue siendo genérico y el chat sigue sin enviar nada por sí mismo — la frontera con F-13 se estrecha, no desaparece
     Given el HTML CRUDO prerenderizado de la ruta "/" con la sección "#reserva-titulo" y el chat completado en el navegador
-    When se inspeccionan el href del enlace de WhatsApp y lo que hace el chat al terminar
-    Then el href SÍ contiene "?text=" con un mensaje genérico FIJO (ANCLA POSITIVA: el enlace lleva mensaje)
-    And ese mensaje NO contiene ningún nombre de servicio, ninguna fecha, ninguna hora ni ningún nombre de persona: no hay composición dinámica
-    And al completar el chat NO se abre WhatsApp, NO se navega a ninguna URL y NO se hace ninguna petición de red: el resumen es una burbuja LOCAL
-    And los bytes de "src/components/Reserva.tsx" NO contienen "fetch(", ni "XMLHttpRequest", ni "window.location", ni "form action": nada sale del navegador
-    # FRONTERA con la feature id 13 (`solicitud_whatsapp`, `pending`), que SÍ compone la solicitud a
-    # partir de lo elegido. Declararlo aquí impide dos cosas: que esta sección invada F-13
-    # «mejorando» el mensaje, y que alguien dé F-13 por cerrada con esto. Y fija la HONESTIDAD del
-    # demo: el nombre que escribe la visitante NO viaja a ningún servidor (por eso no hay tratamiento
-    # de datos que informar en capa 1 hoy; el día que el chat ENVÍE algo, eso cambia y es F-13).
+    When se inspeccionan el href del enlace cuyo nombre accesible es exactamente "WhatsApp" y lo que hace el chat al terminar
+    Then ese href SÍ contiene "?text=" con un mensaje genérico FIJO (ANCLA POSITIVA: el enlace lleva mensaje)
+    And ese mensaje genérico NO contiene ningún nombre de servicio, ninguna fecha, ninguna hora ni ningún nombre de persona: sigue siendo la invitación fija a escribir, no una solicitud concreta
+    And al completar el chat NO se abre WhatsApp automáticamente, NO se navega a ninguna URL y NO se hace ninguna petición de red: el enlace nuevo de la reserva (@s24) es para que LA CLIENTA lo pulse, el chat no lo dispara solo
+    And los bytes de "src/components/Reserva.tsx" NO contienen "fetch(", ni "XMLHttpRequest", ni "window.location", ni "form action": nada sale del navegador sin que la clienta pulse un enlace
+    # FRONTERA con la feature id 13 (`solicitud_whatsapp`, `pending`), que SIGUE siendo la única vía
+    # con disponibilidad REAL (franjas por profesional, no las fijas de este guion) y confirmación de
+    # servidor. Lo que este contrato YA NO hace es fingir que el chat "confirma": compone un mensaje
+    # (@s23) y ofrece un enlace (@s24) para que la clienta lo envíe ella misma — decisión explícita de
+    # Pablo (ver cabecera v3), no una mejora improvisada de F-13.
+
+  @s23
+  Scenario Outline: mensajeReserva compone, en castellano natural, los cuatro datos de la clienta — función PURA
+    Given la función "mensajeReserva" de "src/components/reserva-logica.ts" llamada con servicio "<servicio>", día "<dia>", franja "<franja>" y nombre "<nombre>"
+    When se lee el texto que devuelve
+    Then el texto devuelto es exactamente "<mensaje>"
+
+    Examples:
+      | servicio | dia                | franja            | nombre           | mensaje                                                                                                                              |
+      | Uñas     | Entre semana       | Por la mañana      | Marta            | Hola, quiero reservar: Uñas · Entre semana · Por la mañana. Me llamo Marta y os escribo desde la web. ¿Podéis confirmarme la hora exacta? |
+      | Cejas    | Este fin de semana | Me es indiferente  | Mª Ángeles & Co. | Hola, quiero reservar: Cejas · Este fin de semana · Me es indiferente. Me llamo Mª Ángeles & Co. y os escribo desde la web. ¿Podéis confirmarme la hora exacta? |
+
+    # La segunda fila (acentos, superíndice, «&») mata al mutante que fija UN valor o pierde un campo
+    # del `Record`, mismo criterio que @s20 sobre el resumen del bot. `mensajeReserva` es PURA (sin
+    # `Date`, sin `Math.random`, sin estado): mismos 4 argumentos, mismo texto siempre. Se testea en
+    # `reserva.test.tsx` junto a `claveBurbuja` (@s19): mismo módulo, mismo patrón F-09. NUNCA se
+    # importa como valor esperado ni se reejecuta contra su propio resultado.
+
+  @s24
+  Scenario: Al terminar el chat aparece, ANTES de "Reservar otra cita", un enlace que ya lleva la reserva escrita
+    Given el chat con servicio "Uñas", día "Entre semana" y franja "Por la mañana" ya elegidos
+    When escribo el nombre "Marta" y pulso el botón "Enviar"
+    Then aparece, ANTES del botón "Reservar otra cita", un enlace cuyo nombre accesible es exactamente "Enviar la reserva por WhatsApp"
+    And su href contiene la subcadena "34625223366" (el E.164 SIN el "+", derivado de TELEFONO de F-02, nunca hardcodeado)
+    And su href, decodificado, es exactamente el texto que devuelve mensajeReserva para esos cuatro datos (@s23)
+    And el enlace reutiliza la clase global "demo-btn demo-btn--wa" (el mismo par de contraste que YA existe: MINIMO_DE_PARES no gana ninguna fila)
+    And el enlace NO lleva target="_blank" (coherente con @s2 y con el botón flotante)
+    And ANTES de terminar el chat (recién montado, o a mitad del guion) este enlace NO existe: es exclusivo del resumen final
+    # "ANTES" en el DOM: entre las burbujas y el botón de reinicio, el enlace de WhatsApp va primero
+    # (acción PRIMARIA) y "Reservar otra cita" después, tal y como pidió Pablo. Mata al mutante que
+    # invierte `hecho && (...)` a `hecho || (...)` (mostraría el enlace ANTES de terminar el guion) y
+    # al que solo oculta el enlace en el HORNEADO pero lo deja en jsdom por una guarda distinta.
 
   # ---------------------------------------------------------------------------
   # DECISIONES QUE VAN A LA PUERTA — el autor PROPONE, el humano DECIDE

@@ -26,23 +26,19 @@
   box-shadow: 0 16px 34px color-mix(in srgb, var(--accent) 10%, transparent);
 }
 
-// §5 foto: hueco decorativo con aspect-ratio 4/3 y fondo de token. Sin <img>, sin subrecurso externo.
-// El monograma se pinta ENCIMA de este mismo fondo (D8): no nace ninguna superficie nueva.
+// §5 foto: contenedor con aspect-ratio 4/3 y fondo de token (visible mientras la foto lazy carga).
+// La foto real (fotos de trabajos, banco de imágenes) rellena el hueco con object-fit: cover.
 .foto {
   aspect-ratio: 4 / 3;
   background: var(--accent-soft);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  overflow: hidden;
 
-// Monograma decorativo (D8): misma pareja de tokens que .chipEspecialidad (par YA en la matriz de
-// contraste, MINIMO_DE_PARES sigue en 18). `aria-hidden` lo hereda del `.foto` que lo envuelve.
-.monograma {
-  font-family: 'Gilda Display', serif;
-  font-weight: 400;
-  font-size: 2.75rem;
-  color: var(--accent-dark);
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 
 // §6 cuerpo
@@ -116,8 +112,7 @@
   flex-wrap: wrap;
 }
 
-.dia,
-.diaActivo {
+.dia {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -127,21 +122,22 @@
   border: 1px solid var(--border-interactive);
   cursor: pointer;
   font-family: 'Manrope', system-ui, sans-serif;
-}
-
-.dia {
   background: var(--bg);
   color: var(--text);
 
   &:hover {
     border-color: var(--accent-dark);
   }
-}
 
-.diaActivo {
-  background: var(--accent-dark);
-  color: var(--on-accent);
-  border-color: var(--accent-dark);
+  // Estado ELEGIDO: se deriva de aria-pressed (misma fuente que el árbol de accesibilidad), NO de
+  // una clase condicional —inmatable bajo `css:false`, mutantes que sobreviven—. AA: el relleno
+  // sigue en --accent-dark (nunca --accent, 4,05:1) bajo texto --on-accent. Mismo patrón que
+  // `.horaOpcion` (§11).
+  &[aria-pressed='true'] {
+    background: var(--accent-dark);
+    color: var(--on-accent);
+    border-color: var(--accent-dark);
+  }
 }
 
 .diaDow {

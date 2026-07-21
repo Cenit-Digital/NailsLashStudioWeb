@@ -35,6 +35,16 @@ export interface DiaOfrecido {
 }
 
 /**
+ * El día en inglés de F-10 para el índice de `getDay()` (0=domingo…6=sábado). Expuesta como función
+ * (no el array `DIA_SEMANA` en crudo) para que se pueda anclar el índice 0 sin importar el dato de
+ * producción como valor esperado: `diasOfrecidos` NUNCA genera un domingo (lo salta), así que su
+ * entrada es inalcanzable por ahí y necesita esta vía directa.
+ */
+export function diaSemanaDe(indiceDia: number): DiaSemana {
+  return DIA_SEMANA[indiceDia]
+}
+
+/**
  * Los SEIS días ofrecidos a partir de MAÑANA, saltando los domingos (el salón cierra, F-10). PURA: el
  * reloj es una DEPENDENCIA INYECTADA (`ahora`), nunca `new Date()` interno → determinista y matable.
  */
@@ -46,7 +56,11 @@ export function diasOfrecidos(ahora: Date): readonly DiaOfrecido[] {
     cursor.setDate(cursor.getDate() + 1)
 
     if (cursor.getDay() !== DOMINGO) {
-      dias.push({ dow: DOW[cursor.getDay()], day: cursor.getDate(), diaSemana: DIA_SEMANA[cursor.getDay()] })
+      dias.push({
+        dow: DOW[cursor.getDay()],
+        day: cursor.getDate(),
+        diaSemana: diaSemanaDe(cursor.getDay()),
+      })
     }
   }
 
@@ -80,14 +94,4 @@ export function franjasDe(diaSemana: DiaSemana): readonly string[] {
  */
 export function indiceCircular(indice: number, total: number): number {
   return ((indice % total) + total) % total
-}
-
-/**
- * La inicial de un nombre, siempre en MAYÚSCULA (contrato @s26-@s28). `charAt(0)` (no `nombre[0]`)
- * devuelve `''` sobre la cadena vacía en vez de `undefined`, así que `.toUpperCase()` encadena sin
- * reventar y el caso vacío se resuelve SIN guarda explícita (una guarda `if (nombre.length === 0)`
- * sería redundante: `''.charAt(0).toUpperCase()` ya da `''`, mutante equivalente e INMATABLE).
- */
-export function inicialDe(nombre: string): string {
-  return nombre.charAt(0).toUpperCase()
 }

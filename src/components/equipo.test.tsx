@@ -1,11 +1,9 @@
-import { readFileSync } from 'node:fs'
-
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { renderToString } from 'react-dom/server'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { Equipo } from './Equipo'
-import { diasOfrecidos, franjasDe, franjasOfrecibles, inicialDe, indiceCircular } from './equipo-logica'
+import { diaSemanaDe, diasOfrecidos, franjasDe, franjasOfrecibles, indiceCircular } from './equipo-logica'
 
 /**
  * feature `equipo_reservas` — la sección de equipo con reserva por profesional y carrusel de reseñas.
@@ -85,7 +83,9 @@ describe('@s1 la sección se hornea navegable, con UNA <section>, siete <article
   it('@s1 hay UN <h2 id="equipo-titulo"> con el texto exacto, más el eyebrow y la intro del diseño', () => {
     const horneado = renderToString(<Equipo />)
 
-    expect(horneado).toMatch(/<h2[^>]*id="equipo-titulo"[^>]*>Nuestro equipo de profesionales<\/h2>/)
+    expect(horneado).toMatch(
+      /<h2[^>]*id="equipo-titulo"[^>]*>Nuestro equipo de profesionales<\/h2>/,
+    )
     expect(horneado).toContain('>Equipo<')
     expect(horneado).toContain(
       'Elige a tu especialista, mira sus reseñas y reserva tu día y hora en segundos.',
@@ -121,6 +121,21 @@ describe('@s4 la sección no aporta ningún <h1>: aporta UN <h2> y SIETE <h3>', 
     expect((horneado.match(/<h1[\s>]/g) ?? []).length).toBe(0)
     expect((horneado.match(/<h2[\s>]/g) ?? []).length).toBe(1)
     expect((horneado.match(/<h3[\s>]/g) ?? []).length).toBe(7)
+  })
+})
+
+describe('la <section> hornea las clases estructurales del diseño (fondo "plain", sin variante alt)', () => {
+  it('la <section> lleva EXACTAMENTE "demo-seccion" y "demo-seccion--plain" (nunca "demo-seccion--alt")', () => {
+    // Son clases GLOBALES literales (no del módulo CSS), así que SÍ son observables bajo css:false:
+    // la sección de equipo va entre Ofertas y Reserva (ambas "alt"), y el diseño alterna a "plain"
+    // aquí. No se usa toHaveClass (regla anti-clase-CSS): se lee el atributo class del horneado.
+    const horneado = renderToString(<Equipo />)
+    const seccion = /<section[^>]*class="([^"]*)"/.exec(horneado)
+
+    expect(seccion, 'no se encontró la <section>').not.toBeNull()
+    expect((seccion as RegExpExecArray)[1]).toContain('demo-seccion')
+    expect((seccion as RegExpExecArray)[1]).toContain('demo-seccion--plain')
+    expect((seccion as RegExpExecArray)[1]).not.toContain('demo-seccion--alt')
   })
 })
 
@@ -176,28 +191,31 @@ describe('@s6 ni "Facial" ni "Depilación" aparecen en la sección de equipo', (
 // HUECO DE FOTO (@s7) y LEYENDA (@s8)
 // =============================================================================================
 
-describe('@s7 el hueco de foto es decorativo: sin imagen, sin literal prohibido, sin subrecurso externo', () => {
-  it('@s7 hay siete <div aria-hidden> de foto, ningún <img>/src, ningún "ph-woman", ninguna URL externa', () => {
+describe('@s7 el hueco de foto lleva la foto real del trabajo: alt útil, sin literal prohibido, sin subrecurso externo', () => {
+  it('@s7 hay siete <img> con alt no vacío, ninguna ya aria-hidden, ningún "ph-woman", ninguna URL externa', () => {
     const horneado = renderToString(<Equipo />)
 
-    expect((horneado.match(/<div[^>]*aria-hidden="true"/g) ?? []).length).toBe(7)
-    expect(horneado).not.toMatch(/<img\b/)
-    expect(horneado).not.toContain('src=')
+    expect((horneado.match(/<img\b/g) ?? []).length).toBe(7)
+    for (const alt of [...horneado.matchAll(/<img[^>]*\salt="([^"]*)"/g)]) {
+      expect(alt[1].length).toBeGreaterThan(0)
+    }
+    expect(horneado).not.toMatch(/<div[^>]*className="[^"]*foto[^"]*"[^>]*aria-hidden="true"/)
     expect(horneado.toLowerCase()).not.toContain('ph-woman')
     expect(horneado).not.toMatch(/https?:\/\//)
     expect(horneado).not.toContain('url(')
   })
 })
 
-describe('@s8 una leyenda visible declara que perfiles y reseñas son de ejemplo', () => {
-  it('@s8 el horneado lleva la leyenda exacta y menciona AMBAS cosas: los perfiles y las reseñas', () => {
+describe('@s8 una leyenda visible declara que perfiles, fotos y reseñas son de ejemplo', () => {
+  it('@s8 el horneado lleva la leyenda exacta y menciona las TRES cosas: perfiles, fotos de banco y reseñas', () => {
     const horneado = renderToString(<Equipo />)
 
     expect(horneado).toContain(
-      'Equipo y reseñas de ejemplo · perfiles de muestra, pendientes de confirmar con el salón',
+      'Equipo, fotos y reseñas de ejemplo · perfiles de muestra y fotos de banco de imágenes, pendientes de confirmar con el salón',
     )
     expect(horneado).toContain('reseñas de ejemplo')
     expect(horneado).toContain('perfiles de muestra')
+    expect(horneado).toContain('fotos de banco de imágenes')
   })
 })
 
@@ -249,6 +267,44 @@ describe('@s10 diasOfrecidos: seis días desde mañana, saltando domingos, con e
       'Saturday',
     )
   })
+
+  it('@s10 el día en inglés de los SEIS días ofrecidos es, en orden, Friday, Saturday, Monday, Tuesday, Wednesday, Thursday', () => {
+    // Ancla DELIBERADAMENTE (no solo por sábado) la correspondencia getDay()→día en inglés de F-10
+    // que usa `franjasDe`: si se vaciara cualquiera de estas seis entradas, esta lista dejaría de
+    // coincidir con los literales escritos A MANO.
+    const dias = diasOfrecidos(new Date(2026, 6, 16))
+
+    expect(dias.map((dia) => dia.diaSemana)).toEqual([
+      'Friday',
+      'Saturday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+    ])
+  })
+})
+
+describe('diaSemanaDe — la correspondencia índice de getDay() (0=domingo…6=sábado) → día en inglés de F-10, para los SIETE índices', () => {
+  it('mapea cada uno de los siete índices a su día en inglés, domingo incluido, aunque diasOfrecidos lo salte', () => {
+    // Los siete literales van A MANO: NUNCA se importa DIA_SEMANA (sería comparar la producción
+    // consigo misma). `diasOfrecidos` nunca genera un domingo, así que el índice 0 no queda anclado
+    // por ningún otro test: aquí es la única vía.
+    expect(diaSemanaDe(0)).toBe('Sunday')
+    expect(diaSemanaDe(1)).toBe('Monday')
+    expect(diaSemanaDe(2)).toBe('Tuesday')
+    expect(diaSemanaDe(3)).toBe('Wednesday')
+    expect(diaSemanaDe(4)).toBe('Thursday')
+    expect(diaSemanaDe(5)).toBe('Friday')
+    expect(diaSemanaDe(6)).toBe('Saturday')
+  })
+
+  it('el domingo (índice 0) mapea a un día CERRADO: franjasDe no ofrece ninguna franja', () => {
+    // Doble cierre para el índice que `diasOfrecidos` nunca alcanza: si `diaSemanaDe(0)` se vaciara,
+    // `HORARIO_SEMANAL['']` sería `undefined` y `franjasOfrecibles` reventaría al leer `.some` de
+    // `undefined`, así que este test también fallaría por excepción, no solo por aserción.
+    expect(franjasDe(diaSemanaDe(0))).toEqual([])
+  })
 })
 
 // =============================================================================================
@@ -270,6 +326,28 @@ describe('@s11 el selector de hora no existe hasta elegir un día', () => {
 
     expect(within(card).getByRole('button', { name: 'Elige día y hora' })).toBeDisabled()
   })
+
+  it('@s11 el bloque de horas NO EXISTE en el DOM sin día elegido: aparece un <div> más al elegir uno', () => {
+    // No basta con "cero botones de franja" (@s11 de arriba): el contenedor de horas debe estar
+    // AUSENTE, no presente-pero-vacío. Se cuenta la estructura (número de <div>), porque bajo
+    // css:false el className del contenedor es undefined y no se puede consultar por clase.
+    renderEnJueves()
+    const card = tarjeta('Lucía')
+    const divsSinDia = card.querySelectorAll('div').length
+
+    fireEvent.click(within(card).getByRole('button', { name: 'mié 22' }))
+
+    expect(card.querySelectorAll('div').length).toBe(divsSinDia + 1)
+  })
+
+  it('@s11 tras hidratar con los seis días reales ya NO se muestra "Cargando días…"', () => {
+    // Ancla la correspondencia inversa de @s9: `dias.length === 0` deja de ser cierto en cuanto
+    // hidrata con los seis días reales, así que el aviso de carga debe desaparecer.
+    renderEnJueves()
+    const card = tarjeta('Lucía')
+
+    expect(within(card).queryByText('Cargando días…')).toBeNull()
+  })
 })
 
 describe('@s12 elegir un día laborable ofrece las seis franjas del salón', () => {
@@ -287,7 +365,10 @@ describe('@s12 elegir un día laborable ofrece las seis franjas del salón', () 
       '17:30',
       '19:00',
     ])
-    expect(within(card).getByRole('button', { name: 'mié 22' })).toHaveAttribute('aria-pressed', 'true')
+    expect(within(card).getByRole('button', { name: 'mié 22' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
     expect(
       chipsDia(card).filter((chip) => chip.getAttribute('aria-pressed') === 'true'),
     ).toHaveLength(1)
@@ -318,8 +399,14 @@ describe('@s14 cambiar de día deselecciona la hora ya elegida', () => {
     fireEvent.click(within(card).getByRole('button', { name: 'jue 23' }))
 
     expect(chipsHora(card).some((chip) => chip.getAttribute('aria-pressed') === 'true')).toBe(false)
-    expect(within(card).getByRole('button', { name: 'jue 23' })).toHaveAttribute('aria-pressed', 'true')
-    expect(within(card).getByRole('button', { name: 'mié 22' })).toHaveAttribute('aria-pressed', 'false')
+    expect(within(card).getByRole('button', { name: 'jue 23' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    expect(within(card).getByRole('button', { name: 'mié 22' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    )
     expect(within(card).getByRole('button', { name: 'Elige día y hora' })).toBeDisabled()
   })
 })
@@ -364,7 +451,10 @@ describe('@s16 con día y hora el botón se habilita y su etiqueta nombra la cit
 
     const horas = chipsHora(card)
     expect(horas.filter((chip) => chip.getAttribute('aria-pressed') === 'true')).toHaveLength(1)
-    expect(horas.find((chip) => chip.textContent === '16:00')).toHaveAttribute('aria-pressed', 'true')
+    expect(horas.find((chip) => chip.textContent === '16:00')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
   })
 })
 
@@ -444,7 +534,10 @@ describe('@s19 elegir un día en una tarjeta no altera ninguna de las otras seis
     fireEvent.click(within(lucia).getByRole('button', { name: 'mié 22' }))
 
     expect(chipsHora(lucia).length).toBeGreaterThan(0)
-    expect(within(lucia).getByRole('button', { name: 'mié 22' })).toHaveAttribute('aria-pressed', 'true')
+    expect(within(lucia).getByRole('button', { name: 'mié 22' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
 
     for (const nombre of ['Carla', 'Andrea', 'Nerea', 'Marta', 'Paula', 'Sara']) {
       const card = tarjeta(nombre)
@@ -587,8 +680,12 @@ describe('@s25 las flechas del carrusel tienen nombre accesible descriptivo, no 
     render(<Equipo />)
     const card = tarjeta('Lucía')
 
-    expect(within(card).getByRole('button', { name: 'Reseña anterior de Lucía' })).toBeInTheDocument()
-    expect(within(card).getByRole('button', { name: 'Reseña siguiente de Lucía' })).toBeInTheDocument()
+    expect(
+      within(card).getByRole('button', { name: 'Reseña anterior de Lucía' }),
+    ).toBeInTheDocument()
+    expect(
+      within(card).getByRole('button', { name: 'Reseña siguiente de Lucía' }),
+    ).toBeInTheDocument()
     expect(within(card).queryByRole('button', { name: '←' })).toBeNull()
     expect(within(card).queryByRole('button', { name: '→' })).toBeNull()
   })
@@ -600,12 +697,14 @@ describe('@s25 las flechas del carrusel tienen nombre accesible descriptivo, no 
     for (const nombre of NOMBRES) {
       const card = tarjeta(nombre)
       nombres.push(
-        within(card).getByRole('button', { name: `Reseña anterior de ${nombre}` }).getAttribute('aria-label') ??
-          '',
+        within(card)
+          .getByRole('button', { name: `Reseña anterior de ${nombre}` })
+          .getAttribute('aria-label') ?? '',
       )
       nombres.push(
-        within(card).getByRole('button', { name: `Reseña siguiente de ${nombre}` }).getAttribute('aria-label') ??
-          '',
+        within(card)
+          .getByRole('button', { name: `Reseña siguiente de ${nombre}` })
+          .getAttribute('aria-label') ?? '',
       )
     }
 
@@ -672,94 +771,84 @@ describe('franjasOfrecibles — el intervalo semiabierto [abre, cierra) filtra p
 })
 
 // =============================================================================================
-// AMPLIACIÓN (2026-07-21) — EL MONOGRAMA: la INICIAL de cada profesional sobre el hueco rosa
-// (@s26..@s31). @s21/@s30/@s31 hablan de "pnpm build" y "dist/index.html": esta sesión tiene
-// PROHIBIDO crear tests build-based nuevos (cada uno cuesta un build completo). Se cubren con
-// `renderToString(<Equipo />)`, el MISMO mecanismo que usa vite-react-ssg para prerenderizar (igual
-// que ya hace `reserva.test.tsx`); el `pnpm build` real con las cinco puertas lo corre el lead una
-// vez al cierre de la sesión.
+// AMPLIACIÓN (2026-07-21) — FOTOS REALES: el monograma se retira, entra la foto del TRABAJO
+// (@s26..@s31). Se cubren con `renderToString(<Equipo />)`, el MISMO mecanismo que usa
+// vite-react-ssg para prerenderizar (igual que ya hace `reserva.test.tsx`); el `pnpm build` real con
+// las cinco puertas lo corre el lead una vez al cierre de la sesión.
 // =============================================================================================
 
-/** El hueco de foto es SIEMPRE el primer hijo del <article> (antes de .cuerpo), aria-hidden. */
+/** El hueco de foto es SIEMPRE el primer hijo del <article> (antes de .cuerpo). */
 function huecoDeFoto(card: HTMLElement): HTMLElement {
   return card.children[0] as HTMLElement
 }
 
-describe('@s26 cada una de las siete tarjetas muestra el monograma con la inicial de SU profesional', () => {
-  const casos: readonly [string, string][] = [
-    ['Lucía', 'L'],
-    ['Carla', 'C'],
-    ['Andrea', 'A'],
-    ['Nerea', 'N'],
-    ['Marta', 'M'],
-    ['Paula', 'P'],
-    ['Sara', 'S'],
-  ]
+/** El fichero y el alt de cada profesional, LEÍDOS del encargo del lead y escritos A MANO (anti-tautología). */
+const FOTOS_EQUIPO: readonly [string, string, string][] = [
+  ['Lucía', 'equipo-nail-art-rojo', 'Nail art en rojo con detalles en blanco y dorado'],
+  ['Carla', 'equipo-extension-pestanas', 'Extensión de pestañas con efecto volumen'],
+  ['Andrea', 'equipo-pedicura', 'Pedicura profesional en cabina'],
+  ['Nerea', 'equipo-cejas-productos', 'Productos de tinte para cejas y pestañas'],
+  ['Marta', 'equipo-pestanas-pinzas', 'Pestañas postizas y pinzas de aplicación'],
+  ['Paula', 'equipo-nail-art-leopardo', 'Nail art con estampado de leopardo sobre esmalte negro'],
+  ['Sara', 'equipo-cuidado-unas', 'Cuidado de cutículas antes del esmaltado'],
+]
 
-  for (const [nombre, inicial] of casos) {
-    it(`@s26 la tarjeta de ${nombre} muestra EXACTAMENTE un monograma y su texto es exactamente "${inicial}"`, () => {
+describe('@s26 cada una de las siete tarjetas muestra la foto REAL de SU trabajo, con el alt exacto', () => {
+  for (const [nombre, , alt] of FOTOS_EQUIPO) {
+    it(`@s26 la tarjeta de ${nombre} muestra EXACTAMENTE una <img> con alt exactamente "${alt}"`, () => {
       render(<Equipo />)
       const hueco = huecoDeFoto(tarjeta(nombre))
+      const imagenes = hueco.querySelectorAll('img')
 
-      expect(hueco).toHaveAttribute('aria-hidden', 'true')
-      expect(hueco.children).toHaveLength(1)
-      expect(hueco.textContent).toBe(inicial)
-      expect(hueco.textContent).toHaveLength(1)
+      expect(imagenes).toHaveLength(1)
+      expect(imagenes[0].getAttribute('alt')).toBe(alt)
     })
   }
 })
 
-describe('@s27 la inicial se devuelve SIEMPRE en mayúscula, venga el nombre como venga', () => {
-  const casos: readonly [string, string][] = [
-    ['Lucía', 'L'],
-    ['lucía', 'L'],
-    ['LUCÍA', 'L'],
-    ['ángela', 'Á'],
-  ]
+describe('@s27 las siete fotos son DISTINTAS entre sí: ninguna tarjeta repite la foto de otra', () => {
+  it('@s27 los siete alt (en orden) son distintos entre sí y ninguno está vacío', () => {
+    render(<Equipo />)
+    const alts = NOMBRES.map(
+      (nombre) => huecoDeFoto(tarjeta(nombre)).querySelector('img')?.getAttribute('alt') ?? '',
+    )
 
-  for (const [nombre, esperado] of casos) {
-    it(`@s27 inicialDe("${nombre}") es exactamente "${esperado}"`, () => {
-      expect(inicialDe(nombre)).toBe(esperado)
-    })
-  }
-})
-
-describe('@s28 CASO LÍMITE — un nombre vacío devuelve cadena vacía, sin reventar', () => {
-  it('@s28 inicialDe("") no lanza, y devuelve "" (nunca "undefined" ni "U")', () => {
-    expect(() => inicialDe('')).not.toThrow()
-
-    const resultado = inicialDe('')
-    expect(resultado).toBe('')
-    expect(resultado).not.toBe('undefined')
-    expect(resultado).not.toBe('U')
+    for (const alt of alts) {
+      expect(alt.length).toBeGreaterThan(0)
+    }
+    expect(new Set(alts).size).toBe(7)
   })
 })
 
-describe('@s29 el monograma es DECORATIVO: no aporta nombre accesible ni contamina el de la tarjeta', () => {
-  it('@s29 ninguna letra suelta se anuncia como botón, encabezado o imagen; el h3 sigue diciendo "Lucía"', () => {
+describe('@s28 cada foto declara sus dimensiones y carga diferida, para no provocar salto de layout', () => {
+  it('@s28 las siete <img> declaran width="800", height="600" y loading="lazy"', () => {
     render(<Equipo />)
 
-    for (const letra of ['L', 'C', 'A', 'N', 'M', 'P', 'S']) {
-      expect(screen.queryByRole('button', { name: letra })).toBeNull()
-      expect(screen.queryByRole('heading', { name: letra })).toBeNull()
-      expect(screen.queryByRole('img', { name: letra })).toBeNull()
+    for (const nombre of NOMBRES) {
+      const img = huecoDeFoto(tarjeta(nombre)).querySelector('img')
+
+      expect(img).toHaveAttribute('width', '800')
+      expect(img).toHaveAttribute('height', '600')
+      expect(img).toHaveAttribute('loading', 'lazy')
     }
+  })
+})
 
-    const hueco = huecoDeFoto(tarjeta('Lucía'))
-    expect(hueco).toHaveAttribute('aria-hidden', 'true')
-    expect(hueco.querySelector('img')).toBeNull()
-    expect(hueco).not.toHaveAttribute('role')
-    expect(hueco).not.toHaveAttribute('aria-label')
-    expect(hueco).not.toHaveAttribute('title')
+describe('@s29 la foto entra en el árbol de accesibilidad con su alt, sin contaminar el nombre de la tarjeta', () => {
+  it('@s29 hay una imagen con nombre accesible "Nail art en rojo..." y el h3 sigue diciendo solo "Lucía"', () => {
+    render(<Equipo />)
 
+    expect(
+      screen.getByRole('img', { name: 'Nail art en rojo con detalles en blanco y dorado' }),
+    ).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 3, name: 'Lucía' })).toBeInTheDocument()
     expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(7)
     expect(screen.getAllByRole('heading', { level: 2 })).toHaveLength(1)
   })
 })
 
-describe('@s30 las siete iniciales viajan HORNEADAS (SSR): no dependen de la hidratación', () => {
-  it('@s30 el HTML horneado trae las siete letras, en orden, todas DISTINTAS, junto al ancla positiva', () => {
+describe('@s30 las siete fotos viajan HORNEADAS (SSR): no dependen de la hidratación', () => {
+  it('@s30 el HTML horneado trae los siete alt, en orden, junto al ancla positiva', () => {
     const horneado = renderToString(<Equipo />)
 
     // Ancla positiva PRIMERO: la extracción no devolvió la cadena vacía.
@@ -768,30 +857,32 @@ describe('@s30 las siete iniciales viajan HORNEADAS (SSR): no dependen de la hid
       expect(horneado).toContain(nombre)
     }
 
-    const monogramas = [...horneado.matchAll(/aria-hidden="true"><span[^>]*>([^<]+)<\/span>/g)].map(
+    const alts = [...horneado.matchAll(/<img[^>]*\salt="([^"]*)"/g)].map(
       (coincidencia) => coincidencia[1],
     )
 
-    expect(monogramas).toEqual(['L', 'C', 'A', 'N', 'M', 'P', 'S'])
-    expect(new Set(monogramas).size).toBe(7)
+    expect(alts).toEqual(FOTOS_EQUIPO.map(([, , alt]) => alt))
   })
 })
 
-describe('@s31 el monograma NO reintroduce fotos ni rompe las puertas de placeholders/terceros', () => {
-  it('@s31 en el horneado no aparece "ph-woman", ni ningún "<img", ni "src=", ni una url() externa', () => {
+describe('@s31 las fotos NO reintroducen "ph-woman" ni rompen la puerta de terceros: son imports locales', () => {
+  it('@s31 en el horneado no aparece "ph-woman" y ningún src de <img> apunta a un origen externo', () => {
     const horneado = renderToString(<Equipo />)
 
     expect(horneado.toLowerCase()).not.toContain('ph-woman')
-    expect(horneado).not.toMatch(/<img\b/)
-    expect(horneado).not.toContain('src=')
-    expect(horneado).not.toMatch(/https?:\/\//)
-    expect(horneado).not.toContain('url(')
+    for (const src of [...horneado.matchAll(/<img[^>]*\ssrc="([^"]*)"/g)].map((m) => m[1])) {
+      expect(src).not.toMatch(/^https?:\/\//)
+      expect(src).not.toMatch(/^\/\//)
+    }
   })
 
-  it('@s31 el bloque .monograma reutiliza el par YA declarado en la matriz de contraste (--accent-dark sobre --accent-soft)', () => {
-    const scss = readFileSync('src/components/equipo.module.scss', 'utf8')
+  it('@s31 los siete ficheros de foto se reconocen en el src de cada <img>', () => {
+    const horneado = renderToString(<Equipo />)
+    const srcs = [...horneado.matchAll(/<img[^>]*\ssrc="([^"]*)"/g)].map((m) => m[1])
 
-    expect(scss).toMatch(/\.monograma\s*\{[^}]*color:\s*var\(--accent-dark\)/)
-    expect(scss).toMatch(/\.foto\s*\{[^}]*background:\s*var\(--accent-soft\)/)
+    expect(srcs).toHaveLength(7)
+    FOTOS_EQUIPO.forEach(([, fichero], indice) => {
+      expect(srcs[indice]).toContain(fichero)
+    })
   })
 })

@@ -250,28 +250,33 @@ Feature: Sección de equipo con reserva por profesional — 7 tarjetas con rol y
   # ---------------------------------------------------------------------------
 
   @s7
-  Scenario: El hueco de foto es un adorno decorativo: sin imagen, sin literal prohibido y sin subrecursos externos
+  Scenario: El hueco de foto lleva la foto REAL del trabajo: alt útil, sin literal prohibido y sin subrecursos externos
     Given el HTML horneado de la home con las siete tarjetas de equipo
     When se inspecciona el hueco de foto de cada tarjeta
-    Then cada hueco es un elemento con aria-hidden="true" (queda FUERA del árbol de accesibilidad: no aporta ningún nombre)
-    And la sección no contiene ningún "<img" ni ningún atributo src
+    Then cada hueco contiene EXACTAMENTE UNA "<img" con un atributo alt NO vacío que describe el TRABAJO, nunca a la persona
+    And ninguno de esos huecos lleva ya aria-hidden="true": la imagen aporta información y entra en el árbol de accesibilidad
     And en toda la página no aparece el literal "ph-woman" ni una sola vez
-    And ningún subrecurso externo se solicita desde la sección: ni img, ni script, ni iframe, ni link, ni @font-face, ni url() apuntando fuera del sitio
-    # Puerta 2 (placeholders: «ph-woman» está en la lista prohibida) y puerta 4 (terceros). Además
-    # cierra D1: NO hay foto de ninguna persona, ni real ni generada, así que no hay derecho de
-    # imagen que gestionar en la DEMO. El hueco mantiene el `aspect-ratio: 4/3` del diseño (spec
-    # visual §5) — eso es CSS, se lee de los BYTES del `.module.scss`, NUNCA con toHaveClass.
+    And ningún "<img src" apunta a un origen externo (http/https de un dominio ajeno): las siete fotos son imports de `src/assets/trabajos/`, que Vite resuelve a rutas propias del sitio
+    # 🔄 REESCRITO (fotos reales): la versión anterior de este escenario describía un `<div
+    # aria-hidden="true">` sin `<img>`, que es justo lo que esta feature reemplaza. Puerta 2
+    # (placeholders: «ph-woman» sigue en la lista prohibida) y puerta 4 (terceros: el import de un
+    # asset local NUNCA es una petición a un origen externo). El hueco mantiene el `aspect-ratio: 4/3`
+    # del diseño (spec visual §5) — eso es CSS, se lee de los BYTES del `.module.scss`, NUNCA con
+    # toHaveClass.
 
   @s8
-  Scenario: Una leyenda VISIBLE declara que los perfiles y las reseñas son de ejemplo
+  Scenario: Una leyenda VISIBLE declara que los perfiles, las fotos y las reseñas son de ejemplo
     Given el HTML horneado de la home con la sección de equipo
     When se lee el pie de la sección de equipo
-    Then se muestra un texto visible cuyo contenido es exactamente "Equipo y reseñas de ejemplo · perfiles de muestra, pendientes de confirmar con el salón"
+    Then se muestra un texto visible cuyo contenido es exactamente "Equipo, fotos y reseñas de ejemplo · perfiles de muestra y fotos de banco de imágenes, pendientes de confirmar con el salón"
     And ese texto está en el HTML HORNEADO (no aparece solo tras hidratar) y no está oculto visualmente
-    And la leyenda menciona AMBAS cosas: los perfiles del equipo y las reseñas
-    # D1 + D2, patrón `LEYENDA_OFERTAS` de F-09. Ni un nombre ni una reseña se presentan como reales.
-    # Los datos viven en `src/lib/demo/equipo-demo.ts` (FUERA del JSX), retirables sin desplegar
-    # código: es lo que exige `feature_list.json` §18. 🔴 EL COPY EXACTO VA A LA PUERTA (D2).
+    And la leyenda menciona las TRES cosas: los perfiles del equipo, que las fotos son de BANCO DE IMÁGENES (no del salón) y las reseñas
+    # D1 + D2, patrón `LEYENDA_OFERTAS` de F-09. 🔄 AMPLIADA (fotos reales): antes solo declaraba
+    # perfiles y reseñas de ejemplo; ahora que las tarjetas llevan fotos reales de banco de imágenes
+    # (Pexels, sin rostro identificable), la leyenda también lo dice — honestidad: son fotos de
+    # trabajos de uñas/pestañas, no fotos del salón ni de las profesionales. Los datos viven en
+    # `src/lib/demo/equipo-demo.ts` (FUERA del JSX), retirables sin desplegar código: es lo que exige
+    # `feature_list.json` §18. 🔴 EL COPY EXACTO VA A LA PUERTA (D2).
 
   # ---------------------------------------------------------------------------
   # LOS DÍAS: calculados EN CLIENTE desde «hoy», saltando domingos. Bajo SSG, hornear fechas es
@@ -496,160 +501,105 @@ Feature: Sección de equipo con reserva por profesional — 7 tarjetas con rol y
     # (`getByRole('button', { name: … })`), nunca por clase CSS.
 
   # ===========================================================================================
-  # AMPLIACIÓN (2026-07-21) — EL MONOGRAMA: la INICIAL de cada profesional sobre el hueco rosa.
+  # AMPLIACIÓN (2026-07-21) — FOTOS REALES: el monograma se RETIRA, entra la foto del TRABAJO.
   # ===========================================================================================
-  # QUÉ CAMBIA Y POR QUÉ. Hoy el hueco de foto es un rectángulo rosa VACÍO
-  # (`<div className={estilos.foto} aria-hidden="true" />`, `Equipo.tsx:74` [V, código leído]): siete
-  # rectángulos idénticos que no dicen nada. El humano (Pablo) ha decidido HOY, por pregunta explícita:
-  # **sin fotos** —ninguna cara generada por IA se presenta como profesional real, D1 y `feature_list.json`
-  # §18 siguen intactos— **pero CON la inicial** de cada profesional en un monograma sobre ese rosa.
-  # Es la única alternativa que da identidad visual a la tarjeta sin crear un derecho de imagen que
-  # gestionar. Los escenarios @s1-@s25 NO se tocan: ninguno se contradice y @s7 sigue mandando (el hueco
-  # sigue siendo DECORATIVO, sin `<img>`, sin `src`, sin `ph-woman` y sin subrecurso externo).
+  # QUÉ CAMBIA Y POR QUÉ. La ampliación anterior (misma fecha) puso la INICIAL de cada profesional
+  # sobre el hueco rosa, para no gestionar ningún derecho de imagen. Pablo ha pedido fotos DE VERDAD
+  # para la reunión. El lead ya hizo la parte de criterio: buscó, miró una a una y seleccionó 13 fotos
+  # de Pexels (licencia libre) para Equipo + Galería; NINGUNA tiene un rostro identificable — la
+  # licencia de Pexels prohíbe «imply endorsement... by people... in the imagery», y poner la cara de
+  # una desconocida en una tarjeta que dice «Lucía · especialista» implicaría que trabaja aquí (LO
+  # 1/1982, derecho a la propia imagen). Son fotos de TRABAJOS (uñas, pestañas, cejas), no retratos.
+  # El monograma se BORRA ENTERO (función, tests, regla SCSS): no queda código muerto. Los escenarios
+  # @s1-@s6 y @s9-@s25 NO se tocan; @s7 y @s8 SÍ (ver arriba): el hueco deja de ser un rectángulo
+  # decorativo y pasa a llevar la foto real, y la leyenda pasa a declarar también que las fotos son de
+  # banco de imágenes.
   #
   # FUENTES LEÍDAS (no inventadas)
-  #   · `src/lib/demo/equipo-demo.ts` L45-53 — EL DATO REAL. Los siete nombres, en orden: Lucía, Carla,
-  #     Andrea, Nerea, Marta, Paula y Sara → iniciales L, C, A, N, M, P, S. Las SIETE son DISTINTAS entre
-  #     sí, así que el monograma DISTINGUE de verdad una tarjeta de otra (@s30). Ese dato es demo y
-  #     retirable sin desplegar código, exactamente como exige §18: la inicial se DERIVA de él, no se
-  #     escribe en ningún sitio nuevo, así que retirar el fichero se lleva también los monogramas.
-  #   · `src/components/equipo.module.scss` §5 `.foto` — `aspect-ratio: 4/3` + `background: var(--accent-soft)`.
-  #     El monograma se pinta SOBRE ese fondo ya existente; no nace una superficie nueva.
-  #   · `src/lib/puerta-contraste.ts` L229-234 — la matriz YA declara el par `--accent-dark` sobre
-  #     `--accent-soft` («tag sobre pastilla suave», rol texto, 4,5:1). Reutilizarlo deja `MINIMO_DE_PARES`
-  #     clavado en 18 y no hay que tocar nada a mano (@s31).
+  #   · `src/lib/demo/equipo-demo.ts` — el dato REAL: cada `ProfesionalDemo` gana `foto` (el import del
+  #     asset) y `alt` (el texto que describe el TRABAJO, nunca a la persona). Los siete ficheros viven
+  #     en `src/assets/trabajos/`, ya commiteados por el lead.
+  #   · `src/components/equipo.module.scss` §5 `.foto` — `aspect-ratio: 4/3` + `background:
+  #     var(--accent-soft)` se conserva como contenedor; la imagen lo rellena (`object-fit: cover`).
   #   · `src/lib/placeholders.ts` L27-34 — `ph-woman` sigue en `PATRONES_PROHIBIDOS`. Sigue PROHIBIDO.
-  #   · `src/pages/home-horneado.test.ts` — el patrón de test build-based (`pnpm build` en `beforeAll`,
-  #     `readFileSync` de `dist/index.html`, SIN importar nada de `src/`) que @s30 y @s31 necesitan.
   #
-  # 🔴 DÓNDE MUERDE LA MUTACIÓN (umbral 1.0) — y cómo NO dejar un mutante inmortal
-  #   · El núcleo mutable nuevo es UNA función PURA de una línea, `inicialDe(nombre)`, que vive en
-  #     `equipo-logica.ts` junto a las otras cuatro (patrón F-09: el módulo del componente exporta SOLO
-  #     el componente, o `react-refresh` escupe warnings y el listón es 0). Stryker la muerde por dos
-  #     mutadores: `MethodExpression` cambia `toUpperCase()` por `toLowerCase()` —lo mata @s27— y
-  #     `charAt` por `charCodeAt` —lo mata cualquier fila de @s27, porque un número no tiene `toUpperCase`
-  #     y la llamada revienta—.
-  #   · ⚠️ NO ESCRIBAS UNA GUARDA `if (nombre.length === 0) return ''`. Es REDUNDANTE y por tanto
-  #     INMATABLE en una de sus variantes: `''.charAt(0)` YA devuelve `''` y `''.toUpperCase()` YA
-  #     devuelve `''`, así que mutar la condición a `false` da EXACTAMENTE el mismo resultado → mutante
-  #     equivalente que sobrevive y hunde el umbral. @s28 existe justo para que el caso vacío se resuelva
-  #     SIN guarda: es también el escenario que obliga a `charAt(0)` en vez de `nombre[0]` (que devuelve
-  #     `undefined` y hace estallar el `.toUpperCase()`). Mismo precedente que el guarda `length===0`
-  #     retirado en F-01.
-  #   · NO-MUTABLE, declarado: la tipografía, el tamaño y la posición de la letra son SCSS (Stryker no ve
-  #     SCSS). Se aseveran leyendo los BYTES del `.module.scss` en `equipo-estilos.test.ts` y con la
-  #     puerta humana. JAMÁS con `toHaveClass` (regla anti-clase-CSS del repo).
+  # 🔴 MUTACIÓN (umbral 1.0): esta ampliación NO añade lógica pura nueva — `foto` y `alt` son DATOS,
+  # igual que `nombre`/`rol`/`especialidades` ya lo eran, y `equipo-demo.ts` sigue FUERA de `mutate`
+  # (patrón F-09: dato fuera, lógica dentro). Al BORRAR `inicialDe` el núcleo mutable de
+  # `equipo-logica.ts` se queda en las tres funciones que ya defendían @s10/@s12/@s13/@s21/@s22
+  # (`diasOfrecidos`, `franjasOfrecibles`/`franjasDe`, `indiceCircular`): nada nuevo que morder, nada
+  # que se quede sin test.
   #
-  # ANTI-TAUTOLOGÍA: las siete letras «L», «C», «A», «N», «M», «P», «S» se escriben A MANO en el test.
-  # ❌ PROHIBIDO importar `EQUIPO_DEMO` para derivar el esperado (`EQUIPO_DEMO[0].nombre[0]` es un test
-  # que se cree a sí mismo: renombra a Lucía y sigue verde). ❌ PROHIBIDO llamar a `inicialDe` para
-  # calcular lo que `inicialDe` debe devolver.
-  #
-  # 🚪 A LA PUERTA HUMANA: D8 — el ASPECTO del monograma (familia, tamaño, si va centrado sobre todo el
-  # hueco 4/3 o en una pastilla) es decisión visual. PROPUESTO: la letra en «Gilda Display» (la misma
-  # serif de `.nombre`), centrada en el hueco, en `--accent-dark` sobre el `--accent-soft` ya existente.
-  # El comportamiento que fijan @s26-@s31 NO depende de esa elección.
+  # ANTI-TAUTOLOGÍA: los siete pares fichero/alt de la tabla de @s26 se escriben A MANO en el test.
+  # ❌ PROHIBIDO importar `EQUIPO_DEMO` para derivar el `alt` esperado.
   # ===========================================================================================
 
   @s26
-  Scenario Outline: Cada una de las siete tarjetas muestra el monograma con la inicial de SU profesional
+  Scenario Outline: Cada una de las siete tarjetas muestra la foto REAL de SU trabajo, con el alt exacto
     Given la home renderizada por SSR, sin ejecutar JavaScript
-    When se lee el hueco decorativo de la tarjeta de "<nombre>"
-    Then ese hueco muestra EXACTAMENTE UN monograma y su texto visible es exactamente "<inicial>"
-    And ese texto es UNA SOLA letra: ni el nombre completo, ni dos iniciales, ni un punto detrás
+    When se lee el hueco de foto de la tarjeta de "<nombre>"
+    Then ese hueco contiene EXACTAMENTE UNA "<img" cuyo atributo alt es exactamente "<alt>"
 
     Examples:
-      | nombre | inicial |
-      | Lucía  | L       |
-      | Carla  | C       |
-      | Andrea | A       |
-      | Nerea  | N       |
-      | Marta  | M       |
-      | Paula  | P       |
-      | Sara   | S       |
+      | nombre | alt                                                              |
+      | Lucía  | Nail art en rojo con detalles en blanco y dorado                |
+      | Carla  | Extensión de pestañas con efecto volumen                        |
+      | Andrea | Pedicura profesional en cabina                                  |
+      | Nerea  | Productos de tinte para cejas y pestañas                        |
+      | Marta  | Pestañas postizas y pinzas de aplicación                        |
+      | Paula  | Nail art con estampado de leopardo sobre esmalte negro          |
+      | Sara   | Cuidado de cutículas antes del esmaltado                        |
 
-    # Los siete nombres y las siete iniciales salen de `src/lib/demo/equipo-demo.ts` L45-53 (LEÍDO, no
-    # inventado) y se escriben A MANO en el test. «Exactamente un monograma» mata al mutante que lo pinta
-    # dos veces o que lo pinta en la tarjeta equivocada; «una sola letra» mata al que emite «Lu» o «Lucía».
+    # El fichero y el alt de cada fila salen del mapeo LEÍDO (no inventado) que fija esta feature; se
+    # escriben A MANO en el test. «Exactamente una <img>» mata al mutante que la pinta dos veces o en
+    # la tarjeta equivocada.
 
   @s27
-  Scenario Outline: La inicial se devuelve SIEMPRE en mayúscula, venga el nombre como venga
-    Given el nombre "<nombre>"
-    When se pide su inicial
-    Then el resultado es exactamente "<inicial>"
-
-    Examples:
-      | nombre | inicial | qué fija                                                                 |
-      | Lucía  | L       | el caso normal, ya en mayúscula: la conversión no lo estropea            |
-      | lucía  | L       | MINÚSCULA de entrada → MAYÚSCULA de salida: sin esta fila, no convertir pasaría verde |
-      | LUCÍA  | L       | todo en mayúsculas: la conversión es idempotente                          |
-      | ángela | Á       | inicial ACENTUADA: se convierte a "Á", no se descarta ni se translitera a "A" |
-
-    # 🔴 ES UNA FUNCIÓN PURA (`inicialDe`), se testea POR VALOR, sin renderizar nada: así Stryker la
-    # muerde. La fila «lucía» es la que mata el mutante `toUpperCase → toLowerCase` del mutador
-    # MethodExpression; la fila «ángela» impide una implementación con un rango `[A-Z]` que se comiera
-    # las iniciales acentuadas (este salón es español). NOTA PARA QUIEN ESCRIBA EL TEST: escribe
-    # «ángela» y «Á» en la MISMA forma de normalización Unicode (NFC, la que teclea el editor); comparar
-    # una "Á" compuesta con una descompuesta da rojo por una razón que no es la del contrato.
-    # No hace falta `toLocaleUpperCase`: el plegado turco (i → İ) no aplica a este sitio.
+  Scenario: Las siete fotos son DISTINTAS entre sí: ninguna tarjeta repite la foto de otra
+    Given la home renderizada por SSR, sin ejecutar JavaScript
+    When se leen los siete atributos alt de las fotos de equipo, en orden de aparición
+    Then los siete son DISTINTOS entre sí y ninguno está vacío
+    # Igual que el monograma exigía siete iniciales distintas para distinguir tarjetas, la foto exige
+    # siete trabajos distintos: repetir la misma foto en dos tarjetas sería una regresión visual que
+    # ningún test hoy detectaría sin este escenario.
 
   @s28
-  Scenario: CASO LÍMITE — un nombre vacío devuelve cadena vacía, sin reventar
-    Given un nombre vacío (la cadena "")
-    When se pide su inicial
-    Then el resultado es exactamente la cadena vacía ""
-    And la llamada NO lanza ninguna excepción
-    And no devuelve "undefined", ni "U", ni ningún carácter de relleno
-    # 🔴 ESTE ESCENARIO ES EL QUE ELIGE LA IMPLEMENTACIÓN. `nombre[0]` devuelve `undefined` y el
-    # `.toUpperCase()` siguiente estalla con un TypeError; `nombre.charAt(0)` devuelve `''` y todo
-    # encadena. Por eso el caso vacío se resuelve SIN guarda explícita: una guarda
-    # `if (nombre.length === 0) return ''` sería código muerto cuyo mutante «condición → false» da el
-    # mismo resultado (equivalente, INMATABLE) y hundiría el umbral de mutación. Ningún nombre de
-    # `EQUIPO_DEMO` está vacío hoy, pero los datos demo son retirables y editables por el cliente (§18):
-    # una fila a medio rellenar no puede tumbar la home.
+  Scenario: Cada foto declara sus dimensiones y carga diferida, para no provocar salto de layout
+    Given la home renderizada por SSR, sin ejecutar JavaScript
+    When se inspecciona la "<img" de cada una de las siete tarjetas
+    Then las siete declaran width="800" y height="600" (las fotos son 800×600)
+    And las siete declaran loading="lazy": ninguna es el elemento LCP de la página (el LCP sigue siendo el titular del hero, F-07)
+    # Sin width/height reservados, la imagen entra tras el layout inicial y empuja el resto de la
+    # tarjeta (CLS). `loading="lazy"` es correcto aquí: la sección de equipo está bajo el pliegue.
 
   @s29
-  Scenario: El monograma es DECORATIVO: no aporta nombre accesible ni contamina el de la tarjeta
+  Scenario: La foto entra en el árbol de accesibilidad con su alt, sin contaminar el nombre de la tarjeta
     Given la sección de equipo con la tarjeta de "Lucía", cuyo "<h3>" ya dice "Lucía"
-    When se consulta el árbol de accesibilidad EXCLUYENDO los elementos ocultos
-    Then no existe NINGÚN elemento cuyo nombre accesible sea exactamente "L", ni "C", ni "A", ni "N", ni "M", ni "P", ni "S": ninguna letra suelta se anuncia
-    And el elemento que pinta el monograma sigue marcado con aria-hidden="true", igual que el hueco de foto de @s7
-    And el nombre accesible del encabezado de la tarjeta sigue siendo exactamente "Lucía": NO es "L Lucía" ni "LLucía"
-    And el monograma no es un "<img>", ni tiene role="img", ni aria-label, ni title: no aporta ninguna alternativa textual
+    When se consulta el árbol de accesibilidad
+    Then existe una imagen cuyo nombre accesible es exactamente "Nail art en rojo con detalles en blanco y dorado"
+    And el nombre accesible del encabezado de la tarjeta sigue siendo exactamente "Lucía": la foto no le añade ni el alt ni ningún otro texto
     And la sección sigue aportando UN "<h2>" y SIETE "<h3>", ni uno más (@s4 sigue verde)
-    # El nombre ya lo dice el `<h3>`. Un lector de pantalla que además anunciara «L, imagen» leería la
-    # tarjeta como «L, Lucía, Nail artist»: ruido que confunde y no informa (WAI-ARIA: lo redundante se
-    # oculta). Se asevera por ROL + NOMBRE ACCESIBLE, nunca por clase CSS.
+    # 🔄 Es la INVERSA del monograma: antes el hueco estaba oculto a propósito (aria-hidden) porque no
+    # tenía nada que decir; ahora SÍ dice algo (el trabajo fotografiado) y por eso deja de ocultarse
+    # (@s7). Lo que no cambia es que el nombre de la profesional lo sigue dando SOLO el `<h3>`.
 
   @s30
-  Scenario: Las siete iniciales viajan HORNEADAS en el artefacto de producción, no dependen de la hidratación
-    Given el HTML CRUDO de "dist/index.html" tras "pnpm build", leído por BYTES y sin ejecutar JavaScript
-    When se extrae el fragmento de la sección "#equipo-titulo" y se leen sus monogramas en orden de aparición
-    Then el fragmento SÍ contiene "Nuestro equipo de profesionales" y los siete nombres (ANCLA POSITIVA: prueba de que la extracción no devolvió la cadena vacía; sin ella lo demás pasaría verde por VACUIDAD)
-    And los monogramas son exactamente SIETE y sus letras, en ese orden, son "L", "C", "A", "N", "M", "P" y "S"
-    And esas siete letras son DISTINTAS entre sí: el monograma distingue de verdad una tarjeta de otra
-    And ninguna de las siete aparece por hidratación: están en los bytes del artefacto, con JavaScript deshabilitado
-    And el código de salida del build es 0
-    # 🔴 A DIFERENCIA DE LOS DÍAS (@s9, que NO se hornean porque caducan), la inicial es un dato
-    # ESTÁTICO derivado del nombre: hornearla no miente nunca y hace que la sección se lea sin JS.
-    # Se asevera sobre `dist/`, NUNCA con jsdom (I-8). ⚠️ ESTE ESCENARIO Y @s31 DEBEN COMPARTIR EL MISMO
-    # `pnpm build`: van en el fichero build-based que ya existe (patrón `src/pages/home-horneado.test.ts`:
-    # build en `beforeAll`, `readFileSync`, y SIN importar nada de `src/`, o Stryker re-ejecutaría un
-    # build por mutante → timeouts, y «un informe de mutación con timeouts MIENTE»). `fileParallelism`
-    # ya está en `false` a propósito porque los tests build-based comparten `dist/`.
+  Scenario: Las siete fotos viajan HORNEADAS (SSR): no dependen de la hidratación
+    Given la sección de equipo renderizada por SSR, sin ejecutar JavaScript ni hidratar
+    When se leen los atributos alt de las fotos en el HTML horneado, en orden de aparición
+    Then el horneado SÍ contiene "Nuestro equipo de profesionales" y los siete nombres (ANCLA POSITIVA: prueba de que la extracción no devolvió la cadena vacía; sin ella lo demás pasaría verde por VACUIDAD)
+    And los siete alt, en ese orden, son los de la tabla de @s26
+    # A diferencia de los días (@s9, que NO se hornean porque caducan), la foto de cada profesional es
+    # un dato ESTÁTICO: hornearla no miente nunca y hace que la sección se lea sin JS.
 
   @s31
-  Scenario: El monograma NO reintroduce fotos ni rompe ninguna de las cinco puertas del build
-    Given el HTML crudo de "dist/index.html" tras el build con las cinco puertas
-    When se inspecciona la sección de equipo del artefacto
+  Scenario: Las fotos NO reintroducen "ph-woman" ni rompen la puerta de terceros: son imports locales
+    Given la home renderizada por SSR, sin ejecutar JavaScript
+    When se inspecciona la sección de equipo horneada
     Then en toda la página no aparece el literal "ph-woman" ni una sola vez
-    And la sección no contiene ningún "<img", ningún atributo src, ni ninguna url() apuntando fuera del sitio: el monograma es TEXTO, no una imagen
-    And no se solicita ningún subrecurso externo desde la sección: ni img, ni script, ni iframe, ni link, ni @font-face
-    And la puerta de contraste sigue evaluando los MISMOS 18 pares: el monograma reutiliza el par "--accent-dark" sobre "--accent-soft" que la matriz YA declara, así que MINIMO_DE_PARES sigue siendo 18 y nadie lo toca
-    And el conjunto de ids de sección y el de href="#…" de la nav siguen siendo EXACTAMENTE los mismos siete de hoy: el monograma no añade ni quita ninguno
-    And el código de salida del build es 0
-    # Puertas 2 (placeholders), 3 (contraste), 4 (terceros) y 5 (anclas). D1 SIGUE CUMPLIDO: no hay foto
-    # de ninguna persona, ni real ni generada, así que no nace ningún derecho de imagen que gestionar; lo
-    # único que se pinta es una letra derivada de un dato demo retirable. 🔴 SI el implementador eligiera
-    # un color distinto para la letra, ese par NUEVO va a `MATRIZ_DE_USO` **y** `MINIMO_DE_PARES` sube A
-    # MANO en `src/lib/puerta-contraste.ts` (es un literal a propósito, no `.length`) — o el build muere.
+    And ninguna "<img src" de la sección apunta a un origen externo (http/https de un dominio ajeno): las siete son imports de `src/assets/trabajos/`, que Vite resuelve a rutas propias
+    And la puerta de contraste no necesita ningún par nuevo: la foto no introduce color de token alguno (es una imagen, no un fondo o texto con `var(--…)`)
+    And el conjunto de ids de sección y el de href="#…" de la nav siguen siendo EXACTAMENTE los mismos siete de hoy: las fotos no añaden ni quitan ninguno
+    # Puertas 2 (placeholders) y 4 (terceros). D1 (`feature_list.json` §18) SIGUE CUMPLIDO en lo que
+    # depende del código: ninguna foto tiene un rostro identificable (decisión y verificación del
+    # lead, no testeable por un test unitario) y los nombres se declaran de ejemplo (@s8).
