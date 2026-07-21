@@ -82,6 +82,46 @@
   ⚠️ **`feature_list.json` F-18/F-13 NO se marcan `done`:** esto es un DEMO verificado, NO publicable.
   El bloqueo de F-18 «para publicar» (fotos reales + consentimiento, LO 1/1982 · RGPD art. 7.3) SIGUE
   vigente; los nombres son de ejemplo. F-13 (calendario que compone la solicitud) es otra feature.
+- **🎨 `#reserva` RESTAURADA al diseño + MONOGRAMA en Equipo — CERRADO Y VERIFICADO (2026-07-21).**
+  Pablo volvió a señalar secciones desviadas del prototipo. **Auditoría del lead contra los BYTES de
+  `dist/index.html` vs `Opcion-1-Rosa.dc.html`:** de las 9 secciones, 7 coincidían; las desviaciones
+  reales eran DOS, y solo dos. (a) `#reserva` tenía el titular «Pide tu cita en un momento» y una
+  columna izquierda con un mini-calendario que el diseño NO pone ahí (el calendario del diseño vive en
+  las tarjetas de `#equipo`, donde ya estaba: estaba DUPLICADO). (b) La galería «Nuestros trabajos» NO
+  existe en el diseño — **decisión de Pablo por pregunta explícita: SE QUEDA donde está**, no se toca.
+  - **`#reserva` restaurada** (`Reserva.tsx`, `reserva.module.scss`): columna izquierda = copy VERBATIM
+    del prototipo (L248-256) —eyebrow, `<h2 id="reserva-titulo">¿Prefieres reservar por chat?</h2>`,
+    párrafo— y DOS enlaces: «WhatsApp» (`waHref`) y «Llamar al estudio» (`telHref`), ambos DERIVADOS de
+    F-02 (el `34600123456` del prototipo NO entra). Mini-calendario borrado entero (−130 líneas) y el
+    SCSS podado: **16 clases declaradas ↔ 16 usadas**, 0 huérfanas. De paso se cazó que `estilos.reserva`
+    NO existía en el módulo y rendía `undefined` en el className: arreglado. `RESERVA_WHATSAPP_TEXTO` en
+    `src/lib/demo/reserva-demo.ts` (3.er punto de entrada DISTINGUIBLE en el móvil del salón).
+  - 🔴 **CAUSA RAÍZ de la deriva, y la lección:** `#reserva` era la ÚNICA sección del proyecto con
+    **CERO tests**; por eso fue la única que se desvió sin que nadie lo notara. Ahora tiene **36 tests**
+    que cubren los **22 escenarios** del contrato reescrito. `features/reserva_chat.feature` v1 MENTÍA
+    (ofrecía «Facial»/«Depilación», que el salón no ofrece): reescrito contra lo que el código hace.
+    `claveBurbuja` sale a `reserva-logica.ts` (el ternario de className era inmatable bajo `css:false`).
+  - **Monograma en Equipo** (@s26-@s31): donde había un rectángulo rosa VACÍO va la INICIAL de cada
+    profesional. `inicialDe(nombre)` PURA en `equipo-logica.ts` (`charAt(0).toUpperCase()`: el caso
+    vacío se resuelve SIN guarda, que sería mutante equivalente). Decorativo de verdad —`aria-hidden`
+    en `.foto`, el nombre lo sigue dando el `<h3>`—. Gilda Display, `--accent-dark` sobre
+    `--accent-soft`: par YA en la matriz, `MINIMO_DE_PARES` sigue en 18. **SIN fotos**: la norma de
+    Pablo (nada de caras de IA) y la puerta 2 (`ph-woman` prohibido) siguen vigentes.
+  - **Puertas (medidas a mano por el lead, no fiadas del informe del agente):** typecheck 0 · lint
+    **0 errores / 0 warnings** · `pnpm build` exit 0 con las **5 puertas** · `pnpm test` **943/943** (32
+    ficheros) · **mutación 100 % en `equipo-logica.ts` (36 muertos) y `Equipo.tsx` (55 muertos), 0
+    supervivientes y 0 exclusiones nuevas** · judge **APROBADO** (0 bloqueantes) · a11y **0 bloqueantes**
+    (monograma 4,86:1 sobre umbral 3:1 por texto grande; `.demo-btn` ≈48 px ≥ SC 2.5.8).
+  - Verificado sobre `dist/index.html` REAL: orden Promociones → Equipo → «¿Prefieres reservar por
+    chat?» → Galería → Contacto → FAQ; las 7 iniciales (L C A N M P S) HORNEADAS; «Pide tu cita» 0
+    apariciones. Diarios: `tdd_reserva_equipo_final.md`, `judge_reserva_equipo_final.md`,
+    `a11y_reserva_equipo_final.md`.
+  - 🟡 **Deuda declarada (NO reparada, decide el humano):** (1) `Reserva.tsx` y `reserva-logica.ts`
+    siguen FUERA de `stryker.config.json → mutate`: hoy tienen 36 tests pero su mutación no se mide.
+    (2) D1 del contrato: el chat es un ASISTENTE DE DEMOSTRACIÓN y no lo dice en pantalla; sin leyenda
+    visible, un visitante puede creer que ha reservado de verdad. Es honestidad, y merece su @s23.
+    (3) `features/galeria_carrusel.feature` @s24 exige que la galería PRECEDA a «Reserva rápida», y hoy
+    va DESPUÉS: el contrato quedó obsoleto cuando Pablo decidió dejarla ahí. Ningún test lo enforce.
 - **Deuda anotada (`progress/deuda_precios_catalogo.md`):** los precios del catálogo quedaron
   descolocados en el commit `5a1345c` (p. ej. «Piernas completas 10 €» < «Medias piernas 35 €», y el
   catálogo anuncia «Facial»/«Depilación» que el salón no ofrece). Pablo pidió expresamente NO tocarlo.

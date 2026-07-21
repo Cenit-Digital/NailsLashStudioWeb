@@ -81,3 +81,13 @@ export function franjasDe(diaSemana: DiaSemana): readonly string[] {
 export function indiceCircular(indice: number, total: number): number {
   return ((indice % total) + total) % total
 }
+
+/**
+ * La inicial de un nombre, siempre en MAYÚSCULA (contrato @s26-@s28). `charAt(0)` (no `nombre[0]`)
+ * devuelve `''` sobre la cadena vacía en vez de `undefined`, así que `.toUpperCase()` encadena sin
+ * reventar y el caso vacío se resuelve SIN guarda explícita (una guarda `if (nombre.length === 0)`
+ * sería redundante: `''.charAt(0).toUpperCase()` ya da `''`, mutante equivalente e INMATABLE).
+ */
+export function inicialDe(nombre: string): string {
+  return nombre.charAt(0).toUpperCase()
+}

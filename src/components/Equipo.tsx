@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { EQUIPO_DEMO, LEYENDA_EQUIPO, type ProfesionalDemo } from '../lib/demo/equipo-demo'
-import { type DiaOfrecido, diasOfrecidos, franjasDe, indiceCircular } from './equipo-logica'
+import { type DiaOfrecido, diasOfrecidos, franjasDe, inicialDe, indiceCircular } from './equipo-logica'
 import estilos from './equipo.module.scss'
 
 /**
@@ -71,7 +71,9 @@ function TarjetaProfesional({ profesional, dias }: TarjetaProps) {
 
   return (
     <article className={estilos.tarjeta}>
-      <div className={estilos.foto} aria-hidden="true" />
+      <div className={estilos.foto} aria-hidden="true">
+        <span className={estilos.monograma}>{inicialDe(profesional.nombre)}</span>
+      </div>
       <div className={estilos.cuerpo}>
         <div className={estilos.filaNombre}>
           <h3 className={estilos.nombre}>{profesional.nombre}</h3>

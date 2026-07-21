@@ -27,9 +27,22 @@
 }
 
 // §5 foto: hueco decorativo con aspect-ratio 4/3 y fondo de token. Sin <img>, sin subrecurso externo.
+// El monograma se pinta ENCIMA de este mismo fondo (D8): no nace ninguna superficie nueva.
 .foto {
   aspect-ratio: 4 / 3;
   background: var(--accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Monograma decorativo (D8): misma pareja de tokens que .chipEspecialidad (par YA en la matriz de
+// contraste, MINIMO_DE_PARES sigue en 18). `aria-hidden` lo hereda del `.foto` que lo envuelve.
+.monograma {
+  font-family: 'Gilda Display', serif;
+  font-weight: 400;
+  font-size: 2.75rem;
+  color: var(--accent-dark);
 }
 
 // §6 cuerpo

@@ -1,9 +1,11 @@
+import { readFileSync } from 'node:fs'
+
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { renderToString } from 'react-dom/server'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { Equipo } from './Equipo'
-import { diasOfrecidos, franjasDe, franjasOfrecibles, indiceCircular } from './equipo-logica'
+import { diasOfrecidos, franjasDe, franjasOfrecibles, inicialDe, indiceCircular } from './equipo-logica'
 
 /**
  * feature `equipo_reservas` — la sección de equipo con reserva por profesional y carrusel de reseñas.
@@ -666,5 +668,130 @@ describe('franjasOfrecibles — el intervalo semiabierto [abre, cierra) filtra p
 
     expect(ofrecidas).not.toContain('13:00')
     expect(ofrecidas).toEqual(['10:00', '11:30'])
+  })
+})
+
+// =============================================================================================
+// AMPLIACIÓN (2026-07-21) — EL MONOGRAMA: la INICIAL de cada profesional sobre el hueco rosa
+// (@s26..@s31). @s21/@s30/@s31 hablan de "pnpm build" y "dist/index.html": esta sesión tiene
+// PROHIBIDO crear tests build-based nuevos (cada uno cuesta un build completo). Se cubren con
+// `renderToString(<Equipo />)`, el MISMO mecanismo que usa vite-react-ssg para prerenderizar (igual
+// que ya hace `reserva.test.tsx`); el `pnpm build` real con las cinco puertas lo corre el lead una
+// vez al cierre de la sesión.
+// =============================================================================================
+
+/** El hueco de foto es SIEMPRE el primer hijo del <article> (antes de .cuerpo), aria-hidden. */
+function huecoDeFoto(card: HTMLElement): HTMLElement {
+  return card.children[0] as HTMLElement
+}
+
+describe('@s26 cada una de las siete tarjetas muestra el monograma con la inicial de SU profesional', () => {
+  const casos: readonly [string, string][] = [
+    ['Lucía', 'L'],
+    ['Carla', 'C'],
+    ['Andrea', 'A'],
+    ['Nerea', 'N'],
+    ['Marta', 'M'],
+    ['Paula', 'P'],
+    ['Sara', 'S'],
+  ]
+
+  for (const [nombre, inicial] of casos) {
+    it(`@s26 la tarjeta de ${nombre} muestra EXACTAMENTE un monograma y su texto es exactamente "${inicial}"`, () => {
+      render(<Equipo />)
+      const hueco = huecoDeFoto(tarjeta(nombre))
+
+      expect(hueco).toHaveAttribute('aria-hidden', 'true')
+      expect(hueco.children).toHaveLength(1)
+      expect(hueco.textContent).toBe(inicial)
+      expect(hueco.textContent).toHaveLength(1)
+    })
+  }
+})
+
+describe('@s27 la inicial se devuelve SIEMPRE en mayúscula, venga el nombre como venga', () => {
+  const casos: readonly [string, string][] = [
+    ['Lucía', 'L'],
+    ['lucía', 'L'],
+    ['LUCÍA', 'L'],
+    ['ángela', 'Á'],
+  ]
+
+  for (const [nombre, esperado] of casos) {
+    it(`@s27 inicialDe("${nombre}") es exactamente "${esperado}"`, () => {
+      expect(inicialDe(nombre)).toBe(esperado)
+    })
+  }
+})
+
+describe('@s28 CASO LÍMITE — un nombre vacío devuelve cadena vacía, sin reventar', () => {
+  it('@s28 inicialDe("") no lanza, y devuelve "" (nunca "undefined" ni "U")', () => {
+    expect(() => inicialDe('')).not.toThrow()
+
+    const resultado = inicialDe('')
+    expect(resultado).toBe('')
+    expect(resultado).not.toBe('undefined')
+    expect(resultado).not.toBe('U')
+  })
+})
+
+describe('@s29 el monograma es DECORATIVO: no aporta nombre accesible ni contamina el de la tarjeta', () => {
+  it('@s29 ninguna letra suelta se anuncia como botón, encabezado o imagen; el h3 sigue diciendo "Lucía"', () => {
+    render(<Equipo />)
+
+    for (const letra of ['L', 'C', 'A', 'N', 'M', 'P', 'S']) {
+      expect(screen.queryByRole('button', { name: letra })).toBeNull()
+      expect(screen.queryByRole('heading', { name: letra })).toBeNull()
+      expect(screen.queryByRole('img', { name: letra })).toBeNull()
+    }
+
+    const hueco = huecoDeFoto(tarjeta('Lucía'))
+    expect(hueco).toHaveAttribute('aria-hidden', 'true')
+    expect(hueco.querySelector('img')).toBeNull()
+    expect(hueco).not.toHaveAttribute('role')
+    expect(hueco).not.toHaveAttribute('aria-label')
+    expect(hueco).not.toHaveAttribute('title')
+
+    expect(screen.getByRole('heading', { level: 3, name: 'Lucía' })).toBeInTheDocument()
+    expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(7)
+    expect(screen.getAllByRole('heading', { level: 2 })).toHaveLength(1)
+  })
+})
+
+describe('@s30 las siete iniciales viajan HORNEADAS (SSR): no dependen de la hidratación', () => {
+  it('@s30 el HTML horneado trae las siete letras, en orden, todas DISTINTAS, junto al ancla positiva', () => {
+    const horneado = renderToString(<Equipo />)
+
+    // Ancla positiva PRIMERO: la extracción no devolvió la cadena vacía.
+    expect(horneado).toContain('Nuestro equipo de profesionales')
+    for (const nombre of NOMBRES) {
+      expect(horneado).toContain(nombre)
+    }
+
+    const monogramas = [...horneado.matchAll(/aria-hidden="true"><span[^>]*>([^<]+)<\/span>/g)].map(
+      (coincidencia) => coincidencia[1],
+    )
+
+    expect(monogramas).toEqual(['L', 'C', 'A', 'N', 'M', 'P', 'S'])
+    expect(new Set(monogramas).size).toBe(7)
+  })
+})
+
+describe('@s31 el monograma NO reintroduce fotos ni rompe las puertas de placeholders/terceros', () => {
+  it('@s31 en el horneado no aparece "ph-woman", ni ningún "<img", ni "src=", ni una url() externa', () => {
+    const horneado = renderToString(<Equipo />)
+
+    expect(horneado.toLowerCase()).not.toContain('ph-woman')
+    expect(horneado).not.toMatch(/<img\b/)
+    expect(horneado).not.toContain('src=')
+    expect(horneado).not.toMatch(/https?:\/\//)
+    expect(horneado).not.toContain('url(')
+  })
+
+  it('@s31 el bloque .monograma reutiliza el par YA declarado en la matriz de contraste (--accent-dark sobre --accent-soft)', () => {
+    const scss = readFileSync('src/components/equipo.module.scss', 'utf8')
+
+    expect(scss).toMatch(/\.monograma\s*\{[^}]*color:\s*var\(--accent-dark\)/)
+    expect(scss).toMatch(/\.foto\s*\{[^}]*background:\s*var\(--accent-soft\)/)
   })
 })

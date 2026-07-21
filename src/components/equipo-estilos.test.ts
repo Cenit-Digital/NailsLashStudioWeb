@@ -56,6 +56,16 @@ describe('equipo-estilos — el hueco de foto mantiene el aspect-ratio 4/3 del d
   })
 })
 
+describe('equipo-estilos — el monograma (D8): Gilda Display en --accent-dark, sobre el --accent-soft ya existente', () => {
+  it('el bloque .monograma usa la familia Gilda Display y el color var(--accent-dark)', () => {
+    const monograma = cuerpoDelBloque(scss(), /\.monograma\s*\{/)
+
+    expect(monograma, 'falta el bloque .monograma').not.toBeNull()
+    expect(monograma as string).toMatch(/font-family:\s*'Gilda Display',\s*serif/)
+    expect(monograma as string).toMatch(/color:\s*var\(--accent-dark\)/)
+  })
+})
+
 describe('equipo-estilos — corrección AA: los rellenos/texto pequeños van a --accent-dark, nunca --accent', () => {
   it('ningún "background:" ni "color:" usa var(--accent) a pelo (solo cabe dentro del color-mix de la sombra)', () => {
     // aviso 1 de la spec: --accent bajo texto blanco o como texto pequeño falla AA. Solo sobrevive en el

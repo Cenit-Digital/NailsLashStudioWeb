@@ -1,29 +1,21 @@
 import { useEffect, useRef, useState } from 'react'
 
+import { RESERVA_WHATSAPP_TEXTO } from '../lib/demo/reserva-demo'
 import { TELEFONO, telHref, waHref } from '../lib/site'
+import { claveBurbuja } from './reserva-logica'
 import estilos from './reserva.module.scss'
 
 /**
  * La sección de reserva (capa visual del DEMO, interactiva). Sección navegable `#reserva-titulo`.
+ * Contrato: features/reserva_chat.feature.
  *
- * Combina las dos piezas interactivas del prototipo SIN equipo ficticio (Pablo: «diseño fiel +
- * contenido honesto»): (a) un mini-calendario servicio → día → hora que COMPONE un mensaje de
- * WhatsApp real (`waHref` de F-02: lo ENVÍA el usuario, es honesto) con la alternativa accesible
- * `tel:`; y (b) el chat guiado de 4 pasos (estado local). Las categorías son las REALES (Uñas ·
- * Pestañas · Cejas), no «Facial/Depilación» del prototipo.
- *
- * 🔴 Los días se calculan en `useEffect` (cliente), NO en el render del módulo: bajo SSG, calcularlos
- * en build-time hornearía fechas caducas. El prototipo hace lo mismo en `componentDidMount`.
+ * La columna izquierda es el copy VERBATIM del diseño (Opción-1-Rosa L248-256): eyebrow + h2 +
+ * párrafo + dos enlaces (WhatsApp / llamar), ambos derivados de la fuente única F-02. NO lleva
+ * calendario: ese widget vive en las tarjetas de `#equipo` (`features/equipo_reservas.feature`).
+ * La columna derecha es el chat guiado de 4 pasos (estado local, NO envía nada a ningún sitio: eso
+ * sigue siendo F-13).
  */
 const ID_RESERVA = 'reserva-titulo'
-const SERVICIOS = ['Uñas', 'Pestañas', 'Cejas'] as const
-const HORAS = ['10:00', '11:30', '13:00', '16:00', '17:30', '19:00'] as const
-const DOW = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb']
-
-interface DiaReserva {
-  readonly dow: string
-  readonly day: number
-}
 
 interface MensajeChat {
   readonly deBot: boolean
@@ -48,33 +40,6 @@ function mensajeInicial(): MensajeChat[] {
 }
 
 export function Reserva() {
-  // — Mini-calendario —
-  const [dias, setDias] = useState<DiaReserva[]>([])
-  const [servicio, setServicio] = useState<string | null>(null)
-  const [diaIdx, setDiaIdx] = useState<number | null>(null)
-  const [horaIdx, setHoraIdx] = useState<number | null>(null)
-
-  useEffect(() => {
-    const out: DiaReserva[] = []
-    const dt = new Date()
-    while (out.length < 6) {
-      dt.setDate(dt.getDate() + 1)
-      if (dt.getDay() !== 0) {
-        out.push({ dow: DOW[dt.getDay()], day: dt.getDate() })
-      }
-    }
-    setDias(out)
-  }, [])
-
-  const completo = servicio !== null && diaIdx !== null && horaIdx !== null
-  const enlaceWhatsApp = completo
-    ? waHref(
-        TELEFONO.legible,
-        `Hola, me gustaría reservar ${servicio} el ${dias[diaIdx].dow} ${dias[diaIdx].day} a las ${HORAS[horaIdx]}. Gracias.`,
-      )
-    : ''
-
-  // — Chat guiado —
   const [mensajes, setMensajes] = useState<MensajeChat[]>(mensajeInicial)
   const [paso, setPaso] = useState(0)
   const [borrador, setBorrador] = useState('')
@@ -128,78 +93,20 @@ export function Reserva() {
   return (
     <section className={`demo-seccion demo-seccion--alt ${estilos.reserva}`} aria-labelledby={ID_RESERVA}>
       <div className={`demo-contenedor ${estilos.rejilla}`}>
-        {/* — Mini-calendario — */}
         <div>
           <p className="demo-eyebrow">Reserva rápida</p>
           <h2 id={ID_RESERVA} className="demo-titulo">
-            Pide tu cita en un momento
+            ¿Prefieres reservar por chat?
           </h2>
           <p className="demo-intro">
-            Elige servicio, día y franja, y te llevamos a WhatsApp con el mensaje listo. Confirmamos
-            la hora exacta al momento.
+            Elige servicio, día y franja horaria con nuestro asistente y te confirmamos la hora
+            exacta por WhatsApp.
           </p>
 
-          <div className={estilos.paso}>
-            <span className={estilos.pasoTitulo}>Servicio</span>
-            <div className={estilos.opciones}>
-              {SERVICIOS.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  className={s === servicio ? estilos.chipActivo : estilos.chip}
-                  aria-pressed={s === servicio}
-                  onClick={() => setServicio(s)}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className={estilos.paso}>
-            <span className={estilos.pasoTitulo}>Día</span>
-            <div className={estilos.opciones}>
-              {dias.length === 0 && <span className={estilos.cargando}>Cargando días…</span>}
-              {dias.map((d, i) => (
-                <button
-                  key={`${d.dow}-${d.day}`}
-                  type="button"
-                  className={i === diaIdx ? estilos.diaActivo : estilos.dia}
-                  aria-pressed={i === diaIdx}
-                  onClick={() => setDiaIdx(i)}
-                >
-                  <span className={estilos.diaDow}>{d.dow}</span>
-                  <span className={estilos.diaNum}>{d.day}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className={estilos.paso}>
-            <span className={estilos.pasoTitulo}>Hora</span>
-            <div className={estilos.opciones}>
-              {HORAS.map((h, i) => (
-                <button
-                  key={h}
-                  type="button"
-                  className={i === horaIdx ? estilos.chipActivo : estilos.chip}
-                  aria-pressed={i === horaIdx}
-                  onClick={() => setHoraIdx(i)}
-                >
-                  {h}
-                </button>
-              ))}
-            </div>
-          </div>
-
           <div className={estilos.acciones}>
-            {completo ? (
-              <a className="demo-btn demo-btn--wa" href={enlaceWhatsApp}>
-                Reservar por WhatsApp
-              </a>
-            ) : (
-              <span className={estilos.deshabilitado}>Elige servicio, día y hora</span>
-            )}
+            <a className="demo-btn demo-btn--wa" href={waHref(TELEFONO.legible, RESERVA_WHATSAPP_TEXTO)}>
+              WhatsApp
+            </a>
             <a className="demo-btn demo-btn--ghost" href={telHref(TELEFONO.legible)}>
               Llamar al estudio
             </a>
@@ -209,7 +116,9 @@ export function Reserva() {
         {/* — Chat guiado — */}
         <div className={estilos.chat}>
           <div className={estilos.chatCabecera}>
-            <div className={estilos.avatar}>nl</div>
+            <div className={estilos.avatar} aria-hidden="true">
+              nl
+            </div>
             <div>
               <div className={estilos.chatNombre}>Nails Lash Studio</div>
               <div className={estilos.enLinea}>en línea</div>
@@ -217,10 +126,7 @@ export function Reserva() {
           </div>
           <div className={estilos.hilo} ref={hilo}>
             {mensajes.map((m, i) => (
-              <div
-                key={i}
-                className={m.deBot ? estilos.burbujaBot : estilos.burbujaUsuario}
-              >
+              <div key={i} data-de={m.deBot ? 'bot' : 'usuario'} className={estilos[claveBurbuja(m.deBot)]}>
                 {m.texto}
               </div>
             ))}
