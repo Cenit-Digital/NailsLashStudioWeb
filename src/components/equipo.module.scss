@@ -1,0 +1,320 @@
+// Sección de equipo (capa visual del DEMO). Valores de `progress/spec_visual_equipo.md`, mapeados a
+// los tokens del repo con la corrección AA aplicada: texto pequeño y rellenos en --accent-dark (nunca
+// --accent, 4,05:1), bordes de controles en --border-interactive (nunca --line, decorativo). Stryker
+// NO ve SCSS: estos bytes los aseveran `equipo-estilos.test.ts` + la puerta humana, jamás toHaveClass.
+
+.equipo {
+  // #equipo no lleva border-top (spec §1): se usa demo-seccion--plain desde el JSX.
+}
+
+// §3 rejilla: min() en el minmax evita el desborde por debajo de 320px (F-08).
+.rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: 1.625rem;
+  margin-top: 2.5rem;
+}
+
+// §4 tarjeta: se cede a la métrica de .demo-card (radius/sombra sub-perceptibles). Aquí, el layout.
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 16px 34px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+// §5 foto: hueco decorativo con aspect-ratio 4/3 y fondo de token. Sin <img>, sin subrecurso externo.
+.foto {
+  aspect-ratio: 4 / 3;
+  background: var(--accent-soft);
+}
+
+// §6 cuerpo
+.cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.375rem 1.375rem 1.5rem;
+}
+
+// §7 fila del nombre
+.filaNombre {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.625rem;
+}
+
+.nombre {
+  margin: 0;
+  font-family: 'Gilda Display', serif;
+  font-weight: 400;
+  font-size: 1.4375rem; // 23px
+  color: var(--ink);
+}
+
+.rol {
+  color: var(--muted);
+  font-size: 0.8125rem; // 13px
+}
+
+// §8 chips de especialidad. Componente nuevo (el .chipChat de reserva tiene otra métrica).
+.especialidades {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4375rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chipEspecialidad {
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  font-size: 0.75rem; // 12px
+  font-weight: 600;
+  padding: 0.3125rem 0.6875rem;
+  border-radius: 30px;
+}
+
+// §9 bloque «Reserva tu cita»
+.reserva {
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+}
+
+.pasoTitulo {
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 0.625rem;
+}
+
+// §10 botones de DÍA — misma spec que .dia/.diaActivo de reserva.module.scss (AA ya aplicado).
+.dias {
+  display: flex;
+  gap: 0.4375rem;
+  flex-wrap: wrap;
+}
+
+.dia,
+.diaActivo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 2.75rem;
+  padding: 0.4375rem 0.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-interactive);
+  cursor: pointer;
+  font-family: 'Manrope', system-ui, sans-serif;
+}
+
+.dia {
+  background: var(--bg);
+  color: var(--text);
+
+  &:hover {
+    border-color: var(--accent-dark);
+  }
+}
+
+.diaActivo {
+  background: var(--accent-dark);
+  color: var(--on-accent);
+  border-color: var(--accent-dark);
+}
+
+.diaDow {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.diaNum {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.cargando {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+// §11 botones de HORA
+.horas {
+  display: flex;
+  gap: 0.4375rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.horaOpcion {
+  padding: 0.5rem 0.875rem;
+  border-radius: 30px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Manrope', system-ui, sans-serif;
+  border: 1px solid var(--border-interactive);
+  background: var(--bg);
+  color: var(--text);
+
+  &:hover {
+    border-color: var(--accent-dark);
+  }
+
+  // Estado ELEGIDO: se deriva de aria-pressed (misma fuente que el árbol de accesibilidad), NO de una
+  // clase condicional —inmatable bajo `css:false`, mutantes que sobreviven—. AA: el relleno sigue en
+  // --accent-dark (nunca --accent, 4,05:1) bajo texto --on-accent.
+  &[aria-pressed='true'] {
+    background: var(--accent-dark);
+    color: var(--on-accent);
+    border-color: var(--accent-dark);
+  }
+}
+
+// §12 botón de reservar (habilitado / disabled). El disabled es un <button disabled>, no un <div>.
+.reservar {
+  width: 100%;
+  margin-top: 0.875rem;
+  padding: 0.75rem;
+  border-radius: 40px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Manrope', system-ui, sans-serif;
+  border: none;
+  background: var(--accent-dark);
+  color: var(--on-accent);
+
+  // Hover MÁS oscuro (nunca --accent, que bajo texto blanco cae a 4,37:1 — aviso 1 de la spec).
+  &:hover {
+    background: color-mix(in srgb, var(--accent-dark) 90%, #000);
+  }
+
+  &:disabled {
+    cursor: default;
+    background: var(--bg);
+    color: var(--muted);
+    border: 1px dashed var(--line);
+  }
+}
+
+// §13 estado CONFIRMADO
+.confirmacion {
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+  text-align: center;
+}
+
+.circulo {
+  width: 2.875rem;
+  height: 2.875rem;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.375rem;
+  margin: 0.125rem auto 0.75rem;
+}
+
+.mensaje {
+  color: var(--ink);
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0 0 0.25rem;
+  font-size: 0.9375rem;
+}
+
+.subtexto {
+  color: var(--muted);
+  font-size: 0.8125rem;
+  margin: 0 0 0.875rem;
+}
+
+.cambiar {
+  background: none;
+  border: none;
+  color: var(--accent-dark);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+// §14 bloque de RESEÑA
+.resena {
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+  margin: 0;
+}
+
+.estrellas {
+  color: var(--accent-2);
+  font-size: 0.875rem;
+  letter-spacing: 2px;
+  margin-bottom: 0.5rem;
+}
+
+.resenaTexto {
+  color: var(--text);
+  line-height: 1.55;
+  margin: 0 0 0.625rem;
+  font-size: 0.875rem;
+  min-height: 3.75rem; // 60px — evita el salto de altura al cambiar de reseña
+  border: none;
+  padding: 0;
+  quotes: none;
+}
+
+.resenaPie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.625rem;
+}
+
+.autora {
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.flechas {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.flecha {
+  width: 1.875rem;
+  height: 1.875rem;
+  border-radius: 50%;
+  border: 1px solid var(--border-interactive);
+  background: var(--bg);
+  color: var(--accent-dark);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    border-color: var(--accent-dark);
+  }
+}
+
+.leyenda {
+  margin: 2.5rem 0 0;
+  color: var(--muted);
+  font-size: 0.8125rem; // 13px
+}

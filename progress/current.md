@@ -52,6 +52,39 @@
     TikTok → @s7 rojo). Fronteras: sin WhatsApp (F-13), sin mapa (F-11), email omitido (D-3), sin TikTok.
   - Frontera respetada: el horario VISIBLE (deuda de F-10) NO se añadió a #contacto — no está en los 15
     escenarios del contrato; añadirlo sería improvisar alcance. Queda como deuda.
+- **F-18 `equipo` — cierre de mutación (2026-07-21, `tdd_craftsman`):** los 8 supervivientes de
+  `Equipo.tsx` (score 93.33 %) resueltos con **3 tests nuevos + 0 exclusiones**. (1) `franjasDe` divide
+  su núcleo en `franjasOfrecibles(franjas)` PURA e inyectable → 2 tests de frontera matan `>= abre` y
+  `< cierra` (81:37, 81:63). (2) El `className` condicional de la hora (177:32 ×3, inmatable con
+  css:false) se BORRA: estado en `&[aria-pressed='true']` del SCSS. (3) La confirmación pasa a
+  VALOR-OBJETO (`propuesta`/`reserva: Cita | null`): se van la bandera `reservado` (118:18) y la guarda
+  redundante (140:23/140:42), sin `// Stryker disable`. **56 verdes** en los 2 ficheros de equipo,
+  typecheck/lint 0. Detalle en `progress/mutation_equipo.md`.
+- **🎨 DEMO Equipo + WhatsApp flotante — CERRADO Y VERIFICADO (2026-07-21).** A petición de Pablo (la
+  página se había desviado del diseño Opción-1-Rosa): (a) se **restauró el orden del diseño** —
+  `Ofertas → Equipo → Reserva → Galería` (la Galería, que se había colado en el hueco de Equipo, baja
+  tras Reserva; NO se borra, decisión de Pablo); (b) **nueva sección `#equipo`** (`Equipo.tsx` +
+  `equipo-logica.ts` + `equipo-demo.ts`), 7 tarjetas (Lucía…Sara) con especialidades REALES (Uñas ·
+  Pestañas · Cejas · Nail art · Pedicura — NUNCA «Facial»/«Depilación», que no existen en el salón),
+  calendario por profesional (sábado sin franjas de tarde por F-10), carrusel de reseñas circular, y
+  **leyenda visible «datos de ejemplo»**; SIN fotos (placeholder de color; el literal `ph-woman` está
+  prohibido por la puerta 2). (c) **Botón FLOTANTE de WhatsApp** (`BotonWhatsApp.tsx`), `<a>` estático
+  fuera de `<main>`, `href` derivado de `waHref` de F-02 (formato `wa.me` VERIFICADO contra la doc
+  oficial de WhatsApp), SVG inline accesible, WCAG 2.2 SC 2.4.11/2.5.8, `prefers-reduced-motion`.
+  Contratos: `features/equipo_reservas.feature` (25) y `features/boton_whatsapp_flotante.feature` (14).
+  **Puertas:** judge equipo APROBADO; judge botón APROBADO (v2, tras cerrar `@s4`); seguridad SECURE;
+  a11y sin bloqueantes. **Mutación 100%** en `Equipo.tsx` y `equipo-logica.ts` (0 exclusiones);
+  `BotonWhatsApp.tsx` EXCLUIDO de `mutate` por no-mutable (`<a>` estático, `@s11` lo enforce; ver
+  `progress/mutation_boton_whatsapp.md`). **Verificación final (medida a mano):** typecheck 0, lint
+  **0 errores/0 warnings** (las 4 funciones puras se extrajeron a `equipo-logica.ts`, patrón F-09),
+  `pnpm build` exit 0 con las **5 puertas verdes**, `pnpm test` **889/889**. Reorden confirmado sobre
+  `dist/index.html` real. De la sesión paralela: el hero se commiteó (`b2564e9`, `f192bad`); no se tocó.
+  ⚠️ **`feature_list.json` F-18/F-13 NO se marcan `done`:** esto es un DEMO verificado, NO publicable.
+  El bloqueo de F-18 «para publicar» (fotos reales + consentimiento, LO 1/1982 · RGPD art. 7.3) SIGUE
+  vigente; los nombres son de ejemplo. F-13 (calendario que compone la solicitud) es otra feature.
+- **Deuda anotada (`progress/deuda_precios_catalogo.md`):** los precios del catálogo quedaron
+  descolocados en el commit `5a1345c` (p. ej. «Piernas completas 10 €» < «Medias piernas 35 €», y el
+  catálogo anuncia «Facial»/«Depilación» que el salón no ofrece). Pablo pidió expresamente NO tocarlo.
 - **Proyecto:** **9 done · 2 spec_ready (F-09/F-12 del lote A) · 6 pending · 4 blocked.**
 - **Contratos del lote A ya aprobados y abiertos** (cabecera ✅): `features/horario.feature` (15),
   `features/contacto.feature` (15), `features/catalogo_servicios.feature` (17). El `tdd_craftsman` los

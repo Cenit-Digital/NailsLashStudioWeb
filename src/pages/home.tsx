@@ -1,9 +1,11 @@
 import { Head } from 'vite-react-ssg'
 
+import { BotonWhatsApp } from '../components/BotonWhatsApp'
 import { Cabecera } from '../components/Cabecera'
 import { Catalogo } from '../components/Catalogo'
 import { Contacto } from '../components/Contacto'
 import { Destacados } from '../components/Destacados'
+import { Equipo } from '../components/Equipo'
 import { Faq } from '../components/Faq'
 import { Galeria } from '../components/Galeria'
 import { Hero } from '../components/Hero'
@@ -109,11 +111,15 @@ export default function Home() {
         <Destacados />
         <Ofertas />
 
-        {/* 🎨 DEMO: galería de trabajos (carrusel) — bloque NO navegable (div). */}
-        <Galeria />
+        {/* 🎨 DEMO: equipo (#equipo-titulo) — sección navegable justo tras Ofertas. Su <h2> con id
+            equipo-titulo cierra la igualdad de conjuntos con el 7º enlace de la nav (F-06). */}
+        <Equipo />
 
         {/* 🎨 DEMO: reserva rápida (#reserva-titulo) — mini-calendario + chat guiado, front-end. */}
         <Reserva />
+
+        {/* 🎨 DEMO: galería de trabajos (carrusel) — bloque NO navegable (div), tras Reserva. */}
+        <Galeria />
 
         {/* La sección de contacto (F-12) enriquecida para el DEMO: horario (F-10) + dirección +
             Instagram + CTA WhatsApp/tel + mapa. Reutiliza #contacto-titulo — no crea sección nueva. */}
@@ -126,6 +132,10 @@ export default function Home() {
       {/* El pie de F-06: la marca, el `tel:` y Facebook (derivados de F-02). NO emite enlaces
           legales (los cazaría la anti-404 —el bug del cliente—; son F-16). Ver src/components/Pie.tsx. */}
       <Pie />
+
+      {/* 🎨 DEMO: botón FLOTANTE de WhatsApp (F-13), HERMANO de <Pie/> y FUERA de <main>: acceso
+          permanente que no pertenece al hilo del contenido. El href deriva de la fuente única F-02. */}
+      <BotonWhatsApp />
     </>
   )
 }
