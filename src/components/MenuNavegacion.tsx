@@ -12,9 +12,11 @@ const ID_LISTA = 'menu-navegacion'
  * JS. El botón hornea «cerrado» (`aria-expanded="false"`, @s16); el toggle del estado llega en @s15.
  *
  * Los enlaces se escriben inline y EXACTAMENTE a las secciones navegables que existen en la home
- * (`#servicios-titulo`, `#contacto-titulo`, `#faq-titulo`): la PUERTA DE ANCLAS VIVAS vigila en cada
- * build que esa igualdad de conjuntos se mantenga. El botón «Reservar» apunta a `#contacto-titulo`
- * (donde vive el CTA de WhatsApp/tel del demo), un id que EXISTE.
+ * (`#servicios-titulo`, `#destacados-titulo`, `#ofertas-titulo`, `#equipo-titulo`, `#reserva-titulo`,
+ * `#contacto-titulo`, `#faq-titulo`): la PUERTA DE ANCLAS VIVAS vigila en cada build que esa igualdad
+ * de conjuntos se mantenga. El 7º enlace, «Equipo» → `#equipo-titulo`, cierra la igualdad con la
+ * `<section>` de equipo que la home monta tras Ofertas. El botón «Reservar» apunta a `#reserva-titulo`,
+ * un id que EXISTE.
  */
 export function MenuNavegacion() {
   // El estado abierto/cerrado vive en `aria-expanded` (atributo CONSULTABLE), NUNCA en un className
@@ -43,6 +45,9 @@ export function MenuNavegacion() {
         </li>
         <li>
           <a href="#ofertas-titulo">Ofertas</a>
+        </li>
+        <li>
+          <a href="#equipo-titulo">Equipo</a>
         </li>
         <li>
           <a href="#reserva-titulo">Reserva</a>

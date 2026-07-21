@@ -26,7 +26,11 @@
     "src/components/MenuNavegacion.tsx",
     "src/components/Pie.tsx",
     "src/components/Hero.tsx",
-    "src/components/Contacto.tsx"
+    "src/components/Contacto.tsx",
+    "src/components/Equipo.tsx",
+    "src/components/equipo-logica.ts",
+    "src/components/Reserva.tsx",
+    "src/components/reserva-logica.ts"
   ],
   "thresholds": {
     "high": 100,

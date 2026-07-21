@@ -1,0 +1,3 @@
+# gherkin_reserva_chat
+
+`features/reserva_chat.feature` REESCRITO v2 (22 escenarios, @s1-@s22): columna izquierda restaurada al copy verbatim del prototipo Opción-1-Rosa L248-256 con los dos href derivados de F-02 (@s1-@s5), la regresión «no vuelve el mini-calendario» (@s6-@s7), el chat guiado tal y como funciona HOY en `Reserva.tsx` (@s8-@s20), las cinco puertas (@s21) y la frontera con F-13 (@s22); 6 decisiones a la puerta humana (D1 leyenda del asistente demo, D3 texto demo, D6 entrada en `stryker.config.json`) y el bloqueante de mutación del `className` ternario de las burbujas reparado en @s19. NO se ha tocado código, tests ni `feature_list.json` (F-13 sigue `pending`: este contrato NO cubre la composición de la solicitud).

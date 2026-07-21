@@ -1,4 +1,9 @@
-// La sección de reserva (capa visual del DEMO): mini-calendario + chat estilo WhatsApp.
+// La sección de reserva (capa visual del DEMO): columna izquierda del diseño (texto + WhatsApp +
+// llamar, SIN calendario: ese widget vive en las tarjetas de `#equipo`) + chat estilo WhatsApp.
+
+.reserva {
+  // Sin reglas propias: el ancla de estilo la fija .rejilla. Mismo patrón que `.equipo {}`.
+}
 
 .rejilla {
   display: grid;
@@ -7,94 +12,10 @@
   align-items: center;
 }
 
-.paso {
-  margin-bottom: 1.125rem;
-}
-
-.pasoTitulo {
-  display: block;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--muted);
-  margin-bottom: 0.625rem;
-}
-
 .opciones {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-}
-
-.chip,
-.chipActivo {
-  padding: 0.5625rem 1rem;
-  border-radius: 30px;
-  border: 1px solid var(--border-interactive);
-  cursor: pointer;
-  font-family: 'Manrope', system-ui, sans-serif;
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
-.chip {
-  background: var(--bg);
-  color: var(--text);
-
-  &:hover {
-    border-color: var(--accent-dark);
-  }
-}
-
-.chipActivo {
-  background: var(--accent-dark);
-  color: var(--on-accent);
-  border-color: var(--accent-dark);
-}
-
-.dia,
-.diaActivo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 2.75rem;
-  padding: 0.4375rem 0.5rem;
-  border-radius: 12px;
-  border: 1px solid var(--border-interactive);
-  cursor: pointer;
-  font-family: 'Manrope', system-ui, sans-serif;
-}
-
-.dia {
-  background: var(--bg);
-  color: var(--text);
-
-  &:hover {
-    border-color: var(--accent-dark);
-  }
-}
-
-.diaActivo {
-  background: var(--accent-dark);
-  color: var(--on-accent);
-  border-color: var(--accent-dark);
-}
-
-.diaDow {
-  font-size: 0.625rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.diaNum {
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-.cargando {
-  color: var(--muted);
-  font-size: 0.875rem;
 }
 
 .acciones {
@@ -103,15 +24,6 @@
   gap: 0.75rem;
   align-items: center;
   margin-top: 1.5rem;
-}
-
-.deshabilitado {
-  background: var(--bg);
-  color: var(--muted);
-  border: 1px dashed var(--line);
-  padding: 0.875rem 1.625rem;
-  border-radius: 40px;
-  font-size: 0.9375rem;
 }
 
 // — Chat —

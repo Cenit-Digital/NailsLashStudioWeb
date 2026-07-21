@@ -250,28 +250,33 @@ Feature: Sección de equipo con reserva por profesional — 7 tarjetas con rol y
   # ---------------------------------------------------------------------------
 
   @s7
-  Scenario: El hueco de foto es un adorno decorativo: sin imagen, sin literal prohibido y sin subrecursos externos
+  Scenario: El hueco de foto lleva la foto REAL del trabajo: alt útil, sin literal prohibido y sin subrecursos externos
     Given el HTML horneado de la home con las siete tarjetas de equipo
     When se inspecciona el hueco de foto de cada tarjeta
-    Then cada hueco es un elemento con aria-hidden="true" (queda FUERA del árbol de accesibilidad: no aporta ningún nombre)
-    And la sección no contiene ningún "<img" ni ningún atributo src
+    Then cada hueco contiene EXACTAMENTE UNA "<img" con un atributo alt NO vacío que describe el TRABAJO, nunca a la persona
+    And ninguno de esos huecos lleva ya aria-hidden="true": la imagen aporta información y entra en el árbol de accesibilidad
     And en toda la página no aparece el literal "ph-woman" ni una sola vez
-    And ningún subrecurso externo se solicita desde la sección: ni img, ni script, ni iframe, ni link, ni @font-face, ni url() apuntando fuera del sitio
-    # Puerta 2 (placeholders: «ph-woman» está en la lista prohibida) y puerta 4 (terceros). Además
-    # cierra D1: NO hay foto de ninguna persona, ni real ni generada, así que no hay derecho de
-    # imagen que gestionar en la DEMO. El hueco mantiene el `aspect-ratio: 4/3` del diseño (spec
-    # visual §5) — eso es CSS, se lee de los BYTES del `.module.scss`, NUNCA con toHaveClass.
+    And ningún "<img src" apunta a un origen externo (http/https de un dominio ajeno): las siete fotos son imports de `src/assets/trabajos/`, que Vite resuelve a rutas propias del sitio
+    # 🔄 REESCRITO (fotos reales): la versión anterior de este escenario describía un `<div
+    # aria-hidden="true">` sin `<img>`, que es justo lo que esta feature reemplaza. Puerta 2
+    # (placeholders: «ph-woman» sigue en la lista prohibida) y puerta 4 (terceros: el import de un
+    # asset local NUNCA es una petición a un origen externo). El hueco mantiene el `aspect-ratio: 4/3`
+    # del diseño (spec visual §5) — eso es CSS, se lee de los BYTES del `.module.scss`, NUNCA con
+    # toHaveClass.
 
   @s8
-  Scenario: Una leyenda VISIBLE declara que los perfiles y las reseñas son de ejemplo
+  Scenario: Una leyenda VISIBLE declara que los perfiles, las fotos y las reseñas son de ejemplo
     Given el HTML horneado de la home con la sección de equipo
     When se lee el pie de la sección de equipo
-    Then se muestra un texto visible cuyo contenido es exactamente "Equipo y reseñas de ejemplo · perfiles de muestra, pendientes de confirmar con el salón"
+    Then se muestra un texto visible cuyo contenido es exactamente "Equipo, fotos y reseñas de ejemplo · perfiles de muestra y fotos de banco de imágenes, pendientes de confirmar con el salón"
     And ese texto está en el HTML HORNEADO (no aparece solo tras hidratar) y no está oculto visualmente
-    And la leyenda menciona AMBAS cosas: los perfiles del equipo y las reseñas
-    # D1 + D2, patrón `LEYENDA_OFERTAS` de F-09. Ni un nombre ni una reseña se presentan como reales.
-    # Los datos viven en `src/lib/demo/equipo-demo.ts` (FUERA del JSX), retirables sin desplegar
-    # código: es lo que exige `feature_list.json` §18. 🔴 EL COPY EXACTO VA A LA PUERTA (D2).
+    And la leyenda menciona las TRES cosas: los perfiles del equipo, que las fotos son de BANCO DE IMÁGENES (no del salón) y las reseñas
+    # D1 + D2, patrón `LEYENDA_OFERTAS` de F-09. 🔄 AMPLIADA (fotos reales): antes solo declaraba
+    # perfiles y reseñas de ejemplo; ahora que las tarjetas llevan fotos reales de banco de imágenes
+    # (Pexels, sin rostro identificable), la leyenda también lo dice — honestidad: son fotos de
+    # trabajos de uñas/pestañas, no fotos del salón ni de las profesionales. Los datos viven en
+    # `src/lib/demo/equipo-demo.ts` (FUERA del JSX), retirables sin desplegar código: es lo que exige
+    # `feature_list.json` §18. 🔴 EL COPY EXACTO VA A LA PUERTA (D2).
 
   # ---------------------------------------------------------------------------
   # LOS DÍAS: calculados EN CLIENTE desde «hoy», saltando domingos. Bajo SSG, hornear fechas es
@@ -494,3 +499,107 @@ Feature: Sección de equipo con reserva por profesional — 7 tarjetas con rol y
     # tarjetas habría además catorce controles con el mismo nombre, indistinguibles en la lista de
     # elementos de un lector de pantalla. Se asevera por ROL + NOMBRE ACCESIBLE
     # (`getByRole('button', { name: … })`), nunca por clase CSS.
+
+  # ===========================================================================================
+  # AMPLIACIÓN (2026-07-21) — FOTOS REALES: el monograma se RETIRA, entra la foto del TRABAJO.
+  # ===========================================================================================
+  # QUÉ CAMBIA Y POR QUÉ. La ampliación anterior (misma fecha) puso la INICIAL de cada profesional
+  # sobre el hueco rosa, para no gestionar ningún derecho de imagen. Pablo ha pedido fotos DE VERDAD
+  # para la reunión. El lead ya hizo la parte de criterio: buscó, miró una a una y seleccionó 13 fotos
+  # de Pexels (licencia libre) para Equipo + Galería; NINGUNA tiene un rostro identificable — la
+  # licencia de Pexels prohíbe «imply endorsement... by people... in the imagery», y poner la cara de
+  # una desconocida en una tarjeta que dice «Lucía · especialista» implicaría que trabaja aquí (LO
+  # 1/1982, derecho a la propia imagen). Son fotos de TRABAJOS (uñas, pestañas, cejas), no retratos.
+  # El monograma se BORRA ENTERO (función, tests, regla SCSS): no queda código muerto. Los escenarios
+  # @s1-@s6 y @s9-@s25 NO se tocan; @s7 y @s8 SÍ (ver arriba): el hueco deja de ser un rectángulo
+  # decorativo y pasa a llevar la foto real, y la leyenda pasa a declarar también que las fotos son de
+  # banco de imágenes.
+  #
+  # FUENTES LEÍDAS (no inventadas)
+  #   · `src/lib/demo/equipo-demo.ts` — el dato REAL: cada `ProfesionalDemo` gana `foto` (el import del
+  #     asset) y `alt` (el texto que describe el TRABAJO, nunca a la persona). Los siete ficheros viven
+  #     en `src/assets/trabajos/`, ya commiteados por el lead.
+  #   · `src/components/equipo.module.scss` §5 `.foto` — `aspect-ratio: 4/3` + `background:
+  #     var(--accent-soft)` se conserva como contenedor; la imagen lo rellena (`object-fit: cover`).
+  #   · `src/lib/placeholders.ts` L27-34 — `ph-woman` sigue en `PATRONES_PROHIBIDOS`. Sigue PROHIBIDO.
+  #
+  # 🔴 MUTACIÓN (umbral 1.0): esta ampliación NO añade lógica pura nueva — `foto` y `alt` son DATOS,
+  # igual que `nombre`/`rol`/`especialidades` ya lo eran, y `equipo-demo.ts` sigue FUERA de `mutate`
+  # (patrón F-09: dato fuera, lógica dentro). Al BORRAR `inicialDe` el núcleo mutable de
+  # `equipo-logica.ts` se queda en las tres funciones que ya defendían @s10/@s12/@s13/@s21/@s22
+  # (`diasOfrecidos`, `franjasOfrecibles`/`franjasDe`, `indiceCircular`): nada nuevo que morder, nada
+  # que se quede sin test.
+  #
+  # ANTI-TAUTOLOGÍA: los siete pares fichero/alt de la tabla de @s26 se escriben A MANO en el test.
+  # ❌ PROHIBIDO importar `EQUIPO_DEMO` para derivar el `alt` esperado.
+  # ===========================================================================================
+
+  @s26
+  Scenario Outline: Cada una de las siete tarjetas muestra la foto REAL de SU trabajo, con el alt exacto
+    Given la home renderizada por SSR, sin ejecutar JavaScript
+    When se lee el hueco de foto de la tarjeta de "<nombre>"
+    Then ese hueco contiene EXACTAMENTE UNA "<img" cuyo atributo alt es exactamente "<alt>"
+
+    Examples:
+      | nombre | alt                                                              |
+      | Lucía  | Nail art en rojo con detalles en blanco y dorado                |
+      | Carla  | Extensión de pestañas con efecto volumen                        |
+      | Andrea | Pedicura profesional en cabina                                  |
+      | Nerea  | Productos de tinte para cejas y pestañas                        |
+      | Marta  | Pestañas postizas y pinzas de aplicación                        |
+      | Paula  | Nail art con estampado de leopardo sobre esmalte negro          |
+      | Sara   | Cuidado de cutículas antes del esmaltado                        |
+
+    # El fichero y el alt de cada fila salen del mapeo LEÍDO (no inventado) que fija esta feature; se
+    # escriben A MANO en el test. «Exactamente una <img>» mata al mutante que la pinta dos veces o en
+    # la tarjeta equivocada.
+
+  @s27
+  Scenario: Las siete fotos son DISTINTAS entre sí: ninguna tarjeta repite la foto de otra
+    Given la home renderizada por SSR, sin ejecutar JavaScript
+    When se leen los siete atributos alt de las fotos de equipo, en orden de aparición
+    Then los siete son DISTINTOS entre sí y ninguno está vacío
+    # Igual que el monograma exigía siete iniciales distintas para distinguir tarjetas, la foto exige
+    # siete trabajos distintos: repetir la misma foto en dos tarjetas sería una regresión visual que
+    # ningún test hoy detectaría sin este escenario.
+
+  @s28
+  Scenario: Cada foto declara sus dimensiones y carga diferida, para no provocar salto de layout
+    Given la home renderizada por SSR, sin ejecutar JavaScript
+    When se inspecciona la "<img" de cada una de las siete tarjetas
+    Then las siete declaran width="800" y height="600" (las fotos son 800×600)
+    And las siete declaran loading="lazy": ninguna es el elemento LCP de la página (el LCP sigue siendo el titular del hero, F-07)
+    # Sin width/height reservados, la imagen entra tras el layout inicial y empuja el resto de la
+    # tarjeta (CLS). `loading="lazy"` es correcto aquí: la sección de equipo está bajo el pliegue.
+
+  @s29
+  Scenario: La foto entra en el árbol de accesibilidad con su alt, sin contaminar el nombre de la tarjeta
+    Given la sección de equipo con la tarjeta de "Lucía", cuyo "<h3>" ya dice "Lucía"
+    When se consulta el árbol de accesibilidad
+    Then existe una imagen cuyo nombre accesible es exactamente "Nail art en rojo con detalles en blanco y dorado"
+    And el nombre accesible del encabezado de la tarjeta sigue siendo exactamente "Lucía": la foto no le añade ni el alt ni ningún otro texto
+    And la sección sigue aportando UN "<h2>" y SIETE "<h3>", ni uno más (@s4 sigue verde)
+    # 🔄 Es la INVERSA del monograma: antes el hueco estaba oculto a propósito (aria-hidden) porque no
+    # tenía nada que decir; ahora SÍ dice algo (el trabajo fotografiado) y por eso deja de ocultarse
+    # (@s7). Lo que no cambia es que el nombre de la profesional lo sigue dando SOLO el `<h3>`.
+
+  @s30
+  Scenario: Las siete fotos viajan HORNEADAS (SSR): no dependen de la hidratación
+    Given la sección de equipo renderizada por SSR, sin ejecutar JavaScript ni hidratar
+    When se leen los atributos alt de las fotos en el HTML horneado, en orden de aparición
+    Then el horneado SÍ contiene "Nuestro equipo de profesionales" y los siete nombres (ANCLA POSITIVA: prueba de que la extracción no devolvió la cadena vacía; sin ella lo demás pasaría verde por VACUIDAD)
+    And los siete alt, en ese orden, son los de la tabla de @s26
+    # A diferencia de los días (@s9, que NO se hornean porque caducan), la foto de cada profesional es
+    # un dato ESTÁTICO: hornearla no miente nunca y hace que la sección se lea sin JS.
+
+  @s31
+  Scenario: Las fotos NO reintroducen "ph-woman" ni rompen la puerta de terceros: son imports locales
+    Given la home renderizada por SSR, sin ejecutar JavaScript
+    When se inspecciona la sección de equipo horneada
+    Then en toda la página no aparece el literal "ph-woman" ni una sola vez
+    And ninguna "<img src" de la sección apunta a un origen externo (http/https de un dominio ajeno): las siete son imports de `src/assets/trabajos/`, que Vite resuelve a rutas propias
+    And la puerta de contraste no necesita ningún par nuevo: la foto no introduce color de token alguno (es una imagen, no un fondo o texto con `var(--…)`)
+    And el conjunto de ids de sección y el de href="#…" de la nav siguen siendo EXACTAMENTE los mismos siete de hoy: las fotos no añaden ni quitan ninguno
+    # Puertas 2 (placeholders) y 4 (terceros). D1 (`feature_list.json` §18) SIGUE CUMPLIDO en lo que
+    # depende del código: ninguna foto tiene un rostro identificable (decisión y verificación del
+    # lead, no testeable por un test unitario) y los nombres se declaran de ejemplo (@s8).
