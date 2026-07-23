@@ -116,3 +116,11 @@
 - **@s17 (A-5)**: preferencia EN CALIENTE (patrón galeria @s12) — reduce a mitad COMPLETA la firma y
   desmonta el botón; desactivarla no rearranca nada; escucha "change" con limpieza verificada.
 - Mutación: exclusión in-situ del equivalente deps-[] RATIFICADA (`progress/mutation_hero_caligrafia_lenta.md`).
+
+### Enmienda 3 (2026-07-24) — 90 s → 30 s, solo el VALOR
+
+- Pablo vio los ≈90 s en su navegador y pidió probar 30; el lead lo vivió en Chrome real (banco de
+  pruebas con el token pisado en caliente, sin tocar código) y el veredicto UI/UX coincide: a 90 s
+  la pluma parece casi quieta; a 30 s (≈3,3 s/letra) siempre hay movimiento visible y sigue ceremonial.
+- Token `--duracion-caligrafia: 30s`, espejo `SEGUNDOS_DE_TRAZO = 30`, total ≈30,8 s. Coreografía
+  relativa, curva `linear`, reloj único y mecanismo SC 2.2.2 (sigue >5 s) INTACTOS. Contrato: @s4 y notas.

@@ -18,7 +18,8 @@ import {
  *
  * EL RELOJ ES UNO: el token `--duracion-caligrafia` del SCSS y `SEGUNDOS_DE_TRAZO` de la lógica
  * se comparan AQUÍ, leyendo los BYTES de la hoja (jsdom no anima; patrón hero-estilos). Si alguien
- * cambia los 90 s en un sitio y no en el otro, este fichero se pone rojo.
+ * cambia los 30 s en un sitio y no en el otro, este fichero se pone rojo. (ENMIENDA 3, 2026-07-24:
+ * 90 s → 30 s; solo cambia el VALOR, el espejo sigue mordiendo en las dos direcciones.)
  */
 const RUTA_SCSS = 'src/components/hero.module.scss'
 
@@ -27,9 +28,9 @@ function scss(): string {
 }
 
 describe('@s4/@s12 el reloj del timeout es EL MISMO que el de la hoja: una sola fuente de verdad', () => {
-  it('@s4 SEGUNDOS_DE_TRAZO es 90 y es el MISMO número que el token --duracion-caligrafia del SCSS', () => {
-    // El 90 va ESCRITO A MANO (anti-tautología) y ADEMÁS se lee de los bytes de la hoja.
-    expect(SEGUNDOS_DE_TRAZO).toBe(90)
+  it('@s4 SEGUNDOS_DE_TRAZO es 30 y es el MISMO número que el token --duracion-caligrafia del SCSS', () => {
+    // El 30 va ESCRITO A MANO (anti-tautología) y ADEMÁS se lee de los bytes de la hoja.
+    expect(SEGUNDOS_DE_TRAZO).toBe(30)
 
     const token = /--duracion-caligrafia\s*:\s*(\d+(?:\.\d+)?)s\s*;/.exec(scss())
 
@@ -53,11 +54,11 @@ describe('@s4/@s12 el reloj del timeout es EL MISMO que el de la hoja: una sola 
     expect(Number(duracion) + Number(extra)).toBe(SEGUNDOS_DE_SALIDA)
   })
 
-  it('@s12 milisegundosDeCeremonia() devuelve 90 800 ms — el fin del reloj que desmonta el control', () => {
-    // 90 + 0,8 = 90,8 s → 90 800 ms, ESCRITO A MANO: el mismo número que asevera hero-estilos
+  it('@s12 milisegundosDeCeremonia() devuelve 30 800 ms — el fin del reloj que desmonta el control', () => {
+    // 30 + 0,8 = 30,8 s → 30 800 ms, ESCRITO A MANO: el mismo número que asevera hero-estilos
     // sobre la hoja (retardo + duración de revelarStudio). Se calcula EN LLAMADA, no en la carga
     // del módulo (estáticos no activables: progress/tdd_deuda_mutacion_full.md, familia B).
-    expect(milisegundosDeCeremonia()).toBe(90_800)
+    expect(milisegundosDeCeremonia()).toBe(30_800)
   })
 })
 
