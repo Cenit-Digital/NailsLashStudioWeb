@@ -4,6 +4,16 @@
 > (regla anti-teléfono-descompuesto). Al cerrar la sesión, mueve el resumen a
 > `history.md` y deja este archivo con solo esta plantilla.
 
+- **Feature en curso: hero — CALIGRAFÍA LENTA (contrato demo `features/hero.feature`, enmienda
+  2026-07-23)** · `tdd_craftsman` en rama `feat/hero-caligrafia-lenta`. **CICLO EN VERDE
+  (2026-07-23): 91 tests de hero (34 estilos + 45 DOM + 12 lógica; baseline 57), 7 ciclos, 18
+  sabotajes matados, typecheck/lint/prettier 0.** Nuevos: `hero-logica.ts` (+ su test). Tocados:
+  `hero.module.scss` (token 90s + linear + calc + `.control` + bloque completada), `Hero.tsx`
+  (control sin cromo, data-firma, fin de reloj), `hero.test.tsx`, `hero-estilos.test.ts`.
+  @s1-@s3/@s5-@s9 intactos y verdes. PENDIENTE del lead: alta de `hero-logica.ts` en
+  `stryker.config.json`, suite completa + build, judge, mutación (Hero.tsx break 100),
+  verificación EN VIVO (brief §4). NO marcado done. Diario:
+  `progress/tdd_hero_caligrafia_lenta.md`. F-07 NO se reabre (precedente 2026-07-20).
 - **Feature en curso: 14 — `resenas_agregado_enlace`** · `tdd_craftsman` en rama
   `feat/galeria-v3-resenas`. **CICLO EN VERDE (2026-07-23): 142 tests nuevos (+4 en
   home-horneado, build-based, sin correr aquí), 7 sabotajes matados, typecheck/lint/prettier 0.**
@@ -21,7 +31,7 @@
   Anterior: sesión cerrada 2026-07-23 (features 22 y 12 → `done`; resumen en `history.md`).
 - **Proyecto:** **12 done · 1 spec_ready (F-09 catálogo, contrato aprobado y abierto:
   `features/catalogo_servicios.feature`, 17 escenarios) · 5 pending · 4 blocked.**
-- **Rama viva:** `feat/galeria-v3-resenas` (commiteada y empujada al cierre; PR pendiente de merge).
+- **Rama viva:** `feat/hero-caligrafia-lenta` (commiteada y empujada al cierre; PR pendiente de merge).
 
 ## Deuda de mutación de la corrida completa (2026-07-23, tdd_craftsman)
 
