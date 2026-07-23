@@ -556,6 +556,13 @@ escenarios. La **revisión adversarial (5 lentes) cazó 2 BLOQUEANTES antes de e
   firma completa), ritmo real medido (6 016 ms de avance en 6 s), clic y Enter completan, sin JS
   estático completo, reduce en caliente, **LCP 148 ms** (el titular sigue sin ser el elemento LCP),
   cero terceros.
+- **Ajuste final del ritmo (2026-07-24)**: Pablo vio los 90 s en su navegador y pidió probar 30; el
+  lead montó un BANCO DE VIVENCIAS (token pisado en caliente por CDP, sin tocar código: cualquier
+  duración se ve en tiempo real con fotogramas en ~3 min) y el veredicto UI/UX coincidió — a 90 s
+  la pluma parecía casi quieta; a 30 s (≈3,3 s/letra) siempre hay movimiento visible y sigue siendo
+  ceremonial. Enmienda 3 del contrato + micro-ciclo (los DOS valores del diseño de token único),
+  mutación 100 %/100 %, 30 000 ms exactos medidos en el build real. El banco queda en el scratchpad
+  de la sesión (vivencia-hero.mjs) para futuros ajustes de ritmo.
 - **Incidente de herramienta, declarado**: el WebSocket nativo de Node (undici) contra el CDP
   murió repetidas veces en corridas largas con muchas capturas; el remedio fue trocear la sonda en
   sesiones cortas (mini-sonda para los 4 checks finales) y hacer ATÓMICOS los pares espera+acción

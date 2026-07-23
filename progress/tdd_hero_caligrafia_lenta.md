@@ -230,3 +230,28 @@
   otros componentes, contratos, `feature_list.json`, `stryker.config.json`, `progress/current.md`.
 - **PENDIENTE del lead**: judge de la enmienda 2 + verificación EN VIVO (arranque en el montaje
   real, foco tras Enter/reloj en Chrome, toggle de reduce en caliente) antes de cualquier `done`.
+
+## Enmienda 3 (30 s)
+
+Micro-ciclo del 2026-07-24 (decisión de Pablo tras vivir ambos ritmos: 90 s → 30 s). El diseño de
+token único hizo que fueran DOS valores de producción y ni uno más.
+
+- **ROJO**: los 3 ficheros de test re-medidos al contrato nuevo (30 / `30s` / 29,7 / 30,2 /
+  30 800 ms, todos ESCRITOS A MANO). Los Then estructurales (token único, calc() derivados,
+  `linear`, un reloj tinta+aplicador, orden de «STUDIO») intactos. Corrida dirigida:
+  **11 fallos** en 3 ficheros contra la producción vieja — rojo demostrado.
+- **VERDE**: `hero.module.scss` `--duracion-caligrafia: 90s → 30s` (línea 52) y `hero-logica.ts`
+  `SEGUNDOS_DE_TRAZO = 90 → 30` (línea 19). **107/107** en verde.
+- **REFACTOR** (en verde): comentarios de producción que citaban el régimen viejo alineados
+  (cabecera del SCSS: ≈3,3 s por letra, total ≈30,8 s; doc de `milisegundosDeCeremonia`). Cero
+  cambios de comportamiento; re-corrida verde.
+- **Sabotaje del espejo, DOS direcciones**: lógica=90/SCSS=30 → 2 tests rojos; SCSS=90s/lógica=30
+  → 1 test rojo (la aserción espejo `Number(token) === SEGUNDOS_DE_TRAZO`). Restaurado, verde.
+- **NO tocados**: `Hero.tsx` (el reloj lo lee de `milisegundosDeCeremonia()`), el `.feature` (ya
+  traía la Enmienda 3), y los `90` que NO son tiempo del régimen (el «90 %» del recorrido en
+  hero.test.tsx:325 y la historia de la auditoría A-3 en :725, que era literalmente 90 s entonces).
+- **Mutación dirigida**: `hero-logica.ts` **16/16 = 100 %** · `Hero.tsx` **50/50 = 100 %**
+  (0 survived, 0 no-cov; 1 Ignored: la exclusión RATIFICADA existente, ninguna nueva).
+  Prettier/ESLint limpios en los ficheros tocados. Sin suite completa ni build (orden del lead).
+- **PENDIENTE del lead**: re-verificación EN VIVO del ritmo real (≈30 s, getAnimations() +
+  muestreo) y del LCP con la animación larga, como fija el contrato.

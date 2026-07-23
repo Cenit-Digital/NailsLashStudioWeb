@@ -474,9 +474,10 @@ describe('@demo el aplicador: <svg> aria-hidden hermano del h1, autohospedado, r
 /* ——————————————————————————————————————————————————————————————————————————————————————————————
  * ENMIENDA 2026-07-23 — LA CALIGRAFÍA LENTA: el control sin cromo (@s10-@s14).
  *
- * A ≈90 s el mecanismo para parar/saltar es OBLIGATORIO (SC 2.2.2, nivel A — PROHIBIDO citarlo
- * como opcional). La forma respeta a Pablo («sin nada de botones»): el propio rótulo es el
- * control — un <button> transparente superpuesto, FUERA del <h1>. jsdom NO anima: aquí se asevera
+ * A ≈30 s (ENMIENDA 3; sigue siendo MÁS de 5 s) el mecanismo para parar/saltar es OBLIGATORIO
+ * (SC 2.2.2, nivel A — PROHIBIDO citarlo como opcional). Pablo pidió «sin nada de botones»: el
+ * rótulo es el control — un <button> transparente superpuesto, FUERA del <h1>. jsdom NO anima:
+ * aquí se asevera
  * el DOM (montaje, activación, desmontaje, ARIA); los tiempos van por BYTES en hero-estilos y en
  * hero-logica; la vivencia real, EN VIVO en Chrome.
  *
@@ -635,11 +636,11 @@ describe('@s11 activar el control completa la firma AL INSTANTE y desmonta el bo
 
 /**
  * @s12 — EL FIN DE RELOJ. jsdom no anima CSS: el «final» que puede observar un test es el del
- * `setTimeout` de Hero.tsx, cuyo plazo (90 800 ms, ESCRITO A MANO aquí) deriva de UNA fuente
+ * `setTimeout` de Hero.tsx, cuyo plazo (30 800 ms, ESCRITO A MANO aquí) deriva de UNA fuente
  * (`milisegundosDeCeremonia()`, aseverada por valor y contra los bytes del SCSS en
  * hero-logica.test.ts). Reloj FALSO avanzado dentro de `act` (patrón galeria.test.tsx).
  */
-const MILISEGUNDOS_DE_CEREMONIA = 90_800
+const MILISEGUNDOS_DE_CEREMONIA = 30_800
 
 /** Avanza el reloj FALSO dentro de `act`, para que React aplique los cambios de estado. */
 function avanzar(milisegundos: number): void {
@@ -649,7 +650,7 @@ function avanzar(milisegundos: number): void {
 }
 
 describe('@s12 el control SOLO existe mientras la animación corre: el fin del reloj lo desmonta solo', () => {
-  it('@s12 un milisegundo ANTES del final el botón sigue; al cumplirse los 90 800 ms desaparece sin intervención', () => {
+  it('@s12 un milisegundo ANTES del final el botón sigue; al cumplirse los 30 800 ms desaparece sin intervención', () => {
     conMovimientoPermitido()
     vi.useFakeTimers()
     const { container } = render(<Hero />)
@@ -668,7 +669,7 @@ describe('@s12 el control SOLO existe mientras la animación corre: el fin del r
   })
 
   it('@s12 la LIMPIEZA del efecto: completar por clic NO deja un reloj vivo que re-etiquete la firma', () => {
-    // Sin `clearTimeout` en la limpieza, el reloj huérfano dispararía a los 90,8 s y pisaría
+    // Sin `clearTimeout` en la limpieza, el reloj huérfano dispararía a los 30,8 s y pisaría
     // «cliente» con «reloj» — ESTA aserción es la que hace matable ese mutante (por eso
     // FaseDeLaFirma distingue los dos finales; ver hero-logica.ts).
     conMovimientoPermitido()
@@ -686,7 +687,7 @@ describe('@s12 el control SOLO existe mientras la animación corre: el fin del r
 describe('@s13 con movimiento reducido el control NO se monta: no hay nada que completar', () => {
   // El rótulo completo YA es visible al instante bajo reduce: lo garantiza la HOJA (@s3/@s5 de
   // hero-estilos: @media reduce → animation none + base final visible). Aquí, el DOM del control.
-  it('@s13 el botón «Completar la firma» NO existe en el árbol en ningún momento, ni siquiera tras 90,8 s', () => {
+  it('@s13 el botón «Completar la firma» NO existe en el árbol en ningún momento, ni siquiera tras 30,8 s', () => {
     stubDeMatchMedia(true)
     vi.useFakeTimers()
     const { container } = render(<Hero />)
@@ -781,7 +782,7 @@ describe('@s17 activar reduce a MITAD de firma la completa; desactivarlo no rear
     expect(escenaDe(container).classList.contains(CLASE_LISTA)).toBe(false)
     expect(screen.queryByRole('button')).toBeNull()
 
-    // Y el reloj quedó LIMPIO al morir el control: 90,8 s después nada re-etiqueta la firma.
+    // Y el reloj quedó LIMPIO al morir el control: 30,8 s después nada re-etiqueta la firma.
     avanzar(MILISEGUNDOS_DE_CEREMONIA)
     expect(escenaDe(container)).toHaveAttribute('data-firma', 'corriendo')
     expect(screen.queryByRole('button')).toBeNull()
