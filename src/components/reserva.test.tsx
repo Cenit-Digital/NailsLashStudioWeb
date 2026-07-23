@@ -5,7 +5,7 @@ import { renderToString } from 'react-dom/server'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { Reserva } from './Reserva'
-import { claveBurbuja, mensajeReserva } from './reserva-logica'
+import { claveBurbuja, desplazarAlFinal, mensajeReserva } from './reserva-logica'
 
 /**
  * Sección `#reserva` — la columna izquierda RESTAURADA al diseño (prototipo Opción-1-Rosa, L248-256)
@@ -68,6 +68,22 @@ describe('@s1 la columna izquierda hornea el eyebrow, el h2 con su id intacto y 
 
     expect(horneado).toContain(`>${EYEBROW}<`)
     expect(horneado).toContain(PARRAFO)
+  })
+
+  it('@s1 la <section> viste demo-seccion demo-seccion--alt y la rejilla demo-contenedor (las clases del diseño)', () => {
+    // Clases GLOBALES literales (no del módulo CSS) → SÍ observables bajo css:false. Se lee el
+    // atributo class del horneado (patrón equipo.test.tsx / remate de contacto), sin toHaveClass.
+    // Matan los dos mutantes que VACÍAN el className de la sección y del contenedor (deuda de
+    // mutación 2026-07-23): sin ellas la sección pierde el fondo alterno y el ancho del contenedor.
+    const horneado = renderToString(<Reserva />)
+    const seccion = /<section[^>]*class="([^"]*)"/.exec(horneado)
+    const contenedor = /<div class="([^"]*)"/.exec(horneado)
+
+    expect(seccion, 'la <section> no lleva atributo class').not.toBeNull()
+    expect(seccion?.[1]).toContain('demo-seccion')
+    expect(seccion?.[1]).toContain('demo-seccion--alt')
+    expect(contenedor, 'la rejilla no lleva atributo class').not.toBeNull()
+    expect(contenedor?.[1]).toContain('demo-contenedor')
   })
 
   it('@s1 la sección no aporta ningún <h1> y NO queda rastro del copy anterior', () => {
@@ -347,6 +363,17 @@ describe('@s13 el cuarto paso pide el nombre por texto libre, sin botones de opc
     expect(enviar.textContent).toBe('→')
     expect(screen.queryByRole('button', { name: '→' })).toBeNull()
   })
+
+  it('@s13 el campo NACE vacío: al aparecer por primera vez no trae nada preescrito', () => {
+    render(<Reserva />)
+    avanzarHastaElNombre()
+
+    // Mutación (deuda 2026-07-23): el estado inicial del borrador es '' y NADIE lo reescribe antes
+    // de que el campo aparezca — el mutante `useState("Stryker was here!")` hornearía ese texto en
+    // el input la primera vez que se muestra. @s14 y @s17 no lo cazan porque siempre ESCRIBEN en el
+    // campo (fireEvent.change) antes de mirar su valor.
+    expect(screen.getByPlaceholderText('Escribe tu nombre…')).toHaveValue('')
+  })
 })
 
 describe('@s14 enviar el nombre vacío o solo espacios no añade NADA al hilo', () => {
@@ -468,6 +495,24 @@ describe('@s18 el hilo se desplaza automáticamente hasta el último mensaje', (
     fireEvent.click(screen.getByRole('button', { name: 'Uñas' }))
 
     expect(hilo.scrollTop).toBe(500)
+  })
+})
+
+describe('@s18 desplazarAlFinal, la lógica PURA del autoscroll, se ejercita por VALOR', () => {
+  // La guarda del ref sin montar vivía INOBSERVABLE dentro del componente: el hilo se renderiza
+  // SIEMPRE, así que `hilo.current` nunca era null en el efecto y el mutante `if (true)` producía
+  // el mismo comportamiento (deuda de mutación 2026-07-23). Extraída aquí (patrón claveBurbuja /
+  // equipo-logica), el null es una ENTRADA real del test y los mutantes de la guarda mueren por valor.
+  it('@s18 con un nodo, deja scrollTop EXACTAMENTE en su scrollHeight (500)', () => {
+    const nodo = { scrollTop: 0, scrollHeight: 500 }
+
+    desplazarAlFinal(nodo)
+
+    expect(nodo.scrollTop).toBe(500)
+  })
+
+  it('@s18 con null (el ref aún sin montar) no hace nada y NO lanza', () => {
+    expect(() => desplazarAlFinal(null)).not.toThrow()
   })
 })
 

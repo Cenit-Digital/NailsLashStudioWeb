@@ -123,3 +123,39 @@ ya extrajo `<Hero/>` del `<h1>` stub). Dos capas de test, como el repo:
 - Mutación con Stryker sobre `site.ts` (instagramHref) y `Contacto.tsx` → `mutation_tester` (umbral 1.0; si algún
   mutante RESISTE, se ESCALA: ampliar/refactorizar, 0 exclusiones). · Review → `judge`. · Verificación EN VIVO
   con Chrome (prominencia del `tel:` en móvil, la página pintada) → el `lead`. **NO se marca `done` aquí.**
+
+---
+
+## Remate: los 8 mutantes escalados — 2026-07-23
+
+> Cierra el ESCALADO de `progress/mutation_contacto.md` (90,59 % < 100, 8 sobrevivientes, 0
+> equivalentes). **SOLO tests**: ni `site.ts` ni `Contacto.tsx` se tocaron (el sabotaje los rompió
+> a mano y los restauró vía `git checkout`, diffs verificados). Vitest dirigido; la re-mutación la
+> corre el lead.
+
+### Los 6 tests nuevos → los 8 mutantes que matan
+
+| Mutante (informe) | Test nuevo | Fichero |
+|---|---|---|
+| `site.ts:125:21` (mensaje «empezar por "@"» vaciado) | `@s3 el handle sin "@" lanza un error que nombra la regla: «empezar por "@"»` — patrón F-02 (`toThrow`, site.test.ts:219) | `site.test.ts` |
+| `site.ts:133:21` (mensaje «no es válido» vaciado) | `@s2 el handle inválido lanza un error que nombra el problema: «no es válido»` (con `'@'` y `'@nails lash'`) | `site.test.ts` |
+| `Contacto.tsx:35:26` (`horario.map(() => undefined)`) | `cada fila empareja sus días con su franja: L-V 10:00–20:00, Sábado 10:00–14:00 y Domingo Cerrado` — literales A MANO, con el guion LARGO «–» (U+2013) de `horarioParaUI`, emparejando día↔franja por regex sobre el `renderToString` | `contacto.test.tsx` |
+| `Contacto.tsx:20:19` (`MAPS_HREF` vaciado, mutante ESTÁTICO) | `el href es EXACTAMENTE el formato oficial Maps URLs ?api=1&query=lat%2Clng` — URL A MANO desde las coordenadas [V]; OJO MEDIDO: React escapa el `&` del atributo como `&amp;` | `contacto.test.tsx` |
+| `Contacto.tsx:26:19` (`demo-seccion …` vaciado) y `:27:23` (`demo-contenedor …`) | `la <section> lleva demo-seccion y la rejilla demo-contenedor` — se lee el atributo `class` del horneado (patrón `equipo.test.tsx:128-138`; sin `toHaveClass`, clases GLOBALES estáticas, no condicionales) | `contacto.test.tsx` |
+| `Contacto.tsx:64:26` (`demo-btn demo-btn--wa …`) y `:77:24` (`demo-btn demo-btn--solido …`) | `el CTA de WhatsApp viste demo-btn demo-btn--wa y «Cómo llegar» demo-btn demo-btn--solido` — regex ancladas al TEXTO de cada enlace | `contacto.test.tsx` |
+
+### Sabotaje (obligatorio): los mutantes replicados A MANO
+
+1. `site.ts`: los DOS mensajes → `new Error('')` ⇒ **2 rojos** (exactamente los 2 tests nuevos).
+   Restaurado con `git checkout -- src/lib/site.ts` (estaba limpio antes).
+2. `Contacto.tsx`: los 4 mutantes aplicados A LA VEZ (`map(() => undefined)`, `MAPS_HREF = \` \``,
+   `className={\`\`}` en la sección y en el CTA) ⇒ **4 rojos** (los 4 tests nuevos, cada uno cazó
+   el suyo). Restaurado con `git checkout -- src/components/Contacto.tsx`.
+
+### Estado
+
+- `site.test.ts`: 44 → **46** (+2) · `contacto.test.tsx`: 8 → **12** (+4). Los 58 verdes juntos.
+- El encuadre del lead fue la vía (a) del informe: extender `contacto.test.tsx` para cubrir la capa
+  demo tal y como está en la rama. Ningún literal se importó de producción (anti-tautología).
+- Pendiente del lead: re-correr `bin/harness mutate src/lib/site.ts` y
+  `bin/harness mutate src/components/Contacto.tsx` para confirmar el 100 %.

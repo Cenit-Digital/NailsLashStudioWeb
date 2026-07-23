@@ -32,3 +32,25 @@ export interface SolicitudReserva {
 export function mensajeReserva({ servicio, dia, franja, nombre }: SolicitudReserva): string {
   return `Hola, quiero reservar: ${servicio} · ${dia} · ${franja}. Me llamo ${nombre} y os escribo desde la web. ¿Podéis confirmarme la hora exacta?`
 }
+
+/** El destino del autoscroll del hilo (@s18): lo MÍNIMO que `desplazarAlFinal` necesita de un nodo. */
+export interface NodoDesplazable {
+  scrollTop: number
+  readonly scrollHeight: number
+}
+
+/**
+ * Baja el hilo del chat hasta el último mensaje (@s18). Asignación directa de `scrollTop` (como el
+ * prototipo): no lanza bajo jsdom, que no implementa `Element.scrollTo`, y baja el hilo en el
+ * navegador igual. La guarda del `null` (el ref aún sin montar) vivía INOBSERVABLE dentro del
+ * componente — el hilo se renderiza SIEMPRE, así que `hilo.current` nunca era falso y el mutante
+ * `if (true)` era inmatable (deuda de mutación 2026-07-23). Extraída aquí (patrón `claveBurbuja`),
+ * la guarda se ejercita por VALOR con un `null` real: el componente solo la CABLEA.
+ */
+export function desplazarAlFinal(nodo: NodoDesplazable | null): void {
+  if (nodo === null) {
+    return
+  }
+
+  nodo.scrollTop = nodo.scrollHeight
+}

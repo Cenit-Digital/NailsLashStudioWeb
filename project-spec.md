@@ -2608,3 +2608,29 @@ amplía con una sección por feature), su destilación Gherkin y **la puerta de 
 humana** antes de que se escriba una línea de producción. Las marcadas `blocked` —`F-16`
 páginas legales, `F-17` pipeline de imágenes, `F-18` equipo, `F-19` probador— **no empiezan
 spec** hasta que se desbloqueen; `F-18` por decisión expresa (T-4).
+
+### Feature 22: `galeria_carrusel` — el carrusel en domo con autoplay accesible
+
+> Feature `#22` de `feature_list.json`, nacida de un encargo directo de Pablo (2026-07-22):
+> transformar el carrusel plano de la demo (PR #5) en un **coverflow 3D** «como el de
+> animmasterlib.dev/sliders», con **autoplay** y pausa al interactuar.
+
+#### La conversación de spec (resumen; la puerta humana vive en `feature_list.json` §22)
+
+Tres decisiones las tomó Pablo en conversación: **silueta domo ∩** (centro elevado, lados
+caen), **4 s por foto**, y **móvil con 3D suavizado y vecinas asomando**. El resto quedó
+**delegado explícitamente** («hazlo tú el 100 % de forma autónoma»). Dos consecuencias
+técnicas se le comunicaron en el momento: el autoplay obliga a un **botón visible de
+pausa** (SC 2.2.2, nivel A — pausar solo con hover no basta), y el paso a 3D pierde el
+deslizamiento táctil del `scroll-snap`, que se repone con Pointer Events.
+
+#### Dónde vive la especificación de verdad
+
+La spec detallada —investigación W3C/APG/WCAG con fuentes, las cinco decisiones críticas
+(sin `preserve-3d`, doble módulo, `transition: none` en la oculta, ángulos saturantes,
+botón sin `aria-pressed`), las trampas medidas del entorno y el presupuesto de escenarios—
+está en **`progress/galeria_coverflow_diseno.md`** (el brief que consumieron
+`gherkin_author` y `tdd_craftsman`), y el contrato ejecutable en
+**`features/galeria_carrusel.feature`**. Duplicarlos aquí garantizaría la contradicción;
+esta sección existe para que el checkpoint C6 tenga su entrada y el lector sepa dónde
+seguir leyendo.

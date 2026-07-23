@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { RESERVA_WHATSAPP_TEXTO } from '../lib/demo/reserva-demo'
 import { TELEFONO, telHref, waHref } from '../lib/site'
-import { claveBurbuja, mensajeReserva } from './reserva-logica'
+import { claveBurbuja, desplazarAlFinal, mensajeReserva } from './reserva-logica'
 import estilos from './reserva.module.scss'
 
 /**
@@ -56,11 +56,9 @@ export function Reserva() {
   const hilo = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // Asignación directa de scrollTop (como el prototipo): no lanza bajo jsdom, que no implementa
-    // Element.scrollTo, y baja el hilo al último mensaje en el navegador igual.
-    if (hilo.current) {
-      hilo.current.scrollTop = hilo.current.scrollHeight
-    }
+    // El CÓMO (asignación de scrollTop, apta para jsdom) y la guarda del ref sin montar viven en
+    // `desplazarAlFinal` (reserva-logica.ts), ejercitados por VALOR (@s18): aquí solo se CABLEA.
+    desplazarAlFinal(hilo.current)
   }, [mensajes])
 
   const avanzar = (valor: string) => {

@@ -274,12 +274,15 @@ describe('@s2 instagramHref falla cerrada ante un handle vacío o inválido — 
     ['arroba_con_espacio', '@nails lash'],
   ]
 
-  it.each(CASOS)('@s2 el caso "%s" LANZA y no emite "https://www.instagram.com//"', (_caso, entrada) => {
-    // «lanza un error»: si por regresión devolviera en vez de lanzar, el centinela dejaría de ser 'LANZÓ'.
-    expect(resultadoODisparo(entrada)).toBe('LANZÓ')
-    // El borde "//" (perfil raíz) escrito A MANO: ante basura, NUNCA un enlace roto que parezca válido.
-    expect(resultadoODisparo(entrada)).not.toBe('https://www.instagram.com//')
-  })
+  it.each(CASOS)(
+    '@s2 el caso "%s" LANZA y no emite "https://www.instagram.com//"',
+    (_caso, entrada) => {
+      // «lanza un error»: si por regresión devolviera en vez de lanzar, el centinela dejaría de ser 'LANZÓ'.
+      expect(resultadoODisparo(entrada)).toBe('LANZÓ')
+      // El borde "//" (perfil raíz) escrito A MANO: ante basura, NUNCA un enlace roto que parezca válido.
+      expect(resultadoODisparo(entrada)).not.toBe('https://www.instagram.com//')
+    },
+  )
 })
 
 describe('@s3 instagramHref ante un handle SIN el "@" inicial — falla cerrada (D-1a, RECOMENDADO en la puerta)', () => {
@@ -291,5 +294,19 @@ describe('@s3 instagramHref ante un handle SIN el "@" inicial — falla cerrada 
     expect(resultadoODisparo('nailslash.studio_')).not.toBe(
       'https://www.instagram.com/nailslash.studio_/',
     )
+  })
+})
+
+describe('los errores de instagramHref son RUIDOSOS: el mensaje nombra el problema (mutación F-12)', () => {
+  // `resultadoODisparo` colapsa CUALQUIER excepción en 'LANZÓ' sin mirar el mensaje: el mutante que
+  // vacía el Error quedaba MUDO (sobrevivientes site.ts:125 y :133 de `progress/mutation_contacto.md`).
+  // Mismo patrón que F-02 en este fichero (@s11: `toThrow('teléfono')`); fragmentos ESCRITOS A MANO.
+  it('@s3 el handle sin "@" lanza un error que nombra la regla: «empezar por "@"»', () => {
+    expect(() => instagramHref('nailslash.studio_')).toThrow('empezar por "@"')
+  })
+
+  it('@s2 el handle inválido lanza un error que nombra el problema: «no es válido»', () => {
+    expect(() => instagramHref('@')).toThrow('no es válido')
+    expect(() => instagramHref('@nails lash')).toThrow('no es válido')
   })
 })

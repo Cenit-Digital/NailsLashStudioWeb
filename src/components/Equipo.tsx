@@ -54,8 +54,12 @@ function TarjetaProfesional({ profesional, dias }: TarjetaProps) {
   const [reserva, setReserva] = useState<Cita | null>(null)
   const [resenaIdx, setResenaIdx] = useState(0)
 
+  // 🔴 Sin `const franjas = diaSel === null ? [] : …`: el brazo `[]` de aquel ternario era DATO
+  // MUERTO (el valor solo se consumía bajo la guarda `diaSel !== null` del JSX, donde siempre es
+  // `franjasDe(...)`) y su mutante ArrayDeclaration era EQUIVALENTE por construcción (deuda de
+  // mutación 2026-07-23). Mismo remedio que la fila muerta del domingo en GRUPOS_SCHEMA de F-10:
+  // se borra el dato inerte en verde y las franjas se piden DONDE se renderizan.
   const diaSel = diaIdx === null ? null : dias[diaIdx]
-  const franjas = diaSel === null ? [] : franjasDe(diaSel.diaSemana)
   const etiquetaBoton =
     propuesta === null
       ? BOTON_INCOMPLETO
@@ -134,7 +138,7 @@ function TarjetaProfesional({ profesional, dias }: TarjetaProps) {
 
             {diaSel !== null && (
               <div className={estilos.horas}>
-                {franjas.map((franja) => (
+                {franjasDe(diaSel.diaSemana).map((franja) => (
                   <button
                     key={franja}
                     type="button"

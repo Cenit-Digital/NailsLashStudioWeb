@@ -30,13 +30,17 @@
     "src/components/Equipo.tsx",
     "src/components/equipo-logica.ts",
     "src/components/Reserva.tsx",
-    "src/components/reserva-logica.ts"
+    "src/components/reserva-logica.ts",
+    "src/components/Galeria.tsx",
+    "src/components/galeria-logica.ts"
   ],
   "thresholds": {
     "high": 100,
     "low": 90,
     "break": 100
   },
+  "_comment_ignorePatterns": "Los tests build-based crean y borran `.experimentos-tmp/` y `.vite-react-ssg-temp/` en la raíz: si una suite corre mientras Stryker copia su sandbox, el copyfile revienta con ENOENT (incidente medido en progress/mutation_contacto.md). Ignorarlos inmuniza la mutación frente a suites concurrentes.",
+  "ignorePatterns": [".experimentos-tmp", ".vite-react-ssg-temp"],
   "tempDirName": ".stryker-tmp",
   "htmlReporter": {
     "fileName": "reports/mutation/index.html"
