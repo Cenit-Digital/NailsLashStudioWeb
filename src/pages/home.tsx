@@ -12,6 +12,7 @@ import { Hero } from '../components/Hero'
 import { Ofertas } from '../components/Ofertas'
 import { Pie } from '../components/Pie'
 import { PruebaColor } from '../components/PruebaColor'
+import { Resenas } from '../components/Resenas'
 import { Reserva } from '../components/Reserva'
 import { HORARIO_SEMANAL, openingHoursSpecification } from '../lib/horario'
 import { canonicaDe, componerTitulo, construirJsonLd, ORIGEN_CANONICA } from '../lib/seo'
@@ -114,6 +115,10 @@ export default function Home() {
         {/* 🎨 DEMO: equipo (#equipo-titulo) — sección navegable justo tras Ofertas. Su <h2> con id
             equipo-titulo cierra la igualdad de conjuntos con el 7º enlace de la nav (F-06). */}
         <Equipo />
+
+        {/* 🎨 DEMO: reseñas (F-14) — bloque NO navegable (div) ENTRE equipo y reserva: el agregado
+            real de Treatwell (atribuido, enlazado, fechado) + carrusel de testimonios de EJEMPLO. */}
+        <Resenas />
 
         {/* 🎨 DEMO: reserva rápida (#reserva-titulo) — mini-calendario + chat guiado, front-end. */}
         <Reserva />

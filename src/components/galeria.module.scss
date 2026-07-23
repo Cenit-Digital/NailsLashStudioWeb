@@ -22,23 +22,28 @@
   margin-top: 2rem;
 }
 
-// Los mandos viven FUERA del escenario con perspectiva: `overflow`, `transform` y `opacity` son los
-// tres asesinos del anillo de foco (SC 2.4.7), y la tarjeta central elevada podría tapar del todo
-// un control que viviera dentro (SC 2.4.11).
-.mandos {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.625rem;
-  margin-bottom: 1rem;
-}
-
+// LOS MANDOS DE CRISTAL [ENMIENDA 3, @s24]: círculos de 2.75rem (44 px, SUPERA SC 2.5.8) flotando
+// SOBRE el marco, anclados a `.carrusel` (position: relative). NUNCA dentro de `.marco`: su
+// overflow:hidden se comería el círculo que asoma, y un focusable dentro de un overflow oculto
+// desplaza el contenedor al tabular (cabecera de @s8). Siguen FUERA del escenario con perspectiva:
+// `overflow`, `transform` y `opacity` son los tres asesinos del anillo de foco (SC 2.4.7).
+// z-index 7 > capaDe(0, 6) = 6: por debajo, la foto central ELEVADA los taparía. Siempre
+// visibles — en táctil no hay hover que los revele. Ni un color nuevo: la puerta de contraste
+// solo lee `_tokens.scss` y no lo vería.
 .rotacion,
-.flecha {
+.flechaAnterior,
+.flechaSiguiente {
+  position: absolute;
+  z-index: 7;
   width: 2.75rem;
   height: 2.75rem;
   border-radius: 50%;
   border: 1px solid var(--border-interactive);
-  background: var(--surface);
+  // El 85 % es el suelo AA del cristal (auditoría a11y del lote, eje 1): con el 78 % el borde
+  // caía a 2,67:1 sobre píxel casi negro; al 85 % borde (3,20:1) y glifo (4,39:1) aguantan
+  // SIEMPRE, sobre cualquier foto que entre el día de mañana.
+  background: color-mix(in srgb, var(--surface) 85%, transparent);
+  backdrop-filter: blur(8px);
   color: var(--accent-dark);
   font-size: 1rem;
   line-height: 1;
@@ -47,6 +52,24 @@
   &:hover {
     border-color: var(--accent-dark);
   }
+}
+
+// El chip ⏸/▶ arriba a la derecha; las flechas en los laterales a media altura. El centrado
+// vertical va SIN transform — @s14 exige UNA ÚNICA declaración de transform en toda la hoja (la
+// de la tarjeta) — y la posición FINA se ajusta EN VIVO, como fija el contrato.
+.rotacion {
+  top: 0.625rem;
+  right: 0.625rem;
+}
+
+.flechaAnterior {
+  left: 0.625rem;
+  top: calc(50% - 1.375rem);
+}
+
+.flechaSiguiente {
+  right: 0.625rem;
+  top: calc(50% - 1.375rem);
 }
 
 // EL RECORTE VIVE AQUÍ, nunca en el elemento con perspectiva: allí aplanaría el 3D.

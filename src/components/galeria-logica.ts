@@ -131,8 +131,9 @@ export function debeRotar(estado: EstadoDeRotacion): boolean {
   return !estado.raton && !estado.foco
 }
 
-/** La cadencia del autoplay: 4 s por foto (decisión del cliente). Constante para poder mutarla. */
-export const MILISEGUNDOS_POR_FOTO = 4000
+// [ENMIENDA 3] La cadencia del autoplay (`MILISEGUNDOS_POR_FOTO`, ahora 2000) MIGRÓ a
+// `carrusel-logica.ts`: es COMPARTIDA con el carrusel de reseñas y este módulo no guarda una
+// segunda copia del número. Los consumidores la importan de allí.
 
 /** El recorrido mínimo, en píxeles, para que un arrastre cuente como cambio de foto. */
 export const UMBRAL_DE_ARRASTRE = 48

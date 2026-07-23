@@ -320,23 +320,25 @@
     {
       "id": 14,
       "name": "resenas_agregado_enlace",
-      "title": "Reseñas: nota agregada + atribución + enlace (la única vía legal)",
-      "description": "Los Términos Comerciales de Treatwell (cl. 4.2.2, abril 2024) NIEGAN expresamente al salón republicar reseñas fuera del sitio, y la Política de CGU otorga la licencia a Treatwell, no al salón. Nota agregada + atribución de plataforma + enlace + sello de fecha. Treatwell (4,9 · 1.231) y Google (4,9 · 226) NO son intercambiables ni sumables.",
+      "title": "Reseñas: agregado real de Treatwell (discreto, atribuido, fechado) + carrusel coverflow de testimonios propios",
+      "description": "Re-encuadre por decisión de Pablo (2026-07-23, AskUserQuestion): sección nueva entre #equipo y #reserva con (a) línea DISCRETA del agregado real de Treatwell — 4,9 · 1.239 opiniones, medido en vivo el 2026-07-23 — SIEMPRE con plataforma declarada + enlace + fecha del dato (dato tipado en src/lib/resenas-agregado.ts, jamás hardcodeado en el componente), y (b) carrusel coverflow 3D en domo de TESTIMONIOS PROPIOS DE EJEMPLO con leyenda visible (patrón LEYENDA_EQUIPO), sustituibles por reseñas reales captadas con consentimiento en el salón. PROHIBIDO republicar textos de Treatwell (cl. 4.2/9.1 + TRLPI + RGPD; docs/research/legal-treatwell.md). El carrusel hereda TODA la conducta de la galería v3 (2 s, pausa, teclado por visibilidad, flechas de cristal, arrastre, diana 24 px, reduced-motion). Sin aggregateRating en el JSON-LD.",
       "acceptance": [
-        "Se declara SIEMPRE de qué plataforma es la nota y se enlaza a ella",
-        "No se republica ni un solo texto de reseña de terceros",
-        "La nota no está hardcodeada: o es dato con fecha, o no se muestra",
-        "No se emite aggregateRating en el JSON-LD",
-        "Se muestra el aviso del art. 20.4 TRLGDCU sobre si se garantiza el origen de las reseñas"
+        "La línea del agregado declara la plataforma, enlaza a la fuente y muestra la fecha del dato; el dato vive tipado y fechado en src/lib/resenas-agregado.ts",
+        "No se republica ni un solo texto de reseña de terceros: los testimonios son propios de ejemplo con leyenda visible (art. 20.4 TRLGDCU integrado en la nota de honestidad)",
+        "No se emite aggregateRating en el JSON-LD (puerta del cascarón intacta)",
+        "El carrusel hereda la conducta contratada de la galería v3 sin duplicar sus escenarios (referencia explícita en el contrato)",
+        "Bloque no navegable (<div>) entre #equipo y #reserva: la puerta de anclas no cambia",
+        "Mutación 100% en Resenas.tsx, carrusel-logica.ts y resenas-agregado.ts"
       ],
       "puerta_legal": "art. 20.4 TRLGDCU",
       "depends_on": [
         "cascaron_semantico"
       ],
       "mutable": true,
-      "bloqueada_para_publicar": "La elección de plataforma (Treatwell 1.231 vs Google 226) la decide el cliente.",
+      "bloqueada_para_publicar": "RESUELTA 2026-07-23: Pablo eligió Treatwell (4,9 · 1.239) como plataforma del agregado.",
       "sdd": true,
-      "status": "pending"
+      "status": "done",
+      "cierre": "CERRADA 2026-07-23. Contrato features/resenas_agregado_enlace.feature (9 escenarios). Sección «Lo que dicen nuestras clientas» entre #equipo y #reserva: agregado REAL discreto (4,9 · 1.239 opiniones en Treatwell, enlace SUBRAYADO a la fuente, dato fechado 23/07/2026 en src/lib/resenas-agregado.ts tipado sin estáticos) + carrusel coverflow de 6 testimonios PROPIOS DE EJEMPLO (resenas-demo.ts, disjuntos del reviewPool de equipo) con leyenda de honestidad visible que integra el art. 20.4 TRLGDCU. NI UN texto de Treatwell (raíl legal cl. 4.2/9.1 + TRLPI + RGPD respetado). Sin aggregateRating en el JSON-LD. Hereda TODA la conducta de la galería v3 por referencia (@s8) con ids propios y el coordinador de teclado compartido. judge: lote RECHAZADO (1 bloqueante: desambiguación) → remate → delta APROBADO. A11y APTO (texto central ≥5,24:1; cristal 85% peor caso; enlace subrayado). Mutación 100%: Resenas.tsx 113/113 (1 exclusión documentada), resenas-logica.ts 30/30, resenas-agregado.ts 4/4 (diseño anti-estáticos verificado). Verificación EN VIVO 50/50 con captura inspeccionada."
     },
     {
       "id": 15,
@@ -495,8 +497,8 @@
       "mutable": true,
       "sdd": true,
       "status": "done",
-      "puerta_humana": "Decisiones de diseño aprobadas por el humano el 2026-07-22 en conversación: silueta domo ∩ (centro elevado, lados caen), autoplay 4 s por foto, móvil con 3D suavizado y asomo de vecinas; autonomía explícita delegada para el resto de decisiones («hazlo tú el 100% de forma autónoma»). Contrato features/galeria_carrusel.feature reescrito de 7 a 18 escenarios. Enmiendas 1-2 del contrato bajo la misma autonomía delegada: E1 = hallazgos de judge/a11y (arrastre @s19, diana 24px, pointer-events, listener en caliente); E2 = bug medido en Chrome real.",
-      "cierre": "CERRADA 2026-07-23. Contrato features/galeria_carrusel.feature v2.2: 19 escenarios (@s1-@s18 originales + @s19 arrastre por Enmienda 1; Enmienda 2 tras bug MEDIDO en vivo). 148 tests de galería (73 componente + 50 lógica + 25 estilos). judge: v1 RECHAZADO (4 cambios, todos anticipos de mutación) → v2 APROBADO → v3 delta APROBADO (progress/judge_galeria_carrusel*.md). Auditoría a11y APTO (progress/a11y_galeria_carrusel.md): ratios reales 4.19:1-6.19:1, SC 2.2.2/1.4.11/2.5.8 cerrados (diana 24px con circulo de 12px en ::before). MUTACIÓN 100%/100% (galeria-logica.ts y Galeria.tsx; 2 equivalentes verificados con exclusión documentada, precedente HOST_WHATSAPP; progress/mutation_galeria_carrusel.md). VERIFICACIÓN EN VIVO con Chrome real por CDP (WSL mirrored + chrome.exe headless): 36/36 — domo ∩ medido en matrices computadas, autoplay 4s cronometrado, pausa SC 2.2.2, arrastre físico (bug del drag nativo de <img> que se tragaba el pointerup: CAZADO en vivo, refutado/confirmado con contraprueba draggable=false, arreglado por Enmienda 2 con touch-action: pan-y), reduced-motion en frío y EN CALIENTE, cero terceros (92 peticiones locales). pnpm build 5 puertas. Suite 1119 tests. Capturas escritorio/móvil inspeccionadas."
+      "puerta_humana": "Decisiones de diseño aprobadas por el humano el 2026-07-22 en conversación: silueta domo ∩ (centro elevado, lados caen), autoplay 4 s por foto, móvil con 3D suavizado y asomo de vecinas; autonomía explícita delegada para el resto de decisiones («hazlo tú el 100% de forma autónoma»). Contrato features/galeria_carrusel.feature reescrito de 7 a 18 escenarios. Enmiendas 1-2 del contrato bajo la misma autonomía delegada: E1 = hallazgos de judge/a11y (arrastre @s19, diana 24px, pointer-events, listener en caliente); E2 = bug medido en Chrome real. | v3 (2026-07-23, encargo directo de Pablo + 4 decisiones por AskUserQuestion): cadencia 2 s con vuelta sin frenazo, pausa al mirar CONFIRMADA, teclado ← → por visibilidad de sección, flechas y pausa integradas como círculos de cristal (mockup elegido), reinicio del reloj tras desplazamiento manual. Brief: progress/galeria_v3_resenas_diseno.md.",
+      "cierre": "CERRADA 2026-07-23. Contrato features/galeria_carrusel.feature v2.2: 19 escenarios (@s1-@s18 originales + @s19 arrastre por Enmienda 1; Enmienda 2 tras bug MEDIDO en vivo). 148 tests de galería (73 componente + 50 lógica + 25 estilos). judge: v1 RECHAZADO (4 cambios, todos anticipos de mutación) → v2 APROBADO → v3 delta APROBADO (progress/judge_galeria_carrusel*.md). Auditoría a11y APTO (progress/a11y_galeria_carrusel.md): ratios reales 4.19:1-6.19:1, SC 2.2.2/1.4.11/2.5.8 cerrados (diana 24px con circulo de 12px en ::before). MUTACIÓN 100%/100% (galeria-logica.ts y Galeria.tsx; 2 equivalentes verificados con exclusión documentada, precedente HOST_WHATSAPP; progress/mutation_galeria_carrusel.md). VERIFICACIÓN EN VIVO con Chrome real por CDP (WSL mirrored + chrome.exe headless): 36/36 — domo ∩ medido en matrices computadas, autoplay 4s cronometrado, pausa SC 2.2.2, arrastre físico (bug del drag nativo de <img> que se tragaba el pointerup: CAZADO en vivo, refutado/confirmado con contraprueba draggable=false, arreglado por Enmienda 2 con touch-action: pan-y), reduced-motion en frío y EN CALIENTE, cero terceros (92 peticiones locales). pnpm build 5 puertas. Suite 1119 tests. Capturas escritorio/móvil inspeccionadas. | v3 CERRADA 2026-07-23 (encargo de Pablo: 2 s, teclado, mandos integrados): contrato v3 con 24 escenarios (@s20 reinicio del reloj, @s21-@s23 teclado por visibilidad con coordinador COMPARTIDO entre los dos carruseles — bloqueante del judge del lote resuelto y re-aprobado en delta —, @s24 mandos de cristal 44px/blur/85%). 220+ tests de galería. Mutación 100% en Galeria.tsx (123/123, 3 exclusiones documentadas), galeria-logica.ts y carrusel-logica.ts (80/80). Verificación EN VIVO 50/50 (sonda v3): cadencia 2 s cronometrada, reloj reiniciado tras acción manual, teclado real con desambiguación y foco-excluye, arrastre, reduced-motion frío/caliente. Informes: judge_lote_v3_resenas.md, a11y_lote_v3_resenas.md, mutation_lote_v3_resenas.md."
     }
   ],
   "no_se_construyen": [

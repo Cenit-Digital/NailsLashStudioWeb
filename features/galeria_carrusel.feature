@@ -1,10 +1,17 @@
 # =============================================================================================
-# Contrato de `galeria_carrusel` — v2.1 = v2 (reescritura completa del borrador, que solo tenía
-# @s1 sobre la POSICIÓN del bloque) + ENMIENDA 1 (2026-07-23, ordenada por el lead a la salida
-# del review del `judge` y de la auditoría a11y): @s19 NUEVO (se CABLEA el arrastre táctil,
-# hallazgo 7 del judge), @s12 ampliado (la preferencia de movimiento se escucha EN CALIENTE,
-# aviso 🔵 eje 5), @s15 ampliado (la tarjeta oculta no captura clics, aviso 🔵 eje 6) y @s17
-# ampliado (diana de 24 px, aviso 🟡 SC 2.5.8). Los Then previos de @s1..@s18 NO cambian.
+# Contrato de `galeria_carrusel` — v3 = v2.2 + ENMIENDA 3 (2026-07-23, encargo DIRECTO de Pablo:
+# 4 decisiones por AskUserQuestion + 3 matices, sintetizadas en el brief
+# `progress/galeria_v3_resenas_diseno.md`). Historial: v2.1 = v2 (reescritura completa del
+# borrador) + ENMIENDA 1 (hallazgos del judge y del auditor a11y: @s19 NUEVO —arrastre—, @s12,
+# @s15 y @s17 ampliados); v2.2 = + ENMIENDA 2 (bug del drag nativo MEDIDO en Chrome real:
+# draggable=false y touch-action, y el rediseño de `pasosDelArrastre` tras el superviviente
+# 153:10 de mutación). LA ENMIENDA 3 CAMBIA: @s9 reescrito a 2000 ms (la cadencia baja de 4 s a
+# 2 s por decisión del cliente, con la constante MUDADA a `carrusel-logica.ts`), @s10 y @s11
+# re-medidos a UN tick de 2000 ms (solo números: su conducta NO cambia), y CINCO escenarios
+# nuevos: @s20 (el reinicio del reloj tras un desplazamiento manual), @s21..@s23 (el teclado
+# global: decisión pura, desambiguación entre DOS carruseles, cableado guardado) y @s24 (los
+# mandos de cristal sobre el marco; la fila .mandos externa desaparece). Los Then de @s1..@s8 y
+# de @s12..@s19 NO cambian.
 #
 # FUENTE DE VERDAD ÚNICA: `progress/galeria_coverflow_diseno.md` (brief del craftsman_lead,
 # síntesis de cuatro reconocimientos: spec CSS 3D del W3C, APG + WCAG 2.2, auditoría de las cinco
@@ -14,17 +21,22 @@
 # `features/hero.feature` y `features/equipo_reservas.feature` (estilo).
 # Fuentes de la ENMIENDA 1: `progress/judge_galeria_carrusel.md` (hallazgo 7: `pasosDelArrastre`
 # exportada y testeada pero SIN llamar) y `progress/a11y_galeria_carrusel.md` (avisos 🟡 y 🔵).
+# Fuente de la ENMIENDA 3: `progress/galeria_v3_resenas_diseno.md` (decisiones de Pablo CERRADAS
+# el 2026-07-23 —no reabrirlas— y diseño técnico: teclado §3, cristal §4, reparto de la lógica
+# compartida con el carrusel de reseñas §5, trampas medidas §7).
 #
 # QUÉ SE CONSTRUYE: la galería «Nuestros trabajos» deja de ser un carril `scroll-snap` y pasa a ser
 # un CARRUSEL COVERFLOW 3D EN DOMO (la central se ELEVA, las laterales CAEN, giran hacia dentro,
-# encogen y se apagan), con bucle infinito por el camino corto, autoplay de 4 s y control de
-# pausa/reanudación persistente.
+# encogen y se apagan), con bucle infinito por el camino corto, autoplay de 2 s (ENMIENDA 3;
+# nació de 4 s), control de pausa/reanudación persistente, teclado global ← / → por visibilidad
+# de la sección y mandos de cristal flotando sobre el marco.
 #
 # ---------------------------------------------------------------------------------------------
-# TECHO: 19 escenarios (@s1..@s19). Los 18 originales los impuso el lead; el @s19 lo añade la
-# ENMIENDA 1 por orden del propio lead (no es ampliación unilateral). Este repo tiene historia de
-# contratos sobredimensionados que convierten un cambio de una tarde en dos días. No se amplía
-# sin humano.
+# TECHO: 24 escenarios (@s1..@s24). Los 18 originales los impuso el lead; el @s19 lo añade la
+# ENMIENDA 1 por orden del propio lead; los CINCO de la ENMIENDA 3 (@s20..@s24) los ordena el
+# brief `progress/galeria_v3_resenas_diseno.md` §6 dentro de su tope de ≤5 nuevos (no es
+# ampliación unilateral). Este repo tiene historia de contratos sobredimensionados que convierten
+# un cambio de una tarde en dos días. No se amplía sin humano.
 # ---------------------------------------------------------------------------------------------
 #
 # LAS DOS CONVENCIONES QUE EL `judge` NECESITA SABER DE ANTEMANO
@@ -49,6 +61,14 @@
 #       letra de ningún SC A/AA: 2.2.2 exige UN MECANISMO, no honrar la preferencia del SO.
 #     · SC 2.3.3 (Animation from Interactions) es AAA y NO cubre el autoplay: prohibido citarlo
 #       como obligación AA.
+#     · [ENMIENDA 3] La cadencia de 2 s y la vuelta «sin frenazo» son DECISIÓN DEL CLIENTE (Pablo,
+#       2026-07-23): ni norma ni APG. La pausa por hover/foco/botón NO cambia — SC 2.2.2 sigue
+#       intacto (@s8, @s10, @s11 y @s12 conservan todos sus Then).
+#     · [ENMIENDA 3] El teclado global por visibilidad (@s21..@s23) es (P) del proyecto —petición
+#       del cliente— y NO letra WCAG: SC 2.1.1 ya estaba satisfecho por flechas y puntos. Su única
+#       línea roja es NO interferir: preventDefault SOLO cuando se atiende.
+#     · [ENMIENDA 3] Los mandos de cristal (@s24) son el mockup ELEGIDO por el cliente; sus 44 px
+#       SUPERAN la letra de SC 2.5.8 (24 px) — el tamaño es del mockup, no de la norma.
 #
 # REGLAS DE REDACCIÓN Y DE TEST (duras)
 # ---------------------------------------------------------------------------------------------
@@ -69,6 +89,9 @@
 #     `el.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, clientX: N }))` y el handler
 #     recibe su `clientX` con normalidad (@s19); `setInterval` NO devuelve `number` con
 #     `@types/node` cargado (`useRef<ReturnType<typeof setInterval> | null>`).
+#   · [ENMIENDA 3] jsdom 25 TAMPOCO implementa `IntersectionObserver` (@s23): la suscripción va
+#     GUARDADA (`typeof IntersectionObserver`) y el test la stubea con CAPTURA del callback y
+#     disparo manual de entradas `{ isIntersecting, intersectionRatio, target }` (brief v3 §7).
 #
 # LO QUE ESTE CONTRATO NO HACE (deuda declarada, brief §12)
 # ---------------------------------------------------------------------------------------------
@@ -81,7 +104,7 @@
 #     Chrome solo queda el GESTO FÍSICO (dedo real), que ningún test de jsdom puede fingir.
 # =============================================================================================
 
-Feature: La galería «Nuestros trabajos» como carrusel coverflow 3D en domo, con bucle infinito por el camino corto, autoplay de 4 segundos y control de pausa persistente
+Feature: La galería «Nuestros trabajos» como carrusel coverflow 3D en domo, con bucle infinito por el camino corto, autoplay de 2 segundos y control de pausa persistente
   Como visitante quiero ver los trabajos del salón en un carrusel con relieve, que avance solo y que
   pueda parar cuando quiera; y como responsable del proyecto quiero que las seis fotos, la nota de
   honestidad y las cinco puertas del build sigan exactamente como están, que el bucle no deje huecos
@@ -269,17 +292,21 @@ Feature: La galería «Nuestros trabajos» como carrusel coverflow 3D en domo, c
   # -------------------------------------------------------------------------------------------
 
   @s9
-  Scenario: La foto centrada cambia cada 4 segundos, ni antes
+  Scenario: La foto centrada cambia cada 2 segundos, ni antes, y la vuelta del final al principio va al MISMO ritmo
     Given el carrusel rotando con la PRIMERA foto centrada y el reloj bajo control del test
-    When el reloj avanza 4000 milisegundos
+    When el reloj avanza 2000 milisegundos
     Then la SEGUNDA foto queda a distancia 0 y la primera pasa a distancia "-1"
-    And a los 3999 milisegundos la PRIMERA seguía centrada: el cambio no ocurre antes de la marca
-    And al avanzar otros 4000 milisegundos queda centrada la TERCERA
-    And a los 24000 milisegundos desde el arranque vuelve a estar centrada la PRIMERA: la vuelta completa son seis pasos
-    # `vi.useFakeTimers()` + `act`. La cadencia es una constante EXPORTADA (mutable y aseverable), no
-    # un número enterrado en el componente. La frontera de los 3999 ms mata los mutantes de
-    # comparador y los de aritmética sobre el intervalo. La vuelta completa a los 24 s vuelve a
-    # ejercitar el bucle de @s4 por el camino largo, ya cableado.
+    And a los 1999 milisegundos la PRIMERA seguía centrada: el cambio no ocurre antes de la marca
+    And al avanzar otros 2000 milisegundos queda centrada la TERCERA
+    And a los 12000 milisegundos desde el arranque vuelve a estar centrada la PRIMERA: la vuelta completa son seis pasos, y el paso de la SEXTA a la PRIMERA consume los MISMOS 2000 milisegundos que cualquier otro — sin frenazo en la costura
+    And la constante exportada de la cadencia vale exactamente 2000 y vive en "src/components/carrusel-logica.ts", compartida con el carrusel de reseñas: la galería NO guarda una segunda copia del número
+    # [ENMIENDA 3 — decisión del CLIENTE, 2026-07-23] La cadencia baja de 4000 a 2000 ms y la
+    # constante se MUDA a `carrusel-logica.ts` (brief v3 §5): la galería la importa de ahí (o la
+    # re-exporta; decisión del craftsman). `vi.useFakeTimers()` + `act`. La frontera de los 1999 ms
+    # mata los mutantes de comparador y de aritmética sobre el intervalo; la vuelta completa a los
+    # 12 s re-ejercita el bucle de @s4 por el camino largo. El «sin frenazo» VISUAL en la costura NO
+    # se re-asevera aquí: lo garantizan el intervalo FIJO de este escenario y el `transition: none`
+    # de la tarjeta oculta que ya exige @s15 — referencia cruzada, no duplicación.
     # [MEDIDO] `setInterval` NO devuelve `number` con `@types/node` cargado (`error TS2322: Type
     # 'Timeout' is not assignable to type 'number'`): el ref se tipa `ReturnType<typeof setInterval>`.
 
@@ -287,7 +314,7 @@ Feature: La galería «Nuestros trabajos» como carrusel coverflow 3D en domo, c
   Scenario Outline: El ratón reanuda la rotación al salir; el foco de teclado NO
     Given el carrusel rotando con la PRIMERA foto centrada
     And "<gesto>" ha entrado en el carrusel y, desde entonces, avanzar el reloj 8000 milisegundos NO ha cambiado la foto centrada
-    When "<gesto>" sale del carrusel y el reloj avanza otros 4000 milisegundos
+    When "<gesto>" sale del carrusel y el reloj avanza otros 2000 milisegundos
     Then la foto centrada es "<foto centrada al final>"
 
     Examples:
@@ -302,12 +329,13 @@ Feature: La galería «Nuestros trabajos» como carrusel coverflow 3D en domo, c
     # media, el `Then` del ratón pasaría verde aunque la pausa no existiera.
     # La rotación queda decidida por una función PURA con TODO inyectado (pausado por el usuario,
     # ratón, foco, arranque explícito): es lo único que Stryker puede morder de este comportamiento.
+    # [ENMIENDA 3] Solo cambia el número (un tick son ahora 2000 ms): la asimetría y sus Then, NO.
 
   @s11
   Scenario: «Iniciar» arranca la rotación AHORA, ignorando el ratón encima y el foco dentro
     Given el carrusel parado por el usuario, con el puntero del ratón ENCIMA del carrusel y el foco de teclado DENTRO de él
     And su control de rotación se anuncia exactamente "Iniciar la reproducción automática"
-    When se pulsa ese control y el reloj avanza 4000 milisegundos
+    When se pulsa ese control y el reloj avanza 2000 milisegundos
     Then la foto centrada ha avanzado UNA posición, aunque el ratón siga encima y el foco siga dentro
     And el nombre accesible del control es ahora exactamente "Parar la reproducción automática"
     And el control sigue sin exponer aria-pressed
@@ -316,6 +344,7 @@ Feature: La galería «Nuestros trabajos» como carrusel coverflow 3D en domo, c
     # the carousel for pausing rotation are ignored». Es la PRECEDENCIA del arranque explícito sobre
     # ratón y foco; la contraria (que el usuario pulse «Iniciar» y no pase nada porque tiene el ratón
     # encima del botón que acaba de pulsar) es el fallo obvio que este escenario impide.
+    # [ENMIENDA 3] Solo cambia el número del tick (2000 ms): la precedencia del arranque, NO.
 
   @s12
   Scenario: Con la preferencia de movimiento reducido, el carrusel arranca PAUSADO pero no se le retira la función, y la preferencia se escucha EN CALIENTE
@@ -550,3 +579,123 @@ Feature: La galería «Nuestros trabajos» como carrusel coverflow 3D en domo, c
     # |Δ| ≥ umbral con umbral > 0 — los And de dirección de arriba NO cambian — y el caso degenerado
     # `pasosDelArrastre(0, 0)` pasa a devolver 0 (nada) en vez de una dirección arbitraria. Sin
     # comparador, no queda mutante de igualdad que instrumentar.
+
+  # -------------------------------------------------------------------------------------------
+  # LO NUEVO DE LA ENMIENDA 3. El reloj que se reinicia, el teclado global y los mandos de
+  # cristal. Fuente: `progress/galeria_v3_resenas_diseno.md` (decisiones de Pablo, 2026-07-23).
+  # -------------------------------------------------------------------------------------------
+
+  @s20
+  Scenario: Cualquier desplazamiento manual REINICIA el reloj: la siguiente foto automática llega 2000 milisegundos después de la acción, no en el resto del tick anterior
+    Given el carrusel rotando con la PRIMERA foto centrada y el reloj bajo control del test
+    When a los 1500 milisegundos del arranque se pulsa el botón "Siguiente"
+    Then la SEGUNDA foto queda centrada EN EL ACTO, por la pulsación
+    And a los 3499 milisegundos desde el arranque la SEGUNDA sigue centrada: el tick que habría caído en t=2000 YA NO EXISTE
+    And a los 3500 milisegundos desde el arranque queda centrada la TERCERA: el intervalo cuenta 2000 milisegundos DESDE la acción, no desde el arranque
+    And repetir la medida sustituyendo la flecha por un punto indicador, por el clic en una tarjeta lateral, por un arrastre por encima del umbral o por una tecla ← / → atendida (@s23) da el MISMO resultado: el siguiente avance automático llega 2000 milisegundos después de CADA acción
+    And en un carrusel PARADO por el usuario el mismo desplazamiento manual NO arranca nada: tras la acción, avanzar el reloj 12000 milisegundos no mueve la foto centrada
+    # (P) decisión del cliente vía brief v3 §3: a 2 s de cadencia, mover a mano y que 0,3 s después
+    # la foto salte sola es un manotazo. Implementación que el brief sugiere (no impone): una
+    # GENERACIÓN de reloj (estado) en las deps del efecto del intervalo; cada acción manual la
+    # incrementa, el efecto se re-suscribe y el intervalo cuenta desde cero. La frontera 3499/3500
+    # mata al mutante que cancela sin reiniciar (nada en 3500) y el And de los 3499 al que reinicia
+    # sin cancelar (dos relojes: tick fantasma en t=2000). El último And es el ANTI-REGRESIÓN de
+    # @s8: reiniciar el reloj JAMÁS puede convertirse en arrancarlo — la parada del usuario sigue
+    # siendo definitiva (SC 2.2.2).
+    # [OJO test] La pulsación se despacha SIN el mouseenter/focus que un ratón real arrastraría
+    # (fireEvent.click a secas): aquí se mide el RELOJ, no las pausas de @s10 — en la página real
+    # los casos observables son el teclado global y el arrastre táctil, donde no hay ni ratón
+    # encima ni foco dentro.
+
+  @s21
+  Scenario Outline: La tecla se convierte en paso por una decisión PURA: las flechas mueven, y toda otra tecla — o una flecha modificada o escrita en un campo — vale cero
+    Given una pulsación de la tecla "<tecla>" con Ctrl "<ctrl>", con Alt "<alt>", con Meta "<meta>" y con un campo de texto activo "<campo>"
+    When se calcula el paso que pide la pulsación
+    Then vale exactamente "<paso>"
+
+    Examples:
+      | tecla      | ctrl | alt | meta | campo | paso | qué fija                                                        |
+      | ArrowLeft  | no   | no  | no   | no    | -1   | la flecha izquierda trae la ANTERIOR, como el botón "Anterior"  |
+      | ArrowRight | no   | no  | no   | no    | +1   | la flecha derecha trae la SIGUIENTE                             |
+      | ArrowDown  | no   | no  | no   | no    | 0    | las flechas verticales son del scroll, no del carrusel          |
+      | a          | no   | no  | no   | no    | 0    | una letra cualquiera no hace nada                               |
+      | ArrowRight | sí   | no  | no   | no    | 0    | Ctrl+flecha es del navegador o del SO: no se atiende            |
+      | ArrowLeft  | no   | sí  | no   | no    | 0    | Alt+flecha es «atrás» en el historial: no se secuestra          |
+      | ArrowRight | no   | no  | sí   | no    | 0    | Meta+flecha es «fin de línea» en macOS: no se secuestra         |
+      | ArrowLeft  | no   | no  | no   | sí    | 0    | con un campo de texto activo la flecha es del CURSOR            |
+
+    # (P) del proyecto — petición del cliente («que pase de foto cuando el usuario está situado en
+    # la web»), NO letra WCAG: SC 2.1.1 ya estaba satisfecho por flechas y puntos tabulables. La
+    # decisión vive PURA en `src/components/carrusel-logica.ts` (compartida con el carrusel de
+    # reseñas, brief v3 §5), con TODO inyectado: tecla, modificadores y si el elemento activo es un
+    # campo de texto (input, textarea, select o contenteditable — el chat de #reserva escribe en un
+    # `<input aria-label="Tu nombre">`, `Reserva.tsx:151-154`). Shift NO bloquea, a propósito:
+    # Shift+flecha no es un atajo del navegador y bloquearla sería cargo sin beneficio. Los ocho
+    # valores esperados van escritos A MANO (anti-tautología).
+
+  @s22
+  Scenario Outline: Con DOS carruseles en la página atiende el suficientemente visible, y si los dos lo están gana el más cercano al centro del viewport
+    Given la galería visible en proporción "<vis galería>" con su centro a "<centro galería>" píxeles del centro del viewport
+    And el carrusel de reseñas visible en proporción "<vis reseñas>" con su centro a "<centro reseñas>" píxeles
+    When se decide quién atiende el teclado
+    Then atiende "<atiende>"
+
+    Examples:
+      | vis galería | vis reseñas | centro galería | centro reseñas | atiende     | qué fija                                                        |
+      | 0.8         | 0.2         | 300            | 900            | la galería  | solo una supera el umbral: atiende ella                         |
+      | 0.2         | 0.8         | 900            | 300            | las reseñas | y es simétrico                                                  |
+      | 0.59        | 0.0         | 100            | 2000           | NINGUNO     | 0.59 queda BAJO el umbral: la frontera es 0.6                   |
+      | 0.6         | 0.0         | 800            | 2000           | la galería  | 0.6 EXACTO ya atiende: el umbral es INCLUSIVO                   |
+      | 0.9         | 0.7         | 600            | 150            | las reseñas | las dos lo superan: manda la CERCANÍA al centro, no la proporción |
+      | 0.7         | 0.7         | 150            | 600            | la galería  | a igual proporción decide la cercanía — no «el primero del DOM» |
+
+    # (P) del proyecto, brief v3 §3. El umbral 0.6 es el del IntersectionObserver («el usuario
+    # situado» = la sección en pantalla); la geometría real —dos secciones altas SEPARADAS por
+    # #reserva— hace casi imposible el doble-visible, y el desempate por cercanía existe para la
+    # pantalla altísima donde ocurra. La decisión es función PURA compartida en `carrusel-logica.ts`
+    # con TODO inyectado (proporciones y distancias: nada de window). La quinta fila mata al mutante
+    # que compara proporciones en vez de distancias; la sexta, al que devuelve el primero registrado.
+    # Si NINGUNO atiende, la tecla es de la página: sin movimiento y SIN preventDefault (@s23).
+
+  @s23
+  Scenario: El cableado del teclado va GUARDADO: sin IntersectionObserver no revienta, preventDefault SOLO cuando se atiende, y el foco dentro atiende sin observador
+    Given un entorno SIN IntersectionObserver, como jsdom 25 (trampa MEDIDA, brief v3 §7)
+    When se monta la galería y se despachan teclas sobre el documento
+    Then montar y desmontar NO lanza ningún error: la suscripción va guardada por typeof IntersectionObserver
+    And con un stub que CAPTURA el callback del observador: tras disparar a mano una entrada con intersectionRatio 0.8 sobre la sección, un keydown "ArrowRight" en el documento centra la SIGUIENTE foto y ESE evento recibe preventDefault
+    And el MISMO keydown con ctrlKey NO mueve la foto y NO recibe preventDefault
+    And tras disparar una entrada con intersectionRatio 0.4, "ArrowLeft" NO mueve la foto y NO recibe preventDefault: el scroll de la página no se secuestra por debajo del umbral
+    And con el foco DENTRO del carrusel — sobre el botón "Siguiente" — "ArrowLeft" centra la ANTERIOR aunque el observador NO exista: el foco dentro atiende por sí solo, sin IO
+    And una tecla atendida REINICIA el reloj del autoplay exactamente como fija @s20
+    And al desmontar se limpia TODO: removeEventListener recibe el mismo manejador de "keydown" que registró addEventListener, y el observador (si existió) recibe disconnect
+    And el GESTO REAL — hacer scroll hasta la sección y pulsar ← / → — se verifica EN VIVO en Chrome antes del cierre: jsdom no sabe de visibilidad de verdad
+    # preventDefault SOLO al atender es la línea roja: un listener global que se traga TODAS las
+    # flechas rompe el desplazamiento por teclado de la página entera. El patrón del stub es el de
+    # matchMedia en @s12: `vi.stubGlobal` con captura del callback y disparo manual de entradas
+    # `{ isIntersecting, intersectionRatio, target }`. La DECISIÓN (qué tecla, quién atiende) ya
+    # quedó pura en @s21/@s22: este escenario exige solo el CABLEADO — guardas, listener sobre el
+    # documento, limpieza — y es deliberadamente el único sitio donde el teclado toca el DOM.
+
+  @s24
+  Scenario: Los mandos son círculos de cristal SOBRE el marco: el chip de rotación primero, las flechas en los laterales, los puntos debajo, y la fila externa desaparece
+    Given la galería renderizada y el fichero "src/components/galeria.module.scss"
+    When se inspecciona el orden de los controles y se leen los bytes del SCSS
+    Then el control de rotación sigue siendo el PRIMER tabulable del carrusel, por delante de "Anterior" y "Siguiente", y los NUEVE controles siguen FUERA del contenedor con perspectiva: el árbol de @s8 NO cambia ni un atributo
+    And los seis puntos siguen DESPUÉS del escenario en el orden del DOM, con su diana de 24 píxeles de @s17 intacta
+    And el SCSS ya NO contiene la regla de la fila ".mandos": la fila externa desaparece
+    And las reglas del chip de rotación y de las flechas declaran "position: absolute": viven SOBRE el marco — las flechas en los laterales a media altura, el chip arriba a la derecha; la POSICIÓN FINA se comprueba EN VIVO, no con píxeles en el test
+    And la caja de los tres mide "2.75rem" por lado
+    And su fondo usa "color-mix(" con "var(--surface)" y "transparent", y declaran "backdrop-filter" con "blur("
+    And su borde usa "var(--border-interactive)" y su glifo "var(--accent-dark)": ni un color nuevo — la puerta de contraste solo lee `_tokens.scss` y no lo vería
+    And declaran un "z-index" MAYOR QUE 6: por encima de la capa máxima de las tarjetas (capaDe(0, 6) = 6), o la foto central elevada los taparía
+    And en el bloque "@media (max-width: 640px)" NINGÚN mando se oculta: ni "display: none", ni "visibility: hidden", ni opacidad 0 aplican al chip ni a las flechas en ningún tamaño — en táctil no hay hover que los revele
+    # (P) mockup de círculos flotantes ELEGIDO POR PABLO (2026-07-23, brief v3 §4). La caja de
+    # 44 px (2.75rem) SUPERA la letra de (N) SC 2.5.8 (24 px): el tamaño es del mockup, no de la
+    # norma. Se asevera por BYTES en `galeria-estilos.test.ts`, como el resto del SCSS.
+    # [OJO] `.marco` tiene overflow:hidden (@s15) y `.galeria` también: un mando absoluto NO puede
+    # vivir DENTRO de `.marco` — el recorte se comería el círculo que asoma y un focusable dentro
+    # de un overflow:hidden desplaza el contenedor al tabular (cabecera de @s8). El ancla natural
+    # es `.carrusel` (position: relative, ya declarado). El PEOR caso de 1.4.11 (glifo y borde
+    # sobre foto clara A TRAVÉS del cristal) lo mide el auditor a11y EN VIVO: el 78 % de --surface
+    # que sugiere el brief §4 es la base de partida, pero el porcentaje exacto NO se fija por bytes
+    # aquí — es del craftsman con el auditor.

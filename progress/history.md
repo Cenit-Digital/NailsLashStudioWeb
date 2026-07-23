@@ -492,3 +492,40 @@ escenarios. La **revisión adversarial (5 lentes) cazó 2 BLOQUEANTES antes de e
   global (apagaría estáticos legítimamente medidos en otros ficheros) NI aceptar la puerta roja.
   Corridas finales: `horario.ts` 100 % · `Reserva.tsx` 100 % · `reserva-logica.ts` 100 % ·
   `Equipo.tsx` 100 % — y `bin/harness verify` COMPLETO en verde como puerta de cierre.
+
+## 2026-07-23 (tarde) — galería v3 + feature `14 — resenas_agregado_enlace` · **CERRADAS `done`**
+
+- **Encargo directo de Pablo** (3 matices + sección nueva, 4 decisiones por `AskUserQuestion`):
+  cadencia **2 s** con vuelta sin frenazo, **teclado ← →** «cuando el usuario está situado» ,
+  **mandos integrados como círculos de cristal** (mockup elegido), y **carrusel de Reseñas** bajo
+  «Nuestro equipo de profesionales» al mismo ritmo y con toda la conducta heredada.
+- **El raíl legal mandó en Reseñas**: Pablo pidió «coger las reseñas de Treatwell» por ser
+  públicas; la investigación [V] del repo (`legal-treatwell.md`, cl. 4.2/9.1 + TRLPI + RGPD)
+  lo prohíbe y SE LE EXPLICÓ con las vías limpias. Eligió: **agregado real discreto**
+  (4,9 · 1.239, medido en vivo, atribuido con enlace SUBRAYADO y fechado, dato tipado en
+  `resenas-agregado.ts` sin estáticos) + **carrusel de testimonios propios de ejemplo** con
+  leyenda 20.4 visible. Ni un texto de Treatwell en el árbol. Sin `aggregateRating` en el JSON-LD.
+- **Galería v3** (contrato → 24 escenarios): @s20 reinicio del reloj tras acción manual (token de
+  generación `{}` sin mutantes equivalentes), @s21-@s23 teclado global por visibilidad
+  (IntersectionObserver GUARDADO — jsdom no lo trae), @s24 cristal por bytes. La constante de
+  cadencia migró a `carrusel-logica.ts` (compartida, sin segunda copia).
+- 🔴 **El bloqueante que cazó el judge del lote** (y el a11y en paralelo): la desambiguación del
+  teclado entre los DOS carruseles era de mentira — dos listeners independientes con la distancia
+  fabricada a 0; con foco en la galería y reseñas visible, una tecla movía AMBOS. Remate: 
+  **coordinador compartido** en `carrusel-logica.ts` (registro de candidatas con medidas REALES
+  del IO, arbitraje único, el foco excluye, limpieza al desmontar) → delta re-APROBADO y el caso
+  verificado EN VIVO (sonda: `teclado-desambigua` y `teclado-foco-excluye`, verdes).
+- **Puertas del lote**: judge lote (galería A / reseñas R→delta A) · a11y APTO (cristal 78→85 %
+  por el peor caso 2,67:1; enlace subrayado; texto central ≥5,24:1) · mutación **100 % en los 6**
+  (carrusel-logica 80/80 · galeria-logica · Galeria 123/123 · Resenas 113/113 · resenas-logica ·
+  resenas-agregado 4/4 anti-estáticos verificado; 5 mutantes de espacios `{' '}` muertos con tests
+  de línea completa; 2 equivalentes por construcción con exclusión ratificada) · build 5 puertas ·
+  **verificación EN VIVO 50/50** con capturas inspeccionadas (galería con cristal + sección
+  Reseñas completa).
+- **Incidentes de proceso, declarados**: (a) dos lanzamientos del craftsman del remate no
+  arrancaron (uno colgado real 2,5 h — matado; el otro matado por MI diagnóstico erróneo: el
+  tamaño del transcript NO mide vida en turnos largos; la sonda de infraestructura respondió en
+  4,7 s y el 3.er intento cerró limpio); (b) el mutation_tester borró sin querer el Ciclo v3 de
+  `Galeria.tsx` con `git checkout --` y lo RECUPERÓ byte-exacto del source del informe de Stryker
+  (validado independientemente: 197/197); (c) tercera variante del ENOENT de sandbox (por `dist/`)
+  → `"dist"` añadido a `ignorePatterns` de stryker.config.json.

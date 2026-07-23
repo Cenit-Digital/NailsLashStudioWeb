@@ -10,7 +10,6 @@ import {
   etiquetaDelPunto,
   etiquetaDeRotacion,
   indiceCircular,
-  MILISEGUNDOS_POR_FOTO,
   pasosDelArrastre,
   signoDe,
   UMBRAL_DE_ARRASTRE,
@@ -248,12 +247,9 @@ describe('@s10 @s11 el predicado de rotación: quién para y quién reanuda', ()
   })
 })
 
-describe('@s9 @s18 las dos magnitudes del carrusel son constantes EXPORTADAS, no números enterrados', () => {
-  it('@s9 la cadencia del autoplay son 4000 milisegundos', () => {
-    // El 4000 va ESCRITO A MANO: 4 s por foto, la decisión del cliente.
-    expect(MILISEGUNDOS_POR_FOTO).toBe(4000)
-  })
-
+describe('@s18 el umbral del arrastre es una constante EXPORTADA, no un número enterrado', () => {
+  // [ENMIENDA 3] `MILISEGUNDOS_POR_FOTO` ya NO vive aquí: migró a `carrusel-logica.ts` (compartida
+  // con el carrusel de reseñas) y la asevera `carrusel-logica.test.ts` @s9.
   it('@s18 el umbral de arrastre son 48 píxeles', () => {
     expect(UMBRAL_DE_ARRASTRE).toBe(48)
   })

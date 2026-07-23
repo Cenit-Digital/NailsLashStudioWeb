@@ -3,8 +3,14 @@
   "_comment": "Prueba de mutación (RF-CODE-001 / GU-HARNESS-001). Valida que los tests muerden. Umbral: 100% sobre las líneas tocadas por la feature. `mutate` es una lista EXPLÍCITA de ficheros (no un glob): cada feature añade los suyos (src/lib/*.ts y src/components/*.tsx). Quedan fuera por convención del stack: App.tsx, main.tsx, pages/* y styles/*. PROHIBIDO acotar con --testFiles (da 0% falso con este stack); acotar solo con --mutate <fichero>. `vitest.configFile` apunta a vitest.stryker.config.ts (NO a vitest.config.ts): esa config EXCLUYE los tests build-based `*-horneado.test.{ts,tsx}` de la MUTACIÓN (corren un `pnpm build` real por-mutante → 409 min); siguen corriendo en `pnpm test`/`bin/harness verify`. Ver el encabezado de vitest.stryker.config.ts.",
   "packageManager": "pnpm",
   "testRunner": "vitest",
-  "plugins": ["@stryker-mutator/vitest-runner"],
-  "reporters": ["html", "clear-text", "progress"],
+  "plugins": [
+    "@stryker-mutator/vitest-runner"
+  ],
+  "reporters": [
+    "html",
+    "clear-text",
+    "progress"
+  ],
   "coverageAnalysis": "perTest",
   "vitest": {
     "configFile": "vitest.stryker.config.ts"
@@ -32,7 +38,11 @@
     "src/components/Reserva.tsx",
     "src/components/reserva-logica.ts",
     "src/components/Galeria.tsx",
-    "src/components/galeria-logica.ts"
+    "src/components/galeria-logica.ts",
+    "src/components/carrusel-logica.ts",
+    "src/components/Resenas.tsx",
+    "src/components/resenas-logica.ts",
+    "src/lib/resenas-agregado.ts"
   ],
   "thresholds": {
     "high": 100,
@@ -40,7 +50,11 @@
     "break": 100
   },
   "_comment_ignorePatterns": "Los tests build-based crean y borran `.experimentos-tmp/` y `.vite-react-ssg-temp/` en la raíz: si una suite corre mientras Stryker copia su sandbox, el copyfile revienta con ENOENT (incidente medido en progress/mutation_contacto.md). Ignorarlos inmuniza la mutación frente a suites concurrentes.",
-  "ignorePatterns": [".experimentos-tmp", ".vite-react-ssg-temp"],
+  "ignorePatterns": [
+    ".experimentos-tmp",
+    ".vite-react-ssg-temp",
+    "dist"
+  ],
   "tempDirName": ".stryker-tmp",
   "htmlReporter": {
     "fileName": "reports/mutation/index.html"

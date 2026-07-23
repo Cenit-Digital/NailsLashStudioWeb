@@ -325,6 +325,91 @@ describe('@s19 [ENMIENDA 2] el marco cede el gesto vertical al navegador y se qu
   })
 })
 
+describe('@s24 [ENMIENDA 3] los mandos son círculos de cristal SOBRE el marco y la fila externa desaparece', () => {
+  /**
+   * La regla COMPARTIDA de los tres mandos: su encabezado es un grupo con coma
+   * (`.rotacion, .flechaAnterior, .flechaSiguiente {`), así que se busca la clase en CUALQUIER
+   * posición del encabezado — `reglaBase` solo casa la clase pegada a la llave.
+   */
+  function reglaDelMando(clase: string): string {
+    return regla(scss(), new RegExp(`\\.${clase}[^{}]*\\{`), `.${clase}`)
+  }
+
+  const MANDOS = ['rotacion', 'flechaAnterior', 'flechaSiguiente']
+
+  it('@s24 el SCSS ya NO contiene la regla de la fila .mandos', () => {
+    expect(scss()).not.toMatch(/\.mandos\b/)
+  })
+
+  it('@s24 los tres mandos declaran position: absolute: viven SOBRE el marco, no en una fila', () => {
+    for (const mando of MANDOS) {
+      expect(reglaDelMando(mando), `.${mando}`).toMatch(/position\s*:\s*absolute/)
+    }
+  })
+
+  it('@s24 la caja de los tres mide 2.75rem por lado (44 px CSS: SUPERA los 24 de SC 2.5.8)', () => {
+    for (const mando of MANDOS) {
+      expect(reglaDelMando(mando), `.${mando}`).toMatch(/width\s*:\s*2\.75rem/)
+      expect(reglaDelMando(mando), `.${mando}`).toMatch(/height\s*:\s*2\.75rem/)
+    }
+  })
+
+  it('@s24 el cristal: fondo color-mix( con var(--surface) y transparent, y backdrop-filter: blur(', () => {
+    for (const mando of MANDOS) {
+      const cuerpo = reglaDelMando(mando)
+
+      expect(cuerpo, `.${mando}`).toMatch(/background\s*:\s*color-mix\(/)
+      expect(cuerpo, `.${mando}`).toContain('var(--surface)')
+      expect(cuerpo, `.${mando}`).toContain('transparent')
+      expect(cuerpo, `.${mando}`).toMatch(/backdrop-filter\s*:\s*blur\(/)
+      // La base al 85 % (auditoría a11y del lote, eje 1): con el 78 % el borde caía a 2,67:1
+      // sobre un píxel casi negro; al 85 % el suelo del compuesto es #D9D9D9 — borde 3,20:1 y
+      // glifo 4,39:1 INCONDICIONALES, sobre cualquier foto imaginable.
+      expect(cuerpo, `.${mando}`).toContain('color-mix(in srgb, var(--surface) 85%, transparent)')
+    }
+  })
+
+  it('@s24 borde var(--border-interactive) y glifo var(--accent-dark): NI UN color nuevo', () => {
+    // La puerta de contraste solo lee `_tokens.scss`: un color inventado aquí sería INVISIBLE
+    // para ella. Mismos tokens que los puntos de @s17.
+    for (const mando of MANDOS) {
+      const cuerpo = reglaDelMando(mando)
+
+      expect(cuerpo, `.${mando}`).toMatch(/border\s*:\s*1px solid var\(--border-interactive\)/)
+      expect(cuerpo, `.${mando}`).toMatch(/color\s*:\s*var\(--accent-dark\)/)
+    }
+  })
+
+  it('@s24 su z-index es MAYOR QUE 6: por encima de la capa máxima de las tarjetas (capaDe(0, 6) = 6)', () => {
+    for (const mando of MANDOS) {
+      const capa = /z-index\s*:\s*(\d+)/.exec(reglaDelMando(mando))
+
+      expect(capa, `.${mando} necesita z-index`).not.toBeNull()
+      expect(Number((capa as RegExpExecArray)[1])).toBeGreaterThan(6)
+    }
+  })
+
+  it('@s24 las flechas anclan cada una a SU lateral y el chip arriba: left, right y top declarados', () => {
+    // La posición FINA se comprueba EN VIVO (contrato): aquí solo el anclaje de cada lado. El
+    // regex busca la regla PROPIA (clase pegada a la llave, sin coma: el grupo compartido no casa
+    // o no contiene el anclaje) con la declaración dentro de su cuerpo.
+    expect(scss()).toMatch(/\.flechaAnterior\s*\{[^}]*left\s*:/)
+    expect(scss()).toMatch(/\.flechaSiguiente\s*\{[^}]*right\s*:/)
+    expect(scss()).toMatch(/\.rotacion\s*\{[^}]*top\s*:/)
+  })
+
+  it('@s24 NINGÚN mando se oculta en ningún tamaño: sin display: none, sin visibility: hidden, sin opacity', () => {
+    // En táctil no hay hover que los revele: la hoja ENTERA queda sin display:none ni
+    // visibility:hidden (hoy no los usa para nada), y los mandos sin opacity propia. El
+    // lookbehind excluye `backface-visibility: hidden` (la de la tarjeta, legítima desde v2).
+    expect(scss()).not.toMatch(/display\s*:\s*none/)
+    expect(scss()).not.toMatch(/(?<![a-z-])visibility\s*:\s*hidden/)
+    for (const mando of MANDOS) {
+      expect(reglaDelMando(mando), `.${mando}`).not.toMatch(/[^-]opacity\s*:/)
+    }
+  })
+})
+
 describe('@s17 el punto ACTUAL se distingue del disponible por COLOR, no solo por opacidad', () => {
   it('@s17 el punto actual y el disponible usan DOS tokens distintos de fondo', () => {
     // (N) SC 1.4.11 Non-text Contrast (AA) — el texto del criterio dice «components AND STATES»: la
