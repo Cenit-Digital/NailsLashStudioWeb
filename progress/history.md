@@ -563,6 +563,10 @@ escenarios. La **revisión adversarial (5 lentes) cazó 2 BLOQUEANTES antes de e
   ceremonial. Enmienda 3 del contrato + micro-ciclo (los DOS valores del diseño de token único),
   mutación 100 %/100 %, 30 000 ms exactos medidos en el build real. El banco queda en el scratchpad
   de la sesión (vivencia-hero.mjs) para futuros ajustes de ritmo.
+  Iteración 2 del banco (2026-07-24): Pablo pidió probar 15 s; vivido en tiempo real por el lead
+  (a 15 s ≈1,7 s/letra la pluma se ve escribir con claridad Y la mayoría de visitantes ve la firma
+  completarse — el punto dulce frente al 30, más ceremonial pero cuyo final pocos veían). Enmienda 4
+  + micro-ciclo con sabotaje del espejo, mutación 100 %/100 %, 15 000 ms exactos en el build real.
 - **Incidente de herramienta, declarado**: el WebSocket nativo de Node (undici) contra el CDP
   murió repetidas veces en corridas largas con muchas capturas; el remedio fue trocear la sonda en
   sesiones cortas (mini-sonda para los 4 checks finales) y hacer ATÓMICOS los pares espera+acción

@@ -212,7 +212,7 @@ function declaracionAnimacion(clase: string): string | null {
 
 /**
  * El valor en segundos del token `--duracion-caligrafia`, LEÍDO de la regla raíz `.escena` (la
- * única regla que envuelve a trazo, aplicador y «STUDIO»). Que además valga EXACTAMENTE 30 lo
+ * única regla que envuelve a trazo, aplicador y «STUDIO»). Que además valga EXACTAMENTE 15 lo
  * asevera el primer test de @s4 con el número ESCRITO A MANO (anti-tautología).
  */
 function segundosDelToken(): number {
@@ -275,7 +275,7 @@ function terminosDeTiempo(animacion: string): string[] {
 /**
  * Resuelve un término de tiempo a SEGUNDOS. Para `calc(var(--duracion-caligrafia) ± n s …)` parte
  * del token y aplica los sumandos con su signo — así los tests de coreografía comparan NÚMEROS de
- * verdad (el contrato exige que todo tiempo derive del token, no literales de 30 duplicados).
+ * verdad (el contrato exige que todo tiempo derive del token, no literales de 15 duplicados).
  */
 function resolverSegundos(termino: string): number {
   if (termino === 'var(--duracion-caligrafia)') {
@@ -317,30 +317,30 @@ function tiemposDe(clase: string, nombre: string): { duracion: number; retardo: 
 }
 
 /**
- * @s4 — REESCRITO (enmienda 2026-07-23, la CALIGRAFÍA LENTA) y RE-MEDIDO (ENMIENDA 3, 2026-07-24:
- * 90 s → 30 s, decisión de Pablo tras vivir ambos ritmos; ≈3,3 s por letra × 9 letras ≈ 30 s de
- * trazo). El número vive en UN token (`--duracion-caligrafia: 30s`) y TODO tiempo del rótulo
- * deriva de él — el reloj del timeout de Hero.tsx lo asevera `hero-logica.test.ts` contra estos
- * MISMOS bytes. La curva sigue `linear`: también a 30 s el cubic-bezier anterior reptaría en los
- * extremos y correría en el centro; una pluma escribe a velocidad constante. jsdom NO anima:
- * BYTES del SCSS; el ritmo real, EN VIVO.
+ * @s4 — REESCRITO (enmienda 2026-07-23, la CALIGRAFÍA LENTA) y RE-MEDIDO dos veces (ENMIENDA 3:
+ * 90 s → 30 s; ENMIENDA 4, 2026-07-24, banco de vivencias iteración 2: 30 s → 15 s, el punto
+ * dulce — ≈1,7 s por letra × 9 letras ≈ 15 s de trazo). El número vive en UN token
+ * (`--duracion-caligrafia: 15s`) y TODO tiempo del rótulo deriva de él — el reloj del timeout de
+ * Hero.tsx lo asevera `hero-logica.test.ts` contra estos MISMOS bytes. La curva sigue `linear`:
+ * también a 15 s el cubic-bezier anterior reptaría en los extremos y correría en el centro; una
+ * pluma escribe a velocidad constante. jsdom NO anima: BYTES del SCSS; el ritmo real, EN VIVO.
  */
-describe('@s4 un ÚNICO token --duracion-caligrafia: 30s gobierna TODOS los tiempos del rótulo', () => {
-  it('@s4 el token vale EXACTAMENTE 30s, vive en la regla raíz .escena y se declara UNA sola vez', () => {
-    // El 30 va ESCRITO A MANO: la decisión de Pablo (≈3,3 s por letra × 9 letras), 2026-07-24.
-    expect(reglaBase('escena')).toMatch(/--duracion-caligrafia\s*:\s*30s\s*;/)
+describe('@s4 un ÚNICO token --duracion-caligrafia: 15s gobierna TODOS los tiempos del rótulo', () => {
+  it('@s4 el token vale EXACTAMENTE 15s, vive en la regla raíz .escena y se declara UNA sola vez', () => {
+    // El 15 va ESCRITO A MANO: la decisión de Pablo (≈1,7 s por letra × 9 letras), 2026-07-24.
+    expect(reglaBase('escena')).toMatch(/--duracion-caligrafia\s*:\s*15s\s*;/)
     // Se cuentan DECLARACIONES de CSS, no prosa: los comentarios citan el token con sus dos puntos.
     const sinComentarios = scss().replace(/\/\/[^\n]*/g, '')
 
     expect((sinComentarios.match(/--duracion-caligrafia\s*:/g) ?? []).length).toBe(1)
-    expect(segundosDelToken()).toBe(30)
+    expect(segundosDelToken()).toBe(15)
   })
 
   it('@s4 fuera del token NO queda ninguna duración de trazo suelta: todo literal restante es ≤ 1 s', () => {
-    // Si alguien duplicara el 30 (u otro trazo largo) como literal en una animación, dejaría DOS
+    // Si alguien duplicara el 15 (u otro trazo largo) como literal en una animación, dejaría DOS
     // relojes que divergen al editar uno. Comentarios fuera: los tiempos de prosa no son CSS.
     const sinComentarios = scss().replace(/\/\/[^\n]*/g, '')
-    const sinToken = sinComentarios.replace(/--duracion-caligrafia\s*:\s*30s\s*;/, '')
+    const sinToken = sinComentarios.replace(/--duracion-caligrafia\s*:\s*15s\s*;/, '')
     const literales = [...sinToken.matchAll(/\b(\d*\.?\d+)(ms|s)\b/g)]
 
     expect(literales.length).toBeGreaterThan(0)
@@ -377,24 +377,24 @@ describe('@s4 un ÚNICO token --duracion-caligrafia: 30s gobierna TODOS los tiem
 
     expect(recorrer.duracion).toBe(escribir.duracion)
     expect(recorrer.retardo).toBe(escribir.retardo)
-    expect(escribir.duracion).toBe(30)
+    expect(escribir.duracion).toBe(15)
     expect(escribir.retardo).toBeCloseTo(0.1, 6)
   })
 
   it('@s4 «retirarse» arranca en calc(var(--duracion-caligrafia) - 0.4s + 0.1s), derivado del token', () => {
     // La coreografía relativa de hoy (el aplicador se retira al acabar el trazo), expresada SOBRE
-    // el token: cambiar los 30 s recoloca la retirada sola. La fórmula va ESCRITA A MANO.
+    // el token: cambiar los 15 s recoloca la retirada sola. La fórmula va ESCRITA A MANO.
     expect(reglaAnimada('aplicador')).toMatch(
       /retirarse\s+0\.5s\s+linear\s+calc\(var\(--duracion-caligrafia\)\s*-\s*0\.4s\s*\+\s*0\.1s\)\s+both/,
     )
-    expect(tiemposDe('aplicador', 'retirarse').retardo).toBeCloseTo(29.7, 6)
+    expect(tiemposDe('aplicador', 'retirarse').retardo).toBeCloseTo(14.7, 6)
   })
 
   it('@s4 «revelarStudio» arranca en calc(var(--duracion-caligrafia) + 0.2s) y «aparecer» sigue en 0.3s', () => {
     expect(reglaAnimada('heroStudio')).toMatch(
       /revelarStudio\s+0\.6s\s+[^;]*calc\(var\(--duracion-caligrafia\)\s*\+\s*0\.2s\)\s+both/,
     )
-    expect(tiemposDe('heroStudio', 'revelarStudio').retardo).toBeCloseTo(30.2, 6)
+    expect(tiemposDe('heroStudio', 'revelarStudio').retardo).toBeCloseTo(15.2, 6)
     // `aparecer` (el fundido de entrada del aplicador) queda IGUAL que antes de la enmienda.
     expect(reglaAnimada('aplicador')).toMatch(/aparecer\s+0\.3s\s+linear\s+0\.1s\s+both/)
   })
@@ -407,14 +407,14 @@ describe('@s4 un ÚNICO token --duracion-caligrafia: 30s gobierna TODOS los tiem
  * afirmando justo lo contrario— porque ningún test comparaba los dos relojes. Este lo hace,
  * RESOLVIENDO el token y los calc() a números.
  */
-describe('@s4 «STUDIO» entra CUANDO la marca ya está escrita, nunca antes — total ≈30,8 s', () => {
+describe('@s4 «STUDIO» entra CUANDO la marca ya está escrita, nunca antes — total ≈15,8 s', () => {
   it('@s4 el retardo de .heroStudio es ≥ que el final del trazo (retardo + duración)', () => {
     const escribir = tiemposDe('trazo', 'escribir')
     const studio = tiemposDe('heroStudio', 'revelarStudio')
 
     expect(escribir.duracion, 'el trazo debe declarar duración').toBeGreaterThan(0)
     expect(studio.retardo, 'STUDIO debe declarar un retardo').toBeGreaterThan(0)
-    // En MILISEGUNDOS ENTEROS: en coma flotante 0,1 + 30 puede dar …0000006 y un `>=` fallaría
+    // En MILISEGUNDOS ENTEROS: en coma flotante 0,1 + 15 puede dar …0000006 y un `>=` fallaría
     // por 6·10⁻¹⁶ describiendo un defecto que no existe.
     const ms = (s: number) => Math.round(s * 1000)
 
@@ -422,13 +422,13 @@ describe('@s4 «STUDIO» entra CUANDO la marca ya está escrita, nunca antes —
     expect(ms(studio.retardo)).toBeGreaterThanOrEqual(ms(escribir.retardo) + ms(escribir.duracion))
   })
 
-  it('@s4 la ceremonia completa (retardo + duración de «revelarStudio») suma 30,8 s EXACTOS', () => {
+  it('@s4 la ceremonia completa (retardo + duración de «revelarStudio») suma 15,8 s EXACTOS', () => {
     const studio = tiemposDe('heroStudio', 'revelarStudio')
     const ms = (s: number) => Math.round(s * 1000)
 
-    // 30 + 0,2 + 0,6 = 30,8 — el 30800 va ESCRITO A MANO y es el MISMO número que asevera
+    // 15 + 0,2 + 0,6 = 15,8 — el 15800 va ESCRITO A MANO y es el MISMO número que asevera
     // `hero-logica.test.ts` para el timeout de Hero.tsx: un solo reloj, dos vigilantes.
-    expect(ms(studio.retardo + studio.duracion)).toBe(30_800)
+    expect(ms(studio.retardo + studio.duracion)).toBe(15_800)
   })
 })
 

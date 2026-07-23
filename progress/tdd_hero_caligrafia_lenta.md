@@ -255,3 +255,29 @@ token único hizo que fueran DOS valores de producción y ni uno más.
   Prettier/ESLint limpios en los ficheros tocados. Sin suite completa ni build (orden del lead).
 - **PENDIENTE del lead**: re-verificación EN VIVO del ritmo real (≈30 s, getAnimations() +
   muestreo) y del LCP con la animación larga, como fija el contrato.
+
+## Enmienda 4 (15 s)
+
+Micro-ciclo del 2026-07-24 (decisión de Pablo, banco de vivencias ITERACIÓN 2: 30 s → 15 s, el
+punto dulce — ≈1,7 s por letra y la mayoría ve la firma completarse). Mismo cambio mecánico que la
+Enmienda 3: DOS valores de producción y ni uno más.
+
+- **ROJO**: los 3 ficheros de test re-medidos al contrato nuevo (15 / `15s` / 14,7 / 15,2 /
+  15 800 ms, todos ESCRITOS A MANO). Then estructurales (token único, calc() derivados, `linear`,
+  un reloj tinta+aplicador, orden de «STUDIO») intactos. Corrida dirigida: **11 fallos** en
+  3 ficheros contra la producción vieja — rojo demostrado (mismo recuento que la Enmienda 3).
+- **VERDE**: `hero.module.scss` `--duracion-caligrafia: 30s → 15s` y `hero-logica.ts`
+  `SEGUNDOS_DE_TRAZO = 30 → 15`. **107/107** en verde.
+- **REFACTOR** (en verde): comentarios de producción alineados (cabecera del SCSS: ≈1,7 s por
+  letra, total ≈15,8 s; doc de `milisegundosDeCeremonia`). Re-corrida verde.
+- **Sabotaje del espejo, DOS direcciones**: lógica=30/SCSS=15 → 2 tests rojos; SCSS=30s/lógica=15
+  → 1 test rojo (la aserción espejo `Number(token) === SEGUNDOS_DE_TRAZO`). Restaurado, verde.
+- **NO tocados**: `Hero.tsx` (el reloj lo lee de `milisegundosDeCeremonia()`), el `.feature` (ya
+  traía la Enmienda 4), y los números que NO son tiempo del régimen (el «90 %» del recorrido y la
+  historia de 90 s de la auditoría A-3 en hero.test.tsx; el «90 s → 30 s → 15 s» histórico de la
+  cabecera del SCSS).
+- **Mutación dirigida**: `hero-logica.ts` **16/16 = 100 %** · `Hero.tsx` **50/50 = 100 %**
+  (0 survived, 0 no-cov; la exclusión RATIFICADA existente, ninguna nueva). Prettier/ESLint
+  limpios en los 5 ficheros tocados. Sin suite completa ni build (orden del lead).
+- **PENDIENTE del lead**: re-verificación EN VIVO del ritmo real (≈15 s, getAnimations() +
+  muestreo) y del LCP, como fija el contrato.

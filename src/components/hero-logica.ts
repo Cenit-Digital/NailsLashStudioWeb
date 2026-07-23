@@ -16,7 +16,7 @@
  * Los segundos del trazo: el ESPEJO del token `--duracion-caligrafia` del SCSS (un test compara
  * los dos números leyendo los bytes de la hoja — cambiar uno sin el otro pone la suite roja).
  */
-export const SEGUNDOS_DE_TRAZO = 30
+export const SEGUNDOS_DE_TRAZO = 15
 
 /**
  * La cola de salida tras el trazo: 0,2 s hasta que arranca `revelarStudio` + 0,6 s de revelado.
@@ -54,7 +54,7 @@ export function debeMontarseElControl(
 }
 
 /**
- * La duración TOTAL de la ceremonia en milisegundos (trazo + cola de salida = ≈30,8 s): es el
+ * La duración TOTAL de la ceremonia en milisegundos (trazo + cola de salida = ≈15,8 s): es el
  * plazo del `setTimeout` con el que `Hero.tsx` desmonta el control cuando el reloj termina solo
  * (@s12). Derivada de UNA fuente en tiempo de llamada, jamás duplicada a mano.
  */
