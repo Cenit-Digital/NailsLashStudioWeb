@@ -107,3 +107,41 @@ describe('@s14 openingHoursSpecification se hornea en el JSON-LD de dist/, sin l
     expect(codigoSalida).toBe(0)
   })
 })
+
+/**
+ * F-14 @s6 — el JSON-LD horneado NO gana un `aggregateRating`: la nota de Treatwell se MUESTRA a
+ * las personas (línea del agregado de la sección de reseñas) pero JAMÁS se marca como propia en el
+ * structured data (guidelines de Google: reseñas de terceros no marcables; brief v3 §2 +
+ * acceptance de F-14). Se AMPLÍA este test build-based EXISTENTE: prohibido crear un cuarto.
+ */
+describe('@s6 (F-14) el JSON-LD horneado NO contiene aggregateRating ni review', () => {
+  it('@s6 ANCLA POSITIVA: la cáscara BeautySalon sigue entera — @type, name y openingHoursSpecification', () => {
+    // Sin ella, la negativa pasaría VACUAMENTE si el JSON-LD entero hubiera desaparecido.
+    const jsonLd = jsonLdHorneado()
+
+    expect(jsonLd['@type']).toBe('BeautySalon')
+    expect(jsonLd.name).toBe('Nails Lash Studio')
+    expect(Object.keys(jsonLd)).toContain('openingHoursSpecification')
+  })
+
+  it('@s6 el JSON-LD no contiene la clave "aggregateRating" ni la clave "review"', () => {
+    const claves = Object.keys(jsonLdHorneado())
+
+    expect(claves).not.toContain('aggregateRating')
+    expect(claves).not.toContain('review')
+  })
+
+  it('@s6 el literal "aggregateRating" no aparece en NINGÚN byte del HTML horneado', () => {
+    expect(html).not.toContain('aggregateRating')
+  })
+
+  it('@s6 y la sección de reseñas SÍ está horneada: el agregado visible viaja en el HTML crudo, atribuido y fechado', () => {
+    // El ancla de la PROPIA F-14 (escrita A MANO): la nota se muestra a las personas…
+    expect(html).toContain('Lo que dicen nuestras clientas')
+    expect(html).toContain('4,9 de 5')
+    expect(html).toContain('1.239')
+    expect(html).toContain('https://www.treatwell.es/establecimiento/nails-lash-studio/')
+    expect(html).toContain('23/07/2026')
+    // …nunca a los buscadores como propia (la negativa de arriba deja de ser vacua con esto verde).
+  })
+})

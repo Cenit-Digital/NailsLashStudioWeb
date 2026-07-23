@@ -1,0 +1,325 @@
+// La sección de reseñas (F-14): la línea discreta del agregado y el carrusel coverflow 3D de
+// testimonios — el MISMO domo ∩ de la galería con una tarjeta DISTINTA: texto, más ancha que
+// alta. Contrato: `features/resenas_agregado_enlace.feature` @s9, que hereda POR REFERENCIA las
+// reglas 3D de `features/galeria_carrusel.feature` (@s13, @s14, @s15, @s17, @s24). Su red son los
+// BYTES de este fichero, que lee `resenas-estilos.test.ts`: Stryker no ve CSS.
+//
+// EL REPARTO: TypeScript decide (distancia, signo, capa, etiquetas) y el SCSS mide (perspectiva,
+// arco, curva, breakpoints). El puente es `[data-distancia='N']` + la variable `--s`.
+//
+// 🔴 Aquí NO se declara `transform-style` (deliberado, herencia de galería): sin él cada tarjeta
+// crea contexto de apilamiento por su propio `transform` y el `z-index` inline es la autoridad,
+// determinista en todos los motores.
+
+.resenas {
+  overflow: hidden;
+}
+
+// [@s2] La línea DISCRETA del agregado: texto secundario --muted sobre el fondo (par AA auditado)
+// con el enlace en --accent-dark. Una línea fina, no un banner.
+.agregado {
+  margin: 0.75rem 0 0;
+  color: var(--muted);
+  font-size: 0.9375rem;
+
+  a {
+    color: var(--accent-dark);
+    // (N) SC 1.4.1: contra el texto de alrededor el enlace rinde 1,12:1 — la distinción no puede
+    // ser SOLO el color. Explícito para que un reset global no mate el default en silencio.
+    text-decoration: underline;
+  }
+}
+
+.carrusel {
+  position: relative;
+  margin-top: 1.5rem;
+}
+
+// LOS MANDOS DE CRISTAL (herencia de @s24): círculos de 2.75rem (44 px, SUPERA SC 2.5.8) flotando
+// SOBRE el marco, anclados a `.carrusel` (position: relative). NUNCA dentro de `.marco`: su
+// overflow:hidden se comería el círculo que asoma. z-index 7 > capaDe(0, 6) = 6. Siempre
+// visibles — en táctil no hay hover que los revele. Ni un color nuevo: la puerta de contraste
+// solo lee `_tokens.scss` y no lo vería.
+.rotacion,
+.flechaAnterior,
+.flechaSiguiente {
+  position: absolute;
+  z-index: 7;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  border: 1px solid var(--border-interactive);
+  // El 85 % es el suelo AA del cristal (auditoría a11y del lote, eje 1): el mismo de la galería.
+  background: color-mix(in srgb, var(--surface) 85%, transparent);
+  backdrop-filter: blur(8px);
+  color: var(--accent-dark);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--accent-dark);
+  }
+}
+
+// El chip ⏸/▶ arriba a la derecha; las flechas en los laterales a media altura. El centrado
+// vertical va SIN transform — la hoja entera tiene UNA ÚNICA declaración de transform (la de la
+// tarjeta) — y la posición FINA se ajusta EN VIVO.
+.rotacion {
+  top: 0.625rem;
+  right: 0.625rem;
+}
+
+.flechaAnterior {
+  left: 0.625rem;
+  top: calc(50% - 1.375rem);
+}
+
+.flechaSiguiente {
+  right: 0.625rem;
+  top: calc(50% - 1.375rem);
+}
+
+// EL RECORTE VIVE AQUÍ, nunca en el elemento con perspectiva: allí aplanaría el 3D.
+.marco {
+  overflow: hidden;
+  // El marco es el dueño del gesto HORIZONTAL; el vertical se le cede al navegador. Sin esto, en
+  // táctil el navegador reclama el gesto para hacer scroll y dispara pointercancel.
+  touch-action: pan-y;
+}
+
+// EL ESCENARIO: el único punto de fuga de las seis tarjetas. La perspectiva va como PROPIEDAD del
+// contenedor; dentro de la transform daría seis puntos de fuga distintos.
+.escenario {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 2.25rem 0 3rem;
+  perspective: 1200px;
+}
+
+.tarjeta {
+  // Las seis comparten celda: el arco lo dibuja el `transform`, jamás el flujo del documento.
+  grid-area: 1 / 1;
+  width: min(420px, 86vw);
+  // [@s9] La proporción PROPIA: una reseña es un párrafo, no una foto 4:3 — más ancha que alta.
+  aspect-ratio: 8 / 5;
+  border-radius: 20px;
+  cursor: pointer;
+  backface-visibility: hidden;
+  box-shadow: 0 30px 60px color-mix(in srgb, var(--accent) 14%, transparent);
+
+  // Los valores por defecto: la lista de funciones es SIEMPRE la misma y SIEMPRE completa.
+  --s: 0;
+  --x: 0%;
+  --y: 0px;
+  --z: 0px;
+  --giro: 0deg;
+  --escala: 1;
+  --opacidad: 1;
+
+  // UNA sola declaración, parametrizada, en el orden traslación → giro → escala. Cada variable
+  // lleva su valor de RESERVA: si una llegara vacía, la declaración entera caería a su valor
+  // inicial *none* (regla de invalid at computed-value time) sin ningún error en consola.
+  transform: translate3d(calc(var(--s, 0) * var(--x, 0%)), var(--y, 0px), var(--z, 0px))
+    rotateY(calc(var(--s, 0) * var(--giro, 0deg))) scale(var(--escala, 1));
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+
+  // El arco de ESCRITORIO: el mismo domo ∩ aplanado de la galería, con separaciones algo menores
+  // porque la tarjeta apaisada ocupa más ancho. [@s9] La CENTRAL es SIEMPRE legible: opacidad 1.
+  &[data-distancia='0'] {
+    --x: 0%;
+    --y: -16px;
+    --z: 0px;
+    --giro: 0deg;
+    --escala: 1.05;
+    --opacidad: 1;
+  }
+
+  &[data-distancia='1'] {
+    --x: 66%;
+    --y: 24px;
+    --z: -140px;
+    --giro: -30deg;
+    --escala: 0.87;
+    --opacidad: 0.62;
+  }
+
+  // Los ángulos SATURAN (30 → 44 → 48) en vez de crecer linealmente: bajo los 90° la tarjeta
+  // nunca pasa de perfil.
+  &[data-distancia='2'] {
+    --x: 118%;
+    --y: 76px;
+    --z: -300px;
+    --giro: -44deg;
+    --escala: 0.73;
+    --opacidad: 0.28;
+  }
+
+  // LA OCULTA: entrar aquí (-2 → +3) es instantáneo e invisible; salir (+3 → +2) sí transiciona.
+  // `pointer-events: none`: a opacidad 0 no puede seguir capturando clics.
+  &[data-distancia='3'] {
+    --x: 140%;
+    --y: 88px;
+    --z: -380px;
+    --giro: -48deg;
+    --escala: 0.69;
+    --opacidad: 0;
+
+    transition: none;
+    pointer-events: none;
+  }
+}
+
+// [@s9] La LÁMINA: el HIJO envoltorio que lleva la opacidad (grouping property: en la tarjeta
+// aplanaría el 3D). Tarjeta de TEXTO sobre --surface2: los pares --text/--surface2,
+// --ink/--surface2 y --accent-dark/--surface2 están AUDITADOS en la puerta de contraste (AA).
+.lamina {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  height: 100%;
+  padding: 1.25rem 1.5rem;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--surface2);
+  border: 1px solid var(--line);
+  opacity: var(--opacidad, 1);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+// El salto del bucle tampoco puede verse desvanecerse: la oculta aparece y desaparece de golpe.
+.tarjeta[data-distancia='3'] .lamina {
+  transition: none;
+}
+
+.cita {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.valoracion {
+  margin: 0;
+  color: var(--accent-dark);
+  font-size: 0.875rem;
+}
+
+.firma {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.autora {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.servicio {
+  color: var(--accent-dark);
+  font-size: 0.8125rem;
+}
+
+.puntos {
+  display: flex;
+  justify-content: center;
+  // El hueco pequeño mantiene la separación VISUAL con cajas de 24 px que NO se solapan.
+  gap: 0.125rem;
+}
+
+// (N) SC 1.4.11 heredado: el punto ACTUAL se distingue del disponible con DOS tokens de color,
+// nunca con la opacidad del mismo rosa. (N) SC 2.5.8: caja de 1.5rem (24 px) con el círculo
+// visible de 0.75rem en el ::before, que lleva CONSIGO su anillo de 1px.
+.punto {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+
+  &::before {
+    content: '';
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    border: 1px solid var(--border-interactive);
+    background: var(--surface);
+  }
+
+  &[data-actual='sí'] {
+    &::before {
+      background: var(--accent-dark);
+      border-color: var(--accent-dark);
+    }
+  }
+}
+
+// [@s5] La leyenda de honestidad: texto secundario --muted sobre el fondo (par AA auditado).
+.leyenda {
+  margin: 1.5rem 0 0;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+// EL MÓVIL conserva el 3D pero SUAVIZADO y con las vecinas ASOMANDO. 640px es el breakpoint que
+// YA usa el repo: no se inventa otro.
+@media (max-width: 640px) {
+  .escenario {
+    padding: 1.5rem 0 2.25rem;
+    perspective: 900px;
+  }
+
+  .tarjeta {
+    width: 80vw;
+
+    &[data-distancia='0'] {
+      --y: -8px;
+      --escala: 1.03;
+    }
+
+    &[data-distancia='1'] {
+      --x: 64%;
+      --y: 12px;
+      --z: -80px;
+      --giro: -16deg;
+      --escala: 0.89;
+      --opacidad: 0.5;
+    }
+
+    &[data-distancia='2'] {
+      --x: 110%;
+      --y: 34px;
+      --z: -160px;
+      --giro: -24deg;
+      --escala: 0.79;
+      --opacidad: 0.14;
+    }
+
+    &[data-distancia='3'] {
+      --x: 126%;
+      --y: 40px;
+      --z: -200px;
+      --giro: -26deg;
+      --escala: 0.77;
+      --opacidad: 0;
+    }
+  }
+}
+
+// (T) del APG + (P) del repo: con la preferencia del sistema puesta, el carrusel arranca pausado
+// (lo decide el componente) y aquí, además, se le quita el movimiento residual.
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta,
+  .lamina {
+    transition: none;
+  }
+}

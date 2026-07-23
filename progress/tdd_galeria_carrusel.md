@@ -327,3 +327,120 @@ Ningún sabotaje se quedó verde: no hubo que reescribir ningún test por no mor
 - Re-mutación (`galeria-logica.ts` y `Galeria.tsx`, break 100: con el rediseño y las 2 exclusiones
   documentadas debería dar 100 %/100 %), re-judge, suite completa/build y la verificación EN VIVO
   del gesto físico en Chrome (dedo real): el lead.
+
+## Ciclo v3
+
+**Fecha:** 2026-07-23 · **Contrato:** `features/galeria_carrusel.feature` v3 (Enmienda 3, @s1..@s24)
+· **Brief:** `progress/galeria_v3_resenas_diseno.md` (§1 decisiones de Pablo, §3 teclado, §4 cristal,
+§5 módulo compartido, §7 trampas medidas) · **Rama:** `feat/galeria-v3-resenas`.
+Vitest DIRIGIDO a los 4 ficheros de galería (orden del lead: nada de suite completa/build/mutación):
+**197 verdes** — `galeria.test.tsx` 90 · `galeria-estilos.test.ts` 34 · `galeria-logica.test.ts` 47
+· `carrusel-logica.test.ts` 26 (NUEVO). Partida: 148 → **+49 netos** (50 tests nuevos escritos,
+1 retirado por mudanza). eslint 0 avisos · `tsc --noEmit` limpio · prettier limpio.
+
+### Lo nuevo de producción
+
+- **`src/components/carrusel-logica.ts` (NUEVO, puro, para mutar al 100 %)**: `MILISEGUNDOS_POR_FOTO
+  = 2000` (MIGRADA desde `galeria-logica.ts` — decisión: los consumidores cambian el import, SIN
+  re-export: el contrato dice «la galería NO guarda una segunda copia» y una re-exportación sería
+  una segunda puerta al mismo número), `pasoDeTecla` + `Pulsacion` (@s21), `esCampoDeEscritura`
+  (la clasificación del elemento activo, pura para que el cableado no lleve literales inmatables),
+  `PROPORCION_VISIBLE_MINIMA = 0.6`, `NADIE = -1` y `quienAtiendeElTeclado` (@s22: umbral
+  INCLUSIVO, desempate por cercanía al centro, empate total estable → primera registrada).
+- **`Galeria.tsx`**: reloj con GENERACIÓN en las deps del efecto (@s20) — el token es `useState({})`
+  + `setGeneracionDelReloj({})`: IDENTIDAD nueva por acción, no aritmética (un contador `g + 1`
+  tendría a `g - 1` de mutante EQUIVALENTE; el `{}` vacío no tiene mutantes). `desplazar` y
+  `mostrarFoto` (puntos + clic de tarjeta) son el camino manual único que reinicia. Teclado (@s23):
+  efecto solo-montaje con listener de `keydown` en `document`, `focoDentroAhora` (ref, con
+  onFocus/onBlur en el carrusel — distinto de `foco`, cuya pausa es pegajosa por @s10),
+  IntersectionObserver GUARDADO por `typeof` con el MISMO umbral de la decisión pura y ratio en
+  ref; `preventDefault()` SOLO al atender; limpieza de listener y `disconnect`. En el handler los
+  desplazamientos van sobre los SETTERS ESTABLES de React (no sobre `desplazar` del render):
+  exhaustive-deps sin avisos y UN solo registro del listener (la limpieza lo asevera).
+- **`galeria.module.scss` (@s24)**: la fila `.mandos` DESAPARECE; grupo `.rotacion, .flechaAnterior,
+  .flechaSiguiente` con `position: absolute`, `z-index: 7` (> capaDe(0,6)=6), caja `2.75rem`,
+  cristal `color-mix(in srgb, var(--surface) 78%, transparent)` + `backdrop-filter: blur(8px)`,
+  borde `var(--border-interactive)`, glifo `var(--accent-dark)`; anclajes propios (chip arriba-dcha,
+  flechas en los laterales a media altura SIN transform — @s14 exige UNA sola declaración en la
+  hoja: el centrado vertical va por `top: calc(50% - 1.375rem)`). Los mandos son hijos DIRECTOS de
+  `.carrusel` (nunca de `.marco`: su overflow se comería el círculo). Sin hover-gating: visibles
+  en todos los tamaños.
+
+### Mapa @s → test (trazabilidad del ciclo v3)
+
+| @s | Test(s) |
+|---|---|
+| @s9 (2000 ms) | `carrusel-logica.test.ts` «la constante exportada vale exactamente 2000» · `galeria.test.tsx` @s9 «1999/2000» y «otros 2000 → 3ª, 12000 → 1ª» |
+| @s10/@s11/@s12 (re-medidos) | `galeria.test.tsx` @s10 (Given 8000 intacto, tick de salida 2000) · @s11 ×2 · @s12 ×4 — sus Then NO cambiaron |
+| @s20 | `galeria.test.tsx` @s20 ×5: flecha 1500→3499/3500 · punto · clic lateral · arrastre ≥ umbral · pausado + 12000 (anti-regresión SC 2.2.2) + tecla en @s23 |
+| @s21 | `carrusel-logica.test.ts` @s21: tabla de 8 filas (a mano) + `esCampoDeEscritura` ×7 |
+| @s22 | `carrusel-logica.test.ts` @s22: tabla de 6 filas + umbral 0.6 + empate total estable + sin candidatas + candidata única (el consumo de HOY) |
+| @s23 | `galeria.test.tsx` @s23 ×9: foco dentro sin IO · blur deja de atender · sin IO no revienta y sin foco no mueve · stub 0.8 + opciones `{threshold:[0.6]}` · ctrl no · 0.4 no (sin preventDefault) · campo de texto real (`input.focus()`) no · tecla reinicia reloj (=@s20) · limpieza (mismo manejador + disconnect) |
+| @s24 | `galeria-estilos.test.ts` @s24 ×8 (bytes: sin `.mandos`, absolute, 2.75rem, color-mix+blur, tokens, z-index>6, anclajes, nada oculto) · `galeria.test.tsx` @s24 ×2 (hijos directos; chip→flechas→escenario→puntos) |
+
+### Ciclos Rojo-Verde (resumen)
+
+| # | @s | ROJO (visto fallar) | VERDE (cambio mínimo) |
+|---|---|---|---|
+| 1 | @s9 | import de `carrusel-logica` inexistente | módulo nuevo con la constante 2000 |
+| 2 | @s9 | frontera 1999/2000 (producción latía a 4000) | `Galeria.tsx` importa de `carrusel-logica`; re-medidos @s10/@s11/@s12 (mantenimiento del contrato, documentado) |
+| 3 | @s21 | 8 filas sin `pasoDeTecla` | guardas `||` + mapa `ArrowLeft/Right` |
+| 4 | @s21 | 7 casos sin `esCampoDeEscritura` | `editable \|\| ETIQUETAS.includes` |
+| 5 | @s22 | 10 tests sin `quienAtiendeElTeclado` | bucle con umbral inclusivo + cercanía |
+| 6 | @s20 | tick fantasma en t=2000 (esperaba 2ª a los 3499, había 3ª) | generación `{}` en deps + reset en `desplazar` |
+| 7 | @s20 | punto no reiniciaba | `mostrarFoto` (punto + clic de tarjeta por el mismo camino) |
+| 8 | @s23 | ArrowLeft con foco dentro no movía | listener + `focoDentroAhora` + decisión pura |
+| 9 | @s23 | stub: sin observador construido | IO guardado + ratio en ref + `quienAtiendeElTeclado` |
+| 10 | @s24 | 9 rojos de bytes/estructura | SCSS cristal + fila fuera del TSX |
+
+(Los pines que nacieron verdes — lateral/arrastre/pausa de @s20, guardas de @s23, orden DOM de
+@s24 — fijan conducta compartida con líneas ya exigidas por un rojo anterior; su capacidad de
+morder quedó DEMOSTRADA con los sabotajes del bloque.)
+
+### Sabotajes de comprobación (aplicar → rojo → revertir; todos matados)
+
+| # | Sabotaje | Rojos |
+|---|---|---|
+| 1 | `MILISEGUNDOS_POR_FOTO = 4000` | 10 |
+| 2 | `ctrl \|\| alt` → `ctrl && alt` en `pasoDeTecla` | 2 |
+| 3 | `ArrowLeft: -1` → `1` | 1 |
+| 4 | umbral `<` → `<=` (0.6 exacto dejaría de atender) | 1 (la fila del 0.6) |
+| 5 | cercanía `<` → `<=` | 1 (el empate total) |
+| 6 | quitar `reiniciarElReloj()` de `desplazar` | 2 |
+| 7 | quitarlo de `mostrarFoto` | 2 |
+| 8 | deps `[rotando]` sin la generación | 4 |
+| 9 | `reiniciarElReloj` también des-pausa (reiniciar→arrancar) | 1 (anti-regresión) |
+| 10 | `preventDefault()` antes de la guarda de atender | 3 |
+| 11 | `!== NADIE` → `=== NADIE` | 5 |
+| 12 | callback del observador vacío | 2 |
+| 13 | quitar `observador?.disconnect()` | 1 |
+| 14 | `z-index: 3` en los mandos | 1 |
+| 15 | fondo `var(--surface)` sin color-mix | 1 |
+| 16 | reintroducir la fila (wrapper `<div>`) | 1 |
+
+### Decisiones del craftsman (dentro del contrato)
+
+- **Sin re-export**: `galeria-logica.ts` NO re-exporta la cadencia; los consumidores importan de
+  `carrusel-logica.ts` (una sola puerta al número; @s9 lo permite explícitamente).
+- **Generación como `{}`**: identidad en vez de contador — elimina POR CONSTRUCCIÓN el mutante
+  equivalente `+1/-1` (misma filosofía que el rediseño por signo de `pasosDelArrastre` en v2.2).
+- **`NADIE` exportada** pero los tests escriben `-1` a mano (anti-tautología).
+- **El handler de teclado usa setters estables** (no cierra sobre `desplazar`): exhaustive-deps a
+  cero sin `useCallback` (sin precedente en el repo y añadiría deps-arrays con mutantes
+  equivalentes) y sin re-suscripciones por render.
+- Dos aserciones de estilo se afinaron durante el ROJO de @s24 (bugs del TEST, no de producción):
+  el regex de regla propia vs. grupo con coma, y `visibility` con lookbehind para no casar
+  `backface-visibility` (legítima desde v2).
+
+### Pendiente (NO lo hago yo)
+
+- **`stryker.config.json`**: añadir `src/components/carrusel-logica.ts` a `mutate` (prohibido
+  tocarlo en este encargo) — el módulo nació para mutarse al 100 %.
+- Re-judge + re-mutación (`Galeria.tsx`, `galeria-logica.ts`, `carrusel-logica.ts`, break 100).
+  Avisos al mutation_tester: los DOS `Stryker disable` de deps constantes (matchMedia y teclado)
+  y el de `arranqueExplicito` siguen documentados en el propio fichero.
+- Suite completa + build + puertas: el lead.
+- Verificación EN VIVO en Chrome: posición FINA de los mandos de cristal (contrato @s24), el
+  teclado real con scroll (jsdom no sabe de visibilidad de verdad, @s23), el gesto físico del
+  arrastre, y el PEOR caso de 1.4.11 del cristal (glifo/borde sobre foto clara) para el auditor
+  a11y — el 78 % de `--surface` es el punto de partida del brief, no un byte aseverado.
