@@ -72,6 +72,67 @@ describe('@s12 la dirección se muestra como TEXTO derivado de DIRECCION (fuente
   })
 })
 
+/* =============================================================================================
+ * REMATE DE MUTACIÓN (progress/mutation_contacto.md): la capa DEMO post-judge (horario, mapa,
+ * clases demo-*) evolucionó el componente sin extender este fichero, que es el que la mutación ve.
+ * Los 6 tests siguientes matan a los 6 sobrevivientes de `Contacto.tsx`. Literales A MANO.
+ * ============================================================================================= */
+
+describe('el horario visible se hornea con sus TRES filas (dato real de F-10)', () => {
+  // Mata al mutante `horario.map(() => undefined)` (Contacto.tsx:35): sin estas aserciones el
+  // bloque del horario desaparecía ENTERO del render sin que la suite se enterara. Las tres filas
+  // van A MANO, con el guion LARGO «–» (U+2013) de la presentación, no el «-» del dato de F-02.
+  it('cada fila empareja sus días con su franja: L-V 10:00–20:00, Sábado 10:00–14:00 y Domingo Cerrado', () => {
+    const horneado = renderToString(<Contacto />)
+
+    expect(horneado).toMatch(/>Lunes a Viernes<\/span><span[^>]*>10:00–20:00</)
+    expect(horneado).toMatch(/>Sábado<\/span><span[^>]*>10:00–14:00</)
+    expect(horneado).toMatch(/>Domingo<\/span><span[^>]*>Cerrado</)
+  })
+})
+
+describe('el enlace «Cómo llegar» abre Google Maps con las coordenadas verificadas de F-02', () => {
+  // Mata al mutante ESTÁTICO que vacía MAPS_HREF (Contacto.tsx:20): un href vacío rompería el
+  // enlace de Maps en producción sin que la suite se enterara. La URL va ESCRITA A MANO desde las
+  // coordenadas [V] (40.5179875, -3.9226688); React escapa el «&» del atributo como «&amp;».
+  it('el href es EXACTAMENTE el formato oficial Maps URLs ?api=1&query=lat%2Clng', () => {
+    expect(renderToString(<Contacto />)).toMatch(
+      /<a\b[^>]*href="https:\/\/www\.google\.com\/maps\/search\/\?api=1&amp;query=40\.5179875%2C-3\.9226688"[^>]*>Cómo llegar<\/a>/,
+    )
+  })
+})
+
+describe('las clases demo del layout sobreviven en el horneado (Stryker SÍ muta los template literals)', () => {
+  // Matan a los 4 mutantes que vacían los className compuestos (Contacto.tsx:26,27,64,77): perder
+  // esas clases destroza el layout demo EN SILENCIO. Son clases GLOBALES literales, observables
+  // bajo css:false; se lee el atributo class del horneado (patrón equipo.test.tsx:128-138), sin
+  // toHaveClass y sin ningún className condicional.
+  it('la <section> lleva demo-seccion y la rejilla demo-contenedor', () => {
+    const horneado = renderToString(<Contacto />)
+    const seccion = /<section[^>]*class="([^"]*)"/.exec(horneado)
+
+    expect(seccion, 'la <section> no declara class').not.toBeNull()
+    expect((seccion as RegExpExecArray)[1]).toContain('demo-seccion')
+
+    // La rejilla es el PRIMER <div> con class del horneado (los demás módulos css quedan undefined).
+    const rejilla = /<div[^>]*class="([^"]*)"/.exec(horneado)
+
+    expect(rejilla, 'la rejilla no declara class').not.toBeNull()
+    expect((rejilla as RegExpExecArray)[1]).toContain('demo-contenedor')
+  })
+
+  it('el CTA de WhatsApp viste demo-btn demo-btn--wa y «Cómo llegar» demo-btn demo-btn--solido', () => {
+    const horneado = renderToString(<Contacto />)
+
+    expect(horneado).toMatch(
+      /<a\b[^>]*class="[^"]*demo-btn demo-btn--wa[^"]*"[^>]*>Escríbenos por WhatsApp<\/a>/,
+    )
+    expect(horneado).toMatch(
+      /<a\b[^>]*class="[^"]*demo-btn demo-btn--solido[^"]*"[^>]*>Cómo llegar<\/a>/,
+    )
+  })
+})
+
 describe('@s14 el texto visible del enlace de Instagram es el handle y es CONSISTENTE con su href', () => {
   it('@s14 el enlace de IG muestra "@nailslash.studio_" y su href es la URL derivada', () => {
     // Texto visible = el handle; href = la URL. Ambos ESCRITOS A MANO. Réplica del @s8 de F-02.

@@ -286,8 +286,9 @@
       "mutable": true,
       "bloqueada_para_publicar": "El email (centroesteticarozas@gmail.com aparece solo en el JSON-LD de la web actual, nunca visible) hay que confirmarlo con el cliente.",
       "sdd": true,
-      "status": "in_progress",
-      "puerta_humana": "APROBADO por el humano el 2026-07-18 (lote A). Contrato features/contacto.feature (15 escenarios) + borrador progress/spec_draft_contacto.md. Revision adversarial: 1 BLOQUEANTE reparado (vacuidad en negativas de #contacto → ahora con ancla positiva; email/TikTok vigilados en TODA la pagina head+body, no solo #contacto) + 4 graves + 4 menores. Decisiones: instagramHref anadido a site.ts (derivacion pura), email OMITIDO en la demo hasta confirmar, frontera F-13 (F-12 da tel: accesible, NO el boton WhatsApp), reutiliza el stub #contacto-titulo (no rompe la puerta de anclas de F-06), TikTok NO."
+      "status": "done",
+      "puerta_humana": "APROBADO por el humano el 2026-07-18 (lote A). Contrato features/contacto.feature (15 escenarios) + borrador progress/spec_draft_contacto.md. Revision adversarial: 1 BLOQUEANTE reparado (vacuidad en negativas de #contacto → ahora con ancla positiva; email/TikTok vigilados en TODA la pagina head+body, no solo #contacto) + 4 graves + 4 menores. Decisiones: instagramHref anadido a site.ts (derivacion pura), email OMITIDO en la demo hasta confirmar, frontera F-13 (F-12 da tel: accesible, NO el boton WhatsApp), reutiliza el stub #contacto-titulo (no rompe la puerta de anclas de F-06), TikTok NO.",
+      "cierre": "CERRADA 2026-07-23 (TDD verde y judge APROBADO desde el 2026-07-19; faltaba la puerta de mutación). Mutación inicial 90.59% con 8 supervivientes TODOS matables (2 en site.ts: mensajes de error mudos; 6 en Contacto.tsx: capa demo post-judge — horario visible, MAPS_HREF, clases demo-*), documentados en progress/mutation_contacto.md. El tdd_craftsman añadió los 8 tests matadores sin tocar producción (progress/tdd_contacto.md § Remate). RE-MEDICIÓN: site.ts 100% y Contacto.tsx 100%, 0 exclusiones nuevas. Cumple la deuda de F-10: el horario visible queda aseverado con literales a mano."
     },
     {
       "id": 13,
@@ -461,13 +462,41 @@
         "Verificación EN VIVO con Chrome tras el TDD: font-family computado del body resuelve a Manrope (document.fonts.check('16px Manrope')) y el de un <h2> a Gilda Display (document.fonts.check('24px Gilda Display')); el woff2 de Gilda Display se descarga de /assets sin esquema http(s)",
         "Regresión en vivo: el <h1> del hero sigue en Great Vibes/Manrope (F-07), cabecera/nav/pie siguen en Manrope (F-06), ningún color cambia (F-03) y no hay peticiones a googleapis/gstatic (F-05); pnpm build exit 0 con las CINCO puertas"
       ],
-      "depends_on": ["cero_terceros", "cascaron_semantico", "hero_marca"],
+      "depends_on": [
+        "cero_terceros",
+        "cascaron_semantico",
+        "hero_marca"
+      ],
       "mutable": false,
       "nota_mutacion": "Nada que mutar: es SCSS. Stryker no ve SCSS y src/styles/ no está en la lista mutate. No lleva mutate propio y se declara aquí en vez de fingir cobertura (igual que F-08).",
       "sdd": true,
       "status": "done",
       "puerta_humana": "APROBADO por el humano el 2026-07-18 (lote A). Feature NUEVA nacida de la deuda de F-07 (el body global no fijaba font-family). Contrato features/tipografia_global.feature (9 escenarios) + borrador progress/spec_draft_tipografia_global.md. Revision adversarial: 0 bloqueantes, 2 graves (grep [V] impreciso; contradiccion h2,h3 una regla o dos) + 4 menores reparados. Decisiones: body Manrope, h2/h3 Gilda Display, partial nuevo _tipografia.scss (no tocar _base.scss de F-04), mutable:false (SCSS).",
       "cierre": "CERRADA 2026-07-18 (lote A). 9 escenarios: @s1-@s7 por TDD estricto leyendo el SCSS; @s8/@s9 por verificacion EN VIVO con Chrome. Partial nuevo src/styles/_tipografia.scss (body 'Manrope',system-ui,sans-serif; h2,h3 'Gilda Display',serif regla conjunta) + @use 'tipografia' en main.scss. NO toca _base.scss/_tokens.scss (F-03/F-04) ni hero.module.scss (F-07) ni cabecera/nav/pie (F-06). judge APROBADO (0 bloqueantes, 2 menores). Mutacion N/A (SCSS, mutable:false, declarado). 679 tests (664 +15), typecheck/lint 0, pnpm build exit 0 con las CINCO puertas (Gilda Display horneado por primera vez sin romper la de terceros). VERIFICACION EN VIVO con Chrome: body computed = 'Manrope,system-ui,sans-serif' (era Times New Roman), h2 'Servicios' computed = 'Gilda Display',serif, document.fonts.check Manrope+Gilda Display = true y ambas loaded; REGRESION F-07 OK (hero sigue en 'Great Vibes',cursive); 0 peticiones a terceros (F-05 intacto). Arregla la deuda declarada en el cierre de F-07 (el body global no fijaba font-family)."
+    },
+    {
+      "id": 22,
+      "name": "galeria_carrusel",
+      "title": "Galería «Nuestros trabajos»: carrusel coverflow 3D en domo con autoplay accesible",
+      "description": "Transforma el carrusel plano scroll-snap de la demo (PR #5) en un coverflow 3D en domo ∩: tarjeta activa elevada y a escala, laterales con rotateY saturante (34°→48°), caída de domo y opacidad reducida; sin transform-style: preserve-3d (orden de pintado por z-index determinista, no por Newell). Autoplay de 4 s con botón de pausa/inicio visible (WCAG 2.2 SC 2.2.2), pausa por hover/foco con reglas distintas de reanudación, reduced-motion arranca pausado. Bucle infinito aritmético (doble módulo, sin clonar nodos) con transition:none en la tarjeta oculta para el salto. Navegación por flechas, puntos indicadores con dos tokens (SC 1.4.11) y clic-en-lateral que centra. Móvil: 3D suavizado con asomo de vecinas y arrastre por Pointer Events.",
+      "acceptance": [
+        "Los 18 escenarios de features/galeria_carrusel.feature verdes por TDD: regresión (@s1–@s2), aritmética del bucle con doble módulo (@s3–@s5), árbol de accesibilidad APG (@s6–@s8), autoplay y pausas (@s9–@s12), SCSS 3D (@s13–@s15), navegación manual (@s16–@s18)",
+        "judge APROBADO contra el contrato + brief progress/galeria_coverflow_diseno.md",
+        "Auditoría a11y específica (SC 2.2.2, 1.4.11 con ratios calculados, patrón carousel del APG, teclado, reduced-motion) sin bloqueantes",
+        "Mutación al 100% sobre src/components/galeria-logica.ts y src/components/Galeria.tsx (añadidos a stryker.config.json)",
+        "Verificación EN VIVO con Chrome real: autoplay avanza y respeta la pausa, transforms 3D computados (rotateY/translate/scale) con domo ∩, salto del bucle sin barrido visible, reduced-motion arranca pausado",
+        "pnpm build exit 0 con las CINCO puertas y suite completa sin regresión (base 956 → 1074+ tests)"
+      ],
+      "depends_on": [
+        "tokens_paleta_contraste",
+        "cero_terceros",
+        "cascaron_semantico"
+      ],
+      "mutable": true,
+      "sdd": true,
+      "status": "done",
+      "puerta_humana": "Decisiones de diseño aprobadas por el humano el 2026-07-22 en conversación: silueta domo ∩ (centro elevado, lados caen), autoplay 4 s por foto, móvil con 3D suavizado y asomo de vecinas; autonomía explícita delegada para el resto de decisiones («hazlo tú el 100% de forma autónoma»). Contrato features/galeria_carrusel.feature reescrito de 7 a 18 escenarios. Enmiendas 1-2 del contrato bajo la misma autonomía delegada: E1 = hallazgos de judge/a11y (arrastre @s19, diana 24px, pointer-events, listener en caliente); E2 = bug medido en Chrome real.",
+      "cierre": "CERRADA 2026-07-23. Contrato features/galeria_carrusel.feature v2.2: 19 escenarios (@s1-@s18 originales + @s19 arrastre por Enmienda 1; Enmienda 2 tras bug MEDIDO en vivo). 148 tests de galería (73 componente + 50 lógica + 25 estilos). judge: v1 RECHAZADO (4 cambios, todos anticipos de mutación) → v2 APROBADO → v3 delta APROBADO (progress/judge_galeria_carrusel*.md). Auditoría a11y APTO (progress/a11y_galeria_carrusel.md): ratios reales 4.19:1-6.19:1, SC 2.2.2/1.4.11/2.5.8 cerrados (diana 24px con circulo de 12px en ::before). MUTACIÓN 100%/100% (galeria-logica.ts y Galeria.tsx; 2 equivalentes verificados con exclusión documentada, precedente HOST_WHATSAPP; progress/mutation_galeria_carrusel.md). VERIFICACIÓN EN VIVO con Chrome real por CDP (WSL mirrored + chrome.exe headless): 36/36 — domo ∩ medido en matrices computadas, autoplay 4s cronometrado, pausa SC 2.2.2, arrastre físico (bug del drag nativo de <img> que se tragaba el pointerup: CAZADO en vivo, refutado/confirmado con contraprueba draggable=false, arreglado por Enmienda 2 con touch-action: pan-y), reduced-motion en frío y EN CALIENTE, cero terceros (92 peticiones locales). pnpm build 5 puertas. Suite 1119 tests. Capturas escritorio/móvil inspeccionadas."
     }
   ],
   "no_se_construyen": [

@@ -323,3 +323,52 @@ describe('@s13 openingHoursSpecification devuelve el array schema.org — dayOfW
     }
   })
 })
+
+/**
+ * Remate de deuda de mutación (2026-07-23) — los 13 mutantes ESTÁTICOS de `horario.ts`: los
+ * inicializadores de módulo (`CADENA_CERRADO`, `ZONA`, `FORMATO_MADRID` y sus 6 opciones) y el corte
+ * de `parsearFranjas` (línea 43), que también se ejecuta al derivar `HORARIO_SEMANAL` durante la
+ * CARGA. El import ESTÁTICO de la cabecera se evalúa UNA sola vez por fichero; si el mutante se
+ * activa DESPUÉS de esa evaluación, la mutación nunca llega a ejecutarse y sobrevive con la suite
+ * entera en verde (medido: `bin/harness mutate src/lib/horario.ts` → 13 supervivientes con «Ran all
+ * tests», pese a que CUALQUIERA de las 13 mutaciones aplicada a mano ROMPE la carga del módulo —
+ * `parsearFranjas('cerrado')` acaba en `aMinutos(undefined)` y lanza; `Intl.DateTimeFormat` con
+ * locale u opciones `''` lanza `RangeError`; sabotajes medidos en
+ * `progress/tdd_deuda_mutacion_full.md`).
+ *
+ * La cura: re-evaluar el módulo FRESCO dentro del test (`vi.resetModules()` + import dinámico) y
+ * re-aseverar el contrato por VALOR sobre esa instancia. Así la evaluación de los inicializadores
+ * ocurre EN tiempo de test, con el mutante ya activo: la mutación o revienta el `import` (el test
+ * falla) o falsea las franjas/filas (la aserción falla). Literales A MANO (anti-tautología),
+ * instantes UTC-`Z`, como en el resto del fichero.
+ */
+describe('mutantes estáticos: el módulo re-evaluado FRESCO cumple el contrato por valor', () => {
+  async function horarioFresco(): Promise<typeof import('./horario.ts')> {
+    vi.resetModules()
+
+    return import('./horario.ts')
+  }
+
+  it('@s8/@s9 fresco: parsearFranjas("cerrado") → [] y HORARIO_SEMANAL trae L-V {600,1200}, sábado {600,840} y domingo []', async () => {
+    const fresco = await horarioFresco()
+
+    expect(fresco.parsearFranjas('cerrado')).toEqual([])
+    expect(fresco.parsearFranjas('10:00-20:00')).toEqual([{ abre: 600, cierra: 1200 }])
+    expect(fresco.HORARIO_SEMANAL.Monday).toEqual([{ abre: 600, cierra: 1200 }])
+    expect(fresco.HORARIO_SEMANAL.Saturday).toEqual([{ abre: 600, cierra: 840 }])
+    expect(fresco.HORARIO_SEMANAL.Sunday).toEqual([])
+  })
+
+  it('@s2/@s4/@s11 fresco: estaAbierto sigue la hora de pared de Madrid y horarioParaUI conserva sus 3 filas', async () => {
+    const fresco = await horarioFresco()
+
+    expect(fresco.estaAbierto(new Date('2026-01-12T09:00:00Z'))).toBe(true)
+    expect(fresco.estaAbierto(new Date('2026-01-12T19:00:00Z'))).toBe(false)
+    expect(fresco.estaAbierto(new Date('2026-07-13T08:30:00Z'))).toBe(true)
+    expect(fresco.horarioParaUI(fresco.HORARIO_SEMANAL)).toEqual([
+      { dias: 'Lunes a Viernes', franja: '10:00–20:00' },
+      { dias: 'Sábado', franja: '10:00–14:00' },
+      { dias: 'Domingo', franja: 'Cerrado' },
+    ])
+  })
+})

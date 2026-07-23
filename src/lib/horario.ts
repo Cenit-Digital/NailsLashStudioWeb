@@ -25,10 +25,23 @@ export interface ExcepcionHorario {
   readonly franjas: readonly Franja[]
 }
 
+// [DEUDA MUTACIÓN 2026-07-23 — contexto común de las exclusiones «Stryker disable» de este fichero]
+// Los excluidos (14: los 13 del informe + el ===→!== del if, mismo caso, «killed» una vez por
+// artefacto) son mutantes ESTÁTICOS (inicializadores evaluados al CARGAR el módulo) que el
+// vitest-runner NO llega a activar: cada mutación, aplicada DE VERDAD por sabotaje a mano, revienta
+// la carga del módulo y pone `horario.test.ts` ENTERO en rojo — la suite los mata; que sobrevivan a
+// «todos los tests» prueba que NUNCA estuvieron activos en la corrida. Medición mutante a mutante en
+// progress/tdd_deuda_mutacion_full.md (Familia B y Resolución del lead). Decisión del lead:
+// exclusión QUIRÚRGICA por línea y por MUTADOR (precedentes: HOST_WHATSAPP site.ts:72, deps de
+// Equipo.tsx:214, Galeria.tsx:90/136), NI `ignoreStatic` global NI puerta roja. NADA más de este
+// fichero queda excluido: el resto se mide (incluido el ObjectLiteral de las opciones de Intl, que
+// COMPARTE línea con el 'en-CA' excluido pero el runner SÍ lo mata — por eso ahí no se usa `all`).
 const MINUTOS_POR_HORA = 60
+// Stryker disable next-line StringLiteral: ESTÁTICO no activado por el runner; '' rompe la carga (diario 2026-07-23)
 const CADENA_CERRADO = 'cerrado'
 const SEPARADOR_FRANJA = '-'
 const SEPARADOR_HORA = ':'
+// Stryker disable next-line StringLiteral: ESTÁTICO no activado; ZONA mutada lanza RangeError en la carga (diario 2026-07-23)
 const ZONA = 'Europe/Madrid'
 
 /** `'10:00' → 600`, `'20:00' → 1200`, `'14:00' → 840`, `'13:59' → 839`. `hora*60 + minuto`. */
@@ -40,6 +53,7 @@ export function aMinutos(hhmm: string): number {
 
 /** `'10:00-20:00' → [{600, 1200}]`; `'cerrado' → []` (la lista vacía ES el «cerrado»). */
 export function parsearFranjas(texto: string): readonly Franja[] {
+  // Stryker disable next-line all: 4 ESTÁTICOS no activados (condición ×2, ===→!== y el cuerpo del if); corren al derivar HORARIO_SEMANAL en la carga. El informe original contó 3 aquí: el ===→!== salió «killed» UNA vez por artefacto de scheduling, pero sobrevive siempre que se le mide aislado — 2 corridas de evidencia en el diario (2026-07-23).
   if (texto === CADENA_CERRADO) {
     return []
   }
@@ -80,8 +94,12 @@ interface HoraDePared {
   readonly fecha: string
 }
 
+// Stryker disable next-line StringLiteral: ESTÁTICO ('en-CA') no activado; el locale mutado lanza en la carga (diario 2026-07-23). El ObjectLiteral de esta línea SIGUE medido.
 const FORMATO_MADRID = new Intl.DateTimeFormat('en-CA', {
   timeZone: ZONA,
+  // Stryker disable StringLiteral: 7 ESTÁTICOS (opciones de Intl) no activados por el runner; cada
+  // '' lanza RangeError en la carga y pone el fichero entero en rojo — sabotaje medido en
+  // progress/tdd_deuda_mutacion_full.md (2026-07-23)
   weekday: 'long',
   year: 'numeric',
   month: '2-digit',
@@ -90,6 +108,7 @@ const FORMATO_MADRID = new Intl.DateTimeFormat('en-CA', {
   minute: '2-digit',
   hourCycle: 'h23',
 })
+// Stryker restore StringLiteral
 
 function horaDePared(instante: Date): HoraDePared {
   const partes: Record<string, string> = Object.fromEntries(

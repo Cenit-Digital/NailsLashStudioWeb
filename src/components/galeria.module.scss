@@ -1,53 +1,161 @@
-// La galería de trabajos (capa visual del DEMO). Carrusel scroll-snap nativo + flechas.
+// La galería de trabajos: CARRUSEL COVERFLOW 3D EN DOMO (∩). La tarjeta centrada se ELEVA; las
+// laterales CAEN, giran hacia dentro, encogen y se apagan. Contrato:
+// `features/galeria_carrusel.feature` (@s13, @s14, @s15, @s17). Su red son los BYTES de este
+// fichero, que lee `galeria-estilos.test.ts`: Stryker no ve CSS y la puerta de contraste solo lee
+// `_tokens.scss`.
+//
+// EL REPARTO: TypeScript decide (distancia, signo, capa, etiquetas) y el SCSS mide (perspectiva,
+// arco, curva, breakpoints). El puente es `[data-distancia='N']` + la variable `--s`.
+//
+// 🔴 Aquí NO se declara `transform-style`. Con la geometría apilada, el orden de pintado lo
+// decidiría el algoritmo de Newell y el `z-index` solo ordenaría elementos COPLANARES — las
+// laterales están rotadas. Sin él, cada tarjeta crea contexto de apilamiento por su propio
+// `transform` y el `z-index` inline es la autoridad, determinista en todos los motores. La
+// perspectiva del padre sigue aplicando igual (spec CSS Transforms 2 §4.1.1). ES DELIBERADO.
 
-.cabecera {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin-bottom: 2rem;
+.galeria {
+  overflow: hidden;
 }
 
-.flechas {
+.carrusel {
+  position: relative;
+  margin-top: 2rem;
+}
+
+// Los mandos viven FUERA del escenario con perspectiva: `overflow`, `transform` y `opacity` son los
+// tres asesinos del anillo de foco (SC 2.4.7), y la tarjeta central elevada podría tapar del todo
+// un control que viviera dentro (SC 2.4.11).
+.mandos {
   display: flex;
+  justify-content: flex-end;
   gap: 0.625rem;
+  margin-bottom: 1rem;
+}
 
-  button {
-    width: 2.75rem;
-    height: 2.75rem;
-    border-radius: 50%;
-    border: 1px solid var(--border-interactive);
-    background: var(--surface);
-    color: var(--accent-dark);
-    font-size: 1.125rem;
-    cursor: pointer;
+.rotacion,
+.flecha {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  border: 1px solid var(--border-interactive);
+  background: var(--surface);
+  color: var(--accent-dark);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
 
-    &:hover {
-      border-color: var(--accent-dark);
-    }
+  &:hover {
+    border-color: var(--accent-dark);
   }
 }
 
-.pista {
-  display: flex;
-  gap: 1.25rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding-bottom: 0.5rem;
-  scrollbar-width: thin;
+// EL RECORTE VIVE AQUÍ, nunca en el elemento con perspectiva: allí aplanaría el 3D.
+.marco {
+  overflow: hidden;
+  // [ENMIENDA 2, @s19] El marco es el dueño del gesto HORIZONTAL; el vertical se le cede al
+  // navegador. Sin esto, en táctil el navegador reclama el gesto para hacer scroll y dispara
+  // pointercancel: el arrastre muere sin pointerup.
+  touch-action: pan-y;
 }
 
-.tile {
-  flex: 0 0 auto;
-  width: 300px;
-  max-width: 80vw;
+// EL ESCENARIO: el único punto de fuga de las seis tarjetas. La perspectiva va como PROPIEDAD del
+// contenedor; dentro de la lista de transforms de cada tarjeta daría seis puntos de fuga distintos,
+// que son seis volteos independientes en vez de un coverflow.
+.escenario {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 2.5rem 0 3.5rem;
+  perspective: 1200px;
+}
+
+.tarjeta {
+  // Las seis comparten celda: el arco lo dibuja el `transform`, jamás el flujo del documento.
+  grid-area: 1 / 1;
+  width: min(320px, 78vw);
   aspect-ratio: 4 / 3;
   border-radius: 20px;
-  scroll-snap-align: start;
+  cursor: pointer;
+  backface-visibility: hidden;
+  box-shadow: 0 30px 60px color-mix(in srgb, var(--accent) 14%, transparent);
+
+  // Los valores por defecto: la lista de funciones es SIEMPRE la misma y SIEMPRE completa.
+  --s: 0;
+  --x: 0%;
+  --y: 0px;
+  --z: 0px;
+  --giro: 0deg;
+  --escala: 1;
+  --opacidad: 1;
+
+  // UNA sola declaración, parametrizada, en el orden traslación → giro → escala. Girar antes de
+  // trasladar daría un anillo cilíndrico; escalar antes multiplicaría la separación por la escala.
+  // Cada variable lleva su valor de RESERVA: si una llegara vacía, la declaración entera caería a
+  // su valor inicial y las seis tarjetas se apilarían en el centro sin ningún error en consola.
+  transform: translate3d(calc(var(--s, 0) * var(--x, 0%)), var(--y, 0px), var(--z, 0px))
+    rotateY(calc(var(--s, 0) * var(--giro, 0deg))) scale(var(--escala, 1));
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+
+  // El arco de ESCRITORIO. La caída (`--y`) es una función PAR de la distancia: negativa eleva la
+  // centrada, positiva hunde las laterales. El domo es deliberadamente APLANADO (razón de caída
+  // ≈2,06, sub-cuadrática): uno circular exacto echaría la tarjeta fuera del encuadre.
+  &[data-distancia='0'] {
+    --x: 0%;
+    --y: -18px;
+    --z: 0px;
+    --giro: 0deg;
+    --escala: 1.06;
+    --opacidad: 1;
+  }
+
+  &[data-distancia='1'] {
+    --x: 72%;
+    --y: 26px;
+    --z: -140px;
+    --giro: -34deg;
+    --escala: 0.88;
+    --opacidad: 0.72;
+  }
+
+  // Los ángulos SATURAN (34 → 48 → 52) en vez de crecer linealmente: a 100° la tarjeta pasaría de
+  // perfil y se vería espejada por detrás. Bajo los 90° eso no puede ocurrir.
+  &[data-distancia='2'] {
+    --x: 128%;
+    --y: 84px;
+    --z: -300px;
+    --giro: -48deg;
+    --escala: 0.74;
+    --opacidad: 0.38;
+  }
+
+  // LA OCULTA. Cada tarjeta hace UNA discontinuidad por vuelta (de -2 a +3): si esa transicionara,
+  // barrería todo el escenario de izquierda a derecha en 0,8 s. Entrar aquí es instantáneo e
+  // invisible; salir (+3 → +2) sí transiciona, desde el borde derecho, que es lo natural.
+  // [ENMIENDA 1] `pointer-events: none`: con opacidad 0 y z-index 3 (> 0, @s5), sin esto quedaría
+  // una franja INVISIBLE junto al borde derecho que robaría el clic de centrar de @s18.
+  &[data-distancia='3'] {
+    --x: 150%;
+    --y: 96px;
+    --z: -380px;
+    --giro: -52deg;
+    --escala: 0.7;
+    --opacidad: 0;
+
+    transition: none;
+    pointer-events: none;
+  }
+}
+
+// La opacidad NUNCA en la tarjeta: es una GROUPING PROPERTY y aplanaría su subárbol 3D.
+.lienzo {
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  overflow: hidden;
   background: linear-gradient(160deg, var(--accent-soft), var(--surface2));
   border: 1px solid var(--line);
-  overflow: hidden;
+  opacity: var(--opacidad, 1);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1);
 
   img {
     display: block;
@@ -57,8 +165,110 @@
   }
 }
 
+// El salto del bucle tampoco puede verse desvanecerse: la oculta aparece y desaparece de golpe.
+.tarjeta[data-distancia='3'] .lienzo {
+  transition: none;
+}
+
+.puntos {
+  display: flex;
+  justify-content: center;
+  // [ENMIENDA 1] El hueco se ENCOGE (0.5rem → 0.125rem) para que la separación VISUAL apenas
+  // cambie al crecer la caja: las cajas de 24 px quedan a 2 px y NO se solapan.
+  gap: 0.125rem;
+}
+
+// (N) SC 1.4.11: la diferencia entre el punto ACTUAL y el disponible es un ESTADO y exige ≥ 3:1.
+// Se distinguen por DOS tokens de color distintos, nunca por la opacidad del mismo rosa.
+// [ENMIENDA 1] (N) SC 2.5.8 Target Size (AA, WCAG 2.2): la CAJA interactiva del <button> mide
+// 1.5rem (24 px CSS) por lado; el CÍRCULO visible sigue en 0.75rem (12 px) y lo pinta el ::before,
+// que lleva CONSIGO el anillo de 1px — `background-clip: content-box` recortaría el FONDO pero el
+// borde se pinta siempre en el borde de la caja, así que esa vía queda descartada.
+.punto {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+
+  &::before {
+    content: '';
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    border: 1px solid var(--border-interactive);
+    background: var(--surface);
+  }
+
+  &[data-actual='sí'] {
+    &::before {
+      background: var(--accent-dark);
+      border-color: var(--accent-dark);
+    }
+  }
+}
+
 .nota {
   margin: 1.5rem 0 0;
   color: var(--muted);
   font-size: 0.8125rem;
+}
+
+// EL MÓVIL conserva el 3D pero SUAVIZADO —menos giro, menos separación, menos profundidad— y con
+// las vecinas ASOMANDO. 640px es el breakpoint que YA usa el repo: no se inventa otro.
+@media (max-width: 640px) {
+  .escenario {
+    padding: 1.5rem 0 2.5rem;
+    perspective: 900px;
+  }
+
+  .tarjeta {
+    width: 62vw;
+
+    &[data-distancia='0'] {
+      --y: -8px;
+      --escala: 1.03;
+    }
+
+    &[data-distancia='1'] {
+      --x: 72%;
+      --y: 14px;
+      --z: -80px;
+      --giro: -18deg;
+      --escala: 0.9;
+      --opacidad: 0.6;
+    }
+
+    &[data-distancia='2'] {
+      --x: 122%;
+      --y: 38px;
+      --z: -160px;
+      --giro: -26deg;
+      --escala: 0.8;
+      --opacidad: 0.18;
+    }
+
+    &[data-distancia='3'] {
+      --x: 140%;
+      --y: 44px;
+      --z: -200px;
+      --giro: -28deg;
+      --escala: 0.78;
+      --opacidad: 0;
+    }
+  }
+}
+
+// (T) del APG + (P) del repo: con la preferencia del sistema puesta, el carrusel arranca pausado
+// (lo decide el componente) y aquí, además, se le quita el movimiento residual. MDN describe
+// literalmente este caso: «Animations such as scaling or panning large objects can be vestibular
+// motion triggers».
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta,
+  .lienzo {
+    transition: none;
+  }
 }
