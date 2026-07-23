@@ -42,7 +42,8 @@
     "src/components/carrusel-logica.ts",
     "src/components/Resenas.tsx",
     "src/components/resenas-logica.ts",
-    "src/lib/resenas-agregado.ts"
+    "src/lib/resenas-agregado.ts",
+    "src/components/hero-logica.ts"
   ],
   "thresholds": {
     "high": 100,

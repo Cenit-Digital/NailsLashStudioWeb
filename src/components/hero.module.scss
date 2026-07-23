@@ -20,16 +20,19 @@
 // (x −15,6 → 3965,3 ‰) con margen, así que ya no existe ninguna caja capaz de seccionar los
 // swashes. Ningún `clip-path` recorta ya el rótulo.
 
-// LOS TIEMPOS VAN EN LITERALES, NO EN VARIABLES DE SASS, a propósito: los tests de @s4 LEEN los
-// bytes de este fichero y suman los valores de tiempo. Con `$duracion` verían un símbolo y la cota
-// dejaría de morder. El tope de 4,5 s (espera + duración) lo APROBÓ Pablo el 2026-07-20 por encima
-// del 2,5 s que tenía F-07 por LCP, para que la caligrafía se aprecie:
-//   · el trazo   → 0,1 s de espera + 3,6 s = 3,7 s
-//   · «STUDIO»   → 3,7 s de espera + 0,6 s = 4,3 s (entra EXACTAMENTE al terminar la marca:
-//     3,7 = 0,1 + 3,6. El contrato @s4 exige «no antes», y el judge cazó que antes entraba 0,3 s
-//     ANTES de tiempo mientras el comentario afirmaba lo contrario.)
-// No infringe WCAG 2.2.2 (exige MÁS de cinco segundos) ni 2.3.3 (AAA, y solo cubre animación
-// disparada por interacción). Bajo prefers-reduced-motion todo aparece al instante.
+// LA CALIGRAFÍA LENTA (enmienda 2026-07-23): TODOS los tiempos del rótulo derivan del ÚNICO token
+// `--duracion-caligrafia: 90s` (decisión de Pablo: ≈10 s por letra × 9 letras). Es una CUSTOM
+// PROPERTY de CSS, no una variable de Sass: los tests de @s4 leen los bytes y la RESUELVEN, así
+// que la cota sigue mordiendo. La curva de escribir/recorrer es `linear`: a esta duración el
+// cubic-bezier anterior reptaría en los extremos y correría en el centro; una pluma real escribe
+// a velocidad constante. La coreografía relativa se conserva SOBRE el token:
+//   · el trazo    → 0,1 s de espera + token
+//   · «retirarse» → arranca en calc(token − 0,4 s + 0,1 s)
+//   · «STUDIO»    → arranca en calc(token + 0,2 s) y dura 0,6 s (total ≈90,8 s)
+// ⚠️ Por encima de 5 s, SC 2.2.2 (nivel A) OBLIGA a un mecanismo para parar/saltar — aquí es el
+// control sin cromo de Hero.tsx (@s10-@s14): el propio rótulo completa la firma. El estado
+// «completada» se lee del atributo `data-firma` (abajo). Bajo prefers-reduced-motion todo aparece
+// al instante y el control NO se monta.
 
 // El eyebrow: la línea SOBRE el titular. F-07 fija SOLO su estructura (un <p>); su CONTENIDO de
 // categorías y su estilo fino son F-09. NUNCA un heading.
@@ -39,9 +42,13 @@
 }
 
 // La escena del hero: inline-block para «abrazar» al rótulo y quedar centrada por el text-align.
+// Es la regla RAÍZ del rótulo: aquí vive el ÚNICO reloj de la caligrafía, que heredan trazo,
+// aplicador y «STUDIO». `hero-logica.ts` guarda el espejo (SEGUNDOS_DE_TRAZO) para el timeout del
+// control, y un test los compara: cambiar uno sin el otro pone la suite roja.
 .escena {
   position: relative;
   display: inline-block;
+  --duracion-caligrafia: 90s;
 }
 
 // El <svg> del rótulo. `overflow: visible` para que el aplicador pueda asomar fuera del viewBox
@@ -70,13 +77,12 @@
   fill: var(--ink);
 }
 
-// La línea central que hace de máscara. BASE = trazo COMPLETO (dashoffset 0) = letras VISIBLES:
-// sin animaciones —o con ellas desactivadas— el rótulo se ve entero. El OCULTO (dashoffset 100)
-// vive SOLO en el fotograma de arranque.
+// La línea central que hace de máscara. BASE = trazo COMPLETO (dashoffset 0) = letras VISIBLES
+// y SIN animación (ENMIENDA 2, @s15): sin la clase de «lista» el rótulo se ve entero y quieto
+// desde el primer pintado. El OCULTO (dashoffset 100) vive SOLO en el fotograma de arranque.
 .trazo {
   stroke-dasharray: 100;
   stroke-dashoffset: 0;
-  animation: escribir 3.6s cubic-bezier(0.45, 0, 0.25, 1) 0.1s both;
 }
 
 // El aplicador. BASE = final del recorrido y ya desvanecido: en reposo no estorba al rótulo.
@@ -85,10 +91,6 @@
   offset-rotate: 0deg;
   offset-distance: 100%;
   opacity: 0;
-  animation:
-    recorrer 3.6s cubic-bezier(0.45, 0, 0.25, 1) 0.1s both,
-    aparecer 0.3s linear 0.1s both,
-    retirarse 0.5s linear 3.2s both;
 }
 
 // El OCULTO vive SOLO aquí, en el arranque de cada keyframe, jamás en la base.
@@ -154,7 +156,6 @@
   padding-left: 0.52em;
   margin-top: 0.75rem;
   opacity: 1;
-  animation: revelarStudio 0.6s cubic-bezier(0.45, 0, 0.25, 1) 3.7s both;
 }
 
 @keyframes revelarStudio {
@@ -163,14 +164,75 @@
   }
 }
 
-// C-4 (CRITERIO DE PROYECTO, NO WCAG A/AA): quien pide menos movimiento se queda en la BASE
-// VISIBLE, sin movimiento residual, y el aplicador se OCULTA. `animation: none` deja cada elemento
-// en su valor computado base: el trazo COMPLETO (letras enteras) y «STUDIO» a opacity 1.
-@media (prefers-reduced-motion: reduce) {
+// EL ARRANQUE EN EL MONTAJE (ENMIENDA 2, @s15 — cierra A-3). La caligrafía ya NO arranca con el
+// CSS a secas: las CINCO animaciones del rótulo viven condicionadas a la clase de «lista», que el
+// efecto de montaje de Hero.tsx añade a la escena EN EL MISMO render que monta el botón. Por
+// construcción nunca hay movimiento sin mecanismo para pararlo: nacen juntos y mueren juntos
+// (completar la firma retira clase y botón a la vez). Sin JavaScript la clase jamás llega: se
+// pinta la BASE, que ya es el estado final (@s7). La clase es GLOBAL a propósito (observable bajo
+// css:false en los tests, precedente data-firma) y ESCRITA A MANO en Hero.tsx.
+//
+// `recorrer` comparte con `escribir` duración (el token), retardo y curva: UN reloj, y la punta
+// cae sobre el borde de lo recién pintado por construcción. `retirarse` deriva del token.
+.escena:global(.caligrafia-lista) {
+  .trazo {
+    animation: escribir var(--duracion-caligrafia) linear 0.1s both;
+  }
+
+  .aplicador {
+    animation:
+      recorrer var(--duracion-caligrafia) linear 0.1s both,
+      aparecer 0.3s linear 0.1s both,
+      retirarse 0.5s linear calc(var(--duracion-caligrafia) - 0.4s + 0.1s) both;
+  }
+
+  .heroStudio {
+    animation: revelarStudio 0.6s cubic-bezier(0.45, 0, 0.25, 1)
+      calc(var(--duracion-caligrafia) + 0.2s) both;
+  }
+}
+
+// LA FIRMA COMPLETADA (@s11 por el cliente, @s12 por el fin del reloj). `animation: none` devuelve
+// cada pieza a su BASE, que ES el estado final visible (I-4): toda la tinta (dashoffset 0), el
+// aplicador retirado (opacity 0) y «STUDIO» entero (opacity 1). El estado viaja en `data-firma`
+// (lo escribe Hero.tsx; patrón data-distancia de la galería): los DOS finales, el mismo resultado.
+.escena[data-firma='cliente'],
+.escena[data-firma='reloj'] {
   .trazo,
   .aplicador,
   .heroStudio {
     animation: none;
+  }
+}
+
+// EL CONTROL SIN CROMO (@s10/@s14). Un <button> transparente que cubre EXACTAMENTE la escena del
+// rótulo (inset: 0 sobre el inline-block relativo que lo abraza): sin fondo, sin borde, sin texto.
+// La única pista visual es el cursor. El anillo de foco NO se declara aquí: lo pinta el
+// `:focus-visible` GLOBAL de _base.scss (por eso esta hoja no tiene NINGÚN outline). Solo se monta
+// mientras la caligrafía corre (Hero.tsx), así que jamás tapa el rótulo terminado.
+.control {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+// C-4 (CRITERIO DE PROYECTO, NO WCAG A/AA): quien pide menos movimiento se queda en la BASE
+// VISIBLE, sin movimiento residual, y el aplicador se OCULTA. `animation: none` deja cada elemento
+// en su valor computado base: el trazo COMPLETO (letras enteras) y «STUDIO» a opacity 1.
+// ⚠️ Los selectores repiten la clase de «lista» (ENMIENDA 2) a PROPÓSITO: un @media no añade
+// especificidad, y con `.trazo` a secas este bloque PERDERÍA contra el bloque condicionado de
+// arriba justo en el único caso en que ambos aplican (reduce activado con la firma en marcha).
+// A igual especificidad gana este, que va después en la hoja — reduce manda al instante, sin JS.
+@media (prefers-reduced-motion: reduce) {
+  .escena:global(.caligrafia-lista) {
+    .trazo,
+    .aplicador,
+    .heroStudio {
+      animation: none;
+    }
   }
 
   .aplicador {

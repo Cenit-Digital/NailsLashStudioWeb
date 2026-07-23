@@ -529,3 +529,34 @@ escenarios. La **revisión adversarial (5 lentes) cazó 2 BLOQUEANTES antes de e
   `Galeria.tsx` con `git checkout --` y lo RECUPERÓ byte-exacto del source del informe de Stryker
   (validado independientemente: 197/197); (c) tercera variante del ENOENT de sandbox (por `dist/`)
   → `"dist"` añadido a `ignorePatterns` de stryker.config.json.
+
+## 2026-07-23 (noche) — la caligrafía LENTA del hero (≈90 s) con el rótulo como control · CERRADA
+
+- **Encargo de Pablo**: la firma «Nails Lash» iba «esquizofrénica» (3,6 s el trazo); pidió ≈10 s
+  por letra → **90 s de caligrafía**, y probarla yo como usuario. Decidió además SIN NINGÚN botón
+  visible — y a >5 s el mecanismo de parar es (N) SC 2.2.2 nivel A: conciliación comunicada y
+  aplicada: **el rótulo ES el control** (botón transparente superpuesto, «Completar la firma»,
+  cursor pointer, foco por el anillo global; cero cromo).
+- **Diseño**: token único `--duracion-caligrafia: 90s` del que TODO deriva por `calc()` (tinta y
+  aplicador en UN reloj, curva `linear`: a velocidad constante las letras complejas tardan más
+  solas); `hero-logica.ts` nuevo con las decisiones puras. Invariantes de F-07 INTACTOS (h1, spans,
+  text node, nombre accesible, base = estado final, cero terceros); F-07 NO se reabre (precedente
+  de la reescritura demo).
+- **Contrato** features/hero.feature: 14 → **17 escenarios** en dos enmiendas. La 2ª, salida de la
+  auditoría a11y (APTO CON AVISOS, dictamen honesto del mecanismo sin cromo: «cumplimiento
+  defendible», decisión del cliente documentada): **A-3** las animaciones arrancan SOLO al montar
+  (clase de hidratación) ⇒ el mecanismo existe SIEMPRE que hay movimiento y sin JS el rótulo se ve
+  COMPLETO y estático; **A-2** el foco se recoloca al desmontarse el botón (las tres vías);
+  **A-5** reduce EN CALIENTE completa la firma y desmonta el control.
+- **Puertas**: judge APROBADO (14/14, reloj único aseverado en ambas direcciones) + delta APROBADO
+  (Enmienda 2) · mutación **100 %/100 %** (`hero-logica` 16/16; `Hero.tsx` 50/50 con 1 equivalente
+  deps-[] ratificado — el anticipado por el diario, verificado por sabotaje con suite 1361/1361) ·
+  build 5 puertas · **EN VIVO 13/13**: 90 000 ms exactos `linear` con delta de reloj 0 ms,
+  fotogramas inspeccionados a ojo (t=5 s el rizo de la N; t=45 s «Nails» justo acabado; t=90 s
+  firma completa), ritmo real medido (6 016 ms de avance en 6 s), clic y Enter completan, sin JS
+  estático completo, reduce en caliente, **LCP 148 ms** (el titular sigue sin ser el elemento LCP),
+  cero terceros.
+- **Incidente de herramienta, declarado**: el WebSocket nativo de Node (undici) contra el CDP
+  murió repetidas veces en corridas largas con muchas capturas; el remedio fue trocear la sonda en
+  sesiones cortas (mini-sonda para los 4 checks finales) y hacer ATÓMICOS los pares espera+acción
+  (una espera y su clic en evaluaciones separadas pueden caer en documentos distintos al navegar).

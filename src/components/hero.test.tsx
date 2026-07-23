@@ -1,6 +1,7 @@
-import { render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { renderToString } from 'react-dom/server'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { cuantosH1 } from '../lib/puerta-cascaron'
 import { seccionesNavegables } from '../lib/puerta-anclas'
@@ -467,5 +468,459 @@ describe('@demo el aplicador: <svg> aria-hidden hermano del h1, autohospedado, r
     // un lector diría «Nails Lash» dos veces.
     const svg = /<svg\b[^>]*>/.exec(horneado)?.[0] ?? ''
     expect(svg).toContain('aria-hidden="true"')
+  })
+})
+
+/* ——————————————————————————————————————————————————————————————————————————————————————————————
+ * ENMIENDA 2026-07-23 — LA CALIGRAFÍA LENTA: el control sin cromo (@s10-@s14).
+ *
+ * A ≈90 s el mecanismo para parar/saltar es OBLIGATORIO (SC 2.2.2, nivel A — PROHIBIDO citarlo
+ * como opcional). La forma respeta a Pablo («sin nada de botones»): el propio rótulo es el
+ * control — un <button> transparente superpuesto, FUERA del <h1>. jsdom NO anima: aquí se asevera
+ * el DOM (montaje, activación, desmontaje, ARIA); los tiempos van por BYTES en hero-estilos y en
+ * hero-logica; la vivencia real, EN VIVO en Chrome.
+ *
+ * `matchMedia` va GUARDADO en Hero.tsx (jsdom 25 no lo trae): el stub de abajo es el patrón de
+ * galeria.test.tsx @s12 — responde `matches` SOLO a la consulta EXACTA, escrita A MANO.
+ * —————————————————————————————————————————————————————————————————————————————————————————————— */
+
+/** El nombre accesible del control, ESCRITO A MANO (contrato @s10). */
+const NOMBRE_DEL_CONTROL = 'Completar la firma'
+
+/**
+ * La clase de «lista» (ENMIENDA 2, @s15/@s7/@s13 — cierra A-3): GLOBAL y ESCRITA A MANO, jamás la
+ * clase del CSS module (bajo `css: false` las del module son undefined; precedente `data-firma`).
+ * El SCSS condiciona TODAS las animaciones del rótulo a ella (bytes en hero-estilos @s15).
+ */
+const CLASE_LISTA = 'caligrafia-lista'
+
+function stubDeMatchMedia(conPreferencia: boolean) {
+  // Los dos listeners ESPIADOS (ENMIENDA 2, @s17): la preferencia se escucha EN CALIENTE con el
+  // patrón ya contratado en galeria.test.tsx @s12 — captura del manejador y disparo manual.
+  const escuchar = vi.fn()
+  const dejarDeEscuchar = vi.fn()
+
+  vi.stubGlobal('matchMedia', (consulta: string) => ({
+    // La media query va ESCRITA A MANO: si Hero.tsx preguntara por otra, `matches` sería false.
+    matches: conPreferencia && consulta === '(prefers-reduced-motion: reduce)',
+    media: consulta,
+    addEventListener: escuchar,
+    removeEventListener: dejarDeEscuchar,
+  }))
+
+  return { escuchar, dejarDeEscuchar }
+}
+
+/** El movimiento PERMITIDO: matchMedia existe y la preferencia de reduce NO casa. */
+function conMovimientoPermitido() {
+  return stubDeMatchMedia(false)
+}
+
+/** El manejador que Hero registró con addEventListener('change'), capturado del espía. */
+function manejadorDelCambio(
+  escuchar: ReturnType<typeof vi.fn>,
+): (cambio: { matches: boolean }) => void {
+  expect(escuchar).toHaveBeenCalledWith('change', expect.any(Function))
+
+  return escuchar.mock.calls[0][1] as (cambio: { matches: boolean }) => void
+}
+
+afterEach(() => {
+  vi.useRealTimers()
+  vi.unstubAllGlobals()
+})
+
+describe('@s10 el rótulo es el control: un botón transparente con nombre accesible, FUERA del <h1>', () => {
+  it('@s10 mientras la caligrafía corre existe el botón «Completar la firma», sin ningún texto visible', () => {
+    conMovimientoPermitido()
+    render(<Hero />)
+
+    const control = screen.getByRole('button', { name: NOMBRE_DEL_CONTROL })
+
+    // Sin cromo: cero texto (el nombre viaja en aria-label), y es un <button> NATIVO de verdad
+    // (type="button"): clic, Enter y Espacio vienen de serie, sin listeners de teclado a mano.
+    expect(control.textContent).toBe('')
+    expect(control).toHaveAttribute('type', 'button')
+    expect(control.tagName).toBe('BUTTON')
+  })
+
+  it('@s10 el botón vive FUERA del <h1>: el titular conserva UN h1, dos <span> y el text node de espacio real', () => {
+    conMovimientoPermitido()
+    const { container } = render(<Hero />)
+
+    const h1 = container.querySelector('h1') as HTMLElement
+
+    // La estructura protegida de F-07, INTACTA con el control montado (@s6/@s7 vivos).
+    expect(h1.querySelector('button')).toBeNull()
+    expect(h1.querySelectorAll(':scope > span')).toHaveLength(2)
+    expect(
+      [...h1.childNodes].some(
+        (nodo) => nodo.nodeType === Node.TEXT_NODE && nodo.textContent === ' ',
+      ),
+      'el text node de espacio REAL entre los dos <span> debe seguir ahí',
+    ).toBe(true)
+    expect(screen.getByRole('heading', { level: 1 })).toHaveAccessibleName('Nails Lash Studio')
+    expect(container.querySelectorAll('h1')).toHaveLength(1)
+  })
+
+  it('@s10 al tabular, el botón recibe el foco (el anillo visible lo pinta el :focus-visible GLOBAL de _base.scss)', async () => {
+    conMovimientoPermitido()
+    render(<Hero />)
+
+    const usuario = userEvent.setup()
+
+    await usuario.tab()
+
+    expect(screen.getByRole('button', { name: NOMBRE_DEL_CONTROL })).toHaveFocus()
+  })
+
+  it('@s10 el botón NO viaja en el HTML horneado: se monta en cliente, donde puede funcionar', () => {
+    // El prerender no conoce la preferencia del visitante NI tiene JS que responda al clic: un
+    // botón horneado sería un control muerto. Se monta tras leer matchMedia (patrón galería).
+    expect(renderToString(<Hero />)).not.toContain('<button')
+  })
+})
+
+/** La escena del rótulo: el elemento que publica la fase de la firma en `data-firma`. */
+function escenaDe(container: HTMLElement): HTMLElement {
+  const escena = container.querySelector('[data-firma]')
+
+  expect(escena, 'la escena debe publicar data-firma').not.toBeNull()
+
+  return escena as HTMLElement
+}
+
+describe('@s11 activar el control completa la firma AL INSTANTE y desmonta el botón', () => {
+  // 🎨 El mecanismo: la BASE del SCSS ya es el estado final (I-4 de F-07). Completar = poner
+  // `animation: none` vía `data-firma` (los bytes de esa regla los asevera hero-estilos): toda la
+  // tinta, el aplicador retirado y «STUDIO» visible, sin reflow. Aquí, el DOM: fase y desmontaje.
+  it('@s11 el CLIC pasa la firma de «corriendo» a «cliente» y el botón desaparece del árbol', () => {
+    conMovimientoPermitido()
+    const { container } = render(<Hero />)
+
+    // Antes de activar: la firma corre (estado inicial OBSERVABLE, mata al literal saboteado).
+    expect(escenaDe(container)).toHaveAttribute('data-firma', 'corriendo')
+
+    fireEvent.click(screen.getByRole('button', { name: NOMBRE_DEL_CONTROL }))
+
+    expect(escenaDe(container)).toHaveAttribute('data-firma', 'cliente')
+    // Ya no hay nada que completar: el botón se desmonta y el rótulo queda descubierto.
+    expect(screen.queryByRole('button')).toBeNull()
+  })
+
+  it('@s11 Enter con el foco también completa (activación NATIVA del <button>)', async () => {
+    conMovimientoPermitido()
+    const { container } = render(<Hero />)
+    const usuario = userEvent.setup()
+
+    await usuario.tab()
+    await usuario.keyboard('{Enter}')
+
+    expect(escenaDe(container)).toHaveAttribute('data-firma', 'cliente')
+    expect(screen.queryByRole('button')).toBeNull()
+  })
+
+  it('@s11 Espacio con el foco también completa (activación NATIVA del <button>)', async () => {
+    conMovimientoPermitido()
+    const { container } = render(<Hero />)
+    const usuario = userEvent.setup()
+
+    await usuario.tab()
+    await usuario.keyboard('[Space]')
+
+    expect(escenaDe(container)).toHaveAttribute('data-firma', 'cliente')
+    expect(screen.queryByRole('button')).toBeNull()
+  })
+})
+
+/**
+ * @s12 — EL FIN DE RELOJ. jsdom no anima CSS: el «final» que puede observar un test es el del
+ * `setTimeout` de Hero.tsx, cuyo plazo (90 800 ms, ESCRITO A MANO aquí) deriva de UNA fuente
+ * (`milisegundosDeCeremonia()`, aseverada por valor y contra los bytes del SCSS en
+ * hero-logica.test.ts). Reloj FALSO avanzado dentro de `act` (patrón galeria.test.tsx).
+ */
+const MILISEGUNDOS_DE_CEREMONIA = 90_800
+
+/** Avanza el reloj FALSO dentro de `act`, para que React aplique los cambios de estado. */
+function avanzar(milisegundos: number): void {
+  act(() => {
+    vi.advanceTimersByTime(milisegundos)
+  })
+}
+
+describe('@s12 el control SOLO existe mientras la animación corre: el fin del reloj lo desmonta solo', () => {
+  it('@s12 un milisegundo ANTES del final el botón sigue; al cumplirse los 90 800 ms desaparece sin intervención', () => {
+    conMovimientoPermitido()
+    vi.useFakeTimers()
+    const { container } = render(<Hero />)
+
+    avanzar(MILISEGUNDOS_DE_CEREMONIA - 1)
+
+    // La ceremonia AÚN corre: el control sigue vivo (mata a un plazo acortado o a un reloj de 0).
+    expect(screen.getByRole('button', { name: NOMBRE_DEL_CONTROL })).toBeInTheDocument()
+    expect(escenaDe(container)).toHaveAttribute('data-firma', 'corriendo')
+
+    avanzar(1)
+
+    // El reloj terminó por sí solo: fase «reloj» y NINGUNA superficie clicable sobre el rótulo.
+    expect(escenaDe(container)).toHaveAttribute('data-firma', 'reloj')
+    expect(screen.queryByRole('button')).toBeNull()
+  })
+
+  it('@s12 la LIMPIEZA del efecto: completar por clic NO deja un reloj vivo que re-etiquete la firma', () => {
+    // Sin `clearTimeout` en la limpieza, el reloj huérfano dispararía a los 90,8 s y pisaría
+    // «cliente» con «reloj» — ESTA aserción es la que hace matable ese mutante (por eso
+    // FaseDeLaFirma distingue los dos finales; ver hero-logica.ts).
+    conMovimientoPermitido()
+    vi.useFakeTimers()
+    const { container } = render(<Hero />)
+
+    fireEvent.click(screen.getByRole('button', { name: NOMBRE_DEL_CONTROL }))
+    avanzar(MILISEGUNDOS_DE_CEREMONIA)
+
+    expect(escenaDe(container)).toHaveAttribute('data-firma', 'cliente')
+    expect(screen.queryByRole('button')).toBeNull()
+  })
+})
+
+describe('@s13 con movimiento reducido el control NO se monta: no hay nada que completar', () => {
+  // El rótulo completo YA es visible al instante bajo reduce: lo garantiza la HOJA (@s3/@s5 de
+  // hero-estilos: @media reduce → animation none + base final visible). Aquí, el DOM del control.
+  it('@s13 el botón «Completar la firma» NO existe en el árbol en ningún momento, ni siquiera tras 90,8 s', () => {
+    stubDeMatchMedia(true)
+    vi.useFakeTimers()
+    const { container } = render(<Hero />)
+
+    expect(screen.queryByRole('button')).toBeNull()
+
+    avanzar(MILISEGUNDOS_DE_CEREMONIA)
+
+    // Ni botón NI reloj: bajo reduce el timeout no debe ni armarse (la fase sigue «corriendo»,
+    // que bajo reduce es solo el nombre del reposo — la hoja ya lo pinta todo).
+    expect(screen.queryByRole('button')).toBeNull()
+    expect(escenaDe(container)).toHaveAttribute('data-firma', 'corriendo')
+  })
+
+  it('@s13 tampoco viaja en el HTML horneado (allí la preferencia es incognoscible: no se monta nada)', () => {
+    expect(renderToString(<Hero />)).not.toContain('<button')
+  })
+
+  it('@s13 la clase de «lista» NO se añade bajo reduce: la caligrafía no arranca y nada hay que completar', () => {
+    // ENMIENDA 2 (@s13 ampliado): bajo reduce «nada cambia: ni clase ni botón». Sin la clase, el
+    // SCSS no declara NINGUNA animación (@s15 en hero-estilos) y la base ya es el estado final.
+    stubDeMatchMedia(true)
+    vi.useFakeTimers()
+    const { container } = render(<Hero />)
+
+    expect(escenaDe(container).classList.contains(CLASE_LISTA)).toBe(false)
+
+    avanzar(MILISEGUNDOS_DE_CEREMONIA)
+
+    expect(escenaDe(container).classList.contains(CLASE_LISTA)).toBe(false)
+  })
+})
+
+/**
+ * @s7 sin-js AMPLIADO (ENMIENDA 2, cierra A-3) — el HTML horneado NO lleva la clase de «lista».
+ * Antes la animación era CSS a secas: si el JS fallaba, 90 s de movimiento SIN mecanismo (el
+ * agujero que señaló la auditoría). Ahora el arranque es del MONTAJE: sin JavaScript la clase
+ * jamás llega, nada anima, y el rótulo se ve COMPLETO y ESTÁTICO desde el primer pintado porque
+ * la base del SCSS ya es el estado final (@s1 de hero-estilos).
+ */
+describe('@s7 sin JavaScript el rótulo nace COMPLETO y ESTÁTICO: el horneado NO lleva la clase de «lista»', () => {
+  it('@s7 renderToString no contiene la clase de «lista» (sin JS nada arranca: la base ya es el final)', () => {
+    expect(renderToString(<Hero />)).not.toContain(CLASE_LISTA)
+  })
+})
+
+/**
+ * @s17 (ENMIENDA 2, cierra A-5) — LA PREFERENCIA SE ESCUCHA EN CALIENTE, en el MISMO efecto que
+ * la lee, con limpieza (patrón contratado en features/galeria_carrusel.feature @s12). Activar
+ * reduce a MITAD de firma la COMPLETA — la clase de «lista» cae (la base ya es el final: toda la
+ * tinta, aplicador retirado, «STUDIO» visible) y el botón se desmonta con ella: no queda superficie
+ * clicable sobre un rótulo estático. Desactivarla después NO rearranca nada: reduce manda una vez.
+ */
+describe('@s17 activar reduce a MITAD de firma la completa; desactivarlo no rearranca nada', () => {
+  it('@s17 el change a matches:true COMPLETA la firma al instante: clase y botón fuera', () => {
+    const { escuchar } = conMovimientoPermitido()
+    vi.useFakeTimers()
+    const { container } = render(<Hero />)
+
+    // La firma corre: clase de «lista» puesta y control vivo (a medio escribir).
+    avanzar(MILISEGUNDOS_DE_CEREMONIA / 2)
+    expect(escenaDe(container).classList.contains(CLASE_LISTA)).toBe(true)
+
+    act(() => manejadorDelCambio(escuchar)({ matches: true }))
+
+    // Sin clase no hay animación declarada (la base ES el final) y sin botón no queda superficie.
+    expect(escenaDe(container).classList.contains(CLASE_LISTA)).toBe(false)
+    expect(screen.queryByRole('button')).toBeNull()
+  })
+
+  it('@s17 un change a matches:false sobre una firma EN MARCHA no la toca: la rama contraria no completa', () => {
+    // Mata al manejador que completara INCONDICIONALMENTE en cada change: pararía la caligrafía
+    // justo cuando el visitante RETIRA la preferencia.
+    const { escuchar } = conMovimientoPermitido()
+    const { container } = render(<Hero />)
+
+    act(() => manejadorDelCambio(escuchar)({ matches: false }))
+
+    expect(escenaDe(container).classList.contains(CLASE_LISTA)).toBe(true)
+    expect(escenaDe(container)).toHaveAttribute('data-firma', 'corriendo')
+    expect(screen.getByRole('button', { name: NOMBRE_DEL_CONTROL })).toBeInTheDocument()
+  })
+
+  it('@s17 desactivar la preferencia DESPUÉS de completar NO rearranca nada: ni caligrafía ni botón, ni reloj fantasma', () => {
+    const { escuchar } = conMovimientoPermitido()
+    vi.useFakeTimers()
+    const { container } = render(<Hero />)
+
+    act(() => manejadorDelCambio(escuchar)({ matches: true }))
+    act(() => manejadorDelCambio(escuchar)({ matches: false }))
+
+    expect(escenaDe(container).classList.contains(CLASE_LISTA)).toBe(false)
+    expect(screen.queryByRole('button')).toBeNull()
+
+    // Y el reloj quedó LIMPIO al morir el control: 90,8 s después nada re-etiqueta la firma.
+    avanzar(MILISEGUNDOS_DE_CEREMONIA)
+    expect(escenaDe(container)).toHaveAttribute('data-firma', 'corriendo')
+    expect(screen.queryByRole('button')).toBeNull()
+  })
+
+  it('@s17 al desmontar, removeEventListener recibe EXACTAMENTE el manejador que registró addEventListener con "change"', () => {
+    const { escuchar, dejarDeEscuchar } = conMovimientoPermitido()
+    const { unmount } = render(<Hero />)
+
+    expect(escuchar).toHaveBeenCalledTimes(1)
+    const manejador = manejadorDelCambio(escuchar)
+
+    expect(dejarDeEscuchar).not.toHaveBeenCalled()
+
+    unmount()
+
+    expect(dejarDeEscuchar).toHaveBeenCalledTimes(1)
+    expect(dejarDeEscuchar).toHaveBeenCalledWith('change', manejador)
+  })
+})
+
+/**
+ * @s16 (ENMIENDA 2, cierra A-2) — EL FOCO NO CAE AL VACÍO. Si `document.activeElement` es el botón
+ * cuando este se desmonta (clic, Enter o fin del reloj), el foco se recoloca en la ESCENA (el
+ * contenedor que envuelve rótulo, titular y botón) con `tabindex="-1"`: acepta foco SOLO
+ * programáticamente — ninguna parada de tabulador nueva — y desde ella el siguiente Tab continúa
+ * hacia delante (los CTAs viven en home.tsx, FUERA del componente: la escena es el destino
+ * razonable DENTRO del hero). Si el foco estaba en otro sitio, NO se roba.
+ */
+describe('@s16 el foco no cae al vacío cuando el botón se desmonta bajo él', () => {
+  it('@s16 por CLIC: el foco pasa a la escena, que lo acepta solo programáticamente (tabindex -1)', async () => {
+    conMovimientoPermitido()
+    const { container } = render(<Hero />)
+    const usuario = userEvent.setup()
+
+    // userEvent.click enfoca el botón al pulsar (como un navegador real) ANTES de activarlo.
+    await usuario.click(screen.getByRole('button', { name: NOMBRE_DEL_CONTROL }))
+
+    expect(screen.queryByRole('button')).toBeNull()
+    expect(escenaDe(container)).toHaveFocus()
+    // tabindex -1: foco programático SÍ, parada de tabulador NO — el siguiente Tab sigue adelante.
+    expect(escenaDe(container)).toHaveAttribute('tabindex', '-1')
+  })
+
+  it('@s16 por ENTER con el foco en el botón: el foco se recoloca en la escena', async () => {
+    conMovimientoPermitido()
+    const { container } = render(<Hero />)
+    const usuario = userEvent.setup()
+
+    await usuario.tab()
+    await usuario.keyboard('{Enter}')
+
+    expect(screen.queryByRole('button')).toBeNull()
+    expect(escenaDe(container)).toHaveFocus()
+  })
+
+  it('@s16 por FIN DE RELOJ mientras el botón tenía el foco: el foco se recoloca, no cae al <body>', () => {
+    conMovimientoPermitido()
+    vi.useFakeTimers()
+    const { container } = render(<Hero />)
+
+    act(() => {
+      screen.getByRole('button', { name: NOMBRE_DEL_CONTROL }).focus()
+    })
+    avanzar(MILISEGUNDOS_DE_CEREMONIA)
+
+    expect(screen.queryByRole('button')).toBeNull()
+    expect(escenaDe(container)).toHaveFocus()
+    expect(document.body).not.toHaveFocus()
+  })
+
+  it('@s16 si el foco NO estaba en el botón, el fin de reloj NO lo roba (la recolocación es condicional)', () => {
+    // El Dado del contrato es «el foco está EN el botón»: fuera de él, robar el foco a mitad de
+    // lectura sería EXACTAMENTE la clase de salto que la gestión de foco debe evitar.
+    conMovimientoPermitido()
+    vi.useFakeTimers()
+    const { container } = render(<Hero />)
+
+    avanzar(MILISEGUNDOS_DE_CEREMONIA)
+
+    expect(screen.queryByRole('button')).toBeNull()
+    expect(escenaDe(container)).not.toHaveFocus()
+  })
+})
+
+/**
+ * @s15 (ENMIENDA 2, cierra A-3) — EL ARRANQUE EN EL MONTAJE, la mitad DOM (los bytes del SCSS los
+ * asevera hero-estilos @s15). El efecto de montaje añade la clase de «lista» a la escena Y monta
+ * el botón EN EL MISMO render: por construcción nunca hay movimiento sin mecanismo para pararlo —
+ * nacen juntos y mueren juntos.
+ */
+describe('@s15 la clase de «lista» y el botón nacen y mueren JUNTOS: movimiento y mecanismo inseparables', () => {
+  it('@s15 al montar con el movimiento permitido la escena recibe la clase de «lista» Y el botón, en el MISMO render', () => {
+    conMovimientoPermitido()
+    const { container } = render(<Hero />)
+
+    // Las dos cosas a la vez tras el montaje: la caligrafía arranca YA con su mecanismo en pie.
+    expect(escenaDe(container).classList.contains(CLASE_LISTA)).toBe(true)
+    expect(screen.getByRole('button', { name: NOMBRE_DEL_CONTROL })).toBeInTheDocument()
+  })
+
+  it('@s15 completar la firma retira la clase CON el botón: sin movimiento no queda mecanismo (mueren juntos)', () => {
+    conMovimientoPermitido()
+    const { container } = render(<Hero />)
+
+    expect(escenaDe(container).classList.contains(CLASE_LISTA)).toBe(true)
+
+    fireEvent.click(screen.getByRole('button', { name: NOMBRE_DEL_CONTROL }))
+
+    // Sin clase no hay animación declarada (la base es el final) y sin botón no queda superficie:
+    // el rótulo terminado queda limpio, como en @s12.
+    expect(escenaDe(container).classList.contains(CLASE_LISTA)).toBe(false)
+    expect(screen.queryByRole('button')).toBeNull()
+  })
+})
+
+describe('@s14 el control no roba clics fuera del área del rótulo', () => {
+  // La GEOMETRÍA real (que el botón cubra el rótulo y NADA más) no existe en jsdom: la fija la
+  // hoja (`.control` absolute + inset 0 dentro de la escena relativa, aseverado por BYTES en
+  // hero-estilos @s14) y se vive EN VIVO. Aquí, lo aseverable del árbol: dónde vive la superficie
+  // y que un clic fuera NO completa nada.
+  it('@s14 un clic FUERA del rótulo (el eyebrow) NO completa la firma: sigue escribiéndose', () => {
+    conMovimientoPermitido()
+    const { container } = render(<Hero />)
+
+    fireEvent.click(container.querySelector('p') as HTMLElement)
+
+    expect(escenaDe(container)).toHaveAttribute('data-firma', 'corriendo')
+    expect(screen.getByRole('button', { name: NOMBRE_DEL_CONTROL })).toBeInTheDocument()
+  })
+
+  it('@s14 la superficie clicable vive DENTRO de la escena del rótulo (su padre directo)', () => {
+    conMovimientoPermitido()
+    const { container } = render(<Hero />)
+
+    const control = screen.getByRole('button', { name: NOMBRE_DEL_CONTROL })
+
+    // El padre del botón ES la escena (la que publica data-firma): con `inset: 0` su caja no
+    // puede salirse del área del rótulo. Fuera de la escena, inset 0 cubriría OTRA cosa.
+    expect(control.parentElement).toBe(escenaDe(container))
   })
 })
