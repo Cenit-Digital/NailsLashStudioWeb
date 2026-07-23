@@ -44,7 +44,7 @@ Característica: Portada con la marca ESCRITA A PINCEL
   #
   # NOTA TÉCNICA de la enmienda: jsdom NO ejecuta animaciones CSS. El token, los
   # tiempos y las curvas (@s4) se aseveran por BYTES del SCSS (patrón galeria-estilos);
-  # el control (@s10–@s14) por DOM. El ritmo REAL de los ≈30 s se verifica EN VIVO en
+  # el control (@s10–@s14) por DOM. El ritmo REAL de los ≈15 s se verifica EN VIVO en
   # Chrome (getAnimations() + muestreo de fotogramas), como pidió Pablo expresamente.
   #
   # ENMIENDA 2 — EL ARRANQUE EN EL MONTAJE (2026-07-23, tras la auditoría
@@ -76,12 +76,24 @@ Característica: Portada con la marca ESCRITA A PINCEL
   #   · Sigue siendo MÁS de 5 segundos ⇒ el mecanismo SC 2.2.2 (el rótulo como control,
   #     @s10–@s14) sigue siendo OBLIGATORIO y NADA de él cambia.
   #
+  # ENMIENDA 4 — DE 30 A 15 SEGUNDOS (decisión de Pablo, 2026-07-24, banco de vivencias
+  # iteración 2):
+  #   · Segunda iteración del banco de vivencias; veredicto UI/UX del lead: a 15 s
+  #     (≈1,7 s por letra) la pluma se ve escribir con claridad Y la mayoría de visitantes
+  #     ve la firma completarse — el punto dulce. Cambia SOLO el VALOR del token
+  #     (30s → 15s) y sus derivados literales (espejo 15, total ≈15,8 s). El VALOR de la
+  #     ENMIENDA 3 queda SUPERADO; todo lo demás de aquella sigue vigente.
+  #   · Sigue siendo MÁS de 5 segundos ⇒ el mecanismo SC 2.2.2 (el rótulo como control,
+  #     @s10–@s14) sigue siendo OBLIGATORIO y NADA de él cambia. La curva linear y el
+  #     reloj único tampoco cambian.
+  #
   # Se mantiene intacto lo que F-07 protegía: UN solo <h1>, dos <span>, el text node
   # de espacio REAL, nombre accesible «Nails Lash Studio», estado base VISIBLE, la
   # animación en la HOJA y nunca inline, --ink como color, y cero terceros. Los
   # escenarios @s1–@s3 y @s5–@s9 NO cambiaron con la enmienda de los 90 s; la
   # ENMIENDA 2 amplía @s7 y @s13 y añade @s15–@s17; la ENMIENDA 3 solo cambia el
-  # VALOR (90 → 30) en @s4 y en estas notas.
+  # VALOR (90 → 30) en @s4 y en estas notas; la ENMIENDA 4 solo cambia el VALOR
+  # (30 → 15) en @s4 y en estas notas.
 
   @s1 @recorte
   Escenario: El rótulo se muestra COMPLETO, sin recortes por ningún lado
@@ -108,20 +120,21 @@ Característica: Portada con la marca ESCRITA A PINCEL
     Entonces es la PUNTA de las cerdas la que va sobre el recorrido, nunca el frasco
     Y la punta coincide con el borde de lo recién pintado
 
-  # @s4 REESCRITO el 2026-07-23 y RETOCADO el 2026-07-24 (ENMIENDA 3: solo el VALOR,
-  # 90 s → 30 s). La curva pasa a linear: también a 30 s el cubic-bezier anterior
-  # reptaría en los extremos y correría en el centro; una pluma real escribe a
-  # velocidad constante, y a velocidad constante las letras complejas tardan más
-  # SOLAS (≈3,3 s por letra es el promedio: 9 letras × 3,3 s ≈ 30 s de trazo).
+  # @s4 REESCRITO el 2026-07-23 y RETOCADO el 2026-07-24 dos veces (ENMIENDA 3:
+  # 90 s → 30 s; ENMIENDA 4: 30 s → 15 s — solo el VALOR en ambas). La curva pasa a
+  # linear: también a 15 s el cubic-bezier anterior reptaría en los extremos y correría
+  # en el centro; una pluma real escribe a velocidad constante, y a velocidad constante
+  # las letras complejas tardan más SOLAS (≈1,7 s por letra es el promedio:
+  # 9 letras × 1,7 s ≈ 15 s de trazo).
   @s4 @duracion
-  Escenario: La caligrafía es una ceremonia de ≈30 segundos a velocidad constante
+  Escenario: La caligrafía es una ceremonia de ≈15 segundos a velocidad constante
     Dada la hoja de estilos del hero (los tiempos se aseveran por BYTES del SCSS)
     Cuando se leen las animaciones del rótulo
-    Entonces existe un ÚNICO token "--duracion-caligrafia: 30s" y todo tiempo del rótulo deriva de él por calc(), sin ninguna otra duración de trazo suelta
+    Entonces existe un ÚNICO token "--duracion-caligrafia: 15s" y todo tiempo del rótulo deriva de él por calc(), sin ninguna otra duración de trazo suelta
     Y "escribir" y "recorrer" duran exactamente var(--duracion-caligrafia) y su curva es "linear" en las DOS
     Y tinta y aplicador siguen siendo UN reloj: misma duración, mismo retardo y misma curva
     Y "retirarse" arranca en calc(var(--duracion-caligrafia) - 0.4s + 0.1s) y "revelarStudio" en calc(var(--duracion-caligrafia) + 0.2s): la coreografía relativa de hoy, derivada del token
-    Y "STUDIO" se revela al terminar la marca, no antes (total ≈30,8 s)
+    Y "STUDIO" se revela al terminar la marca, no antes (total ≈15,8 s)
 
   @s5 @reducido
   Escenario: Con movimiento reducido, el rótulo aparece al instante y sin aplicador

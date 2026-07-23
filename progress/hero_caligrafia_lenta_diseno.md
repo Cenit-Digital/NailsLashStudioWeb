@@ -124,3 +124,9 @@
   la pluma parece casi quieta; a 30 s (≈3,3 s/letra) siempre hay movimiento visible y sigue ceremonial.
 - Token `--duracion-caligrafia: 30s`, espejo `SEGUNDOS_DE_TRAZO = 30`, total ≈30,8 s. Coreografía
   relativa, curva `linear`, reloj único y mecanismo SC 2.2.2 (sigue >5 s) INTACTOS. Contrato: @s4 y notas.
+
+### Enmienda 4 (2026-07-24) — 30 s → 15 s, solo el VALOR (banco de vivencias, iteración 2)
+
+- Decisión de Pablo; veredicto UI/UX del lead: a 15 s (≈1,7 s/letra) la pluma se ve escribir con claridad
+  Y la mayoría de visitantes ve la firma completarse — el punto dulce. Token `15s`, espejo
+  `SEGUNDOS_DE_TRAZO = 15`, total ≈15,8 s. Linear, reloj único y SC 2.2.2 (sigue >5 s) INTACTOS.
