@@ -2,13 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import {
   capaDe,
-  claveDeRotacion,
   claveDistancia,
   debeRotar,
   distanciaCircular,
   etiquetaDeDiapositiva,
   etiquetaDelPunto,
-  etiquetaDeRotacion,
   indiceCircular,
   pasosDelArrastre,
   signoDe,
@@ -167,21 +165,6 @@ describe('@s6 @s17 las etiquetas accesibles de la diapositiva y del punto se com
       'Ver la foto 5 de 6',
       'Ver la foto 6 de 6',
     ])
-  })
-})
-
-describe('@s8 @s11 @s12 la etiqueta del control de rotación CAMBIA con el estado', () => {
-  it('@s8 rotando se anuncia «Parar la reproducción automática»', () => {
-    expect(etiquetaDeRotacion(true)).toBe('Parar la reproducción automática')
-  })
-
-  it('@s8 parado se anuncia «Iniciar la reproducción automática»', () => {
-    expect(etiquetaDeRotacion(false)).toBe('Iniciar la reproducción automática')
-  })
-
-  it('@s8 el gancho de test data-estado vale "rotando" o "pausado"', () => {
-    expect(claveDeRotacion(true)).toBe('rotando')
-    expect(claveDeRotacion(false)).toBe('pausado')
   })
 })
 

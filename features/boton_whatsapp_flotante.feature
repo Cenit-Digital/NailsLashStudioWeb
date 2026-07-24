@@ -1,4 +1,9 @@
 # =============================================================================================
+# 🔴 RETIRADA — 2026-07-24. Esta propuesta NUNCA cruzó la puerta humana (su propio encabezado
+# lo dice: «Estado: PROPUESTA hasta la puerta humana», sin entrada en feature_list.json). Pablo
+# eliminó el componente que la habría implementado (commit 479d541). Se conserva el fichero como
+# registro histórico de la propuesta; no describe código vigente.
+# =============================================================================================
 # CONTRATO — botón FLOTANTE de WhatsApp (rama demo/lunes-prototipo, petición de Pablo:
 # «completamente funcional»). Fichero NUEVO. Estado: PROPUESTA hasta la puerta humana.
 #

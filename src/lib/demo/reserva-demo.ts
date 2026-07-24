@@ -1,8 +1,9 @@
 /**
  * Texto DEMO prellenado del enlace de WhatsApp de la sección `#reserva` (columna izquierda del
- * prototipo Opción-1-Rosa). Es una constante PROPIA, distinta de `CONTACTO_WHATSAPP_TEXTO` y de
- * `BOTON_WHATSAPP_FLOTANTE_TEXTO`, para que los TRES puntos de entrada (el CTA de #contacto, el
- * botón flotante y este) sean DISTINGUIBLES cuando lleguen los mensajes al móvil del salón.
+ * prototipo Opción-1-Rosa). Es una constante PROPIA, distinta de `CONTACTO_WHATSAPP_TEXTO`, para
+ * que los DOS puntos de entrada (el CTA de #contacto y este) sean DISTINGUIBLES cuando lleguen los
+ * mensajes al móvil del salón. (El botón flotante de WhatsApp y su constante propia se retiraron:
+ * commit 479d541.)
  *
  * `waHref` (F-02) le aplica `encodeURIComponent`. El mensaje lo ENVÍA el usuario desde su propio
  * WhatsApp: el enlace solo abre el chat con el texto puesto, nadie promete que alguien conteste. La

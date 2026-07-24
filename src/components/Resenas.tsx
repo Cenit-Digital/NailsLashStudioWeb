@@ -23,12 +23,10 @@ import {
 } from './carrusel-logica'
 import {
   capaDe,
-  claveDeRotacion,
   claveDistancia,
   debeRotar,
   distanciaCircular,
   etiquetaDeDiapositiva,
-  etiquetaDeRotacion,
   indiceCircular,
   pasosDelArrastre,
   signoDe,
@@ -76,12 +74,6 @@ export function Resenas() {
   const [raton, setRaton] = useState(false)
   // El foco NO se limpia al salir: entrar para la rotación y solo el botón la devuelve.
   const [foco, setFoco] = useState(false)
-  // MUTANTE EQUIVALENTE (BooleanLiteral false→true) POR LA MISMA CONSTRUCCIÓN verificada en
-  // progress/mutation_galeria_carrusel.md (Galeria.tsx 86:62): su único lector es `debeRotar` y
-  // `entra()` cancela el arranque EN EL MISMO lote — ningún render alcanzable distingue los dos
-  // valores iniciales (precedente HOST_WHATSAPP, site.ts:72-73).
-  // Stryker disable next-line all
-  const [arranqueExplicito, setArranqueExplicito] = useState(false)
   // [@s20 heredado] La GENERACIÓN del reloj: cada acción manual crea un token NUEVO (identidad,
   // no aritmética). El efecto del intervalo la lleva en sus deps: acción → efecto nuevo → el
   // intervalo cuenta 2 s DESDE la acción, no desde el arranque.
@@ -95,7 +87,15 @@ export function Resenas() {
   // COMPARTIDO de `carrusel-logica.ts`: la decisión es UNA para los DOS carruseles (@s22 + @s8).
   const raiz = useRef<HTMLDivElement | null>(null)
 
-  const rotando = debeRotar({ pausadoPorElUsuario: pausado, raton, foco, arranqueExplicito })
+  // El botón que ponía `arranqueExplicito` a `true` se retiró a mano (commit 9cf32a9): hoy ningún
+  // gesto de UI puede activar esa rama de `debeRotar`, así que aquí se pasa siempre `false`. La
+  // función pura conserva el parámetro por ser una capacidad reutilizable (ver su docblock).
+  const rotando = debeRotar({
+    pausadoPorElUsuario: pausado,
+    raton,
+    foco,
+    arranqueExplicito: false,
+  })
 
   useEffect(
     () => {
@@ -247,19 +247,9 @@ export function Resenas() {
     reiniciarElReloj()
   }
 
-  /**
-   * El botón de rotación. Parar es DEFINITIVO (SC 2.2.2); arrancar ignora el ratón encima y el
-   * foco dentro (APG). La etiqueta y el `data-estado` siguen a la VOLUNTAD del usuario.
-   */
-  const alternarRotacion = () => {
-    setPausado(!pausado)
-    setArranqueExplicito(pausado)
-  }
-
-  /** Un ratón o un foco NUEVOS cancelan el arranque explícito y vuelven a mandar ellos. */
+  /** El ratón o el foco entran al carrusel: marcan su fuente como activa (paran la rotación). */
   const entra = (poner: (dentro: boolean) => void) => {
     poner(true)
-    setArranqueExplicito(false)
   }
 
   /** [@s19 heredado] El gesto empieza: se guarda dónde bajó el puntero sobre el marco. */

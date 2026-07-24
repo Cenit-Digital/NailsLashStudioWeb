@@ -1,6 +1,5 @@
 import { Head } from 'vite-react-ssg'
 
-import { BotonWhatsApp } from '../components/BotonWhatsApp'
 import { Cabecera } from '../components/Cabecera'
 import { Catalogo } from '../components/Catalogo'
 import { Contacto } from '../components/Contacto'
