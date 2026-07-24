@@ -424,20 +424,6 @@ describe('@s8 (@s6 de galería) el carrusel se anuncia como carrusel, con sus id
       expect(diapositiva).not.toHaveAttribute('aria-hidden')
     }
   })
-
-  it('@s8 «Anterior» y «Siguiente» apuntan con aria-controls a la pista PROPIA id="resenas-pista"', () => {
-    const { container } = render(<Resenas />)
-    const pista = pistaDe(container)
-
-    expect(pista).not.toBeNull()
-    expect(tarjetasDe(pista)).toHaveLength(6)
-    for (const nombre of ['Anterior', 'Siguiente']) {
-      expect(screen.getByRole('button', { name: nombre })).toHaveAttribute(
-        'aria-controls',
-        'resenas-pista',
-      )
-    }
-  })
 })
 
 describe('@s4 @s9 las tarjetas llevan TEXTO propio: cita + autora + servicio + estrellas, sin una sola <img>', () => {
@@ -508,51 +494,6 @@ describe('@s4 @s9 las tarjetas llevan TEXTO propio: cita + autora + servicio + e
 })
 
 /* --- @s8 (@s16..@s19 de galería): la navegación manual — flechas, puntos, clic lateral, arrastre. --- */
-
-describe('@s8 (@s16 de galería) las flechas mueven UNA posición y dan la vuelta por los DOS extremos', () => {
-  /** Deja centrado el testimonio `indice` a base de pulsar «Siguiente». */
-  function conCentrado(indice: number): HTMLElement {
-    const { container } = render(<Resenas />)
-
-    for (let paso = 0; paso < indice; paso++) {
-      fireEvent.click(screen.getByRole('button', { name: 'Siguiente' }))
-    }
-    expect(centrada(container)).toBe(indice)
-
-    return container
-  }
-
-  it.each([
-    { boton: 'Siguiente', partida: 0, esperada: 1, que: 'el avance normal' },
-    { boton: 'Siguiente', partida: 5, esperada: 0, que: 'la vuelta hacia DELANTE, sin hueco' },
-    { boton: 'Anterior', partida: 0, esperada: 5, que: 'la vuelta hacia ATRÁS (índice negativo)' },
-    { boton: 'Anterior', partida: 1, esperada: 0, que: 'el retroceso normal' },
-  ])(
-    '@s8 «$boton» desde el testimonio $partida centra el $esperada — $que',
-    ({ boton, partida, esperada }) => {
-      const container = conCentrado(partida)
-
-      fireEvent.click(screen.getByRole('button', { name: boton }))
-
-      expect(centrada(container)).toBe(esperada)
-      expect(distanciasDe(container).filter((d) => d === '0')).toEqual(['0'])
-    },
-  )
-
-  it('@s8 ninguna tarjeta se queda sin data-distancia ni expone un valor fuera de {0,1,2,3}', () => {
-    const { container } = render(<Resenas />)
-
-    for (let paso = 0; paso < 7; paso++) {
-      const distancias = distanciasDe(container)
-
-      expect(distancias).toHaveLength(6)
-      for (const distancia of distancias) {
-        expect(['0', '1', '2', '3']).toContain(distancia)
-      }
-      fireEvent.click(screen.getByRole('button', { name: 'Siguiente' }))
-    }
-  })
-})
 
 describe('@s8 (@s17 de galería) los puntos hablan de testimonios y marcan el actual con aria-disabled', () => {
   /** Los seis puntos indicadores, en orden del DOM, por el nombre PROPIO del grupo. */
@@ -720,17 +661,6 @@ describe('@s8 (@s19 de galería) arrastrar sobre el marco mueve UN testimonio, c
 
 /* --- @s8 (@s7..@s12 y @s20 de galería): el autoplay, sus pausas y el reloj que se reinicia. --- */
 
-// Las dos etiquetas del control de rotación, ESCRITAS A MANO (nunca importadas de producción).
-const ETIQUETA_PARAR = 'Parar la reproducción automática'
-const ETIQUETA_INICIAR = 'Iniciar la reproducción automática'
-
-/** El control de rotación de ESTE carrusel, por su nombre accesible actual (que CAMBIA). */
-function control(): HTMLElement {
-  return screen.getByRole('button', {
-    name: (nombre) => nombre === ETIQUETA_PARAR || nombre === ETIQUETA_INICIAR,
-  })
-}
-
 /** Avanza el reloj FALSO dentro de `act`, para que React aplique los cambios de estado. */
 function avanzar(milisegundos: number): void {
   act(() => {
@@ -743,65 +673,6 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-describe('@s8 (@s8 de galería) el control de rotación es el PRIMER tabulable, su nombre CAMBIA y nunca lleva aria-pressed', () => {
-  it('@s8 arranca «Parar…», al pulsarlo pasa a «Iniciar…», y en NINGÚN estado expone aria-pressed', () => {
-    render(<Resenas />)
-
-    expect(control()).toHaveAccessibleName(ETIQUETA_PARAR)
-    expect(control()).not.toHaveAttribute('aria-pressed')
-
-    fireEvent.click(control())
-
-    expect(control()).toHaveAccessibleName(ETIQUETA_INICIAR)
-    expect(control()).not.toHaveAttribute('aria-pressed')
-  })
-
-  it('@s8 el glifo VISIBLE del control es «❙❙» rotando y «▶» pausado, y data-estado los acompaña', () => {
-    render(<Resenas />)
-
-    expect(control().textContent).toBe('❙❙')
-    expect(control()).toHaveAttribute('data-estado', 'rotando')
-
-    fireEvent.click(control())
-
-    expect(control().textContent).toBe('▶')
-    expect(control()).toHaveAttribute('data-estado', 'pausado')
-  })
-
-  it('@s8 tras pararlo, 12000 ms NO cambian el testimonio centrado, ni aunque el puntero salga: parada DEFINITIVA', () => {
-    vi.useFakeTimers()
-    const { container } = render(<Resenas />)
-
-    fireEvent.click(control())
-    fireEvent.mouseLeave(carruselDe(container))
-    avanzar(12000)
-
-    expect(centrada(container)).toBe(0)
-  })
-
-  it('@s8 es el PRIMER tabulable del carrusel, por delante de «Anterior» y «Siguiente», y son NUEVE controles', () => {
-    const { container } = render(<Resenas />)
-    const tabulables = [...carruselDe(container).querySelectorAll('button, a[href], input, select')]
-
-    expect(tabulables).toHaveLength(9)
-    expect(tabulables[0]).toHaveAccessibleName(ETIQUETA_PARAR)
-    expect(tabulables[1]).toHaveAccessibleName('Anterior')
-    expect(tabulables[2]).toHaveAccessibleName('Siguiente')
-  })
-
-  it('@s8 está SIEMPRE presente: se hornea en el SSR, sin depender del ratón ni del foco', () => {
-    expect(renderToString(<Resenas />)).toContain(ETIQUETA_PARAR)
-  })
-
-  it('@s8 NINGÚN elemento enfocable vive dentro del contenedor con perspectiva', () => {
-    const { container } = render(<Resenas />)
-
-    expect(
-      pistaDe(container).querySelectorAll('button, a[href], input, select, [tabindex]'),
-    ).toHaveLength(0)
-  })
-})
-
 describe('@s8 (@s7 de galería) la voz de la pista se calla mientras rota sola y habla cuando manda el usuario', () => {
   it('@s8 recién montada (rotando, sin foco) la pista expone aria-live="off" y aria-atomic="false"', () => {
     const { container } = render(<Resenas />)
@@ -810,10 +681,13 @@ describe('@s8 (@s7 de galería) la voz de la pista se calla mientras rota sola y
     expect(pistaDe(container)).toHaveAttribute('aria-atomic', 'false')
   })
 
-  it('@s8 parada por el usuario, pasa a aria-live="polite": los cambios los provoca él', () => {
+  it('@s8 parada (el ratón dentro del carrusel), pasa a aria-live="polite": los cambios los provoca él', () => {
+    // [ENMIENDA 4, 2026-07-24] El control de rotación que paraba con un clic ya NO existe: la fila
+    // «rotando=no, foco=no» sigue siendo ALCANZABLE sin él, basta con que el ratón esté DENTRO del
+    // carrusel (`raton=true`, patrón `galeria.test.tsx`).
     const { container } = render(<Resenas />)
 
-    fireEvent.click(control())
+    fireEvent.mouseEnter(carruselDe(container))
 
     expect(pistaDe(container)).toHaveAttribute('aria-live', 'polite')
   })
@@ -859,12 +733,14 @@ describe('@s8 (@s9 de galería) el testimonio centrado cambia cada 2 segundos, n
 })
 
 describe('@s8 (@s20 de galería) cualquier desplazamiento manual REINICIA el reloj', () => {
-  it('@s8 «Siguiente» en t=1500: el 2º queda EN EL ACTO, en t=3499 sigue y en t=3500 llega el 3º', () => {
+  it('@s8 el punto «Ver el testimonio 2 de 6» en t=1500: el 2º queda EN EL ACTO, en t=3499 sigue y en t=3500 llega el 3º', () => {
+    // [ENMIENDA 4, 2026-07-24] El `When` usaba el botón «Siguiente» (RETIRADO, @s16 de galería):
+    // se sustituye por el punto indicador del 2º testimonio, mismo efecto por la misma vía.
     vi.useFakeTimers()
     const { container } = render(<Resenas />)
 
     avanzar(1500)
-    fireEvent.click(screen.getByRole('button', { name: 'Siguiente' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Ver el testimonio 2 de 6' }))
 
     expect(centrada(container)).toBe(1)
 
@@ -913,19 +789,25 @@ describe('@s8 (@s20 de galería) cualquier desplazamiento manual REINICIA el rel
     expect(centrada(container)).toBe(2)
   })
 
-  it('@s8 en un carrusel PARADO por el usuario, el desplazamiento manual NO arranca nada', () => {
+  it('@s8 en un carrusel parado por `prefers-reduced-motion` (única parada que sobrevive), el desplazamiento manual NO arranca nada', () => {
+    // [ENMIENDA 4, 2026-07-24] El botón que paraba «por el usuario» ya NO EXISTE (@s8/@s11 de
+    // galería, RETIRADOS): la única parada persistente que sobrevive es `prefers-reduced-motion`.
+    vi.stubGlobal('matchMedia', (consulta: string) => ({
+      matches: consulta === '(prefers-reduced-motion: reduce)',
+      media: consulta,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    }))
     vi.useFakeTimers()
     const { container } = render(<Resenas />)
 
-    fireEvent.click(control())
-    fireEvent.click(screen.getByRole('button', { name: 'Siguiente' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Ver el testimonio 2 de 6' }))
 
     expect(centrada(container)).toBe(1)
 
     avanzar(12000)
 
     expect(centrada(container)).toBe(1)
-    expect(control()).toHaveAccessibleName(ETIQUETA_INICIAR)
   })
 })
 
@@ -945,63 +827,23 @@ describe('@s8 (@s10 de galería) el ratón reanuda la rotación al salir; el foc
     expect(centrada(container)).toBe(1)
   })
 
-  it('@s8 el FOCO de teclado para, y al salir NO reanuda sola: solo el botón la devuelve', () => {
+  it('@s8 el FOCO de teclado para, y al salir NO reanuda sola: pegajosa PERMANENTE, nada la devuelve', () => {
+    // [ENMIENDA 4, 2026-07-24] El botón «Iniciar» que antes revertía esta pausa YA NO EXISTE
+    // (@s11 de galería, RETIRADO). El foco se posa sobre CUALQUIER tabulable del carrusel: un
+    // punto indicador (@s17 de galería).
     vi.useFakeTimers()
     const { container } = render(<Resenas />)
-    const siguiente = screen.getByRole('button', { name: 'Siguiente' })
+    const punto = screen.getByRole('button', { name: 'Ver el testimonio 1 de 6' })
 
-    fireEvent.focus(siguiente)
+    fireEvent.focus(punto)
     avanzar(8000)
 
     expect(centrada(container)).toBe(0)
 
-    fireEvent.blur(siguiente)
+    fireEvent.blur(punto)
     avanzar(2000)
 
     expect(centrada(container)).toBe(0)
-  })
-})
-
-describe('@s8 (@s11 de galería) «Iniciar» arranca AHORA, ignorando el ratón encima y el foco dentro', () => {
-  it('@s8 con el puntero encima y el foco dentro, pulsar «Iniciar» avanza UNA posición a los 2000 ms', () => {
-    vi.useFakeTimers()
-    const { container } = render(<Resenas />)
-
-    fireEvent.click(control())
-    fireEvent.mouseEnter(carruselDe(container))
-    fireEvent.focus(screen.getByRole('button', { name: 'Siguiente' }))
-
-    expect(control()).toHaveAccessibleName(ETIQUETA_INICIAR)
-
-    fireEvent.click(control())
-    avanzar(2000)
-
-    expect(centrada(container)).toBe(1)
-    expect(control()).toHaveAccessibleName(ETIQUETA_PARAR)
-    expect(control()).not.toHaveAttribute('aria-pressed')
-  })
-
-  it('@s8 tras «Iniciar», un ratón NUEVO vuelve a pausar: el arranque explícito NO es pegajoso', () => {
-    vi.useFakeTimers()
-    const { container } = render(<Resenas />)
-
-    fireEvent.click(control())
-    fireEvent.mouseEnter(carruselDe(container))
-    fireEvent.click(control())
-    avanzar(2000)
-
-    expect(centrada(container)).toBe(1)
-
-    fireEvent.mouseLeave(carruselDe(container))
-    fireEvent.mouseEnter(carruselDe(container))
-    avanzar(12000)
-
-    expect(centrada(container)).toBe(1)
-
-    fireEvent.mouseLeave(carruselDe(container))
-    avanzar(2000)
-
-    expect(centrada(container)).toBe(2)
   })
 })
 
@@ -1010,15 +852,19 @@ describe('@s8 (@s12 de galería) con movimiento reducido arranca PAUSADO y la pr
   function stubDeMatchMedia(conPreferencia: boolean) {
     const escuchar = vi.fn()
     const dejarDeEscuchar = vi.fn()
-
-    vi.stubGlobal('matchMedia', (consulta: string) => ({
+    // Espiado (no una función suelta): mata el `StringLiteral` que vaciaría la consulta real
+    // (`'(prefers-reduced-motion: reduce)' -> ''`), invisible mientras nada comprobara con QUÉ
+    // argumento se llamó de verdad a `matchMedia` (mismo patrón que `galeria.test.tsx`).
+    const matchMedia = vi.fn((consulta: string) => ({
       matches: conPreferencia && consulta === '(prefers-reduced-motion: reduce)',
       media: consulta,
       addEventListener: escuchar,
       removeEventListener: dejarDeEscuchar,
     }))
 
-    return { escuchar, dejarDeEscuchar }
+    vi.stubGlobal('matchMedia', matchMedia)
+
+    return { escuchar, dejarDeEscuchar, matchMedia }
   }
 
   /** El manejador que el carrusel registró con addEventListener('change'). */
@@ -1030,26 +876,45 @@ describe('@s8 (@s12 de galería) con movimiento reducido arranca PAUSADO y la pr
     return escuchar.mock.calls[0][1] as (cambio: { matches: boolean }) => void
   }
 
-  it('@s8 a los 12000 ms sigue centrado el PRIMERO: arrancó pausado, y el control dice «Iniciar…» SIN disabled', () => {
-    stubDeMatchMedia(true)
-    vi.useFakeTimers()
-    const { container } = render(<Resenas />)
+  it('@s8 window.matchMedia se consulta con la media query EXACTA de movimiento reducido', () => {
+    // Sin esta comprobación, el mutante `StringLiteral` que cambia la consulta real por `''`
+    // sobrevive: ningún test comprobaba con QUÉ argumento llegaba la llamada de verdad.
+    const { matchMedia } = stubDeMatchMedia(true)
+    render(<Resenas />)
 
-    avanzar(12000)
-
-    expect(centrada(container)).toBe(0)
-    expect(control()).toHaveAccessibleName(ETIQUETA_INICIAR)
-    expect(control()).not.toBeDisabled()
-    expect(control()).not.toHaveAttribute('disabled')
+    expect(matchMedia).toHaveBeenCalledWith('(prefers-reduced-motion: reduce)')
   })
 
-  it('@s8 pulsar «Iniciar» bajo movimiento reducido SÍ arranca la rotación', () => {
+  it('@s8 a los 12000 ms sigue centrado el PRIMERO: arrancó pausado y no se movió ni una posición', () => {
     stubDeMatchMedia(true)
     vi.useFakeTimers()
     const { container } = render(<Resenas />)
 
-    fireEvent.click(control())
+    // Checkpoint a un tiempo NO múltiplo de 12000 (6×2000, la vuelta completa): sin esta
+    // comprobación intermedia, si el arranque pausado no pausara nada, el reloj seguiría rotando y
+    // volvería a caer en el PRIMERO tras una vuelta entera — el `Then` final pasaría igual (mismo
+    // patrón que @s8 (@s10 de galería), `avanzar(8000)`).
     avanzar(2000)
+
+    expect(centrada(container)).toBe(0)
+
+    avanzar(10000)
+
+    expect(centrada(container)).toBe(0)
+  })
+
+  it('@s8 [ENMIENDA 4] bajo esta preferencia YA NO EXISTE ninguna forma de arrancar la rotación: ni por control (retirado) ni por ningún otro gesto de la UI', () => {
+    // El desplazamiento MANUAL (un punto indicador) sigue moviendo el testimonio EN EL ACTO, pero
+    // el reloj automático sigue sin correr: la parada es PERMANENTE mientras dure la página.
+    stubDeMatchMedia(true)
+    vi.useFakeTimers()
+    const { container } = render(<Resenas />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ver el testimonio 2 de 6' }))
+
+    expect(centrada(container)).toBe(1)
+
+    avanzar(12000)
 
     expect(centrada(container)).toBe(1)
   })
@@ -1073,10 +938,18 @@ describe('@s8 (@s12 de galería) con movimiento reducido arranca PAUSADO y la pr
     expect(centrada(container)).toBe(1)
 
     act(() => manejadorDelCambio(escuchar)({ matches: true }))
-    avanzar(12000)
+
+    // Checkpoint a un tiempo NO múltiplo de 12000 tras la pausa: si el listener `change` no
+    // pausara nada, aquí ya habría avanzado varios pasos (mismo patrón que @s8 (@s10 de galería),
+    // `avanzar(8000)`). Sin esta comprobación, saltar directo a `avanzar(12000)` cae en el MISMO
+    // testimonio por una vuelta entera y no distingue «pausado» de «dio una vuelta entera sin parar».
+    avanzar(8000)
 
     expect(centrada(container)).toBe(1)
-    expect(control()).toHaveAccessibleName(ETIQUETA_INICIAR)
+
+    avanzar(4000)
+
+    expect(centrada(container)).toBe(1)
   })
 
   it('@s8 un cambio que DESACTIVA la preferencia NO pausa una rotación en curso', () => {
@@ -1090,7 +963,7 @@ describe('@s8 (@s12 de galería) con movimiento reducido arranca PAUSADO y la pr
     expect(centrada(container)).toBe(1)
   })
 
-  it('@s8 un cambio que DESACTIVA la preferencia NO arranca una pausada: reanudar es del usuario', () => {
+  it('@s8 [AJUSTADO ENMIENDA 4] un cambio que DESACTIVA la preferencia no reanuda nada: la pausa es DEFINITIVA por NINGUNA vía', () => {
     const { escuchar } = stubDeMatchMedia(true)
     vi.useFakeTimers()
     const { container } = render(<Resenas />)
@@ -1099,7 +972,6 @@ describe('@s8 (@s12 de galería) con movimiento reducido arranca PAUSADO y la pr
     avanzar(12000)
 
     expect(centrada(container)).toBe(0)
-    expect(control()).toHaveAccessibleName(ETIQUETA_INICIAR)
   })
 
   it('@s8 al desmontar, removeEventListener recibe EXACTAMENTE el manejador registrado con "change"', () => {
@@ -1136,11 +1008,13 @@ function pulsarTecla(opciones: KeyboardEventInit): KeyboardEvent {
 }
 
 describe('@s8 (@s23 de galería) el foco DENTRO del carrusel de reseñas atiende el teclado por sí solo', () => {
-  it('@s8 con el foco sobre su «Siguiente», ArrowLeft centra el ANTERIOR y ESE evento recibe preventDefault', () => {
+  it('@s8 con el foco sobre CUALQUIER tabulable (un punto indicador), ArrowLeft centra el ANTERIOR y ESE evento recibe preventDefault', () => {
     // jsdom NO trae IntersectionObserver y aquí NO se stubea: el foco dentro basta.
+    // [ENMIENDA 4] El foco se posaba sobre «Siguiente» (RETIRADO, @s16 de galería) SOLO como
+    // cualquier elemento tabulable: un punto indicador cumple el mismo papel.
     const { container } = render(<Resenas />)
 
-    fireEvent.focus(screen.getByRole('button', { name: 'Siguiente' }))
+    fireEvent.focus(screen.getByRole('button', { name: 'Ver el testimonio 1 de 6' }))
     const evento = pulsarTecla({ key: 'ArrowLeft' })
 
     expect(centrada(container)).toBe(5)
@@ -1149,10 +1023,10 @@ describe('@s8 (@s23 de galería) el foco DENTRO del carrusel de reseñas atiende
 
   it('@s8 cuando el foco SALE deja de atender: ArrowLeft ya no mueve ni recibe preventDefault', () => {
     const { container } = render(<Resenas />)
-    const siguiente = screen.getByRole('button', { name: 'Siguiente' })
+    const punto = screen.getByRole('button', { name: 'Ver el testimonio 1 de 6' })
 
-    fireEvent.focus(siguiente)
-    fireEvent.blur(siguiente)
+    fireEvent.focus(punto)
+    fireEvent.blur(punto)
     const evento = pulsarTecla({ key: 'ArrowLeft' })
 
     expect(centrada(container)).toBe(0)
@@ -1431,7 +1305,9 @@ describe('@s8 la desambiguación del teclado entre los DOS carruseles es la de @
     verSeccion(pistaResenas, 0.8, 100)
     const carruselGaleria = pistaGaleria.closest('[aria-roledescription="carrusel"]') as HTMLElement
 
-    fireEvent.focus(within(carruselGaleria).getByRole('button', { name: 'Siguiente' }))
+    // [ENMIENDA 4] El foco se posaba sobre «Siguiente» (RETIRADO, @s16 de galería) SOLO como
+    // cualquier elemento tabulable DENTRO de la galería: un punto indicador cumple el mismo papel.
+    fireEvent.focus(within(carruselGaleria).getByRole('button', { name: 'Ver la foto 1 de 6' }))
 
     const evento = new KeyboardEvent('keydown', {
       key: 'ArrowLeft',
@@ -1511,32 +1387,9 @@ describe('@s8 la desambiguación del teclado entre los DOS carruseles es la de @
   })
 })
 
-describe('@s8 (@s24 de galería) los mandos de cristal flotan SOBRE el marco, sin fila externa', () => {
-  it('@s8 el chip de rotación, «Anterior» y «Siguiente» son HIJOS DIRECTOS del carrusel', () => {
-    const { container } = render(<Resenas />)
-    const carrusel = carruselDe(container)
-
-    expect(control().parentElement).toBe(carrusel)
-    expect(screen.getByRole('button', { name: 'Anterior' }).parentElement).toBe(carrusel)
-    expect(screen.getByRole('button', { name: 'Siguiente' }).parentElement).toBe(carrusel)
-  })
-
-  it('@s8 el orden del DOM: chip → Anterior → Siguiente → escenario → puntos (tab-order del APG)', () => {
-    const { container } = render(<Resenas />)
-    const pista = pistaDe(container)
-    const puntos = screen.getByRole('group', { name: 'Elegir el testimonio que se muestra' })
-
-    expect(
-      screen.getByRole('button', { name: 'Siguiente' }).compareDocumentPosition(pista) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy()
-    expect(pista.compareDocumentPosition(puntos) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-  })
-})
-
 /* --- @s8: los DOS carruseles CONVIVEN en la home, desambiguados por su nombre accesible. --- */
 
-describe('@s8 en la home conviven DOS «Anterior», DOS «Siguiente» y DOS controles de rotación', () => {
+describe('@s8 [AJUSTADO 2026-07-24, ENMIENDA 4] los DOS carruseles conviven en la home: ningún id compartido, grupos de puntos con nombre propio', () => {
   it('@s8 los dos carruseles se nombran «Nuestros trabajos» y «Lo que dicen nuestras clientas» y no comparten NINGÚN id', () => {
     const { container } = render(
       <HelmetProvider>
@@ -1557,27 +1410,11 @@ describe('@s8 en la home conviven DOS «Anterior», DOS «Siguiente» y DOS cont
     expect(ids).toContain('resenas-pista')
   })
 
-  it('@s8 hay DOS botones de cada mando en la página, y dentro del ámbito de CADA carrusel siguen siendo singulares', () => {
-    render(
-      <HelmetProvider>
-        <Home />
-      </HelmetProvider>,
-    )
-
-    expect(screen.getAllByRole('button', { name: 'Anterior' })).toHaveLength(2)
-    expect(screen.getAllByRole('button', { name: 'Siguiente' })).toHaveLength(2)
-    expect(screen.getAllByRole('button', { name: ETIQUETA_PARAR })).toHaveLength(2)
-
-    // La desambiguación es el nombre accesible del carrusel CONTENEDOR: dentro de cada ámbito,
-    // getByRole (SINGULAR) no lanza.
-    for (const nombre of ['Nuestros trabajos', 'Lo que dicen nuestras clientas']) {
-      const ambito = screen.getByRole('group', { name: nombre })
-
-      expect([...ambito.querySelectorAll('[aria-label="Anterior"]')]).toHaveLength(1)
-      expect([...ambito.querySelectorAll('[aria-label="Siguiente"]')]).toHaveLength(1)
-      expect([...ambito.querySelectorAll(`[aria-label="${ETIQUETA_PARAR}"]`)]).toHaveLength(1)
-    }
-  })
+  // [RETIRADO ENMIENDA 4] "hay DOS botones de cada mando en la página..." (Anterior, Siguiente,
+  // control de rotación) — ya no tiene referente en NINGUNO de los dos carruseles (ambos perdieron
+  // sus tres controles en el MISMO commit 9cf32a9). Lo que sigue siendo cierto, y lo sustituye, ya
+  // está cubierto: el test de arriba (ningún id compartido) y el de abajo (grupos de puntos con
+  // nombre accesible propio).
 
   it('@s8 los puntos de cada carrusel hablan su idioma: «Ver la foto…» en la galería, «Ver el testimonio…» aquí', () => {
     render(

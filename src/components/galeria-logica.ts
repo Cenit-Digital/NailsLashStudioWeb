@@ -80,20 +80,6 @@ export function etiquetaDelPunto(indice: number, total: number): string {
 }
 
 /**
- * La etiqueta del control de rotación, que CAMBIA con el estado. Por eso el botón NO expone
- * `aria-pressed` (APG literal: «since the label changes, the rotation control does not have any
- * states, e.g., aria-pressed, specified»): anunciaría el estado dos veces y de forma contradictoria.
- */
-export function etiquetaDeRotacion(rotando: boolean): string {
-  return rotando ? 'Parar la reproducción automática' : 'Iniciar la reproducción automática'
-}
-
-/** El gancho de test `data-estado` del control de rotación. */
-export function claveDeRotacion(rotando: boolean): 'rotando' | 'pausado' {
-  return rotando ? 'rotando' : 'pausado'
-}
-
-/**
  * El `aria-live` del contenedor de diapositivas (APG): CALLADO mientras la rotación es automática
  * —anunciar cada cambio interrumpiría al usuario— y `polite` en cuanto los cambios los provoca él.
  */
@@ -109,7 +95,13 @@ export interface EstadoDeRotacion {
   readonly raton: boolean
   /** El foco de teclado ENTRÓ en el carrusel. Para, y NO reanuda sola: solo el botón la devuelve. */
   readonly foco: boolean
-  /** El usuario pulsó «Iniciar»: quiere rotación YA, ignorando el ratón encima y el foco dentro. */
+  /**
+   * El usuario pulsó «Iniciar»: quiere rotación YA, ignorando el ratón encima y el foco dentro.
+   * [ENMIENDA 4] El botón que lo activaba se retiró a mano (commit 9cf32a9): HOY ningún componente
+   * (`Galeria.tsx`, `Resenas.tsx`) llama a `debeRotar` con este campo a `true` — ambos pasan
+   * siempre `false`. Se conserva aquí, en la función PURA, como capacidad reutilizable (documentada
+   * y probada por `galeria-logica.test.ts` @s8/@s11) para un futuro control que vuelva a arrancarla.
+   */
   readonly arranqueExplicito: boolean
 }
 

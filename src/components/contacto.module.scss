@@ -42,7 +42,13 @@
   color: var(--text);
   font-size: 0.96875rem;
 
-  a {
+  // Enlaces informativos (Teléfono, Instagram) en el rosa de marca. Se EXCLUYE `.demo-btn` a
+  // propósito: un botón (p. ej. el CTA de WhatsApp `.demo-btn--wa`) trae su propio color de la
+  // utilidad global `_demo.scss`, y sin este `:not()` el `.datos a` lo pisaría por especificidad
+  // (0,1,1 > 0,1,0) tiñendo su texto de --accent-dark sobre el verde. `:global(.demo-btn)` porque
+  // `demo-btn` es una clase GLOBAL (no del módulo): sin `:global` CSS Modules la hashearía y el
+  // `:not` no casaría nunca. Patrón `:global()` ya usado en el repo (hero.module.scss:178).
+  a:not(:global(.demo-btn)) {
     color: var(--accent-dark);
     text-decoration: none;
 

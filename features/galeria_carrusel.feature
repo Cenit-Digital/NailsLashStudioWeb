@@ -1,17 +1,24 @@
 # =============================================================================================
-# Contrato de `galeria_carrusel` — v3 = v2.2 + ENMIENDA 3 (2026-07-23, encargo DIRECTO de Pablo:
-# 4 decisiones por AskUserQuestion + 3 matices, sintetizadas en el brief
-# `progress/galeria_v3_resenas_diseno.md`). Historial: v2.1 = v2 (reescritura completa del
-# borrador) + ENMIENDA 1 (hallazgos del judge y del auditor a11y: @s19 NUEVO —arrastre—, @s12,
-# @s15 y @s17 ampliados); v2.2 = + ENMIENDA 2 (bug del drag nativo MEDIDO en Chrome real:
-# draggable=false y touch-action, y el rediseño de `pasosDelArrastre` tras el superviviente
-# 153:10 de mutación). LA ENMIENDA 3 CAMBIA: @s9 reescrito a 2000 ms (la cadencia baja de 4 s a
-# 2 s por decisión del cliente, con la constante MUDADA a `carrusel-logica.ts`), @s10 y @s11
-# re-medidos a UN tick de 2000 ms (solo números: su conducta NO cambia), y CINCO escenarios
-# nuevos: @s20 (el reinicio del reloj tras un desplazamiento manual), @s21..@s23 (el teclado
-# global: decisión pura, desambiguación entre DOS carruseles, cableado guardado) y @s24 (los
-# mandos de cristal sobre el marco; la fila .mandos externa desaparece). Los Then de @s1..@s8 y
-# de @s12..@s19 NO cambian.
+# 🟠 ENMIENDA 4 (2026-07-24): DECISIÓN INFORMADA DE PABLO, FUERA DEL TDD, ABRE UN HUECO WCAG.
+# El commit `9cf32a9` retiró a mano los TRES controles del carrusel (rotación, «Anterior»,
+# «Siguiente»). Pablo, informado del hueco resultante en SC 2.2.2, decidió CONSERVARLO. @s8, @s11,
+# @s16 y @s24 quedan RETIRADOS (cuerpo histórico conservado, tag nunca reutilizado); @s2, @s6,
+# @s7 [sin cambios, confirmado], @s10, @s12, @s20 y @s23 quedan AJUSTADOS. Ver el bloque dedicado
+# tras el TECHO y `progress/enmienda4_carrusel_sc222.md` para el registro completo de la decisión.
+# =============================================================================================
+# Contrato de `galeria_carrusel` — v4 = v3 + ENMIENDA 4 (2026-07-24, ver bloque arriba) = v2.2 +
+# ENMIENDA 3 (2026-07-23, encargo DIRECTO de Pablo: 4 decisiones por AskUserQuestion + 3 matices,
+# sintetizadas en el brief `progress/galeria_v3_resenas_diseno.md`). Historial: v2.1 = v2
+# (reescritura completa del borrador) + ENMIENDA 1 (hallazgos del judge y del auditor a11y: @s19
+# NUEVO —arrastre—, @s12, @s15 y @s17 ampliados); v2.2 = + ENMIENDA 2 (bug del drag nativo MEDIDO
+# en Chrome real: draggable=false y touch-action, y el rediseño de `pasosDelArrastre` tras el
+# superviviente 153:10 de mutación). LA ENMIENDA 3 CAMBIA: @s9 reescrito a 2000 ms (la cadencia
+# baja de 4 s a 2 s por decisión del cliente, con la constante MUDADA a `carrusel-logica.ts`),
+# @s10 y @s11 re-medidos a UN tick de 2000 ms (solo números: su conducta NO cambia), y CINCO
+# escenarios nuevos: @s20 (el reinicio del reloj tras un desplazamiento manual), @s21..@s23 (el
+# teclado global: decisión pura, desambiguación entre DOS carruseles, cableado guardado) y @s24
+# (los mandos de cristal sobre el marco; la fila .mandos externa desaparece). Los Then de @s1..@s8
+# y de @s12..@s19 NO cambian [EN v3; la ENMIENDA 4, arriba, SÍ toca varios de @s8 en adelante].
 #
 # FUENTE DE VERDAD ÚNICA: `progress/galeria_coverflow_diseno.md` (brief del craftsman_lead,
 # síntesis de cuatro reconocimientos: spec CSS 3D del W3C, APG + WCAG 2.2, auditoría de las cinco
@@ -27,16 +34,81 @@
 #
 # QUÉ SE CONSTRUYE: la galería «Nuestros trabajos» deja de ser un carril `scroll-snap` y pasa a ser
 # un CARRUSEL COVERFLOW 3D EN DOMO (la central se ELEVA, las laterales CAEN, giran hacia dentro,
-# encogen y se apagan), con bucle infinito por el camino corto, autoplay de 2 s (ENMIENDA 3;
-# nació de 4 s), control de pausa/reanudación persistente, teclado global ← / → por visibilidad
-# de la sección y mandos de cristal flotando sobre el marco.
+# encogen y se apagan), con bucle infinito por el camino corto y autoplay de 2 s (ENMIENDA 3; nació
+# de 4 s). [ENMIENDA 4, 2026-07-24] YA NO lleva control de pausa/reanudación persistente ni mandos
+# de cristal: Pablo los retiró a mano (commit 9cf32a9), a sabiendas del hueco en SC 2.2.2 — ver el
+# bloque ENMIENDA 4 más abajo. Lo que SÍ conserva: teclado global ← / → por visibilidad de la
+# sección, puntos indicadores, clic en tarjeta lateral y arrastre táctil.
 #
 # ---------------------------------------------------------------------------------------------
 # TECHO: 24 escenarios (@s1..@s24). Los 18 originales los impuso el lead; el @s19 lo añade la
 # ENMIENDA 1 por orden del propio lead; los CINCO de la ENMIENDA 3 (@s20..@s24) los ordena el
 # brief `progress/galeria_v3_resenas_diseno.md` §6 dentro de su tope de ≤5 nuevos (no es
 # ampliación unilateral). Este repo tiene historia de contratos sobredimensionados que convierten
-# un cambio de una tarde en dos días. No se amplía sin humano.
+# un cambio de una tarde en dos días. No se amplía sin humano. [ENMIENDA 4] El TECHO sigue en 24
+# tags tras la retirada: @s8, @s11, @s16 y @s24 quedan RETIRADOS (título marcado, cuerpo
+# histórico) — NINGÚN tag se renumera ni se reutiliza; `resenas_agregado_enlace.feature` @s8
+# referencia estos números por texto.
+# ---------------------------------------------------------------------------------------------
+#
+# ENMIENDA 4 (2026-07-24) — SC 2.2.2 YA NO SE CUMPLE: DECISIÓN INFORMADA DE PABLO, FUERA DEL TDD
+# ---------------------------------------------------------------------------------------------
+#   QUÉ PASÓ. El commit `9cf32a9` ("Eliminar botones de control del carrusel en Galeria y
+#   Resenas"), hecho A MANO por Pablo —el dueño del producto, FUERA del ciclo TDD— borró de
+#   `src/components/Galeria.tsx` y `src/components/Resenas.tsx` los TRES <button> de mando: el
+#   control de rotación (❙❙/▶, `onClick={alternarRotacion}`, el aria-label que alternaba «Parar la
+#   reproducción automática»/«Iniciar la reproducción automática», `data-estado`) y las dos
+#   flechas («Anterior»/«Siguiente», `onClick={() => desplazar(±1)}`). `alternarRotacion` queda
+#   sin llamador (código MUERTO): un `tdd_craftsman` posterior lo retirará junto con la
+#   implementación, sobre ESTE contrato ya amendado.
+#
+#   LA PREGUNTA Y LA RESPUESTA. El `craftsman_lead` avisó del hueco resultante en WCAG 2.2 SC
+#   2.2.2 (Pause, Stop, Hide, Nivel A, BLOQUEANTE) citando LITERALMENTE la propia línea de este
+#   contrato que lo declaraba bloqueante (ver el escenario @s8, RETIRADO más abajo, y su nota:
+#   «(N) SC 2.2.2 Pause, Stop, Hide (Nivel A, BLOQUEANTE, y de No-Interferencia: un fallo aquí
+#   contamina la conformidad de TODA la página)»), y preguntó explícitamente si restaurar AL
+#   MENOS el botón de pausa. Pablo respondió, A SABIENDAS del hueco:
+#     > «No lo soluciones para que todo pase, con los cambios que yo he hecho, que para eso los
+#     > he hecho yo a mano, gracias, ultrathink.»
+#   Es DECISIÓN INFORMADA de la puerta humana: se conserva la edición de Pablo tal cual, y el
+#   contrato se enmienda para reflejarla con honestidad — nunca al revés. Registro completo en
+#   `progress/enmienda4_carrusel_sc222.md`.
+#
+#   QUÉ SOBREVIVE (ninguno depende de los tres controles eliminados):
+#     · La pausa por `prefers-reduced-motion` (arranca pausado si el SO lo pide) — @s12.
+#     · La pausa TRANSITORIA al pasar el ratón por encima, que REANUDA sola al salir — @s10, fila
+#       del ratón.
+#     · La pausa al recibir el foco de teclado, que YA ERA «pegajosa» (no reanudaba sola) y ahora
+#       es PERMANENTE mientras dure la página: antes el botón «Iniciar» la revertía, y ese botón
+#       ya no existe — @s10, fila del foco.
+#     · El teclado ← / → por sección visible (@s21..@s23), el arrastre táctil (@s19), los puntos
+#       indicadores (@s17) y el clic en tarjeta lateral (@s18): NINGUNO depende de los botones
+#       eliminados y NINGUNO de sus Then cambia.
+#
+#   QUÉ YA NO EXISTE:
+#     · La pausa/reanudación EXPLÍCITA por click/tap del usuario — el control de rotación
+#       (@s8, RETIRADO) y el arranque explícito «Iniciar» que ignoraba ratón y foco (@s11,
+#       RETIRADO).
+#     · La navegación manual por flecha-botón «Anterior»/«Siguiente» (@s16, RETIRADO): el paso ±1
+#       sigue cubierto por teclado (@s21), puntos (@s17), clic en tarjeta (@s18) y arrastre
+#       (@s19), pero YA NO por botón.
+#     · Los mandos de cristal (chip de rotación + flechas) sobre el marco (@s24, RETIRADO).
+#
+#   LA CONSECUENCIA WCAG, declarada sin atenuantes. Para un usuario que navegue SOLO con ratón o
+#   SOLO con el dedo (sin teclado), el autoplay de 2 s YA NO TIENE ningún mecanismo de parada
+#   PERSISTENTE y bajo su control: el hover pausa pero se reanuda solo al levantar el puntero, y
+#   no queda ni botón ni gesto táctil que la pare de forma duradera. WCAG 2.2 SC 2.2.2 (Pause,
+#   Stop, Hide, Nivel A) YA NO SE CUMPLE para esos usuarios, desde el 2026-07-24, por decisión de
+#   Pablo tomada A SABIENDAS del hueco. Para el usuario de TECLADO la situación es la contraria y
+#   no incumple 2.2.2 (que no exige poder REINICIAR la animación, solo poder pararla): tabular al
+#   carrusel la para y la deja parada de forma permanente.
+#
+#   ESCENARIOS RETIRADOS (título `[RETIRADO 2026-07-24, ENMIENDA 4]`, cuerpo histórico intacto,
+#   tag nunca reutilizado): @s8, @s11, @s16, @s24.
+#   ESCENARIOS AJUSTADOS (algún Then/And concreto retirado o reescrito; el resto de cada uno
+#   sigue vigente): @s2, @s6, @s10, @s12, @s20, @s23.
+#   ESCENARIOS CONFIRMADOS SIN CAMBIO (releídos contra el test real; no dependen de los botones
+#   retirados): @s7, @s9.
 # ---------------------------------------------------------------------------------------------
 #
 # LAS DOS CONVENCIONES QUE EL `judge` NECESITA SABER DE ANTEMANO
@@ -55,15 +127,24 @@
 # ---------------------------------------------------------------------------------------------
 #   (N) letra de una norma  ·  (T) técnica suficiente / implementación de referencia (APG)  ·
 #   (P) criterio de proyecto. Cada escenario dice de cuál vive. En particular:
-#     · El control de pausa persistente y visible es (N) SC 2.2.2 (A, y de No-Interferencia).
+#     · El control de pausa persistente y visible ERA (N) SC 2.2.2 (A, y de No-Interferencia).
+#       [ENMIENDA 4, 2026-07-24] YA NO EXISTE (retirado a mano, @s8 RETIRADO): SC 2.2.2 YA NO SE
+#       CUMPLE para quien navega solo con ratón o solo con el dedo. Decisión informada de Pablo;
+#       ver el bloque ENMIENDA 4 tras el TECHO. PROHIBIDO citar este criterio como cumplido desde
+#       esta fecha: sería la MISMA atribución normativa falsa que esta leyenda castiga, en sentido
+#       inverso.
 #     · «El control va primero en el orden de tabulación» es (T) del APG, NO la letra de SC 2.4.3.
 #     · «Arranca pausado bajo prefers-reduced-motion» es (T) del APG + (P) del repo, y NO es la
 #       letra de ningún SC A/AA: 2.2.2 exige UN MECANISMO, no honrar la preferencia del SO.
 #     · SC 2.3.3 (Animation from Interactions) es AAA y NO cubre el autoplay: prohibido citarlo
 #       como obligación AA.
 #     · [ENMIENDA 3] La cadencia de 2 s y la vuelta «sin frenazo» son DECISIÓN DEL CLIENTE (Pablo,
-#       2026-07-23): ni norma ni APG. La pausa por hover/foco/botón NO cambia — SC 2.2.2 sigue
-#       intacto (@s8, @s10, @s11 y @s12 conservan todos sus Then).
+#       2026-07-23): ni norma ni APG. [ENMIENDA 4, 2026-07-24 — CORRIGE LO SIGUIENTE, QUE DEJÓ DE
+#       SER CIERTO] Esta línea decía «la pausa por hover/foco/botón NO cambia — SC 2.2.2 sigue
+#       intacto (@s8, @s10, @s11 y @s12 conservan todos sus Then)»: el botón desapareció (@s8 y
+#       @s11 quedan RETIRADOS) y SC 2.2.2 YA NO SE CUMPLE para quien navega solo con ratón o solo
+#       con el dedo. Solo sobreviven la pausa transitoria del ratón y la pausa pegajosa —ahora
+#       PERMANENTE, sin retorno— del foco (@s10, AJUSTADO). Ver el bloque ENMIENDA 4.
 #     · [ENMIENDA 3] El teclado global por visibilidad (@s21..@s23) es (P) del proyecto —petición
 #       del cliente— y NO letra WCAG: SC 2.1.1 ya estaba satisfecho por flechas y puntos. Su única
 #       línea roja es NO interferir: preventDefault SOLO cuando se atiende.
@@ -102,13 +183,25 @@
 #   · [ENMIENDA 1] El ARRASTRE con el dedo YA NO está excluido: su cableado lo exige @s19 (la
 #     decisión sigue en `pasosDelArrastre`, ya testeada por valor). Para la verificación EN VIVO en
 #     Chrome solo queda el GESTO FÍSICO (dedo real), que ningún test de jsdom puede fingir.
+#   · [ENMIENDA 4, 2026-07-24] YA NO garantiza WCAG 2.2 SC 2.2.2 (Pause, Stop, Hide, Nivel A) para
+#     usuarios de ratón o táctil sin teclado: el mecanismo de parada persistente por acción del
+#     usuario (el control de rotación, @s8) fue retirado a mano por decisión INFORMADA de Pablo
+#     (commit 9cf32a9, fuera del TDD), que prefirió conservar su edición a restaurar el botón tras
+#     ser avisado del hueco. Es DEUDA DECLARADA, no un descuido: ver el bloque ENMIENDA 4 tras el
+#     TECHO y `progress/enmienda4_carrusel_sc222.md`.
 # =============================================================================================
 
-Feature: La galería «Nuestros trabajos» como carrusel coverflow 3D en domo, con bucle infinito por el camino corto, autoplay de 2 segundos y control de pausa persistente
-  Como visitante quiero ver los trabajos del salón en un carrusel con relieve, que avance solo y que
-  pueda parar cuando quiera; y como responsable del proyecto quiero que las seis fotos, la nota de
-  honestidad y las cinco puertas del build sigan exactamente como están, que el bucle no deje huecos
-  vacíos y que quien navegue con teclado o con lector de pantalla no se quede fuera.
+Feature: La galería «Nuestros trabajos» como carrusel coverflow 3D en domo, con bucle infinito por el camino corto y autoplay de 2 segundos [ENMIENDA 4, 2026-07-24: SIN control de pausa/reanudación por acción del usuario ni flechas de navegación — retirados a mano por decisión INFORMADA de Pablo; WCAG 2.2 SC 2.2.2 ya NO se cumple para quien navega solo con ratón o solo con el dedo]
+  Como visitante quiero ver los trabajos del salón en un carrusel con relieve que avance solo. [ENMIENDA
+  4] Ya NO puedo pararlo ni reanudarlo cuando quiera con un control dedicado: si navego con teclado,
+  tabular al carrusel lo detiene de forma permanente (sin manera de reanudarlo salvo recargar la
+  página); si paso el ratón por encima lo detiene solo mientras lo mantengo ahí, y se reanuda solo al
+  retirarlo; si uso solo el dedo, no tengo ningún mecanismo de parada duradera. Sigo pudiendo moverme a
+  mano con los puntos indicadores, pulsando una tarjeta lateral, arrastrando o —si estoy con teclado—
+  con las flechas ← / →: lo que ya NO existe son los botones «Anterior»/«Siguiente» ni el control de
+  rotación. Y como responsable del proyecto quiero que las seis fotos, la nota de honestidad y las
+  cinco puertas del build sigan exactamente como están, que el bucle no deje huecos vacíos y que quien
+  navegue con teclado o con lector de pantalla no se quede fuera de lo que SÍ sigue existiendo.
 
   # -------------------------------------------------------------------------------------------
   # LO QUE NO PUEDE ROMPERSE. Dos escenarios de regresión, ni uno más.
@@ -138,14 +231,17 @@ Feature: La galería «Nuestros trabajos» como carrusel coverflow 3D en domo, c
     And la galería aporta exactamente UN "<h2>", cuyo texto es exactamente "Nuestros trabajos"
     And los puntos indicadores NO son "<a href='#…'>" y no viven dentro de ninguna "<nav>": son "<button type='button'>"
     And se muestra la nota exactamente "Galería de muestra · fotos de banco de imágenes, las fotos reales del salón se añaden antes de publicar."
-    And existe EXACTAMENTE UN botón cuyo nombre accesible es "Anterior" y EXACTAMENTE UNO cuyo nombre accesible es "Siguiente"
+    And [ENMIENDA 4, 2026-07-24] ya NO existe ningún botón cuyo nombre accesible sea "Anterior" ni "Siguiente": las flechas se retiraron a mano (commit 9cf32a9) y su escenario propio, @s16, queda RETIRADO
     And la galería sigue viviendo dentro de "<main>"
     # [CRITICO] Convertirlo en `<section aria-labelledby>` rompe DOS puertas a la vez: pasaría a ser
     # «sección navegable» (`puerta-cascaron.ts:505-520`) y la nav no la enlaza, luego
     # `REGLA_INALCANZABLE` (`puerta-anclas.ts:132-142`). Usar `<nav>` o `<a href="#…">` para los
     # puntos los mete en la puerta de anclas como anclas de navegación (`puerta-anclas.ts:34,46-60`).
     # La nota se compara CARÁCTER A CARÁCTER, con su «·» y sus acentos (`galeria.test.tsx:78-84`).
-    # Que la galería siga dentro de `<main>` lo vigila `boton-whatsapp-montaje.test.tsx:50-63`.
+    # Que la galería siga dentro de `<main>` lo vigila `galeria.test.tsx:1119-1128`.
+    # [ENMIENDA 4] El And de las flechas ANTES afirmaba su EXISTENCIA singular; ahora afirma su
+    # AUSENCIA, con la misma precisión: ninguna atribución de cumplimiento sin verificar, en
+    # ningún sentido.
 
   # -------------------------------------------------------------------------------------------
   # LA ARITMÉTICA DEL BUCLE. Aquí es donde muerde Stryker: es lo único que puede morder.
@@ -231,7 +327,11 @@ Feature: La galería «Nuestros trabajos» como carrusel coverflow 3D en domo, c
     And sus nombres accesibles son, en orden del DOM, "1 de 6", "2 de 6", "3 de 6", "4 de 6", "5 de 6" y "6 de 6"
     And NINGUNA diapositiva expone aria-hidden, ni siquiera la que está a distancia 3 y no se ve
     And el orden del DOM de las seis es SIEMPRE 1..6, cualquiera que sea la foto centrada
-    And los botones "Anterior" y "Siguiente" apuntan con aria-controls al contenedor de diapositivas, que tiene id="galeria-pista"
+    # [RETIRADO ENMIENDA 4, 2026-07-24] "And los botones "Anterior" y "Siguiente" apuntan con
+    # aria-controls al contenedor de diapositivas, que tiene id="galeria-pista"" — ya no tiene
+    # referente: las flechas se retiraron (@s16, RETIRADO). El resto de @s6 (role=group,
+    # aria-roledescription, aria-labelledby, las seis diapositivas nunca ocultas, el orden del
+    # DOM) SIGUE VIGENTE sin cambio.
     # (T) APG, variante Grouped. (N) ARIA para el `aria-hidden`: quien oculta contenido VISIBLE «MUST
     # ensure that identical or equivalent meaning and functionality is exposed», y aquí no lo está en
     # ningún otro sitio (una foto al 38 % se ve). El propio APG avisa: «the screen reader experience
@@ -261,9 +361,23 @@ Feature: La galería «Nuestros trabajos» como carrusel coverflow 3D en domo, c
     # en `rotando` a secas; la segunda mata al que lo convierte en `!foco`. `aria-atomic="false"` está
     # en la prosa del patrón APG pero AUSENTE del HTML de sus dos ejemplos (verificado): se pone
     # porque es inocuo y blinda contra un ancestro que lo ponga a `true`.
+    # [ENMIENDA 4, 2026-07-24 — CONFIRMADO SIN CAMBIO] Este Scenario Outline nunca menciona el
+    # control retirado: la fila «rotando=no, foco=no» sigue siendo ALCANZABLE sin él (basta con
+    # que el ratón esté DENTRO del carrusel, `raton=true`, que ya para la rotación por sí solo —
+    # ver `debeRotar` en `galeria-logica.ts`), y la fila «rotando=no, foco=sí» tras la ENMIENDA 4
+    # es incluso MÁS fácil de alcanzar (el foco basta y ya no hace falta ningún botón). Ningún Then
+    # cambia.
 
   @s8
-  Scenario: El control de rotación es el PRIMER tabulable, su nombre CAMBIA y nunca lleva aria-pressed
+  Scenario: [RETIRADO 2026-07-24, ENMIENDA 4] El control de rotación es el PRIMER tabulable, su nombre CAMBIA y nunca lleva aria-pressed
+    # [RETIRADO — decisión INFORMADA de Pablo, commit 9cf32a9, fuera del TDD] El control de
+    # rotación (❙❙/▶) que este escenario describe YA NO EXISTE en `Galeria.tsx`: Pablo lo borró a
+    # mano y, avisado del hueco en SC 2.2.2 (BLOQUEANTE — la propia nota de este escenario, más
+    # abajo, lo dice literalmente), decidió CONSERVAR su edición. El cuerpo de abajo se CONSERVA
+    # ÍNTEGRO como registro histórico de lo que el control garantizaba (y de por qué su ausencia
+    # es un hueco WCAG real, no un detalle): NO describe código vigente desde el 2026-07-24. Ver
+    # el bloque ENMIENDA 4 tras el TECHO y `progress/enmienda4_carrusel_sc222.md`. Este tag @s8 NO
+    # se reutiliza para ningún escenario nuevo.
     Given el carrusel rotando, cuyo control de rotación tiene el nombre accesible exactamente "Parar la reproducción automática"
     When se pulsa ese control
     Then su nombre accesible pasa a ser exactamente "Iniciar la reproducción automática"
@@ -311,7 +425,7 @@ Feature: La galería «Nuestros trabajos» como carrusel coverflow 3D en domo, c
     # 'Timeout' is not assignable to type 'number'`): el ref se tipa `ReturnType<typeof setInterval>`.
 
   @s10
-  Scenario Outline: El ratón reanuda la rotación al salir; el foco de teclado NO
+  Scenario Outline: [AJUSTADO 2026-07-24, ENMIENDA 4] El ratón reanuda la rotación al salir; el foco de teclado NO
     Given el carrusel rotando con la PRIMERA foto centrada
     And "<gesto>" ha entrado en el carrusel y, desde entonces, avanzar el reloj 8000 milisegundos NO ha cambiado la foto centrada
     When "<gesto>" sale del carrusel y el reloj avanza otros 2000 milisegundos
@@ -320,7 +434,7 @@ Feature: La galería «Nuestros trabajos» como carrusel coverflow 3D en domo, c
     Examples:
       | gesto                | foto centrada al final | decisión                                                        |
       | el puntero del ratón | la SEGUNDA             | reanuda sola al salir (T)                                       |
-      | el foco de teclado   | la PRIMERA             | NO reanuda sola: solo el botón la devuelve (P, lectura conservadora) |
+      | el foco de teclado   | la PRIMERA             | NO reanuda sola y [ENMIENDA 4] ya NO existe ningún mecanismo que la devuelva: pegajosa PERMANENTE |
 
     # LA ASIMETRÍA ES DELIBERADA y es la decisión nº 2 de la cabecera de este fichero. El APG se
     # contradice consigo mismo sobre si el foco reanuda; se elige que NO (2 fuentes contra 1, y es la
@@ -330,9 +444,22 @@ Feature: La galería «Nuestros trabajos» como carrusel coverflow 3D en domo, c
     # La rotación queda decidida por una función PURA con TODO inyectado (pausado por el usuario,
     # ratón, foco, arranque explícito): es lo único que Stryker puede morder de este comportamiento.
     # [ENMIENDA 3] Solo cambia el número (un tick son ahora 2000 ms): la asimetría y sus Then, NO.
+    # [ENMIENDA 4, 2026-07-24] El Then de la fila del foco NO cambia (sigue siendo la PRIMERA): lo
+    # que cambia es SOLO la columna "decisión" (comentario, no aserción). Antes, «solo el botón la
+    # devuelve» describía una vía de retorno real (pulsar «Iniciar»); esa vía YA NO EXISTE
+    # (@s11, RETIRADO): la pausa por foco es ahora PERMANENTE mientras la página no se recargue.
+    # Para el usuario de TECLADO esto NO incumple SC 2.2.2 (que exige poder PARAR, no poder
+    # REINICIAR); el hueco real está en @s10 fila del RATÓN combinada con la ausencia de @s8: quien
+    # NO usa teclado no tiene ninguna parada persistente. Ver el bloque ENMIENDA 4 tras el TECHO.
 
   @s11
-  Scenario: «Iniciar» arranca la rotación AHORA, ignorando el ratón encima y el foco dentro
+  Scenario: [RETIRADO 2026-07-24, ENMIENDA 4] «Iniciar» arranca la rotación AHORA, ignorando el ratón encima y el foco dentro
+    # [RETIRADO — decisión INFORMADA de Pablo, commit 9cf32a9, fuera del TDD] El sujeto de este
+    # escenario es el botón «Iniciar» (el mismo control de rotación de @s8, en su estado pausado):
+    # YA NO EXISTE. El cuerpo de abajo se CONSERVA ÍNTEGRO como registro histórico de la
+    # precedencia que el arranque explícito imponía sobre ratón y foco — hoy INALCANZABLE, porque
+    # `arranqueExplicito` nunca vuelve a ser `true` (su único setter vivía en el `onClick` borrado).
+    # Ver el bloque ENMIENDA 4 tras el TECHO. Este tag @s11 NO se reutiliza.
     Given el carrusel parado por el usuario, con el puntero del ratón ENCIMA del carrusel y el foco de teclado DENTRO de él
     And su control de rotación se anuncia exactamente "Iniciar la reproducción automática"
     When se pulsa ese control y el reloj avanza 2000 milisegundos
@@ -347,15 +474,17 @@ Feature: La galería «Nuestros trabajos» como carrusel coverflow 3D en domo, c
     # [ENMIENDA 3] Solo cambia el número del tick (2000 ms): la precedencia del arranque, NO.
 
   @s12
-  Scenario: Con la preferencia de movimiento reducido, el carrusel arranca PAUSADO pero no se le retira la función, y la preferencia se escucha EN CALIENTE
+  Scenario: [AJUSTADO 2026-07-24, ENMIENDA 4] Con la preferencia de movimiento reducido, el carrusel arranca PAUSADO y —desde la ENMIENDA 4— se queda así para siempre: la preferencia se escucha EN CALIENTE, pero ya no hay ninguna forma de arrancar
     Given el sistema operativo con la preferencia "prefers-reduced-motion: reduce" activada
     When se monta la galería y el reloj avanza 12000 milisegundos
     Then la foto centrada sigue siendo la PRIMERA: el carrusel arrancó pausado, no se movió ni una posición
-    And el control de rotación se anuncia exactamente "Iniciar la reproducción automática"
-    And ese control NO expone el atributo disabled: pulsarlo arranca la rotación
+    # [RETIRADO ENMIENDA 4] "el control de rotación se anuncia exactamente 'Iniciar la reproducción
+    # automática'" y "ese control NO expone el atributo disabled: pulsarlo arranca la rotación" —
+    # ninguno de los dos tiene ya referente: el control se retiró (@s8, RETIRADO).
+    And [ENMIENDA 4] bajo esta preferencia YA NO EXISTE ninguna forma de arrancar la rotación: ni por control (retirado, @s8) ni por ningún otro gesto de la UI — la parada es PERMANENTE mientras dure la página, sin recargarla
     And las seis diapositivas siguen presentes, con sus nombres accesibles "1 de 6" … "6 de 6"
-    And en el caso CONTRARIO — montada SIN la preferencia y rotando — activarla con la página abierta pausa la rotación EN CURSO: desde el disparo del cambio, avanzar el reloj 12000 milisegundos NO mueve la foto centrada y el control pasa a anunciarse exactamente "Iniciar la reproducción automática"
-    And un cambio que DESACTIVA la preferencia no toca nada: NO pausa una rotación en curso y NO arranca una pausada — reanudar sigue siendo decisión del usuario, con su botón
+    And en el caso CONTRARIO — montada SIN la preferencia y rotando — activarla con la página abierta pausa la rotación EN CURSO: desde el disparo del cambio, avanzar el reloj 12000 milisegundos NO mueve la foto centrada [ENMIENDA 4: se retira la mención del control, que antes pasaba a anunciarse "Iniciar la reproducción automática" y ya no existe]
+    And [AJUSTADO ENMIENDA 4] un cambio que DESACTIVA la preferencia no toca nada: NO pausa una rotación en curso y NO arranca una pausada — reanudar YA NO es posible por NINGUNA vía: ni retirando la preferencia ni con ningún control, la pausa que impuso `prefers-reduced-motion` es DEFINITIVA
     And al desmontar la galería la escucha se limpia: removeEventListener recibe EXACTAMENTE el mismo manejador que registró addEventListener con el evento "change"
     # (T) implementación de referencia del APG, literal: «If operating system preferences have been
     # set for reduced motion or disabling animations, the auto-rotation is initially paused». Y (P)
@@ -374,6 +503,10 @@ Feature: La galería «Nuestros trabajos» como carrusel coverflow 3D en domo, c
     # mano con `{ matches: true }` y con `{ matches: false }`. La rama del matches:false NO es
     # decorativa: mata al mutante que pausa INCONDICIONALMENTE en cada change — ese mutante pararía
     # el carrusel justo cuando el usuario RETIRA la preferencia.
+    # [ENMIENDA 4, 2026-07-24] Antes de esta enmienda, «retirar la preferencia no arranca una
+    # pausada» era una elección DELIBERADA entre dos vías de reanudar (el botón seguía disponible).
+    # Ahora es la ÚNICA verdad posible: no queda ninguna vía. Es el mismo hallazgo del bloque
+    # ENMIENDA 4 tras el TECHO, aplicado a este escenario.
 
   # -------------------------------------------------------------------------------------------
   # EL SCSS. Se asevera leyendo los BYTES del fichero: Stryker no ve SCSS y la puerta de contraste
@@ -468,7 +601,18 @@ Feature: La galería «Nuestros trabajos» como carrusel coverflow 3D en domo, c
   # -------------------------------------------------------------------------------------------
 
   @s16
-  Scenario Outline: Las flechas mueven una posición y dan la vuelta por los DOS extremos
+  Scenario Outline: [RETIRADO 2026-07-24, ENMIENDA 4] Las flechas mueven una posición y dan la vuelta por los DOS extremos
+    # [RETIRADO — decisión INFORMADA de Pablo, commit 9cf32a9, fuera del TDD] Los botones
+    # «Anterior»/«Siguiente» que este escenario ejercita YA NO EXISTEN. El cuerpo de abajo se
+    # CONSERVA ÍNTEGRO como registro histórico de la aritmética que fijaban (el paso ±1 y la vuelta
+    # por los DOS extremos, incluida la fila que caza el índice NEGATIVO). ESA ARITMÉTICA NO SE
+    # PIERDE del todo: la vuelta hacia DELANTE (6ª→1ª) la sigue ejerciendo @s9 (autoplay) y la
+    # vuelta hacia ATRÁS (el caso `i % n` sale NEGATIVO que este escenario defendía) la sigue
+    # ejerciendo @s23 (ArrowLeft desde la 1ª centra la 6ª, MISMA llamada a `indiceCircular` en el
+    # componente) — no una réplica de @s16, pero SÍ el mismo call site con el mismo signo. Lo que
+    # se pierde es SOLO la cobertura POR BOTÓN de esa aritmética; no se abre un escenario nuevo
+    # para sustituirla porque @s23 ya la ejercita por teclado. Ver el bloque ENMIENDA 4 tras el
+    # TECHO. Este tag @s16 NO se reutiliza.
     Given el carrusel parado con la foto "<foto de partida>" centrada
     When se pulsa el botón "<botón>"
     Then la foto centrada pasa a ser la "<foto centrada>"
@@ -586,26 +730,33 @@ Feature: La galería «Nuestros trabajos» como carrusel coverflow 3D en domo, c
   # -------------------------------------------------------------------------------------------
 
   @s20
-  Scenario: Cualquier desplazamiento manual REINICIA el reloj: la siguiente foto automática llega 2000 milisegundos después de la acción, no en el resto del tick anterior
+  Scenario: [AJUSTADO 2026-07-24, ENMIENDA 4] Cualquier desplazamiento manual REINICIA el reloj: la siguiente foto automática llega 2000 milisegundos después de la acción, no en el resto del tick anterior
     Given el carrusel rotando con la PRIMERA foto centrada y el reloj bajo control del test
-    When a los 1500 milisegundos del arranque se pulsa el botón "Siguiente"
+    When a los 1500 milisegundos del arranque se pulsa el punto indicador "Ver la foto 2 de 6" [ENMIENDA 4: sustituye a la flecha "Siguiente", RETIRADA — @s16]
     Then la SEGUNDA foto queda centrada EN EL ACTO, por la pulsación
     And a los 3499 milisegundos desde el arranque la SEGUNDA sigue centrada: el tick que habría caído en t=2000 YA NO EXISTE
     And a los 3500 milisegundos desde el arranque queda centrada la TERCERA: el intervalo cuenta 2000 milisegundos DESDE la acción, no desde el arranque
-    And repetir la medida sustituyendo la flecha por un punto indicador, por el clic en una tarjeta lateral, por un arrastre por encima del umbral o por una tecla ← / → atendida (@s23) da el MISMO resultado: el siguiente avance automático llega 2000 milisegundos después de CADA acción
-    And en un carrusel PARADO por el usuario el mismo desplazamiento manual NO arranca nada: tras la acción, avanzar el reloj 12000 milisegundos no mueve la foto centrada
+    And repetir la medida sustituyendo el punto indicador por el clic en una tarjeta lateral, por un arrastre por encima del umbral o por una tecla ← / → atendida (@s23) da el MISMO resultado: el siguiente avance automático llega 2000 milisegundos después de CADA acción [ENMIENDA 4: la flecha-botón YA NO es una de las vías — @s16, RETIRADO]
+    And [AJUSTADO ENMIENDA 4] en un carrusel parado por la preferencia de movimiento reducido del sistema (@s12 — hoy la ÚNICA vía de parada que sobrevive) el mismo desplazamiento manual NO arranca nada: tras la acción, avanzar el reloj 12000 milisegundos no mueve la foto centrada
     # (P) decisión del cliente vía brief v3 §3: a 2 s de cadencia, mover a mano y que 0,3 s después
     # la foto salte sola es un manotazo. Implementación que el brief sugiere (no impone): una
     # GENERACIÓN de reloj (estado) en las deps del efecto del intervalo; cada acción manual la
     # incrementa, el efecto se re-suscribe y el intervalo cuenta desde cero. La frontera 3499/3500
     # mata al mutante que cancela sin reiniciar (nada en 3500) y el And de los 3499 al que reinicia
-    # sin cancelar (dos relojes: tick fantasma en t=2000). El último And es el ANTI-REGRESIÓN de
-    # @s8: reiniciar el reloj JAMÁS puede convertirse en arrancarlo — la parada del usuario sigue
-    # siendo definitiva (SC 2.2.2).
+    # sin cancelar (dos relojes: tick fantasma en t=2000). El último And es el ANTI-REGRESIÓN de lo
+    # que ANTES fijaba @s8 (RETIRADO): reiniciar el reloj JAMÁS puede convertirse en arrancarlo —
+    # la parada por `prefers-reduced-motion` sigue siendo definitiva (y ahora, tras la ENMIENDA 4,
+    # es la ÚNICA parada persistente que queda en todo el contrato).
     # [OJO test] La pulsación se despacha SIN el mouseenter/focus que un ratón real arrastraría
     # (fireEvent.click a secas): aquí se mide el RELOJ, no las pausas de @s10 — en la página real
     # los casos observables son el teclado global y el arrastre táctil, donde no hay ni ratón
     # encima ni foco dentro.
+    # [ENMIENDA 4, 2026-07-24] El `When` usaba el botón "Siguiente" (RETIRADO, @s16): se sustituye
+    # por el punto indicador de la 2ª foto, que produce EL MISMO efecto observable (activo=1, EN EL
+    # ACTO) por la MISMA vía de reinicio del reloj (`mostrarFoto` → `reiniciarElReloj`). El último
+    # `And` usaba "parado por el usuario" (el botón, RETIRADO): la única forma de parar que
+    # sobrevive es `prefers-reduced-motion`, así que el `Given` implícito de esa fila cambia de
+    # mecanismo sin cambiar su Then.
 
   @s21
   Scenario Outline: La tecla se convierte en paso por una decisión PURA: las flechas mueven, y toda otra tecla — o una flecha modificada o escrita en un campo — vale cero
@@ -658,17 +809,22 @@ Feature: La galería «Nuestros trabajos» como carrusel coverflow 3D en domo, c
     # Si NINGUNO atiende, la tecla es de la página: sin movimiento y SIN preventDefault (@s23).
 
   @s23
-  Scenario: El cableado del teclado va GUARDADO: sin IntersectionObserver no revienta, preventDefault SOLO cuando se atiende, y el foco dentro atiende sin observador
+  Scenario: [AJUSTADO 2026-07-24, ENMIENDA 4] El cableado del teclado va GUARDADO: sin IntersectionObserver no revienta, preventDefault SOLO cuando se atiende, y el foco dentro atiende sin observador
     Given un entorno SIN IntersectionObserver, como jsdom 25 (trampa MEDIDA, brief v3 §7)
     When se monta la galería y se despachan teclas sobre el documento
     Then montar y desmontar NO lanza ningún error: la suscripción va guardada por typeof IntersectionObserver
     And con un stub que CAPTURA el callback del observador: tras disparar a mano una entrada con intersectionRatio 0.8 sobre la sección, un keydown "ArrowRight" en el documento centra la SIGUIENTE foto y ESE evento recibe preventDefault
     And el MISMO keydown con ctrlKey NO mueve la foto y NO recibe preventDefault
     And tras disparar una entrada con intersectionRatio 0.4, "ArrowLeft" NO mueve la foto y NO recibe preventDefault: el scroll de la página no se secuestra por debajo del umbral
-    And con el foco DENTRO del carrusel — sobre el botón "Siguiente" — "ArrowLeft" centra la ANTERIOR aunque el observador NO exista: el foco dentro atiende por sí solo, sin IO
+    And con el foco DENTRO del carrusel — posado en cualquier elemento tabulable, por ejemplo un punto indicador [ENMIENDA 4: antes se posaba sobre el botón "Siguiente", RETIRADO — @s16] — "ArrowLeft" centra la ANTERIOR aunque el observador NO exista: el foco dentro atiende por sí solo, sin IO
     And una tecla atendida REINICIA el reloj del autoplay exactamente como fija @s20
     And al desmontar se limpia TODO: removeEventListener recibe el mismo manejador de "keydown" que registró addEventListener, y el observador (si existió) recibe disconnect
     And el GESTO REAL — hacer scroll hasta la sección y pulsar ← / → — se verifica EN VIVO en Chrome antes del cierre: jsdom no sabe de visibilidad de verdad
+    # [ENMIENDA 4, 2026-07-24] El resto de este escenario es puro cableado de teclado/
+    # IntersectionObserver y NO depende de los tres controles retirados: CONFIRMADO sin más
+    # cambios. El único ajuste es el elemento donde se posa el foco en el And de arriba, que usaba
+    # "Siguiente" SOLO como cualquier elemento tabulable dentro del carrusel — con el botón
+    # retirado, cualquier punto indicador (@s17) cumple el mismo papel.
     # preventDefault SOLO al atender es la línea roja: un listener global que se traga TODAS las
     # flechas rompe el desplazamiento por teclado de la página entera. El patrón del stub es el de
     # matchMedia en @s12: `vi.stubGlobal` con captura del callback y disparo manual de entradas
@@ -677,7 +833,15 @@ Feature: La galería «Nuestros trabajos» como carrusel coverflow 3D en domo, c
     # documento, limpieza — y es deliberadamente el único sitio donde el teclado toca el DOM.
 
   @s24
-  Scenario: Los mandos son círculos de cristal SOBRE el marco: el chip de rotación primero, las flechas en los laterales, los puntos debajo, y la fila externa desaparece
+  Scenario: [RETIRADO 2026-07-24, ENMIENDA 4] Los mandos son círculos de cristal SOBRE el marco: el chip de rotación primero, las flechas en los laterales, los puntos debajo, y la fila externa desaparece
+    # [RETIRADO — decisión INFORMADA de Pablo, commit 9cf32a9, fuera del TDD] Los TRES mandos de
+    # cristal que este escenario posiciona (el chip de rotación y las dos flechas) YA NO EXISTEN:
+    # los tres `<button>` se borraron enteros, así que no queda nada que posicionar «sobre el
+    # marco». El cuerpo de abajo se CONSERVA ÍNTEGRO como registro histórico del mockup ELEGIDO
+    # por Pablo el 2026-07-23 (brief v3 §4), vigente solo entre esa fecha y el 2026-07-24. Los
+    # puntos indicadores (@s17), que SÍ sobreviven, ya NO comparten fila con ningún mando retirado:
+    # siguen siendo los últimos tabulables del carrusel, con su diana de 24 px intacta. Ver el
+    # bloque ENMIENDA 4 tras el TECHO. Este tag @s24 NO se reutiliza.
     Given la galería renderizada y el fichero "src/components/galeria.module.scss"
     When se inspecciona el orden de los controles y se leen los bytes del SCSS
     Then el control de rotación sigue siendo el PRIMER tabulable del carrusel, por delante de "Anterior" y "Siguiente", y los NUEVE controles siguen FUERA del contenedor con perspectiva: el árbol de @s8 NO cambia ni un atributo

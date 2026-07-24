@@ -1,6 +1,5 @@
 import { Head } from 'vite-react-ssg'
 
-import { BotonWhatsApp } from '../components/BotonWhatsApp'
 import { Cabecera } from '../components/Cabecera'
 import { Catalogo } from '../components/Catalogo'
 import { Contacto } from '../components/Contacto'
@@ -137,10 +136,6 @@ export default function Home() {
       {/* El pie de F-06: la marca, el `tel:` y Facebook (derivados de F-02). NO emite enlaces
           legales (los cazaría la anti-404 —el bug del cliente—; son F-16). Ver src/components/Pie.tsx. */}
       <Pie />
-
-      {/* 🎨 DEMO: botón FLOTANTE de WhatsApp (F-13), HERMANO de <Pie/> y FUERA de <main>: acceso
-          permanente que no pertenece al hilo del contenido. El href deriva de la fuente única F-02. */}
-      <BotonWhatsApp />
     </>
   )
 }

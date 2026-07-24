@@ -211,14 +211,28 @@ Feature: La sección de reseñas: el agregado real de Treatwell en una línea di
   # -------------------------------------------------------------------------------------------
 
   @s8
-  Scenario: El carrusel de testimonios OBEDECE el contrato de la galería v3 POR REFERENCIA, con ids y etiquetas propios
+  Scenario: [AJUSTADO 2026-07-24, ver ENMIENDA 4 de galeria_carrusel.feature] El carrusel de testimonios OBEDECE el contrato de la galería v3 POR REFERENCIA, con ids y etiquetas propios
     Given el carrusel de la sección de reseñas montado
-    When se le aplican los escenarios de conducta de "features/galeria_carrusel.feature" (v3)
-    Then los cumple TODOS leyendo «foto» como «testimonio»: la aritmética circular de seis tarjetas con data-distancia, "--s" y z-index inline (@s3..@s5), el árbol APG Grouped con seis diapositivas "1 de 6".."6 de 6" jamás ocultas (@s6), la voz de la pista (@s7), el control de rotación PRIMERO, sin aria-pressed y con parada definitiva (@s8), la cadencia de 2000 milisegundos (@s9), las reglas de pausa de ratón y foco (@s10, @s11), reduced-motion que arranca pausado y se escucha en caliente (@s12), las flechas con vuelta por los dos extremos (@s16), los puntos con aria-disabled y diana de 24 píxeles (@s17), el clic en lateral (@s18), el arrastre con umbral 48 (@s19), el reinicio del reloj (@s20), el teclado (@s21..@s23) y los mandos de cristal (@s24)
+    When se le aplican los escenarios de conducta de "features/galeria_carrusel.feature" (v3 + ENMIENDA 4)
+    Then los cumple TODOS leyendo «foto» como «testimonio»: la aritmética circular de seis tarjetas con data-distancia, "--s" y z-index inline (@s3..@s5), el árbol APG Grouped con seis diapositivas "1 de 6".."6 de 6" jamás ocultas (@s6), la voz de la pista (@s7), la cadencia de 2000 milisegundos (@s9), las reglas de pausa del ratón (reanuda sola al salir) y del foco (pegajosa, ahora PERMANENTE — @s10), reduced-motion que arranca pausado y se escucha en caliente, sin ninguna vía para reanudarlo (@s12), los puntos con aria-disabled y diana de 24 píxeles (@s17), el clic en lateral (@s18), el arrastre con umbral 48 (@s19), el reinicio del reloj por acción manual (@s20) y el teclado (@s21..@s23)
+    # [ENMIENDA 4, 2026-07-24 — remite, no duplica: ver `features/galeria_carrusel.feature`] El
+    # control de rotación (@s8 de galería), el arranque explícito «Iniciar» (@s11 de galería), las
+    # flechas-botón «Anterior»/«Siguiente» (@s16 de galería) y los mandos de cristal (@s24 de
+    # galería) quedaron RETIRADOS en el contrato PADRE por decisión INFORMADA de Pablo (commit
+    # 9cf32a9, fuera del TDD): este carrusel heredado NO los tenía nunca por sí mismo y, por la
+    # regla de oro «hereda POR REFERENCIA», este Then YA NO promete heredarlos. La cita literal de
+    # Pablo, la pregunta del `craftsman_lead` y el detalle completo de qué sobrevive y qué no viven
+    # en la ENMIENDA 4 de `features/galeria_carrusel.feature` (bloque tras el TECHO) y en
+    # `progress/enmienda4_carrusel_sc222.md` — se remite, no se repite el razonamiento aquí.
     And la cadencia es LA MISMA CONSTANTE de "src/components/carrusel-logica.ts" que usa la galería: no existe una segunda copia del 2000
-    And sus identificadores son PROPIOS: la pista es id="resenas-pista" (los aria-controls de sus flechas apuntan a ella) y el carrusel se etiqueta con aria-labelledby al "<h2>" de @s1 — dos carruseles en la misma página no comparten NINGÚN id
+    And sus identificadores son PROPIOS: la pista es id="resenas-pista" y el carrusel se etiqueta con aria-labelledby al "<h2>" de @s1 — dos carruseles en la misma página no comparten NINGÚN id
     And sus etiquetas hablan de testimonios: el grupo de puntos se llama exactamente "Elegir el testimonio que se muestra" y cada punto "Ver el testimonio N de 6"
-    And en la home conviven DOS botones "Anterior", DOS "Siguiente" y DOS controles de rotación: se desambiguan por el nombre accesible de su carrusel contenedor ("Nuestros trabajos" / "Lo que dicen nuestras clientas"); dentro del ámbito de CADA carrusel siguen siendo singulares
+    # [RETIRADO ENMIENDA 4] "en la home conviven DOS botones "Anterior", DOS "Siguiente" y DOS
+    # controles de rotación..." — ya no tiene referente en NINGUNO de los dos carruseles (ambos
+    # perdieron sus tres controles en el MISMO commit 9cf32a9). Lo que sigue siendo cierto, y lo
+    # sustituye, es el And anterior: los dos carruseles no comparten NINGÚN id ("galeria-pista" /
+    # "resenas-pista") y sus grupos de puntos se distinguen por nombre accesible propio ("Elegir la
+    # foto…" / "Elegir el testimonio…").
     And la desambiguación del teclado entre los DOS carruseles es la de @s22 del contrato de galería: la decisión es UNA y compartida, no dos copias
     # LA REGLA DE ORO de este contrato (acceptance 4 de F-14): heredar POR REFERENCIA, no por
     # copia. Este fichero fija SOLO las diferencias; re-litigar aquí una decisión de la galería

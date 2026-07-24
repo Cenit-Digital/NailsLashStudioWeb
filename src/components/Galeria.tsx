@@ -27,13 +27,11 @@ import {
 } from './carrusel-logica'
 import {
   capaDe,
-  claveDeRotacion,
   claveDistancia,
   debeRotar,
   distanciaCircular,
   etiquetaDeDiapositiva,
   etiquetaDelPunto,
-  etiquetaDeRotacion,
   indiceCircular,
   pasosDelArrastre,
   signoDe,
@@ -95,12 +93,6 @@ export function Galeria() {
   const [raton, setRaton] = useState(false)
   // El foco NO se limpia al salir: entrar para la rotación y solo el botón la devuelve.
   const [foco, setFoco] = useState(false)
-  // MUTANTE EQUIVALENTE (BooleanLiteral false→true), verificado en
-  // progress/mutation_galeria_carrusel.md (86:62): inobservable POR CONSTRUCCIÓN — su único lector
-  // es `debeRotar` y `entra()` cancela el arranque EN EL MISMO lote, así que ningún render
-  // alcanzable distingue los dos valores iniciales (precedente HOST_WHATSAPP, site.ts:72-73).
-  // Stryker disable next-line all
-  const [arranqueExplicito, setArranqueExplicito] = useState(false)
   // [@s20] La GENERACIÓN del reloj: cada acción manual crea un token NUEVO (identidad, no
   // aritmética: un contador `g + 1` tendría a `g - 1` de mutante EQUIVALENTE — cualquier cambio
   // re-suscribe igual). El efecto del intervalo la lleva en sus deps: acción → efecto nuevo →
@@ -116,7 +108,15 @@ export function Galeria() {
   // carruseles de la página (@s22 + @s8 de reseñas).
   const raiz = useRef<HTMLDivElement | null>(null)
 
-  const rotando = debeRotar({ pausadoPorElUsuario: pausado, raton, foco, arranqueExplicito })
+  // El botón que ponía `arranqueExplicito` a `true` se retiró a mano (commit 9cf32a9): hoy ningún
+  // gesto de UI puede activar esa rama de `debeRotar`, así que aquí se pasa siempre `false`. La
+  // función pura conserva el parámetro por ser una capacidad reutilizable (ver su docblock).
+  const rotando = debeRotar({
+    pausadoPorElUsuario: pausado,
+    raton,
+    foco,
+    arranqueExplicito: false,
+  })
 
   useEffect(
     () => {
@@ -277,21 +277,9 @@ export function Galeria() {
     [],
   )
 
-  /**
-   * El botón de rotación. Parar es DEFINITIVO (SC 2.2.2); arrancar ignora el ratón encima y el
-   * foco dentro (APG). La etiqueta y el `data-estado` siguen a la VOLUNTAD del usuario (`pausado`),
-   * no a la pausa transitoria del ratón: si siguieran a esta, el botón diría «Iniciar» justo cuando
-   * el usuario acerca el puntero para pararlo.
-   */
-  const alternarRotacion = () => {
-    setPausado(!pausado)
-    setArranqueExplicito(pausado)
-  }
-
-  /** Un ratón o un foco NUEVOS cancelan el arranque explícito y vuelven a mandar ellos. */
+  /** El ratón o el foco entran al carrusel: marcan su fuente como activa (paran la rotación). */
   const entra = (poner: (dentro: boolean) => void) => {
     poner(true)
-    setArranqueExplicito(false)
   }
 
   /** [@s19] El gesto empieza: se guarda dónde bajó el puntero sobre el marco. */
@@ -353,36 +341,6 @@ export function Galeria() {
             enfocarCandidata(CANDIDATA_GALERIA, false)
           }}
         >
-          {/* [ENMIENDA 3, @s24] Los mandos de cristal: SIN fila — hijos directos del carrusel,
-              flotando sobre el marco por SCSS. El chip va PRIMERO en el DOM (tab-order del APG)
-              y los tres siguen fuera del contenedor con perspectiva (@s8). */}
-          <button
-            type="button"
-            className={estilos.rotacion}
-            aria-label={etiquetaDeRotacion(!pausado)}
-            data-estado={claveDeRotacion(!pausado)}
-            onClick={alternarRotacion}
-          >
-            {pausado ? '▶' : '❙❙'}
-          </button>
-          <button
-            type="button"
-            className={estilos.flechaAnterior}
-            aria-label="Anterior"
-            aria-controls={ID_PISTA}
-            onClick={() => desplazar(-PASO_DE_FLECHA)}
-          >
-            ←
-          </button>
-          <button
-            type="button"
-            className={estilos.flechaSiguiente}
-            aria-label="Siguiente"
-            aria-controls={ID_PISTA}
-            onClick={() => desplazar(PASO_DE_FLECHA)}
-          >
-            →
-          </button>
           <div
             className={estilos.marco}
             onPointerDown={alBajarElPuntero}

@@ -13,6 +13,110 @@
 - Resultado: done.
 -->
 
+## 2026-07-24 — CI roja (Arnés raíz init) por dos ediciones manuales de Pablo fuera del TDD: retiro del botón flotante de WhatsApp + ENMIENDA 4 del carrusel (SC 2.2.2) · CERRADA
+
+- **Disparador**: el PR #11 (run #46) llegó con "Arnés raíz (init)" en rojo. Causa raíz: dos commits de
+  Pablo, hechos a mano y fuera del ciclo TDD, dejaron cabos sueltos — `479d541` borró
+  `BotonWhatsApp.tsx` sin terminar el borrado (import roto en `home.tsx` + 3 tests huérfanos + scss +
+  constante muerta) y `9cf32a9` quitó los tres botones de mando del carrusel (rotación, «Anterior»,
+  «Siguiente») de `Galeria.tsx`/`Resenas.tsx`, dejando ~60 tests rotos y 6 errores de `tsc`/`eslint`
+  por código muerto (`alternarRotacion`, `claveDeRotacion`, `etiquetaDeRotacion`).
+- **Retiro 1 — botón flotante de WhatsApp** (`tdd_craftsman`, sin puerta humana que cruzar: el
+  contrato `features/boton_whatsapp_flotante.feature` NUNCA se aprobó — su propio encabezado decía
+  "PROPUESTA hasta la puerta humana", sin entrada en `feature_list.json`; F-13 `solicitud_whatsapp`
+  sigue `pending` intacta). Retirado el import roto, los 3 tests huérfanos, el `.module.scss` y la
+  constante `BOTON_WHATSAPP_FLOTANTE_TEXTO` sin consumidor; banner RETIRADA en el `.feature` (cuerpo
+  histórico conservado). Diario: `progress/tdd_boton_whatsapp_retiro.md`.
+- **Retiro 2 — controles del carrusel, ENMIENDA 4** (el delicado: reabre un hueco legal en dos
+  features `done` y mutadas al 100%). El `craftsman_lead` preguntó explícitamente a Pablo si
+  restaurar al menos el botón de pausa, citando el propio contrato («SC 2.2.2 Pause, Stop, Hide,
+  Nivel A, BLOQUEANTE»). Respuesta literal de Pablo: *"No lo soluciones para que todo pase, con los
+  cambios que yo he hecho, que para eso los he hecho yo a mano, gracias, ultrathink."* — decisión
+  INFORMADA de conservar su edición y aceptar el hueco. Pipeline completo:
+  - `gherkin_author`: ENMIENDA 4 en `features/galeria_carrusel.feature` (y `resenas_agregado_enlace.feature`
+    por herencia). RETIRADOS @s8/@s11/@s16/@s24 (cuerpo histórico intacto, tags nunca reutilizados);
+    AJUSTADOS @s2/@s6/@s10/@s12/@s20/@s23; confirmados sin cambio @s7/@s9. Declara sin atenuantes que
+    SC 2.2.2 ya NO se cumple para quien navega solo con ratón o solo con el dedo. Registro:
+    `progress/enmienda4_carrusel_sc222.md`.
+  - `tdd_craftsman`: sincronizó `Galeria.tsx`/`Resenas.tsx`/tests con el contrato — retiró
+    `alternarRotacion` y `claveDeRotacion`/`etiquetaDeRotacion` (+ su describe dedicado en
+    `galeria-logica.test.ts`, sin ningún llamador). 1299/1299 tests, typecheck/lint 0.
+  - `judge`: CHANGES_REQUESTED (1 bloqueante) — `arranqueExplicito` sobrevivió a la misma poda que
+    `alternarRotacion` por la misma causa de muerte (su único setter a `true` vivía dentro de esa
+    función ya borrada); código de producción sin ningún test que lo exigiera.
+  - `tdd_craftsman` (remate): retiró el cableado de `arranqueExplicito` de los dos componentes;
+    CONSERVÓ `debeRotar`/`EstadoDeRotacion.arranqueExplicito` en `galeria-logica.ts` sin cambios (sí
+    tiene llamador real y test dedicado legítimo de la función pura, `galeria-logica.test.ts` @s8/@s11) —
+    decisión que la mutación posterior confirmó sin agujeros. También 3 menores de prosa (citas a
+    ficheros/constantes ya borrados).
+  - `judge` (delta): APPROVED.
+  - `mutation_tester`: FAIL inicial 94,12% (16 supervivientes, 8+8 en Galeria.tsx/Resenas.tsx, UNA
+    sola familia — deuda de aserción: `avanzar(12000)` coincide con una vuelta completa del carrusel
+    [6×2000 ms] y no distingue "pausado" de "dio la vuelta entera"; `galeria-logica.ts` ya 100%,
+    incluida la rama `arranqueExplicito`). Ninguno declarado equivalente.
+  - `tdd_craftsman` (remate mutación): amplió `@s12`/`@s8 (@s12 de galería)` con un checkpoint a
+    tiempo NO múltiplo del ciclo (`avanzar(2000)`/`avanzar(8000)`, mismo patrón que `@s10`) + una
+    aserción sobre el argumento exacto de `matchMedia`. 1301/1301 tests (1299→1301). Mutación
+    re-corrida: **100% en Galeria.tsx, Resenas.tsx y galeria-logica.ts, 0 supervivientes.**
+  - Informes: `progress/judge_retiro_whatsapp_y_carrusel.md` (dos rondas), `progress/mutation_carrusel_enmienda4.md`,
+    `progress/tdd_carrusel_enmienda4.md`.
+- **Verificación final del `craftsman_lead`** (independiente, no solo confiada a los diarios):
+  `pnpm typecheck` 0, `pnpm lint` 0, `pnpm test` 1301/1301 (39 ficheros), `pnpm build` exit 0 con las
+  CINCO puertas (cascarón, placeholders, contraste, terceros, anclas vivas).
+- **`feature_list.json`**: ids 22 (`galeria_carrusel`) y 14 (`resenas_agregado_enlace`) — status
+  sigue `done` (no es una feature nueva, es una enmienda a un contrato ya cerrado); se añadió el
+  bloque `| ENMIENDA 4 (2026-07-24)...` a su `cierre`, declarando sin ambigüedad que el
+  `description`/`acceptance` originales ("autoplay con botón de pausa/inicio visible", "navegación
+  por flechas") ya NO describen el comportamiento vigente — se conservan como registro histórico de
+  lo aprobado en 2026-07-22/23, no como estado actual.
+- **Nota de higiene** (hallazgo menor del `judge`, resuelto aquí): este mismo `current.md` arrastraba
+  contenido de sesiones anteriores ya cerradas y registradas en `feature_list.json`/este mismo
+  `history.md` (el ciclo v3 de `hero-caligrafia-lenta`, y los ciclos previos de F-14/F-22 camino a su
+  cierre 2026-07-23) sin consolidar. Se archiva íntegro aquí abajo, tal cual estaba, para no perder
+  ningún dato — la rama `feat/hero-caligrafia-lenta` y su PR pendiente de merge, si siguen abiertos,
+  son responsabilidad de quien retome ese hilo; no se tocan en esta sesión.
+- **Resultado**: 0 errores / 0 fallos / 0 warnings en typecheck, lint, tests y build. Commit y push a
+  `feature/last_fixes` a continuación de este cierre.
+
+### Contenido archivado de `progress/current.md` (sin consolidar hasta hoy, preservado íntegro)
+
+- **Feature en curso: hero — CALIGRAFÍA LENTA (contrato demo `features/hero.feature`, enmienda
+  2026-07-23)** · `tdd_craftsman` en rama `feat/hero-caligrafia-lenta`. **CICLO EN VERDE
+  (2026-07-23): 91 tests de hero (34 estilos + 45 DOM + 12 lógica; baseline 57), 7 ciclos, 18
+  sabotajes matados, typecheck/lint/prettier 0.** Nuevos: `hero-logica.ts` (+ su test). Tocados:
+  `hero.module.scss` (token 90s + linear + calc + `.control` + bloque completada), `Hero.tsx`
+  (control sin cromo, data-firma, fin de reloj), `hero.test.tsx`, `hero-estilos.test.ts`.
+  @s1-@s3/@s5-@s9 intactos y verdes. PENDIENTE del lead: alta de `hero-logica.ts` en
+  `stryker.config.json`, suite completa + build, judge, mutación (Hero.tsx break 100),
+  verificación EN VIVO (brief §4). NO marcado done. Diario:
+  `progress/tdd_hero_caligrafia_lenta.md`. F-07 NO se reabre (precedente 2026-07-20).
+  [NOTA 2026-07-24: la entrada de arriba parece anterior al cierre ya registrado más arriba en este
+  mismo fichero, "2026-07-23 (noche) — la caligrafía LENTA del hero (≈90 s)... CERRADA" — se archiva
+  tal cual sin reconciliar, por si el "PR pendiente de merge" de `feat/hero-caligrafia-lenta` sigue
+  abierto de verdad.]
+- **Feature en curso: 14 — `resenas_agregado_enlace`** · `tdd_craftsman` en rama
+  `feat/galeria-v3-resenas`. **CICLO EN VERDE (2026-07-23): 142 tests nuevos (+4 en
+  home-horneado, build-based, sin correr aquí), 7 sabotajes matados, typecheck/lint/prettier 0.**
+  Nuevos: `Resenas.tsx`, `resenas-logica.ts`, `resenas.module.scss`, `resenas-agregado.ts`,
+  `resenas-demo.ts`. home.tsx: solo el cableado ENTRE Equipo y Reserva. PENDIENTE del lead:
+  añadir los 3 mutables a `stryker.config.json`, suite completa + build, judge, mutación,
+  verificación en vivo. NO marcado done. Diario: `progress/tdd_resenas.md`.
+  [NOTA 2026-07-24: `feature_list.json` id 14 ya está `done` con cierre completo (mutación 100%,
+  EN VIVO 50/50) — esta entrada quedó desactualizada tras ese cierre. `stryker.config.json` YA
+  contiene `Resenas.tsx`/`resenas-logica.ts` (confirmado por inspección directa el 2026-07-24).]
+- **Feature en curso: 22 — `galeria_carrusel` (v3, Enmienda 3)** · `tdd_craftsman` en rama
+  `feat/galeria-v3-resenas`. **CICLO v3 EN VERDE (2026-07-23): 197 tests de galería (+49), eslint/
+  tsc/prettier limpios, 16 sabotajes matados.** `carrusel-logica.ts` NUEVO (cadencia 2000, teclado
+  @s21/@s22), reloj con generación (@s20), teclado cableado y guardado (@s23), mandos de cristal
+  (@s24, `.mandos` fuera). Diario completo: `progress/tdd_galeria_carrusel.md` § Ciclo v3.
+  PENDIENTE del lead: añadir `carrusel-logica.ts` a `stryker.config.json` → judge → mutación →
+  verificación en vivo. NO marcado done.
+  Anterior: sesión cerrada 2026-07-23 (features 22 y 12 → `done`; resumen en `history.md`).
+  [NOTA 2026-07-24: `feature_list.json` id 22 ya está `done` con cierre v3 completo (mutación 100%,
+  EN VIVO 50/50) — esta entrada quedó desactualizada tras ese cierre. `stryker.config.json` YA
+  contiene `carrusel-logica.ts` (confirmado por inspección directa el 2026-07-24).]
+
+
 ## 2026-07-17 — feature `5 — cero_terceros` · **CERRADA `done`**
 
 **Resultado: 43/43 escenarios · 576 tests · judge APROBADO · mutación 100 % en los dos ficheros
