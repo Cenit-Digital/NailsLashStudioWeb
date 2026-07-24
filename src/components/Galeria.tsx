@@ -353,36 +353,6 @@ export function Galeria() {
             enfocarCandidata(CANDIDATA_GALERIA, false)
           }}
         >
-          {/* [ENMIENDA 3, @s24] Los mandos de cristal: SIN fila — hijos directos del carrusel,
-              flotando sobre el marco por SCSS. El chip va PRIMERO en el DOM (tab-order del APG)
-              y los tres siguen fuera del contenedor con perspectiva (@s8). */}
-          <button
-            type="button"
-            className={estilos.rotacion}
-            aria-label={etiquetaDeRotacion(!pausado)}
-            data-estado={claveDeRotacion(!pausado)}
-            onClick={alternarRotacion}
-          >
-            {pausado ? '▶' : '❙❙'}
-          </button>
-          <button
-            type="button"
-            className={estilos.flechaAnterior}
-            aria-label="Anterior"
-            aria-controls={ID_PISTA}
-            onClick={() => desplazar(-PASO_DE_FLECHA)}
-          >
-            ←
-          </button>
-          <button
-            type="button"
-            className={estilos.flechaSiguiente}
-            aria-label="Siguiente"
-            aria-controls={ID_PISTA}
-            onClick={() => desplazar(PASO_DE_FLECHA)}
-          >
-            →
-          </button>
           <div
             className={estilos.marco}
             onPointerDown={alBajarElPuntero}
