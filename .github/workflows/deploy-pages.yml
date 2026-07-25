@@ -1,0 +1,94 @@
+name: Publicar en GitHub Pages
+
+# Despliegue del sitio SSG (vite-react-ssg) en GitHub Pages, en cada push a `main` o a mano
+# (workflow_dispatch). El JOB de despliegue vive en el entorno `github-pages`, que tiene una
+# regla de protección de "revisor obligatorio" (Pablo) configurada por API el 2026-07-24: CADA
+# despliegue real queda PAUSADO hasta que él lo aprueba a mano en la pestaña Actions — decisión
+# explícita del humano (ver progress/deploy_github_pages.md), porque el proyecto declara en
+# feature_list.json/progress/ que "sin razón social ni NIF válido en fuente pública, la web no
+# se puede publicar" (F-16, páginas legales, sigue `blocked`). Este workflow NO burla esa puerta:
+# la traslada a un clic consciente, caso por caso, en vez de automatizarla sin más.
+#
+# Referencia oficial (verificada 2026-07-25): docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages
+# — permisos, entorno `github-pages` y versiones de las acciones (checkout@v6,
+# configure-pages@v5, upload-pages-artifact@v4, deploy-pages@v4) tomados de esa página.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  NO_COLOR: "1"
+
+# Un solo despliegue en curso a la vez; no cancelamos uno en marcha (podría estar sirviendo ya).
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    name: Build (arnés + build de producción con las 5 puertas)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      # pnpm ANTES de setup-node: mismo motivo que harness-ci.yml (el caché automático de
+      # setup-node necesita pnpm ya en el PATH para detectarlo).
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      # Red de seguridad: aunque `main` solo debería recibir código que ya pasó por CI en su PR,
+      # nunca desplegamos sin volver a comprobar typecheck+lint+tests aquí mismo.
+      - run: node .harness/harness.mjs init
+
+      # `actions/configure-pages` registra el despliegue contra la configuración de Pages ya
+      # activada (API, 2026-07-24, build_type=workflow) y expone metadatos (URL, entorno) que
+      # `actions/deploy-pages` necesita más abajo.
+      #
+      # `base_path` NO se usa aquí: `vite.config.ts` fija `base: '/NailsLashStudioWeb/'` como
+      # LITERAL FIJO (ENMIENDA 1 a F-05/F-04, 2026-07-25, progress/tdd_subruta_github_pages.md) —
+      # se intentó primero un `base` dinámico vía variable de entorno, pero `violacionesDeBase`
+      # (F-05) lee `vite.config.ts` como TEXTO SIN EVALUAR y nunca puede verificar una expresión
+      # no literal, así que se descartó. Si el repo cambia de nombre/organización, hay que
+      # actualizar el literal en `vite.config.ts` a mano (y sus tests).
+      - name: Configurar GitHub Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Build de producción (vite-react-ssg + las 5 puertas)
+        run: pnpm build
+
+      # GitHub Pages pasa el artefacto por Jekyll si no existe este fichero, e ignoraría
+      # cualquier ruta que empiece por "_" (aquí no hay ninguna, pero es la práctica oficial
+      # recomendada para cualquier sitio que no sea Jekyll).
+      - name: Desactivar el procesado Jekyll
+        run: touch dist/.nojekyll
+
+      - name: Subir el artefacto de Pages
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+  deploy:
+    name: Desplegar (requiere aprobación manual — entorno github-pages)
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Desplegar a GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

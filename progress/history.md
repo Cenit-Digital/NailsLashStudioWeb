@@ -13,6 +13,81 @@
 - Resultado: done.
 -->
 
+## 2026-07-25 — Despliegue en GitHub Pages (push a `main`): infraestructura + subruta `/NailsLashStudioWeb/` · CERRADA
+
+- **Encargo de Pablo**: desplegar el sitio en GitHub Pages en cada push a `main`, investigación en
+  documentación oficial, autonomía total, preguntar cualquier duda real.
+- **Investigación (documentación oficial de GitHub, verificada 2026-07-25) encontró tres bloqueos
+  reales que no eran míos para decidir**: (1) el repo era privado y la organización estaba en plan
+  Free — GitHub Pages exige repo público en Free, cita literal: *"If the account that owns the
+  repository uses GitHub Free... the repository must be public"*; con Team el código puede seguir
+  privado, pero el SITIO publicado sigue siendo público igualmente (acceso restringido de verdad
+  exige Enterprise Cloud); (2) el proyecto declara por escrito que "sin razón social ni NIF válido
+  en fuente pública, la web no se puede publicar" (F-16 sigue `blocked`); (3) `ORIGEN_CANONICA =
+  'https://example.invalid'` (`src/lib/seo.ts:238`) es un placeholder deliberado, "decisión del
+  CLIENTE". Tres preguntas vía `AskUserQuestion`; respuestas de Pablo: repo público (acepta exponer
+  el historial); pipeline listo con **aprobación manual suya por despliegue** (regla de protección
+  del entorno `github-pages`); dominio "de momento no hay... esto será temporal, hasta que el
+  cliente pague y despleguemos en nuestro servidor". Registro completo:
+  `progress/deploy_github_pages.md`.
+- **Infraestructura aplicada por API** (`craftsman_lead`, con permisos de admin del repo): repo
+  público (`gh repo edit --visibility public`); GitHub Pages activado
+  (`POST .../pages`, `build_type=workflow`, URL real
+  `https://cenit-digital.github.io/NailsLashStudioWeb/`); entorno `github-pages` con regla de
+  revisor obligatorio = Pablo (`PUT .../environments/github-pages`, confirmado con
+  `deployment-branch-policies`: `main` ya permitido). Workflow nuevo
+  `.github/workflows/deploy-pages.yml` (push a `main` + `workflow_dispatch`; build con
+  `node .harness/harness.mjs init` + `pnpm build`; `actions/checkout@v6`,
+  `actions/configure-pages@v5`, `actions/upload-pages-artifact@v4`, `actions/deploy-pages@v4`,
+  versiones verificadas contra la documentación oficial).
+- **La subruta rompió DOS features cerradas, mutadas al 100%, en cascada** — cada una resuelta con
+  el mismo rigor de ENMIENDA que el resto de este proceso (contrato → TDD → judge → mutación):
+  1. `features/cero_terceros.feature` (F-05, ENMIENDA 1, @s27 ampliado): `violacionesDeBase`
+     exigía el literal exacto `'/'` para `base` en `vite.config.ts`; se generaliza a CUALQUIER ruta
+     root-relativa del mismo origen (empieza por `/`, no `://`, no `//`) — preserva los DOS
+     invariantes reales (cero terceros + ruta root-absoluta no relativa) en vez de una
+     implementación más conservadora que el invariante que dice proteger. `baseDeclarada` se
+     exporta para reutilizarla en F-04, sin duplicar razonamiento.
+  2. `features/cascaron_semantico.feature` (F-04, ENMIENDA 1, @s36/@s37/@s38 nuevos): la puerta
+     anti-404 (A-17) no sabía traducir un href con prefijo de subruta (`/NailsLashStudioWeb/`) a la
+     ruta lógica real (`/`) del artefacto — falso positivo de 404. Regla nueva: prefijo + resto
+     conocido → no violación; prefijo + resto desconocido → SIGUE siendo violación (404 real,
+     invariante intacto); sin prefijo con `base` declarada → fuera de ámbito de esta puerta
+     (decisión razonada: no puede saber qué vive en la raíz de un dominio compartido de GitHub
+     Pages — discusión no bloqueante del `judge` sobre este punto, relevante para quien implemente
+     F-16, dejada por escrito en `progress/judge_subruta_github_pages.md`).
+  3. `vite.config.ts` fija `base: '/NailsLashStudioWeb/'` como LITERAL FIJO (no dinámico: un
+     `base` dinámico vía variable de entorno se intentó primero y se revirtió, porque
+     `violacionesDeBase` lee `vite.config.ts` como TEXTO SIN EVALUAR y nunca puede verificar una
+     expresión no literal). `vitest.config.ts` es un fichero separado que NO hereda `base`, así
+     que NINGÚN test se ve afectado — decisión aceptada dado que hoy no existe ningún despliegue
+     alternativo en la raíz (temporal, por decisión explícita de Pablo).
+- **judge**: ambas ENMIENDAs APPROVED (0 bloqueantes, 2 graves de infraestructura —ya corregidos—,
+  2 menores de prosa —ya corregidos). `progress/judge_subruta_github_pages.md`.
+- **mutation_tester**: `puerta-terceros.ts` 100% a la primera (117/117). `puerta-cascaron.ts` 4
+  supervivientes en `esEnlaceRoto` (99.20%) — 2 por un hueco real de test (faltaba una fila en
+  `@s37` con href sin el prefijo de `base` y MÁS LARGO que `base`) y 2 síntoma de un ternario
+  redundante (`resto === '' ? RAIZ_DEL_ARTEFACTO : ...`, identidad `X+''===X`). Rematados por
+  `tdd_craftsman`: fila nueva + refactor (no exclusión) → **100.00%** (493 killed + 4 timeout/497,
+  0 supervivientes). `progress/mutation_subruta_github_pages.md`.
+- **Verificación final** (independiente, repetida varias veces por el `craftsman_lead` tras cada
+  remate): `pnpm typecheck` 0, `pnpm lint` 0, `pnpm test` **1311/1311** (39 ficheros), `pnpm build`
+  con `dist/` limpio → exit 0, CINCO puertas verdes, confirmado por grep directo sobre
+  `dist/index.html`: `href="/NailsLashStudioWeb/"` en la marca, assets/scripts prefijados
+  `/NailsLashStudioWeb/assets/...`.
+- **`feature_list.json`**: ids 4 y 5 (status sigue `done`, no se reabre el ciclo) documentan la
+  ENMIENDA 1 en su campo `cierre`, mismo formato que la ENMIENDA 4 de F-22/F-14 de la sesión
+  anterior.
+- **Lo que NO se ha hecho** (fuera de alcance de este encargo, por decisión explícita): no se ha
+  hecho push a `main` — el workflow queda listo y disparará en el PRÓXIMO push real a esa rama
+  (fusión de este PR o posterior); el primer despliegue de verdad seguirá pausado hasta la
+  aprobación manual de Pablo en la pestaña Actions, tal y como pidió. No se ha tocado
+  `ORIGEN_CANONICA` en el código fuente (sigue `https://example.invalid`, decisión del cliente
+  intacta), ni F-16, ni configurado un dominio personalizado.
+- **Resultado**: 0 errores / 0 fallos / 0 warnings en typecheck, lint, tests y build. Pipeline de
+  despliegue listo y con aprobación manual configurada. Commit y push a `feature/last_fixes` a
+  continuación de este cierre.
+
 ## 2026-07-24 — CI roja (Arnés raíz init) por dos ediciones manuales de Pablo fuera del TDD: retiro del botón flotante de WhatsApp + ENMIENDA 4 del carrusel (SC 2.2.2) · CERRADA
 
 - **Disparador**: el PR #11 (run #46) llegó con "Arnés raíz (init)" en rojo. Causa raíz: dos commits de

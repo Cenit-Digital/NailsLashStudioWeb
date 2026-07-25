@@ -1,3 +1,78 @@
+# =============================================================================================
+# 🟠 ENMIENDA 1 (2026-07-25): LA PUERTA ANTI-404 BAJO UNA BASE DE DESPLIEGUE DECLARADA — @s23/@s24
+# SE PRESERVAN INTACTOS; SE AÑADEN @s36, @s37 Y @s38. CERO REGRESIÓN.
+# =============================================================================================
+# CASO DE USO NUEVO, NO ANTICIPADO EL 2026-07-16 (fecha de la puerta humana original de F-04):
+# desplegar el sitio en GitHub Pages DE PROYECTO (`https://cenit-digital.github.io/NailsLashStudioWeb/`)
+# exige `base: '/NailsLashStudioWeb/'` en `vite.config.ts` — ya ADMITIDO por `cero_terceros.feature`
+# ENMIENDA 1 (mismo día, @s27). Con esa `base` activa, `Cabecera.tsx` hornea el ÚNICO href interno
+# absoluto que el sitio emite hoy (el enlace de marca, vía `import.meta.env.BASE_URL`) como
+# `href="/NailsLashStudioWeb/"`. Un `tdd_craftsman` MIDIÓ (`progress/tdd_subruta_github_pages.md`
+# §Remate) que ESTA PUERTA (A-17, `src/lib/puerta-cascaron.ts`, `violacionesDeEnlaces`) lo marca
+# como 404 — FALSO POSITIVO: `rutasDelArtefacto` (línea ~638/656) son las rutas LÓGICAS derivadas
+# de los ficheros FÍSICOS de `dist/` (`rutaDelFichero`), que GitHub Pages sirve TAL CUAL bajo la
+# subruta SIN que el build cree ninguna subcarpeta física — `dist/index.html` sigue siendo la ruta
+# lógica `"/"`, nunca `"/NailsLashStudioWeb/"`.
+#
+# **QUÉ CAMBIA, Y QUÉ NO:** @s23 y @s24 NO SE TOCAN — ni una letra — porque su `Given` NUNCA declara
+# una `base`: SON, por construcción, el caso de HOY (build servido en la raíz del dominio), y bajo
+# ese caso el comportamiento tiene que seguir IDÉNTICO. Se AÑADEN tres escenarios nuevos, numerados
+# a continuación del último tag usado en el fichero (`@s35`), porque introducen una precondición
+# (`vite.config.ts` declara `base`) que NINGUNA fila de @s23/@s24 anticipaba, y mezclarla en sus
+# tablas habría obligado a añadir una columna `base` retroactiva a filas YA APROBADAS por el humano
+# — el mismo criterio que ya usó `cero_terceros.feature` para sus @s41-@s43 («3 escenarios nuevos, y
+# SOLO porque no encajaban en ninguno de los ya aprobados»).
+#
+# LOS TRES CASOS QUE SE AÑADEN, Y POR QUÉ CADA UNO:
+#   (b) @s36 — un href con el prefijo de la base pero cuyo RESTO no es una ruta lógica conocida
+#       SIGUE siendo violación: la base NO debe convertirse en un comodín que oculte un 404 real.
+#   (a) @s37 — un href con el prefijo de la base y cuyo RESTO SÍ es una ruta lógica conocida NO es
+#       violación (el caso real: `/NailsLashStudioWeb/` → resto `""` → ruta lógica `"/"`, que
+#       EXISTE). La MISMA tabla ancla también (c): un href SIN el prefijo de la base, cuando SÍ hay
+#       una base declarada, NO es violación DE ESTA PUERTA — ver el porqué abajo, no es gratuito.
+#   @s38 — ancla que el RESTO se resuelve como ruta lógica GENÉRICA (`/servicios`, no solo la home
+#       `/`): sin este escenario, una implementación podría «aprobar» solo el caso trivial
+#       `href === base` sin generalizar de verdad la resta del prefijo, y quedaría INERTE frente a
+#       cualquier ruta interna que no sea la portada.
+#
+# 🔴 **LA DECISIÓN MÁS DELICADA — (c), UN HREF SIN EL PREFIJO DE LA BASE, CUANDO SÍ HAY BASE
+# DECLARADA:** ¿es un 404 real (interno-roto) o queda fuera del ámbito de esta puerta? SE DECIDE
+# QUE QUEDA FUERA, tratado como los externos (mismo trato que `https://…`), y NO como violación,
+# por el mismo argumento que ya usa `esRutaInterna` para excluir lo que la puerta NO PUEDE
+# VERIFICAR: bajo GitHub Pages **DE PROYECTO**, la raíz del origen (`cenit-digital.github.io/`, SIN
+# el prefijo `/NailsLashStudioWeb/`) puede alojar un sitio DISTINTO Y LEGÍTIMO — GitHub Pages **DE
+# USUARIO/ORGANIZACIÓN**, que vive exactamente ahí [V, citado y verificado por
+# `progress/enmienda1_cero_terceros_subruta.md` §1, MISMO DÍA]. Esta puerta SOLO conoce `dist/`: NO
+# tiene ninguna autoridad ni visibilidad sobre lo que existe en la raíz del origen cuando el propio
+# despliegue declara que su sitio vive en una subcarpeta. Marcar `/otra-cosa` como «roto» sería
+# ASEVERAR ALGO QUE ESTA PUERTA NO PUEDE SABER — exactamente el tipo de falso positivo que
+# `esRutaInterna` ya evita a propósito para `https://…`, `tel:`, `mailto:` y `#ancla`. Es un hueco
+# DECLARADO, no cerrado: un `href="/x"` escrito a mano por error (olvidando
+# `import.meta.env.BASE_URL`) NO lo cazará esta puerta bajo una base declarada. Mismo tipo de límite
+# que el `fetch()` de JS ya declarado y no cerrado en F-05 (`@s34` de `cero_terceros.feature`). Hoy
+# el ÚNICO mecanismo del repo para emitir un href interno es `import.meta.env.BASE_URL`, que SIEMPRE
+# incluye el prefijo por construcción — el hueco es teórico hasta que alguien lo contradiga a mano.
+#
+# **CÓMO SE COMUNICA `base` A LA PUERTA — recomendación de arquitectura para el `tdd_craftsman`:**
+# reutilizar la MISMA función `baseDeclarada(config: string)` que `src/lib/puerta-terceros.ts` YA
+# tiene (hoy privada) y que `cero_terceros.feature` ENMIENDA 1 ya validó (contrato + TDD + mutación
+# 100 %) para distinguir una subcarpeta legítima de un origen de tercero — «no dupliques el
+# razonamiento», mismo principio que F-14 heredando de F-22. `src/lib/puerta-cascaron.ts` corre
+# ANTES que `src/lib/puerta-terceros.ts` en el pipeline de `pnpm build` [V: `package.json`], así que
+# NO puede apoyarse en que F-05 ya validó `base` — pero CUALQUIER `base` que no sea root-absoluta
+# legítima nunca produce un href que `esRutaInterna` reconozca como interno (el prefijo se hornea
+# literalmente vía `BASE_URL`, y ningún esquema ni protocolo-relativo empieza por un solo `/`), así
+# que esta puerta NO necesita revalidar la legitimidad de `base`: solo necesita el PREFIJO. Detalle
+# completo, con la alternativa de un módulo compartido considerada y descartada, en
+# `progress/enmienda_cascaron_base.md`.
+#
+# NO SE TOCA: `src/lib/puerta-cascaron.ts`, `src/lib/puerta-terceros.ts`, sus tests, `vite.config.ts`
+# ni `feature_list.json` (F-04 sigue `done`; esta enmienda amplía su contrato sin reabrir el ciclo
+# completo — mismo patrón que la ENMIENDA 1 de `cero_terceros.feature` y la ENMIENDA 4 de
+# `resenas_agregado_enlace`/`galeria_carrusel`). El `tdd_craftsman` implementa por TDD sobre este
+# contrato ya amendado.
+# =============================================================================================
+
 # Contrato de la feature 4 (`cascaron_semantico`) de feature_list.json.
 # Destilado de project-spec.md → «Feature 4: cascaron_semantico — la cáscara HORNEADA, el JSON-LD
 # de cero y la puerta que mira dist/». Encarna T-6 («JSON-LD escrito de cero, sin aggregateRating»)
@@ -1121,6 +1196,9 @@ Feature: Cáscara semántica horneada, JSON-LD escrito de cero y la puerta que m
     # por la razón equivocada.
     # `example.invalid` es TLD reservado (RFC 2606): el mailto NO es un dato del cliente, es un
     # fixture. **El email real NO se publica (A-11).**
+    # 🟠 Ver también @s36-@s38 (ENMIENDA 1, 2026-07-25, al final de este fichero): la MISMA puerta
+    # bajo una base de despliegue declarada (GitHub Pages DE PROYECTO). Este escenario NO cambia:
+    # sigue siendo el caso «sin base declarada».
 
   @s25
   Scenario: el informe acusa una línea por violación y es determinista
@@ -1320,3 +1398,66 @@ Feature: Cáscara semántica horneada, JSON-LD escrito de cero y la puerta que m
     # PORQUÉ**, exactamente como `@s18` ancla el 88 % en F-03. Sin él, alguien «normaliza» el
     # `index.html` a `<head lang="es">` dentro de seis meses, ve los tests en rojo y **cambia los
     # tests**.
+
+  # ---------------------------------------------------------------------------
+  # La puerta ANTI-404 bajo una BASE DE DESPLIEGUE DECLARADA (ENMIENDA 1, 2026-07-25)
+  # ---------------------------------------------------------------------------
+  # @s23 y @s24 (arriba) NO SE TOCAN: su `Given` nunca declara `base`, así que SON el caso de HOY
+  # (build servido en la raíz del dominio) y su comportamiento sigue IDÉNTICO. Los tres escenarios
+  # de aquí abajo cubren el caso NUEVO: GitHub Pages DE PROYECTO, con `base` fijada a una subcarpeta
+  # same-origin root-absoluta ya validada por `cero_terceros.feature` ENMIENDA 1 (@s27). Ver el
+  # banner de cabecera de este fichero para el análisis completo, y
+  # `progress/enmienda_cascaron_base.md` para el registro de decisión.
+
+  @s36
+  Scenario Outline: con una base declarada, un href con su prefijo pero SIN ruta lógica tras él sigue siendo violación
+    Given un vite.config.ts que declara base "/NailsLashStudioWeb/"
+    And el HTML CRUDO de la ruta "/" con un enlace a "<href>"
+    And un artefacto de producción que contiene únicamente "dist/index.html"
+    When se inspecciona el sitio con la lista de rutas esperadas ["/"] bajo esa base
+    Then hay exactamente 1 violación
+    And la violación declara la ruta "/", la regla "href interno sin fichero en dist/" y el href "<href>"
+
+    Examples:
+      | href                             | por qué sigue siendo violación                                                                                                    |
+      | /NailsLashStudioWeb/inexistente  | el prefijo de la base coincide; el resto "/inexistente" no es NINGUNA ruta lógica del artefacto — 404 real, la base no lo esconde |
+      | /NailsLashStudioWeb/Servicios    | el prefijo coincide; el resto "/Servicios" no es una ruta lógica — la resolución sigue sin ser un juego de cajas (mismo invariante que @s23) |
+
+    # 🔴 LA RAZÓN DE SER DE ESTE ESCENARIO: sin él, una implementación podría «arreglar» @s37
+    # aceptando CUALQUIER href que empiece por el prefijo de la base, sin comprobar el resto — y
+    # ESO REABRIRÍA EXACTAMENTE EL 404 QUE A-17 EXISTE PARA CERRAR, ahora con un prefijo delante.
+    # La base AMPLÍA lo que cuenta como «interno», NUNCA lo que cuenta como «existe».
+
+  @s37
+  Scenario Outline: con una base declarada, un href con su prefijo y una ruta lógica conocida NO es violación; sin el prefijo, queda fuera del ámbito de esta puerta
+    Given un vite.config.ts que declara base "/NailsLashStudioWeb/"
+    And el HTML CRUDO de la ruta "/" con un enlace a "<href>"
+    And un artefacto de producción que contiene únicamente "dist/index.html"
+    When se inspecciona el sitio con la lista de rutas esperadas ["/"] bajo esa base
+    Then no se emite ninguna violación por la regla "href interno sin fichero en dist/"
+
+    Examples:
+      | href                                          | por qué no es violación                                                                                                                                                                          |
+      | /NailsLashStudioWeb/                          | el prefijo coincide y el resto (vacío) es la ruta lógica "/", que EXISTE — es el enlace REAL que hornea Cabecera.tsx bajo esta base                                                             |
+      | /otra-cosa                                    | NO tiene el prefijo de la base declarada: fuera del ámbito de esta puerta. Bajo GitHub Pages DE PROYECTO la raíz del origen puede alojar un sitio DISTINTO (Pages de usuario/organización) que esta puerta no puede ver ni verificar — tratarlo como roto sería un FALSO POSITIVO sobre un sitio ajeno |
+      | /pagina-que-no-tiene-nada-que-ver-con-la-base | NO tiene el prefijo de la base declarada Y es MÁS LARGO que la base (a diferencia de "/otra-cosa", más corta): mismo razonamiento que la fila anterior, fuera del ámbito de esta puerta — ejercita el caso "sin prefijo" cuando `ruta.slice(base.length)` NO da la cadena vacía |
+
+    # 🔴 LA FILA DE `/otra-cosa` ES LA DECISIÓN MÁS DELICADA DE ESTA ENMIENDA, Y ESTÁ RAZONADA EN EL
+    # BANNER DE CABECERA DE ESTE FICHERO Y EN `progress/enmienda_cascaron_base.md`: es un HUECO
+    # DECLARADO, no cerrado — un href interno escrito a mano SIN pasar por
+    # `import.meta.env.BASE_URL` no lo cazará esta puerta bajo una base declarada. Mismo tipo de
+    # límite que el `fetch()` de JS ya declarado y no cerrado en F-05 (@s34 de `cero_terceros.feature`).
+
+  @s38
+  Scenario: con una base declarada, el resto tras el prefijo se resuelve como CUALQUIER ruta lógica, no solo la home
+    Given un vite.config.ts que declara base "/NailsLashStudioWeb/"
+    And el HTML CRUDO de la ruta "/" con un enlace a "/NailsLashStudioWeb/servicios"
+    And un artefacto de producción que contiene "dist/index.html" y "dist/servicios/index.html"
+    When se inspecciona el sitio con la lista de rutas esperadas ["/", "/servicios"] bajo esa base
+    Then no se emite ninguna violación por la regla "href interno sin fichero en dist/"
+    # ANTI-VACUIDAD: sin este escenario, @s37 se satisface con una implementación que solo reconoce
+    # el caso TRIVIAL `href === base` (resto vacío → home) sin generalizar de verdad «quitar el
+    # prefijo y comparar el resto contra las rutas lógicas» — y quedaría INERTE frente a cualquier
+    # ruta interna que no sea la portada. F-04 hoy solo emite la home [V: `RUTAS_ESPERADAS = ['/']`],
+    # así que este escenario usa un FIXTURE de dos rutas sobre el decisor PURO — el mismo argumento
+    # que ya usa @s14 para no nacer inerte: los fixtures son gratis, escrito de otra forma es teatro.

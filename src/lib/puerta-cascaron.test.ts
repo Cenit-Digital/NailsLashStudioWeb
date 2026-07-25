@@ -217,13 +217,20 @@ describe('inspeccionarSitio → el lang (@s15)', () => {
   })
 })
 
-/** Las violaciones de UNA regla concreta: los escenarios de frontera cuentan POR REGLA. */
+/**
+ * Las violaciones de UNA regla concreta: los escenarios de frontera cuentan POR REGLA.
+ *
+ * `base` es OPCIONAL y por defecto `null` (sin base declarada, el caso de hoy) — así @s23/@s24 y
+ * todo lo demás que ya llamaba a este helper con 3 argumentos SIGUE COMPILANDO SIN TOCARSE
+ * (ENMIENDA 1, 2026-07-25, @s36-@s38).
+ */
 function violacionesPorRegla(
   paginas: readonly PaginaArtefacto[],
   rutasEsperadas: readonly string[],
   regla: string,
+  base: string | null = null,
 ): readonly unknown[] {
-  return inspeccionarSitio(paginas, rutasEsperadas).filter((una) => una.regla === regla)
+  return inspeccionarSitio(paginas, rutasEsperadas, base).filter((una) => una.regla === regla)
 }
 
 /**
@@ -683,6 +690,62 @@ describe('inspeccionarSitio → la puerta ANTI-404 (@s23, @s24)', () => {
 })
 
 /**
+ * 🟠 ENMIENDA 1 (2026-07-25): LA PUERTA ANTI-404 BAJO UNA BASE DE DESPLIEGUE DECLARADA. @s23/@s24
+ * (arriba) NO CAMBIAN — su `Given` nunca declara `base` — y son el caso «sin base» de hoy.
+ * `progress/enmienda_cascaron_base.md` registra la decisión completa.
+ */
+describe('inspeccionarSitio → la puerta ANTI-404 bajo una base declarada (@s36, @s37, @s38)', () => {
+  const BASE = '/NailsLashStudioWeb/'
+
+  it.each([
+    [
+      '/NailsLashStudioWeb/inexistente',
+      'el prefijo de la base coincide; el resto "/inexistente" no es NINGUNA ruta lógica del artefacto — 404 real, la base no lo esconde',
+    ],
+    [
+      '/NailsLashStudioWeb/Servicios',
+      'el prefijo coincide; el resto "/Servicios" no es una ruta lógica — la resolución sigue sin ser un juego de cajas',
+    ],
+  ])('@s36 con base declarada, un href con su prefijo pero sin ruta lógica tras él sigue siendo violación: "%s" (%s)', (href) => {
+    expect(inspeccionarSitio([paginaCompleta('/', { enlaces: ['/', href] })], ['/'], BASE)).toEqual([
+      { ruta: '/', regla: 'href interno sin fichero en dist/', valor: href },
+    ])
+  })
+
+  it.each([
+    ['/NailsLashStudioWeb/', 'el prefijo coincide y el resto (vacío) es la ruta lógica "/", que EXISTE'],
+    [
+      '/otra-cosa',
+      'NO tiene el prefijo de la base declarada: fuera del ámbito de esta puerta (puede ser un sitio distinto en la raíz del origen)',
+    ],
+    [
+      '/pagina-que-no-tiene-nada-que-ver-con-la-base',
+      'NO tiene el prefijo Y es MÁS LARGO que la base (a diferencia de "/otra-cosa"): ejercita de verdad la guarda `!ruta.startsWith(base)`, porque `ruta.slice(base.length)` no da la cadena vacía',
+    ],
+  ])('@s37 con base declarada, "%s" no produce violación anti-404 (%s)', (href) => {
+    expect(
+      violacionesPorRegla(
+        [paginaCompleta('/', { enlaces: [href] })],
+        ['/'],
+        'href interno sin fichero en dist/',
+        BASE,
+      ),
+    ).toEqual([])
+  })
+
+  it('@s38 con base declarada, el resto tras el prefijo se resuelve como CUALQUIER ruta lógica, no solo la home', () => {
+    const paginas = [
+      paginaCompleta('/', { enlaces: [`${BASE}servicios`] }),
+      paginaCompleta('/servicios'),
+    ]
+
+    expect(
+      violacionesPorRegla(paginas, ['/', '/servicios'], 'href interno sin fichero en dist/', BASE),
+    ).toEqual([])
+  })
+})
+
+/**
  * LA PUERTA ACUSA, NO GRUÑE (precedente F-01/F-03): «hay un problema de SEO» sin decir en qué
  * ruta ni qué regla obliga a buscarlo a mano — y a las 3 de la mañana nadie lo busca: LO SALTA.
  * DETERMINISMO: misma entrada → misma salida, MISMO ORDEN. El informe tiene que ser DIFFABLE, o
@@ -846,6 +909,37 @@ describe('ejecutarPuertaDelCascaron → falla cerrada si ella misma revienta (@s
     // ANCLA LA CAUSA CONCRETA, no solo la frase: es el superviviente REAL que la mutación
     // destapó en `puerta.ts` de F-01 (un motivo vaciado cumplía «...contenga la frase»).
     expect(resultado.lineas.join('\n')).toContain(MOTIVO)
+  })
+})
+
+/**
+ * 🟠 ENMIENDA 1 (2026-07-25, @s37): la `base` declarada se propaga desde `PeticionPuertaCascaron`
+ * hasta `violacionesDeEnlaces`. Es el cableado que necesita `tools/puerta-cascaron.ts` para pasarle
+ * a la puerta el `base` que lee de `vite.config.ts` — sin este campo, el humilde no podría
+ * compilar la llamada real que exige el build bajo GitHub Pages DE PROYECTO.
+ */
+describe('ejecutarPuertaDelCascaron → la base de despliegue se propaga a la anti-404 (@s37)', () => {
+  const BASE = '/NailsLashStudioWeb/'
+
+  it('@s37 el enlace real de la marca ("/NailsLashStudioWeb/") bajo esa base declarada no rompe el build', () => {
+    const resultado = ejecutarPuertaDelCascaron({
+      artefacto: artefactoCon(ficheroDe('dist/index.html', { enlaces: [BASE] })),
+      rutasEsperadas: ['/'],
+      base: BASE,
+    })
+
+    expect(resultado.codigoSalida).toBe(0)
+    expect(resultado.lineas).toEqual([])
+  })
+
+  it('@s37 SIN base en la petición (campo ausente), el mismo href SÍ rompe el build (cero regresión de @s23)', () => {
+    const resultado = ejecutarPuertaDelCascaron({
+      artefacto: artefactoCon(ficheroDe('dist/index.html', { enlaces: [BASE] })),
+      rutasEsperadas: ['/'],
+    })
+
+    expect(resultado.codigoSalida).not.toBe(0)
+    expect(resultado.lineas.join('\n')).toContain(BASE)
   })
 })
 

@@ -1,3 +1,42 @@
+# =============================================================================================
+# 🟠 ENMIENDA 1 (2026-07-25): SUBRUTA DE DESPLIEGUE (GITHUB PAGES DE PROYECTO) — @s27 SE AMPLÍA,
+# NO SE DEBILITA.
+# =============================================================================================
+# CASO DE USO NUEVO, NO ANTICIPADO EL 2026-07-17 (fecha de la puerta humana original de F-05):
+# desplegar el sitio en la subcarpeta de un dominio ajeno al propio, típicamente GitHub Pages DE
+# PROYECTO (`https://cenit-digital.github.io/NailsLashStudioWeb/`, NO Pages de usuario/org, que
+# vive en la raíz). Ese despliegue exige `base: '/NailsLashStudioWeb/'` en `vite.config.ts`: es el
+# ÚNICO mecanismo real — `progress/tdd_subruta_github_pages.md` (2026-07-25) midió contra el código
+# fuente de `vite-react-ssg` que el flag `--base` de su CLI NO se propaga a `import.meta.env.BASE_URL`
+# ni al `basename` de react-router, solo alimenta el CSS crítico de `beasties`.
+#
+# LA REDACCIÓN ORIGINAL DE @s27 EXIGÍA QUE `base` FUERA NO DECLARADA O EXACTAMENTE EL LITERAL `'/'`:
+# bloqueaba esa subcarpeta legítima EXACTAMENTE IGUAL que un origen de tercero, tratando dos riesgos
+# distintos como si fueran uno. **EL INVARIANTE REAL QUE @s26/@s27 PROTEGEN SON DOS** (la cabecera
+# de @s26, razón 1, ya lo decía sin que la regla de @s27 lo tradujera bien):
+#   1. **CERO ORIGEN DE TERCEROS**: `base` no puede tener esquema/host (`https://cdn.evil.example/x/`)
+#      ni ser protocolo-relativa (`//cdn.tercero.com/`) — eso SÍ reescribe los `url()` fuera del
+#      propio dominio.
+#   2. **RUTA ROOT-ABSOLUTA, NO RELATIVA**: `base` no puede ser una ruta relativa (`'./'`) — eso
+#      rompe la propiedad de que los `url()` sean resolubles sin depender de dónde vive el documento
+#      que los referencia.
+# Una subcarpeta como `/NailsLashStudioWeb/` empieza por `/`, no contiene `://` y no empieza por
+# `//`: **SATISFACE LOS DOS INVARIANTES REALES** — sigue siendo root-absoluta y del MISMO origen. El
+# literal exacto `'/'` era una implementación MÁS CONSERVADORA que el invariante que dice proteger,
+# escrita cuando el único valor observado era `/` a secas y nadie necesitaba una subcarpeta.
+#
+# **QUÉ CAMBIA, Y QUÉ NO:** @s27 se reescribe para que la regla sea la de los DOS invariantes reales,
+# no el literal exacto — la fila `base es "/subcarpeta/"` PASA (antes fallaba) y se añade
+# `base es "/NailsLashStudioWeb/"` (el caso real) y `base es "//cdn.tercero.com/"` (ancla el
+# protocolo-relativo, que la redacción original cazaba solo por "no es el literal", sin fila propia
+# que lo distinguiera de una ruta relativa). Las filas `https://…` y `./` que YA fallaban SIGUEN
+# fallando, sin tocar. @s26 NO cambia: su `Given` ya fijaba «un vite.config.ts que no declara base»
+# como precondición, ajena al literal exacto de `base`. Ningún otro escenario de este fichero
+# depende del literal `'/'`. Registro completo de la decisión: `progress/enmienda1_cero_terceros_subruta.md`.
+# `src/lib/puerta-terceros.ts`, `src/lib/terceros.test.ts` y `vite.config.ts` NO se tocan en esta
+# enmienda: el `tdd_craftsman` implementa por TDD sobre este contrato ya amendado.
+# =============================================================================================
+#
 # Contrato de la feature 5 (`cero_terceros`) de feature_list.json.
 # Destilado de project-spec.md → «Feature 5: cero_terceros — la petición que nunca sale, y la
 # puerta que lo demuestra».
@@ -1770,8 +1809,11 @@ Feature: Cero peticiones automáticas a terceros, fuentes autohospedadas y la pu
     # mueren en esta tabla** — el positivo (filas 1-2) y el negativo (filas 3-6) **juntos**. Sin las
     # filas 1-2, «todo es violación» pasa las 3-6.
 
+  # 🟠 ENMIENDA 1 (2026-07-25): ver el bloque al inicio del fichero. La regla de `base` se AMPLÍA
+  # de «literal exacto `/`» a «los dos invariantes reales» — sigue sin pasar ni un origen de
+  # tercero ni una ruta relativa, y ahora SÍ pasa una subcarpeta same-origin.
   @s27
-  Scenario Outline: la puerta asevera la config base de vite.config.ts, ADEMÁS de la salida
+  Scenario Outline: la puerta asevera la config base de vite.config.ts, ADEMÁS de la salida — pasa cualquier ruta same-origin root-absoluta, no solo el literal "/" [AMPLIADO, ENMIENDA 1, 2026-07-25]
     Given un artefacto de producción cuyo CSS está limpio, con todos los @font-face esperados y ningún origen externo
     And un vite.config.ts en el que <situacion>
     When se ejecuta la puerta de terceros sobre ese artefacto con la allowlist []
@@ -1782,10 +1824,12 @@ Feature: Cero peticiones automáticas a terceros, fuentes autohospedadas y la pu
       | situacion                              | codigo | asercion                                                                       |
       | no se declara base                     | 0      | no se emite ninguna violación por base                                         |
       | base es exactamente "/"                | 0      | no se emite ninguna violación por base                                         |
+      | base es "/subcarpeta/"                 | 0      | no se emite ninguna violación por base                                         |
+      | base es "/NailsLashStudioWeb/"         | 0      | no se emite ninguna violación por base                                         |
       | base es "https://cdn.evil.example/x/"  | 1      | una línea propia declara la violación de base y NOMBRA "vite.config.ts"        |
       | base es "https://cdn.tercero.com/"     | 1      | una línea propia declara la violación de base y NOMBRA "vite.config.ts"        |
+      | base es "//cdn.tercero.com/"           | 1      | una línea propia declara la violación de base y NOMBRA "vite.config.ts"        |
       | base es "./"                           | 1      | una línea propia declara la violación de base y NOMBRA "vite.config.ts"        |
-      | base es "/subcarpeta/"                 | 1      | una línea propia declara la violación de base y NOMBRA "vite.config.ts"        |
 
     # 🔴 **`base` ES LA VÍA Nº1 POR LA QUE UN TERCERO ENTRA SIN QUE NADIE LO ESCRIBA** [V, medido con
     # un build REAL]: `base: 'https://cdn.evil.example/x/'` reescribe **TODOS** los `url()` →
@@ -1806,10 +1850,36 @@ Feature: Cero peticiones automáticas a terceros, fuentes autohospedadas y la pu
     # **LA 1ª FILA ES EL ESTADO REAL DE HOY** [V: `vite.config.ts` del repo **no declara `base`**;
     # comprobado hoy] — y no es decorativa: **sin ella la regla nacería rompiendo el build de un repo
     # correcto**.
-    # **LAS FILAS `"./"` Y `"/subcarpeta/"` anclan la regla EXACTA**: pasa **`base` no declarada** o
-    # **declarada EXACTAMENTE `'/'`**; **cualquier otra cosa es violación**. **NO** es «pasa si no
-    # empieza por http»: `'./'` no empieza por http y **rompe el invariante de la ruta root-absoluta**
-    # (razón 1 de @s26). 🔴 **`StringLiteral` sobre `'/'` muere aquí.**
+    #
+    # 🟠 **REESCRITO POR LA ENMIENDA 1 (2026-07-25) — LA REGLA YA NO ES «LITERAL EXACTO `/`».** El
+    # texto anterior decía *«pasa `base` no declarada o declarada EXACTAMENTE `'/'`; cualquier otra
+    # cosa es violación»*, y ESO YA NO ES CIERTO — ERA MÁS ESTRICTO QUE EL INVARIANTE QUE DICE
+    # PROTEGER: bloqueaba una subcarpeta same-origin legítima (despliegue en GitHub Pages DE
+    # PROYECTO, p. ej. `/NailsLashStudioWeb/`) exactamente igual que un origen de tercero, tratando
+    # dos riesgos distintos como si fueran el mismo. **LA REGLA VIGENTE — los DOS invariantes reales
+    # que @s26/@s27 protegen, ni uno más:**
+    #   - `base` **PASA** si no se declara, **O** si es una ruta que **empieza por `/`**, **NO
+    #     empieza por `//`** (protocolo-relativo) **y NO contiene `://`** (ningún esquema).
+    #   - `base` **FALLA** si contiene `://` (URL absoluta con esquema — filas `https://…`), si
+    #     empieza por `//` (protocolo-relativo — fila `//cdn.tercero.com/`, el hueco clásico de
+    #     @s8/@s26 aplicado aquí a `base`: SIN esta fila, «cualquier cosa que no sea el literal `/`
+    #     falla» y «cualquier cosa que no empiece por `http` pasa» son INDISTINGUIBLES para este
+    #     escenario) o si NO empieza por `/` (ruta relativa — fila `./`, SIGUE rompiendo el
+    #     invariante de la ruta root-absoluta, razón 1 de @s26; NO cambia con esta enmienda).
+    # **LAS FILAS `"/subcarpeta/"` Y `"/NailsLashStudioWeb/"` (la 2ª, el caso REAL de despliegue —
+    # ver `progress/enmienda1_cero_terceros_subruta.md`) ANCLAN LA AMPLIACIÓN**: las dos empiezan por
+    # `/`, no contienen `://` y no empiezan por `//` → satisfacen los DOS invariantes reales → **YA
+    # NO SON VIOLACIÓN** (antes de esta enmienda, `/subcarpeta/` daba código 1; hoy da 0). **LAS
+    # FILAS `https://…`, `//cdn.tercero.com/` Y `./` NO CAMBIAN**: seguían y siguen fallando, cada
+    # una por una razón distinta de las tres que ahora la regla nombra explícitamente.
+    # 🔴 **MUTANTES QUE ESTA TABLA MATA:** `StringLiteral` sobre cualquiera de los tres literales que
+    # deciden la regla (`'/'`, `'//'`, `'://'`) — cada uno tiene al menos una fila que pasa por él y
+    # otra que falla por él. `EqualityOperator`/`BooleanLiteral`/`LogicalOperator` sobre la condición
+    # compuesta (empieza-por-`/` Y no-empieza-por-`//` Y no-contiene-`://`): invertir cualquiera de
+    # los tres términos, o cambiar el conector, hace que al menos una fila cambie de código, y la
+    # tabla lo detecta — el positivo (filas 1-4) y el negativo (filas 5-8) juntos. Sin las filas 1-4,
+    # «todo es violación» pasaría las 5-8; sin la fila `//cdn.tercero.com/`, una regla que solo mirase
+    # «empieza por `/`» (sin excluir `//`) pasaría esa fila por error.
     # ⚠️ **`leerConfigVite()` devuelve EL TEXTO de `vite.config.ts`** (forma F-03: `leerScss`), y una
     # función **PURA** decide. **No se importa la config: se lee como texto.** Un `import` de
     # `vite.config.ts` ejecutaría código y no vería `--base`.

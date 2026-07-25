@@ -18,9 +18,14 @@ import {
   ejecutarPuertaDelCascaron,
   RUTAS_ESPERADAS,
 } from '../src/lib/puerta-cascaron.ts'
+// 🟠 ENMIENDA 1 (2026-07-25, @s37): la MISMA extracción de texto que ya usa `tools/puerta-terceros.ts`
+// para leer `base` de `vite.config.ts` — sin revalidar su legitimidad (eso es de F-05); esta puerta
+// solo necesita el PREFIJO literal. Ver src/lib/puerta-terceros.ts y progress/enmienda_cascaron_base.md.
+import { baseDeclarada } from '../src/lib/puerta-terceros.ts'
 
 const DIRECTORIO_ARTEFACTO = 'dist'
 const ES_HTML = /\.html$/i
+const FICHERO_DE_CONFIG = 'vite.config.ts'
 
 const artefactoReal: ArtefactoDeProduccion = {
   // Honra el contrato del puerto: responde sin lanzar. Es lo que permite a la puerta preguntar
@@ -42,6 +47,9 @@ const artefactoReal: ArtefactoDeProduccion = {
 const resultado = ejecutarPuertaDelCascaron({
   artefacto: artefactoReal,
   rutasEsperadas: RUTAS_ESPERADAS,
+  // LANZA si vite.config.ts no existe, mismo contrato que tools/puerta-terceros.ts. Se lee como
+  // TEXTO, nunca se importa: la puerta no ejecuta la config, solo necesita el prefijo literal.
+  base: baseDeclarada(readFileSync(FICHERO_DE_CONFIG, 'utf8')),
 })
 
 for (const linea of resultado.lineas) {
