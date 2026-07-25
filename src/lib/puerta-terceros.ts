@@ -100,11 +100,18 @@ const TIPO_CSS = 'css'
 const FICHERO_DE_CONFIG = 'vite.config.ts'
 
 /**
- * La única `base` que sostiene el invariante de la ruta root-absoluta. Pasa `base` NO DECLARADA o
- * declarada EXACTAMENTE `'/'`; CUALQUIER OTRA COSA es violación — `'./'` no empieza por http y
- * rompe el invariante igual (@s27).
+ * 🟠 ENMIENDA 1 (2026-07-25): el prefijo que decide LOS DOS invariantes reales de `base`, no un
+ * literal exacto (@s27 ampliado). `base` PASA si no se declara, o si empieza por `BASE_PROPIA`
+ * (`'/'`) SIN empezar por `PREFIJO_PROTOCOLO_RELATIVO` (`'//'`): ninguna URL con esquema explícito
+ * puede empezar por `/` (RFC 3986: un esquema es `ALPHA *( ALPHA / DIGIT / "+" / "-" / "." ) ":"`),
+ * así que ese único prefijo basta para excluir CUALQUIER origen de tercero (`https://…`) Y para
+ * exigir la ruta root-absoluta (`'./'` no empieza por `/`, sigue rompiendo el invariante). El
+ * protocolo-relativo (`'//cdn.tercero.com/'`) SÍ empieza por `/` — de ahí la exclusión aparte.
  */
 const BASE_PROPIA = '/'
+
+/** El hueco clásico (@s8/@s26 aplicado a `base`): empieza por `/` pero es un origen de tercero. */
+const PREFIJO_PROTOCOLO_RELATIVO = '//'
 
 /** `@font-face` … `}`. Sirve para las dos formas reales, `@font-face {` y la minificada `@font-face{`. */
 const BLOQUE_FONT_FACE = /@font-face([^}]*)\}/g
@@ -186,18 +193,32 @@ function motivoDelReventon(error: unknown): string {
 /**
  * La `base` declarada en el texto de la config, o null si NO SE DECLARA — que es el estado real de
  * hoy [V: `vite.config.ts` del repo no declara `base`] y es válido.
+ *
+ * 🟠 EXPORTADA (ENMIENDA 1 de `cascaron_semantico.feature`, 2026-07-25): `src/lib/puerta-cascaron.ts`
+ * (F-04) reutiliza esta MISMA extracción de texto — nunca revalida la legitimidad de `base`, solo
+ * necesita el PREFIJO literal — para que un href interno con el prefijo de la base se resuelva
+ * contra las rutas lógicas del artefacto. Ver `progress/enmienda_cascaron_base.md`.
  */
-function baseDeclarada(config: string): string | null {
+export function baseDeclarada(config: string): string | null {
   const encontrada = BASE_DE_VITE.exec(config)
 
   return encontrada === null ? null : sinComillas(encontrada[1]).trim()
 }
 
+/**
+ * LOS DOS INVARIANTES REALES DE `base` (ENMIENDA 1, @s27): cero origen de terceros y ruta
+ * root-absoluta, NO una — pasa `/`, `/subcarpeta/` o `/NailsLashStudioWeb/`; falla `https://…`,
+ * `//cdn.tercero.com/` (protocolo-relativo) y `./` (relativa).
+ */
+function esRutaPropiaRootAbsoluta(base: string): boolean {
+  return base.startsWith(BASE_PROPIA) && !base.startsWith(PREFIJO_PROTOCOLO_RELATIVO)
+}
+
 function* violacionesDeBase(config: string): Generator<string> {
   const base = baseDeclarada(config)
 
-  if (base !== null && base !== BASE_PROPIA) {
-    yield `${FICHERO_DE_CONFIG} — base debe no declararse o ser exactamente "/": "${base}"`
+  if (base !== null && !esRutaPropiaRootAbsoluta(base)) {
+    yield `${FICHERO_DE_CONFIG} — base debe no declararse o ser una ruta same-origin root-absoluta: "${base}"`
   }
 }
 

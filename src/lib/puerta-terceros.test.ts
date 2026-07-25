@@ -166,9 +166,13 @@ describe('el CSS de dist/ solo admite rutas /assets/… o data: — cualquier ot
  *     DONDE ESTÁ LA CAUSA. @s26 sería MUDA sobre la causa.
  * EL 1er Given ES CRÍTICO: EL CSS ESTÁ LIMPIO. Aquí la puerta rompe SIN QUE HAYA NI UN ORIGEN
  * EXTERNO EN EL ARTEFACTO, y ESO es el escenario.
- * LAS FILAS `"./"` Y `"/subcarpeta/"` anclan la regla EXACTA: pasa `base` NO DECLARADA o declarada
- * EXACTAMENTE `'/'`; cualquier otra cosa es violación. NO es «pasa si no empieza por http»: `'./'`
- * no empieza por http y ROMPE EL INVARIANTE DE LA RUTA ROOT-ABSOLUTA.
+ * 🟠 ENMIENDA 1 (2026-07-25): la regla YA NO exige el literal exacto `"/"`. Pasa cualquier `base`
+ * NO DECLARADA o que empiece por `/` SIN empezar por `//` (protocolo-relativo) — `/subcarpeta/` y
+ * `/NailsLashStudioWeb/` (el caso real de GitHub Pages de proyecto) ANCLAN la ampliación. Sigue
+ * fallando `'./'` (ruta relativa, no empieza por `/`), cualquier `https://…` (esquema explícito,
+ * tampoco empieza por `/` — RFC 3986: un esquema no puede empezar por `/`) y `'//cdn.tercero.com/'`
+ * (protocolo-relativo: el hueco clásico de @s8/@s26 aplicado aquí — SIN esa fila, una regla que
+ * solo mirase «empieza por `/`» la dejaría pasar por error).
  * ⚠️ `leerConfigVite()` devuelve EL TEXTO de `vite.config.ts` (forma F-03: `leerScss`) y una función
  * PURA decide. NO se importa la config: un `import` ejecutaría código y no vería `--base`.
  */
@@ -180,8 +184,12 @@ describe('la puerta asevera la config base de vite.config.ts, ADEMÁS de la sali
     expect(resultado.lineas).toEqual([])
   })
 
-  it('@s27 base declarada exactamente "/" no emite ninguna violación por base', () => {
-    const resultado = ejecutarPuertaDeTerceros(peticion({ config: configConBase('/') }))
+  it.each([
+    ['/'],
+    ['/subcarpeta/'],
+    ['/NailsLashStudioWeb/'],
+  ])('@s27 base "%s" es una ruta same-origin root-absoluta: no emite ninguna violación por base', (base) => {
+    const resultado = ejecutarPuertaDeTerceros(peticion({ config: configConBase(base) }))
 
     expect(resultado.codigoSalida).toBe(0)
     expect(resultado.lineas).toEqual([])
@@ -190,8 +198,8 @@ describe('la puerta asevera la config base de vite.config.ts, ADEMÁS de la sali
   it.each([
     ['https://cdn.evil.example/x/'],
     ['https://cdn.tercero.com/'],
+    ['//cdn.tercero.com/'],
     ['./'],
-    ['/subcarpeta/'],
   ])('@s27 base "%s" rompe el build con una línea propia que NOMBRA vite.config.ts', (base) => {
     const resultado = ejecutarPuertaDeTerceros(peticion({ config: configConBase(base) }))
 

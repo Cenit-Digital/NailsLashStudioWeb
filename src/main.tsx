@@ -43,4 +43,7 @@ import '@fontsource/great-vibes/latin-400.css'
 import './styles/main.scss'
 
 // `createRoot` es el nombre que busca vite-react-ssg: no es opcional.
-export const createRoot = ViteReactSSG({ routes })
+// `basename` viaja a react-router: `vite.config.ts` fija `base: '/NailsLashStudioWeb/'`
+// (ENMIENDA 1 a F-05/F-04, 2026-07-25), así que en producción `basename` vale
+// '/NailsLashStudioWeb/', no '/'. Ver el porqué en progress/tdd_subruta_github_pages.md.
+export const createRoot = ViteReactSSG({ routes, basename: import.meta.env.BASE_URL })

@@ -448,6 +448,7 @@ function violacionesDelJsonLd(pagina: PaginaArtefacto): ViolacionCascaron[] {
 function violacionesDeLaPagina(
   pagina: PaginaArtefacto,
   rutasDelArtefacto: ReadonlySet<string>,
+  base: string | null,
 ): ViolacionCascaron[] {
   const violaciones: ViolacionCascaron[] = []
   const acusar = (regla: string, valor: string): number => violaciones.push({ ruta: pagina.ruta, regla, valor })
@@ -520,7 +521,7 @@ function violacionesDeLaPagina(
   }
 
   violaciones.push(...violacionesDelJsonLd(pagina))
-  violaciones.push(...violacionesDeEnlaces(pagina, rutasDelArtefacto))
+  violaciones.push(...violacionesDeEnlaces(pagina, rutasDelArtefacto, base))
 
   return violaciones
 }
@@ -555,9 +556,51 @@ function esRutaInterna(href: string): boolean {
   return RUTA_INTERNA.test(href)
 }
 
+/** La ruta lógica de la home, tal y como la produce `rutaDelFichero('dist/index.html')`. */
+const RAIZ_DEL_ARTEFACTO = '/'
+
 /** El href sin `?query` ni `#fragmento`: lo que identifica al fichero del artefacto. */
 function rutaDelHref(href: string): string {
   return href.split(/[?#]/)[0]
+}
+
+/**
+ * 🟠 ENMIENDA 1 (2026-07-25, @s36/@s37/@s38): bajo una `base` de despliegue DECLARADA (GitHub
+ * Pages DE PROYECTO, p. ej. `/NailsLashStudioWeb/`), un href interno con SU PREFIJO se resuelve
+ * QUITÁNDOSELO — el RESTO se compara contra `rutasDelArtefacto` exactamente igual que sin base
+ * (@s36: el resto sigue teniendo que ser una ruta lógica conocida, o SIGUE siendo violación; @s38:
+ * el resto es CUALQUIER ruta, no solo la home).
+ *
+ * Un href que NO empieza por el prefijo, cuando SÍ hay `base` declarada, queda FUERA DEL ÁMBITO de
+ * esta puerta (@s37, fila "/otra-cosa"): bajo GitHub Pages DE PROYECTO la raíz del origen puede
+ * alojar un sitio DISTINTO y LEGÍTIMO (Pages de usuario/organización) que esta puerta no puede ver
+ * ni verificar — marcarlo «roto» sería asegurar algo que no se puede saber. Hueco DECLARADO, no
+ * cerrado: mismo tipo de límite que el `fetch()` de JS de F-05 (@s34 de `cero_terceros.feature`).
+ *
+ * SIN `base` declarada, la ruta ES el resto entero: comportamiento IDÉNTICO a @s23/@s24.
+ */
+function esEnlaceRoto(
+  href: string,
+  rutasDelArtefacto: ReadonlySet<string>,
+  base: string | null,
+): boolean {
+  const ruta = rutaDelHref(href)
+
+  if (base === null) {
+    return !rutasDelArtefacto.has(ruta)
+  }
+
+  if (!ruta.startsWith(base)) {
+    return false
+  }
+
+  const resto = ruta.slice(base.length)
+
+  // El ternario `resto === '' ? RAIZ_DEL_ARTEFACTO : ...` es redundante: por la identidad de
+  // JavaScript `X + '' === X`, `${RAIZ_DEL_ARTEFACTO}${resto}` YA da RAIZ_DEL_ARTEFACTO ('/')
+  // cuando `resto === ''`, sin condicional. Ver progress/mutation_subruta_github_pages.md
+  // (mutantes 3 y 4 sobre la línea original).
+  return !rutasDelArtefacto.has(`${RAIZ_DEL_ARTEFACTO}${resto}`)
 }
 
 /**
@@ -574,9 +617,10 @@ function rutaDelHref(href: string): string {
 function violacionesDeEnlaces(
   pagina: PaginaArtefacto,
   rutasDelArtefacto: ReadonlySet<string>,
+  base: string | null,
 ): ViolacionCascaron[] {
   return extraerEnlaces(pagina.html)
-    .filter((href) => esRutaInterna(href) && !rutasDelArtefacto.has(rutaDelHref(href)))
+    .filter((href) => esRutaInterna(href) && esEnlaceRoto(href, rutasDelArtefacto, base))
     .map((href) => ({ ruta: pagina.ruta, regla: REGLA_ENLACE_ROTO, valor: href }))
 }
 
@@ -645,10 +689,17 @@ function violacionesDeRutasAusentes(
 /**
  * El orden del informe es el de las páginas recibidas y, dentro de cada una, el de las reglas:
  * misma entrada → misma salida, MISMO ORDEN. El informe tiene que ser DIFFABLE (@s25).
+ *
+ * `base` es OPCIONAL, por defecto `null` (sin base declarada), para no romper la firma de los
+ * demás llamadores/tests (@s23-@s35 la siguen invocando con 2 argumentos, sin tocarse — ENMIENDA 1,
+ * 2026-07-25). Con `base` declarada, la anti-404 la aplica SOLO `violacionesDeEnlaces` (@s36-@s38);
+ * el resto de reglas de la página es AJENO a `base` por diseño — nada en el contrato de F-04 pide
+ * que cambien.
  */
 export function inspeccionarSitio(
   paginas: readonly PaginaArtefacto[],
   rutasEsperadas: readonly string[],
+  base: string | null = null,
 ): ViolacionCascaron[] {
   // Las rutas que EXISTEN DE VERDAD en el artefacto, que es contra lo que se asevera el eje
   // «permanente» de la anti-404: NO contra las esperadas. Una ruta esperada que el build no
@@ -657,7 +708,7 @@ export function inspeccionarSitio(
 
   return [
     ...violacionesDeRutasAusentes(paginas, rutasEsperadas),
-    ...paginas.flatMap((pagina) => violacionesDeLaPagina(pagina, rutasDelArtefacto)),
+    ...paginas.flatMap((pagina) => violacionesDeLaPagina(pagina, rutasDelArtefacto, base)),
     ...violacionesDeCanonicaRepetida(paginas),
   ]
 }
@@ -690,6 +741,13 @@ export interface ArtefactoDeProduccion {
 export interface PeticionPuertaCascaron {
   readonly artefacto: ArtefactoDeProduccion
   readonly rutasEsperadas: readonly string[]
+  /**
+   * 🟠 ENMIENDA 1 (2026-07-25, @s37): la `base` declarada en `vite.config.ts` (la MISMA
+   * `baseDeclarada` de `src/lib/puerta-terceros.ts`), o `null`/AUSENTE si no hay ninguna. El
+   * humilde `tools/puerta-cascaron.ts` la cablea; SIN ESTE CAMPO, un `PeticionPuertaCascaron`
+   * existente sigue compilando y significa exactamente lo de hoy (@s23-@s30, sin tocar).
+   */
+  readonly base?: string | null
 }
 
 export interface ResultadoPuertaCascaron {
@@ -737,7 +795,7 @@ export function ejecutarPuertaDelCascaron(
 }
 
 function inspeccionarArtefacto(peticion: PeticionPuertaCascaron): ResultadoPuertaCascaron {
-  const { artefacto, rutasEsperadas } = peticion
+  const { artefacto, rutasEsperadas, base = null } = peticion
 
   // LA GUARDA DE LA GUARDA (@s27). Sin ella, la de @s26 SE DESACTIVA SOLA: con la lista vacía,
   // «una HTML por cada ruta esperada» se satisface VACUAMENTE y la puerta pasa sin inspeccionar
@@ -761,7 +819,7 @@ function inspeccionarArtefacto(peticion: PeticionPuertaCascaron): ResultadoPuert
 
   // La inspección incluye la GUARDA de «una HTML por cada ruta esperada» (@s26): va PRIMERO,
   // porque un dist/ vacío tiene que acusar QUÉ RUTA FALTA, no «no encontré enlaces».
-  const violaciones = inspeccionarSitio(paginas, rutasEsperadas)
+  const violaciones = inspeccionarSitio(paginas, rutasEsperadas, base)
 
   if (violaciones.length > 0) {
     return { codigoSalida: CODIGO_FALLO, lineas: violaciones.map(describirViolacion) }
