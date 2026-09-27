@@ -1,4 +1,62 @@
 # =============================================================================================
+# 🟠 ENMIENDA F-23 (2026-09-27): EL CHAT DE LA DERECHA SE EXTRAE A `ChatNailbot` Y PASA A SER NAILBOT
+# =============================================================================================
+#   QUÉ PASA. La feature F-23 `nailbot_chat_compartido` (encargo de Pablo del 2026-09-27; decisiones
+#   H1–H8 del humano y L1–L16 del lead en `progress/nailbot_diseno.md`; contrato en `project-spec.md`
+#   → «Feature 23» y la «Resolución del craftsman_lead a HS-1..HS-7», que MANDA) saca el chat de
+#   `Reserva.tsx` a un componente COMPARTIDO, `src/components/ChatNailbot.tsx`, con su cerebro PURO en
+#   `chat-nailbot-logica.ts`, su copy en `src/lib/demo/nailbot-demo.ts` y sus estilos en
+#   `chat-nailbot.module.scss`. `Reserva.tsx` lo monta en la columna derecha (horneado, como hoy) y el
+#   robot flotante (F-24) monta OTRA instancia, independiente, en su panel. `claveBurbuja`,
+#   `desplazarAlFinal` y `mensajeReserva` se quedan en `reserva-logica.ts` (esta última, AMPLIADA con
+#   el nombre opcional).
+#
+#   EL CONTRATO DEL CHAT NUEVO VIVE EN `features/nailbot_chat_compartido.feature` (@s1..@s14). ESTE
+#   FICHERO NO LO DUPLICA: donde un escenario de aquí dependía del copy o del guion que F-23 cambia,
+#   REMITE a F-23 en vez de copiar el literal (una sola fuente del copy entre contratos, igual que
+#   `nailbot-demo.ts` lo es en el código). Estos escenarios siguen ejercitando el chat A TRAVÉS de
+#   `<Reserva />`: son también la prueba de que `#reserva` monta Nailbot.
+#
+#   CONVENCIÓN (la de la ENMIENDA 4 de `galeria_carrusel.feature`): NINGÚN tag se renumera ni se
+#   reutiliza, y NINGÚN @s nuevo entra aquí (techo L16). RETIRADO = título marcado
+#   `[RETIRADO 2026-09-27, F-23]` y cuerpo histórico ÍNTEGRO, sin test vigente. AJUSTADO = título
+#   marcado `[AJUSTADO 2026-09-27, F-23]`; el Given/Then/And que cambia se conserva COMENTADO como
+#   `# [RETIRADO F-23] …` y su sustituto va marcado `[AJUSTADO F-23]`; el resto sigue vigente tal cual.
+#
+#   RETIRADOS (2):
+#     @s8  — cabecera «Nails Lash Studio» + «en línea» + avatar «nl» → nailbot_chat_compartido @s1
+#     @s12 — el guion de 4 pasos con su copy               → nailbot_chat_compartido @s3
+#   AJUSTADOS (9):
+#     @s7  — la hoja pierde los selectores del chat (se mudan a chat-nailbot.module.scss)
+#     @s9, @s17 — el saludo (remite a F-23 @s3)
+#     @s11 — la pregunta del día y «Un sábado» (remite a F-23 @s3)
+#     @s13 — el paso del nombre ya tiene un botón de opción, «Prefiero no decirlo»
+#     @s15 — el resumen (copy corregido de HS-6)
+#     @s20 — su Given usaba «Este fin de semana», que desaparece
+#     @s22 — la guarda de fuente del código movido la asevera F-23 @s12
+#     @s23 — gana la fila SIN nombre
+#   INTACTOS (13): @s1–@s6, @s10, @s14, @s16, @s18, @s19, @s21, @s24. Releídos contra el contrato de
+#     F-23: ChatNailbot no trae headings ni enlaces al montar, no va antes de la rejilla, no añade
+#     botones (ni cerrar ni minimizar), no usa aria-pressed, mantiene las burbujas como hijas DIRECTAS
+#     del hilo con `data-de`, reutiliza `claveBurbuja` y `mensajeReserva` SIN moverlas, conserva el
+#     enlace `demo-btn demo-btn--wa` (A-25: «nada de verde» es del lanzador de F-24, no del chat) y el
+#     orden enlace → «Reservar otra cita». @s14 sigue en siete burbujas por el camino sin sábado. El
+#     TEST de @s18 cambia el literal del saludo con el que localiza el hilo; el escenario, no.
+#
+#   DESVIACIÓN DECLARADA respecto a la tabla de `project-spec.md` («La enmienda de reserva_chat», L5):
+#   la tabla proponía @s12 AJUSTADO. Se RETIRA: todo su contenido —la pregunta y los botones de cada
+#   paso— lo fija ahora nailbot_chat_compartido @s3, y ajustarlo duplicaría el guion en dos contratos
+#   (orden del lead: «no dupliques en reserva_chat lo que ya cubra F-23: remite»). Su fila 4, la que
+#   mataba al mutante del «quinto paso», tiene heredero: F-23 @s6 (tras el nombre, el chat TERMINA).
+#   Por el mismo criterio, @s9, @s11 y @s17 remiten su literal a F-23 @s3 en vez de copiarlo.
+#
+#   LA D1 (al final) QUEDA CERRADA por F-23: leyenda visible SIEMPRE (nailbot_chat_compartido @s1 y
+#   @s2) y «en línea» retirado (@s8, RETIRADO). Deuda viva declarada (HS-5 a): el token
+#   `--estado-en-linea` y su fila de MATRIZ_DE_USO SE QUEDAN, así que @s21 («MINIMO_DE_PARES sigue
+#   valiendo EXACTAMENTE 18») sigue INTACTO.
+# =============================================================================================
+#
+# =============================================================================================
 # CONTRATO — sección #reserva: columna izquierda RESTAURADA al diseño + chat guiado que SE MANTIENE
 # y que ahora SÍ entrega lo contestado por WhatsApp.
 # v2: REESCRITO ENTERO, aprobado por la puerta humana (@s1-@s21 implementados y en HEAD).
@@ -157,6 +215,10 @@
 #   src/components/reserva-estilos.test.ts     (NUEVO: BYTES del .module.scss)
 #   src/lib/demo/reserva-demo.ts               (NUEVO: el texto DEMO prellenado del enlace)
 #   stryker.config.json                        (dos líneas: Reserva.tsx + reserva-logica.ts en mutate)
+#   [ENMIENDA F-23, 2026-09-27] El chat SALE de Reserva.tsx y de reserva.module.scss hacia
+#   ChatNailbot.tsx, chat-nailbot.module.scss, chat-nailbot-logica.ts y src/lib/demo/nailbot-demo.ts
+#   (artefactos fijados en nailbot_chat_compartido.feature). Reserva.tsx y reserva-logica.ts siguen en
+#   `mutate` y su mutación se RE-MIDE.
 #
 # =============================================================================================
 # TRAZA
@@ -170,9 +232,11 @@
 #   mensajeReserva compone servicio+día+franja+nombre, función PURA         → @s23
 #   el enlace "Enviar la reserva por WhatsApp" aparece SOLO al terminar,
 #   antes de "Reservar otra cita", con href derivado de F-02               → @s24
+#   [ENMIENDA F-23] el chat es Nailbot (ChatNailbot compartido con el robot) → nailbot_chat_compartido
+#   @s1..@s14; aquí: @s7, @s9, @s11, @s13, @s15, @s17, @s20, @s22, @s23 AJUSTADOS; @s8, @s12 RETIRADOS
 # =============================================================================================
 
-Feature: Reserva rápida — la columna izquierda vuelve al diseño (texto + WhatsApp + llamar, SIN calendario) y el chat guiado de la derecha sigue funcionando igual, y ahora SÍ entrega lo contestado
+Feature: Reserva rápida — la columna izquierda vuelve al diseño (texto + WhatsApp + llamar, SIN calendario) y el chat guiado de la derecha sigue funcionando igual, y ahora SÍ entrega lo contestado [ENMIENDA F-23, 2026-09-27: el chat de la derecha es ahora Nailbot, el ChatNailbot compartido con el robot flotante — su contrato es nailbot_chat_compartido.feature]
   Como visitante quiero, en la sección de reserva, una invitación clara a escribir por WhatsApp o a
   llamar al estudio, y un asistente de chat que me pregunte servicio, día, franja y nombre en cuatro
   pasos y que, al terminar, me ofrezca un enlace con la reserva ya redactada para enviarla yo misma
@@ -275,25 +339,41 @@ Feature: Reserva rápida — la columna izquierda vuelve al diseño (texto + Wha
     # refactor futuro reactiva sin querer, y que Stryker contaría como no cubierto.
 
   @s7
-  Scenario: La hoja de estilos pierde los bloques que solo vestían al calendario y conserva los vivos
+  Scenario: [AJUSTADO 2026-09-27, F-23] La hoja de estilos pierde los bloques que solo vestían al calendario y conserva los vivos
     Given los bytes de "src/components/reserva.module.scss"
     When se buscan en ellos los selectores de la hoja
-    Then la hoja SÍ declara ".rejilla", ".acciones", ".chat", ".chatCabecera", ".hilo", ".chipChat", ".entrada" y ".reiniciar" (ANCLA POSITIVA: la hoja se leyó, NO está vacía y el chat sigue vestido)
+    # [RETIRADO F-23] Then la hoja SÍ declara ".rejilla", ".acciones", ".chat", ".chatCabecera", ".hilo", ".chipChat", ".entrada" y ".reiniciar" (ANCLA POSITIVA: la hoja se leyó, NO está vacía y el chat sigue vestido)
+    Then [AJUSTADO F-23] la hoja SÍ declara ".reserva", ".rejilla" y ".acciones" (ANCLA POSITIVA: la hoja se leyó y NO está vacía)
+    And [AJUSTADO F-23] la hoja YA NO declara ".chat", ".chatCabecera", ".avatar", ".chatNombre", ".enLinea", ".hilo", ".burbujaBot", ".burbujaUsuario", ".chatPie", ".opciones", ".chipChat", ".entrada" ni ".reiniciar": el chat se mudó a "src/components/chat-nailbot.module.scss", cuyos bytes vigila nailbot_chat_compartido @s13
     And la hoja NO declara ".paso", ni ".pasoTitulo", ni ".dia", ni ".diaActivo", ni ".diaDow", ni ".diaNum", ni ".cargando", ni ".chip", ni ".chipActivo", ni ".deshabilitado"
     And la hoja NO contiene "url(" ni "@font-face": no estrena ningún subrecurso (puerta 4)
     # CSS MUERTO = invitación a resucitar el calendario. `.opciones` SE CONSERVA: lo sigue usando la
     # botonera del chat (Reserva.tsx:230). `.chipChat` es del chat y NO es `.chip`. NO-MUTABLE por
     # declaración (Stryker no ve SCSS): lo aseveran estos BYTES, patrón `contacto-estilos.test.ts`.
     # PROHIBIDO `toHaveClass` (css:false → `estilos.x` es `undefined` en test).
+    # [AJUSTADO F-23, 2026-09-27] La frase sobre `.opciones` de arriba queda HISTÓRICA: era la botonera
+    # del chat y se muda con él. El mismo argumento del CSS muerto vale para el chat: dos copias de sus
+    # selectores acabarían divergiendo. Las regex son `\.<selector>\b` (`.chat` no casa con
+    # `.chatCabecera`). Si Reserva.tsx necesita una celda de rejilla para el chat, usa un nombre nuevo.
 
   # ---------------------------------------------------------------------------
   # COLUMNA DERECHA — EL CHAT. Se mantiene y debe seguir funcionando al 100%.
   # Guion FIJO de 4 pasos: no es un chatbot con IA, ninguna respuesta del bot depende del texto
   # libre salvo el nombre, que solo se interpola en el resumen final.
+  # [ENMIENDA F-23, 2026-09-27] El chat es ahora `<ChatNailbot />`, montado por Reserva.tsx. Sigue
+  # siendo un guion fijo (cuatro pasos; tres con «Un sábado») y el nombre es OPCIONAL («Prefiero no
+  # decirlo»). Estos escenarios lo ejercitan a través de `<Reserva />`; su contrato propio es
+  # nailbot_chat_compartido.feature.
   # ---------------------------------------------------------------------------
 
   @s8
-  Scenario: La cabecera del chat identifica al estudio con el nombre canónico y su estado
+  Scenario: [RETIRADO 2026-09-27, F-23] La cabecera del chat identifica al estudio con el nombre canónico y su estado
+    # [RETIRADO — F-23, L1] «en línea» afirmaba un agente que no existe (`feature_list.json` →
+    # `no_se_construyen`, «#reserva (chat simulado)»), y el avatar de letras «nl» cede su sitio al arte
+    # de Nailbot. La cabecera nueva («Nailbot» + «Asistente automático · demo» + `NailbotArte`
+    # estático) la fija nailbot_chat_compartido.feature @s1. El cuerpo de abajo se CONSERVA ÍNTEGRO
+    # como registro histórico: NO describe código vigente desde el 2026-09-27, y su test se retira.
+    # Este tag @s8 NO se reutiliza.
     Given la sección de reserva renderizada
     When se lee la cabecera del widget de chat
     Then muestra el texto exactamente "Nails Lash Studio", con sus capitales (NO "nails lash studio")
@@ -304,16 +384,20 @@ Feature: Reserva rápida — la columna izquierda vuelve al diseño (texto + Wha
     # `--estado-en-linea` (#186237, AA). El literal se escribe A MANO, jamás importando `NOMBRE`.
 
   @s9
-  Scenario: El chat viaja HORNEADO: sin ejecutar JavaScript ya se ve el primer mensaje y sus tres opciones
+  Scenario: [AJUSTADO 2026-09-27, F-23] El chat viaja HORNEADO: sin ejecutar JavaScript ya se ve el primer mensaje y sus tres opciones
     Given la sección de reserva renderizada por SSR, sin ejecutar JavaScript ni hidratar
     When se inspecciona el hilo del chat en el HTML horneado
-    Then el hilo contiene EXACTAMENTE UNA burbuja, y su texto es exactamente "¡Hola! Soy el asistente de Nails Lash Studio ✨ ¿Qué te gustaría reservar?"
+    # [RETIRADO F-23] Then el hilo contiene EXACTAMENTE UNA burbuja, y su texto es exactamente "¡Hola! Soy el asistente de Nails Lash Studio ✨ ¿Qué te gustaría reservar?"
+    Then [AJUSTADO F-23] el hilo contiene EXACTAMENTE UNA burbuja (data-de="bot"), y su texto es exactamente el saludo de Nailbot que fija nailbot_chat_compartido.feature @s3, fila «servicio»
     And se hornean los TRES botones de opción "Uñas", "Pestañas" y "Cejas"
     And NO se hornea ningún campo de texto ni el botón "Reservar otra cita"
     # El estado inicial del chat es DETERMINISTA (no depende del reloj ni de nada calculado), así que
     # SÍ puede hornearse sin mentir — al revés que los días del calendario de `#equipo` (@s9 de
     # `equipo_reservas.feature`). Quien llega con el JS aún cargando ve un chat con contenido, no un
     # hueco. Se asevera sobre `renderToString(<Reserva />)`, NUNCA con jsdom.
+    # [AJUSTADO F-23, 2026-09-27] Solo cambia el literal del saludo, que se REMITE a F-23 (no se copia
+    # aquí; el test lo escribe A MANO). Lo NUEVO del horneado —cabecera «Nailbot», leyenda, hilo
+    # `role="log"` con nombre— es nailbot_chat_compartido @s1, que remite aquí para el conteo: no se duplica.
 
   @s10
   Scenario: Las opciones del primer paso son las categorías REALES del salón — ni "Facial" ni "Depilación"
@@ -330,18 +414,31 @@ Feature: Reserva rápida — la columna izquierda vuelve al diseño (texto + Wha
     # negativa de página entera nacería ROJA por culpa ajena.
 
   @s11
-  Scenario: Elegir una opción añade mi respuesta y encadena la siguiente pregunta
+  Scenario: [AJUSTADO 2026-09-27, F-23] Elegir una opción añade mi respuesta y encadena la siguiente pregunta
     Given la sección de reserva renderizada, con el chat en su primer paso
     When pulso el botón de opción "Uñas"
     Then el hilo pasa a tener EXACTAMENTE tres burbujas
     And la segunda burbuja es mía y su texto es exactamente "Uñas"
-    And la tercera es del bot y su texto es exactamente "¡Perfecto! ¿Qué día te viene mejor?"
-    And los botones de opción visibles pasan a ser "Entre semana", "Este fin de semana" y "Lo antes posible"
+    # [RETIRADO F-23] And la tercera es del bot y su texto es exactamente "¡Perfecto! ¿Qué día te viene mejor?"
+    # [RETIRADO F-23] And los botones de opción visibles pasan a ser "Entre semana", "Este fin de semana" y "Lo antes posible"
+    And [AJUSTADO F-23] la tercera es del bot y su texto es exactamente la pregunta del paso «día» que fija nailbot_chat_compartido.feature @s3
+    And [AJUSTADO F-23] los botones de opción visibles pasan a ser exactamente los de esa misma fila de F-23 @s3: «Un sábado» sustituye a «Este fin de semana»
     # El conteo EXACTO de burbujas mata al mutante que pierde el eco del usuario o que duplica la
     # pregunta. Los tres literales se escriben A MANO (jamás importando `FLUJO_CHAT`).
+    # [AJUSTADO F-23, 2026-09-27] Los literales se REMITEN a F-23 (el test los sigue escribiendo A MANO,
+    # jamás importando `nailbot-demo.ts`). «Este fin de semana» desaparece porque el domingo está
+    # cerrado [V: `HORARIO.domingo = 'cerrado'`, site.ts:34]: ofrecía un día sin servicio.
 
   @s12
-  Scenario Outline: El guion es FIJO y tiene cuatro pasos, con las opciones de cada uno
+  Scenario Outline: [RETIRADO 2026-09-27, F-23] El guion es FIJO y tiene cuatro pasos, con las opciones de cada uno
+    # [RETIRADO — F-23] Las cuatro preguntas y las nueve opciones de abajo YA NO son las del chat: el
+    # guion de Nailbot (saludo nuevo, «Un sábado», el paso del nombre con «Prefiero no decirlo») lo fija
+    # ÍNTEGRO nailbot_chat_compartido.feature @s3, y el salto de la franja en sábado, @s4. Se RETIRA en
+    # vez de AJUSTARSE (desviación declarada en el banner de la ENMIENDA F-23) para no duplicar el
+    # guion en dos contratos. La fila 4, que mataba al mutante del «quinto paso», tiene heredero en
+    # F-23 @s6 (tras el nombre, el chat TERMINA). El cuerpo se CONSERVA ÍNTEGRO como registro
+    # histórico: NO describe código vigente desde el 2026-09-27, y su test se retira. Este tag @s12 NO
+    # se reutiliza.
     Given el chat situado en el paso "<paso>" tras haber respondido los anteriores
     When leo el último mensaje del bot y los botones de opción visibles
     Then el mensaje del bot es exactamente "<pregunta del bot>"
@@ -359,12 +456,13 @@ Feature: Reserva rápida — la columna izquierda vuelve al diseño (texto + Wha
     # al mutante del comparador `siguiente < FLUJO_CHAT.length` por el lado de «se pasa de largo».
 
   @s13
-  Scenario: El cuarto paso pide el nombre por texto libre, y ahí no hay botones de opción
+  Scenario: [AJUSTADO 2026-09-27, F-23] El cuarto paso pide el nombre por texto libre, y ahí ya no queda ningún botón de opción del guion
     Given el chat en su cuarto paso, con servicio, día y franja ya respondidos
     When se inspecciona el pie del chat
     Then existe un campo de texto cuyo placeholder es exactamente "Escribe tu nombre…" y cuyo nombre accesible es exactamente "Tu nombre"
     And existe un botón cuyo nombre accesible es exactamente "Enviar"
-    And NO se muestra ningún botón de opción: los chips del guion han desaparecido
+    # [RETIRADO F-23] And NO se muestra ningún botón de opción: los chips del guion han desaparecido
+    And [AJUSTADO F-23] los chips del guion (servicio, día y franja) han desaparecido, y el ÚNICO botón de opción del paso es el de saltarse el nombre, "Prefiero no decirlo": los botones del paso son exactamente los que fija nailbot_chat_compartido.feature @s3, fila «nombre»
     And el glifo "→" del botón de enviar NO es su nombre accesible: el nombre lo pone un aria-label
     # El placeholder lleva PUNTOS SUSPENSIVOS TIPOGRÁFICOS («…», U+2026), no tres puntos: el literal
     # se copia tal cual (Reserva.tsx:242). Un botón llamado «→» se anunciaría como «flecha derecha,
