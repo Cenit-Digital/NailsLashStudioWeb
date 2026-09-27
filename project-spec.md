@@ -176,6 +176,13 @@ demás es placeholder.
 | **T-5** | **Umbral de mutación 1.0** (proporción), y **prohibido `--testFiles`** en Stryker: acotar con `--mutate <fichero>` | El `0.8` por defecto del arnés; copiar el `100` de Stryker | El base exige `break: 100` **[V]** → **este repo tiene la puerta más estricta que su propio repo base**. Y `--testFiles` da **0 % falso** con este stack exacto (16/16 supervivientes con él, 100 % sin él; reproducido 2 veces, causa raíz **[NV]**) **[V]** |
 | **T-6** | **JSON-LD escrito de cero**: `LocalBusiness`/`BeautySalon` con el NAP y `geo` verificados, **sin `aggregateRating`** | Copiar el JSON-LD de la web actual; emitir `aggregateRating` con la nota de Treatwell | Copiarlo **propagaría sus bugs**: `addressLocality: "Las Ceudas"` y un `vatID` malformado **[V]**. Y Google **prohíbe** agregar notas de otros sitios («*Don't aggregate reviews or ratings from other websites*») → riesgo de acción manual **[V]**. Las estrellas se ganan por Google Business Profile, que es otro canal |
 | **T-7** | **Los tests conviven con el código** (`paths.tests: "src"`) y **se consulta por rol, nombre accesible, texto o `data-*`, nunca por clase CSS** | El default `tests/` del arnés; consultar por `styles.card` | `vitest.config.ts` solo incluye `src/**/*.{test,spec}.{ts,tsx}` **[V]** → poner tests en `tests/` = **tests que no se ejecutan**. Y `css: false` es *load-bearing*: los CSS Modules no se procesan en test → `styles.card` es **`undefined`** **[V]**. Efecto secundario buscado: **el test solo ve lo que ve un lector de pantalla** |
+| **N-1** | **Nailbot (F-23/F-24) es un asistente automático de DEMO y lo dice**: leyenda visible, nunca «IA», sin «en línea» (H6, L1 de `progress/nailbot_diseno.md`) | Anunciarlo como «ChatBot de IA», como decía el encargo; mantener el «en línea» | Un guion fijo **no es un sistema de IA** (AI Act art. 3.1 y cons. 12; Directrices del art. 50 §30.i: *«rule-based quick message answers»*) **[V: `docs/research/asistente-robot/01-legal.md` §2]**. El art. 50.1 no obliga hoy, pero llamarlo IA sería engañoso **[I]**. El día de la IA real, la leyenda se cambia por el aviso del art. 50 (`06` §4) |
+| **N-2** | **Un solo cerebro, dos puertas**: `ChatNailbot` en `#reserva` y en el panel del robot, con estado independiente (H2, L5) | Un chat nuevo para el robot que no toque `Reserva.tsx` (la «vía barata» de `05` §5) | Lo pidió el humano, y dos guiones acaban divergiendo. **Matiza T-2** («una sola vía de reserva»): no añade una vía, añade una **puerta** a la misma lógica de composición (`mensajeReserva`) |
+| **N-3** | **La costura del servidor futuro es la firma de una función PURA**, `responder(estado, entrada) → estado` (H1, H7, L4) | Un adaptador «remoto» especulativo; llamar a la API de Claude desde el navegador | Herencia sin uso = deuda muerta (memoria organizacional). Una clave en GitHub Pages es **pública** (`06` §0). Lo que la costura no garantiza (asincronía, texto libre, copy legal) está en F-23, HS-7 |
+| **N-4** | **Datos mínimos y cero persistencia en Nailbot**: opciones cerradas, nombre opcional y nunca teléfono; cero `fetch`, storage y analítica (L2, L11, L15) | Pedir el teléfono; texto libre; recordar el bocadillo en `sessionStorage` | RGPD art. 5.1.c (WhatsApp ya aporta el número) y art. 9 (el texto libre invita a datos de salud) **[V: `01` §3.1]**. I-2: el «sin cookies» se mantiene por construcción |
+| **N-5** | **El robot se anima en bucle con control de pausa**, y se queda quieto con `prefers-reduced-motion` (H3, L9, L10) | La «ráfaga» ≤ 5 s que termina en pose fija; un bucle sin control | Decisión del humano. Un bucle decorativo **cumple las tres condiciones de SC 2.2.2 (A)** y necesita un mecanismo; `prefers-reduced-motion` es criterio de proyecto y **no** sustituye a 2.2.2 **[V: `04` §1]** |
+| **N-6** | **El lanzador solo existe en el cliente y el panel es un `<dialog>` modal nativo** (L7, L8) | Hornear el botón; un `role="dialog"` propio; un panel no modal | Sin JS, un botón horneado estaría muerto. El navegador da la inercia, Esc, la *top layer* y la vuelta del foco; jsdom no, así que hay stub protegido y verificación en vivo |
+| **N-7** | **Nada de verde ni logo de WhatsApp en el lanzador** (H5) | Recuperar el botón verde retirado (commit 479d541) | Palabra del humano: un robot con la estética del negocio que **invite a reservar** por el chat. Su alcance dentro del panel está en A-25 |
 
 ---
 
@@ -208,6 +215,10 @@ No están cerradas. **No se dan por resueltas** y ninguna se resuelve adivinando
 | **A-20** | ✅ **CERRADA (2026-07-16) por el humano: `priceRange` NO entra.** Es **Text, no número** (*«for example $$$»* **[V]**): un `"priceRange": 25` es **sintácticamente válido y basura semántica** — nadie lo rechaza y **degrada en silencio**. Y **los precios reales están bloqueados** (B-5, F-09: el titular no los publica): emitir un rango sin precios verificados **sería inventar**. Es **recomendada** por Google, nunca requerida: su ausencia no rompe nada | **Cerrada** |
 | **A-21** | ✅ **CERRADA (2026-07-16) por el humano: el origen entra como PLACEHOLDER cubierto por la puerta de F-01.** El dominio final es **[NV]** — sigue abierto si se migra `nailslashlasrozas.es` con 301, y **lo decide el cliente**. El origen se registra en la capa de placeholders de F-01 → **el build de PRODUCCIÓN falla** mientras no se decida, y el de **desarrollo no**. Es la **decisión 9** aplicada literalmente: *el contenido no verificado vive en una capa explícita y es estructuralmente imposible publicarlo por accidente*. **F-04 se construye entera hoy**, con la canónica probada, y el dato real entra **sin tocar código**. F-04 **no duplica** la puerta de F-01: se apoya en ella | **Cerrada** |
 | **A-22** | ✅ **CERRADA (2026-07-16) por el humano: `home → `${marca} · ${reclamo}`; resto → `${sección} · ${marca}`.** Home: **«Nails Lash Studio · Uñas, pestañas y cejas en Las Rozas de Madrid»**. Resto: **«Servicios · Nails Lash Studio»**. Contenido **[V]**: las categorías reales son **Uñas · Pestañas · Cejas** (*«Facial» NO existe en este negocio*) y la localidad es **Las Rozas de Madrid**. Marca al final en las interiores: lo distintivo primero (pestaña estrecha y SERP truncan por la derecha). **Es criterio de PROYECTO/SEO, jamás `SC 2.4.2`**, cuyo listón normativo es *«describe topic or purpose»* con **cero requisito de unicidad [V]**. **Sin este literal el acceptance «mutar la composición del title rompe un test» no tenía nada que mutar** y el mutante del orden sobrevivía | **Cerrada** |
+| **A-23** | **La capa 1 de Nailbot está incompleta hasta F-16.** El aviso de F-23 cubre la finalidad y el control del envío, pero **no** la identidad del responsable, ni los derechos, ni el acceso a la política que pide el art. 11 LOPDGDD **[V: `docs/research/asistente-robot/01-legal.md` §3.1]**: esos datos no existen (D-6) y la política es F-16 (`blocked`). Mientras tanto, la demo se despliega en GitHub Pages con el teléfono real. ¿Se aprueba **cada** despliegue a sabiendas? Además, «El salón lo usará solo para gestionar tu cita» compromete al salón sin haberlo confirmado con él. Ver F-23, HS-1 | **Cliente** (datos del titular) + **humano** (cada aprobación de Pages) |
+| **A-24** | **El servidor de Nailbot con IA real** (NO se construye hoy): proveedor y hosting, mismo número en la app y en la API (*Coexistence*), modelo y presupuesto, presupuesto de WhatsApp desde el 1-oct-2026 y residencia de datos (S1–S5), más las **puertas legales previas**: aviso del art. 50.1 en el primer turno, contratos de encargo, transferencia a EE. UU. y la cl. 4.7 de Meta. Todo en `docs/research/asistente-robot/06-diseno-servidor-futuro.md` §3–§4. Y **ya**: revocar la clave `sk-proj-…` que se pegó en una sesión (no es de Anthropic; `06` §0) | **El salón** (S1–S5) + **humano** (la clave y el arranque) |
+| **A-25** | **¿«Nada de verde» (H5) alcanza al panel del robot?** El lanzador cumple, pero el `ChatNailbot` que abre trae el verde de `#reserva`: la burbuja de la persona, el botón de enviar y el enlace `demo-btn--wa` que exige `reserva_chat` @s24. Recomendación: H5 se refiere al lanzador. Ver F-24, HS-16 | **Humano** (Pablo) |
+| **A-26** | **Dos literales que el brief no fija o que chocan con el rol del control:** el nombre accesible del hilo `role="log"` (F-23, HS-4; `04` sugiere «Conversación») y «Pulsa el botón», que nombra un enlace (F-23, HS-6). El spec_partner no escribe copy | **Lead/humano**, en la puerta de F-23 |
 
 **Y lo que no es una pregunta sino un aviso con valor legal:** hay que decirle al cliente
 **ya**, sin esperar a la web nueva, que **su aviso legal actual da 404** y que su política
@@ -2634,3 +2645,726 @@ está en **`progress/galeria_coverflow_diseno.md`** (el brief que consumieron
 **`features/galeria_carrusel.feature`**. Duplicarlos aquí garantizaría la contradicción;
 esta sección existe para que el checkpoint C6 tenga su entrada y el lector sepa dónde
 seguir leyendo.
+
+---
+
+### Feature 23: `nailbot_chat_compartido` — el chat de `#reserva` pasa a ser Nailbot: un solo cerebro PURO, honesto y sin red, para la sección y para el robot
+
+> Feature `#23`. **Aún sin entrada en `feature_list.json`** (la crea el `craftsman_lead`; esta sección no
+> toca ese fichero). Nace del encargo de Pablo del **2026-09-27** («Robot pintándose las uñas esperando a
+> que pidan cita… enlazado con un ChatBot de IA… no lo implementes con servidor todavía») y es la mitad
+> **sin robot** de ese encargo: el cerebro y la cara del chat. La otra mitad —el robot flotante— es
+> **F-24**, que depende de esta.
+>
+> **Fuente de verdad del copy y de los nombres de artefacto: `progress/nailbot_diseno.md`** (el brief:
+> §2 = decisiones del humano **H1–H8**, §3 = decisiones del lead **L1–L16**, §4 = copy **LITERAL**, §5 =
+> ficheros, §6 = fuera de alcance). Investigación con fuentes oficiales y fecha:
+> `docs/research/asistente-robot/01-legal.md` … `06-diseno-servidor-futuro.md`. **Esta sección no
+> reescribe el copy**: cita los literales tal cual o remite al brief §4. Si un literal de aquí y uno del
+> brief difieren, **manda el brief**; si esta sección señala un hueco del brief (HS-n), **manda la
+> puerta humana**.
+
+#### Cómo se acordó — declarado, sin fingir
+
+La conversación con el humano **la condujo el `craftsman_lead`** con `AskUserQuestion` el 2026-09-27; sus
+respuestas son **H1–H8** del brief, y las decisiones técnicas que el lead tomó con ellas, **L1–L16**. El
+`spec_partner` **no simula** un debate que no tuvo: destila H/L en contrato comprobable y, donde el brief
+deja algo sin cerrar o choca con el repo, lo escribe en **«Huecos detectados por spec_partner»** (HS-1 a
+HS-7), cada uno con su propuesta y **PENDIENTE DE PUERTA HUMANA**. Nada de lo que va a la puerta se da
+por resuelto aquí.
+
+#### Propósito
+
+Que quien quiere cita **componga su solicitud en cuatro pasos de opciones cerradas** (tres si elige
+sábado) con un asistente que **dice lo que es** —automático, de demostración, ni persona ni IA—, que **pide
+el mínimo** —nombre opcional, nunca teléfono— y que **no envía nada por sí mismo**: al terminar le entrega
+un enlace de WhatsApp con el mensaje redactado, **que ella decide enviar**; y que **ese mismo cerebro**
+sirva, sin duplicarse, en `#reserva` y en el panel del robot (F-24).
+
+#### Qué cambia respecto al chat de hoy (`src/components/Reserva.tsx:31-179`)
+
+| Hoy **[V]** | Con F-23 | Por qué |
+| --- | --- | --- |
+| Cabecera «Nails Lash Studio» + «en línea» + avatar de letras «nl» | «Nailbot» + «Asistente automático · demo» + avatar `NailbotArte` **estático** | **L1**: «en línea» afirma un agente que no existe (`feature_list.json` → `no_se_construyen`, «#reserva (chat simulado)») |
+| Sin leyenda | Leyenda visible **siempre**, dentro del chat | **L1** + política de datos demo marcados. Cierra la **D1** que `reserva_chat.feature:543-554` dejó abierta |
+| Día «Este fin de semana» | «Un sábado» | El domingo está cerrado **[V: `HORARIO.domingo = 'cerrado'`, `site.ts:34`]**: «fin de semana» ofrecía un día sin servicio |
+| El sábado pregunta la franja, incluida «Por la tarde» | El sábado **no** pregunta la franja y lo explica con el dato de F-02 | **L6**. Es el defecto que `reserva_chat.feature:64-66` reconocía por escrito («puede ofrecer "Por la tarde" un día que el salón cierra») |
+| Nombre obligatorio | Nombre **opcional** («Prefiero no decirlo») | **L2** (RGPD art. 5.1.c) |
+| Resumen «Te confirmaremos la hora exacta por WhatsApp. ¡Te esperamos…!» | Resumen que dice lo que de verdad ocurre: pulsas, lo envías tú y allí te confirman | **L1** / **D-3**: el chat no confirma nada |
+| Ningún aviso de datos | Aviso de **capa 1** justo encima del enlace final, **sin enlace** | **L3**; provisional hasta F-16 (HS-1, A-23) |
+| Guion y avance dentro del `.tsx` | Cerebro **puro** `responder` en `chat-nailbot-logica.ts`; copy en `src/lib/demo/nailbot-demo.ts` | **L4** (la costura del servidor futuro) + `eslint.config.js:24` (un `.tsx` solo exporta el componente) |
+| Un chat, en un sitio | **Un** componente `ChatNailbot`, **dos** instancias con estado independiente | **H2**, **L5** |
+
+#### Contrato
+
+**1. `ChatNailbot`: lo que ve y hace la persona.** Orden en el DOM, de arriba abajo:
+
+| Zona | Contenido | Reglas |
+| --- | --- | --- |
+| Cabecera | `NailbotArte` estático + «Nailbot» + «Asistente automático · demo» | El avatar lleva `aria-hidden="true"` y no aporta nada al nombre accesible. **Ningún** `<h1>`–`<h6>`: el título del diálogo lo pone F-24 fuera de `ChatNailbot`, y en `#reserva` el `h2` ya existe |
+| Leyenda | «Demo · Nailbot responde con opciones predefinidas: no es una persona ni usa inteligencia artificial.» | Visible **siempre**: al montar, a mitad, al terminar y tras reiniciar. Texto real. **No** es una burbuja (sin `data-de`) |
+| Hilo | Burbujas con `data-de` = `bot` o `usuario`, **hijas directas** del nodo del autoscroll | Solo se añade al final. Estilo por `claveBurbuja` y autoscroll por `desplazarAlFinal`, **reutilizadas sin moverlas** de `reserva-logica.ts` (L5) |
+| Pie | Según el paso: chips de opción · en el paso nombre, campo «Tu nombre» (placeholder «Escribe tu nombre…») + botón «Enviar» + chip «Prefiero no decirlo» · al terminar, aviso de capa 1 → enlace «Enviar la reserva por WhatsApp» → botón «Reservar otra cita» | Al montar: **0 enlaces y exactamente 3 botones** (lo exigen @s2 y @s10 de `reserva_chat`). `ChatNailbot` **nunca** trae botón de cerrar ni de minimizar: cerrar el panel es cosa de F-24 |
+
+**2. El guion como máquina de estados.** Las frases están en el brief §4; aquí solo van las transiciones:
+
+```
+servicio ──opción──▶ día ──«Entre semana» o «Lo antes posible»──▶ franja ──opción──▶ nombre
+                      └──«Un sábado»──▶ [regla del sábado: franja = «Por la mañana»] ──(mismo turno)──▶ nombre
+nombre ──nombre válido (trim ≠ '') o «Prefiero no decirlo»──▶ final ──«Reservar otra cita»──▶ estado inicial EXACTO
+```
+
+- Cada opción elegida aparece como burbuja **de la persona** (como hoy, @s11). La franja que impone el
+  sábado **no**, porque nadie la eligió (HS-2).
+- Nombre vacío o de solo espacios → **nada cambia** (como hoy, @s14). Saltarse el nombre es **explícito**
+  («Prefiero no decirlo»), nunca un «Enviar» vacío: así un Enter accidental no decide por ella.
+- La frase del sábado **deriva de `HORARIO.sabado`** (F-02) sustituyendo «-» por « a ». Con el dato de hoy
+  (`'10:00-14:00'` **[V]**) es «Los sábados abrimos de 10:00 a 14:00, así que te busco hueco por la
+  mañana.» **Prohibido** el literal «10:00-14:00» o «10:00 a 14:00» en `nailbot-demo.ts`, en la lógica o en
+  el `.tsx` (L6). La guarda del formato y el coste de la inferencia «solo mañana» están en HS-3.
+
+**3. `responder`: la costura (L4)**, en `src/components/chat-nailbot-logica.ts`.
+
+| | |
+| - | - |
+| **Entrada** | `estado` (dato plano: mensajes, paso, respuestas, fin) + `entrada` (lo que hizo la persona: elegir una opción, enviar un nombre, reiniciar) |
+| **Salida** | El estado **siguiente**, como objeto nuevo. La entrada **no se muta** (se asevera con un estado congelado) |
+| **Pureza** | Sin reloj, sin azar, sin red, sin storage, sin DOM. Mismo par → mismo resultado |
+| **Horario** | La frase del sábado se calcula **en la llamada**, jamás en la carga del módulo: un derivado en la carga es un mutante estático que el runner no activa (trampa medida, `hero-logica.ts:10-12`, `05` §3) |
+| **Copy** | Importa los literales de `nailbot-demo.ts`; no escribe copy propio |
+| **Lo que NO es** | Ni interfaz, ni adaptador, ni `async`. La costura **es la firma** (L4). Qué garantiza y qué no el día del servidor: HS-7 |
+
+El borrador del campo de nombre es estado **de UI** y se queda en el componente. La validación
+(`trim() === ''` → el mismo estado) sí vive en la función pura, para que Stryker la muerda por valor.
+
+**4. `mensajeReserva` ampliada** (`reserva-logica.ts`, **sin moverla**, L5):
+
+- **Con nombre: byte a byte el texto actual.** Las dos filas de `reserva_chat.feature` @s23 siguen verdes
+  sin tocarlas.
+- **Sin nombre:** la variante literal del brief §4.
+- «Sin nombre» = **campo ausente** (propuesta de spec_partner: `nombre` opcional en `SolicitudReserva`).
+  Nunca «Me llamo undefined», nunca «Me llamo  y». Casa con el acceptance de F-13 «omite los campos
+  ausentes sin escribir undefined».
+- **Descartadas:** una segunda función `mensajeReservaSinNombre` (dos sitios donde divergir) y la cadena
+  vacía como marca de «sin nombre» (confunde «no lo dijo» con «lo dejó en blanco», que la UI ya descarta).
+
+**5. Salida a WhatsApp (L15).** `waHref(TELEFONO.legible, mensajeReserva(…))` en un `<a>` **sin
+`target`**, presente **solo** en el estado final. `ChatNailbot.tsx` **no** contiene número ni host, y ningún
+test asevera el host (A-10). Cero `fetch`, cero storage, cero analítica. El guion no navega ni abre nada
+por sí solo.
+
+**6. `NailbotArte`: la parte de F-23 (estática).**
+
+- SVG inline con la **geometría y los colores** de `nailbot-prototipo.html:147-231` (nada más del
+  prototipo: ni su copy ni su CSS de estado, HS-15), `aria-hidden="true"` y `focusable="false"`, **sin**
+  `<title>`, **sin** `<defs>` y **sin ningún `id`**: el arte aparecerá varias veces en la misma página (L9).
+- Pose = **estado final visible**: uñas pintadas, pincel en el bote (I-4).
+- Su paleta decorativa (`--nb-*`: el rojo de labios y uñas, el oro rosa…) vive en
+  `nailbot-arte.module.scss`, **no** en `_tokens.scss`. Es decoración dentro de un SVG oculto a la AT, no
+  texto ni borde de control, y la puerta de contraste solo lee `_tokens.scss` (`05` §4, «El rojo de los
+  labios»). La fijan tests de bytes.
+- **Sin atributo de animación, nunca se mueve**, ni siquiera en `no-preference`. F-24 animará **solo** la
+  instancia del lanzador. El avatar de la cabecera del chat, que viaja **horneado** en `#reserva`, no se
+  mueve jamás: si se moviera en bucle, sería un SC 2.2.2 sin control de pausa en `#reserva`.
+
+**7. Invariantes (se aseveran, no se suponen).**
+
+- Ningún `<section>`, `<nav>` ni heading en `ChatNailbot` ni en `NailbotArte` (puertas 1 y 5, `05` §1).
+- Estado inicial **determinista** → el SSG lo hornea como hoy (`reserva_chat` @s9).
+- Si hace falta algún `id` (p. ej. para un `aria-describedby`), sale de `useId` y **nunca** de un literal:
+  habrá dos instancias en la página.
+- Ningún literal de la lista negra de F-01 en guion, SVG, SCSS ni comentarios (`05` §1, puerta 2: el guion
+  viaja en el JS aunque el panel no se hornee).
+- Ninguna fila nueva en `MATRIZ_DE_USO`; `MINIMO_DE_PARES` sigue en **18** (`reserva_chat` @s21, HS-5).
+
+#### Casos límite
+
+1. **«Un sábado»** → burbuja «Un sábado», frase del sábado y pregunta del nombre; **ninguna** burbuja de
+   franja de la persona. El resumen y el mensaje dicen «Un sábado · Por la mañana» (HS-2).
+2. **`HORARIO.sabado` que no es un rango `HH:MM-HH:MM`** (p. ej. `'cerrado'`) → jamás «Los sábados abrimos
+   de cerrado» (HS-3).
+3. **«Prefiero no decirlo»** → resumen y mensaje **sin nombre**, sin «undefined» y sin dobles espacios.
+4. **Nombre vacío o de solo espacios** → el hilo no cambia (hoy, @s14).
+5. **Nombre «Mª Ángeles & Co.»** → se interpola tal cual; React escapa; nunca `dangerouslySetInnerHTML`
+   (hoy, @s20).
+6. **Nombre muy largo** → se interpola entero, **sin** `maxlength` (como hoy). Declarado: no se trunca.
+7. **Reiniciar** tras un recorrido con sábado y sin nombre → el estado inicial **exacto**: una burbuja, tres
+   opciones, sin campo, sin aviso y sin enlace.
+8. **Dos instancias en la misma página** → actuar en una no cambia la otra (L5).
+9. **SSR sin JS** → cabecera, leyenda, **una** burbuja (el saludo nuevo) y tres opciones; ni campo, ni
+   aviso, ni enlace.
+10. **Antes de terminar** no existen ni el aviso ni el enlace final: el aviso acompaña al enlace (L3).
+11. **Enter** en el campo envía; **cualquier otra tecla**, no (hoy, @s16).
+12. **Emoji del copy** («💅», «✨») → el lector de pantalla los nombra. Es copy literal decidido: no se toca.
+
+#### Decisiones (con su porqué)
+
+| # | Decisión | Alternativa descartada | Porqué |
+| - | --- | --- | --- |
+| **H1 · L4** | Panel de chat → WhatsApp con guion local; la costura del servidor es la **firma** de `responder` | Un adaptador «remoto» especulativo; llamar a la API desde el navegador | Patrón de memoria: herencia sin uso = deuda muerta. Una clave en GitHub Pages **es pública** (`06` §0, `03` §A) |
+| **H2 · L5** | **Un** componente, dos instancias **independientes** | La «vía barata» de `05` §5: un chat nuevo que no toca `Reserva.tsx` | El humano pidió **un** asistente. La vía barata duplicaría guion y copy, y acabarían divergiendo. El coste (enmendar `reserva_chat`) está medido en `05` §5 |
+| **L1 · H6** | Se llama Nailbot, se presenta como «asistente automático» y **nunca** como IA; leyenda visible | Anunciarlo como «ChatBot de IA», como decía el encargo | Un guion fijo **no es sistema de IA** (AI Act art. 3.1, cons. 12; Directrices del art. 50 §30.i **[V: `01` §2]**) → el art. 50.1 no obliga hoy, pero llamarlo IA sería engañoso (Directrices §50 **[I: `01` §2.3]**). El robot como avatar es correcto porque no es figura humana (§38) |
+| **L2** | Opciones cerradas + nombre opcional; **nunca** teléfono ni texto libre | Pedir el teléfono (el prototipo); una pregunta abierta «¿algo más?» | RGPD art. 5.1.c; WhatsApp ya aporta el número; el texto libre invita a datos de salud (art. 9) **[V: `01` §3.1]** |
+| **L3** | Capa 1 encima del enlace final, **sin enlace** | Aviso con enlace a `/privacidad`; no poner aviso hasta F-16 | La ruta no existe → la anti-404 de F-04 rompería el build. No poner nada deja el statu quo: **cero** aviso. Queda incompleto: HS-1 |
+| **L6** | Sábado sin franja, explicado **con el dato** de F-02 | Literal «10:00-14:00» en el guion; preguntar la franja igual | I-7, fuente única. Ofrecer «Por la tarde» un sábado es ofrecer lo que no hay |
+| **L15** | Solo `waHref` en un `<a>` que pulsa ella; sin `target` | Abrir WhatsApp automáticamente al terminar; `fetch` | D-3: es honesto **porque lo envía ella** |
+| **spec_partner** | «Un sábado» sustituye a «Este fin de semana» | Mantener «Este fin de semana» | El domingo está cerrado **[V]** |
+| **spec_partner** | Saltarse el nombre solo con «Prefiero no decirlo», nunca con un «Enviar» vacío | Tratar el envío vacío como «sin nombre» | Un Enter accidental no debe decidir por ella, y @s14 sigue intacto |
+
+#### La enmienda de `features/reserva_chat.feature` (L5)
+
+Convención de la ENMIENDA 4 de la galería: **ningún tag se renumera ni se reutiliza**; un escenario
+retirado conserva su cuerpo histórico con el título marcado `[RETIRADO <fecha>, F-23]`, y uno ajustado
+marca qué `Then`/`And` cambia. Inventario contrastado contra el contrato vigente **[V]**:
+
+| @s | Estado | Qué cambia |
+| --- | --- | --- |
+| @s1–@s6 | **INTACTOS** | `ChatNailbot` no trae headings ni enlaces al montar, y no va antes de la rejilla |
+| @s7 | **AJUSTADO** | El ancla positiva pierde `.chat`, `.chatCabecera`, `.hilo`, `.chipChat`, `.entrada` y `.reiniciar`: se mudan a `chat-nailbot.module.scss`, que gana su propio test de bytes |
+| @s8 | **RETIRADO** | «Nails Lash Studio» + «en línea» + avatar «nl». Lo sustituye el escenario de cabecera de F-23 |
+| @s9 | **AJUSTADO** | El literal del saludo |
+| @s10 | **INTACTO** | Siguen siendo exactamente «Uñas», «Pestañas» y «Cejas» |
+| @s11 | **AJUSTADO** | La pregunta del paso 2 y la opción «Un sábado» |
+| @s12 | **AJUSTADO** | Las cuatro preguntas; la fila 4 ya **tiene** una opción («Prefiero no decirlo») |
+| @s13 | **AJUSTADO** | «NO se muestra ningún botón de opción» pasa a «se muestra **exactamente** "Prefiero no decirlo"» |
+| @s14 | **INTACTO** | Las siete burbujas del `Given` valen en el camino sin sábado |
+| @s15 | **AJUSTADO** | El literal del resumen |
+| @s16 | **INTACTO** | |
+| @s17 | **AJUSTADO** | El literal del saludo |
+| @s18 | **INTACTO** (el `.feature`) | Su test busca el hilo por el texto del saludo: cambia el literal del test, no el escenario |
+| @s19 | **INTACTO** | `claveBurbuja` sigue en `reserva-logica.ts` |
+| @s20 | **AJUSTADO** | Su `Given` usa «Este fin de semana», que desaparece. Pasa a un día que no sea sábado: con «Un sábado», la franja «Me es indiferente» ya no se puede elegir |
+| @s21 | **INTACTO** | Build existente; `MINIMO_DE_PARES` sigue en 18 (HS-5) |
+| @s22 | **AJUSTADO** | La guarda de fuente (`fetch(`, `XMLHttpRequest`, `window.location`, `form action`) se **extiende** a `ChatNailbot.tsx` y `chat-nailbot-logica.ts`; si no, el código movido queda sin guarda (`05` §5) |
+| @s23 | **AJUSTADO** | Gana la fila **sin nombre**. Las dos filas actuales se quedan: son entradas válidas de una función pura |
+| @s24 | **INTACTO** | El orden enlace → reinicio se mantiene; el aviso es un escenario nuevo de F-23 |
+
+La **D1** de ese contrato (la leyenda que nadie llegó a añadir) **queda cerrada** por F-23.
+
+#### Dependencias
+
+- **F-02** `datos_negocio_fuente_unica`: `TELEFONO`, `waHref` y `HORARIO.sabado`.
+- **F-03** `tokens_paleta_contraste`: los textos nuevos usan pares **ya** vigilados (HS-5).
+- **F-04** `cascaron_semantico`: puerta 1 (ni `<h1>` ni `<section>`) y anti-404 (por eso el aviso no enlaza).
+- **F-05** `cero_terceros`: SVG inline, sin `url(` y sin fuentes nuevas.
+- **F-06** `header_nav_footer`: puerta 5 (ni `<section>` ni `<nav>`).
+- **`reserva_chat`**: contrato **enmendado** (tabla de arriba). Ojo: **no tiene entrada en
+  `feature_list.json`** (`05` §5).
+- **F-10** `horario`: solo si se reutiliza `parsearFranjas` para la guarda del sábado (HS-3).
+- **F-13** `solicitud_whatsapp`, **frontera**: la disponibilidad real y la confirmación siguen siendo
+  suyas. F-23 adelanta dos de sus acceptance («capa 1 junto al botón», provisional, y «solo servicio,
+  fecha y nombre; nunca salud») sin cerrarlos.
+- **F-16** `paginas_legales` (`blocked`), **para PUBLICAR**: la capa 1 completa necesita al responsable y
+  el enlace a la política (HS-1, **A-23**).
+- `feature_list.json` → `no_se_construyen`, «#reserva (chat simulado)»: F-23 responde a sus tres
+  objeciones («en línea», no envía nada, pide el nombre sin aviso). Actualizar esa entrada es tarea del lead.
+
+#### Criterios de aceptación verificables
+
+**Horneado** (`renderToString(<Reserva/>)`, nunca jsdom):
+1. La cabecera muestra «Nailbot» y «Asistente automático · demo»; **no** aparece «en línea»; el avatar es un
+   `<svg>` con `aria-hidden="true"` y `focusable="false"`, sin `id`, sin `<defs>` y sin `<title>`.
+2. La leyenda literal está presente.
+3. Hay **una** burbuja (`data-de="bot"`, el saludo nuevo), **tres** botones, **cero** enlaces del chat y
+   ningún campo.
+
+**Interacción** (`render` + `fireEvent`, literales escritos a mano):
+4. El guion: la pregunta y las opciones de cada paso (outline).
+5. El sábado: número y orden exactos de burbujas, la franja impuesta en el resumen y la frase con «10:00 a
+   14:00».
+6. El paso nombre: campo + «Enviar» + «Prefiero no decirlo».
+7. Final con y sin nombre: el resumen literal **y** `decodeURIComponent(href)` igual al mensaje literal
+   (dos filas).
+8. El aviso de capa 1 va **inmediatamente antes** del enlace final, no contiene ningún enlace y **no existe**
+   antes de terminar.
+9. Dos instancias independientes.
+10. Reinicio exacto tras un recorrido con sábado y sin nombre.
+11. Si la puerta acepta HS-4: el hilo es un `role="log"` horneado y, tras cada acción, el foco pasa al primer
+    control del paso nuevo.
+
+**Puras** (por valor):
+12. `responder`: determinista y sin mutar la entrada congelada; la frase del sábado con **dos** rangos
+    sintéticos (uno distinto del real, para matar al mutante que fija el valor) y la guarda de HS-3.
+13. `mensajeReserva` sin nombre (fila nueva de @s23).
+
+**Bytes:**
+14. Guardas de fuente sobre `ChatNailbot.tsx` y `chat-nailbot-logica.ts`, **con el ancla positiva primero**
+    (`waHref(` en el `.tsx`): sin número, sin host, sin `fetch(`, `XMLHttpRequest`, `window.location`,
+    `localStorage`, `sessionStorage` ni `document.cookie`; y **ni `nailbot-demo.ts`, ni la lógica, ni el
+    `.tsx` contienen «10:00»** (L6). Ninguna guarda contra `if (` o `?` (L15, `05` §7).
+15. `chat-nailbot.module.scss` y `nailbot-arte.module.scss`: selectores ancla, sin `url(` ni `@font-face`, y
+    colores de texto solo de pares vigilados (HS-5).
+
+**Mutación:** 100 % en `ChatNailbot.tsx`, `chat-nailbot-logica.ts` y `NailbotArte.tsx` (nuevos en `mutate`),
+y **re-medida** en `Reserva.tsx` y `reserva-logica.ts`. Se acota con `--mutate`, jamás con `--testFiles`.
+
+**Build** (lo corre el lead; **ningún** test nuevo que lo lance): las cinco puertas en verde, un solo
+`<h1>` y `MINIMO_DE_PARES` en 18.
+
+**En vivo, anotado en `progress/`** (no son tests verdes): un lector de pantalla recorriendo el chat (qué se
+anuncia en cada turno, HS-4), el chat solo con teclado, 320 px, y el enlace final abierto en Android, iOS y
+WhatsApp Web **con y sin nombre**.
+
+#### Techo de alcance (L16)
+
+- **≤ 14 escenarios nuevos** en `features/nailbot_chat_compartido.feature`. Los criterios de arriba se
+  agrupan en escenarios; los huecos que la puerta acepte **salen de esos 14**, no se suman.
+- En `reserva_chat.feature`, **solo** las enmiendas de la tabla: ningún `@s` nuevo allí.
+- **Prohibido** crear tests build-based (`*-horneado`): lo horneado se prueba con `renderToString`.
+- `pnpm test` completo **una** vez al final; se itera con `pnpm exec vitest run <fichero>`; el `pnpm build`
+  lo corre el lead.
+- **Fuera de alcance** (brief §6): servidor, IA real, WhatsApp Cloud API, texto libre, persistencia,
+  analítica, la página de privacidad (F-16), la columna izquierda de `#reserva`, las otras secciones y la
+  disponibilidad real (F-13).
+
+#### Huecos detectados por spec_partner — PENDIENTES DE PUERTA HUMANA
+
+**HS-1 · La capa 1 está incompleta, y la demo es pública.** El art. 11 LOPDGDD pide en la información
+básica **(a)** la identidad del responsable, **(b)** la finalidad y **(c)** la posibilidad de ejercer los
+derechos de los arts. 15-22, más un medio para acceder al resto de la información **[V: `01` §3.1]**. El
+literal de L3 cubre **(b)** y el control del envío; **no** cubre (a), ni (c), ni el medio de acceso. Y hoy
+no puede: el nombre legal del responsable **no existe en fuente pública** (D-6) y la política es F-16
+(`blocked`). Dos matices más. (i) La frase «El salón lo usará solo para gestionar tu cita» **compromete al
+salón** a una limitación de finalidad que nadie ha confirmado con él (D-6: no hay contacto). (ii) La home se
+despliega en GitHub Pages en cada push a `main`, tras la aprobación manual de Pablo (`deploy-pages.yml`), y
+con el teléfono **real**: una persona real puede mandarle hoy su nombre al salón desde la demo. No es un
+riesgo nuevo —el chat actual lo hace **sin ningún** aviso—, pero L3 lo llama «dependencia anotada», y este
+documento sostiene que «un invariante sin puerta mecánica es una intención» (Contrato general).
+**Propuesta:** (1) aceptar el literal como mejora provisional; (2) que el lead añada al acceptance de F-16
+«completar la capa 1 de Nailbot con el responsable y el enlace a la política»; (3) llevar a la puerta
+humana, como **A-23**, si cada aprobación del despliegue en Pages asume a sabiendas esa capa incompleta.
+**No** se propone meterlo en la capa de placeholders de F-01: rompería el build de Pages, que es el mismo
+`pnpm build`, y eso choca con H8.
+
+**HS-2 · El turno del sábado no dice cuántas burbujas son.** El brief dice que la frase del sábado va «en
+lugar del paso franja» y que «se pasa al paso nombre en el MISMO turno», pero no si la frase y la pregunta
+del nombre son **una** burbuja o **dos**, ni si la franja impuesta aparece como burbuja de la persona. Los
+tests cuentan burbujas exactas (patrón de @s11 y @s14), así que la ambigüedad los hace inescribibles.
+**Propuesta:** **dos burbujas del bot**, cada una con su literal intacto (la frase del sábado y la pregunta
+del nombre), y **ninguna** burbuja de la persona con «Por la mañana», porque ella no la eligió. Por el
+camino del sábado se llega al paso nombre con **6** burbujas; por el normal, con 7.
+
+**HS-3 · La regla del sábado lee un dato que no valida, y su conclusión no sale del dato.** (a)
+**Formato:** si `HORARIO.sabado` pasara a `'cerrado'` (el formato que ya usa `domingo` **[V: `site.ts:34`]**),
+sustituir «-» por « a » produciría «Los sábados abrimos de cerrado». (b) **Inferencia:** «así que te busco
+hueco por la mañana» es verdad **porque** el sábado cierra a las 14:00. Si el dato cambia a `'10:00-20:00'`,
+la frase se derivaría bien y **mentiría** igual. L6 quiere que la frase salga del dato, pero la
+**decisión** de saltarse la franja sigue escrita a mano. **Propuesta:** (a) una guarda pura: si el rango no
+casa con `HH:MM-HH:MM`, la regla **no** se aplica y la franja se pregunta como otro día cualquiera; mejor
+**reutilizar** `parsearFranjas`/`aMinutos` de F-10 (`horario.ts:48-66`, ya mutados) que escribir otro
+`split`. (b) **Acoplamiento declarado**, no inferencia: un test canario en `chat-nailbot-logica.test.ts`
+que se pone rojo si el sábado real deja de cerrar a las 14:00, con un mensaje que obliga a revisar la frase.
+Es una precondición, no un valor esperado importado. **Descartado por ahora:** derivar el salto de un
+umbral de cierre («mañana» = cierra antes de X); exige un número que nadie ha decidido, y L6 pide «nada más
+listo».
+
+**HS-4 · Foco y anuncios entre turnos: el chat de hoy pierde el foco a cada paso.** Al pulsar un chip, ese
+`<button>` se **desmonta** (cambian las opciones) y el foco cae al `<body>`; con «Reservar otra cita» pasa
+lo mismo. Para quien usa teclado o lector de pantalla, cada turno lo expulsa del chat, y la respuesta nueva
+del bot **no se anuncia**, porque el hilo no es una región viva. El brief no lo trata: L8 y `04` §14 solo
+hablan del foco al abrir el panel, y proponen el **campo**, que en el paso 1 no existe. **Riesgo:** SC 2.4.3
+y 4.1.3 en las **dos** instancias. Es heredado, pero F-23 reescribe justo esta pieza. **Propuesta:** (a) el
+hilo con `role="log"` y un `aria-live="polite"` redundante, presente desde el primer render (horneado) y con
+nombre accesible (ARIA23, `04` §4.3 y §15). **El literal de ese nombre no está en el brief**: `04` sugiere
+«Conversación», pero lo fija el lead en la puerta, no el spec_partner (**A-26**). (b) Tras **cada acción de
+la persona**, el foco pasa al primer control del paso nuevo: el primer chip, el campo en el paso nombre, el
+enlace final al terminar y el primer chip tras reiniciar. **Nunca** al montar, porque en `#reserva` robaría
+el foco al cargar la página. (c) Al terminar, el aviso de capa 1 describe al enlace final
+(`aria-describedby`), para que quien llega a él por el foco no se salte el aviso. Coste: unos 2 escenarios,
+**dentro** del techo de 14.
+
+**HS-5 · Contraste: una fila se queda huérfana y los textos nuevos no tienen par declarado.** (a) Retirar
+«en línea» deja sin uso el token `--estado-en-linea` y su fila de `MATRIZ_DE_USO` **[V:
+`puerta-contraste.ts:279-283`]**. **La fila no se debe borrar:** bajaría el conteo de 18 y rompería la
+guarda `MINIMO_DE_PARES` (puerta 3) y el literal «sigue valiendo EXACTAMENTE 18» de `reserva_chat` @s21.
+**Propuesta:** fila y token se quedan, declarados como deuda viva (cero riesgo, cero trabajo). La clase
+`.enLinea` sí desaparece con la mudanza a `chat-nailbot.module.scss`. (b) El brief no dice de qué color van
+el subtítulo, la leyenda y el aviso, y la puerta es **ciega** a los `.module.scss` (`05` §1): un color
+inventado pasaría el build sin que nadie lo mirase. **Propuesta:** solo pares **ya** vigilados, por ejemplo
+`--ink` o `--accent-dark` sobre `--accent-soft` en la cabecera, y `--muted` sobre `--surface` o `--text`
+sobre `--bg` en el pie y la leyenda. Se confirman contra los fondos reales en el TDD y se fijan por bytes.
+
+**HS-6 · «Pulsa el botón» nombra un enlace.** Los dos resúmenes dicen «Pulsa el botón para
+enviársela…», pero el control es un `<a>` (rol *link*, `reserva_chat` @s24) y un lector de pantalla lo
+anuncia como «enlace». No incumple ningún SC por sí mismo **[I]**, pero es una incoherencia en el único
+sitio donde se le dice qué hacer. El copy es **literal** y el spec_partner no lo reescribe. **Opciones para
+la puerta (A-26):** dejarlo; cambiar el copy (p. ej., que nombre el enlace por su texto); **nunca**
+convertir el enlace en `<button>`, porque rompería @s24 y la regla de que sea ella quien pulse un enlace.
+
+**HS-7 · La costura del servidor está sobrevendida, y `06` no coincide con el brief.** (a) `06` §1 escribe
+`responder(estado, entrada) → turno` en `src/components/nailbot-*.ts`; el brief (L4, §5) fija `→ estado`
+en `chat-nailbot-logica.ts`. **Manda el brief**, y `06` debería corregirse (es un documento del lead). (b)
+H1 y `06` prometen cambiar el guion por la IA «sin rehacer la UI» o «sin tocar la UI». No es del todo
+cierto. Un `fetch` es **asíncrono y puede fallar**: hace falta un estado de espera («escribiendo…» en un
+`role="status"` aparte, `04` §16) y una salida de error, p. ej. el WhatsApp directo. Una IA conversa en
+**texto libre**, y hoy solo hay chips. Y el art. 50.1 obliga a **cambiar la leyenda** y a avisar en el primer
+turno (`06` §4.1). **Propuesta:** que el contrato diga con honestidad lo que la costura garantiza —la
+**forma** del estado que pinta la UI y un único punto de sustitución— y lo que **no** —la sincronía, el
+texto libre y el copy legal—; y **no construir nada asíncrono hoy** (L4 lo prohíbe con razón).
+
+#### Resolución del craftsman_lead a HS-1..HS-7 (2026-09-27) — MANDA SOBRE EL BRIEF
+
+- **HS-1 → ACEPTADA la propuesta.** El literal de L3 va como capa 1 **provisional**; se añade al
+  acceptance de F-16 «completar la capa 1 de Nailbot con la identidad del responsable, los derechos y el
+  enlace a la política». A-23 se informa al humano en la puerta (es el statu quo mejorado: hoy el chat no
+  lleva ningún aviso).
+- **HS-2 → ACEPTADA.** Camino del sábado: **dos** burbujas del bot (frase del sábado + pregunta del nombre)
+  y **ninguna** burbuja de la persona con «Por la mañana». 6 burbujas al llegar al paso nombre por ese
+  camino, 7 por el normal.
+- **HS-3 → ACEPTADA (a) y (b).** (a) Guarda pura: si `HORARIO.sabado` no casa con `HH:MM-HH:MM` la regla no
+  se aplica y la franja se pregunta; se **reutiliza** lo ya mutado de `horario.ts` si su firma encaja (si no,
+  una regex local mínima). (b) Test canario de acoplamiento declarado (el sábado real cierra a las 14:00).
+- **HS-4 → ACEPTADA (a), (b) y (c).** Literal del nombre accesible del hilo: «Conversación con Nailbot».
+  Foco tras cada acción de la persona al primer control del paso nuevo; **nunca** al montar. El aviso de
+  capa 1 describe al enlace final con `aria-describedby`.
+- **HS-5 → ACEPTADA (a) y (b).** Fila y token `--estado-en-linea` se quedan (deuda viva declarada); textos
+  nuevos solo con pares ya vigilados, fijados por bytes.
+- **HS-6 → COPY CORREGIDO por el lead** (sustituye a los dos resúmenes de §4 del brief):
+  - con nombre: «¡Gracias, {nombre}! ✨ Tu solicitud: {servicio} · {día} · {franja}. Envíasela al salón por
+    WhatsApp con el enlace de abajo y allí te confirmarán la hora exacta.»
+  - sin nombre: «¡Gracias! ✨ Tu solicitud: {servicio} · {día} · {franja}. Envíasela al salón por WhatsApp
+    con el enlace de abajo y allí te confirmarán la hora exacta.»
+- **HS-7 → ACEPTADA.** El contrato dice lo que la costura garantiza (forma del estado + un único punto de
+  sustitución) y lo que NO (sincronía, texto libre, copy legal). Nada asíncrono hoy. El lead corrige `06` §1.
+
+---
+
+### Feature 24: `nailbot_flotante` — el robot que se pinta las uñas en la esquina: lanzador solo-cliente, animación con pausa, bocadillo y `<dialog>` modal nativo
+
+> Feature `#24`. **Aún sin entrada en `feature_list.json`** (la crea el lead). **Depende de F-23**: monta su
+> `ChatNailbot` y **anima** su `NailbotArte`. Misma fuente de verdad que F-23 (`progress/nailbot_diseno.md`:
+> H3, H4, H5, L7–L14 y el bloque «Flotante» del §4). La investigación de a11y y animación está en
+> `docs/research/asistente-robot/04-a11y-animacion.md`, y las restricciones del repo en `05`. Los huecos,
+> **HS-8** a **HS-17**, están pendientes de puerta.
+
+#### Propósito
+
+Una invitación **persistente**, con la estética del salón y **sin nada de verde ni logo de WhatsApp** (H5),
+a reservar desde cualquier punto de la home: un robot de pestañas largas y morros rojos que se pinta las
+uñas en la esquina inferior derecha y que abre **el mismo Nailbot de F-23** en un diálogo modal nativo. Sin
+tapar el foco de nadie, sin robarles teclas a los carruseles y con su movimiento **bajo el control de la
+persona** (SC 2.2.2, nivel A).
+
+#### Qué ve y hace la persona
+
+| Momento | Qué ve | Qué puede hacer |
+| --- | --- | --- |
+| HTML horneado, o sin JS | **Nada** del flotante (L7): sin JS no habría acción, y no se hornea un botón muerto | Reservar en `#reserva` (F-23), que sí viaja horneado |
+| Tras hidratar | El robot en la esquina, animado en bucle si su sistema no pide menos movimiento, y a su lado el botón de pausa (32×32) | Abrir el chat; pausar o reanudar la animación |
+| A los 4 s, si nunca abrió el panel | El bocadillo «¿Te pinto una cita? 💅» (destacado) + «Soy Nailbot y te ayudo a reservar.», con su × | Cerrarlo con × o con Esc; no vuelve en esa carga |
+| Al abrir | Diálogo modal «Reserva con Nailbot» (`h2`), botón «Cerrar el chat» y el chat de F-23; el resto de la página, inerte bajo un `::backdrop` | Reservar; cerrar con «Cerrar el chat», con Esc o con el gesto atrás de Android. El foco vuelve al robot |
+| Con el panel abierto | ← y → **no** mueven los carruseles de detrás | Usar el chat con teclado sin efectos colaterales |
+| Con `prefers-reduced-motion: reduce` | El robot quieto en su pose final | Lo mismo, sin movimiento (qué pasa con el control de pausa: HS-8) |
+
+#### Contrato
+
+**Lanzador.** `<button type="button">` con `aria-label` «Abrir el chat con Nailbot para reservar cita» y
+`aria-haspopup="dialog"` (ARIA 1.2 exige que el valor case con el rol del contenedor **[V: `04` §4.4]**).
+`aria-expanded` y `aria-controls` no están confirmados como obligatorios, y con un modal el lanzador queda
+inerte mientras está abierto: **no** se añaden. Dentro va la instancia **animada** de `NailbotArte`. Área
+≥ 44×44 como criterio de proyecto (el listón AA de SC 2.5.8 es 24×24; el prototipo usa 104 px, y 76 px por
+debajo de 600 px). `position: fixed` abajo a la derecha, sumando `env(safe-area-inset-*, 0px)`, con
+`z-index` explícito (HS-11) y sin `inset: 0` ni `width: 100%`. **Sin verde, sin logo y sin «WhatsApp» en
+su nombre** (H5).
+
+**Pausa (L10).** `<button type="button">` con `aria-label` fijo «Pausar la animación de Nailbot» y
+`aria-pressed`: la etiqueta no cambia y el estado lo dice `aria-pressed` (APG Button). Mide 32×32 y va
+**adyacente** al robot (G186). El estado vive en el atributo `data-animacion` del arte y **nunca** en un
+`className` condicional (`05` §2.1). Sin persistencia. El arranque, reduced-motion y qué significa «pausar»
+están en HS-8.
+
+**Arte animado (L9).** F-24 añade a `nailbot-arte.module.scss` los `@keyframes` del prototipo, con tiempos y
+curvas **verbatim** (`nailbot-prototipo.html:71-113`):
+- **todas** dentro de `@media (prefers-reduced-motion: no-preference)` (patrón B de C39, `04` §2);
+- **solo** para la instancia con `data-animacion`: el avatar de la cabecera del chat, sin atributo, no se
+  mueve nunca, ni en `#reserva` ni en el panel (contrato 6 de F-23);
+- solo `transform` y `opacity`, con `transform-box: fill-box` y `transform-origin` explícito donde el
+  prototipo lo pone, y sin `will-change`;
+- el estado base sigue siendo la pose final visible (I-4).
+
+**Bocadillo (L11, H4).** Aparece **una vez por carga de página**, a los **4 s** de montar el lanzador y
+**solo si** el panel no se ha abierto nunca. **No** es región viva; mientras se ve, el lanzador lo
+referencia con `aria-describedby` (id de `useId`). Su × lleva el `aria-label` «Cerrar el mensaje de
+Nailbot» y mide ≥ 24×24. Esc lo cierra **sin mover el foco** (el ámbito de ese Esc y el foco tras el ×
+están en HS-9). Al abrir el panel desaparece y no vuelve. Es estático, o con una entrada de ≤ 5 s solo en
+`no-preference` (`04`, regla 11). Sin storage: el «no vuelve en esa visita» de H4 significa «en esa
+**carga**» (L11).
+
+**Diálogo (L8, L13).** `<dialog>` **nativo**, abierto con `showModal()` y cerrado **siempre** con `close()`;
+**nunca** con una prop `open` controlada por React, porque quitar `open` a mano deja el documento bloqueado
+**[V: `04` §6.1]**. Sin `role` redundante, sin `tabindex` y con `closedby` por defecto (Esc cierra; el clic
+fuera, no). `aria-labelledby` apunta al `h2` visible «Reserva con Nailbot», y hay un botón visible «Cerrar
+el chat» (≥ 24×24). Dentro va **su propia** instancia de `ChatNailbot` (su ciclo de vida, en HS-13). El
+diálogo **detiene la propagación** de `ArrowLeft` y `ArrowRight`, las **únicas** teclas que escuchan los
+carruseles **[V: `carrusel-logica.ts:27-30`]**, y de **ninguna** otra: Escape tiene que seguir llegando al
+mecanismo nativo, y ← y → dentro del campo siguen moviendo el cursor (no se llama a `preventDefault`).
+React 17+ delega los eventos en la raíz, que cuelga de `document` **[I]**, así que esto se asevera con un
+escuchador real en `document` y no se da por supuesto. El foco inicial está en HS-12.
+
+**Montaje (L7, L14).** En `src/pages/home.tsx`, **después de `</main>` y antes de `<Pie />`**, como
+hermano (ni dentro del `<footer>` ni dentro de ninguna sección). **Solo en el cliente**: el SSR y la primera
+pasada de la hidratación devuelven `null`, y un efecto de montaje lo enciende. Así el HTML de `dist/` no
+cambia en nada y las puertas 1, 4 y 5 no lo ven (la 2 sí lee el JS: nada de la lista negra). El widget no
+trae `<section>`, `<nav>` ni `<h1>`, y el `h2` del diálogo solo existe en el cliente. Cómo se verifica:
+HS-14.
+
+**C43 (L12).** `scroll-padding-bottom` en el bloque `html` de `_base.scss`, **junto** al
+`scroll-padding-top: 6rem` que ya existe (no se toca; lo vigila `scroll-padding-cabecera.test.ts`), con
+`env(safe-area-inset-bottom, 0px)`. Cuánto mide y dónde va el «hueco al final»: HS-10.
+
+**Setup de test (L8).** Stub **protegido** de `showModal`/`close` en `vitest.setup.ts`, que solo actúa si
+faltan (jsdom 25 no los implementa **[V: `04` §6.5]**): `showModal` pone `open`, y `close` lo quita y
+despacha `close`. Lo nativo (inercia, Esc, *top layer*, vuelta del foco) **no** se prueba en jsdom: se
+verifica en navegador.
+
+**Lógica pura (`nailbot-flotante-logica.ts`), por valor:** si se muestra el bocadillo (ms desde el
+montaje, si se abrió alguna vez, si se descartó); el estado de la animación ante cada evento (preferencia
+leída, pulsación de pausa, cambio de `reduce` en caliente); y si una tecla se detiene en el diálogo. Todo se
+calcula **en la llamada**. La consulta `'(prefers-reduced-motion: reduce)'` se asevera **exacta** espiando
+`matchMedia` (`galeria.test.tsx:709-715`), y los 4 s se prueban en puntos que **no** son múltiplos del
+ciclo, p. ej. a 3 999 y a 4 000 ms.
+
+#### Casos límite
+
+1. **Sin JS** → ni lanzador ni bocadillo: el `renderToString` de la home no contiene «Abrir el chat con
+   Nailbot…».
+2. **Abrir el panel antes de 4 s** → el bocadillo no aparece nunca en esa carga.
+3. **Cerrar el bocadillo** (× o Esc) → no vuelve en esa carga; al recargar, vuelve (no hay storage).
+4. **Abrir el panel con el bocadillo a la vista** → desaparece y no vuelve.
+5. **`reduce` desde el principio, activado en caliente o desactivado en caliente** → quieto; se pausa; **no**
+   se reanuda solo (L10). El control, en HS-8.
+6. **← o → sobre un chip del panel con un carrusel visible detrás** → el carrusel no se mueve. **Escape, Tab
+   o una letra** → sí se propagan.
+7. **Escape en el campo del nombre, con el panel abierto** → cierra el diálogo (nativo); el chat no «envía»
+   nada (`reserva_chat` @s16) y la conversación se conserva (HS-13).
+8. **Cerrar y reabrir el panel** → la conversación sigue donde estaba (HS-13), y la de `#reserva`, intacta.
+9. **Con el panel abierto**, el robot sigue moviéndose tras el `::backdrop` y la pausa queda inerte hasta
+   cerrar. Conforme **[I]**: el mecanismo de 2.2.2 está a un Esc de distancia. Se declara para que nadie lo
+   «arregle» con una pausa automática que pise el estado que eligió la persona.
+10. **Tabulando hasta el final de la página** → el último enlace del pie no queda **totalmente** tapado
+    (F110). En vivo (HS-10).
+11. **Menú móvil desplegado en una pantalla baja** → el robot no tapa sus enlaces (HS-11). En vivo.
+12. **Gesto atrás de Android con el panel abierto** → cierra el panel (petición de cierre nativa). En vivo.
+13. **Varias copias del arte en la página** → cero `id`, ningún duplicado.
+14. **Fuera de alcance, declarado:** ← y → sobre los chips del chat de **`#reserva`** pueden mover la galería
+    si está a la vista en un 60 % o más. Es anterior a F-24 y F-24 no lo toca.
+
+#### Decisiones (con su porqué)
+
+| # | Decisión | Alternativa descartada | Porqué |
+| - | --- | --- | --- |
+| **H3 · L10** | Bucle + control de pausa; con reduced-motion, quieto | La «ráfaga» ≤ 5 s que termina en pose fija (la recomendación de `04`, regla 4) | La decidió el humano. Un bucle decorativo **cumple las tres condiciones** de 2.2.2 (arranca solo, dura más de 5 s y va en paralelo) **[V: `04` §1.4]**, así que necesita un mecanismo. `prefers-reduced-motion` **no** es técnica de 2.2.2 **[V: `04` §1.3]**: es criterio de proyecto y no lo sustituye |
+| **H4 · L11** | Bocadillo una vez, descartable y sin storage | Que reaparezca en cada visita, recordándolo en `sessionStorage` | L2 e I-2: cero almacenamiento. «Visita» = carga |
+| **H5** | Nada de verde ni logo de WhatsApp en el lanzador | Recuperar el botón verde retirado (commit 479d541) | Palabra del humano: «Queremos un robotito que pegue con la estética del negocio» |
+| **L7** | El lanzador solo existe en el cliente | Hornearlo (como el botón verde retirado) | Sin JS no hay acción: un botón horneado sería un botón muerto. `position: fixed` no produce CLS. Precedente: el control del hero «nunca viaja horneado» (`05` §2.6) |
+| **L8** | `<dialog>` nativo y modal | Un `div role="dialog"` propio; un diálogo no modal | El navegador da la inercia, Esc, la *top layer*, el `::backdrop` y la vuelta del foco; hacerlo a mano es más código y más mutantes. Con modal, el 2.4.11 del panel desaparece: fuera no hay foco posible (`04` §3). En móvil ocuparía casi toda la pantalla de todos modos. Coste: stub en jsdom y verificación en vivo |
+| **L9** | El arte del prototipo, con la animación como opt-in de `no-preference` | Lottie, un GIF o un SVG animado por JS | Cero dependencias y cero terceros (F-05). Con el patrón B, el HTML ya sale quieto para quien lo pidió, sin depender de JS |
+| **L12** | C43 con `scroll-padding-bottom` | Ninguna mitigación; una posición no fija | F110: un botón fijo puede tapar **por completo** un control enfocado **[V: `04` §3]** |
+| **L13** | El diálogo detiene ← y → | Cambiar los carruseles para que comprueben si hay un diálogo abierto | Los carruseles escuchan en `document` **[V]**; cambiarlos es tocar F-22, que ya está `done` |
+| **L14** | Tras `</main>` y antes de `<Pie />` | Dentro de `<main>`, dentro del `<footer>` o después de `<Pie />` | Un `position: fixed` que acompaña a toda la página no pertenece a una sección (contrato retirado del botón verde, `05` §1). Antes del pie, el robot entra en el orden de tabulación antes que los enlaces del pie |
+
+#### Dependencias
+
+- **F-23** `nailbot_chat_compartido`: `ChatNailbot` y `NailbotArte`. **F-24 no empieza su TDD hasta que F-23
+  esté `done`.**
+- **F-04**: puerta 1 (ni `<h1>` ni `<section>` en lo horneado; aquí no se hornea nada).
+- **F-05**: cero terceros (ni `url(`, ni fuentes, ni Lottie).
+- **F-06**: el `scroll-padding-top` que convive con el nuevo, la cabecera **sticky** con `z-index: 50` y su
+  menú móvil (HS-11), y el `<footer>` junto al que se monta (HS-10).
+- **F-07**: precedente del control de animación y de `matchMedia` leído en un efecto (`Hero.tsx:105-148`,
+  según `05` §2.5-2.6).
+- **F-22** `galeria_carrusel`: sus escuchas de ← y → en `document` (L13).
+- **F-03**: ninguna fila nueva en la matriz (HS-17).
+- **F-16**: hereda de F-23 la dependencia **para publicar** (A-23).
+
+#### Criterios de aceptación verificables
+
+**SSR y montaje:**
+1. El `renderToString` de la home **no** contiene el lanzador; tras montar en jsdom, **sí**.
+2. Tras montar, el lanzador queda **después** de `<main>` y **antes** del `<footer>`, con las anclas
+   positivas primero, y el widget no aporta `<section>`, `<nav>` ni headings fuera del diálogo (HS-14).
+
+**Lanzador, pausa y arte:**
+3. Lanzador: `type="button"`, `aria-label` literal, `aria-haspopup="dialog"` y el arte con `aria-hidden`.
+4. La pausa alterna `aria-pressed` y `data-animacion`, y su etiqueta no cambia.
+5. Reduced-motion: la consulta exacta, el arranque y los dos sentidos del cambio en caliente (HS-8).
+
+**Bocadillo:**
+6. Aparece a los 4 000 ms y no a los 3 999, solo si el panel no se ha abierto, y el `aria-describedby` solo
+   existe mientras se ve.
+7. El × (con su nombre) y Esc lo cierran sin mover el foco, y no vuelve; al abrir el panel, desaparece
+   (HS-9).
+
+**Diálogo:**
+8. Al pulsar el lanzador se llama a `showModal`; el diálogo se llama «Reserva con Nailbot» y contiene
+   «Cerrar el chat» y el chat de F-23.
+9. «Cerrar el chat» llama a `close`, y el evento `close` deja el estado en cerrado.
+10. ← y → no llegan a un escuchador de `document`; Escape, Tab y una letra, sí.
+11. El foco inicial (HS-12) y la conversación conservada al cerrar y reabrir (HS-13).
+
+**Bytes:**
+12. `nailbot-arte.module.scss`: **todas** las `@keyframes` y sus usos dentro de `no-preference`; solo
+    `transform` y `opacity`; `transform-box: fill-box`; la animación atada a `[data-animacion]`; sin
+    `will-change` ni `url(`.
+13. `nailbot-flotante.module.scss`: `position: fixed`, `z-index` explícito (HS-11),
+    `env(safe-area-inset-bottom`, pausa de 32 px y lanzador ≥ 44 px; sin `inset: 0` ni `width: 100%`; **sin
+    verde** (`#25d366`, `demo-btn--wa`) y sin «whatsapp» en los ficheros propios del flotante (H5).
+14. `_base.scss`: `scroll-padding-bottom` presente en `html`, ligado al tamaño del lanzador y a
+    `env(safe-area-inset-bottom` (HS-10), y `scroll-padding-top` intacto.
+15. Guardas de fuente sobre `NailbotFlotante.tsx` y su lógica, con ancla positiva: sin `fetch(`, sin
+    storage y sin analítica. Ninguna guarda contra `if (` o `?`.
+
+**Mutación:** 100 % en `NailbotFlotante.tsx` y `nailbot-flotante-logica.ts` (nuevos en `mutate`), y
+re-medida en `NailbotArte.tsx`. Las dependencias `[]` de los efectos de solo-montaje son mutantes
+**equivalentes** con precedente (`Hero.tsx:150-157`, `Galeria.tsx:154-159`): `Stryker disable` con la
+justificación escrita en `progress/mutation_nailbot_flotante.md`, nunca a ciegas.
+
+**En vivo (Chrome real y un móvil), anotado en `progress/`:** Esc, la inercia del fondo, la *top layer* y la
+vuelta del foco; F110 tabulando hacia abajo **y** hacia arriba a 320, 390 y 1280 px; el menú móvil
+desplegado en apaisado; la animación, la pausa y el reduced-motion del sistema; el gesto atrás de Android;
+el área segura de iOS; el tamaño real de los objetivos; y el enlace final abierto en WhatsApp **desde el
+panel**.
+
+#### Techo de alcance (L16)
+
+- **≤ 16 escenarios** en `features/nailbot_flotante.feature`. Los huecos que la puerta acepte **salen de
+  esos 16**.
+- **Prohibido** crear tests build-based. La home se prueba con `renderToString` (el SSR) y con `render` en
+  jsdom (el cliente); el build lo corre el lead.
+- Ficheros: los del brief §5 y ninguno más, **salvo** que la puerta acepte HS-10 (b), que añadiría la hoja
+  del pie.
+- **Fuera de alcance:** el brief §6, y tocar los carruseles (F-22) o la cabecera (F-06) más allá de lo que
+  HS-10 y HS-11 lleven a la puerta.
+
+#### Huecos detectados por spec_partner — PENDIENTES DE PUERTA HUMANA
+
+**HS-8 · La pausa no dice qué hace con reduced-motion, ni si congela o reinicia.** (a) L10: «arranca en
+pausa si reduce». Pero L9 pone **todas** las `@keyframes` dentro de `no-preference`: con `reduce` no hay
+nada que reanudar, y si la persona despulsa el botón, `aria-pressed="false"` anuncia una animación que
+**no** va a ocurrir. Es un control que miente. El precedente del repo va al revés: el control del hero **no
+se monta** si la preferencia no permite animar (`hero-logica.ts:49-54`, `05` §2.6). **Propuesta:** con
+`reduce`, el botón de pausa **no se monta**; no hay movimiento, así que 2.2.2 no aplica. Si `reduce` se
+activa en caliente, `data-animacion` pasa a pausada y el botón desaparece, recolocando el foco si estaba en
+él (precedente `Hero.tsx:85-101`). Si se desactiva, el botón reaparece **pulsado** y la animación **no** se
+reanuda sola, como pide L10. (b) «Pausar» puede ser **congelar donde está** (`animation-play-state:
+paused`, que reanuda desde ese punto: técnica G4) o **volver a la pose base** (`animation: none`, como el
+`data-firma` del hero). **Propuesta:** congelar, porque cumple G4 y casa con «Pausar» + `aria-pressed`. A
+cambio, un fotograma congelado puede enseñar una uña a medio pintar o el pincel en el aire: es aceptable, y
+se anota para que no se reporte como fallo.
+
+**HS-9 · El Esc del bocadillo solo sirve si escucha en todo el documento.** El bocadillo aparece solo, en la
+esquina, y puede tapar un enlace que recibe el foco. SC 2.4.11 lo perdona **solo si** la persona puede
+destaparlo **sin mover el foco** (Nota 2 **[V: `04` §3]**). Eso lo consigue el Esc de L11, **pero** solo si
+se escucha en `document` mientras el bocadillo está a la vista, y no únicamente con el foco dentro de él. El
+brief no fija ese ámbito. Además, al cerrarlo con su ×, ese botón se desmonta y el foco cae al `<body>`.
+**Propuesta:** escuchar Esc en `document` **solo mientras el bocadillo está visible** (no hay otro Esc en la
+página con el que choque: el menú móvil no escucha Esc **[V: `grep` en `src/components/`]**), y tras el ×,
+mandar el foco al lanzador.
+
+**HS-10 · El `scroll-padding-bottom` se queda corto, y el «hueco al final del documento» pinta una franja
+rosa.** (a) L12 lo calcula como «alto del lanzador + separación + área segura», pero el arte **desborda** el
+botón (`width: 116%`, `top: -16%` **[V: `nailbot-prototipo.html:49`]**) y la pausa va en la esquina
+superior (`:51`). Lo que tapa mide unos 141 px en escritorio y unos 108 en móvil **[I]**, no 124 ni 96. Y un
+test de bytes no puede comprobar que un número **baste**. **Propuesta:** que el tamaño del lanzador y el
+`scroll-padding-bottom` salgan de **la misma custom property** (una sola fuente, I-7), y que el test de
+bytes asevere ese vínculo más `env(safe-area-inset-bottom`; que baste, lo dice F110 en vivo. (b) «El mismo
+hueco al final del documento»: si se hace con `padding-bottom` en `html`, sale una **franja de fondo rosa**
+(`body { background: var(--bg) }` **[V: `_demo.scss:12-16`]**) **debajo del pie oscuro** (`.pie {
+background: var(--ink) }` **[V: `cabecera.module.scss:130-135`]**), y también sin JS, donde no hay robot.
+**Propuesta:** medir primero con F110 si el último enlace del pie llega a quedar tapado. El pie ya tiene 40
+px de relleno inferior más la línea «©», y sus enlaces no están en la esquina derecha **[I]**. Si hace
+falta, el hueco va en el relleno inferior de `.pie`, que es oscuro, y no en `html`; eso añade
+`cabecera.module.scss` a la lista de ficheros (decisión del lead). Si no hace falta, no se pone: YAGNI.
+
+**HS-11 · El `z-index` del lanzador frente al menú móvil desplegado.** El prototipo usa `z-index: 50` **[V:
+`nailbot-prototipo.html:39`]** y `05` recomienda «> 50». La cabecera sticky también es 50 **[V:
+`cabecera.module.scss:15`]**, y su menú móvil se despliega **dentro** de ella, hacia abajo (`:108-126`). En
+una pantalla baja, como un móvil en apaisado, el menú abierto puede llegar a la esquina del robot. Con 50 y
+el robot más tarde en el DOM, o con más de 50, **el robot tapa los últimos enlaces del menú**; y como el menú
+es sticky, ningún `scroll-padding` lo arregla (F110). **Propuesta:** un `z-index` **entre 8 y 49**, por
+encima de los carruseles (7 **[V: `galeria.module.scss:37`]**) y por debajo de la cabecera. El diálogo no
+depende de esto, porque va en la *top layer*. Se verifica en vivo, en apaisado.
+
+**HS-12 · El foco inicial al abrir no está fijado, y la recomendación de `04` no sirve en el paso 1.** `04`
+§14 propone enfocar el **campo** tras `showModal()`, porque el `autoFocus` de React falla dentro de
+`<dialog>` (issue #23301 **[V]**). Pero en el paso 1 no hay campo: hay chips. **Propuesta:** no escribir
+código de foco. Sin `autofocus`, `showModal()` enfoca **el primer enfocable** del diálogo **[V: `04` §6.2]**,
+así que basta con ordenar el DOM: `h2` → `ChatNailbot` → «Cerrar el chat» (colocado arriba por CSS). El
+primer enfocable es entonces el primer control del paso en curso: el chip «Uñas» al estrenarlo, el campo en
+el paso nombre y el enlace al terminar, coherente con HS-4. En jsdom se asevera el **orden** (el primer
+enfocable del diálogo es el esperado); que el navegador lo enfoque, en vivo. Cero mutantes. Alternativa
+igual de válida para la APG: «Cerrar el chat» el primero en el DOM, y entonces el foco inicial cae en él.
+
+**HS-13 · ¿Qué vive dentro del diálogo cuando está cerrado?** El brief no dice si el `ChatNailbot` del panel
+se monta siempre (con el diálogo cerrado) o solo al abrirlo, ni si la conversación sobrevive a cerrar y
+reabrir. Importa por dos cosas. (i) Si se monta siempre, sus textos están **dos veces** en el DOM desde el
+principio (la instancia de `#reserva` y la del panel), y cualquier `getByText` de los tests de la home falla
+por duplicado. (ii) Si se desmonta al cerrar, un Esc accidental **borra** lo que la persona llevaba.
+**Propuesta:** montarlo **la primera vez que se abre** y **conservarlo** después: al reabrir, la
+conversación sigue donde estaba, y el único reinicio es «Reservar otra cita». En memoria, sin storage.
+
+**HS-14 · Un lanzador que solo existe en el cliente no sale en `renderToString`, y el montaje (L14) se queda
+sin test.** El juez **rechazó** la v1 del botón verde precisamente porque su montaje fuera de `<main>` no
+tenía test (`05` §7). Con L7, el SSR de la home no contiene el flotante, así que la técnica de entonces
+(comparar `indexOf` sobre `renderToString`) **no ve nada**. **Propuesta:** dos pruebas, ninguna de build.
+(a) SSR, negativa: la home horneada **no** contiene el lanzador (L7). (b) Cliente: `render` de la home en
+jsdom con su `HelmetProvider`, esperar al efecto y aseverar con `compareDocumentPosition` que el lanzador va
+**después** de `<main>` y **antes** del `<footer>`, con las anclas positivas primero. Una guarda de bytes
+sobre `home.tsx` sirve de apoyo, pero no es la prueba.
+
+**HS-15 · «Portado VERBATIM» solo vale para la geometría: el prototipo discrepa del brief.** Diferencias
+**[V]**: el `aria-label` del lanzador dice «Abrir el chat **de** Nailbot…» (`:243`), y el brief, «**con**
+Nailbot»; el bocadillo dice «Soy Nailbot, te ayudo a reservar.», con el 💅 fuera del destacado (`:236`); la ×
+dice «Cerrar mensaje de Nailbot» (`:237`), y el brief, «Cerrar **el** mensaje…»; la pausa mide 30 px, y 26
+por debajo de 600 px (`:51`, `:122`), cuando el brief fija 32; el `z-index` es 50 (HS-11); el reduced-motion
+va con el patrón **A** y `!important` (`:117`), y el brief manda el B; y el estado se llama `data-pausado`
+(`:116`), y el brief, `data-animacion`. **Propuesta:** una regla escrita en el contrato: del prototipo se
+portan **solo** la geometría (`viewBox` y trazados), los colores decorativos y los tiempos de las
+`@keyframes`; el copy, los tamaños de los controles y el CSS de estado salen **del brief**. Los tests
+escriben los literales del brief a mano, así que un copia-pega del prototipo los pone en rojo.
+
+**HS-16 · ¿Hasta dónde llega «nada de verde» (H5)?** El lanzador cumple. Pero el panel monta `ChatNailbot`,
+que trae verde: la burbuja de la persona (`#dcf6e3`/`#1c3b28`), el botón de enviar (`#25d366`) y el enlace
+final (`demo-btn--wa`, que `reserva_chat` @s24 **exige**) **[V: `05` §4, `reserva.module.scss`]**.
+**Propuesta:** H5 se refiere al **lanzador**, la pieza que sustituye al botón verde retirado; el panel usa
+un `ChatNailbot` **idéntico** al de `#reserva` (H2), con su verde. Si Pablo quiere el panel sin verde, hay
+que cambiar `ChatNailbot` en **las dos** instancias y enmendar @s24. Es decisión suya (**A-25**), no del
+TDD.
+
+**HS-17 · El contraste del lanzador (SC 1.4.11) no lo vigila nadie.** La puerta de contraste es ciega a los
+`.module.scss` (`05` §1). El prototipo identifica el botón con un disco blanco y un anillo `--accent-soft`
+sobre el fondo `--bg` (`:43-44`): un borde de ~1,1–1,2:1 **[I, cálculo propio]**. 1.4.11 pide 3:1 para la
+información visual **necesaria para identificar** el control **[V: `04` §4.5]**. Aquí la identidad la dan
+los rasgos del robot —ojos `#3A1D29`, labios `#D7263D` y el corazón en `--accent-2` sobre la cara clara,
+todos muy por encima de 3:1 **[I]**—, así que probablemente cumple, pero **nadie lo ha medido**. La pausa
+(borde `--border-interactive` sobre `--surface`, icono en `--accent-dark`) sale mejor por dominancia
+**[I]**. **Propuesta:** o se deja el aspecto del prototipo y ese juicio **[I]** se verifica en vivo y se
+anota en `progress/`, o el anillo pasa a `--accent-dark`, que sobre `--bg` ya está en la matriz (4,5:1 como
+texto, de sobra para 3:1): sin fila nueva y vigilado. Decide el lead.
+
+#### Resolución del craftsman_lead a HS-8..HS-17 (2026-09-27) — MANDA SOBRE EL BRIEF
+
+- **HS-8 → ACEPTADA (a) y (b).** Con `reduce` el botón de pausa **no se monta** y el arte queda en su pose
+  base. `reduce` en caliente → `data-animacion` pausada, el botón desaparece y, si tenía el foco, el foco va
+  al lanzador. `reduce` desactivado → el botón reaparece **pulsado** y la animación NO se reanuda sola.
+  «Pausar» = **congelar** (`animation-play-state: paused`, técnica G4); un fotograma a medio pintar no es fallo.
+- **HS-9 → ACEPTADA.** Esc escuchado en `document` **solo** mientras el bocadillo está visible; tras la ×,
+  el foco va al lanzador.
+- **HS-10 → ACEPTADA.** (a) Tamaño del lanzador y `scroll-padding-bottom` salen de la MISMA custom property
+  (declarada en `:root` desde `_base.scss`, con su valor móvil en el mismo breakpoint), más
+  `env(safe-area-inset-bottom, 0px)`; el test de bytes asevera el vínculo. (b) El «hueco al final» NO se
+  pone a ciegas: se mide F110 en vivo; solo si el último enlace del pie queda tapado, se añade relleno
+  inferior a `.pie` (decisión del lead en la verificación, anotada en `progress/`).
+- **HS-11 → ACEPTADA.** `z-index` del lanzador y del bocadillo = **40** (entre carruseles 7 y cabecera 50).
+- **HS-12 → ACEPTADA la vía sin código de foco.** Orden del DOM del diálogo: `h2` → `ChatNailbot` → «Cerrar
+  el chat» (situado arriba a la derecha por CSS). El primer enfocable es el primer control del paso en
+  curso. En jsdom se asevera el orden; el foco real, en vivo.
+- **HS-13 → ACEPTADA.** El `ChatNailbot` del panel se monta la primera vez que se abre y se conserva; solo
+  «Reservar otra cita» reinicia. En memoria.
+- **HS-14 → ACEPTADA (a) y (b).** SSR negativa + cliente con `compareDocumentPosition` y anclas positivas.
+- **HS-15 → ACEPTADA.** Del prototipo se portan SOLO geometría (`viewBox`, trazados), colores decorativos y
+  tiempos de `@keyframes`; copy, tamaños de controles y CSS de estado salen del brief.
+- **HS-16 → A LA PUERTA HUMANA (A-25)** con la recomendación del lead: H5 se refiere al **lanzador**; el
+  panel usa el `ChatNailbot` idéntico al de `#reserva`.
+- **HS-17 → el anillo del lanzador pasa a `--accent-dark`** (par ya vigilado, sin fila nueva); el disco
+  sigue blanco. Verificación visual en vivo.
