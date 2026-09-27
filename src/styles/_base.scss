@@ -39,4 +39,19 @@
 // lo vigila (el SCSS no es mutable: el mutante aquí es HUMANO y la puerta de aprobación su defensa).
 html {
   scroll-padding-top: 6rem;
+  // Nailbot (robot flotante, F-24): el foco que baja por la página no debe quedar tapado por el
+  // lanzador fijo de la esquina inferior (SC 2.4.11, técnica C43). Sale de la MISMA custom property
+  // que dimensiona el lanzador (HS-10) + su separación y el halo del arte + el área segura del móvil.
+  scroll-padding-bottom: calc(var(--nailbot-lanzador) + 3rem + env(safe-area-inset-bottom, 0px));
+}
+
+// Tamaño del lanzador de Nailbot: una sola fuente para el botón y para el scroll-padding-bottom.
+:root {
+  --nailbot-lanzador: 6.5rem;
+}
+
+@media (max-width: 600px) {
+  :root {
+    --nailbot-lanzador: 4.75rem;
+  }
 }

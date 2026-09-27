@@ -1,0 +1,199 @@
+// Nailbot flotante: lanzador fijo abajo a la derecha, control de pausa (SC 2.2.2), bocadillo y
+// panel <dialog> modal nativo. Brief: progress/nailbot_diseno.md · spec F-24 (project-spec.md).
+//
+// - Sin verde ni logo de WhatsApp en el lanzador (H5).
+// - Tamaño del lanzador = la MISMA custom property que alimenta el `scroll-padding-bottom` de
+//   `_base.scss` (HS-10): el foco que baja por la página no queda tapado por el robot (SC 2.4.11, C43).
+// - z-index 40: por encima de los carruseles (7) y por debajo de la cabecera sticky (50) (HS-11).
+// - El anillo del lanzador es `--accent-dark` sobre `--bg`: par ya vigilado por la puerta de
+//   contraste (HS-17, SC 1.4.11).
+
+.flotante {
+  position: fixed;
+  right: calc(1.25rem + env(safe-area-inset-right, 0px));
+  bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  display: flex;
+  align-items: flex-end;
+  gap: 0.625rem;
+}
+
+.robot {
+  position: relative;
+}
+
+.lanzador {
+  position: relative;
+  display: block;
+  width: var(--nailbot-lanzador);
+  height: var(--nailbot-lanzador);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 38%, var(--surface) 0 55%, var(--surface2) 100%);
+  box-shadow:
+    0 10px 28px color-mix(in srgb, var(--ink) 22%, transparent),
+    0 0 0 2px var(--surface),
+    0 0 0 4px var(--accent-dark);
+  cursor: pointer;
+
+  svg {
+    position: absolute;
+    left: -8%;
+    top: -16%;
+    width: 116%;
+    height: 116%;
+  }
+}
+
+.lanzador:focus-visible {
+  outline: 3px solid var(--accent-dark);
+  outline-offset: 6px;
+}
+
+.pausa {
+  position: absolute;
+  top: -0.25rem;
+  left: -0.25rem;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1.5px solid var(--border-interactive);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--accent-dark);
+  cursor: pointer;
+
+  svg {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+}
+
+.bocadillo {
+  position: relative;
+  max-width: 13rem;
+  margin-bottom: 2.5rem;
+  padding: 0.625rem 2.25rem 0.625rem 0.875rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px 16px 4px 16px;
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--ink) 16%, transparent);
+}
+
+.bocadilloTexto {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.875rem;
+  line-height: 1.35;
+
+  strong {
+    color: var(--ink);
+  }
+}
+
+.cerrarBocadillo {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  font-size: 1.125rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+// — Panel: <dialog> modal nativo, anclado abajo a la derecha en escritorio —
+.dialogo {
+  width: min(26rem, calc(100vw - 2rem));
+  max-height: min(44rem, calc(100dvh - 2rem));
+  margin: auto 1.25rem 1.25rem auto;
+  padding: 3.25rem 1rem 1rem;
+  border: 0;
+  border-radius: 24px;
+  background: var(--bg);
+  color: var(--text);
+  overflow: auto;
+  box-shadow: 0 30px 60px color-mix(in srgb, var(--ink) 28%, transparent);
+}
+
+.dialogo::backdrop {
+  background: color-mix(in srgb, var(--ink) 35%, transparent);
+}
+
+.titulo {
+  position: absolute;
+  top: 1rem;
+  left: 1.25rem;
+  margin: 0;
+  color: var(--ink);
+  font-family: 'Gilda Display', serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+}
+
+.leyenda {
+  margin: 0.75rem 0 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.cerrarChat {
+  position: absolute;
+  top: 0.625rem;
+  right: 0.625rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1.5px solid var(--border-interactive);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--accent-dark);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .bocadillo {
+    max-width: 10.5rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .dialogo {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    margin: 0;
+    border-radius: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bocadillo {
+    animation: aparecer 0.35s ease-out;
+  }
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -8,6 +8,7 @@ import { Equipo } from '../components/Equipo'
 import { Faq } from '../components/Faq'
 import { Galeria } from '../components/Galeria'
 import { Hero } from '../components/Hero'
+import { NailbotFlotante } from '../components/NailbotFlotante'
 import { Ofertas } from '../components/Ofertas'
 import { Pie } from '../components/Pie'
 import { PruebaColor } from '../components/PruebaColor'
@@ -132,6 +133,10 @@ export default function Home() {
         {/* 🎨 DEMO: la FAQ en acordeón (#faq-titulo), respuestas siempre en el DOM. */}
         <Faq />
       </main>
+
+      {/* Nailbot (F-24): el robot flotante que abre el chat de reserva. Fuera de <main> y antes del pie:
+          es una capa fija que acompaña a toda la página, no una sección. Solo se monta en cliente. */}
+      <NailbotFlotante />
 
       {/* El pie de F-06: la marca, el `tel:` y Facebook (derivados de F-02). NO emite enlaces
           legales (los cazaría la anti-404 —el bug del cliente—; son F-16). Ver src/components/Pie.tsx. */}

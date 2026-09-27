@@ -1,0 +1,341 @@
+// El arte de Nailbot (SVG inline). Paleta PROPIA y DECORATIVA del robot: no es texto ni borde de
+// control, así que queda fuera de la matriz de contraste (F-03). Lo que identifica al botón
+// (el anillo `--accent-dark` del lanzador) sí es un par vigilado.
+//
+// ESTADO BASE = POSE FINAL VISIBLE (memoria organizacional «estado-base-visible-ssg-reduced-motion»):
+// uñas pintadas, pincel en el bote, soplidos y destellos ocultos. Todas las @keyframes viven DENTRO
+// de `prefers-reduced-motion: no-preference` y solo corren con `data-animado='si'`.
+.arte {
+  --nb-carcasa: #ffffff;
+  --nb-perfil: #e4b3c4;
+  --nb-oro-rosa: #e7b09f;
+  --nb-oro-rosa-osc: #c07f6e;
+  --nb-cara: #fbe7ef;
+  --nb-ojo: #3a1d29;
+  --nb-rojo: #d7263d;
+  --nb-rojo-osc: #99102a;
+  --nb-colorete: #f2a0ba;
+  --nb-una-base: #f1cfdb;
+
+  display: block;
+  overflow: visible;
+
+  * {
+    transform-box: fill-box;
+  }
+}
+
+.soplido,
+.brillo,
+.brilloB {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .arte[data-animado='si'] {
+    .flota {
+      transform-origin: center;
+      animation: flotar 3.2s ease-in-out infinite;
+    }
+
+    .corazon {
+      transform-origin: center;
+      animation: latir 1.6s ease-in-out infinite;
+    }
+
+    .ojos {
+      transform-origin: center;
+      animation: parpadeo 4.6s ease-in-out infinite;
+    }
+
+    .labios {
+      transform-origin: center;
+      animation: soplar 7s ease-in-out infinite;
+    }
+
+    .manoUnas {
+      transform-origin: 50% 100%;
+      animation: lucir 7s ease-in-out infinite;
+    }
+
+    .manoPincel {
+      animation: pintar 7s ease-in-out infinite;
+    }
+
+    .esmalte1 {
+      animation: una1 7s ease-in-out infinite;
+    }
+
+    .esmalte2 {
+      animation: una2 7s ease-in-out infinite;
+    }
+
+    .esmalte3 {
+      animation: una3 7s ease-in-out infinite;
+    }
+
+    .esmalte4 {
+      animation: una4 7s ease-in-out infinite;
+    }
+
+    .soplido {
+      animation: soplo 7s ease-out infinite;
+    }
+
+    .brillo {
+      transform-origin: center;
+      animation: destello 7s ease-in-out infinite;
+    }
+
+    .brilloB {
+      transform-origin: center;
+      animation: destelloB 7s ease-in-out infinite;
+    }
+  }
+
+  // PAUSA (SC 2.2.2, técnica G4): congela en su sitio; al reanudar sigue desde ese fotograma.
+  .arte[data-animado='si'][data-animacion='pausada'] * {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes flotar {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-2.5px);
+  }
+}
+
+@keyframes latir {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  20% {
+    transform: scale(1.2);
+  }
+
+  40% {
+    transform: scale(1);
+  }
+}
+
+@keyframes parpadeo {
+  0%,
+  44%,
+  50%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  47% {
+    transform: scaleY(0.08);
+  }
+}
+
+// El pincel sale del bote, barre las 4 uñas con toques y vuelve al bote.
+@keyframes pintar {
+  0%,
+  4% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  11% {
+    transform: translate(-60.7px, -17.5px) rotate(-10deg);
+  }
+
+  15% {
+    transform: translate(-60.7px, -15px) rotate(-10deg);
+  }
+
+  20% {
+    transform: translate(-55.7px, -19.9px) rotate(-8deg);
+  }
+
+  25% {
+    transform: translate(-55.7px, -17.4px) rotate(-8deg);
+  }
+
+  30% {
+    transform: translate(-50.7px, -19.3px) rotate(-6deg);
+  }
+
+  35% {
+    transform: translate(-50.7px, -16.8px) rotate(-6deg);
+  }
+
+  40% {
+    transform: translate(-45.7px, -16.9px) rotate(-4deg);
+  }
+
+  45% {
+    transform: translate(-45.7px, -14.4px) rotate(-4deg);
+  }
+
+  54%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+// Cada uña se pinta cuando el pincel la toca (el 0 % oculta; la BASE, fuera del keyframe, es pintada).
+@keyframes una1 {
+  0%,
+  13% {
+    opacity: 0;
+  }
+
+  16%,
+  94% {
+    opacity: 1;
+  }
+
+  99%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes una2 {
+  0%,
+  23% {
+    opacity: 0;
+  }
+
+  26%,
+  94% {
+    opacity: 1;
+  }
+
+  99%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes una3 {
+  0%,
+  33% {
+    opacity: 0;
+  }
+
+  36%,
+  94% {
+    opacity: 1;
+  }
+
+  99%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes una4 {
+  0%,
+  43% {
+    opacity: 0;
+  }
+
+  46%,
+  94% {
+    opacity: 1;
+  }
+
+  99%,
+  100% {
+    opacity: 0;
+  }
+}
+
+// Tras pintar, levanta la mano para lucirla y sopla para secarla.
+@keyframes lucir {
+  0%,
+  54%,
+  90%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  60%,
+  84% {
+    transform: translateY(-3px) rotate(-6deg);
+  }
+}
+
+@keyframes soplar {
+  0%,
+  58%,
+  76%,
+  100% {
+    transform: scale(1, 1);
+  }
+
+  62%,
+  72% {
+    transform: scale(0.6, 1.2);
+  }
+}
+
+@keyframes soplo {
+  0%,
+  61% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+
+  65% {
+    opacity: 0.95;
+  }
+
+  75% {
+    opacity: 0;
+    transform: translate(-4px, 4px);
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes destello {
+  0%,
+  76% {
+    opacity: 0;
+    transform: scale(0.2) rotate(0deg);
+  }
+
+  81% {
+    opacity: 1;
+    transform: scale(1) rotate(45deg);
+  }
+
+  88%,
+  100% {
+    opacity: 0;
+    transform: scale(0.2) rotate(90deg);
+  }
+}
+
+@keyframes destelloB {
+  0%,
+  79% {
+    opacity: 0;
+    transform: scale(0.2) rotate(0deg);
+  }
+
+  84% {
+    opacity: 1;
+    transform: scale(1) rotate(45deg);
+  }
+
+  91%,
+  100% {
+    opacity: 0;
+    transform: scale(0.2) rotate(90deg);
+  }
+}
