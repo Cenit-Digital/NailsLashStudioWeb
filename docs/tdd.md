@@ -51,8 +51,9 @@ Al cerrar, cada `@s` debe estar cubierto por al menos un test concreto. El
 
 ```markdown
 ## Trazabilidad
+
 - @s1 (archivo vacío → 0) → test_count_archivo_vacio
-- @s2 (tres notas → 3)    → test_count_varias_notas
+- @s2 (tres notas → 3) → test_count_varias_notas
 - @s3 (no modifica el archivo) → test_count_no_muta_archivo
 ```
 

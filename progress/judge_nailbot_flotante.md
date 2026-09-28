@@ -5,6 +5,7 @@
 Revisión de solo lectura hecha el 2026-09-28 contra `features/nailbot_flotante.feature` (15 escenarios), `project-spec.md` («Feature 24» y «Resolución del craftsman_lead a HS-8..HS-17») y el árbol de trabajo (`git diff HEAD`). Por orden del lead, **no** he ejecutado vitest, `pnpm test`, `pnpm build`, Stryker ni `bin/harness init` (este último lanza `pnpm test` completo), porque hay una mutación en curso. Solo he pasado ESLint a los 7 ficheros de F-24: exit 0 y sin avisos. También he medido una regla CSS en Chrome headless (ver B1).
 
 ## Cobertura de escenarios (@s ↔ test)
+
 - @s1: [x] `nailbot-flotante.test.tsx:87` «la home horneada no trae…» y `:109` «NailbotFlotante a solas tampoco hornea nada»
 - @s2: [x] `nailbot-flotante.test.tsx:115` (posición, `<h1>` e ids) y `:146` (sin section/nav/headings, antes y después de abrir). Además hay un apoyo de bytes en `nailbot-flotante-estilos.test.ts:330`
 - @s3: [x] `nailbot-flotante.test.tsx:161`
@@ -24,14 +25,16 @@ Revisión de solo lectura hecha el 2026-09-28 contra `features/nailbot_flotante.
 Ningún `@s` se queda sin test. Los tests cumplen las prohibiciones del contrato: no usan `toHaveClass`, no importan copy ni tiempos de producción como valor esperado, el `<dialog>` no se controla con `open={` y las aserciones negativas llevan su ancla positiva.
 
 ## Disciplina TDD
+
 - **¿Producción sin test que la pida?** SÍ:
   - `NailbotFlotante.tsx:168-172`: el icono de la pausa cambia (triángulo o barras) según `pausaPulsada`, pero ningún test asevera el trazado ni el cambio (grep `10.4|M2 1.5|path` en los tres tests: 0 resultados). La pausa no cambia de etiqueta (APG, @s4), así que este icono es el único indicio visual del estado. Stryker convertirá el ternario en `true`/`false` y ambos mutantes sobrevivirán.
   - `NailbotFlotante.tsx:47`, `:93` y `:128`: las escrituras `descartado.current = true` están muertas. Esta ref solo se lee en `:78`, dentro del temporizador de un solo disparo de `:76-80`. Ese temporizador salta antes de que el bocadillo exista, y solo con el bocadillo visible se puede descartar (el escuchador de Esc está condicionado en `:87` y la × solo existe entonces). Por eso, cuando `:78` lee `descartado.current`, vale siempre `false`. Si se borran `:93` y `:128`, toda la suite sigue verde, y los dos mutantes `BooleanLiteral` serán equivalentes. «No vuelve en esa carga» lo garantiza que el temporizador salte una sola vez, no esta ref.
 - **¿Hay evidencia de Rojo→Verde→Refactor?** NO. No existe `progress/tdd_nailbot_flotante.md`, ni bitácora ni mapa `@s → test`. El propio lead declara que el código lo escribió él antes que los tests: la vía rápida `302ddb4` ya incluía `NailbotFlotante.tsx`, y los tests se escribieron después, escenario a escenario, contra el contrato. Esto incumple la Ley 1 por construcción. Se puede aceptar como excepción declarada, pero tiene que quedar escrita (C6).
 
 ## Calidad
+
 - **B1, bloqueante: la pausa no congela en un navegador real (regresión frente a `302ddb4`).**
-  - En `nailbot-arte.module.scss:36-93`, cada regla animada tiene la forma `.arte[data-animacion] .x`, con especificidad (0,3,0), y usa el *shorthand* `animation:`. Ese shorthand repone `animation-play-state` a su valor inicial, `running`.
+  - En `nailbot-arte.module.scss:36-93`, cada regla animada tiene la forma `.arte[data-animacion] .x`, con especificidad (0,3,0), y usa el _shorthand_ `animation:`. Ese shorthand repone `animation-play-state` a su valor inicial, `running`.
   - La regla de pausa `.arte[data-animacion='pausada'] *` (`:96-98`) solo llega a (0,2,0), así que pierde la cascada.
   - Lo he medido en Chrome headless con los mismos selectores: el estado calculado de `.flota` bajo `data-animacion="pausada"` es `animation-play-state=running`. Con los selectores de HEAD (`.arte[data-animado='si'] .flota` frente a `.arte[data-animado='si'][data-animacion='pausada'] *`, misma especificidad y la pausa después) sale `paused`. La reproducción está en el scratchpad de la sesión (`pausa.html`).
   - Consecuencias:
@@ -57,9 +60,10 @@ Ningún `@s` se queda sin test. Los tests cumplen las prohibiciones del contrato
   - `trampas-del-horneado.test.tsx:145`: `execFileSync('node', …)` sin shell es equivalente (`node.exe` se resuelve sin shell) y además aguanta espacios en la ruta.
   - `tools/mutate.mjs`: el cambio de punto y coma es solo formato (`.prettierrc` `semi: false`). En el uso documentado (sin argumento, o con una ruta con `/`) el comando es idéntico. Menor: `JSON.stringify` (`:39`) no escapa bien para shell. En cmd.exe dobla las barras invertidas de una ruta Windows y deja expandir las variables de entorno; en sh deja expandir el dólar y las comillas invertidas.
 - Arquitectura: sigue el patrón del repo (componente + `-logica.ts` pura + `.module.scss` + tests junto al código + copy en `src/lib/demo/nailbot-demo.ts`). No añade dependencias (`package.json` sin cambios) ni hay `console.*` o TODO sueltos. `docs/architecture.md` sigue siendo plantilla, sin capas propias contra las que medir.
-- Nota para el a11y_seo_auditor: el lanzador vive fuera de todo landmark, a propósito (L14), así que la regla *best-practice* `region` de axe lo marcará. Conviene dejarlo justificado.
+- Nota para el a11y_seo_auditor: el lanzador vive fuera de todo landmark, a propósito (L14), así que la regla _best-practice_ `region` de axe lo marcará. Conviene dejarlo justificado.
 
 ## Checkpoints
+
 - C1: [x] ficheros base · [x] docs · [ ] `bin/harness init` exit 0 (NO ejecutado: lanza `pnpm test` completo, prohibido durante la mutación; sin verificar)
 - C2: [ ] como mucho una `in_progress`: F-23 **y** F-24 lo están a la vez (`harness.config.json` `one_feature_at_a_time: true`), y la cabecera del propio `.feature` dice «su TDD NO empieza hasta que F-23 esté `done`» · [ ] toda `done` con tests verdes (sin verificar esta sesión) · [x] `current.md` describe la sesión activa (aunque cita `progress/tdd_nailbot_chat_compartido.md`, que no existe)
 - C3: [x] módulos previstos · [x] sin dependencias nuevas · [x] sin logs ni TODOs
@@ -69,12 +73,14 @@ Ningún `@s` se queda sin test. Los tests cumplen las prohibiciones del contrato
 - C7: [ ] pendiente (mutation_tester)
 
 ## Cambios requeridos
+
 1. **B1, la pausa.** Arreglar la cascada de `nailbot-arte.module.scss:96-98` para que `data-animacion='pausada'` gane a las reglas animadas de `:36-93`. Opciones, a elegir sin `!important` (HS-15):
    - una especificidad ≥ (0,3,0), declarada después;
    - longhands en lugar del shorthand `animation:`;
    - `animation-play-state` dentro de cada regla animada.
 
    Además, añadir un test de bytes a @s12 que habría fallado con el fichero actual. Por ejemplo: la regla de pausa tiene al menos tantas clases y atributos como cada selector animado y va después de ellos. Verificarlo EN VIVO: la pausa congela, y al retirar «reduce» el robot sigue quieto.
+
 2. **Icono de la pausa** (`NailbotFlotante.tsx:168-172`). Poner un test que muerda el cambio de icono con `aria-pressed` (y proponer al lead que lo añada a @s4), o quitar el ternario.
 3. **Ref `descartado` muerta** (`NailbotFlotante.tsx:47/:78/:93/:128`). Dos salidas:
    - quitarla;

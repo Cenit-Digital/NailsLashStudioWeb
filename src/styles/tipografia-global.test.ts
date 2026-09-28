@@ -130,7 +130,7 @@ describe('@s2 la regla CONJUNTA `h2, h3` declara el stack de Gilda Display — s
 })
 
 describe('@s3 el partial está ENGANCHADO al punto de entrada de los estilos', () => {
-  it('@s3 main.scss lo importa con @use \'tipografia\'', () => {
+  it("@s3 main.scss lo importa con @use 'tipografia'", () => {
     // ANTI-VACUIDAD (misma guarda que `@use 'base'` de F-04 @s11): un `_tipografia.scss` perfecto
     // que nadie importa NO llega al sitio (el cuerpo seguiría en Times New Roman) = verde por
     // vacuidad de esta feature. Se lee `main.scss` y se afirma el `@use`.
@@ -156,7 +156,9 @@ describe('@s4 ninguno de los dos selectores se queda SIN font-family — la AUSE
 
 /** Los valores de cada declaración `font-family` del partial (sin comentarios). */
 function declaracionesFontFamily(fuente: string): string[] {
-  return [...sinComentarios(fuente).matchAll(/font-family\s*:\s*([^;{}]+)/g)].map((m) => m[1].trim())
+  return [...sinComentarios(fuente).matchAll(/font-family\s*:\s*([^;{}]+)/g)].map((m) =>
+    m[1].trim(),
+  )
 }
 
 /** Cada familia/identificador de cada declaración `font-family`, ya troceado por comas y sin vacíos. */
@@ -193,7 +195,9 @@ describe('@s5 cero fuentes no autohospedadas — allowlist de F-05, sin @import 
     expect(desnudos.length).toBeGreaterThan(0)
 
     for (const identificador of desnudos) {
-      expect(GENERICOS, `identificador desnudo no genérico: ${identificador}`).toContain(identificador)
+      expect(GENERICOS, `identificador desnudo no genérico: ${identificador}`).toContain(
+        identificador,
+      )
     }
   })
 
@@ -224,7 +228,9 @@ describe('@s6 el selector de encabezados es EXACTAMENTE h2, h3 y NO incluye h1 �
     const clasesHero = ['.heroMarca', '.heroStudio', '.titulo']
 
     for (const regla of reglas(partial())) {
-      expect(selectoresDe(regla.selector), 'ninguna regla del partial matchea h1').not.toContain('h1')
+      expect(selectoresDe(regla.selector), 'ninguna regla del partial matchea h1').not.toContain(
+        'h1',
+      )
 
       for (const clase of clasesHero) {
         expect(regla.selector, `el partial no debe declarar ${clase}`).not.toContain(clase)
@@ -240,9 +246,10 @@ describe('@s6 el selector de encabezados es EXACTAMENTE h2, h3 y NO incluye h1 �
 describe('@s7 la capa global es un SUELO, no un TECHO — sin !important, solo selectores de tipo', () => {
   it('@s7 ninguna declaración font-family del partial lleva !important', () => {
     for (const declaracion of declaracionesFontFamily(partial())) {
-      expect(declaracion, 'una font-family con !important convertiría el suelo en techo').not.toMatch(
-        /!important/i,
-      )
+      expect(
+        declaracion,
+        'una font-family con !important convertiría el suelo en techo',
+      ).not.toMatch(/!important/i)
     }
   })
 
@@ -254,9 +261,10 @@ describe('@s7 la capa global es un SUELO, no un TECHO — sin !important, solo s
     // El body fija su fuente por HERENCIA (la fuerza más débil) y `h2, h3` es (0,0,1): cualquier
     // font-family propia (hero, cabecera) o clase futura (precios de F-09) los derrota.
     for (const regla of reglas(partial())) {
-      expect(regla.selector, `${regla.selector} debe ser un selector de tipo, sin clase ni id`).not.toMatch(
-        /[.#]/,
-      )
+      expect(
+        regla.selector,
+        `${regla.selector} debe ser un selector de tipo, sin clase ni id`,
+      ).not.toMatch(/[.#]/)
     }
   })
 })

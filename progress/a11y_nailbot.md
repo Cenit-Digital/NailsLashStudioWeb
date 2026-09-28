@@ -13,6 +13,7 @@ Contrastes calculados con la fórmula de luminancia relativa de WCAG sobre los h
 ## Bloqueante
 
 ### 1. La pausa no congela nada: SC 2.2.2 (A) y SC 4.1.2 (estado anunciado falso)
+
 - `src/components/nailbot-arte.module.scss:96-98`: `.arte[data-animacion='pausada'] * { animation-play-state: paused; }` tiene especificidad **(0,2,0)**.
 - `:36-93`: cada regla animada, por ejemplo `.arte[data-animacion] .flota { animation: flotar 3.2s ease-in-out infinite; }`, tiene **(0,3,0)**. El shorthand `animation` también fija `animation-play-state`, y lo deja en `running`. Como gana la especificidad más alta, **las 13 animaciones siguen corriendo con la pausa pulsada**.
 - Confirmado en el CSS construido (`dist/assets/app-DpVG4Cmp.css`): `._arte_vi6nv_1[data-animacion=pausada] *{animation-play-state:paused}` frente a `._arte_vi6nv_1[data-animacion] ._flota_vi6nv_26{transform-origin:center;animation:_flotar_vi6nv_1 3.2s ease-in-out infinite}`.
@@ -43,6 +44,7 @@ Contrastes calculados con la fórmula de luminancia relativa de WCAG sobre los h
    - Corrección: `input::placeholder { color: var(--muted); opacity: 1; }` (6,42:1).
 
 ## Menores
+
 - **Esquinas cuadradas al enfocar.** La regla global `:focus-visible { border-radius: 2px }` (`_base.scss:18-22`) entra en el bundle después de los módulos (`src/main.tsx:2` importa App antes que `main.scss` en `:43`; en el dist está en el byte 35832, frente al 24341 del lanzador). Con foco de teclado, el lanzador, la pausa, la × y «Cerrar el chat» pierden el círculo. Es visual, no de WCAG. Corrección: `border-radius: 50%` en sus `:focus-visible`.
 - **Clics bloqueados junto al robot.** `.flotante` (`:10-18`) no lleva `pointer-events: none`. Con el bocadillo visible, los huecos de su caja (unos 350×163 px en escritorio) capturan los clics sobre la página que hay debajo, incluido el pie. Corrección: `pointer-events: none` en el contenedor y `auto` en los hijos.
 - **Bocadillo en móvil.** Su borde superior (unos 150 px, estimado) supera el `scroll-padding-bottom` de 124 px. Es conforme por la Nota 2 de 2.4.11, porque Esc lo descarta sin mover el foco. Comprobar en la prueba F110 en vivo.
@@ -57,67 +59,72 @@ Contrastes calculados con la fórmula de luminancia relativa de WCAG sobre los h
 
 **1.4.3 Contraste de texto (calculado)**
 
-| Elemento | Colores | Ratio |
-|---|---|---|
-| Subtítulo (12 px) | `--accent-dark` sobre `--accent-soft` | 4,86:1 (margen de solo 0,36) |
-| Leyenda y aviso (12 px) | `--muted` sobre `--surface` | 6,93:1 |
-| Bocadillo, texto | `--text` sobre `--surface` | 9,10:1 |
-| Bocadillo, destacado | `--ink` sobre `--surface` | 7,62:1 |
-| Título del diálogo | `--ink` sobre `--bg` | 7,06:1 |
-| Nombre del chat | `--ink` sobre `--accent-soft` | 5,98:1 |
+| Elemento                | Colores                               | Ratio                        |
+| ----------------------- | ------------------------------------- | ---------------------------- |
+| Subtítulo (12 px)       | `--accent-dark` sobre `--accent-soft` | 4,86:1 (margen de solo 0,36) |
+| Leyenda y aviso (12 px) | `--muted` sobre `--surface`           | 6,93:1                       |
+| Bocadillo, texto        | `--text` sobre `--surface`            | 9,10:1                       |
+| Bocadillo, destacado    | `--ink` sobre `--surface`             | 7,62:1                       |
+| Título del diálogo      | `--ink` sobre `--bg`                  | 7,06:1                       |
+| Nombre del chat         | `--ink` sobre `--accent-soft`         | 5,98:1                       |
 
 Las filas del subtítulo, la leyenda y el aviso existen en MATRIZ_DE_USO y se pintan sobre esos fondos de verdad (`.chatCabecera`, `.leyenda` y `.chatPie`).
 
 **1.4.11 Contraste de componentes (calculado)**
 
-| Elemento | Colores | Ratio |
-|---|---|---|
-| Anillo del lanzador | `--accent-dark` sobre `--bg` | 5,74:1 |
-| Anillo del lanzador | frente al aro blanco interior | 6,19:1 |
-| Disco del lanzador sobre el pie | blanco sobre `--ink` | 7,62:1 |
-| Pausa, borde | frente a `--bg` | 4,19:1 |
-| Pausa, icono | sobre blanco | 6,19:1 |
-| × del bocadillo | `--muted` | 6,93:1 |
-| «Cerrar el chat», borde | frente a `--bg` | 4,19:1 |
-| «Cerrar el chat», glifo | | 6,19:1 |
-| Borde del campo | | 4,52:1 |
-| Foco global | sobre blanco / sobre `--bg` | 4,52:1 / 4,19:1 |
+| Elemento                        | Colores                       | Ratio           |
+| ------------------------------- | ----------------------------- | --------------- |
+| Anillo del lanzador             | `--accent-dark` sobre `--bg`  | 5,74:1          |
+| Anillo del lanzador             | frente al aro blanco interior | 6,19:1          |
+| Disco del lanzador sobre el pie | blanco sobre `--ink`          | 7,62:1          |
+| Pausa, borde                    | frente a `--bg`               | 4,19:1          |
+| Pausa, icono                    | sobre blanco                  | 6,19:1          |
+| × del bocadillo                 | `--muted`                     | 6,93:1          |
+| «Cerrar el chat», borde         | frente a `--bg`               | 4,19:1          |
+| «Cerrar el chat», glifo         |                               | 6,19:1          |
+| Borde del campo                 |                               | 4,52:1          |
+| Foco global                     | sobre blanco / sobre `--bg`   | 4,52:1 / 4,19:1 |
 
 **2.2.2 y 2.3.3 (fuera del bloqueante)**
+
 - Las 13 `@keyframes` y la animación de aparición del bocadillo están dentro de `no-preference` (patrón B).
 - Con «reduce», la pausa no se monta y nada se mueve; este camino no depende de la regla rota.
 - El chat y su avatar no se animan.
 
 **2.4.3 Orden y foco**
+
 - Tras cada acción, el foco va al primer control del paso nuevo y nunca al montar (`ChatNailbot.tsx:50-55`, `chat-nailbot-logica.ts:192-198`).
 - Un nombre vacío deja el mismo estado, así que el foco se queda en el campo.
 - La × lleva el foco al lanzador, y activar «reduce» en caliente también.
 - En el DOM, el flotante va entre `</main>` y el pie. Dentro del diálogo, el orden es h2, chat y «Cerrar» al final, como fija HS-12.
 
 **2.4.11 Foco no tapado**
+
 - `scroll-padding-bottom` sale de la misma variable que el tamaño del lanzador.
 - Da 152 px en escritorio frente a unos 141 px que ocupan el arte y la pausa, y 124 px en móvil frente a unos 108 px. En ambos casos suma el área segura.
 - El final del pie a 1280 px no queda tapado según la geometría estimada; se confirma con la prueba F110 en vivo (HS-10 b).
 
 **2.5.8 Tamaño de objetivo**
 
-| Control | Tamaño |
-|---|---|
-| Lanzador | 104 px / 76 px |
-| Pausa | 32 px |
-| × del bocadillo | 28 px |
-| «Cerrar el chat» | 36 px |
-| «Enviar» | 44 px |
-| Chips | unos 36 px de alto |
+| Control          | Tamaño             |
+| ---------------- | ------------------ |
+| Lanzador         | 104 px / 76 px     |
+| Pausa            | 32 px              |
+| × del bocadillo  | 28 px              |
+| «Cerrar el chat» | 36 px              |
+| «Enviar»         | 44 px              |
+| Chips            | unos 36 px de alto |
 
 La pausa queda por encima del lanzador (z-index 1).
 
 **1.4.13 Bocadillo**
+
 - Fuera del alcance literal, porque lo lanza un temporizador y no el hover ni el foco.
 - Aun así cumple: se descarta con la × y con Esc desde cualquier punto, no caduca solo y no es región viva.
 - Describe al lanzador sin arrastrar el nombre de la ×.
 
 **4.1.2 Nombre, rol y valor**
+
 - Lanzador: `aria-haspopup="dialog"`, sin `aria-expanded` y el arte con `aria-hidden`.
 - Pausa: `aria-pressed` con etiqueta estable (el estado es falso por el bloqueante).
 - Las × tienen `aria-label` y el glifo oculto.
@@ -125,20 +132,25 @@ La pausa queda por encima del lanzador (z-index 1).
 - El campo tiene `aria-label` y el enlace final, `aria-describedby` al aviso.
 
 **4.1.3 Mensajes de estado**
+
 - El hilo es `role="log"` con `aria-live="polite"` y `aria-label`, ya presente en el HTML horneado de #reserva.
 - En el panel, el hilo nace con su contenido inicial y los mensajes nuevos solo se añaden al final.
 
 **`<dialog>` nativo**
+
 - Se abre con `showModal()` en un efecto, sin autofocus y sin controlar `open` desde React.
 - `onClose` sincroniza el estado cuando se cierra con Esc o con el gesto atrás.
 - ← y → no llegan a `document` (se corta la propagación) y no se llama a `preventDefault`.
 
 **Mejoras de este diff**
+
 - Se quitó `outline: none` del campo, así que ahora tiene foco visible.
 - `overflow-wrap: anywhere` evita que un nombre de 300 caracteres desborde.
 
 ## SEO
+
 Sin problemas. En `dist/index.html`:
+
 - Hay 0 apariciones de «Abrir el chat con Nailbot», `<dialog`, `data-animacion` y «Pausar la animación».
 - Hay 1 `<h1`, 1 `<title` y 1 meta description.
 - El chat de #reserva sale horneado con `role="log"`, «Asistente automático · demo» y la leyenda, una vez cada uno.
@@ -146,7 +158,9 @@ Sin problemas. En `dist/index.html`:
 `NailbotFlotante` devuelve `null` en el SSR y en la primera pasada del cliente (`:116-118`), así que no hornea nada y no hay desajuste de hidratación. ChatNailbot no añade encabezados ni landmarks.
 
 ## Cobertura @s y tests
+
 Todos los @s de los dos contratos tienen tests. Faltan dos:
+
 - El efecto real de la pausa en la cascada: @s12 pasa sin probar nada, ver el bloqueante.
 - Esc con el foco dentro del bocadillo.
 

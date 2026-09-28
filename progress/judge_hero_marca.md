@@ -8,6 +8,7 @@ potenciales, sobre el HTML CRUDO de dist/ (readFileSync + string, JAMAS jsdom) y
 mutable. Los dos MUERDEN. bin/harness init VERDE (661 tests). pnpm build exit 0 con las CINCO puertas.
 
 ## Alcance verificado
+
 - Puerta humana confirmada por DOS vias: cabecera del .feature (APROBADO 2026-07-18) y
   feature_list.json seccion 7 status in_progress + campo puerta_humana (C-1..C-3, C-5, C-7 literales).
 - Commit F-07 = 8726fdf. Toco SOLO: Hero.tsx, hero.module.scss, partir-nombre.ts + sus tests,
@@ -16,29 +17,29 @@ mutable. Los dos MUERDEN. bin/harness init VERDE (661 tests). pnpm build exit 0 
 
 ## Cobertura de escenarios (@s -> test) — 15/15 implementables
 
-- @s1  (base VISIBLE en SCSS): [x] hero-estilos.test.ts @s1 (x3: heroMarca clip-path inset(0 0 0 0),
+- @s1 (base VISIBLE en SCSS): [x] hero-estilos.test.ts @s1 (x3: heroMarca clip-path inset(0 0 0 0),
   heroStudio opacity:1, ninguna base con opacity:0/clip-path recortante). MEDIDO en dist: base visible.
-- @s2  (oculto SOLO en el 0%): [x] hero-estilos.test.ts @s2 (it.each paintReveal, fadeUp): lee 0% y 100%.
-- @s3  (@media reduce{animation:none}): [x] hero-estilos.test.ts @s3. Presente en dist.
-- @s4  (delay+duracion <= 1,2 s): [x] hero-estilos.test.ts @s4 (it.each heroMarca/heroStudio). El limite
+- @s2 (oculto SOLO en el 0%): [x] hero-estilos.test.ts @s2 (it.each paintReveal, fadeUp): lee 0% y 100%.
+- @s3 (@media reduce{animation:none}): [x] hero-estilos.test.ts @s3. Presente en dist.
+- @s4 (delay+duracion <= 1,2 s): [x] hero-estilos.test.ts @s4 (it.each heroMarca/heroStudio). El limite
   1,2 va A MANO; suma solo valores con unidad de tiempo (ignora el cubic-bezier) y exige >=2 tiempos (no
   esconde el delay). MEDIDO en SCSS y en dist: 1s+0,1s=1,1s y 0,9s+0,2s=1,1s <= 1,2 s.
-- @s5  (dist crudo: nombre presente, sin ocultacion inline, sin observer): [x] hero.test.tsx @s5 (x4:
+- @s5 (dist crudo: nombre presente, sin ocultacion inline, sin observer): [x] hero.test.tsx @s5 (x4:
   nombre presente, no opacity:0/clip-path inline, no animation inline, no IntersectionObserver) +
   mi medicion directa de dist/index.html (ver Sabotajes).
-- @s6  (UN h1, hijos span nunca div): [x] hero.test.tsx @s6 (x2 via cuantosH1) + home.test.tsx @s6
+- @s6 (UN h1, hijos span nunca div): [x] hero.test.tsx @s6 (x2 via cuantosH1) + home.test.tsx @s6
   (pagina) + puerta de cascaron en pnpm build. MEDIDO en dist: 1 h1, 2 span, 0 div.
-- @s7  (nombre accesible Nails Lash Studio, text node de espacio REAL): [x] hero.test.tsx @s7 (x2:
+- @s7 (nombre accesible Nails Lash Studio, text node de espacio REAL): [x] hero.test.tsx @s7 (x2:
   toHaveAccessibleName + estructural sobre bytes </span> <span, la anti-fragil). MEDIDO en dist: </span> <span.
-- @s8  (sin text node -> Nails LashStudio, 16 — defecto prohibido): [x] hero.test.tsx @s8 (x2: literal
+- @s8 (sin text node -> Nails LashStudio, 16 — defecto prohibido): [x] hero.test.tsx @s8 (x2: literal
   a mano + bytes pegados). Caracterizacion del negativo.
-- @s9  (titular --ink, nunca --accent/--brush como texto): [x] hero-estilos.test.ts @s9 (x3) + puerta de
+- @s9 (titular --ink, nunca --accent/--brush como texto): [x] hero-estilos.test.ts @s9 (x3) + puerta de
   contraste en build. MEDIDO en dist CSS: ._titulo color:var(--ink), sin color:var(--accent), sin
   color:#C05576. MINIMO_DE_PARES sigue en 18 y la puerta reporta 18 pares (ni fila nueva ni rama 3:1).
 - @s10 (eyebrow p, nunca heading, sin Facial): [x] hero.test.tsx @s10 (x3). MEDIDO en dist: p.eyebrow
   vacio, cero h2-h6 aportados por el hero, Facial ausente en toda la pagina.
 - @s11 (h1+p SIN section no activa anclas F-06): [x] hero.test.tsx @s11 (x2 via seccionesNavegables REAL)
-  + puerta de anclas en build. MEDIDO en dist: los 2 section son servicios/contacto (F-04); el hero suelto en main.
+  - puerta de anclas en build. MEDIDO en dist: los 2 section son servicios/contacto (F-04); el hero suelto en main.
 - @s12 (marca/tipo por lastIndexOf): [x] partir-nombre.test.ts @s12 (x2: dato real + Uno Dos Tres).
 - @s13 (guarda corte < 0): [x] partir-nombre.test.ts @s13 (x2).
 - @s15 (mutar la derivacion rompe un test): [x] cubierto por @s12/@s13/@s16 sobre partir-nombre.ts.
@@ -67,6 +68,7 @@ mutable. Los dos MUERDEN. bin/harness init VERDE (661 tests). pnpm build exit 0 
    vacio, Facial ausente. CSS horneado: base visible + oculto solo en 0% + @media reduce{animation:none}.
 
 ## Disciplina TDD
+
 - Produccion sin test que la pida? NO. partir-nombre.ts (guarda corte<0 exigida por @s13/@s16),
   hero.module.scss (cada regla exigida por @s1-@s4/@s9), Hero.tsx (h1+2 spans+espacio+eyebrow exigidos por
   @s5-@s11), cableado en home.tsx (@s6 a nivel de pagina). Bitacora con ciclos Rojo->Verde->Refactor y 3
@@ -77,6 +79,7 @@ mutable. Los dos MUERDEN. bin/harness init VERDE (661 tests). pnpm build exit 0 
   vive DENTRO del it; en los describe solo literales -> sin supervivientes falsos.
 
 ## Atribucion normativa
+
 - Ninguna atribucion normativa falsa. El @media reduced-motion se declara CRITERIO DE PROYECTO (C-4), no
   obligacion WCAG. Los hits de "WCAG obliga"/"obligatorio" en los tests son las GUARDAS que PROHIBEN esa
   atribucion, no la cometen. NO hay numero LCP asertado como puerta unitaria: el LCP vive solo en
@@ -84,6 +87,7 @@ mutable. Los dos MUERDEN. bin/harness init VERDE (661 tests). pnpm build exit 0 
   literal de SC 2.2.2. El "ESCENARIO OBLIGATORIO" de @s5 se refiere a un escenario requerido, no a WCAG.
 
 ## Checkpoints
+
 - C1 (arnes completo, bin/harness init exit 0): [x] — 661 tests verdes, lint/typecheck limpios.
 - C2 (estado coherente, 1 sola in_progress): [x] — solo F-07 in_progress.
 - C3 (arquitectura, sin deps nuevas, sin debug suelto): [x] — sin dependencias nuevas; paintReveal es CSS puro (cero asset).
@@ -93,6 +97,7 @@ mutable. Los dos MUERDEN. bin/harness init VERDE (661 tests). pnpm build exit 0 
 - C7 (mutacion >= umbral 1.0): [ ] PENDIENTE del mutation_tester (puerta distinta; no la corro yo).
 
 ## Menores (NO bloqueantes)
+
 1. @s5 unitario via renderToString, no readFileSync de dist/. El contrato pide "readFileSync + string"
    sobre el artefacto. Los tests usan renderToString (react-dom/server) como proxy fiel del prerender SSG
    (NO es jsdom), y el eje de bytes de dist/ queda cubierto por pnpm build + la bitacora + mi propia
@@ -104,6 +109,7 @@ mutable. Los dos MUERDEN. bin/harness init VERDE (661 tests). pnpm build exit 0 
    (todos los mutantes @s15 muertos) y que un 0/0 en Hero.tsx no enmascara nada.
 
 ## Cambios requeridos
+
 Ninguno. La feature esta lista para la puerta de mutacion.
 
 ---
@@ -118,24 +124,27 @@ contrato (sobre el SCSS, `readFileSync`+string, jamás jsdom): MUERDE. `pnpm tes
 `typecheck`/`lint` 0, `pnpm build` exit 0 con las CINCO puertas. Árbol restaurado al estado en revisión.
 
 ## Puerta humana confirmada (DOS vías)
+
 - `features/hero_marca.feature`: cabecera «APROBADO POR LA PUERTA HUMANA EL 2026-07-18» + bloque `@s17`
   (líneas 451-468) con «Este escenario NACE APROBADO... no lleva ninguna marca de pendiente».
 - `feature_list.json` §7: `status: in_progress`, `acceptance[6]` (el 7º) = la tipografía de marca, y
   campo `puerta_humana` con «AMPLIACION 2026-07-18 ... El humano aprobo arreglarlo en F-07».
 
 ## Cobertura de escenarios (@s17 ↔ test)
+
 - @s17: [x] cubierto por `src/components/hero-estilos.test.ts` › describe `@s17` (3 `it`):
   1. `.heroMarca` declara `font-family: 'Great Vibes', cursive` — regex a mano
      `/font-family\s*:\s*['"]Great Vibes['"]\s*,\s*cursive/` (hero-estilos.test.ts:266-269).
   2. `.heroStudio` declara `font-family: 'Manrope', sans-serif` — regex a mano
      `/font-family\s*:\s*['"]Manrope['"]\s*,\s*sans-serif/` (hero-estilos.test.ts:271-274).
   3. NINGUNA de las dos se queda SIN `font-family` (presencia explícita, hero-estilos.test.ts:276-283).
-  → Aseveradas LAS DOS reglas (Great Vibes+cursive y Manrope+sans-serif), leyendo el `.module.scss`
-  con `reglaBase()` (la regla BASE del elemento, NUNCA la del `@media` — verificado: el regex
-  `\.heroMarca\s*\{` no casa el `.heroMarca,` del @media; el `.heroStudio {` base está antes del @media
-  → `cuerpoDelBloque` devuelve la base).
+     → Aseveradas LAS DOS reglas (Great Vibes+cursive y Manrope+sans-serif), leyendo el `.module.scss`
+     con `reglaBase()` (la regla BASE del elemento, NUNCA la del `@media` — verificado: el regex
+     `\.heroMarca\s*\{` no casa el `.heroMarca,` del @media; el `.heroStudio {` base está antes del @media
+     → `cuerpoDelBloque` devuelve la base).
 
 ## El test MUERDE (no es vacuo) — sabotaje reproducido por MÍ
+
 - Reproduje el SABOTAJE A del `tdd_craftsman`: quité `font-family: 'Great Vibes', cursive;` de
   `.heroMarca` en `hero.module.scss` y corrí `hero-estilos.test.ts` → **2 failed | 12 passed**: cayeron
   el `it` específico de Great Vibes Y el de presencia; el de Manrope siguió VERDE (discrimina cuál
@@ -147,6 +156,7 @@ contrato (sobre el SCSS, `readFileSync`+string, jamás jsdom): MUERDE. `pnpm tes
   Árbol final = los 6 ficheros en revisión, nada más.
 
 ## Implementación == acceptance
+
 - `src/components/hero.module.scss` regla base `.heroMarca` (línea 28): `font-family: 'Great Vibes', cursive;`.
   Regla base `.heroStudio` (línea 34): `font-family: 'Manrope', sans-serif;`. Las dos EN LA HOJA.
 - Los nombres de familia CASAN con los `@font-face` de F-05: `Great Vibes` (400) y `Manrope` (400-700),
@@ -155,11 +165,13 @@ contrato (sobre el SCSS, `readFileSync`+string, jamás jsdom): MUERDE. `pnpm tes
   @font-face (misma familia). El eyebrow ya usaba `'Manrope'` (línea 13) — coherente.
 
 ## Anti-tautología
+
 - Los literales `'Great Vibes'`, `cursive`, `'Manrope'`, `sans-serif` van ESCRITOS A MANO en el test,
   NO importados. El fichero de test importa SOLO `MATRIZ_DE_USO, MINIMO_DE_PARES` de `puerta-contraste`;
   la única mención a `site.ts` es un COMENTARIO (línea 262), no un `import`. Como el 1,2 s de @s4.
 
 ## Nada de más (alcance) — `git --no-pager diff`
+
 - SOLO: `src/components/hero.module.scss` (+2 líneas `font-family`), `src/components/hero-estilos.test.ts`
   (+1 describe `@s17`, 3 `it`), y docs de contrato/progreso (`feature_list.json` acceptance[6]+puerta_humana,
   `features/hero_marca.feature` bloque @s17, `progress/gherkin_hero_marca.md`, `progress/tdd_hero_marca.md`).
@@ -167,12 +179,14 @@ contrato (sobre el SCSS, `readFileSync`+string, jamás jsdom): MUERDE. `pnpm tes
   ningún test exija: las 2 líneas del SCSS las pide @s17.
 
 ## Coherencia de método (NO es hueco)
+
 - @s17 lee el SCSS igual que @s1/@s3/@s9 (Stryker no ve CSS → lo aseveran el test que LEE el SCSS + la
   puerta humana). El eje [NV] «qué fuente PINTA el navegador» (`document.fonts.check('142px "Great
-  Vibes"')` + `font-family` computado del `<span>`) queda para la RE-VERIFICACIÓN EN VIVO con Chrome del
+Vibes"')` + `font-family` computado del `<span>`) queda para la RE-VERIFICACIÓN EN VIVO con Chrome del
   lead, mismo estatuto que el número LCP de C-2. Correcto, no es un hueco.
 
 ## Sin regresión
+
 - `pnpm typecheck` → 0 errores. `pnpm lint` → 0 warnings.
 - `pnpm test` → **664 passed** (19 ficheros) — la cuenta esperada.
 - `pnpm build` → **exit 0** con las CINCO puertas (cascarón, placeholders, contraste 18 pares, terceros
@@ -182,6 +196,7 @@ contrato (sobre el SCSS, `readFileSync`+string, jamás jsdom): MUERDE. `pnpm tes
 - Los 15 escenarios previos siguen VERDES e INTACTOS (`hero-estilos.test.ts` 14 passed; suite 664).
 
 ## Checkpoints
+
 - C1 (arnés, build exit 0): [x] — 664 verde, typecheck/lint limpios, build 5 puertas.
 - C2 (1 sola in_progress): [x] — solo F-07.
 - C3 (arquitectura, sin deps nuevas): [x] — 2 líneas de CSS, cero asset, cero dependencia.
@@ -192,6 +207,7 @@ contrato (sobre el SCSS, `readFileSync`+string, jamás jsdom): MUERDE. `pnpm tes
   SCSS no lo ve Stryker; la cobertura de mutación sigue en `partir-nombre.ts`). Puerta distinta.
 
 ## Menores (NO bloqueantes)
+
 1. El tercer `it` (presencia `/font-family\s*:/`) está subsumido para COBERTURA por los dos asertos
    específicos (si `.heroMarca` casa `'Great Vibes', cursive`, obviamente tiene `font-family:`). No es
    defecto: aporta un mensaje de fallo más claro para «falta del todo» y sirvió para discriminar en el
@@ -201,4 +217,5 @@ contrato (sobre el SCSS, `readFileSync`+string, jamás jsdom): MUERDE. `pnpm tes
    lead tras esta aprobación — es el eje [NV]/C-2, fuera de la puerta unitaria del `judge`.
 
 ## Cambios requeridos
+
 Ninguno. `@s17` APROBADO. Sin bloqueantes. Lista para la puerta de mutación.

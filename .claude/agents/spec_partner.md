@@ -53,9 +53,9 @@ favor de una. Deja que el humano decida; registra la decisión y su razón.
 - ❌ NUNCA edites `src/`, los tests ni `features/`.
 - ❌ NUNCA cambies el `status` a `done`.
 - ✅ Si una decisión queda sin cerrar, escríbela como **PREGUNTA ABIERTA** en
-   `project-spec.md` y no la des por resuelta.
+  `project-spec.md` y no la des por resuelta.
 - ✅ Cada afirmación del spec debe poder convertirse en un escenario
-   Given/When/Then. Si no es comprobable, refínala o márcala como abierta.
+  Given/When/Then. Si no es comprobable, refínala o márcala como abierta.
 
 ## Comunicación
 

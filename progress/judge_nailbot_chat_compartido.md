@@ -9,6 +9,7 @@ La cobertura del contrato es alta y los tests de verdad detectan errores. Aun as
 ## Cobertura de escenarios (cada @s y su test)
 
 ### features/nailbot_chat_compartido.feature (14 de 14 cubiertos)
+
 - @s1: [x] cubierto por `chat-nailbot.test.tsx:62-131`, 7 tests sobre `renderToString(<Reserva/>)` y `<ChatNailbot/>`. Comprueban «Nailbot» y el subtítulo como nodos exactos, que no aparece «en línea» ni «nl», el `<svg>` con aria-hidden y focusable y sin data-animacion, la leyenda una sola vez, el log con su nombre, el orden de los 4 anclajes con los cuatro presentes y que no hay h1-h6, section, nav ni `<a `. Hay un punto débil en la regex de 90-100 (ver menores).
 - @s2: [x] `chat-nailbot.test.tsx:133-152`: las 4 filas, con `closest('[data-de]')` y `closest('[role=log]')`.
 - @s3: [x] `chat-nailbot.test.tsx:154-223`: las 5 filas, incluida «Lo antes posible → franja». Comprueba sin maxlength, que no existe «Este fin de semana» y que no hay más campo que «Tu nombre».
@@ -25,6 +26,7 @@ La cobertura del contrato es alta y los tests de verdad detectan errores. Aun as
 - @s14: [x] `nailbot-arte.test.tsx:12-66`.
 
 ### Enmienda F-23 de features/reserva_chat.feature
+
 - @s1-@s6 (sin cambios): [x] `reserva.test.tsx:60-221`
 - @s7 (ajustado): [x] `:223-284`
 - @s8 (retirado): [x] lo hereda F-23 @s1; anotado en `:286-287`
@@ -48,12 +50,14 @@ La cobertura del contrato es alta y los tests de verdad detectan errores. Aun as
 Textos esperados escritos a mano (sin tautologías): se cumple. Los tests nuevos no importan `nailbot-demo`, `TELEFONO`, `waHref`, `mensajeReserva` ni `responder` como valor esperado. La única importación de datos es `HORARIO` en el test de alerta, que es la excepción declarada. No se usa `toHaveClass` en ninguno.
 
 ## Disciplina TDD
+
 - ¿Hay código de producción que ningún test pida? **SÍ.**
   - `chat-nailbot-logica.ts:161-166`: la rama `nombre` condicional y el `return estado` para entradas desconocidas. Solo lo pide un test pensado para el futuro, mal etiquetado como @s11 (`chat-nailbot-logica.test.ts:227-236`).
   - `chat-nailbot-logica.ts:114`: `paso === 'dia' &&` no se puede alcanzar desde la UI. Su test está mal etiquetado como @s5 (`:105-110`).
 - ¿Hay prueba de rojo-verde-refactor? **NO.** `progress/tdd_nailbot_chat_compartido.md` no existe, aunque `progress/current.md:28` lo cita. El lead declara que escribió el código primero y luego los tests contra el contrato.
 
 ## Calidad
+
 - Lo bueno: `responder` es pura y corta, con la tabla `SIGUIENTE`, tipos `readonly`, `fraseSabado` calculada en la llamada, el texto centralizado y `useId` para el aviso. `mensajeReserva` cambia lo mínimo (`reserva-logica.ts:33-41`). Las guardas sobre el código fuente respetan las restricciones de Stryker. No hay logs de depuración ni TODOs.
 - `ChatNailbot.tsx:69`: un cast `as SolicitudReserva` en cada render.
 - `ChatNailbot.tsx:123-133`: envío del nombre duplicado.
@@ -65,6 +69,7 @@ Textos esperados escritos a mano (sin tautologías): se cumple. Los tests nuevos
 - Tests: la regex débil de `chat-nailbot.test.tsx:90-100`, la aserción de foco que no prueba nada en `:409-422`, y `nailbot-arte.test.tsx:50-55`, que no mira opacity en las bases.
 
 ## Checkpoints
+
 - C1: [x] ficheros base · [x] docs · [ ] `bin/harness init` exit 0. Falla en el paso 3 (2 features en `in_progress`); lo confirmé con `harness status`.
 - C2: [ ] como mucho una en `in_progress` (están la 23 y la 24) · [ ] features `done` con tests en verde (suite completa sin ejecutar) · [x] current.md describe la sesión activa.
 - C3: [x] módulos (architecture.md sigue siendo una plantilla sin capas) · [x] sin dependencias nuevas · [x] sin logs ni TODOs.
@@ -74,6 +79,7 @@ Textos esperados escritos a mano (sin tautologías): se cumple. Los tests nuevos
 - C7: [ ] pendiente del mutation_tester (mutación en curso).
 
 ## Cambios requeridos
+
 1. F-24 → `spec_ready` mientras F-23 siga abierta. Cuando acabe la mutación, `bin/harness init` completo en verde, con la suite entera y los `*-horneado`.
 2. Escribir `progress/tdd_nailbot_chat_compartido.md` con el mapa de cada @s a su test (el de arriba sirve) y con la desviación de haber escrito el código primero declarada con honestidad.
 3. Quitar el código que nadie pidió: `chat-nailbot-logica.ts:161-166` (rama terminal o `switch` exhaustivo con `never`) y `:114` (`paso === 'dia' &&`), junto con sus tests `chat-nailbot-logica.test.ts:227-236` y `:105-110`. La otra opción es quitarles la etiqueta @s y justificar la decisión en el diario.

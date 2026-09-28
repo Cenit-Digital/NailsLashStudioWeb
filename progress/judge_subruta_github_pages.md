@@ -1,4 +1,5 @@
 # Review — ENMIENDA 1 de F-05 (`cero_terceros`) y ENMIENDA 1 de F-04 (`cascaron_semantico`)
+
 # Subruta de despliegue en GitHub Pages de proyecto
 
 > `judge`, 2026-07-25, rama `feature/last_fixes`. No es una feature nueva: dos enmiendas a
@@ -22,6 +23,7 @@ codigo de las dos puertas amendadas -- detalle en la seccion de hallazgos transv
 ## F-05 -- `cero_terceros`, ENMIENDA 1 (@s27 ampliado)
 
 ### Cobertura de escenarios (@s <-> test)
+
 Contraste hecho leyendo la tabla EXACTA de `features/cero_terceros.feature:1815-1832` (8 filas)
 contra el `it`/`it.each` real en `src/lib/puerta-terceros.test.ts:179-211` -- no contra el diario.
 
@@ -41,6 +43,7 @@ Y el valor literal de base -- evita que un mutante que cambie el texto del mensa
 falta de asercion de contenido.
 
 ### Fidelidad contrato <-> produccion
+
 `src/lib/puerta-terceros.ts:96-223` -- BASE_PROPIA = '/', PREFIJO_PROTOCOLO_RELATIVO = '//',
 esRutaPropiaRootAbsoluta(base) = base.startsWith('/') && !base.startsWith('//'),
 violacionesDeBase usa esa funcion. El contrato describe TRES condiciones (empieza por /, no
@@ -58,6 +61,7 @@ de @s27; baseDeclarada cambia SOLO de visibilidad (export), sin tocar su cuerpo;
 resto del fichero de test no tienen ni una linea de diff.
 
 ### Disciplina TDD
+
 - Produccion sin test que la pida? NO.
 - Evidencia de Rojo-Verde-Refactor? SI -- `progress/tdd_subruta_github_pages.md:151-174` documenta
   2 ciclos: ciclo 1 (rojo con /subcarpeta/ y /NailsLashStudioWeb/ esperando 0, verde con
@@ -65,6 +69,7 @@ resto del fichero de test no tienen ni una linea de diff.
   del ciclo 1 lo dejaba pasar por error --, verde con la exclusion de protocolo-relativo).
 
 ### Calidad
+
 - Nombres reveladores (esRutaPropiaRootAbsoluta, PREFIJO_PROTOCOLO_RELATIVO), sin numeros
   magicos, funciones de una sola responsabilidad.
 - Capas respetadas: `src/lib/puerta-terceros.ts` sigue sin leer ficheros/process.env;
@@ -74,6 +79,7 @@ resto del fichero de test no tienen ni una linea de diff.
   salida/exit sigue viviendo en ejecutarPuertaDeTerceros/el humilde, sin mezclar capas.
 
 ### Hallazgos
+
 Ninguno en `src/lib/puerta-terceros.ts` ni en su test. Ver la seccion de hallazgos transversales
 para lo tocado fuera de esta puerta.
 
@@ -82,6 +88,7 @@ para lo tocado fuera de esta puerta.
 ## F-04 -- `cascaron_semantico`, ENMIENDA 1 (@s36/@s37/@s38 nuevos)
 
 ### Cobertura de escenarios (@s <-> test)
+
 Contraste hecho leyendo `features/cascaron_semantico.feature:1412-1463` (@s36/@s37/@s38) y
 `:1143-1201` (@s23/@s24, el hermano NO tocado) contra `src/lib/puerta-cascaron.test.ts:655-742` y
 `:917-942`.
@@ -108,6 +115,7 @@ Contraste hecho leyendo `features/cascaron_semantico.feature:1412-1463` (@s36/@s
 Las filas de la tabla de cada escenario nuevo tienen test propio; ni una fila de mas ni de menos.
 
 ### Cero regresion -- verificado por lectura directa, no solo confiado
+
 `git diff -- src/lib/puerta-cascaron.test.ts` muestra que el bloque describe de la puerta ANTI-404
 (@s23, @s24) (lineas 655-690) no tiene ni una linea de diff: los `it.each` de @s23 y @s24, sus
 fixtures y sus aserciones son BYTE A BYTE los mismos de antes de la enmienda. La unica funcion que
@@ -115,6 +123,7 @@ cambia de firma es violacionesPorRegla, con un 4o parametro opcional que por def
 comportamiento anterior.
 
 ### Fidelidad contrato <-> produccion
+
 `src/lib/puerta-cascaron.ts:582-600` (esEnlaceRoto) implementa EXACTAMENTE los tres casos del
 contrato: base === null -> comportamiento identico a hoy (delega en rutasDelArtefacto.has(ruta),
 sin tocar); base declarada y el href empieza por su prefijo -> se compara el RESTO (con / prepuesta
@@ -131,6 +140,7 @@ tools/puerta-terceros.ts. Sin logica propia, sin test dedicado, fuera de mutate 
 contrato del humilde ya establecido por F-01/F-04.
 
 ### Disciplina TDD
+
 - Produccion sin test que la pida? NO.
 - Evidencia de Rojo-Verde-Refactor? SI -- `progress/tdd_subruta_github_pages.md:259-296` documenta
   2 ciclos: ciclo 1 (@s36 nace en verde-que-no-lo-era por como transpila Vitest un argumento de mas
@@ -139,6 +149,7 @@ contrato del humilde ya establecido por F-01/F-04.
   real con codigoSalida 1 en vez de 0).
 
 ### Calidad
+
 - esEnlaceRoto es una funcion nueva, nombrada, de una sola responsabilidad, con guard clauses
   claras (base === null primero, luego !ruta.startsWith(base)).
 - Capas respetadas: la pura no lee ficheros; el humilde cablea IO y no anade logica.
@@ -171,6 +182,7 @@ para justificar un hueco en la MISMA puerta que existe porque el code review no 
 original es una tension que el propio documento no resuelve -- solo la menciona de pasada.
 
 Dicho esto, dos cosas atenuan la gravedad de la tension:
+
 1. Hoy el hueco es teorico, no real: verificado por grep propio sobre src/ que el UNICO mecanismo
    del repo que emite un href interno absoluto es Cabecera.tsx via import.meta.env.BASE_URL, que
    SIEMPRE incluye el prefijo por construccion. Todo lo demas son anclas (#...), tel:, externos o
@@ -190,6 +202,7 @@ con honestidad; pido que la tension quede escrita tambien aqui, para que nadie l
 coste".
 
 ### Hallazgos
+
 Ninguno bloqueante ni grave en `src/lib/puerta-cascaron.ts`, su test, ni `tools/puerta-cascaron.ts`.
 Ver la seccion de hallazgos transversales para lo tocado fuera de esta puerta, y el punto 3 arriba
 como discusion no bloqueante.
@@ -199,6 +212,7 @@ como discusion no bloqueante.
 ## Hallazgos transversales (fuera de las dos puertas, dentro del alcance del encargo)
 
 ### [Grave] .github/workflows/deploy-pages.yml lineas 62-63 -- PAGES_BASE_PATH es ahora una
+
 variable muerta que contradice su propio comentario
 El workflow sigue pasando `PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}` como variable de
 entorno a `pnpm build` (linea 63), y su comentario (lineas 53-55) dice literalmente que
@@ -220,6 +234,7 @@ la variable del workflow (ya no la necesita nadie), o volver a leerla desde el h
 si algun dia se quiere volver a lo dinamico.
 
 ### [Grave] feature_list.json ids 4 y 5 -- el cierre/puerta_humana no reflejan la ENMIENDA
+
 Ninguna de las dos entradas (id 4, id 5) menciona la ENMIENDA 1 de hoy: status sigue done en
 ambas (correcto, no hace falta reabrir el ciclo -- mismo patron que la ENMIENDA 4 de
 resenas_agregado_enlace/galeria_carrusel, que SI dejo nota en su campo cierre, visible en
@@ -232,6 +247,7 @@ craftsman_lead gestiona feature_list.json, no judge/tdd_craftsman, mismo criteri
 `progress/judge_retiro_whatsapp_y_carrusel.md` hallazgo 2).
 
 ### [Menor] src/main.tsx lineas 46-48 y src/components/Cabecera.tsx lineas 12-15 -- comentarios
+
 desactualizados
 Los dos ficheros conservan la frase "aunque hoy vite.config.ts no la expone" (y en Cabecera.tsx,
 "bajo el base por defecto vale / (identico a antes)"), escrita cuando estos dos ficheros se
@@ -241,6 +257,7 @@ codigo), pero induce a error a quien lea estos ficheros hoy pensando que la subr
 bloqueada.
 
 ### [Menor] Punto 3 (arriba) -- no es un hallazgo de codigo, es una discusion que pido dejar por
+
 escrito para quien implemente F-16 (ver recomendacion en la seccion F-04).
 
 ## Recomendacion feature_list.json (para el craftsman_lead, no para este judge)
@@ -255,6 +272,7 @@ proyecto), que status sigue done sin reabrir el ciclo, y las referencias a
 gestiona el craftsman_lead, no el judge (regla dura del rol).
 
 ## Checkpoints
+
 - C1: [x] `bin/harness init` verde, verificado por este judge de forma independiente
   (Node v22.15.0, tsc --noEmit 0, eslint . 0, vitest run 1310/1310, 39 ficheros).
 - C2: [x] ninguna feature en in_progress -- F-04 y F-05 siguen done, coherente con que esto es
@@ -271,7 +289,9 @@ gestiona el craftsman_lead, no el judge (regla dura del rol).
 - C7: no evaluado aqui -- la mutacion corre despues de este veredicto, como marca el proceso.
 
 ## Cambios requeridos
+
 Ninguno bloqueante. Recomendaciones no bloqueantes (no impiden APPROVED):
+
 1. .github/workflows/deploy-pages.yml -- decidir si retirar PAGES_BASE_PATH (ya no lo consume
    nadie) o volver a cablearlo; y corregir el comentario que dice evitar el hardcode del nombre del
    repo, que ya no es cierto.

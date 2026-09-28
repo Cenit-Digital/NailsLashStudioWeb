@@ -15,14 +15,14 @@
 
 ## ✅ Lo que pasó en vivo (medido en Chrome, no en jsdom)
 
-| Eje | Medido | Veredicto |
-| --- | --- | --- |
-| **LCP** | **40–48 ms** (viewport 1280 y 320) | ✅ ≪ 2,5 s p75. **C-3 (acortar la animación a ≤1,2s) funcionó**: el hero ya NO bloquea el LCP (el prototipo lo llevaba a ~5,3s) |
-| **El elemento LCP** | Es un **`<P>`** (size ~7.752–9.450), **NO el titular** (`lcp_inH1: false`) | ✅ **El `[NV]` del `clip-path` resulta MOOT**: el titular recortado nunca fue el elemento LCP, así que da igual si el clip-path lo excluye o no |
-| **`prefers-reduced-motion: reduce`** | `clip-path: inset(0px)` (visible), `opacity: 1`, `getAnimations() == []` | ✅ **El hero se ve COMPLETO y sin movimiento** bajo reduced-motion. El patrón de memoria funciona en Chrome real |
-| **Animación (movimiento normal)** | `paintReveal` termina en `finished`, `clip-path: inset(0px 0% 0px 0px)` (revelado) | ✅ La animación corre y **termina** dejando el titular visible |
-| **Reflow SC 1.4.10** | a **320px**: `scrollWidth == clientWidth == 320` | ✅ **Sin desbordamiento horizontal** |
-| **Nombre accesible del h1** | `"Nails Lash Studio"` (con el espacio real) | ✅ El text node `{' '}` funciona en Chrome real, no solo en el test |
+| Eje                                  | Medido                                                                             | Veredicto                                                                                                                                       |
+| ------------------------------------ | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **LCP**                              | **40–48 ms** (viewport 1280 y 320)                                                 | ✅ ≪ 2,5 s p75. **C-3 (acortar la animación a ≤1,2s) funcionó**: el hero ya NO bloquea el LCP (el prototipo lo llevaba a ~5,3s)                 |
+| **El elemento LCP**                  | Es un **`<P>`** (size ~7.752–9.450), **NO el titular** (`lcp_inH1: false`)         | ✅ **El `[NV]` del `clip-path` resulta MOOT**: el titular recortado nunca fue el elemento LCP, así que da igual si el clip-path lo excluye o no |
+| **`prefers-reduced-motion: reduce`** | `clip-path: inset(0px)` (visible), `opacity: 1`, `getAnimations() == []`           | ✅ **El hero se ve COMPLETO y sin movimiento** bajo reduced-motion. El patrón de memoria funciona en Chrome real                                |
+| **Animación (movimiento normal)**    | `paintReveal` termina en `finished`, `clip-path: inset(0px 0% 0px 0px)` (revelado) | ✅ La animación corre y **termina** dejando el titular visible                                                                                  |
+| **Reflow SC 1.4.10**                 | a **320px**: `scrollWidth == clientWidth == 320`                                   | ✅ **Sin desbordamiento horizontal**                                                                                                            |
+| **Nombre accesible del h1**          | `"Nails Lash Studio"` (con el espacio real)                                        | ✅ El text node `{' '}` funciona en Chrome real, no solo en el test                                                                             |
 
 ---
 
@@ -84,22 +84,22 @@ registra.
 
 ## ✅ El eje [NV] que abrió la ampliación, ahora en verde
 
-| Eje | ANTES (el fallo cazado) | AHORA (medido en vivo) |
-| --- | --- | --- |
-| `document.fonts.check('142px "Great Vibes"')` | **`false`** | **`true`** ✅ |
-| `font-family` computado de «Nails Lash» (`.heroMarca`) | `"Times New Roman"` (fallback UA) | **`"Great Vibes", cursive`** ✅ |
-| `font-family` computado de «Studio» (`.heroStudio`) | heredado del cuerpo | **`Manrope, sans-serif`** ✅ |
-| `Great Vibes 400` en `document.fonts` | `unloaded` | **`loaded`** ✅ |
-| Nombre accesible del `<h1>` | — | **`Nails Lash Studio`** ✅ (text node `{' '}` real) |
-| CSS horneado en `dist/assets/*.css` | sin `font-family` en el titular | `._heroMarca{font-family:Great Vibes,cursive;…}` · `._heroStudio{font-family:Manrope,sans-serif;…}` ✅ |
+| Eje                                                    | ANTES (el fallo cazado)           | AHORA (medido en vivo)                                                                                 |
+| ------------------------------------------------------ | --------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `document.fonts.check('142px "Great Vibes"')`          | **`false`**                       | **`true`** ✅                                                                                          |
+| `font-family` computado de «Nails Lash» (`.heroMarca`) | `"Times New Roman"` (fallback UA) | **`"Great Vibes", cursive`** ✅                                                                        |
+| `font-family` computado de «Studio» (`.heroStudio`)    | heredado del cuerpo               | **`Manrope, sans-serif`** ✅                                                                           |
+| `Great Vibes 400` en `document.fonts`                  | `unloaded`                        | **`loaded`** ✅                                                                                        |
+| Nombre accesible del `<h1>`                            | —                                 | **`Nails Lash Studio`** ✅ (text node `{' '}` real)                                                    |
+| CSS horneado en `dist/assets/*.css`                    | sin `font-family` en el titular   | `._heroMarca{font-family:Great Vibes,cursive;…}` · `._heroStudio{font-family:Manrope,sans-serif;…}` ✅ |
 
 ## ✅ Regresión / invariantes (Chrome real headless CDP, 3 ramas)
 
-| Escenario | Great Vibes | `font-family` | LCP | ¿LCP en `<h1>`? | reflow | anims |
-| --- | --- | --- | --- | --- | --- | --- |
-| normal 1280 | `true` | `"Great Vibes", cursive` | **216 ms** | `false` (`<P>`/`<H3>`) | `scrollW==clientW==1258` | `paintReveal: finished` |
-| reduced-motion 1280 | `true` | `"Great Vibes", cursive` | **156 ms** | `false` | `1258==1258` | **`[]`** (sin movimiento residual) |
-| reflow 320 | `true` | `"Great Vibes", cursive` | **136 ms** | `false` | **`320==320`** (sin desborde) | `paintReveal: finished` |
+| Escenario           | Great Vibes | `font-family`            | LCP        | ¿LCP en `<h1>`?        | reflow                        | anims                              |
+| ------------------- | ----------- | ------------------------ | ---------- | ---------------------- | ----------------------------- | ---------------------------------- |
+| normal 1280         | `true`      | `"Great Vibes", cursive` | **216 ms** | `false` (`<P>`/`<H3>`) | `scrollW==clientW==1258`      | `paintReveal: finished`            |
+| reduced-motion 1280 | `true`      | `"Great Vibes", cursive` | **156 ms** | `false`                | `1258==1258`                  | **`[]`** (sin movimiento residual) |
+| reflow 320          | `true`      | `"Great Vibes", cursive` | **136 ms** | `false`                | **`320==320`** (sin desborde) | `paintReveal: finished`            |
 
 - **LCP 136-216 ms** ≪ 2,5 s p75 [V: web.dev] con Great Vibes YA en el camino crítico (43 KB woff2,
   status 200). El acceptance decía «el LCP medido (40 ms) aguanta Great Vibes»; ahora, con la fuente
@@ -118,8 +118,8 @@ registra.
 - **Consola limpia en carga:** el único mensaje es `Content Script: Initializing` de la PROPIA
   extensión (`chrome-extension://…`), no de la app. 0 errores / 0 warnings de la página.
 - **Captura visual:** el `<h1>` muestra «Nails Lash» en la cursiva de marca (Great Vibes, rosa `--ink`)
-  + «Studio» en Manrope — el diseño Opcion-1-Rosa. La partición en dos `<span>` por fin aporta su
-  contraste tipográfico.
+  - «Studio» en Manrope — el diseño Opcion-1-Rosa. La partición en dos `<span>` por fin aporta su
+    contraste tipográfico.
 
 ## 🟡 Hallazgos FUERA DE ALCANCE de F-07 (reportados, NO tocados — una feature a la vez)
 
@@ -137,6 +137,7 @@ registra.
    global del cuerpo. Candidato a su propia feature. **Deuda declarada, no reparada.**
 
 ## Veredicto de la fase EN VIVO
+
 **PASS.** El eje [NV] que abrió la ampliación (¿el navegador PINTA Great Vibes?) queda **cerrado en
 verde**, medido por la extensión de Chrome del humano Y por CDP headless. Sin regresión (LCP, reduced-
 motion, reflow, contraste, cero terceros, consola). Los 2 hallazgos fuera de alcance quedan DECLARADOS

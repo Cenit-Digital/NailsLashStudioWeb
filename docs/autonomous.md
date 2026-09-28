@@ -23,18 +23,18 @@ la metodología y una plantilla pública, así que **la fusión es siempre manua
 
 ## Arquitectura (los ficheros)
 
-| Fichero | Rol |
-| --- | --- |
-| `.github/workflows/autonomous-evolve.yml` | El disparador. Deliberadamente "tonto": cron + `workflow_dispatch`, permisos mínimos, apunta al mandato y para. |
-| `.github/AUTONOMOUS.md` | El mandato. Alcance, **límites duros**, política de fusión, formato del PR y **backlog por niveles de riesgo**. Es la fuente de verdad. |
+| Fichero                                       | Rol                                                                                                                                                                                    |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `.github/workflows/autonomous-evolve.yml`     | El disparador. Deliberadamente "tonto": cron + `workflow_dispatch`, permisos mínimos, apunta al mandato y para.                                                                        |
+| `.github/AUTONOMOUS.md`                       | El mandato. Alcance, **límites duros**, política de fusión, formato del PR y **backlog por niveles de riesgo**. Es la fuente de verdad.                                                |
 | `.github/workflows/guard-sensitive-paths.yml` | Guardián. En cada PR, si se tocan rutas sensibles (el propio workflow, el mandato, la CI o el motor) etiqueta el PR con `permissions-change` para que la revisión no lo pase por alto. |
-| `.github/CODEOWNERS` | Fuerza revisión del dueño sobre esas mismas rutas sensibles (efectivo cuando la protección de rama exige "review from Code Owners"). |
+| `.github/CODEOWNERS`                          | Fuerza revisión del dueño sobre esas mismas rutas sensibles (efectivo cuando la protección de rama exige "review from Code Owners").                                                   |
 
 ## Requisitos previos
 
 1. **Node.js ≥ 18** — ya es requisito del arnés; el runner lo trae.
 2. **Secret `CLAUDE_CODE_OAUTH_TOKEN`** en este repo
-   (*Settings → Secrets and variables → Actions → New repository secret*). Es el
+   (_Settings → Secrets and variables → Actions → New repository secret_). Es el
    mismo token de `claude setup-token` que usa el bot de docs: está ligado a tu
    cuenta, no al repo, pero **los secrets no se heredan entre repos**, así que
    hay que darlo de alta aquí también. (Usa el mismo valor en ambos repos; si
@@ -61,38 +61,39 @@ falta crearlas a mano**: se crean de forma idempotente antes de usarse.
       Este repo es **privado** y la organización está en plan **Free**, y en esa
       combinación GitHub **no aplica** la protección de rama: puedes crear la
       regla, pero no hace nada. Lo dice él mismo al intentarlo, literalmente:
-      *"Your rules won't be enforced on this private repository until you upgrade
-      this organization to GitHub Team or Enterprise"* (y en la pestaña de
+      _"Your rules won't be enforced on this private repository until you upgrade
+      this organization to GitHub Team or Enterprise"_ (y en la pestaña de
       rulesets, lo equivalente). Así que, en ESTE repo, "solo abre PR" **no puede
       imponerse mecánicamente**: descansa en el mandato, en el guardián de rutas
       sensibles y en tu revisión, igual que en `SistemaDeMemoriaUncleBob` (que es
       privado por lo mismo). Es una razón más para no encender el bot todavía
       (ver § Cadencia).
 
-      Si algún día la organización sube a **GitHub Team**, esto se activa solo y
-      entonces sí merece la pena hacer la checklist de abajo — que es la del repo
-      canónico de la plantilla, que **sí** es público y **sí** la tiene puesta.
-      En *Settings → Branches → Add branch protection rule* (o *Settings → Rules
-      → Rulesets*) sobre `main`:
-    - ✅ *Require a pull request before merging* → *Require approvals: 1* y
-      ✅ *Require review from Code Owners*.
-    - ✅ *Require status checks to pass before merging* y añade los checks de la
-      CI: `Arnés raíz (init)`, `Ejemplo Python (init + mutación 100%)`,
-      `Ejemplo Node (init + mutación 100%)`.
-    - ✅ *Block force pushes* (y no permitir push directo a `main`).
-    - ✅ *Do not allow bypassing the above settings* — o, si quieres poder actuar
-      tú directamente en una urgencia, limita el *bypass* a administradores, pero
-      **nunca** incluyas la GitHub App de Claude en la lista de bypass.
-      Referencia oficial: <https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches>.
-    - ℹ️ *Si eres el único mantenedor:* "Require approvals: 1" no deja auto-aprobar
-      tus propios PRs, y podrías bloquearte a ti mismo. Deja tu cuenta como
-      *bypass* de administrador para tu trabajo, o prescinde del requisito de
-      aprobación humana confiando en los *required checks*. Lo **imprescindible
-      contra el bot** es más simple: *exigir PR y bloquear el push directo a
-      `main`*, con la App de Claude fuera de cualquier *bypass*. Las aprobaciones
-      humanas y el review de Code Owners son calidad de revisión añadida.
-- [ ] Probar sin esperar al próximo lunes/miércoles/viernes: *Actions →
-      «Evolución autónoma del arnés» → Run workflow* (`workflow_dispatch`); marca
+  Si algún día la organización sube a **GitHub Team**, esto se activa solo y
+  entonces sí merece la pena hacer la checklist de abajo — que es la del repo
+  canónico de la plantilla, que **sí** es público y **sí** la tiene puesta.
+  En _Settings → Branches → Add branch protection rule_ (o _Settings → Rules
+  → Rulesets_) sobre `main`:
+  - ✅ _Require a pull request before merging_ → _Require approvals: 1_ y
+    ✅ _Require review from Code Owners_.
+  - ✅ _Require status checks to pass before merging_ y añade los checks de la
+    CI: `Arnés raíz (init)`, `Ejemplo Python (init + mutación 100%)`,
+    `Ejemplo Node (init + mutación 100%)`.
+  - ✅ _Block force pushes_ (y no permitir push directo a `main`).
+  - ✅ _Do not allow bypassing the above settings_ — o, si quieres poder actuar
+    tú directamente en una urgencia, limita el _bypass_ a administradores, pero
+    **nunca** incluyas la GitHub App de Claude en la lista de bypass.
+    Referencia oficial: <https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches>.
+  - ℹ️ _Si eres el único mantenedor:_ "Require approvals: 1" no deja auto-aprobar
+    tus propios PRs, y podrías bloquearte a ti mismo. Deja tu cuenta como
+    _bypass_ de administrador para tu trabajo, o prescinde del requisito de
+    aprobación humana confiando en los _required checks_. Lo **imprescindible
+    contra el bot** es más simple: _exigir PR y bloquear el push directo a
+    `main`_, con la App de Claude fuera de cualquier _bypass_. Las aprobaciones
+    humanas y el review de Code Owners son calidad de revisión añadida.
+
+- [ ] Probar sin esperar al próximo lunes/miércoles/viernes: _Actions →
+      «Evolución autónoma del arnés» → Run workflow_ (`workflow_dispatch`); marca
       **`forzar`** si quieres saltarte la guarda de PR abierto. Requiere que el
       workflow ya esté en la rama por defecto **y** que el job esté encendido
       (ver § Cadencia: hoy no lo está, a propósito).
@@ -106,15 +107,15 @@ falta crearlas a mano**: se crean de forma idempotente antes de usarse.
 - **Consumidores de la plantilla** (quien haga "Use this template"): el workflow
   se copia, pero el job **no corre** salvo que se opte explícitamente creando la
   variable de repo `ENABLE_AUTONOMOUS_EVOLVE=true`
-  (*Settings → Secrets and variables → Actions → Variables*). Verás un run
-  marcado como *skipped* cada lunes, miércoles y viernes mientras no optes: es
+  (_Settings → Secrets and variables → Actions → Variables_). Verás un run
+  marcado como _skipped_ cada lunes, miércoles y viernes mientras no optes: es
   inofensivo (un job saltado no consume minutos ni hace fallar nada). Así ningún
   proyecto nuevo hereda un bot programado que no pidió. **Este repo es uno de
   esos consumidores y hoy NO ha optado**: lee § Cadencia antes de crear la
   variable.
 - **Desactivarlo del todo**: borra `.github/workflows/autonomous-evolve.yml` (y,
   si quieres, `.github/AUTONOMOUS.md` y `.github/workflows/guard-sensitive-paths.yml`),
-  o desactiva el workflow desde la pestaña *Actions*.
+  o desactiva el workflow desde la pestaña _Actions_.
 
 ## Cadencia
 
@@ -130,14 +131,14 @@ guarda que impide que haya más de un PR del bot esperando revisión a la vez.
 > El cron está puesto, pero el job no corre: este repo nació de
 > `TemplateSSDUncleBob` con "Use this template", y la guarda de plantilla
 > (`if: github.repository == 'Cenit-Digital/TemplateSSDUncleBob' || vars.ENABLE_AUTONOMOUS_EVOLVE == 'true'`)
-> lo deja en *skipped* mientras no crees la variable. **No la crees todavía.**
+> lo deja en _skipped_ mientras no crees la variable. **No la crees todavía.**
 >
 > El motivo no es el cron: es el mandato. `.github/AUTONOMOUS.md` también se
 > copió literal, así que **el mandato de este repo sigue siendo el de la
 > plantilla** — se titula "Evolución autónoma — TemplateSSDUncleBob" y su
 > backlog habla de adaptadores, ejemplos y el motor `.harness/`. Peor aún: su
 > **límite 4 prohíbe expresamente** tocar `features/`, `progress/`, `src/`,
-> `project-spec.md` y `feature_list.json`, que es justo *todo* el proyecto de
+> `project-spec.md` y `feature_list.json`, que es justo _todo_ el proyecto de
 > NailsLash. Encender el bot hoy no te daría un bot que avanza la web de la
 > clienta: te daría uno que **tiene prohibido tocarla** y que se dedicaría a
 > reescribir el motor del arnés dentro del repo de un cliente, derivando de la
@@ -155,12 +156,12 @@ guarda que impide que haya más de un PR del bot esperando revisión a la vez.
 >    así que un bot no puede recorrer el ciclo SDD entero por su cuenta sin
 >    saltársela. Mira `.github/AUTONOMOUS.md` de `WebEmpresa` como ejemplo de
 >    mandato de proyecto que respeta esa puerta.
-> 2. Crear la variable `ENABLE_AUTONOMOUS_EVOLVE=true` en *Settings → Secrets and
->    variables → Actions → **pestaña Variables***. (Es una *variable*, no un
->    *secret*: los secrets `CLAUDE_CODE_OAUTH_TOKEN` y `ORG_READ_TOKEN` que ya
+> 2. Crear la variable `ENABLE_AUTONOMOUS_EVOLVE=true` en _Settings → Secrets and
+>    variables → Actions → **pestaña Variables**_. (Es una _variable_, no un
+>    _secret_: los secrets `CLAUDE_CODE_OAUTH_TOKEN` y `ORG_READ_TOKEN` que ya
 >    están dados de alta aquí no encienden nada por sí solos.)
 >
-> Mientras tanto verás runs *skipped* los lunes, miércoles y viernes: son
+> Mientras tanto verás runs _skipped_ los lunes, miércoles y viernes: son
 > inofensivos y no consumen minutos.
 
 > Avisos sobre workflows programados, de la doc oficial de GitHub:
@@ -175,7 +176,7 @@ guarda que impide que haya más de un PR del bot esperando revisión a la vez.
 >   automatically disabled when no repository activity has occurred in 60 days".
 >   Este repo es **privado**, y sobre los privados la doc no dice nada, ni a
 >   favor ni en contra — así que no demos por hecho que estamos exentos. Si dejas
->   de ver runs, revisa la pestaña *Actions*. (Los fallos de runs programadas se
+>   de ver runs, revisa la pestaña _Actions_. (Los fallos de runs programadas se
 >   notifican por email al último que tocó el fichero del workflow.)
 
 ## Modelo de seguridad
@@ -186,7 +187,7 @@ fe del bot:
 
 - **Alcance total, fusión manual — pero aquí NO mecánica.** El bot puede tocar
   cualquier cosa; nada debería llegar a `main` sin que un humano lea el diff y
-  pulse *merge*. En el repo canónico de la plantilla eso lo impone GitHub con la
+  pulse _merge_. En el repo canónico de la plantilla eso lo impone GitHub con la
   protección de rama; **en este repo, no**: privado + plan Free = la protección
   no se aplica (ver § Puesta en marcha). Aquí la garantía es solo el mandato, el
   guardián y tu revisión — la misma postura honesta que `SistemaDeMemoriaUncleBob`.
@@ -201,7 +202,7 @@ fe del bot:
   autodeclaración deja de ser el único mecanismo.
 - **Sin trampas para la CI.** Prohibido borrar/relajar tests o bajar el umbral de
   mutación para forzar el verde (límite 2). Marcar los jobs de `harness-ci.yml`
-  como *required checks* (checklist) cierra el hueco de que un PR borre la CI y se
+  como _required checks_ (checklist) cierra el hueco de que un PR borre la CI y se
   presente en verde: si el check desaparece, el merge queda bloqueado.
 - **El umbral de mutación no baja.** Los ejemplos están al 100%; cualquiera nuevo
   se mide igual (límite 3).
@@ -228,7 +229,7 @@ Tres cortafuegos van de serie en el workflow:
 - `--max-budget-usd 15` — techo de gasto por ejecución. La
   [referencia oficial del CLI](https://code.claude.com/docs/en/cli-reference)
   lo documenta ("Maximum dollar amount to spend on API calls before stopping",
-  *print mode only* — que es como corre la acción).
+  _print mode only_ — que es como corre la acción).
 
 Matiz importante según cómo autentiques:
 
@@ -256,7 +257,7 @@ enlace de creación. Por eso el prompt instruye al bot a abrirlo él mismo con
 que `harness-ci.yml` (que dispara en `pull_request`) corra sobre ese PR, el push
 y el PR deben crearse con el token de la **GitHub App de Claude**, no con el
 `GITHUB_TOKEN` por defecto (los eventos del `GITHUB_TOKEN` no disparan otros
-workflows). No es cuestión de la *firma* del commit, sino de qué token crea el
+workflows). No es cuestión de la _firma_ del commit, sino de qué token crea el
 evento. Con la App instalada, ese es el caso. Si alguna vez la CI no arrancara,
 el bot lo indica en el PR para que la relances a mano.
 

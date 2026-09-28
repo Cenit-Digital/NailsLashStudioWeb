@@ -4,10 +4,10 @@
 **Ficheros mutados:** `src/lib/placeholders.ts` y `src/lib/puerta.ts` (lista `mutate`
 de `stryker.config.json`). `tools/puerta-placeholders.ts` NO se muta (humble object).
 
-| Fichero | Score | killed | survived | ignored |
-| --- | --- | --- | --- | --- |
-| `src/lib/placeholders.ts` | 100.00% | 87 | **0** | 1 (equivalente, ver §3) |
-| `src/lib/puerta.ts` | 100.00% | — | **0** | 0 |
+| Fichero                   | Score   | killed | survived | ignored                 |
+| ------------------------- | ------- | ------ | -------- | ----------------------- |
+| `src/lib/placeholders.ts` | 100.00% | 87     | **0**    | 1 (equivalente, ver §3) |
+| `src/lib/puerta.ts`       | 100.00% | —      | **0**    | 0                       |
 
 > **La cifra que vale es la de una corrida SIN carga.** Todo lo de abajo se midió a
 > `--concurrency 2`; el equivalente se confirmó también a `--concurrency 1`.
@@ -16,15 +16,15 @@ de `stryker.config.json`). `tools/puerta-placeholders.ts` NO se muta (humble obj
 
 El primer `mutation_tester` reportó «100 %, 0 survived» y **no era cierto**. Corrió
 mientras el workflow tenía muchos agentes compitiendo por CPU: **134 de 147 mutantes
-hicieron *timeout*** y Stryker cuenta el timeout como muerto. Su razonamiento —«un
+hicieron _timeout_** y Stryker cuenta el timeout como muerto. Su razonamiento —«un
 superviviente real termina, no cuelga, así que 0 survived no puede enmascarar nada»—
 **es precisamente el error**: un superviviente que ADEMÁS hace timeout se cuenta como
 muerto y desaparece del informe. Bajo carga, los supervivientes se disfrazan de kills.
 
 Correr la mutación **en tranquilo, a baja concurrencia**, destapó **tres** hallazgos
 reales que la corrida de alta concurrencia tapaba. Regla para el futuro:
-*la puerta de mutación se corre a baja concurrencia; un informe con muchos timeouts no
-es de fiar.*
+_la puerta de mutación se corre a baja concurrencia; un informe con muchos timeouts no
+es de fiar._
 
 ## Los tres hallazgos y su resolución
 

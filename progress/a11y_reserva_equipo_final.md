@@ -10,6 +10,7 @@ Alcance: solo el diff de `src/components/Reserva.tsx` + `reserva.module.scss` y 
 ## 1. Nombre accesible de los dos enlaces nuevos — SC 2.4.4 (Link Purpose, In Context) — PASS 🔵
 
 `src/components/Reserva.tsx:107-112`:
+
 ```
 <a className="demo-btn demo-btn--wa" href={waHref(...)}>WhatsApp</a>
 <a className="demo-btn demo-btn--ghost" href={telHref(...)}>Llamar al estudio</a>
@@ -32,10 +33,12 @@ Alcance: solo el diff de `src/components/Reserva.tsx` + `reserva.module.scss` y 
 ## 2. Tamaño de objetivo — SC 2.5.8 (Target Size Minimum, AA, 24×24 CSS) — PASS
 
 `.demo-btn` en `src/styles/_demo.scss:129-139`:
+
 ```
 padding: 0.9375rem 2rem; // 15px 32px
 font-size: 0.9375rem;    // 15px, line-height "normal" (sin override, ~1.15-1.2)
 ```
+
 Altura renderizada ≈ 15px×2 + (~15×1.15-1.2) ≈ **47-48px**. Anchura (contenido + 64px de padding
 horizontal): «WhatsApp» ≈ 125-135px, «Llamar al estudio» ≈ 205-215px. Ambos ejes superan
 sobradamente el mínimo AA de 24×24 y **mantienen el suelo histórico de 44×44** que ya traía el
@@ -45,7 +48,7 @@ repo (mismo patrón que `.flotante` en `boton-whatsapp.module.scss:17`, 56×56).
 
 - **2.4.7**: no hay ninguna regla de foco propia en `reserva.module.scss` para `.acciones a`, así que
   aplica la regla GLOBAL `src/styles/_base.scss:18-22` (`outline: 3px solid var(--border-interactive);
-  outline-offset: 2px;`), ya probada por `cascara-global.test.ts`. PASA.
+outline-offset: 2px;`), ya probada por `cascara-global.test.ts`. PASA.
 - **2.4.11**: el botón flotante de WhatsApp (`src/components/boton-whatsapp.module.scss:10-24`) es
   `position: fixed; right/bottom: 1.25rem; z-index: 1000;` con caja de 56×56px, y **no existe
   `scroll-padding-bottom`** que lo compense (solo hay `scroll-padding-top: 6rem` en
@@ -61,11 +64,13 @@ repo (mismo patrón que `.flotante` en `boton-whatsapp.module.scss:17`, 56×56).
 ## 4. Monograma decorativo — ¿fuera del árbol de accesibilidad? — PASS
 
 `src/components/Equipo.tsx:74-75`:
+
 ```
 <div className={estilos.foto} aria-hidden="true">
   <span className={estilos.monograma}>{inicialDe(profesional.nombre)}</span>
 </div>
 ```
+
 Confirmado en `dist/index.html`: `aria-hidden="true"><span class="_monograma_1imbm_26">L</span>`
 (y C/A/N/M/P/S para el resto). `aria-hidden="true"` en el contenedor saca TODO su subárbol
 (incluido el `<span>` con la letra) del árbol de accesibilidad — un lector de pantalla NO
@@ -113,6 +118,7 @@ Ni `Reserva.tsx`/`reserva.module.scss` ni `Equipo.tsx`/`equipo.module.scss` aña
 ---
 
 ### Resumen de hallazgos
+
 - 🔴 Bloqueantes: **0**
 - 🟡 Importantes: **0**
 - 🔵 Menores: **2** — (a) `aria-label` opcional en «WhatsApp» para navegación fuera de contexto

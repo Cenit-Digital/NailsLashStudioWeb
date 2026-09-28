@@ -64,7 +64,7 @@
 
 - Círculos de **44×44 px** (SC 2.5.8) absolutos sobre `.marco`: ← a la izquierda, → a la derecha,
   centrados verticalmente; ⏸/▶ arriba a la derecha. `background:
-  color-mix(in srgb, var(--surface) 78%, transparent)` + `backdrop-filter: blur(8px)` + borde
+color-mix(in srgb, var(--surface) 78%, transparent)` + `backdrop-filter: blur(8px)` + borde
   `var(--border-interactive)` + glifo `var(--accent-dark)`. Hover: borde `--accent-dark` y
   elevación sutil. El auditor a11y debe verificar 1.4.11 en el PEOR caso (glifo/borde sobre foto
   clara a través del cristal — el 78 % de `--surface` da base sólida).
@@ -79,7 +79,7 @@
 - **`src/components/Resenas.tsx`** (cablea) + **`resenas.module.scss`** (mide) +
   **`src/lib/demo/resenas-demo.ts`** (6 testimonios de EJEMPLO: autora nombre de pila + texto
   1-2 frases + nota 4-5 + servicio; NADA que se presente como real; leyenda obligatoria visible)
-  + **`src/lib/resenas-agregado.ts`** (el dato fechado de §2).
+  - **`src/lib/resenas-agregado.ts`** (el dato fechado de §2).
 - **Reutiliza la aritmética pura de `galeria-logica.ts`** (indiceCircular, distanciaCircular,
   claveDistancia, signoDe, capaDe, debeRotar, vozDeLaPista, pasosDelArrastre…): importa, NO
   duplica. Lo NUEVO compartido (teclado §3, reinicio de reloj, cadencia) vive en

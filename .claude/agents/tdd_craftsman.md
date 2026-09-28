@@ -41,13 +41,13 @@ REFACTOR → limpia con la barra verde: nombres, duplicación, funciones cortas
 3. **Por cada escenario `@s` en orden**, ejecuta uno o más ciclos
    Rojo-Verde-Refactor:
    a. **ROJO** — escribe un test que codifica ese Given/When/Then y verifica
-      que **falla** (`bin/harness test`). Un test que pasa a la primera no
-      demuestra nada: ajústalo o sospecha.
+   que **falla** (`bin/harness test`). Un test que pasa a la primera no
+   demuestra nada: ajústalo o sospecha.
    b. **VERDE** — la mínima implementación en `src/` que lo pone verde.
    c. **REFACTOR** — con la barra verde, elimina duplicación y mejora nombres.
-      Vuelve a correr los tests tras cada cambio.
+   Vuelve a correr los tests tras cada cambio.
    d. Apunta el ciclo en `progress/tdd_<name>.md` (qué `@s`, qué test, qué
-      cambio mínimo).
+   cambio mínimo).
 4. **Trazabilidad**: cada escenario `@s` debe quedar cubierto por al menos un
    test concreto. Escribe el mapa `@s → test` en `progress/tdd_<name>.md`.
 5. Ejecuta `bin/harness init`. Verde de punta a punta.
@@ -62,11 +62,11 @@ REFACTOR → limpia con la barra verde: nombres, duplicación, funciones cortas
 - ❌ Una sola feature por sesión.
 - ❌ No "adelantes" código para escenarios futuros. Un `@s` a la vez.
 - ❌ Si un escenario no se puede satisfacer sin desviarse del `.feature`,
-   paras y pides cambios al contrato — no inventas comportamiento.
+  paras y pides cambios al contrato — no inventas comportamiento.
 - ✅ Refactoriza SOLO en verde. Si los tests están rojos, no refactorizas:
-   arreglas.
+  arreglas.
 - ✅ Funciones cortas, nombres reveladores, sin números mágicos
-   (`docs/conventions.md`).
+  (`docs/conventions.md`).
 
 ## Comunicación con el lead
 
@@ -75,7 +75,9 @@ Tu respuesta final es **una sola línea**:
 ```
 green -> progress/tdd_<name>.md
 ```
+
 o
+
 ```
 blocked -> progress/tdd_<name>.md
 ```

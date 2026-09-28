@@ -23,10 +23,10 @@ aniadir tests nunca baja un score y aqui ni se rozaron. Baseline **629/629 verde
 
 ### Salud del informe — SE LEE ANTES QUE EL SCORE
 
-| Fichero | Concurrencia | `# timeout` | tests/mutante (vs ronda anterior) | dry run (tests que cubren) | `# errors` | Vale? |
-| ------- | ------------ | ----------- | --------------------------------- | -------------------------- | ---------- | ----- |
-| `src/lib/puerta-anclas.ts` | `--concurrency 1` | **0** | **4,17** (subio desde 3,64) | **39** (subio desde 28) | 0 | **si** |
-| `src/components/MenuNavegacion.tsx` | `--concurrency 1` | **0** | **2,33** (bajo desde 3,00) | **12** (subio desde 11) | 0 | **si** |
+| Fichero                             | Concurrencia      | `# timeout` | tests/mutante (vs ronda anterior) | dry run (tests que cubren) | `# errors` | Vale?  |
+| ----------------------------------- | ----------------- | ----------- | --------------------------------- | -------------------------- | ---------- | ------ |
+| `src/lib/puerta-anclas.ts`          | `--concurrency 1` | **0**       | **4,17** (subio desde 3,64)       | **39** (subio desde 28)    | 0          | **si** |
+| `src/components/MenuNavegacion.tsx` | `--concurrency 1` | **0**       | **2,33** (bajo desde 3,00)        | **12** (subio desde 11)    | 0          | **si** |
 
 1. **`# timeout` = 0 en los dos** -> el score se puede leer. `puerta-anclas.ts` es codigo puro sin
    bucles largos; `MenuNavegacion.tsx` renderiza con Testing Library. Ni un timeout -> no hay mentira
@@ -55,13 +55,13 @@ pnpm exec stryker run --mutate src/components/MenuNavegacion.tsx  --concurrency 
 
 ### El score — ya con derecho a leerse
 
-| Fichero | `# timeout` | tests/mut | Total | Killed | **Survived** | **NoCov** | `# errors` | Score |
-| ------- | ----------- | --------- | ----- | ------ | ------------ | --------- | ---------- | ----- |
-| `src/lib/puerta-anclas.ts` | **0** | 4,17 | **149** | 149 | **0** | **0** | 0 | **100,00 %** |
-| `src/components/MenuNavegacion.tsx` | **0** | 2,33 | **6** | 6 | **0** | **0** | 0 | **100,00 %** |
-| `src/components/Cabecera.tsx` (sin cambios) | — | — | **1** | 1 | **0** | 0 | 0 | **100,00 %** |
-| `src/components/Pie.tsx` (sin cambios) | — | — | **1** | 1 | **0** | 0 | 0 | **100,00 %** |
-| **Feature** | **0** | — | **157** | **157** | **0** | **0** | 0 | **100,00 %** |
+| Fichero                                     | `# timeout` | tests/mut | Total   | Killed  | **Survived** | **NoCov** | `# errors` | Score        |
+| ------------------------------------------- | ----------- | --------- | ------- | ------- | ------------ | --------- | ---------- | ------------ |
+| `src/lib/puerta-anclas.ts`                  | **0**       | 4,17      | **149** | 149     | **0**        | **0**     | 0          | **100,00 %** |
+| `src/components/MenuNavegacion.tsx`         | **0**       | 2,33      | **6**   | 6       | **0**        | **0**     | 0          | **100,00 %** |
+| `src/components/Cabecera.tsx` (sin cambios) | —           | —         | **1**   | 1       | **0**        | 0         | 0          | **100,00 %** |
+| `src/components/Pie.tsx` (sin cambios)      | —           | —         | **1**   | 1       | **0**        | 0         | 0          | **100,00 %** |
+| **Feature**                                 | **0**       | —         | **157** | **157** | **0**        | **0**     | 0          | **100,00 %** |
 
 Stryker salio con **codigo 0** en los dos ficheros re-medidos («Final mutation score of 100.00 is
 greater than or equal to break threshold 100»). **Ni un superviviente, ni un equivalente**: el
@@ -78,12 +78,12 @@ refactor cerro el hueco sin abrir otro. **Nada que escalar.**
 > «Un informe con timeouts MIENTE» (`docs/verification.md` s.52). «Un `tests per mutant` desplomado
 > miente al reves e INVENTA supervivientes» (s.77). **Ninguna de las dos mordio aqui, y esta probado.**
 
-| Fichero | Concurrencia | `# timeout` | tests/mutante | dry run (tests que cubren) | `# errors` | `# no cov` | Vale? |
-| ------- | ------------ | ----------- | ------------- | -------------------------- | ---------- | ---------- | ----- |
-| `puerta-anclas.ts` | `--concurrency 1` | **0** | **3,64** | **28** | 0 | 1 | **si** |
-| `Cabecera.tsx` | `--concurrency 1` | **0** | **1,00** | **11** | 0 | 0 | **si** |
-| `MenuNavegacion.tsx` | `--concurrency 1` | **0** | **3,00** | **11** | 0 | 0 | **si** |
-| `Pie.tsx` | `--concurrency 1` | **0** | **1,00** | **11** | 0 | 0 | **si** |
+| Fichero              | Concurrencia      | `# timeout` | tests/mutante | dry run (tests que cubren) | `# errors` | `# no cov` | Vale?  |
+| -------------------- | ----------------- | ----------- | ------------- | -------------------------- | ---------- | ---------- | ------ |
+| `puerta-anclas.ts`   | `--concurrency 1` | **0**       | **3,64**      | **28**                     | 0          | 1          | **si** |
+| `Cabecera.tsx`       | `--concurrency 1` | **0**       | **1,00**      | **11**                     | 0          | 0          | **si** |
+| `MenuNavegacion.tsx` | `--concurrency 1` | **0**       | **3,00**      | **11**                     | 0          | 0          | **si** |
+| `Pie.tsx`            | `--concurrency 1` | **0**       | **1,00**      | **11**                     | 0          | 0          | **si** |
 
 1. **`# timeout` = 0 en los CUATRO.** `puerta-anclas.ts` es **codigo puro sin un solo bucle largo**:
    un timeout ahi seria imposible por construccion y contaria como MUERTO inflando el score (la
@@ -98,12 +98,12 @@ refactor cerro el hueco sin abrir otro. **Nada que escalar.**
    supervivientes «que deberian morir obviamente» se aplicaron **a mano** al fichero real y se corrio
    la **suite COMPLETA (617 tests)**:
 
-| Sabotaje (mutante aplicado a mano) | Tests corridos | Fallos | Veredicto |
-| ---------------------------------- | -------------- | ------ | --------- |
-| `puerta-anclas.ts:91` `if (headings.has(referencia))` -> `if (true)` | **617** | **0** | **SOBREVIVE (real)** |
-| `puerta-anclas.ts:215` `.some(...)` -> `.every(...)` (guarda @s7) | **617** | **0** | **SOBREVIVE (real)** |
-| `puerta-anclas.ts:53` `if (href !== undefined && ...)` -> `if (true && ...)` | **617** | **0** | **SOBREVIVE (real)** |
-| `MenuNavegacion.tsx:5` `ID_LISTA = "menu-navegacion"` -> `""` | **617** | **0** | **SOBREVIVE (real)** |
+| Sabotaje (mutante aplicado a mano)                                           | Tests corridos | Fallos | Veredicto            |
+| ---------------------------------------------------------------------------- | -------------- | ------ | -------------------- |
+| `puerta-anclas.ts:91` `if (headings.has(referencia))` -> `if (true)`         | **617**        | **0**  | **SOBREVIVE (real)** |
+| `puerta-anclas.ts:215` `.some(...)` -> `.every(...)` (guarda @s7)            | **617**        | **0**  | **SOBREVIVE (real)** |
+| `puerta-anclas.ts:53` `if (href !== undefined && ...)` -> `if (true && ...)` | **617**        | **0**  | **SOBREVIVE (real)** |
+| `MenuNavegacion.tsx:5` `ID_LISTA = "menu-navegacion"` -> `""`                | **617**        | **0**  | **SOBREVIVE (real)** |
 
 **Los 4 dejan la suite en verde con el defecto dentro** -> son agujeros reales, no supervivientes
 inventados por una medicion rota. Los **617 tests corridos** cuadran con el baseline (**617/617
@@ -126,13 +126,13 @@ pnpm exec stryker run --mutate src/components/Pie.tsx            --concurrency 1
 
 ## 2. Informe por fichero — el score, ya con derecho a leerse
 
-| Fichero | `# timeout` | tests/mut | Total | Killed | **Survived** | **NoCov** | Score |
-| ------- | ----------- | --------- | ----- | ------ | ------------ | --------- | ----- |
-| `src/lib/puerta-anclas.ts` | **0** | 3,64 | **148** | 128 | **19** | **1** | **86,49 %** |
-| `src/components/Cabecera.tsx` | **0** | 1,00 | **1** | 1 | **0** | 0 | **100,00 %** |
-| `src/components/MenuNavegacion.tsx` | **0** | 3,00 | **6** | 5 | **1** | 0 | **83,33 %** |
-| `src/components/Pie.tsx` | **0** | 1,00 | **1** | 1 | **0** | 0 | **100,00 %** |
-| **Feature** | **0** | — | **156** | **135** | **20** | **1** | **86,54 %** |
+| Fichero                             | `# timeout` | tests/mut | Total   | Killed  | **Survived** | **NoCov** | Score        |
+| ----------------------------------- | ----------- | --------- | ------- | ------- | ------------ | --------- | ------------ |
+| `src/lib/puerta-anclas.ts`          | **0**       | 3,64      | **148** | 128     | **19**       | **1**     | **86,49 %**  |
+| `src/components/Cabecera.tsx`       | **0**       | 1,00      | **1**   | 1       | **0**        | 0         | **100,00 %** |
+| `src/components/MenuNavegacion.tsx` | **0**       | 3,00      | **6**   | 5       | **1**        | 0         | **83,33 %**  |
+| `src/components/Pie.tsx`            | **0**       | 1,00      | **1**   | 1       | **0**        | 0         | **100,00 %** |
+| **Feature**                         | **0**       | —         | **156** | **135** | **20**       | **1**     | **86,54 %**  |
 
 Stryker sale con **codigo 1** en `puerta-anclas.ts` y `MenuNavegacion.tsx` (break: 100). El
 NoCoverage cuenta como no-matado (128/148, no 128/147).
@@ -151,6 +151,7 @@ anti-clase-CSS **se respeto** y no hay que rediseniar por esa via.
 agrupan por el hueco de contrato que los deja vivos y por el test que los mataria.
 
 ### Grupo A — `<a>` de nav SIN `href` (2 mutantes, `anclasDeNav`)
+
 - **`:51:20`** `OptionalChaining` — `ATRIBUTO_HREF.exec(etiqueta[0])?.[1]` -> `...[1]`
 - **`:53:11`** `ConditionalExpression` — `if (href !== undefined && ...)` -> `if (true && ...)` [sabotaje]
   **Falta:** una `<nav>` con un `<a>` **sin atributo `href`** -> 0 anclas de esa etiqueta, **sin
@@ -158,6 +159,7 @@ agrupan por el hueco de contrato que los deja vivos y por el test que los matari
   fixture lleva `href`.
 
 ### Grupo B — un id vacio no identifica a nadie (3 mutantes, `idsDeLaPagina:71`)
+
 - **`:71:5`** `MethodExpression` — elimina `.filter((id) => id !== '')`
 - **`:71:83`** `ConditionalExpression` — `.filter((id) => true)`
 - **`:71:90`** `StringLiteral` — `id !== "Stryker was here!"`
@@ -166,6 +168,7 @@ agrupan por el hueco de contrato que los deja vivos y por el test que los matari
   puerta, **identico al `:58` de F-05**.
 
 ### Grupo C — seccion con `aria-labelledby` que no resuelve (3, `seccionesNavegables:89-91`)
+
 - **`:89:24`** `OptionalChaining` — `ATRIBUTO_LABELLEDBY.exec(seccion[1])?.[1]` -> `...[1]`
 - **`:89:69`** `StringLiteral` **(NoCoverage)** — `?? ''` -> `?? "Stryker was here!"`
 - **`:91:9`** `ConditionalExpression` — `if (headings.has(referencia))` -> `if (true)` [sabotaje]
@@ -175,6 +178,7 @@ agrupan por el hueco de contrato que los deja vivos y por el test que los matari
   **distingue navegable=seccion-con-heading-real de navegable=cualquier-seccion**.
 
 ### Grupo D — el TEXTO de `describir()` y las constantes REGLA (5, `:30 :31 :127 :143`)
+
 - **`:30:35`** `StringLiteral` — `REGLA_ANCLA_MUERTA = ''`
 - **`:31:35`** `StringLiteral` — `REGLA_INALCANZABLE = ''`
 - **`:127:16`** `StringLiteral` — `ancla: ''` -> `"Stryker was here!"` (violacion inalcanzable)
@@ -186,6 +190,7 @@ agrupan por el hueco de contrato que los deja vivos y por el test que los matari
   que separa estas dos ramas.
 
 ### Grupo E — guardas de vacuidad `.some` -> `.every` (2, `:215 @s7`, `:227 @s19`)
+
 - **`:215:35`** `MethodExpression` — `paginas.some(...anclasDeNav...> 0)` -> `paginas.every(...)` [sabotaje]
 - **`:227:33`** `MethodExpression` — `paginas.some(...seccionesNavegables...> 0)` -> `paginas.every(...)`
   **Falta:** un artefacto **MULTI-PAGINA** donde **algunas** paginas tienen anclas/secciones y
@@ -194,6 +199,7 @@ agrupan por el hueco de contrato que los deja vivos y por el test que los matari
   de `:212-214` si neutralizo el mutante `> 0 -> >= 0`; **este es OTRO**, sobre el cuantificador.)
 
 ### Grupo F — tolerancia de espacios alrededor del `=` en la extraccion (5, `:36 :67 :82`)
+
 - **`:36:23`** `Regex` — `ATRIBUTO_HREF`: `\bhref\s*=\s*` -> `\bhref\S*=\s*`
 - **`:36:23`** `Regex` — `ATRIBUTO_HREF`: `\bhref\s*=\s*` -> `\bhref\s*=\S*`
 - **`:67:21`** `Regex` — `ATRIBUTO_ID`: `\sid\s*=\s*` -> `\sid\S*=\s*`
@@ -232,15 +238,15 @@ agrupan por el hueco de contrato que los deja vivos y por el test que los matari
 
 ## 6. Que pedirle al `tdd_craftsman` (escenarios que faltan, no codigo de mas)
 
-| # | Escenario/test rojo que falta | Mata |
-| - | ----------------------------- | ---- |
-| 1 | `<nav>` con un `<a>` **sin `href`** -> 0 anclas de esa etiqueta, sin lanzar | Grupo A (`:51`,`:53`) |
-| 2 | Pagina con un `id=""` -> **no** cuenta como destino de anclaje | Grupo B (`:71` x3) |
-| 3 | `<section>` **sin `aria-labelledby`** / con labelledby que **no resuelve** -> **no** navegable, sin lanzar | Grupo C (`:89` x2, `:91`) |
-| 4 | Aserto del **texto exacto** de `describir()` para ancla-muerta **e** inalcanzable (regla + formato) | Grupo D (`:30`,`:31`,`:127`,`:143`) |
-| 5 | Artefacto **multi-pagina mixto** (unas con anclas/secciones, otras no) y 0 violaciones -> exit 0 | Grupo E (`:215`,`:227`) |
-| 6 | Fixtures con **espacios alrededor del `=`** en `href`/`id`/`aria-labelledby` | Grupo F (`:36` x2,`:67`,`:82` x2) |
-| 7 | `MenuNavegacion`: `aria-controls` del boton **== `id`** del `<ul>` y **no vacio** | `MenuNav:5` |
+| #   | Escenario/test rojo que falta                                                                              | Mata                                |
+| --- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| 1   | `<nav>` con un `<a>` **sin `href`** -> 0 anclas de esa etiqueta, sin lanzar                                | Grupo A (`:51`,`:53`)               |
+| 2   | Pagina con un `id=""` -> **no** cuenta como destino de anclaje                                             | Grupo B (`:71` x3)                  |
+| 3   | `<section>` **sin `aria-labelledby`** / con labelledby que **no resuelve** -> **no** navegable, sin lanzar | Grupo C (`:89` x2, `:91`)           |
+| 4   | Aserto del **texto exacto** de `describir()` para ancla-muerta **e** inalcanzable (regla + formato)        | Grupo D (`:30`,`:31`,`:127`,`:143`) |
+| 5   | Artefacto **multi-pagina mixto** (unas con anclas/secciones, otras no) y 0 violaciones -> exit 0           | Grupo E (`:215`,`:227`)             |
+| 6   | Fixtures con **espacios alrededor del `=`** en `href`/`id`/`aria-labelledby`                               | Grupo F (`:36` x2,`:67`,`:82` x2)   |
+| 7   | `MenuNavegacion`: `aria-controls` del boton **== `id`** del `<ul>` y **no vacio**                          | `MenuNav:5`                         |
 
 **Patron de los 21 (identico a F-05):** salvo el grupo F (regex de tolerancia, el mas grave: una
 propiedad prometida en un comentario que ningun test sostiene), **todos son guardas y ramas

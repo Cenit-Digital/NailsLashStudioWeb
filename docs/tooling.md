@@ -8,11 +8,11 @@
 
 ## Agentes de apoyo (`.claude/agents/`)
 
-| Agente             | Cuándo usarlo                                             | Qué escribe                       |
-| ------------------ | -------------------------------------------------------- | --------------------------------- |
-| `security_reviewer`| Features que tocan entrada de usuario, auth, IO, red     | `progress/security_review.md`     |
-| `a11y_seo_auditor` | Features con UI web (accesibilidad y SEO)                | `progress/audit_a11y_seo.md`      |
-| `mentor`           | Cuando el humano quiere explicación didáctica de un cambio | Responde en chat (no bloquea)   |
+| Agente              | Cuándo usarlo                                              | Qué escribe                   |
+| ------------------- | ---------------------------------------------------------- | ----------------------------- |
+| `security_reviewer` | Features que tocan entrada de usuario, auth, IO, red       | `progress/security_review.md` |
+| `a11y_seo_auditor`  | Features con UI web (accesibilidad y SEO)                  | `progress/audit_a11y_seo.md`  |
+| `mentor`            | Cuando el humano quiere explicación didáctica de un cambio | Responde en chat (no bloquea) |
 
 Son **de solo lectura**: revisan y reportan, no editan `src/`. Bórralos si tu
 proyecto no los necesita (p. ej. `a11y_seo_auditor` en un proyecto sin UI web).

@@ -58,24 +58,24 @@ contradice al código. No lo uses como fuente de la paleta.
 
 ## 2 · Stack y versiones (verificado en `package.json`)
 
-| Capa | Herramienta | Versión declarada | Fuente |
-| --- | --- | --- | --- |
-| Framework | React | `^19.2.0` | `package.json:35` |
-| Lenguaje | TypeScript | `^5.9.0` | `package.json:58` |
-| Bundler | Vite | `^7.3.0` | `package.json:61` |
-| SSG | `vite-react-ssg` | `0.9.0` (pin exacto, sin `^`) | `package.json:62` |
-| Rutas | `react-router-dom` | `^6.30.0` | `package.json:37` |
-| Estilos | `sass` | `^1.80.0` | `package.json:58` |
-| Primitivas UI | `radix-ui` | `^1.6.0` | `package.json:34` |
-| Fuentes | `@fontsource/outfit`, `@fontsource/dm-sans` | `^5.0.0` | `package.json:30-31` |
-| Tests | Vitest | `^4.0.0` | `package.json:63` |
-| Testing Library | `@testing-library/react` | `^16.3.0` | `package.json:43` |
-| Mutación | `@stryker-mutator/core` | `^9.6.0` | `package.json:42` |
-| Lint | ESLint | `^9.39.0` (flat config) | `package.json:52` |
-| Formato | Prettier | `^3.4.0` | `package.json:57` |
-| Email | `resend` | `^6.17.1` | `package.json:38` |
-| Gestor | pnpm | `pnpm@11.9.0` (`packageManager`) | `package.json:8` |
-| Node | `>=22.12.0` (`.nvmrc` = `22`) | | `package.json:10`, `.nvmrc:1` |
+| Capa            | Herramienta                                 | Versión declarada                | Fuente                        |
+| --------------- | ------------------------------------------- | -------------------------------- | ----------------------------- |
+| Framework       | React                                       | `^19.2.0`                        | `package.json:35`             |
+| Lenguaje        | TypeScript                                  | `^5.9.0`                         | `package.json:58`             |
+| Bundler         | Vite                                        | `^7.3.0`                         | `package.json:61`             |
+| SSG             | `vite-react-ssg`                            | `0.9.0` (pin exacto, sin `^`)    | `package.json:62`             |
+| Rutas           | `react-router-dom`                          | `^6.30.0`                        | `package.json:37`             |
+| Estilos         | `sass`                                      | `^1.80.0`                        | `package.json:58`             |
+| Primitivas UI   | `radix-ui`                                  | `^1.6.0`                         | `package.json:34`             |
+| Fuentes         | `@fontsource/outfit`, `@fontsource/dm-sans` | `^5.0.0`                         | `package.json:30-31`          |
+| Tests           | Vitest                                      | `^4.0.0`                         | `package.json:63`             |
+| Testing Library | `@testing-library/react`                    | `^16.3.0`                        | `package.json:43`             |
+| Mutación        | `@stryker-mutator/core`                     | `^9.6.0`                         | `package.json:42`             |
+| Lint            | ESLint                                      | `^9.39.0` (flat config)          | `package.json:52`             |
+| Formato         | Prettier                                    | `^3.4.0`                         | `package.json:57`             |
+| Email           | `resend`                                    | `^6.17.1`                        | `package.json:38`             |
+| Gestor          | pnpm                                        | `pnpm@11.9.0` (`packageManager`) | `package.json:8`              |
+| Node            | `>=22.12.0` (`.nvmrc` = `22`)               |                                  | `package.json:10`, `.nvmrc:1` |
 
 > **Inferencia (no verificada):** `vite-react-ssg` está clavado en `0.9.0` sin
 > caret mientras todo lo demás usa `^`. Parece deliberado (paquete sensible al
@@ -110,8 +110,8 @@ src/
 > `components` ni de `pages` (lógica pura, aislada y testeable).
 
 Esto es **direccional y estricto**: `lib/` no puede importar hacia arriba. El
-motivo declarado: *"La lógica con valor de negocio vive en `lib/` para poder
-testearla y mutarla sin renderizar"* (`docs/architecture.md:38-39`).
+motivo declarado: _"La lógica con valor de negocio vive en `lib/` para poder
+testearla y mutarla sin renderizar"_ (`docs/architecture.md:38-39`).
 
 **`components/` es PLANO.** No hay `components/ui/`, ni `components/sections/`,
 ni carpeta por componente. Los 23 archivos cuelgan directos de
@@ -163,7 +163,7 @@ export default function Logo({ withWordmark = true, size = 40, animated = false 
 **JSDoc en español sobre props y funciones exportadas** (`Logo.tsx:5-15`,
 `lib/theme.ts:1-10`, `lib/useReveal.ts:6-13`). Los comentarios explican **el porqué**,
 no el qué — a menudo citan el escenario Gherkin (`Servicios.tsx:66-67`:
-*"Revelado en scroll (#15) … SSR-safe"*).
+_"Revelado en scroll (#15) … SSR-safe"_).
 
 ### 3.3 · SCSS: módulos, tokens y globales
 
@@ -177,10 +177,7 @@ no el qué — a menudo citan el escenario Gherkin (`Servicios.tsx:66-67`:
 `src/styles/main.scss` completo (4 líneas):
 
 ```scss
-@use 'tokens'
-@use 'reset'
-@use 'base'
-@use 'logo-draw'
+@use 'tokens' @use 'reset' @use 'base' @use 'logo-draw';
 ```
 
 (`src/styles/main.scss:1-4` — nótese: `@use 'tokens'`, **sin** el guion bajo ni la
@@ -195,8 +192,9 @@ Los parciales existentes: `_tokens.scss`, `_reset.scss`, `_base.scss`,
 `_tokens.scss` se haya cargado antes.
 
 **Qué va en global vs. en módulo:**
+
 - `_reset.scss` — reset moderno mínimo: `box-sizing`, `margin: 0`, `img/svg
-  display:block`, `button { font: inherit }`, `ul { list-style: none }`
+display:block`, `button { font: inherit }`, `ul { list-style: none }`
   (`_reset.scss:1-38`).
 - `_base.scss` — estilos de **elemento** (`body`, `h1,h2,h3`, `a`,
   `:focus-visible`) + **dos clases globales**: `.skip-link` (`_base.scss:47-60`) y
@@ -241,25 +239,25 @@ El fondo llena el viewport; `.inner` centra y limita. **Alternancia de fondo:**
 usan `bg-2`) — `docs/DESIGN_SYSTEM.md:150-151`.
 
 Motivo documentado de por qué `main` no lleva `max-width` (`_base.scss:24-31`):
-si lo llevara, *"duplicaría el gutter y recortaría las bandas de color de sección"*.
+si lo llevara, _"duplicaría el gutter y recortaría las bandas de color de sección"_.
 
 ### 3.4 · Naming (tabla consolidada)
 
-| Elemento | Convención | Ejemplo verificado |
-| --- | --- | --- |
-| Componente (archivo) | `PascalCase.tsx` | `src/components/ThemeToggle.tsx` |
-| Componente (export) | `export default function PascalCase` | `Servicios.tsx:65` |
-| Página (archivo) | **`kebab-case.tsx`** | `src/pages/aviso-legal.tsx` |
-| Página (export) | `PascalCase`, **puede diferir del archivo** | `App.tsx:4`: `import LegalNotice from './pages/aviso-legal'` |
-| Módulo SCSS | `PascalCase.module.scss` | `src/components/Hero.module.scss` |
-| Parcial SCSS global | `_kebab-case.scss` | `src/styles/_logo-draw.scss` |
-| Clase CSS Module | **`camelCase`** | `.cardTitle` (`Servicios.module.scss:89`), `.exampleLabel` (`:136`) |
-| Utilidad `lib/` (archivo) | `camelCase.ts` | `src/lib/seo.ts`, `src/lib/useIsMobile.ts` |
-| Hook | `useAlgo` | `src/lib/useReveal.ts:14` |
-| Función pura | `camelCase` | `resolveTheme` (`lib/theme.ts:34`) |
-| Constante módulo | `SCREAMING_SNAKE_CASE` | `NAV_LINKS` (`nav.ts:11`), `SERVICES` (`Servicios.tsx:14`), `MODE_CYCLE` (`theme.ts:64`), `REVEAL_ROOT_MARGIN` (`useReveal.ts:4`) |
-| Constante privada de archivo | `SCREAMING_SNAKE_CASE` | `STORAGE_KEY` (`theme.ts:8`) |
-| Tipo | `type PascalCase` (nunca `interface`) | `ResolvedTheme` (`theme.ts:2`), `NavLink` (`nav.ts:5`) |
+| Elemento                     | Convención                                  | Ejemplo verificado                                                                                                                |
+| ---------------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Componente (archivo)         | `PascalCase.tsx`                            | `src/components/ThemeToggle.tsx`                                                                                                  |
+| Componente (export)          | `export default function PascalCase`        | `Servicios.tsx:65`                                                                                                                |
+| Página (archivo)             | **`kebab-case.tsx`**                        | `src/pages/aviso-legal.tsx`                                                                                                       |
+| Página (export)              | `PascalCase`, **puede diferir del archivo** | `App.tsx:4`: `import LegalNotice from './pages/aviso-legal'`                                                                      |
+| Módulo SCSS                  | `PascalCase.module.scss`                    | `src/components/Hero.module.scss`                                                                                                 |
+| Parcial SCSS global          | `_kebab-case.scss`                          | `src/styles/_logo-draw.scss`                                                                                                      |
+| Clase CSS Module             | **`camelCase`**                             | `.cardTitle` (`Servicios.module.scss:89`), `.exampleLabel` (`:136`)                                                               |
+| Utilidad `lib/` (archivo)    | `camelCase.ts`                              | `src/lib/seo.ts`, `src/lib/useIsMobile.ts`                                                                                        |
+| Hook                         | `useAlgo`                                   | `src/lib/useReveal.ts:14`                                                                                                         |
+| Función pura                 | `camelCase`                                 | `resolveTheme` (`lib/theme.ts:34`)                                                                                                |
+| Constante módulo             | `SCREAMING_SNAKE_CASE`                      | `NAV_LINKS` (`nav.ts:11`), `SERVICES` (`Servicios.tsx:14`), `MODE_CYCLE` (`theme.ts:64`), `REVEAL_ROOT_MARGIN` (`useReveal.ts:4`) |
+| Constante privada de archivo | `SCREAMING_SNAKE_CASE`                      | `STORAGE_KEY` (`theme.ts:8`)                                                                                                      |
+| Tipo                         | `type PascalCase` (nunca `interface`)       | `ResolvedTheme` (`theme.ts:2`), `NavLink` (`nav.ts:5`)                                                                            |
 
 **Regla oficial** (`docs/conventions.md:9-12`, cita literal):
 
@@ -279,8 +277,8 @@ copiarlo y documentarlo explícitamente** en nuestro `conventions.md`.
 **Excepción a documentar:** hay **un componente por archivo… salvo componentes
 auxiliares privados**. `ThemeToggle.tsx:33` define `function ThemeIcon(...)` sin
 exportar, en el mismo archivo que `ThemeToggle`. Es un helper de render privado,
-no un componente reutilizable. La regla real es: *un componente **exportado** por
-archivo*.
+no un componente reutilizable. La regla real es: _un componente **exportado** por
+archivo_.
 
 ### 3.5 · Barrels e imports — VERIFICADO NEGATIVO
 
@@ -292,6 +290,7 @@ archivo*.
 `vitest.config.ts` (19 líneas) tampoco.
 
 **Consecuencia: imports relativos siempre.** Evidencia:
+
 - `src/components/Servicios.tsx:1` — `import { useReveal } from '../lib/useReveal'`
 - `src/components/Servicios.tsx:2` — `import CheckIcon from './CheckIcon'`
 - `src/pages/home.tsx:2` — `import Contacto from '../components/Contacto'`
@@ -324,10 +323,10 @@ Nótese `type ThemeMode` **inline dentro del import de valores**, no en un
 
 **Cómo se define un tema:** dos bloques, y solo dos:
 
-| Bloque | Línea | Paleta |
-| --- | --- | --- |
-| `:root` | `_tokens.scss:16` | Claro — "Bosque & Limón" (por defecto) |
-| `:root[data-theme='dark']` | `_tokens.scss:88` | Oscuro — "Noche & Oro" |
+| Bloque                     | Línea             | Paleta                                 |
+| -------------------------- | ----------------- | -------------------------------------- |
+| `:root`                    | `_tokens.scss:16` | Claro — "Bosque & Limón" (por defecto) |
+| `:root[data-theme='dark']` | `_tokens.scss:88` | Oscuro — "Noche & Oro"                 |
 
 Cita literal de la cabecera (`_tokens.scss:11-13`):
 
@@ -366,6 +365,7 @@ el CSS** — funciona porque `:root` ya aplica. Copiar exactamente.
 **Dos reglas de valor explícitas y llamativas:**
 
 1. **Nada de `color-mix()` ni derivados** (`_tokens.scss:7-9`, cita literal):
+
    > los colores se usan SIEMPRE con `var(--color-…)`. Los valores son literales
    > exactos del diseño (**no derivados con `color-mix`**) para garantizar
    > fidelidad 1:1.
@@ -386,13 +386,13 @@ valor de escritorio, el SCSS ya es fluido. **Discrepancia menor doc↔código.**
 
 **Alias deprecados** (`_tokens.scss:76-82`) — `--color-soft`, `--color-brand`,
 `--color-brand-mint`. **NO los copies**: son deuda del scaffold previo de
-WebEmpresa. Cita literal: *"No usar en código nuevo; migrar a los tokens de arriba
-y eliminar cuando ya no queden referencias"*. Nuestro repo nace limpio.
+WebEmpresa. Cita literal: _"No usar en código nuevo; migrar a los tokens de arriba
+y eliminar cuando ya no queden referencias"_. Nuestro repo nace limpio.
 
 #### 3.6.1 · Cómo se define un token de color NUEVO (procedimiento verificado)
 
-Reconstruido del commit `6e9a052` *"feat(marca): logo Órbita + tokens
-Bosque&Limón/Noche&Oro por TDD (#12)"*, que tocó a la vez
+Reconstruido del commit `6e9a052` _"feat(marca): logo Órbita + tokens
+Bosque&Limón/Noche&Oro por TDD (#12)"_, que tocó a la vez
 `features/`, `src/styles/_tokens.scss`, `src/styles/tokens.test.ts` y
 `stryker.config.json` (`git show --stat 6e9a052`). El flujo es **SDD → TDD**:
 
@@ -448,18 +448,18 @@ function lightRoot(): string {
 
 Lógica pura en `src/lib/theme.ts`, exports verificados:
 
-| Export | Línea | Qué hace |
-| --- | --- | --- |
-| `type ResolvedTheme` | `:2` | `'light' \| 'dark'` |
-| `type ThemeMode` | `:5` | `ResolvedTheme \| 'system'` |
-| `systemPrefersDark()` | `:11` | `matchMedia('(prefers-color-scheme: dark)').matches` |
-| `applyTheme(theme)` | `:16` | `document.documentElement.dataset.theme = theme` |
-| `getStoredMode()` | `:21` | lee `localStorage`; inválido/ausente → `'system'` |
-| `resolveTheme(mode, prefersDark)` | `:34` | función **pura** (sin tocar DOM) |
-| `applyInitialTheme()` | `:42` | resuelve + aplica en carga |
-| `setMode(mode)` | `:50` | persiste + aplica |
-| `nextMode(mode)` | `:74` | cicla `light → dark → system → light` |
-| `initialThemeAttribute(stored, prefersDark)` | `:83` | **réplica pura del script anti-FOUC** |
+| Export                                       | Línea | Qué hace                                             |
+| -------------------------------------------- | ----- | ---------------------------------------------------- |
+| `type ResolvedTheme`                         | `:2`  | `'light' \| 'dark'`                                  |
+| `type ThemeMode`                             | `:5`  | `ResolvedTheme \| 'system'`                          |
+| `systemPrefersDark()`                        | `:11` | `matchMedia('(prefers-color-scheme: dark)').matches` |
+| `applyTheme(theme)`                          | `:16` | `document.documentElement.dataset.theme = theme`     |
+| `getStoredMode()`                            | `:21` | lee `localStorage`; inválido/ausente → `'system'`    |
+| `resolveTheme(mode, prefersDark)`            | `:34` | función **pura** (sin tocar DOM)                     |
+| `applyInitialTheme()`                        | `:42` | resuelve + aplica en carga                           |
+| `setMode(mode)`                              | `:50` | persiste + aplica                                    |
+| `nextMode(mode)`                             | `:74` | cicla `light → dark → system → light`                |
+| `initialThemeAttribute(stored, prefersDark)` | `:83` | **réplica pura del script anti-FOUC**                |
 
 Claves de diseño a copiar:
 
@@ -470,14 +470,18 @@ Claves de diseño a copiar:
   `'system'` se hace `removeItem`, no se guarda `'system'` (`theme.ts:52`).
 - **`localStorage` siempre en `try/catch`** (`theme.ts:22-30`, `:51-59`): si falla
   el almacenamiento, el tema **se aplica igual** en memoria (`:60`). Comentario
-  literal: *"Almacenamiento no disponible: el tema se aplica solo en memoria."*
+  literal: _"Almacenamiento no disponible: el tema se aplica solo en memoria."_
 - **Ciclo por `Record`, no por `switch`** (`theme.ts:64-68`):
   ```ts
-  const MODE_CYCLE: Record<ThemeMode, ThemeMode> = { light: 'dark', dark: 'system', system: 'light' }
+  const MODE_CYCLE: Record<ThemeMode, ThemeMode> = {
+    light: 'dark',
+    dark: 'system',
+    system: 'light',
+  }
   ```
 - **Duplicación deliberada y documentada** entre `index.html:14-27` (script inline
   anti-FOUC, en ES5 con `var`) y `theme.ts:83` (`initialThemeAttribute`). El
-  comentario del HTML lo dice (`index.html:12-13`): *"Espeja `src/lib/theme.ts:initialThemeAttribute`"*.
+  comentario del HTML lo dice (`index.html:12-13`): _"Espeja `src/lib/theme.ts:initialThemeAttribute`"_.
   Se duplica **para poder testear la lógica del script inline** sin ejecutar el HTML.
 - **`<meta name="theme-color">` por esquema** (`index.html:7-8`), con los hex de
   `--color-bg` de cada tema, + `<meta name="color-scheme" content="light dark">` (`:9`).
@@ -500,7 +504,7 @@ Claves de diseño a copiar:
 > por clase CSS**. Eso explica que los tests consulten por **rol, texto o
 > `data-*`**, nunca por clase. Cuando hace falta un gancho de test se añade un
 > `data-*` explícito: `data-icon` en `ThemeToggle.tsx:37` — comentario literal
-> (`:31`): *"El `data-icon` es el gancho testeable."*
+> (`:31`): _"El `data-icon` es el gancho testeable."_
 
 `vitest.setup.ts` es **una línea** (`:1`): `import '@testing-library/jest-dom/vitest'`.
 
@@ -521,6 +525,7 @@ con `@s4`). Y los `@sN` se **reinician por archivo** (cada `.feature` tiene su
 numeración).
 
 **Estructura del test** (`Sectores.test.tsx`):
+
 - Constantes de datos esperados arriba, `SCREAMING_SNAKE_CASE` (`:5` `NAMES`,
   `:7` `DESCRIPTIONS`, `:14` `NOTE`).
 - `describe('Sectores', …)` = nombre del componente, sin sufijo (`:16`).
@@ -547,6 +552,7 @@ Y en componentes, `expect(h2.textContent).toBe('Sectores con los que trabajamos'
 
 **Split `Componente.test.tsx` vs `Componente.behavior.test.tsx`.** Solo `Contacto`
 y `Servicios` lo usan:
+
 - `Contacto.test.tsx` — estructura estática (campos, etiquetas, textos), imports
   mínimos: `render, screen, within` + `describe, expect, it` (`:1-3`).
 - `Contacto.behavior.test.tsx` — interacción y async: añade `userEvent`, `waitFor`,
@@ -573,8 +579,8 @@ vi.mock('../lib/contact', async (importOriginal) => {
 **Mutación** (`stryker.config.json`): `testRunner: 'vitest'`, `coverageAnalysis:
 'perTest'`, y **`mutate` como lista EXPLÍCITA de 17 archivos** (`:12-30`) — no un
 glob. Umbrales: `high: 100, low: 90, break: 100` (`:31-35`) → **el build rompe por
-debajo del 100%**. Comentario literal (`:3`): *"Valida que los tests muerden.
-Umbral: 100% sobre las líneas tocadas por la feature."*
+debajo del 100%**. Comentario literal (`:3`): _"Valida que los tests muerden.
+Umbral: 100% sobre las líneas tocadas por la feature."_
 
 Cuando un mutante es **equivalente** (no observable), se silencia con comentario
 justificado, nunca en silencio (`Logo.tsx:26-28`):
@@ -592,7 +598,14 @@ Mismo patrón en `useReveal.ts:18-19` (guarda `if (!root) return` inalcanzable).
 **Prettier** (`.prettierrc.json:1-8`) — copiar **literal**:
 
 ```json
-{ "semi": false, "singleQuote": true, "trailingComma": "all", "printWidth": 100, "tabWidth": 2, "endOfLine": "lf" }
+{
+  "semi": false,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "printWidth": 100,
+  "tabWidth": 2,
+  "endOfLine": "lf"
+}
 ```
 
 **`.editorconfig`** (`:1-9`): `charset = utf-8`, `end_of_line = lf`,
@@ -632,9 +645,9 @@ export const SITE = {
 const ORGANIZATION_LD = JSON.stringify({ … }).replace(/</g, '\\u003c')
 ```
 
-Comentario literal (`home.tsx:12-14`): *"JSON-LD Organization (**no LocalBusiness:
+Comentario literal (`home.tsx:12-14`): _"JSON-LD Organization (**no LocalBusiness:
 no inventamos dirección ni teléfono**). Se escapa "<" para que un cierre de
-`</script>` en los datos no pueda romper el documento"*.
+`</script>` en los datos no pueda romper el documento"_.
 
 > **Muy relevante para nosotros:** WebEmpresa usa `Organization` **porque no tenía
 > dirección verificada**. NailsLashStudioWeb **sí es un local físico en Las Rozas**,
@@ -661,13 +674,14 @@ campo `entry`** obligatorio por ruta (`entry: 'src/pages/home.tsx'`) — requisi
 
 Esto **contradice** al código y al Design System, que dicen **Bosque & Limón**
 (claro) y **Noche & Oro** (oscuro):
-- `src/styles/_tokens.scss:4` — *"Paleta CLARA = Bosque & Limón · Paleta OSCURA = Noche & Oro"*
-- `docs/DESIGN_SYSTEM.md:10` — *"Paleta **CLARA = Bosque & Limón** · Paleta **OSCURA = Noche & Oro**"*
+
+- `src/styles/_tokens.scss:4` — _"Paleta CLARA = Bosque & Limón · Paleta OSCURA = Noche & Oro"_
+- `docs/DESIGN_SYSTEM.md:10` — _"Paleta **CLARA = Bosque & Limón** · Paleta **OSCURA = Noche & Oro**"_
 - `src/styles/_tokens.scss:39` — `--color-primary: #1e7a4f` (verde, no teal)
 
 `architecture.md` quedó sin actualizar tras el commit `6e9a052` (que cambió la
-paleta). `DESIGN_SYSTEM.md:5-6` se declara ganador: *"Este documento manda sobre
-cualquier valor suelto del scaffold previo"*.
+paleta). `DESIGN_SYSTEM.md:5-6` se declara ganador: _"Este documento manda sobre
+cualquier valor suelto del scaffold previo"_.
 
 **Consecuencia:** la **jerarquía de fuentes de verdad** es
 `_tokens.scss` (código) > `DESIGN_SYSTEM.md` > `conventions.md` > `architecture.md`.
@@ -678,20 +692,20 @@ paleta rosa.
 
 ## 4 · Lo que NO he podido verificar
 
-| # | Afirmación / dato | Por qué no está verificado | Qué haría falta |
-| --- | --- | --- | --- |
-| 1 | `RF-CODE-001`, `RF-MARCA-001`, `RF-STACK-001`, `RF-SISTEMA-001`, `DE-002`, `GU-HARNESS-001` | Son páginas de **Confluence** citadas desde `conventions.md:3`, `architecture.md:22`, `DESIGN_SYSTEM.md:5`, `stryker.config.json:3`. **No están en el repo.** No he accedido a Confluence. | Acceso al espacio de Confluence (hay MCP de Atlassian disponible), o export de esas páginas al repo. **Pueden contener normas de empresa que este informe no recoge.** |
-| 2 | Diseño "Cenit Digital - Web (final)" (Claude Design) | Fuente de verdad citada en `_tokens.scss:3` y `DESIGN_SYSTEM.md:2-5`. Existe un HTML de 2,7 MB en la raíz (`Cenit Digital - Web (final) - Diseño - Final- Definitivo.html`) que **no he abierto** (tamaño). | Abrir el HTML o el proyecto de Claude Design. Solo necesario si queremos replicar *decisiones visuales*, no convenciones de código. |
-| 3 | Contraste AA de la paleta **rosa** de NailsLashStudio | La paleta rosa **no existe todavía**. `DESIGN_SYSTEM.md:220` dice que el contraste de la verde *"validado en RF-MARCA-001"* — no he visto esa validación. | Definir la paleta rosa y validar cada par texto/fondo con una herramienta WCAG (ratio ≥ 4.5:1 texto normal, ≥ 3:1 texto grande y UI). **No asumir que un rosa de marca pasa AA — los rosas claros suelen fallar sobre blanco.** |
-| 4 | Que `pnpm test` / `pnpm verify` pasen **hoy** en WebEmpresa | **No he ejecutado nada.** Todo el informe es análisis estático. | `pnpm install && pnpm test && pnpm mutation` en WebEmpresa. |
-| 5 | La regla "clases CSS Module en `camelCase`" | **No está en ningún doc.** Inferida de uso 100% consistente (`Servicios.module.scss:89` ↔ `Servicios.tsx:87`). | Confirmar con el equipo y **documentarla explícitamente** en nuestro `conventions.md`. |
-| 6 | La regla "`type` siempre, nunca `interface`" | **No documentada.** Inferida: cero `interface` en `src/`. | Ídem #5. Podría añadirse `@typescript-eslint/consistent-type-definitions` para forzarla. |
-| 7 | Criterio "contenido en componente vs. en `lib/`" | Inferido: `SERVICES` vive en `Servicios.tsx:14` pero `NAV_LINKS` en `lib/nav.ts:11`. **No hay regla escrita.** | Preguntar al equipo. Mi hipótesis: a `lib/` lo compartido por ≥2 componentes o con lógica testeable. |
-| 8 | Criterio del sufijo `.behavior.test.tsx` / `.reveal.test.tsx` | Inferido de 2 casos (`Contacto`, `Servicios`). No documentado. | Ídem #7. |
-| 9 | Por qué `vite-react-ssg` está pinneado a `0.9.0` sin `^` | `package.json:62`. Sin comentario que lo explique. | `git log` sobre `package.json` o preguntar. Copiar el pin por defecto. |
-| 10 | Datos del negocio real (dirección, teléfono, horario, NIF, servicios, precios) del salón de Las Rozas | **Fuera del alcance de esta investigación** y **no inventables**. | Facilitados por el cliente. Bloquean: `lib/site.ts`, JSON-LD `LocalBusiness`, aviso legal, y el `tel:` del formulario (`Contacto.test.tsx` `@s2` exige `href` que empiece por `tel:`). |
-| 11 | Si `docs/architecture.md:53-57` es error o refleja una decisión revertida | Detecté la contradicción (§3.9) pero no su causa. | `git log -p docs/architecture.md`. Irrelevante para nosotros: reescribimos esa sección. |
-| 12 | Contenido de `api/`, `design/`, `tools/`, `scripts/` de WebEmpresa | **No explorados** — fuera del área "convenciones de `src/`". `api/` probablemente tiene la función serverless de Resend (`package.json:38` + `@vercel/firewall:32`). | Explorar si vamos a implementar formulario de contacto con email. |
+| #   | Afirmación / dato                                                                                     | Por qué no está verificado                                                                                                                                                                                  | Qué haría falta                                                                                                                                                                                                                 |
+| --- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `RF-CODE-001`, `RF-MARCA-001`, `RF-STACK-001`, `RF-SISTEMA-001`, `DE-002`, `GU-HARNESS-001`           | Son páginas de **Confluence** citadas desde `conventions.md:3`, `architecture.md:22`, `DESIGN_SYSTEM.md:5`, `stryker.config.json:3`. **No están en el repo.** No he accedido a Confluence.                  | Acceso al espacio de Confluence (hay MCP de Atlassian disponible), o export de esas páginas al repo. **Pueden contener normas de empresa que este informe no recoge.**                                                          |
+| 2   | Diseño "Cenit Digital - Web (final)" (Claude Design)                                                  | Fuente de verdad citada en `_tokens.scss:3` y `DESIGN_SYSTEM.md:2-5`. Existe un HTML de 2,7 MB en la raíz (`Cenit Digital - Web (final) - Diseño - Final- Definitivo.html`) que **no he abierto** (tamaño). | Abrir el HTML o el proyecto de Claude Design. Solo necesario si queremos replicar _decisiones visuales_, no convenciones de código.                                                                                             |
+| 3   | Contraste AA de la paleta **rosa** de NailsLashStudio                                                 | La paleta rosa **no existe todavía**. `DESIGN_SYSTEM.md:220` dice que el contraste de la verde _"validado en RF-MARCA-001"_ — no he visto esa validación.                                                   | Definir la paleta rosa y validar cada par texto/fondo con una herramienta WCAG (ratio ≥ 4.5:1 texto normal, ≥ 3:1 texto grande y UI). **No asumir que un rosa de marca pasa AA — los rosas claros suelen fallar sobre blanco.** |
+| 4   | Que `pnpm test` / `pnpm verify` pasen **hoy** en WebEmpresa                                           | **No he ejecutado nada.** Todo el informe es análisis estático.                                                                                                                                             | `pnpm install && pnpm test && pnpm mutation` en WebEmpresa.                                                                                                                                                                     |
+| 5   | La regla "clases CSS Module en `camelCase`"                                                           | **No está en ningún doc.** Inferida de uso 100% consistente (`Servicios.module.scss:89` ↔ `Servicios.tsx:87`).                                                                                              | Confirmar con el equipo y **documentarla explícitamente** en nuestro `conventions.md`.                                                                                                                                          |
+| 6   | La regla "`type` siempre, nunca `interface`"                                                          | **No documentada.** Inferida: cero `interface` en `src/`.                                                                                                                                                   | Ídem #5. Podría añadirse `@typescript-eslint/consistent-type-definitions` para forzarla.                                                                                                                                        |
+| 7   | Criterio "contenido en componente vs. en `lib/`"                                                      | Inferido: `SERVICES` vive en `Servicios.tsx:14` pero `NAV_LINKS` en `lib/nav.ts:11`. **No hay regla escrita.**                                                                                              | Preguntar al equipo. Mi hipótesis: a `lib/` lo compartido por ≥2 componentes o con lógica testeable.                                                                                                                            |
+| 8   | Criterio del sufijo `.behavior.test.tsx` / `.reveal.test.tsx`                                         | Inferido de 2 casos (`Contacto`, `Servicios`). No documentado.                                                                                                                                              | Ídem #7.                                                                                                                                                                                                                        |
+| 9   | Por qué `vite-react-ssg` está pinneado a `0.9.0` sin `^`                                              | `package.json:62`. Sin comentario que lo explique.                                                                                                                                                          | `git log` sobre `package.json` o preguntar. Copiar el pin por defecto.                                                                                                                                                          |
+| 10  | Datos del negocio real (dirección, teléfono, horario, NIF, servicios, precios) del salón de Las Rozas | **Fuera del alcance de esta investigación** y **no inventables**.                                                                                                                                           | Facilitados por el cliente. Bloquean: `lib/site.ts`, JSON-LD `LocalBusiness`, aviso legal, y el `tel:` del formulario (`Contacto.test.tsx` `@s2` exige `href` que empiece por `tel:`).                                          |
+| 11  | Si `docs/architecture.md:53-57` es error o refleja una decisión revertida                             | Detecté la contradicción (§3.9) pero no su causa.                                                                                                                                                           | `git log -p docs/architecture.md`. Irrelevante para nosotros: reescribimos esa sección.                                                                                                                                         |
+| 12  | Contenido de `api/`, `design/`, `tools/`, `scripts/` de WebEmpresa                                    | **No explorados** — fuera del área "convenciones de `src/`". `api/` probablemente tiene la función serverless de Resend (`package.json:38` + `@vercel/firewall:32`).                                        | Explorar si vamos a implementar formulario de contacto con email.                                                                                                                                                               |
 
 ---
 
@@ -699,77 +713,77 @@ paleta rosa.
 
 ### 5.1 · Qué EXIGE (obligatorio para ser indistinguible)
 
-| # | Exigencia | Fuente |
-| --- | --- | --- |
-| E1 | Estructura `src/{main.tsx, App.tsx, pages/, components/, lib/, styles/}` | `architecture.md:26-34` |
-| E2 | `components/` **plano**, `PascalCase.tsx`, 1 componente exportado por archivo, `export default function` | `conventions.md:9-10` |
-| E3 | Dirección de dependencias: `pages → components → lib`; **`lib` no importa hacia arriba** | `architecture.md:36-39` |
-| E4 | Trío co-locado `X.tsx` + `X.module.scss` + `X.test.tsx` | `conventions.md:15,24` |
-| E5 | Imports **relativos**. Sin barrels, sin alias | `tsconfig.json` (sin `paths`), `vite.config.ts` (sin `alias`) |
-| E6 | Orden de imports: react → lib → componentes → **`styles` último** | `ThemeToggle.tsx:1-11`, `Servicios.tsx:1-4` |
-| E7 | SCSS Modules por componente; globales en `styles/` con **`@use`, nunca `@import`** | `conventions.md:15-16`, `main.scss:1-4` |
-| E8 | Parciales `_kebab-case.scss` agregados en `main.scss`, orden `tokens → reset → base` | `main.scss:1-4` |
-| E9 | Tokens = **CSS custom properties** en `:root` + `:root[data-theme='dark']`. **Claro en `:root` a secas** | `_tokens.scss:16,88` |
-| E10 | **0 hex en componentes** — siempre `var(--color-…)` | `conventions.md:16`, `DESIGN_SYSTEM.md:19,214` |
-| E11 | Valores **literales**, sin `color-mix()`; transparencias con `rgba()` | `_tokens.scss:7-9` |
-| E12 | Tokens agrupados por comentario, en el orden de `_tokens.scss` (tipografía → layout → radios → marca → fondos → texto → tags → logo → feedback → sombra), cada uno con comentario de uso | `_tokens.scss:17-74` |
-| E13 | Clases CSS Module en `camelCase` | *inferido* — `Servicios.module.scss:89` |
-| E14 | Tipos con `type`, nunca `interface` | *inferido* — `Logo.tsx:4`, `nav.ts:5` |
-| E15 | Constantes de módulo en `SCREAMING_SNAKE_CASE` | `nav.ts:11`, `theme.ts:8,64` |
-| E16 | Páginas `kebab-case.tsx`, export `PascalCase` | `conventions.md:12`, `App.tsx:4` |
-| E17 | Tests co-locados con `it('@sN …')` citando el `.feature` | `conventions.md:24-26` |
-| E18 | Queries por rol/texto/`data-*`, **nunca por clase** (`css: false`) | `vitest.config.ts:10`, `Sectores.test.tsx:39` |
-| E19 | Aserciones **exactas** (`toEqual` del array completo, `toBe` del texto literal) | `nav.test.ts:6-11`, `Sectores.test.tsx:22` |
-| E20 | `tokens.test.ts` leyendo el SCSS con `readFileSync` + regex `/i` | `tokens.test.ts:5-8,24` |
-| E21 | Stryker con `mutate` **lista explícita** y `break: 100` | `stryker.config.json:12-35` |
-| E22 | Prettier: `semi:false`, `singleQuote:true`, `trailingComma:'all'`, `printWidth:100` | `.prettierrc.json:1-8` |
-| E23 | Tema: `data-theme` en `<html>` + `localStorage` + **anti-FOUC inline** en `index.html` | `DESIGN_SYSTEM.md:51-64`, `index.html:10-28` |
-| E24 | `localStorage` siempre en `try/catch`, aplicando el tema aunque falle | `theme.ts:22-30,51-60` |
-| E25 | Todo en **español**: comentarios, JSDoc, `describe`/`it`, commits, docs | todo el repo |
-| E26 | `lib/site.ts` con `as const` como fuente única de datos del sitio | `site.ts:1-7` |
-| E27 | Skip-link + `<main id="contenido" tabIndex={-1}>` + `:focus-visible` con outline de `primary` | `Layout.tsx:24-30`, `_base.scss:42-45` |
-| E28 | Patrón sección a sangre completa + `.inner` con `--maxw`/`--gutter`/`--section-y` | `DESIGN_SYSTEM.md:147-151`, `Servicios.module.scss:1-11` |
-| E29 | Mutantes equivalentes: `// Stryker disable next-line all` **con justificación escrita** | `Logo.tsx:26-28`, `useReveal.ts:18-19` |
+| #   | Exigencia                                                                                                                                                                                | Fuente                                                        |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| E1  | Estructura `src/{main.tsx, App.tsx, pages/, components/, lib/, styles/}`                                                                                                                 | `architecture.md:26-34`                                       |
+| E2  | `components/` **plano**, `PascalCase.tsx`, 1 componente exportado por archivo, `export default function`                                                                                 | `conventions.md:9-10`                                         |
+| E3  | Dirección de dependencias: `pages → components → lib`; **`lib` no importa hacia arriba**                                                                                                 | `architecture.md:36-39`                                       |
+| E4  | Trío co-locado `X.tsx` + `X.module.scss` + `X.test.tsx`                                                                                                                                  | `conventions.md:15,24`                                        |
+| E5  | Imports **relativos**. Sin barrels, sin alias                                                                                                                                            | `tsconfig.json` (sin `paths`), `vite.config.ts` (sin `alias`) |
+| E6  | Orden de imports: react → lib → componentes → **`styles` último**                                                                                                                        | `ThemeToggle.tsx:1-11`, `Servicios.tsx:1-4`                   |
+| E7  | SCSS Modules por componente; globales en `styles/` con **`@use`, nunca `@import`**                                                                                                       | `conventions.md:15-16`, `main.scss:1-4`                       |
+| E8  | Parciales `_kebab-case.scss` agregados en `main.scss`, orden `tokens → reset → base`                                                                                                     | `main.scss:1-4`                                               |
+| E9  | Tokens = **CSS custom properties** en `:root` + `:root[data-theme='dark']`. **Claro en `:root` a secas**                                                                                 | `_tokens.scss:16,88`                                          |
+| E10 | **0 hex en componentes** — siempre `var(--color-…)`                                                                                                                                      | `conventions.md:16`, `DESIGN_SYSTEM.md:19,214`                |
+| E11 | Valores **literales**, sin `color-mix()`; transparencias con `rgba()`                                                                                                                    | `_tokens.scss:7-9`                                            |
+| E12 | Tokens agrupados por comentario, en el orden de `_tokens.scss` (tipografía → layout → radios → marca → fondos → texto → tags → logo → feedback → sombra), cada uno con comentario de uso | `_tokens.scss:17-74`                                          |
+| E13 | Clases CSS Module en `camelCase`                                                                                                                                                         | _inferido_ — `Servicios.module.scss:89`                       |
+| E14 | Tipos con `type`, nunca `interface`                                                                                                                                                      | _inferido_ — `Logo.tsx:4`, `nav.ts:5`                         |
+| E15 | Constantes de módulo en `SCREAMING_SNAKE_CASE`                                                                                                                                           | `nav.ts:11`, `theme.ts:8,64`                                  |
+| E16 | Páginas `kebab-case.tsx`, export `PascalCase`                                                                                                                                            | `conventions.md:12`, `App.tsx:4`                              |
+| E17 | Tests co-locados con `it('@sN …')` citando el `.feature`                                                                                                                                 | `conventions.md:24-26`                                        |
+| E18 | Queries por rol/texto/`data-*`, **nunca por clase** (`css: false`)                                                                                                                       | `vitest.config.ts:10`, `Sectores.test.tsx:39`                 |
+| E19 | Aserciones **exactas** (`toEqual` del array completo, `toBe` del texto literal)                                                                                                          | `nav.test.ts:6-11`, `Sectores.test.tsx:22`                    |
+| E20 | `tokens.test.ts` leyendo el SCSS con `readFileSync` + regex `/i`                                                                                                                         | `tokens.test.ts:5-8,24`                                       |
+| E21 | Stryker con `mutate` **lista explícita** y `break: 100`                                                                                                                                  | `stryker.config.json:12-35`                                   |
+| E22 | Prettier: `semi:false`, `singleQuote:true`, `trailingComma:'all'`, `printWidth:100`                                                                                                      | `.prettierrc.json:1-8`                                        |
+| E23 | Tema: `data-theme` en `<html>` + `localStorage` + **anti-FOUC inline** en `index.html`                                                                                                   | `DESIGN_SYSTEM.md:51-64`, `index.html:10-28`                  |
+| E24 | `localStorage` siempre en `try/catch`, aplicando el tema aunque falle                                                                                                                    | `theme.ts:22-30,51-60`                                        |
+| E25 | Todo en **español**: comentarios, JSDoc, `describe`/`it`, commits, docs                                                                                                                  | todo el repo                                                  |
+| E26 | `lib/site.ts` con `as const` como fuente única de datos del sitio                                                                                                                        | `site.ts:1-7`                                                 |
+| E27 | Skip-link + `<main id="contenido" tabIndex={-1}>` + `:focus-visible` con outline de `primary`                                                                                            | `Layout.tsx:24-30`, `_base.scss:42-45`                        |
+| E28 | Patrón sección a sangre completa + `.inner` con `--maxw`/`--gutter`/`--section-y`                                                                                                        | `DESIGN_SYSTEM.md:147-151`, `Servicios.module.scss:1-11`      |
+| E29 | Mutantes equivalentes: `// Stryker disable next-line all` **con justificación escrita**                                                                                                  | `Logo.tsx:26-28`, `useReveal.ts:18-19`                        |
 
 ### 5.2 · Qué PROHÍBE
 
-| # | Prohibición | Fuente |
-| --- | --- | --- |
-| P1 | ❌ Hex sueltos en componentes o en `*.module.scss` | `conventions.md:16` — verificado: 0 coincidencias hoy |
-| P2 | ❌ `@import` de Sass (usar `@use`) | `conventions.md:16` |
-| P3 | ❌ Variables SCSS (`$color-…`), mixins, funciones, mapas para el sistema de color | *verificado negativo*: no existen en `src/styles/` |
-| P4 | ❌ `color-mix()` o derivados de color | `_tokens.scss:7-9` |
-| P5 | ❌ Barrels (`index.ts`) | *verificado negativo*: `find src -name "index.ts*"` → 0 |
-| P6 | ❌ Alias de import (`@/…`) | *verificado negativo*: sin `paths`/`alias` |
-| P7 | ❌ Subcarpetas en `components/` | *verificado*: 23 archivos planos |
-| P8 | ❌ `lib/` importando de `components/` o `pages/` | `architecture.md:36-39` |
-| P9 | ❌ JSX en `lib/` (salvo tests `.test.tsx` de hooks) | `conventions.md:11`, `architecture.md:32` |
-| P10 | ❌ CSS global fuera de `styles/` (excepciones: `.skip-link`, `.prose`) | `conventions.md:16`, `_base.scss:47,62` |
-| P11 | ❌ Copiar los alias **DEPRECADOS** `--color-soft`, `--color-brand`, `--color-brand-mint` | `_tokens.scss:76-82` |
-| P12 | ❌ Copiar `architecture.md:53-57` (paleta obsoleta: "Teal Profundo"/"Océano y Coral") | §3.9 de este informe |
-| P13 | ❌ `any` sin justificación | `conventions.md:8` |
-| P14 | ❌ Testear por clase CSS (`css:false` las deja `undefined`) | `vitest.config.ts:10` |
-| P15 | ❌ Punto y coma / comillas dobles (Prettier) | `.prettierrc.json:1-2` |
-| P16 | ❌ Selector `:root[data-theme='light']` (el claro va en `:root` a secas) | `_tokens.scss:16` |
-| P17 | ❌ `interface` (usar `type`) | *inferido* |
-| P18 | ❌ Inventar dirección/teléfono/horario en JSON-LD | `home.tsx:12` — precedente explícito |
+| #   | Prohibición                                                                              | Fuente                                                  |
+| --- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| P1  | ❌ Hex sueltos en componentes o en `*.module.scss`                                       | `conventions.md:16` — verificado: 0 coincidencias hoy   |
+| P2  | ❌ `@import` de Sass (usar `@use`)                                                       | `conventions.md:16`                                     |
+| P3  | ❌ Variables SCSS (`$color-…`), mixins, funciones, mapas para el sistema de color        | _verificado negativo_: no existen en `src/styles/`      |
+| P4  | ❌ `color-mix()` o derivados de color                                                    | `_tokens.scss:7-9`                                      |
+| P5  | ❌ Barrels (`index.ts`)                                                                  | _verificado negativo_: `find src -name "index.ts*"` → 0 |
+| P6  | ❌ Alias de import (`@/…`)                                                               | _verificado negativo_: sin `paths`/`alias`              |
+| P7  | ❌ Subcarpetas en `components/`                                                          | _verificado_: 23 archivos planos                        |
+| P8  | ❌ `lib/` importando de `components/` o `pages/`                                         | `architecture.md:36-39`                                 |
+| P9  | ❌ JSX en `lib/` (salvo tests `.test.tsx` de hooks)                                      | `conventions.md:11`, `architecture.md:32`               |
+| P10 | ❌ CSS global fuera de `styles/` (excepciones: `.skip-link`, `.prose`)                   | `conventions.md:16`, `_base.scss:47,62`                 |
+| P11 | ❌ Copiar los alias **DEPRECADOS** `--color-soft`, `--color-brand`, `--color-brand-mint` | `_tokens.scss:76-82`                                    |
+| P12 | ❌ Copiar `architecture.md:53-57` (paleta obsoleta: "Teal Profundo"/"Océano y Coral")    | §3.9 de este informe                                    |
+| P13 | ❌ `any` sin justificación                                                               | `conventions.md:8`                                      |
+| P14 | ❌ Testear por clase CSS (`css:false` las deja `undefined`)                              | `vitest.config.ts:10`                                   |
+| P15 | ❌ Punto y coma / comillas dobles (Prettier)                                             | `.prettierrc.json:1-2`                                  |
+| P16 | ❌ Selector `:root[data-theme='light']` (el claro va en `:root` a secas)                 | `_tokens.scss:16`                                       |
+| P17 | ❌ `interface` (usar `type`)                                                             | _inferido_                                              |
+| P18 | ❌ Inventar dirección/teléfono/horario en JSON-LD                                        | `home.tsx:12` — precedente explícito                    |
 
 ### 5.3 · Features que implica
 
 **Portables casi 1:1** (cambiando textos y tokens):
 
-| Feature | Origen | Nota |
-| --- | --- | --- |
-| Sistema de tokens + 2 temas | `_tokens.scss`, `features/marca.feature` | **Rosa** en claro; **falta decidir el oscuro** (ver riesgo R1) |
+| Feature                                | Origen                                                                   | Nota                                                                                                 |
+| -------------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| Sistema de tokens + 2 temas            | `_tokens.scss`, `features/marca.feature`                                 | **Rosa** en claro; **falta decidir el oscuro** (ver riesgo R1)                                       |
 | Selector de tema 3 estados + anti-FOUC | `features/theme_selector.feature`, `ThemeToggle.tsx`, `index.html:10-28` | Cambiar `'cenit-theme'` → p. ej. `'nails-theme'` **en los 2 sitios** (`theme.ts:8`, `index.html:16`) |
-| Layout + skip-link + Header/Footer | `features/layout_accesibilidad.feature`, `Layout.tsx` | Directo |
-| Nav + menú móvil | `features/nav.feature`, `HeaderNav.tsx`, `MobileMenu.tsx` | Cambian las anclas (Servicios/Precios/Galería/Contacto…) |
-| Hero | `features/hero.feature` | Copy nuevo |
-| Sección tipo "Servicios" (zigzag) | `features/servicios.feature`, `Servicios.module.scss` | Encaja bien con tratamientos (uñas, pestañas) |
-| Reveal en scroll | `features/servicios_scroll_reveal.feature`, `lib/useReveal.ts` | Genérico vía `data-*`: portable tal cual (`useReveal.ts:10-11`) |
-| Formulario de contacto | `features/contact_form.feature`, `lib/contact.ts` + `api/` | Incluye honeypot (`@s8`). **`api/` sin explorar** |
-| Footer + aviso legal | `features/footer.feature`, `pages/aviso-legal.tsx` | **Contenido legal real pendiente** |
-| SEO por página | `lib/seo.ts`, `pages/home.tsx:28-40` | **Cambiar `Organization` → `LocalBusiness`/`BeautySalon`** — solo con datos verificados |
+| Layout + skip-link + Header/Footer     | `features/layout_accesibilidad.feature`, `Layout.tsx`                    | Directo                                                                                              |
+| Nav + menú móvil                       | `features/nav.feature`, `HeaderNav.tsx`, `MobileMenu.tsx`                | Cambian las anclas (Servicios/Precios/Galería/Contacto…)                                             |
+| Hero                                   | `features/hero.feature`                                                  | Copy nuevo                                                                                           |
+| Sección tipo "Servicios" (zigzag)      | `features/servicios.feature`, `Servicios.module.scss`                    | Encaja bien con tratamientos (uñas, pestañas)                                                        |
+| Reveal en scroll                       | `features/servicios_scroll_reveal.feature`, `lib/useReveal.ts`           | Genérico vía `data-*`: portable tal cual (`useReveal.ts:10-11`)                                      |
+| Formulario de contacto                 | `features/contact_form.feature`, `lib/contact.ts` + `api/`               | Incluye honeypot (`@s8`). **`api/` sin explorar**                                                    |
+| Footer + aviso legal                   | `features/footer.feature`, `pages/aviso-legal.tsx`                       | **Contenido legal real pendiente**                                                                   |
+| SEO por página                         | `lib/seo.ts`, `pages/home.tsx:28-40`                                     | **Cambiar `Organization` → `LocalBusiness`/`BeautySalon`** — solo con datos verificados              |
 
 **Nuevas / divergentes:**
 
@@ -780,10 +794,10 @@ paleta rosa.
   `--color-zenith` son **específicos de la Órbita**: renombrar a los del nuestro.
 - **Galería de trabajos** — no existe en WebEmpresa. Feature nueva. Requiere
   decidir formato de imagen y `alt` reales (`conventions.md:19-20` exige `alt`).
-- **Reservas / citas** — WebEmpresa lo *vende* como servicio pero no lo implementa.
+- **Reservas / citas** — WebEmpresa lo _vende_ como servicio pero no lo implementa.
   Si el salón lo quiere, es feature nueva desde cero.
-- **Precios** — `DESIGN_SYSTEM.md:182` dice *"**Sin precios** (decisión de producto
-  pendiente)"*. Un salón normalmente **sí** los publica → divergencia esperable.
+- **Precios** — `DESIGN_SYSTEM.md:182` dice _"**Sin precios** (decisión de producto
+  pendiente)"_. Un salón normalmente **sí** los publica → divergencia esperable.
 - **JSON-LD `LocalBusiness`** — ver §4 #10.
 
 ### 5.4 · Riesgos y decisiones abiertas
@@ -829,6 +843,6 @@ paleta rosa.
 
 ---
 
-*Informe generado por análisis estático del repo. **No se ejecutó ningún comando
+_Informe generado por análisis estático del repo. **No se ejecutó ningún comando
 de build/test** en WebEmpresa (§4 #4). Todas las citas `archivo:linea` son
-relativas a la raíz de `WebEmpresa` y verificables con `git show`/lectura directa.*
+relativas a la raíz de `WebEmpresa` y verificables con `git show`/lectura directa._

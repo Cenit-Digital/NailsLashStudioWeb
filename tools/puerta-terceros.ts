@@ -17,10 +17,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import process from 'node:process'
 
-import {
-  ejecutarPuertaDeTerceros,
-  PARES_DE_FUENTE_ESPERADOS,
-} from '../src/lib/puerta-terceros.ts'
+import { ejecutarPuertaDeTerceros, PARES_DE_FUENTE_ESPERADOS } from '../src/lib/puerta-terceros.ts'
 import type { RecursoDeArtefacto } from '../src/lib/terceros.ts'
 
 const DIRECTORIO_ARTEFACTO = 'dist'

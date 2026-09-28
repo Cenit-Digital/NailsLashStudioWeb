@@ -57,7 +57,7 @@ lo trata como fallo, igual que en los demás stacks:
 ```yaml
 # .gremlins.yaml
 thresholds:
-  efficacy: 100   # % mínimo de mutantes muertos; el arnés exige 100 en los ejemplos
+  efficacy: 100 # % mínimo de mutantes muertos; el arnés exige 100 en los ejemplos
   mutant-coverage: 0
 ```
 

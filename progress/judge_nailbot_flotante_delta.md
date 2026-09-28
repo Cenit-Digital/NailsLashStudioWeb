@@ -5,6 +5,7 @@
 Revisión delta de solo lectura (2026-09-28) contra `progress/judge_nailbot_flotante.md`.
 
 Qué he hecho:
+
 - NO he lanzado `pnpm build`, Stryker ni la suite completa (orden del lead). `bin/harness init` 46/46 y 1475/1475 es medición del lead.
 - Tests acotados: `pnpm exec vitest run` sobre `nailbot-flotante.test.tsx`, `nailbot-flotante-logica.test.ts`, `nailbot-flotante-estilos.test.ts` y `nailbot-arte.test.tsx`. Resultado: 4 ficheros, **90/90 en verde**.
 - ESLint sobre los 7 ficheros de F-24, `vitest.setup.ts`, `tools/mutate.mjs` y las 5 `tools/puerta-*.ts`: exit 0.
@@ -47,6 +48,7 @@ Qué he hecho:
    - Siguen abiertos, no bloquean: partir el componente en hooks; `@media` anidado dentro de `.pausa { … }` (`estilos.test.ts:199-207` sigue sin verlo); escapado de `tools/mutate.mjs`.
 
 ## Cobertura de escenarios (@s ↔ test)
+
 - @s1: [x] `nailbot-flotante.test.tsx:87`, `:109`
 - @s2: [x] `nailbot-flotante.test.tsx:115`, `:151`
 - @s3: [x] `nailbot-flotante.test.tsx:166`
@@ -66,6 +68,7 @@ Qué he hecho:
 Ningún `@s` sin test.
 
 ## Disciplina TDD
+
 - **¿Producción sin test que la pida?** SÍ, solo en CSS nuevo de la ronda a11y, y con una trampa:
   - `nailbot-flotante.module.scss:18-23`: `.flotante { pointer-events: none; > * { pointer-events: auto } }`. Ningún test lo exige (grep `pointer-events` en los tests de F-24: 0 resultados). Es CSS que decide si el widget recibe clics:
     - si alguien borra o des-anida la regla `> *`, el robot, la pausa, la × y el panel dejan de recibir clics y toques, y los 1475 tests, las 5 puertas y el typecheck siguen en verde (`fireEvent.click` de jsdom ignora `pointer-events`);
@@ -75,6 +78,7 @@ Ningún `@s` sin test.
 - **¿Evidencia de Rojo→Verde→Refactor?** NO para el código original: la vía rápida está declarada en `progress/tdd_nailbot_flotante.md:3-12` y es una excepción aceptada y registrada. Las curas de esta ronda sí traen su test (icono, cascada, temporizador, `box-sizing`, `enfocar`/`focoDentro`), salvo el CSS de arriba.
 
 ## Calidad
+
 - `NailbotFlotante.tsx:43` y `:87`: `msDesdeElMontaje` solo toma los valores 0 y `RETARDO_BOCADILLO_MS`. El nombre promete una medida y en la práctica es un «tiempo cumplido». Lo impone la firma de @s6 (filas 3 999/4 000/60 000 ms), así que es coherente con el contrato. Menor de nombre, no bloquea.
 - `nailbot-flotante-logica.ts:51` y `:61`: el `if` explícito sobre `"preferencia"` y el `return estado` final son inalcanzables según los tipos (tras los dos `if`, `evento` es `never`). Solo los pide un test que fuerza un tipo imposible con un cast (`logica.test.ts:81-88`), es decir, código con la forma que pide Stryker. Sería más limpio un `switch` exhaustivo con comprobación `never`. Menor.
 - `nailbot-flotante-logica.ts:43-45`: la rama `estado === null` de `pulsarPausa` la exige el tipo (`EstadoAnimacion | null`); queda justificada. Cerrado.
@@ -90,6 +94,7 @@ Ningún `@s` sin test.
   - `_base.scss`: el paso de rem a px de `--nailbot-lanzador` lo exige @s14 («valor en px»). Correcto.
 
 ## Checkpoints
+
 - C1: [x] ficheros base · [x] docs · [x] `bin/harness init` exit 0 según la medición del lead (no re-ejecutado por orden; los 4 ficheros de F-24 dan 90/90 y ESLint exit 0)
 - C2: [x] una sola `in_progress` (F-23) · [x] las `done` con tests verdes (suite completa del lead: 1475/1475) · [x] `current.md` describe la sesión (falta la nota de F-24 en `spec_ready`, menor)
 - C3: [x] módulos previstos · [x] sin dependencias nuevas · [x] sin logs ni TODOs
@@ -99,6 +104,7 @@ Ningún `@s` sin test.
 - C7: [x] 100 % en los 7 ficheros, timeouts re-medidos a concurrencia 1, equivalentes justificados con precedente (`progress/mutation_nailbot.md`). El SCSS queda fuera de la mutación, que es justo por lo que el punto de C6 importa.
 
 ## Cambios requeridos
+
 1. **Test de bytes para el `pointer-events` del contenedor** (`nailbot-flotante.module.scss:18-23`), a añadir en `nailbot-flotante-estilos.test.ts`, bloque @s13. No hace falta tocar producción.
    - Ancla positiva: `.flotante` declara `pointer-events: none`.
    - Además, una regla hija directa de `.flotante` (el `> *` anidado) devuelve `pointer-events: auto`.

@@ -8,9 +8,9 @@ que esta sección "NO compone la solicitud" y que eso era F-13 (`pending`). Hizo
 contrato lo escribió un agente esa misma mañana y no había puerta humana para tocarlo.
 
 DESPUÉS, el `craftsman_lead` preguntó a Pablo explícitamente (`AskUserQuestion`) qué debía pasar al
-terminar el chat. Pablo eligió: *"Que acabe abriendo WhatsApp — Al terminar las 4 preguntas, un botón
+terminar el chat. Pablo eligió: _"Que acabe abriendo WhatsApp — Al terminar las 4 preguntas, un botón
 abre WhatsApp con la reserva ya escrita (servicio, día, franja y nombre) para que la clienta la
-envíe."* La puerta humana quedó abierta para esta pieza concreta (no para el resto de F-13: sigue
+envíe."_ La puerta humana quedó abierta para esta pieza concreta (no para el resto de F-13: sigue
 pendiente la disponibilidad real por profesional/franja y la confirmación de servidor).
 
 Esta sesión reescribe la frontera del contrato (`@s22` acotado + `@s23`/`@s24` nuevos, con la cabecera
@@ -36,7 +36,7 @@ Esta sesión reescribe la frontera del contrato (`@s22` acotado + `@s23`/`@s24` 
 - **VERDE**: en `Reserva.tsx`, dentro de `{hecho && (...)}` se envuelve en un Fragment y se añade el
   `<a className="demo-btn demo-btn--wa" href={...}>` ANTES del `<button>` de reiniciar. El href sale
   de un nuevo helper local `hrefReservaWhatsapp(respuestas)` que junta `waHref(TELEFONO.legible,
-  mensajeReserva(...))` — ninguna composición de texto vive en el JSX.
+mensajeReserva(...))` — ninguna composición de texto vive en el JSX.
 - **REFACTOR**: la llamada `waHref(TELEFONO.legible, mensajeReserva({...}))` se extrajo del JSX a
   `hrefReservaWhatsapp` (module-scope, no exportado, hermano de `mensajeInicial`) para que la línea del
   `<a>` quede en una sola línea legible. Tests re-corridos tras el cambio: siguen verdes.

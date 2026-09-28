@@ -131,17 +131,20 @@ describe('@s1 la puerta de anclas acusa un ancla muerta', () => {
     ['#colores', 'colores'],
     ['#servicios', 'servicios'],
     ['#contacto', 'contacto'],
-  ])('@s1 la nav enlaza %s y la página no tiene ese id → 1 violación que declara el ancla y el id', (ancla, idBuscado) => {
-    const violaciones = inspeccionarAnclas([
-      { ruta: '/', html: html({ anclasNav: [ancla], headingsSueltos: [`${idBuscado}-titulo`] }) },
-    ])
+  ])(
+    '@s1 la nav enlaza %s y la página no tiene ese id → 1 violación que declara el ancla y el id',
+    (ancla, idBuscado) => {
+      const violaciones = inspeccionarAnclas([
+        { ruta: '/', html: html({ anclasNav: [ancla], headingsSueltos: [`${idBuscado}-titulo`] }) },
+      ])
 
-    expect(violaciones).toHaveLength(1)
-    expect(violaciones[0].regla).toBe(REGLA_ANCLA_MUERTA)
-    expect(violaciones[0].ruta).toBe('/')
-    expect(violaciones[0].ancla).toBe(ancla)
-    expect(violaciones[0].id).toBe(idBuscado)
-  })
+      expect(violaciones).toHaveLength(1)
+      expect(violaciones[0].regla).toBe(REGLA_ANCLA_MUERTA)
+      expect(violaciones[0].ruta).toBe('/')
+      expect(violaciones[0].ancla).toBe(ancla)
+      expect(violaciones[0].id).toBe(idBuscado)
+    },
+  )
 })
 
 /**
@@ -182,7 +185,10 @@ describe('@s3 una sección navegable que ninguna ancla enlaza es inalcanzable', 
       const violaciones = inspeccionarAnclas([
         {
           ruta: '/',
-          html: html({ secciones: [{ labelledby: idSeccion, headingId: idSeccion }], anclasNav: [] }),
+          html: html({
+            secciones: [{ labelledby: idSeccion, headingId: idSeccion }],
+            anclasNav: [],
+          }),
         },
       ])
 
@@ -488,7 +494,9 @@ describe('@s10 la puerta de anclas está enganchada al build de PRODUCCIÓN, no 
     const build = scripts().build
 
     expect(build).toContain('tools/puerta-anclas.ts')
-    expect(build.indexOf('vite-react-ssg build')).toBeLessThan(build.indexOf('tools/puerta-anclas.ts'))
+    expect(build.indexOf('vite-react-ssg build')).toBeLessThan(
+      build.indexOf('tools/puerta-anclas.ts'),
+    )
     expect(build.indexOf('tools/puerta-cascaron.ts')).toBeLessThan(
       build.indexOf('tools/puerta-anclas.ts'),
     )

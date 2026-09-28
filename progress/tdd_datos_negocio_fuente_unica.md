@@ -5,6 +5,7 @@ Contrato: `features/datos_negocio_fuente_unica.feature` (`@s1..@s12`).
 Depende de F-01 (`done`): `src/lib/placeholders.ts`, `src/lib/puerta.ts`.
 
 Artefactos que construyo:
+
 - `src/lib/site.ts` (NUEVO): fuente única del NAP + `telHref` + `waHref` + `registros`.
 - `src/lib/site.test.ts` (NUEVO): los 12 escenarios, co-locado.
 - `tools/puerta-placeholders.ts`: cablea `registros` (A-12) — el humilde, sin tests.
@@ -18,6 +19,7 @@ reexportarlos (tocar F-01, ya `done`) o una regla propia alineada en `site.ts`.
 
 **Elegido: regla propia en `site.ts`, alineada con el comportamiento observable
 de F-01, SIN acoplarse a internos no exportados.** Motivos:
+
 1. **No toco F-01 (`done`).** Exportar constantes de `placeholders.ts` es
    producción nueva en un módulo cerrado sin un test rojo de F-01 que lo pida
    (violaría la Ley 1 sobre otra feature) y abre superficie de mutación cruzada.
@@ -97,11 +99,11 @@ la primera" (@s6, @s8, @s9, @s12) se verificaron mordiendo la producción a mano
 `pnpm exec stryker run --mutate src/lib/site.ts --concurrency 2`.
 
 - **1ª corrida: 96.49 %, 2 supervivientes** (0 timeouts, corrida tranquila).
-  1. `throw new Error(\`…\`)` → `Error(\`\`)`: `@s11` con `toThrow()` sin mensaje no
-     lo veía. Un error MUDO viola la "falla RUIDOSA" que el propio contrato exige
-     (sección modos de error). **MATADO**: simplifiqué el mensaje a un literal
-     único y `@s11`/`@s12` anclan el fragmento `'teléfono'` escrito a mano
-     (`toThrow('teléfono')`) — precedente F-01 `@s22` (anclar la causa). No se
+  1. `throw new Error(\`…\`)`→`Error(\`\`)`: `@s11`con`toThrow()`sin mensaje no
+lo veía. Un error MUDO viola la "falla RUIDOSA" que el propio contrato exige
+(sección modos de error). **MATADO**: simplifiqué el mensaje a un literal
+único y`@s11`/`@s12`anclan el fragmento`'teléfono'` escrito a mano
+(`toThrow('teléfono')`) — precedente F-01 `@s22` (anclar la causa). No se
      importa la constante de producción (anti-tautología).
   2. `HOST_WHATSAPP = 'https://wa.me/'` → `''`: **mutante equivalente respecto al
      contrato** (A-10: el `.feature` ordena NO aseverar el host). Excluido
@@ -127,13 +129,13 @@ la primera" (@s6, @s8, @s9, @s12) se verificaron mordiendo la producción a mano
   `@s2 Facebook…`, `@s2 no se expone ningún … TikTok`.
 - **@s3** (telHref legible) → `@s3 normaliza el teléfono legible a "tel:+34625223366"`.
 - **@s4** (separadores/prefijo/idempotencia) → Outline `@s4 telHref("%s") es
-  "tel:+34625223366"` (8 filas).
+"tel:+34625223366"` (8 filas).
 - **@s5** (waHref sin `+` + urlencoded) → `@s5 lleva el número "34625223366"…`.
 - **@s6** (encodeURIComponent) → Outline `@s6 escapa "%s" … a "%s"` (4 filas).
 - **@s7** (texto vacío omite `?text=`) → `@s7 con texto vacío OMITE el parámetro text…`.
 - **@s8** (fuente única) → `@s8 el texto y ambos href salen del mismo dato canónico…`.
 - **@s9** (encaje vía patrón) → Outline `@s9 el teléfono real "%s" no produce
-  ninguna violación` (3 filas), sobre `detectarPlaceholders` real.
+ninguna violación` (3 filas), sobre `detectarPlaceholders` real.
 - **@s10** (registros → puerta, A-11/A-12) → `@s10 registros proyecta el NAP…`,
   `@s10 la puerta de F-01 … no emite ninguna violación`,
   `@s10 el email NO figura…`. Efecto observable: `pnpm build` verde.

@@ -25,7 +25,7 @@ Todas las citas legales de este informe se han extraído de los **textos consoli
    Es práctica desleal por engañosa **per se** (art. 27.8 LCD vía art. 19.2 LCD: "en todo caso y en
    cualquier circunstancia"). No hace falta que nadie se engañe ni que se demuestre daño: basta la
    conducta. ✅ Esto incluye el riesgo más probable y más real del proyecto: dejar testimonios
-   *placeholder* de maqueta en el sitio real al lanzar.
+   _placeholder_ de maqueta en el sitio real al lanzar.
 
 2. **Prohibido publicar solo las reseñas positivas filtrando las negativas.** El considerando (49)
    de la Directiva 2019/2161 cita expresamente como manipulación prohibida "publicando únicamente
@@ -37,8 +37,8 @@ Todas las citas legales de este informe se han extraído de los **textos consoli
    que proceden de clientes reales, **y de explicar cómo se procesan** (art. 20.4 TRLGDCU). ✅
    Incumplirlo es, por mandato legal expreso, práctica desleal engañosa (art. 20.6 TRLGDCU).
 
-4. **Cuidado con la afirmación de verificación.** Decir "reseñas verificadas" *sin tomar medidas
-   razonables y proporcionadas* para comprobarlo es infracción **per se** (art. 27.7 LCD). ✅
+4. **Cuidado con la afirmación de verificación.** Decir "reseñas verificadas" _sin tomar medidas
+   razonables y proporcionadas_ para comprobarlo es infracción **per se** (art. 27.7 LCD). ✅
    Es más seguro **no afirmar** verificación que afirmarla sin poder probarla — sobre todo porque
    **la carga de la prueba recae en el empresario** (arts. 20.5 y 51.7 TRLGDCU). ✅
 
@@ -69,23 +69,26 @@ entre otras, la **Directiva (UE) 2019/2161** ("Ómnibus"), que a su vez modific�
 de prácticas comerciales desleales.
 
 Fuentes:
+
 - RDL 24/2021: <https://www.boe.es/diario_boe/txt.php?id=BOE-A-2021-17910>
 - Directiva (UE) 2019/2161: <https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:32019L2161>
 
 Dos preceptos del RDL 24/2021 nos importan, y los he verificado en el historial de versiones del BOE:
 
-| Precepto del RDL 24/2021 | Qué modificó | Entrada en vigor |
-| --- | --- | --- |
-| **art. 82.2** | Da nueva redacción al **art. 20 TRLGDCU** → introduce el apartado 4 sobre reseñas | **28 de mayo de 2022** (DF 10.c) ✅ |
-| **art. 84.3** | **Añade los apartados 6, 7 y 8 al art. 27 LCD** | **28 de mayo de 2022** (DF 10.c) ✅ |
+| Precepto del RDL 24/2021 | Qué modificó                                                                      | Entrada en vigor                    |
+| ------------------------ | --------------------------------------------------------------------------------- | ----------------------------------- |
+| **art. 82.2**            | Da nueva redacción al **art. 20 TRLGDCU** → introduce el apartado 4 sobre reseñas | **28 de mayo de 2022** (DF 10.c) ✅ |
+| **art. 84.3**            | **Añade los apartados 6, 7 y 8 al art. 27 LCD**                                   | **28 de mayo de 2022** (DF 10.c) ✅ |
 
 ✅ Verificado en las notas de vigencia del texto consolidado del BOE:
+
 > "Se añaden los apartados 6, 7 y 8 por el art. 84.3 del Real Decreto-ley 24/2021, de 2 de noviembre.
 > Ref. BOE-A-2021-17910#a8-6 — Los apartados 6, 7 y 8 añadidos entran en vigor el 28 de mayo de 2022,
 > según establece la disposición final 10.c) del citado Real Decreto-ley."
 
 **Capa posterior importante:** la **Ley 10/2025, de 26 de diciembre, por la que se regulan los
 servicios de atención a la clientela** (BOE-A-2025-26698) volvió a tocar la materia:
+
 - Su **DF 3ª.Uno** modificó el **art. 20.4 TRLGDCU**, añadiendo la regla de los 30 días y la facultad
   de solicitar la eliminación de reseñas. Vigencia **28/12/2025**. ✅
 - Su **DF 1ª** añadió el **apartado 9 al art. 27 LCD** (personalización de precios; no nos afecta). ✅
@@ -101,15 +104,16 @@ Fuente: <https://www.boe.es/buscar/doc.php?id=BOE-A-2025-26698>
 
 ### 2.2 ¿Es práctica desleal/engañosa PER SE publicar reseñas inventadas? → **SÍ**
 
-✅ **VERIFICADO.** La clave está en el **art. 19.2 LCD**, que fija el carácter *per se*:
+✅ **VERIFICADO.** La clave está en el **art. 19.2 LCD**, que fija el carácter _per se_:
 
 > **Artículo 19. Prácticas comerciales desleales con los consumidores.**
+>
 > 1. Sin perjuicio de lo establecido en los artículos 19 y 20 del texto refundido de la Ley General
-> para la Defensa de los Consumidores y Usuarios y otras leyes complementarias, únicamente tendrán la
-> consideración de prácticas comerciales desleales con los consumidores y usuarios, las previstas en
-> este capítulo y en los artículos 4, 5, 7 y 8 de esta ley.
-> **2. Las prácticas comerciales reguladas en los artículos 21 a 31, ambos inclusive, son en todo caso
-> y en cualquier circunstancia, prácticas comerciales desleales con los consumidores.**
+>    para la Defensa de los Consumidores y Usuarios y otras leyes complementarias, únicamente tendrán la
+>    consideración de prácticas comerciales desleales con los consumidores y usuarios, las previstas en
+>    este capítulo y en los artículos 4, 5, 7 y 8 de esta ley.
+>    **2. Las prácticas comerciales reguladas en los artículos 21 a 31, ambos inclusive, son en todo caso
+>    y en cualquier circunstancia, prácticas comerciales desleales con los consumidores.**
 
 Fuente: art. 19 LCD, texto consolidado — <https://www.boe.es/buscar/act.php?id=BOE-A-1991-628>
 (bloque `a19`, versión vigente desde 2010-01-01, redacción por Ley 29/2009).
@@ -176,6 +180,7 @@ Fuente: considerando (49), Directiva (UE) 2019/2161 —
 **"distorsionen reseñas de consumidores o usuarios […] con el fin de promocionar bienes o servicios"**.
 La subsunción del filtrado en "distorsionar" es una **inferencia interpretativa**, pero descansa en
 base sólida:
+
 - el considerando (49) es el criterio interpretativo auténtico de la norma que el art. 27.8 transpone;
 - la DPCD es de **armonización plena**, por lo que el art. 27.8 debe leerse conforme a ella;
 - el considerando cita el filtrado **como ejemplo de la conducta típica**, no como supuesto distinto.
@@ -227,18 +232,20 @@ Fuente: art. 20 TRLGDCU, texto consolidado —
 
 **Trazabilidad de cada párrafo** (✅ verificado en el historial de versiones del BOE):
 
-| Párrafo del art. 20.4 | Introducido por | Vigente desde |
-| --- | --- | --- |
-| Párrafo 1º (garantiza o no + cómo se procesan) | **art. 82.2 RDL 24/2021** (Ómnibus) | 28/05/2022 |
-| Párrafo 2º (**30 días naturales** + derecho de respuesta) | **DF 3ª.Uno Ley 10/2025** | 28/12/2025 |
-| Párrafo 3º (solicitud de eliminación) | **DF 3ª.Uno Ley 10/2025** | 28/12/2025 |
+| Párrafo del art. 20.4                                     | Introducido por                     | Vigente desde |
+| --------------------------------------------------------- | ----------------------------------- | ------------- |
+| Párrafo 1º (garantiza o no + cómo se procesan)            | **art. 82.2 RDL 24/2021** (Ómnibus) | 28/05/2022    |
+| Párrafo 2º (**30 días naturales** + derecho de respuesta) | **DF 3ª.Uno Ley 10/2025**           | 28/12/2025    |
+| Párrafo 3º (solicitud de eliminación)                     | **DF 3ª.Uno Ley 10/2025**           | 28/12/2025    |
 
 Correspondencia europea del párrafo 1º ✅: **art. 7.6 DPCD** (añadido por la Ómnibus):
+
 > "Cuando un comerciante facilite el acceso a las reseñas de los consumidores sobre los productos, se
 > considerará **esencial** la información acerca de si el comerciante garantiza que las reseñas
 > publicadas pertenezcan a consumidores que hayan realmente utilizado o adquirido el producto."
 
 **Qué son "medidas razonables y proporcionadas"** ✅ — considerando (47), última frase:
+
 > "Dichas medidas podrían incluir **medios técnicos para verificar la fiabilidad de la persona que
 > publica la reseña**, por ejemplo, **solicitando información para comprobar que el consumidor ha
 > adquirido o utilizado realmente el producto**."
@@ -247,11 +254,11 @@ Es una lista abierta y **ejemplificativa**, no un estándar cerrado. 🔶 Para u
 natural sería la cita/reserva efectivamente realizada.
 
 > ⚠️ **Defecto de técnica legislativa que conviene conocer** 🔶 **INFERENCIA.** El párrafo 2º dice
-> *"a efectos del **apartado anterior**"* estando **dentro** del propio apartado 4. Literalmente
+> _"a efectos del **apartado anterior**"_ estando **dentro** del propio apartado 4. Literalmente
 > remitiría al apartado 3 (clasificación en buscadores), lo que carece de sentido. La lectura
-> razonable es que quiso decir *"del párrafo anterior"* (es decir, del propio régimen de reseñas).
+> razonable es que quiso decir _"del párrafo anterior"_ (es decir, del propio régimen de reseñas).
 > **El alcance exacto de la regla de los 30 días es, por tanto, jurídicamente incierto**: no está claro
-> si (a) impide *publicar* reseñas sobre experiencias de hace más de 30 días, o (b) es solo un criterio
+> si (a) impide _publicar_ reseñas sobre experiencias de hace más de 30 días, o (b) es solo un criterio
 > a efectos de la facultad de eliminación/verificación. **Es el punto más dudoso del informe.** ❌ No he
 > encontrado doctrina, guía oficial ni jurisprudencia que lo aclare (§3).
 
@@ -261,18 +268,18 @@ natural sería la cita/reserva efectivamente realizada.
 
 ✅ Salvo donde se indique.
 
-| Conducta | Precepto | ¿Per se? | Notas |
-| --- | --- | --- | --- |
-| Publicar testimonios inventados / de relleno | **art. 27.8 LCD** | **SÍ** (art. 19.2) | Incluye *placeholders* de maqueta al lanzar |
-| Encargar reseñas a terceros (agencia, amigos, compra de reseñas) | **art. 27.8 LCD** | **SÍ** | "o encarguen a otra persona física o jurídica" |
-| Publicar solo positivas / eliminar negativas | **art. 27.8 LCD** ("distorsionen") | **SÍ** | 🔶 subsunción vía considerando (49) |
-| Decir "reseñas verificadas" sin medidas razonables | **art. 27.7 LCD** | **SÍ** | Riesgo alto si se afirma sin poder probar |
-| No informar de si se garantiza la verificación | **art. 20.4 + 20.6 TRLGDCU** | No | El 20.6 lo remite al **art. 7 LCD** (omisión engañosa) |
-| No explicar cómo se procesan las reseñas | **art. 20.4 + 20.6 TRLGDCU** | No | Ídem |
-| Fingir ser cliente (el salón se autorreseña) | **art. 27.5 LCD** | **SÍ** | "presentarse de forma fraudulenta como un consumidor o usuario" ✅ |
-| Exhibir sello de calidad sin autorización | **art. 21.2 LCD** | **SÍ** | "es igualmente, **en todo caso**, una práctica comercial desleal por engañosa" ✅ |
+| Conducta                                                         | Precepto                           | ¿Per se?           | Notas                                                                             |
+| ---------------------------------------------------------------- | ---------------------------------- | ------------------ | --------------------------------------------------------------------------------- |
+| Publicar testimonios inventados / de relleno                     | **art. 27.8 LCD**                  | **SÍ** (art. 19.2) | Incluye _placeholders_ de maqueta al lanzar                                       |
+| Encargar reseñas a terceros (agencia, amigos, compra de reseñas) | **art. 27.8 LCD**                  | **SÍ**             | "o encarguen a otra persona física o jurídica"                                    |
+| Publicar solo positivas / eliminar negativas                     | **art. 27.8 LCD** ("distorsionen") | **SÍ**             | 🔶 subsunción vía considerando (49)                                               |
+| Decir "reseñas verificadas" sin medidas razonables               | **art. 27.7 LCD**                  | **SÍ**             | Riesgo alto si se afirma sin poder probar                                         |
+| No informar de si se garantiza la verificación                   | **art. 20.4 + 20.6 TRLGDCU**       | No                 | El 20.6 lo remite al **art. 7 LCD** (omisión engañosa)                            |
+| No explicar cómo se procesan las reseñas                         | **art. 20.4 + 20.6 TRLGDCU**       | No                 | Ídem                                                                              |
+| Fingir ser cliente (el salón se autorreseña)                     | **art. 27.5 LCD**                  | **SÍ**             | "presentarse de forma fraudulenta como un consumidor o usuario" ✅                |
+| Exhibir sello de calidad sin autorización                        | **art. 21.2 LCD**                  | **SÍ**             | "es igualmente, **en todo caso**, una práctica comercial desleal por engañosa" ✅ |
 
-> **Matiz relevante** 🔶: la vía del art. 20.6 → art. 7 LCD **no** es *per se* (el art. 7 no está en el
+> **Matiz relevante** 🔶: la vía del art. 20.6 → art. 7 LCD **no** es _per se_ (el art. 7 no está en el
 > rango 21–31 del art. 19.2), por lo que en teoría requeriría el test de aptitud para distorsionar el
 > comportamiento económico. **Pero** el art. 20.6 califica el incumplimiento directamente como práctica
 > desleal engañosa, y el art. 7.6 DPCD declara esa información **"esencial"** — lo que en la práctica
@@ -307,14 +314,12 @@ el incumplimiento del deber de información del art. 20.4. 🔶
 **b) La calificación — art. 48 TRLGDCU** (vigente desde 28/12/2025):
 
 > **Artículo 48. Calificación y Graduación de las infracciones.**
-> […]
-> 2. […] las infracciones se calificarán inicialmente por los caracteres de la acción u omisión y de la
+> […] 2. […] las infracciones se calificarán inicialmente por los caracteres de la acción u omisión y de la
 > culpabilidad del responsable conforme a las siguientes reglas:
 > **a) Las infracciones de los apartados f), g), i), k), m), n), ñ), p), q) y t) del artículo 47 se
 > calificarán como leves, salvo que tengan la consideración de graves de acuerdo con el apartado
 > tercero de este artículo.**
-> […]
-> 3. Las infracciones que […] merezcan en principio la calificación de leve o grave […] serán
+> […] 3. Las infracciones que […] merezcan en principio la calificación de leve o grave […] serán
 > calificadas respectivamente como **graves o muy graves** si concurriere alguna de las siguientes
 > circunstancias:
 > a) Haber sido realizadas aprovechando situaciones de necesidad […]
@@ -326,8 +331,7 @@ el incumplimiento del deber de información del art. 20.4. 🔶
 > d) Producir una **alteración social grave** […] originando alarma o desconfianza en los consumidores
 > o usuarios o incidiendo desfavorablemente en un sector económico.
 > e) Realizarse prevaliéndose de la situación de predominio del infractor en un sector del mercado.
-> f) Ser **reincidente** el responsable […]
-> 4. Las infracciones que […] merezcan en principio la calificación de grave o muy grave **se
+> f) Ser **reincidente** el responsable […] 4. Las infracciones que […] merezcan en principio la calificación de grave o muy grave **se
 > considerarán respectivamente como leve o grave si antes de iniciarse el procedimiento sancionador el
 > responsable corrigiera diligentemente las irregularidades** […]
 
@@ -338,31 +342,32 @@ arreglar la web en cuanto se detecte el problema **rebaja la calificación**. �
 **c) La multa — art. 49 TRLGDCU** (redacción vigente desde 04/11/2022, por Ley 23/2022 DF 1ª.4):
 
 > **Artículo 49. Sanciones.**
+>
 > 1. La imposición de sanciones deberá garantizar, en cualquier circunstancia, que la comisión de una
-> infracción no resulte más beneficiosa para la parte infractora que el incumplimiento de las normas
-> infringidas. Sobre esta base, las infracciones serán sancionadas con multa comprendida entre los
-> siguientes importes máximos y mínimos:
-> **a) Infracciones leves: entre 150 y 10.000 euros**, pudiéndose sobrepasar esas cantidades hasta
-> alcanzar entre **dos y cuatro veces el beneficio ilícito** obtenido.
-> **b) Infracciones graves: entre 10.001 y 100.000 euros** pudiéndose sobrepasar esas cantidades hasta
-> alcanzar entre **cuatro y seis veces el beneficio ilícito** obtenido.
-> **c) Infracciones muy graves: ente 100.001 y 1.000.000 de euros** [*sic*, "ente" en el BOE],
-> pudiéndose sobrepasar esas cantidades hasta alcanzar entre **seis y ocho veces el beneficio ilícito**
-> obtenido.
-> No obstante, cuando la aplicación de los rangos indicados anteriormente conlleve la imposición de una
-> sanción desproporcionada en relación con la **capacidad económica** del infractor se podrá utilizar el
-> rango asignado a la calificación de un menor nivel de gravedad para el cálculo de la sanción.
+>    infracción no resulte más beneficiosa para la parte infractora que el incumplimiento de las normas
+>    infringidas. Sobre esta base, las infracciones serán sancionadas con multa comprendida entre los
+>    siguientes importes máximos y mínimos:
+>    **a) Infracciones leves: entre 150 y 10.000 euros**, pudiéndose sobrepasar esas cantidades hasta
+>    alcanzar entre **dos y cuatro veces el beneficio ilícito** obtenido.
+>    **b) Infracciones graves: entre 10.001 y 100.000 euros** pudiéndose sobrepasar esas cantidades hasta
+>    alcanzar entre **cuatro y seis veces el beneficio ilícito** obtenido.
+>    **c) Infracciones muy graves: ente 100.001 y 1.000.000 de euros** [_sic_, "ente" en el BOE],
+>    pudiéndose sobrepasar esas cantidades hasta alcanzar entre **seis y ocho veces el beneficio ilícito**
+>    obtenido.
+>    No obstante, cuando la aplicación de los rangos indicados anteriormente conlleve la imposición de una
+>    sanción desproporcionada en relación con la **capacidad económica** del infractor se podrá utilizar el
+>    rango asignado a la calificación de un menor nivel de gravedad para el cálculo de la sanción.
 >
 > 2. Para determinar […] el importe de la multa […] se atenderá especialmente a […] la naturaleza de la
-> infracción, el grado de culpabilidad o la existencia de intencionalidad, el carácter continuado de la
-> infracción, **el número de consumidores afectados**, el nivel de los daños y perjuicios que hayan
-> sufrido […] así como **el volumen de negocio anual** o cualquier otro indicador de su capacidad
-> económica.
-> […]
-> **5. Cuando se impongan sanciones con arreglo al artículo 21 del Reglamento (UE) 2017/2394, su importe
-> máximo para infracciones muy graves, equivaldrá al 4 % del volumen de negocio anual del empresario en
-> España o en los Estados miembros afectados por la infracción. En caso de no disponerse de esta
-> información, se podrán imponer multas cuyo importe máximo equivaldrá a dos millones de euros.**
+>    infracción, el grado de culpabilidad o la existencia de intencionalidad, el carácter continuado de la
+>    infracción, **el número de consumidores afectados**, el nivel de los daños y perjuicios que hayan
+>    sufrido […] así como **el volumen de negocio anual** o cualquier otro indicador de su capacidad
+>    económica.
+>    […]
+>    **5. Cuando se impongan sanciones con arreglo al artículo 21 del Reglamento (UE) 2017/2394, su importe
+>    máximo para infracciones muy graves, equivaldrá al 4 % del volumen de negocio anual del empresario en
+>    España o en los Estados miembros afectados por la infracción. En caso de no disponerse de esta
+>    información, se podrán imponer multas cuyo importe máximo equivaldrá a dos millones de euros.**
 
 Fuente: <https://www.boe.es/buscar/act.php?id=BOE-A-2007-20555> (bloque `a49`).
 
@@ -421,7 +426,7 @@ legitimación del art. 33 LCD) — ver §3.
 🔶 **INFERENCIA (grado de confianza: alto).** El art. 20.4 TRLGDCU se activa con
 **"las prácticas comerciales en las que un empresario facilite el acceso a las reseñas"**. El precepto
 **no distingue** entre plataforma de terceros y web propia, ni exige que el empresario sea un
-*marketplace*. Una sección de "testimonios" o un widget de reseñas de Google en la home del salón
+_marketplace_. Una sección de "testimonios" o un widget de reseñas de Google en la home del salón
 **facilita el acceso a reseñas** y, por tanto, queda dentro del tipo.
 
 Refuerzo ✅: el considerando (47) habla genéricamente de "cuando los comerciantes faciliten el acceso a
@@ -438,18 +443,18 @@ opción de menor riesgo, no como opción de riesgo cero.
 
 ## 3. Lo que NO he podido verificar
 
-| # | Afirmación / cuestión pendiente | Estado | Qué haría falta para verificarlo |
-| --- | --- | --- | --- |
-| 1 | **Alcance real de la regla de los 30 días** (art. 20.4 párr. 2º): ¿prohíbe publicar reseñas sobre experiencias de hace >30 días, o solo condiciona la facultad de eliminación? La remisión "a efectos del apartado anterior" es defectuosa. | ❌ **Es la mayor incertidumbre del informe** | Preámbulo/tramitación parlamentaria de la Ley 10/2025; guía de la Dirección General de Consumo; doctrina; primera jurisprudencia. Consulta a abogado. |
-| 2 | Contenido de la **Guía de la Comisión sobre la DPCD (2021/C 526/01), sección 4.2.4** sobre reseñas (aplicación a webs propias, filtrado, medidas razonables). | ❌ Verifiqué que **la sección 4.2.4 existe y versa sobre reseñas**, pero el documento se truncó al recuperarlo | Descargar el PDF completo de la Comunicación 2021/C 526/01 desde EUR-Lex y leer la sección 4.2.4 íntegra. |
-| 3 | Si un **enlace simple** (no incrustado) a Google Reviews activa el art. 20.4. | ❌ | Guía oficial de Consumo / doctrina / jurisprudencia. Consulta a abogado. |
-| 4 | **Autoridad competente concreta** para sancionar a un salón en Las Rozas de Madrid y su normativa autonómica de consumo (posibles tipos o cuantías propios de la Comunidad de Madrid). | ❌ No investigado | Ley de consumo de la Comunidad de Madrid + estructura de la Dirección General competente. La normativa autonómica **puede** endurecer el marco. |
-| 5 | **Articulado civil de la LCD** (acciones de cesación/rectificación, art. 32; legitimación de competidores, art. 33). | ❌ No verificado en este informe | Recuperar bloques `a32`/`a33` del texto consolidado de la LCD (BOE-A-1991-628). |
-| 6 | **Jurisprudencia española** aplicando los arts. 27.7/27.8 LCD a reseñas desde 2022. | ❌ No investigado | Búsqueda en CENDOJ. Relevante para calibrar el riesgo real de sanción. |
-| 7 | Si existe **resolución sancionadora publicada** por reseñas falsas en España (art. 49.7 TRLGDCU obliga a publicar las muy graves). | ❌ No investigado | Webs de las autoridades de consumo autonómicas y estatal. |
-| 8 | **Datos del negocio**: si el salón ya tiene perfil de Google/reseñas, cuántas, y si piensa mostrarlas en la web. | ❌ **Desconocido** — `project-spec.md` está en estado de plantilla vacía (`project-spec.md:9-11`) y `feature_list.json` solo contiene `ejemplo_feature` (`feature_list.json:14-24`) | Preguntar al negocio. **Bloquea el diseño de la feature.** |
-| 9 | Aplicabilidad del **Reglamento (UE) 2022/2065 (DSA)** — no analizado; en principio no aplica a una web corporativa que no es intermediario. | ❌ No investigado | Analizar solo si la web permitiera publicar reseñas de terceros. |
-| 10 | Encaje de **RGPD/LOPDGDD** al publicar nombre/foto de clientes en testimonios (base jurídica, consentimiento, derecho de supresión). | ❌ Fuera del área asignada, pero **conexo y necesario** | Informe del área de privacidad. **Un testimonio real con nombre y foto necesita consentimiento.** |
+| #   | Afirmación / cuestión pendiente                                                                                                                                                                                                             | Estado                                                                                                                                                                              | Qué haría falta para verificarlo                                                                                                                      |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Alcance real de la regla de los 30 días** (art. 20.4 párr. 2º): ¿prohíbe publicar reseñas sobre experiencias de hace >30 días, o solo condiciona la facultad de eliminación? La remisión "a efectos del apartado anterior" es defectuosa. | ❌ **Es la mayor incertidumbre del informe**                                                                                                                                        | Preámbulo/tramitación parlamentaria de la Ley 10/2025; guía de la Dirección General de Consumo; doctrina; primera jurisprudencia. Consulta a abogado. |
+| 2   | Contenido de la **Guía de la Comisión sobre la DPCD (2021/C 526/01), sección 4.2.4** sobre reseñas (aplicación a webs propias, filtrado, medidas razonables).                                                                               | ❌ Verifiqué que **la sección 4.2.4 existe y versa sobre reseñas**, pero el documento se truncó al recuperarlo                                                                      | Descargar el PDF completo de la Comunicación 2021/C 526/01 desde EUR-Lex y leer la sección 4.2.4 íntegra.                                             |
+| 3   | Si un **enlace simple** (no incrustado) a Google Reviews activa el art. 20.4.                                                                                                                                                               | ❌                                                                                                                                                                                  | Guía oficial de Consumo / doctrina / jurisprudencia. Consulta a abogado.                                                                              |
+| 4   | **Autoridad competente concreta** para sancionar a un salón en Las Rozas de Madrid y su normativa autonómica de consumo (posibles tipos o cuantías propios de la Comunidad de Madrid).                                                      | ❌ No investigado                                                                                                                                                                   | Ley de consumo de la Comunidad de Madrid + estructura de la Dirección General competente. La normativa autonómica **puede** endurecer el marco.       |
+| 5   | **Articulado civil de la LCD** (acciones de cesación/rectificación, art. 32; legitimación de competidores, art. 33).                                                                                                                        | ❌ No verificado en este informe                                                                                                                                                    | Recuperar bloques `a32`/`a33` del texto consolidado de la LCD (BOE-A-1991-628).                                                                       |
+| 6   | **Jurisprudencia española** aplicando los arts. 27.7/27.8 LCD a reseñas desde 2022.                                                                                                                                                         | ❌ No investigado                                                                                                                                                                   | Búsqueda en CENDOJ. Relevante para calibrar el riesgo real de sanción.                                                                                |
+| 7   | Si existe **resolución sancionadora publicada** por reseñas falsas en España (art. 49.7 TRLGDCU obliga a publicar las muy graves).                                                                                                          | ❌ No investigado                                                                                                                                                                   | Webs de las autoridades de consumo autonómicas y estatal.                                                                                             |
+| 8   | **Datos del negocio**: si el salón ya tiene perfil de Google/reseñas, cuántas, y si piensa mostrarlas en la web.                                                                                                                            | ❌ **Desconocido** — `project-spec.md` está en estado de plantilla vacía (`project-spec.md:9-11`) y `feature_list.json` solo contiene `ejemplo_feature` (`feature_list.json:14-24`) | Preguntar al negocio. **Bloquea el diseño de la feature.**                                                                                            |
+| 9   | Aplicabilidad del **Reglamento (UE) 2022/2065 (DSA)** — no analizado; en principio no aplica a una web corporativa que no es intermediario.                                                                                                 | ❌ No investigado                                                                                                                                                                   | Analizar solo si la web permitiera publicar reseñas de terceros.                                                                                      |
+| 10  | Encaje de **RGPD/LOPDGDD** al publicar nombre/foto de clientes en testimonios (base jurídica, consentimiento, derecho de supresión).                                                                                                        | ❌ Fuera del área asignada, pero **conexo y necesario**                                                                                                                             | Informe del área de privacidad. **Un testimonio real con nombre y foto necesita consentimiento.**                                                     |
 
 ---
 
@@ -457,28 +462,28 @@ opción de menor riesgo, no como opción de riesgo cero.
 
 ### 4.1 Qué PROHÍBE (líneas rojas — no negociables)
 
-| # | Prohibición | Fuente |
-| --- | --- | --- |
-| P1 | **Ningún testimonio inventado, ficticio o *placeholder* en la web publicada.** Incluye texto de maqueta, nombres genéricos ("María G., clienta encantada") y fotos de stock presentadas como clientas reales. | art. 27.8 LCD + art. 19.2 LCD ✅ |
-| P2 | **No encargar, comprar ni pedir reseñas falsas** a terceros (agencias, familiares, personal del salón). | art. 27.8 LCD ✅ |
-| P3 | **No filtrar por puntuación**: si se muestran reseñas, no publicar solo las buenas ocultando las malas. | art. 27.8 ("distorsionen") + considerando (49) ✅🔶 |
-| P4 | **No afirmar "reseñas verificadas"** (ni sellos, ni "100 % clientas reales") sin medidas razonables y proporcionadas **demostrables**. | art. 27.7 LCD ✅ |
-| P5 | **El salón no puede autorreseñarse** ni presentarse como cliente. | art. 27.5 LCD ✅ |
-| P6 | **No exhibir sellos de calidad/confianza** sin autorización. | art. 21.2 LCD ✅ |
+| #   | Prohibición                                                                                                                                                                                                   | Fuente                                              |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| P1  | **Ningún testimonio inventado, ficticio o _placeholder_ en la web publicada.** Incluye texto de maqueta, nombres genéricos ("María G., clienta encantada") y fotos de stock presentadas como clientas reales. | art. 27.8 LCD + art. 19.2 LCD ✅                    |
+| P2  | **No encargar, comprar ni pedir reseñas falsas** a terceros (agencias, familiares, personal del salón).                                                                                                       | art. 27.8 LCD ✅                                    |
+| P3  | **No filtrar por puntuación**: si se muestran reseñas, no publicar solo las buenas ocultando las malas.                                                                                                       | art. 27.8 ("distorsionen") + considerando (49) ✅🔶 |
+| P4  | **No afirmar "reseñas verificadas"** (ni sellos, ni "100 % clientas reales") sin medidas razonables y proporcionadas **demostrables**.                                                                        | art. 27.7 LCD ✅                                    |
+| P5  | **El salón no puede autorreseñarse** ni presentarse como cliente.                                                                                                                                             | art. 27.5 LCD ✅                                    |
+| P6  | **No exhibir sellos de calidad/confianza** sin autorización.                                                                                                                                                  | art. 21.2 LCD ✅                                    |
 
 > 🚨 **P1 es el riesgo operativo número uno de este proyecto.** El patrón de fallo más probable no es
 > una campaña deliberada de reseñas falsas: es **una maqueta con testimonios de relleno que llega a
-> producción**. Es ilícito *per se* y no admite defensa de buena fe.
+> producción**. Es ilícito _per se_ y no admite defensa de buena fe.
 
 ### 4.2 Qué EXIGE (obligaciones positivas, solo si la web muestra reseñas)
 
-| # | Obligación | Fuente |
-| --- | --- | --- |
-| E1 | Declarar **si el salón garantiza o no** que las reseñas provienen de clientas reales. | art. 20.4 párr. 1º TRLGDCU ✅ |
-| E2 | Explicar **de forma clara cómo se procesan** las reseñas (origen, si se publican todas, si se moderan y con qué criterio). | art. 20.4 párr. 1º + considerando (47) ✅ |
-| E3 | La información debe ser **clara, comprensible, veraz y accesible**. | art. 20.2 TRLGDCU ✅ |
-| E4 | **Poder probarlo**: conservar evidencia del cumplimiento — también en vía sancionadora. | arts. 20.5 y 51.7 TRLGDCU ✅ |
-| E5 | Vigilar la **regla de los 30 días** (alcance incierto, §3 #1). | art. 20.4 párr. 2º TRLGDCU ✅ (texto) / ❌ (alcance) |
+| #   | Obligación                                                                                                                 | Fuente                                               |
+| --- | -------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| E1  | Declarar **si el salón garantiza o no** que las reseñas provienen de clientas reales.                                      | art. 20.4 párr. 1º TRLGDCU ✅                        |
+| E2  | Explicar **de forma clara cómo se procesan** las reseñas (origen, si se publican todas, si se moderan y con qué criterio). | art. 20.4 párr. 1º + considerando (47) ✅            |
+| E3  | La información debe ser **clara, comprensible, veraz y accesible**.                                                        | art. 20.2 TRLGDCU ✅                                 |
+| E4  | **Poder probarlo**: conservar evidencia del cumplimiento — también en vía sancionadora.                                    | arts. 20.5 y 51.7 TRLGDCU ✅                         |
+| E5  | Vigilar la **regla de los 30 días** (alcance incierto, §3 #1).                                                             | art. 20.4 párr. 2º TRLGDCU ✅ (texto) / ❌ (alcance) |
 
 ### 4.3 Features que implica
 
@@ -486,33 +491,33 @@ Ninguna de estas features existe todavía: `feature_list.json` está en estado d
 (`feature_list.json:14-24`, única entrada `ejemplo_feature`). **Propuesta para el `craftsman_lead`**,
 en orden de prioridad:
 
-1. **`testimonios_aviso_verificacion`** — *(obligatoria si hay reseñas en la web)*
+1. **`testimonios_aviso_verificacion`** — _(obligatoria si hay reseñas en la web)_
    Bloque de aviso, visible y adyacente a las reseñas (no enterrado en el footer ni solo en la página
    legal), que declare E1 y E2. Criterios de aceptación observables:
-   - El aviso es visible sin interacción en el mismo *viewport* que las reseñas, o accesible con un
+   - El aviso es visible sin interacción en el mismo _viewport_ que las reseñas, o accesible con un
      clic desde ellas.
    - El texto declara explícitamente si se garantiza o no la verificación.
    - El texto describe cómo se obtienen y procesan las reseñas.
    - `sdd: true` — el redactado exacto debe pasar por la puerta humana **y por revisión legal**.
 
-2. **`test_no_testimonios_placeholder`** — *(guardarraíl — recomiendo que sea la primera)*
+2. **`test_no_testimonios_placeholder`** — _(guardarraíl — recomiendo que sea la primera)_
    Test automatizado que **falla el build** si en el bundle de producción aparecen testimonios no
    trazados a una fuente real: lista de patrones prohibidos (`lorem`, `ipsum`, nombres de ejemplo,
    textos de maqueta) + verificación de que todo testimonio publicado tiene entrada correspondiente en
    la fuente de datos de reseñas reales. **Convierte la línea roja P1 en una puerta mecánica.**
    Encaja de forma natural en el arnés (`bin/harness test`).
 
-3. **`reseñas_sin_filtrado`** — *(si se muestran reseñas propias)*
+3. **`reseñas_sin_filtrado`** — _(si se muestran reseñas propias)_
    Si existe selección/curación de reseñas, el criterio **no puede** ser la puntuación. Aceptación:
    no existe en el código ningún filtro, orden o umbral que excluya reseñas por su valoración
    (p. ej., `rating >= 4`). Verificable por test y por revisión de código.
 
-4. **`reseñas_trazabilidad`** — *(soporte de E4)*
+4. **`reseñas_trazabilidad`** — _(soporte de E4)_
    Cada testimonio publicado debe llevar metadatos de origen (fuente, fecha de la experiencia, fecha
    de la reseña, consentimiento). Sostiene la carga de la prueba del art. 51.7 y permite evaluar la
    regla de los 30 días.
 
-5. **`enlace_google_reviews`** — *(alternativa de menor superficie)*
+5. **`enlace_google_reviews`** — _(alternativa de menor superficie)_
    Si el negocio acepta, sustituir el bloque de testimonios por un enlace al perfil de Google. Reduce
    drásticamente la exposición — aunque **no la elimina con certeza** (§2.7, §3 #3).
 
@@ -542,12 +547,12 @@ Todas consultadas el **2026-07-15**. Los textos consolidados del BOE se recupera
 de legislación consolidada (`https://www.boe.es/datosabiertos/api/legislacion-consolidada/id/{id}/texto/bloque/{bloque}`),
 seleccionando en cada caso **la versión vigente** del bloque.
 
-| Fuente | Identificador | URL |
-| --- | --- | --- |
-| TRLGDCU (texto consolidado) — arts. 20, 47, 48, 49, 50, 51, 52 | BOE-A-2007-20555 | <https://www.boe.es/buscar/act.php?id=BOE-A-2007-20555> |
-| Ley de Competencia Desleal (texto consolidado) — arts. 7, 19, 21, 27 | BOE-A-1991-628 | <https://www.boe.es/buscar/act.php?id=BOE-A-1991-628> |
-| RDL 24/2021 (transposición Ómnibus) — arts. 82.2, 82.4, 84.3, DF 10.c | BOE-A-2021-17910 | <https://www.boe.es/diario_boe/txt.php?id=BOE-A-2021-17910> |
-| Ley 10/2025, de servicios de atención a la clientela — DF 1ª, DF 3ª | BOE-A-2025-26698 | <https://www.boe.es/buscar/doc.php?id=BOE-A-2025-26698> |
-| Directiva (UE) 2019/2161 (Ómnibus) — considerandos 47 y 49, Anexo I 23 ter/23 quater, art. 7.6 DPCD | CELEX:32019L2161 | <https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:32019L2161> |
-| Guía de la Comisión sobre la DPCD (2021/C 526/01) — **sección 4.2.4, contenido NO recuperado** | CELEX:52021XC1229(05) | <https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:52021XC1229(05)> |
-| Estado del proyecto (plantilla vacía) | — | `project-spec.md:9-11`, `feature_list.json:14-24` |
+| Fuente                                                                                              | Identificador         | URL                                                                              |
+| --------------------------------------------------------------------------------------------------- | --------------------- | -------------------------------------------------------------------------------- |
+| TRLGDCU (texto consolidado) — arts. 20, 47, 48, 49, 50, 51, 52                                      | BOE-A-2007-20555      | <https://www.boe.es/buscar/act.php?id=BOE-A-2007-20555>                          |
+| Ley de Competencia Desleal (texto consolidado) — arts. 7, 19, 21, 27                                | BOE-A-1991-628        | <https://www.boe.es/buscar/act.php?id=BOE-A-1991-628>                            |
+| RDL 24/2021 (transposición Ómnibus) — arts. 82.2, 82.4, 84.3, DF 10.c                               | BOE-A-2021-17910      | <https://www.boe.es/diario_boe/txt.php?id=BOE-A-2021-17910>                      |
+| Ley 10/2025, de servicios de atención a la clientela — DF 1ª, DF 3ª                                 | BOE-A-2025-26698      | <https://www.boe.es/buscar/doc.php?id=BOE-A-2025-26698>                          |
+| Directiva (UE) 2019/2161 (Ómnibus) — considerandos 47 y 49, Anexo I 23 ter/23 quater, art. 7.6 DPCD | CELEX:32019L2161      | <https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:32019L2161>      |
+| Guía de la Comisión sobre la DPCD (2021/C 526/01) — **sección 4.2.4, contenido NO recuperado**      | CELEX:52021XC1229(05) | <https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:52021XC1229(05)> |
+| Estado del proyecto (plantilla vacía)                                                               | —                     | `project-spec.md:9-11`, `feature_list.json:14-24`                                |

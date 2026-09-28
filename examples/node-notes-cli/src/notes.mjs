@@ -15,11 +15,11 @@ export class NoteNotFound extends NoteError {}
  * @returns {{id:number, title:string, body:string, createdAt:string}}
  */
 export function createNote(title, body, existing, createdAt) {
-  const maxId = existing.reduce((max, n) => Math.max(max, n.id), 0);
+  const maxId = existing.reduce((max, n) => Math.max(max, n.id), 0)
   return Object.freeze({
     id: maxId + 1,
     title,
     body,
     createdAt: createdAt || new Date().toISOString(),
-  });
+  })
 }

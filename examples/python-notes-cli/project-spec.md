@@ -16,11 +16,11 @@ Engineering, edición artesano), no complejidad de dominio.
 - **Sin dependencias externas.** `requirements.txt` permanece vacío. Todo se
   hace con la stdlib (`argparse`, `json`, `tempfile`, `unittest`). Esto
   mantiene el arnés reproducible y permite el mutador casero
-  (`tools/mutate.py`). *Alternativa descartada:* `click` + `pytest-bdd` —
+  (`tools/mutate.py`). _Alternativa descartada:_ `click` + `pytest-bdd` —
   más ergonómico, pero introduce dependencias y oculta el mecanismo.
 - **Almacén JSON atómico.** Las notas viven en un único archivo JSON
   (`NOTES_FILE`, por defecto `.notes.json`). La escritura es atómica
-  (archivo temporal + `os.replace`). *Razón:* nunca dejar el archivo a
+  (archivo temporal + `os.replace`). _Razón:_ nunca dejar el archivo a
   medias si el proceso muere.
 - **Contrato de errores uniforme.** Los errores de dominio (`NoteError`,
   `NoteNotFound`) se imprimen en **stderr** y devuelven **exit code != 0**.
@@ -31,7 +31,7 @@ Engineering, edición artesano), no complejidad de dominio.
 
 ## Comandos
 
-### `count` — contar notas  *(feature #8, en construcción)*
+### `count` — contar notas _(feature #8, en construcción)_
 
 - **Propósito:** responder "¿cuántas notas tengo?" de un vistazo.
 - **Comportamiento:** imprime un único entero, el total de notas.
@@ -44,15 +44,15 @@ Engineering, edición artesano), no complejidad de dominio.
   2. Archivo con N notas → `N` exacto (no "≥1", el número justo).
   3. Idempotente: ejecutarlo no cambia el almacén.
 - **Decisiones:**
-  - *Salida = entero pelado, sin texto* (`3`, no `Total: 3`). Razón:
-    componible con `| wc`, `$(...)`, etc. *Alternativa descartada:* línea
+  - _Salida = entero pelado, sin texto_ (`3`, no `Total: 3`). Razón:
+    componible con `| wc`, `$(...)`, etc. _Alternativa descartada:_ línea
     descriptiva — más amigable, menos componible. Gana componibilidad por
     coherencia con `list`/`recent`.
-  - *Almacén inexistente cuenta como 0*, no como error. Razón: "no hay
+  - _Almacén inexistente cuenta como 0_, no como error. Razón: "no hay
     notas todavía" es un estado válido, no un fallo. Coherente con `list`,
     que tampoco falla si no hay notas.
 
-### `recent` — N notas más recientes  *(feature #7, done)*
+### `recent` — N notas más recientes _(feature #7, done)_
 
 - **Propósito:** ver las últimas notas sin listar todo.
 - **Contrato:**
@@ -64,7 +64,7 @@ Engineering, edición artesano), no complejidad de dominio.
 - **Decisión:** mismo formato que `list` para no inventar un segundo
   contrato de presentación.
 
-### `since` — filtrar por fecha  *(feature #12)*
+### `since` — filtrar por fecha _(feature #12)_
 
 - **Propósito:** ver "lo que apunté desde el lunes" — las notas creadas en
   una fecha de calendario dada o después de ella.
@@ -100,19 +100,19 @@ Engineering, edición artesano), no complejidad de dominio.
   5. Archivo de notas vacío o inexistente → stdout vacío, exit code 0.
   6. Idempotente: ejecutarlo no cambia el almacén.
 - **Decisiones:**
-  - *Validación con `strptime("%Y-%m-%d")`, rechazando fechas imposibles.*
+  - _Validación con `strptime("%Y-%m-%d")`, rechazando fechas imposibles._
     Razón: el usuario merece un error claro ante `2026-13-40` o
     `2026-02-30`, no un filtrado silencioso sobre una fecha absurda.
-    *Alternativa descartada:* validar solo el patrón regex `YYYY-MM-DD` —
+    _Alternativa descartada:_ validar solo el patrón regex `YYYY-MM-DD` —
     más simple, pero deja pasar fechas de calendario imposibles sin avisar.
-  - *Comparación por fecha de calendario con límite inclusivo (`>=`).*
+  - _Comparación por fecha de calendario con límite inclusivo (`>=`)._
     Razón: el modelo mental del usuario es "día", no "instante"; una nota
     creada a las 23:00 del día indicado debe contar. Se compara la parte de
-    fecha de `created_at` contra la fecha dada. *Alternativa descartada:*
+    fecha de `created_at` contra la fecha dada. _Alternativa descartada:_
     comparar instantes completos tomando la fecha como medianoche —
     coherente a nivel de tipos, pero excluiría notas del propio día creadas
     después de las 00:00, contradiciendo la intuición de "desde el lunes".
-  - *Mismo formato de salida y orden descendente que `recent`.* Razón: no
+  - _Mismo formato de salida y orden descendente que `recent`._ Razón: no
     inventar un segundo contrato de presentación; `since` es un `list`
     filtrado por fecha. Coherente con la decisión global de salida
     componible.

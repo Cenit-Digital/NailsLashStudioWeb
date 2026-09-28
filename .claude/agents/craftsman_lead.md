@@ -25,7 +25,7 @@ que la disciplina (TDD + juicio + mutación) la talle.
 
 Toda feature con `"sdd": true` recorre cinco fases. Hay **una sola puerta de
 aprobación humana**, justo después de los escenarios Gherkin: el humano firma
-el *contrato ejecutable* antes de que se escriba una línea de producción.
+el _contrato ejecutable_ antes de que se escriba una línea de producción.
 
 ```
 pending
@@ -48,6 +48,7 @@ sin que el `judge` apruebe **y** la puntuación de mutación supere el umbral de
 Mira la primera feature no-`done` / no-`blocked` con `"sdd": true`:
 
 ### Caso A — status == `pending`, sin `project-spec.md` que la cubra
+
 1. Lanza **1 `spec_partner`** (conversacional): debate decisiones y escribe/
    amplía `project-spec.md`.
 2. Cuando el spec capture la feature, lanza **1 `gherkin_author`** que destila
@@ -56,6 +57,7 @@ Mira la primera feature no-`done` / no-`blocked` con `"sdd": true`:
    y di **'aprobado'** para empezar el ciclo TDD, o pide cambios.»
 
 ### Caso B — escenarios aprobados por el humano
+
 1. Cambia el status a `in_progress` en `feature_list.json`.
 2. Lanza **1 `tdd_craftsman`** con el `.feature` y la sección de
    `project-spec.md`. Trabaja por TDD estricto.
@@ -66,17 +68,19 @@ Mira la primera feature no-`done` / no-`blocked` con `"sdd": true`:
    convoca `security_reviewer` o `a11y_seo_auditor` (no sustituyen al judge).
 
 ### Caso C — escenarios sin aprobación humana
+
 NO continúes. Recuérdale al humano que le toca leer los `.feature`.
 
 ### Caso D — status == `in_progress`
+
 Sesión interrumpida. Pregunta si reanudas el ciclo TDD o abortas.
 
 ## Escalado de esfuerzo
 
-| Complejidad          | Subagentes                                                                 |
-| -------------------- | -------------------------------------------------------------------------- |
+| Complejidad          | Subagentes                                                                  |
+| -------------------- | --------------------------------------------------------------------------- |
 | Trivial (1 comando)  | spec_partner → gherkin_author → ⏸ → tdd_craftsman → judge → mutation_tester |
-| Media (2-3 archivos) | + 1-2 `Explore` en paralelo para mapear el código antes del TDD            |
+| Media (2-3 archivos) | + 1-2 `Explore` en paralelo para mapear el código antes del TDD             |
 | Refactor grande      | Divide por escenario Gherkin; un ciclo TDD por escenario                    |
 
 ## Regla anti-teléfono-descompuesto

@@ -101,7 +101,7 @@
    pura». El carrusel de reseñas existe EN ESTE LOTE y ni la distancia se aporta (0 fijo) ni la
    decisión es una. Corregir el comentario (o cumplirlo) junto con el hallazgo 1.
 3. **[Menor — galería] Sombreado de nombre en `Galeria.tsx:199`**: `const activo =
-   document.activeElement` eclipsa el estado `activo` (índice centrado, línea 87) dentro del mismo
+document.activeElement` eclipsa el estado `activo` (índice centrado, línea 87) dentro del mismo
    componente. `Resenas.tsx:165` ya usa `enfocado`: igualar al corregir el hallazgo 1.
 4. **[Observación — reseñas] ~180 líneas de cableado duplicadas** entre `Galeria.tsx` y
    `Resenas.tsx` (efectos de matchMedia/intervalo/teclado, handlers de gesto). El contrato solo
@@ -256,7 +256,7 @@ de propina, y los bloques B y C completos.
 ### 5. Corrida dirigida
 
 - `carrusel-logica.test.ts` + `galeria.test.tsx` + `resenas.test.tsx` + `galeria-estilos.test.ts`
-  + `resenas-estilos.test.ts` → **295/295 verdes** (5 ficheros, 5.1 s).
+  - `resenas-estilos.test.ts` → **295/295 verdes** (5 ficheros, 5.1 s).
 
 ### Disciplina TDD del delta
 

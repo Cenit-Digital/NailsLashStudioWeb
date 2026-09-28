@@ -7,6 +7,7 @@ aprobado, la regla ANTI-TAUTOLOGÍA, disciplina TDD y calidad de artesano. La mu
 valida después el `mutation_tester` (C7).
 
 **Medido, no fiado del recuento declarado:**
+
 - `bin/harness init` → **verde** (entorno, lint, typecheck, 182→**183 tests**, 6 ficheros).
 - `pnpm test` → **183 passed**, 0 warnings.
 - `node tools/puerta-contraste.ts` (el humilde REAL contra el SCSS REAL) →
@@ -19,17 +20,17 @@ No basta con que el test sea verde: si el literal esperado saliera de la impleme
 vigilada, una fórmula rota pasaría verde. **Reimplementé G17 desde cero (script propio del
 juez, sin importar `src/`) y recalculé cada literal del contrato.** Todos coinciden:
 
-| Comprobación | Real (cálculo independiente) | Literal del test | |
-| --- | --- | --- | --- |
-| Las 15 filas hex↔hex de @s11 | 6.4214 · 6.9297 · 5.7394 · 6.1936 · 5.2435 · 4.8554 · 6.1936 · 5.8639 · 7.0638 · 6.4535 · 5.9759 · 8.4308 · 7.7024 · 3.5445 · 5.7945 | 6.42 · 6.93 · 5.74 · 6.19 · 5.24 · 4.86 · 6.19 · 5.86 · 7.06 · 6.45 · 5.98 · 8.43 · 7.70 · 3.54 · 5.79 | **15/15 OK** |
-| **Fila del pie (A-16)** | **4.5913** | **4.59** | OK — y `toBeCloseTo(4.60)` **FALLA** (desvío 0,0087). A-16 confirmada |
-| @s17 fondo real al 88 % sobre negro | **[222.64, 214.72, 217.36]** | idéntico | OK |
-| @s17 nav `--muted` / logo `--ink` | **4.8915 / 5.3809** | 4.89 / 5.38 | OK — peor under posible |
-| Las 10 filas de margen de @s17 | 6.35 · 6.99 · 5.55 · 6.11 · 5.32 · 5.86 · 5.17 · 5.69 · 5.05 · 5.55 | idénticas | **10/10 OK** |
-| **@s18 al 82 %** | fondo **[207.46, 200.08, 202.54]**, nav **4.2216 < 4.5 → VIOLACIÓN** | 4.22 | OK. El logo aguanta (4.6440): la asimetría que escondía el fallo, confirmada |
-| @s12 `#FFFFFF`/`#C05576` | **4.3729** → `toFixed(2)` = `4.37` | 4.37 | OK, y cae en el hueco (3,0 · 4,5) |
-| @s16 `--ink` viejo `#B0466A` | **4.1887** → `4.19`; `<4.5` **y** `>3.0` | 4.19 | OK: la trampa vive justo ahí |
-| @s7 primarios / @s8 / @s9 | `L(#FF0000)===0.2126`, `L(#00FF00)===0.7152`, `L(#0000FF)===0.0722`, `L(#FFFFFF)===1`, `ratio===21`, `214.2`, `224.4` | idénticos | **exactos en IEEE-754**: el `toBe`/`toEqual` es legítimo |
+| Comprobación                        | Real (cálculo independiente)                                                                                                         | Literal del test                                                                                       |                                                                              |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| Las 15 filas hex↔hex de @s11        | 6.4214 · 6.9297 · 5.7394 · 6.1936 · 5.2435 · 4.8554 · 6.1936 · 5.8639 · 7.0638 · 6.4535 · 5.9759 · 8.4308 · 7.7024 · 3.5445 · 5.7945 | 6.42 · 6.93 · 5.74 · 6.19 · 5.24 · 4.86 · 6.19 · 5.86 · 7.06 · 6.45 · 5.98 · 8.43 · 7.70 · 3.54 · 5.79 | **15/15 OK**                                                                 |
+| **Fila del pie (A-16)**             | **4.5913**                                                                                                                           | **4.59**                                                                                               | OK — y `toBeCloseTo(4.60)` **FALLA** (desvío 0,0087). A-16 confirmada        |
+| @s17 fondo real al 88 % sobre negro | **[222.64, 214.72, 217.36]**                                                                                                         | idéntico                                                                                               | OK                                                                           |
+| @s17 nav `--muted` / logo `--ink`   | **4.8915 / 5.3809**                                                                                                                  | 4.89 / 5.38                                                                                            | OK — peor under posible                                                      |
+| Las 10 filas de margen de @s17      | 6.35 · 6.99 · 5.55 · 6.11 · 5.32 · 5.86 · 5.17 · 5.69 · 5.05 · 5.55                                                                  | idénticas                                                                                              | **10/10 OK**                                                                 |
+| **@s18 al 82 %**                    | fondo **[207.46, 200.08, 202.54]**, nav **4.2216 < 4.5 → VIOLACIÓN**                                                                 | 4.22                                                                                                   | OK. El logo aguanta (4.6440): la asimetría que escondía el fallo, confirmada |
+| @s12 `#FFFFFF`/`#C05576`            | **4.3729** → `toFixed(2)` = `4.37`                                                                                                   | 4.37                                                                                                   | OK, y cae en el hueco (3,0 · 4,5)                                            |
+| @s16 `--ink` viejo `#B0466A`        | **4.1887** → `4.19`; `<4.5` **y** `>3.0`                                                                                             | 4.19                                                                                                   | OK: la trampa vive justo ahí                                                 |
+| @s7 primarios / @s8 / @s9           | `L(#FF0000)===0.2126`, `L(#00FF00)===0.7152`, `L(#0000FF)===0.0722`, `L(#FFFFFF)===1`, `ratio===21`, `214.2`, `224.4`                | idénticos                                                                                              | **exactos en IEEE-754**: el `toBe`/`toEqual` es legítimo                     |
 
 La cabecera es **88 %** en `_tokens.scss:66`, no 82 %. Correcto.
 
@@ -62,15 +63,15 @@ input sintético `10.31475` cumple `10.31475/255 === 0.04045` **exacto** (verifi
 
 ## Cobertura de escenarios (@s ↔ test) — 18/18
 
-- @s1  [x] `@s1 convierte "%s" a tres enteros 0-255` (4 filas)
-- @s2  [x] `@s2 expande la forma corta "%s"` (3 filas)
-- @s3  [x] `@s3 es insensible a mayúsculas/minúsculas`
-- @s4  [x] `@s4 lanza ante el hex malformado "%s"` (**6 filas**, con `1px solid #AB5F79`)
-- @s5  [x] `@s5 canalLineal(%i) es exactamente %i` (2 filas, anclas exactas)
-- @s6  [x] rama LINEAL + rama POTENCIA, con `toBe`
-- @s7  [x] `@s7 la luminancia de %s es exactamente %s` (5 filas, primarios CROMÁTICOS)
-- @s8  [x] ratio 21 + simetría, los dos anclados al literal
-- @s9  [x] `@s9 %s` (4 filas: alfa=1, alfa=0, `--line` .16, `color-mix` .88)
+- @s1 [x] `@s1 convierte "%s" a tres enteros 0-255` (4 filas)
+- @s2 [x] `@s2 expande la forma corta "%s"` (3 filas)
+- @s3 [x] `@s3 es insensible a mayúsculas/minúsculas`
+- @s4 [x] `@s4 lanza ante el hex malformado "%s"` (**6 filas**, con `1px solid #AB5F79`)
+- @s5 [x] `@s5 canalLineal(%i) es exactamente %i` (2 filas, anclas exactas)
+- @s6 [x] rama LINEAL + rama POTENCIA, con `toBe`
+- @s7 [x] `@s7 la luminancia de %s es exactamente %s` (5 filas, primarios CROMÁTICOS)
+- @s8 [x] ratio 21 + simetría, los dos anclados al literal
+- @s9 [x] `@s9 %s` (4 filas: alfa=1, alfa=0, `--line` .16, `color-mix` .88)
 - @s10 [x] `@s10 el token %s vale exactamente %s` (6 filas, contra el fichero REAL) + 3 de parser
 - @s11 [x] 16 filas + no-violación + puerta limpia exit 0 + auditabilidad + ruta vigilada
 - @s12 [x] 1 violación que acusa par/ratio/umbral + exit != 0 + **enganche al build y NO al dev** + determinismo
@@ -131,10 +132,10 @@ La fila **aterrizó en el contrato durante este review** (`git diff HEAD -- feat
 `+ | 1px solid #AB5F79 |`) y el test la tiene (`contraste.test.ts:59`). **Verificado que mata de
 verdad**, no de boquilla:
 
-| entrada | con `^` (producción) | sin `^` (mutante) | |
-| --- | --- | --- | --- |
-| `""`, `A23E5F`, `#GGGGGG`, `#12`, `#12345` | rechaza | rechaza | **IDÉNTICO → las 5 NO matan** |
-| **`1px solid #AB5F79`** | **rechaza → lanza** | **acepta → slice(1) = "px solid #AB5F79" → [NaN,NaN,NaN]** | **DISCRIMINA → MATA** |
+| entrada                                    | con `^` (producción) | sin `^` (mutante)                                          |                               |
+| ------------------------------------------ | -------------------- | ---------------------------------------------------------- | ----------------------------- |
+| `""`, `A23E5F`, `#GGGGGG`, `#12`, `#12345` | rechaza              | rechaza                                                    | **IDÉNTICO → las 5 NO matan** |
+| **`1px solid #AB5F79`**                    | **rechaza → lanza**  | **acepta → slice(1) = "px solid #AB5F79" → [NaN,NaN,NaN]** | **DISCRIMINA → MATA**         |
 
 Confirmado además que **la producción no se tocó**: `HEX_VALIDO` sigue siendo
 `/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i` (`contraste.ts:20`). El hueco era del contrato y se cerró
@@ -157,8 +158,8 @@ lo que importa más, **la lección está escrita en el sitio donde muerde**:
   la bitácora §2 y toda la mutación de F-03 se midió a concurrencia 1. **RECOMENDACIÓN AL LEAD
   (no bloqueante):** esto ya ha mordido **dos veces** (F-01 y F-03). La bitácora de una feature
   es memoria que nadie relee. Merece subir a `docs/verification.md` o a `stryker.config.json`
-  como regla del arnés —*un informe con timeouts no es un informe verde: se remide a
-  concurrencia 1*— y es candidato a patrón de memoria organizacional. Para el `mutation_tester`:
+  como regla del arnés —_un informe con timeouts no es un informe verde: se remide a
+  concurrencia 1_— y es candidato a patrón de memoria organizacional. Para el `mutation_tester`:
   **exigir 0 timeouts** antes de dar por buena una puntuación.
 
 ## Calidad (lente de artesano)

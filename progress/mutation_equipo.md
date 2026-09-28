@@ -21,27 +21,27 @@
 
 ### Matable con UN test nuevo (3)
 
-- **src/components/Equipo.tsx:81:37**  `ConditionalExpression`
+- **src/components/Equipo.tsx:81:37** `ConditionalExpression`
   - original: `minutos >= franja.abre && minutos < franja.cierra`
-  - mutado:   `true && minutos < franja.cierra`  (se borra la cota inferior `>= abre`)
+  - mutado: `true && minutos < franja.cierra` (se borra la cota inferior `>= abre`)
   - Por qué sobrevive: ninguna franja candidata cae ANTES de la apertura, así que quitar el
     límite inferior no cambia nada observable. Todas las `FRANJAS_POSIBLES` (10:00…19:00) son
     `>= abre` en todos los días probados.
   - Falta: un caso con una franja candidata ANTERIOR a `abre` (día que abra p. ej. a las 11:00,
     de modo que 10:00 deba filtrarse por la cota inferior) y aseverar que 10:00 NO se ofrece.
 
-- **src/components/Equipo.tsx:81:63**  `EqualityOperator`
+- **src/components/Equipo.tsx:81:63** `EqualityOperator`
   - original: `minutos < franja.cierra`
-  - mutado:   `minutos <= franja.cierra`
+  - mutado: `minutos <= franja.cierra`
   - Por qué sobrevive: ninguna franja candidata coincide EXACTAMENTE con el minuto de cierre,
     así que `<` y `<=` son indistinguibles (sáb cierra 14:00=840; vecinas 13:00=780 dentro,
     16:00=960 fuera; ninguna == 840).
   - Falta: un caso de frontera con una franja candidata igual a `cierra` que deba EXCLUIRSE
     (aseverar que un hueco que empieza justo al cierre no se ofrece).
 
-- **src/components/Equipo.tsx:118:18**  `BooleanLiteral`
-  - original: `setReservado(false)`  (dentro de `reiniciar`)
-  - mutado:   `setReservado(true)`
+- **src/components/Equipo.tsx:118:18** `BooleanLiteral`
+  - original: `setReservado(false)` (dentro de `reiniciar`)
+  - mutado: `setReservado(true)`
   - Por qué sobrevive: @s18 solo comprueba que tras "Cambiar" reaparece la vista de reserva;
     como `reiniciar` también limpia `diaIdx` y `hora`, la guarda de render de L140 es falsa
     con o sin la bandera pegada en true, enmascarando el defecto.
@@ -56,13 +56,13 @@ y `estilos.horaOpcion` son ambos `undefined`, luego `className` es `undefined` e
 y el ternario es inobservable en test. El estado real SÍ es observable por `aria-pressed` (L178),
 cuyos mutantes murieron. Es la observación #1 del `judge`.
 
-- **src/components/Equipo.tsx:177:32**  `ConditionalExpression`
+- **src/components/Equipo.tsx:177:32** `ConditionalExpression`
   - original: `className={franja === hora ? estilos.horaActiva : estilos.horaOpcion}`
-  - mutado:   `className={true ? estilos.horaActiva : estilos.horaOpcion}`
-- **src/components/Equipo.tsx:177:32**  `ConditionalExpression`
-  - mutado:   `className={false ? estilos.horaActiva : estilos.horaOpcion}`
-- **src/components/Equipo.tsx:177:32**  `EqualityOperator`
-  - original: `franja === hora`  →  mutado: `franja !== hora`
+  - mutado: `className={true ? estilos.horaActiva : estilos.horaOpcion}`
+- **src/components/Equipo.tsx:177:32** `ConditionalExpression`
+  - mutado: `className={false ? estilos.horaActiva : estilos.horaOpcion}`
+- **src/components/Equipo.tsx:177:32** `EqualityOperator`
+  - original: `franja === hora` → mutado: `franja !== hora`
   - Falta / arreglo (vía preferida del proyecto): REDISEÑAR para que la clase se derive de la
     misma fuente consultable que `aria-pressed`, eliminando la condición duplicada e inmatable
     (no relajar aserciones ni borrar código). NB: la variante de días (L160) SÍ murió; solo la
@@ -74,19 +74,20 @@ No los excluyo yo para forzar PASS. El veredicto es FAIL por los otros seis. Los
 documentados para que el `tdd_craftsman` decida: rediseñar o anotar `// Stryker disable
 next-line all` con justificación.
 
-- **src/components/Equipo.tsx:140:23**  `ConditionalExpression`
+- **src/components/Equipo.tsx:140:23** `ConditionalExpression`
   - original: `reservado && diaSel !== null && hora !== null`
-  - mutado:   `reservado && true && hora !== null`  (guarda `diaSel !== null` → `true`)
+  - mutado: `reservado && true && hora !== null` (guarda `diaSel !== null` → `true`)
   - Por qué sobrevive: invariante del componente. `reservado` solo pasa a true por el botón
     "Reservar" (habilitado solo con `completo` = diaSel!==null && hora!==null) y `reiniciar`
     resetea `reservado` junto a `diaSel`; luego `reservado === true ⟹ diaSel !== null` siempre.
     Guarda redundante: sin estado alcanzable que la distinga. Candidato EQUIVALENTE.
-- **src/components/Equipo.tsx:140:42**  `ConditionalExpression`
+- **src/components/Equipo.tsx:140:42** `ConditionalExpression`
   - original: `reservado && diaSel !== null && hora !== null`
-  - mutado:   `reservado && diaSel !== null && true`  (guarda `hora !== null` → `true`)
+  - mutado: `reservado && diaSel !== null && true` (guarda `hora !== null` → `true`)
   - Mismo razonamiento: `reservado === true ⟹ hora !== null`. Candidato EQUIVALENTE.
 
 ## Nota de proceso
+
 Solo mido y reporto. NO edito `src/` ni los tests. Matar cada superviviente es trabajo del
 `tdd_craftsman` (test rojo → verde) y re-paso por el `judge`. La feature NO cierra a 93.33 %.
 
@@ -101,6 +102,7 @@ typecheck 0 · lint 0 errores. Las dos mutaciones matables se aplicaron a mano y
 tests nuevos SE PONEN ROJOS antes de revertir (disciplina rojo→verde).
 
 ### Matados con test nuevo (2 → función PURA inyectable)
+
 Se extrajo el núcleo del filtro a `franjasOfrecibles(franjas: readonly Franja[])` (PURA, horario
 INYECTADO, patrón de `abiertoEn`/`dentroDe` de F-10). `franjasDe` queda como fino cableado a
 `HORARIO_SEMANAL`. Así los comparadores de frontera se muerden por valor con horarios arbitrarios:
@@ -159,7 +161,9 @@ confirme 100 % (lo lanza otra fase; el `tdd_craftsman` no ejecuta la mutación).
   los `*-horneado` quedan excluidos de la mutación por diseño, corren en `bin/harness verify`).
 
 ### Supervivientes
+
 NINGUNO. Los 8 de la Ronda 1 (93.33 %) fueron neutralizados:
+
 - **81:37** y **81:63** (cotas de frontera) — muertos por los tests nuevos de
   `franjasOfrecibles` (abre 11:00 → 10:00 fuera; cierra 13:00 → 13:00 fuera).
 - **177:32 ×3** (ternario `className` inmatable con `css:false`) — el ternario ya NO existe:
@@ -171,6 +175,7 @@ NINGUNO. Los 8 de la Ronda 1 (93.33 %) fueron neutralizados:
   equivalentes a esas cotas ya no son alcanzables → sin mutantes que excluir.
 
 ### Exclusiones Stryker
+
 NINGUNA. No hay `// Stryker disable` en el archivo. El 100 % es genuino, no forzado.
 
 Cierre: la feature `equipo_reservas` cumple la puerta de mutación (100 % ≥ umbral 100 %).
@@ -204,6 +209,7 @@ componente exporte SOLO el componente — react-refresh). El fichero YA está en
   los `*-horneado` quedan excluidos de la mutación por diseño). 6.83 tests por mutante de media.
 
 ### Mutantes sobrevivientes
+
 NINGUNO. Cada uno de los 40 mutantes fue matado o expiró por timeout. Los comparadores de frontera
 del filtro (`>= abre`, `< cierra` en `franjasOfrecibles`), la normalización circular
 `((i % n) + n) % n` de `indiceCircular`, y el salto de domingos + serie desde mañana de
@@ -211,6 +217,7 @@ del filtro (`>= abre`, `< cierra` en `franjasOfrecibles`), la normalización cir
 y los describes `franjasOfrecibles`/`franjasDe`/`indiceCircular`).
 
 ### Exclusiones Stryker
+
 NINGUNA. No hay `// Stryker disable` en el archivo. El 100 % es genuino, no forzado.
 
 Cierre: `src/components/equipo-logica.ts` cumple la puerta de mutación (100 % ≥ umbral 100 %).
@@ -240,9 +247,11 @@ Cierre: `src/components/equipo-logica.ts` cumple la puerta de mutación (100 % �
   quedan excluidos de la mutación por diseño). 7.23 tests por mutante de media.
 
 ### Mutantes sobrevivientes
+
 NINGUNO.
 
 ### Exclusiones Stryker
+
 NINGUNA. No hay ningún `// Stryker disable` en `Equipo.tsx`. El 100 % es genuino, no forzado.
 
 Cierre: `src/components/Equipo.tsx` mantiene la puerta de mutación (100 % ≥ umbral 100 %) en su forma

@@ -18,17 +18,17 @@ verde como si viniera de TDD.
 
 ## Mapa escenario ↔ test
 
-| Escenario                  | Dónde se asevera                                                                                                                  |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| @s1 recorte                | `hero.test.tsx` → «@s1 el viewBox ENCIERRA la tinta real» (4 tests) · `hero-estilos.test.ts` → «@s1 ya NO queda ningún clip-path» |
+| Escenario                  | Dónde se asevera                                                                                                                                           |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| @s1 recorte                | `hero.test.tsx` → «@s1 el viewBox ENCIERRA la tinta real» (4 tests) · `hero-estilos.test.ts` → «@s1 ya NO queda ningún clip-path»                          |
 | @s2 trazo + coherencia     | `hero.test.tsx` → máscara + `pathLength="100"` + 1 subtrazo + `isPointInStroke` (frente único) · `hero-estilos.test.ts` → dasharray en unidades de usuario |
-| @s3 la punta, no el frasco | `hero.test.tsx` → «@s3 la PUNTA del aplicador» (4 tests)                                                                          |
-| @s4 duración y orden       | `hero-estilos.test.ts` → cota ≤ 4,5 s + «STUDIO entra cuando la marca ya está escrita»                                            |
-| @s5 movimiento reducido    | `hero-estilos.test.ts` → @s3 del `@media` + `@demo` display:none                                                                  |
-| @s6 accesibilidad          | `hero.test.tsx` → @s6/@s7/@s8 (F-07) + «NO duplica el nombre»                                                                     |
-| @s7 sin JS                 | `hero.test.tsx` → @s5 (F-07), sobre el HTML del prerender                                                                         |
-| @s8 cero terceros          | `hero.test.tsx` → href local o `data:`, nunca http · puerta F-05 del build                                                        |
-| @s9 responsive             | `hero-estilos.test.ts` → «@s9 el <svg> mide en em el ancho de su viewBox» (3 tests)                                               |
+| @s3 la punta, no el frasco | `hero.test.tsx` → «@s3 la PUNTA del aplicador» (4 tests)                                                                                                   |
+| @s4 duración y orden       | `hero-estilos.test.ts` → cota ≤ 4,5 s + «STUDIO entra cuando la marca ya está escrita»                                                                     |
+| @s5 movimiento reducido    | `hero-estilos.test.ts` → @s3 del `@media` + `@demo` display:none                                                                                           |
+| @s6 accesibilidad          | `hero.test.tsx` → @s6/@s7/@s8 (F-07) + «NO duplica el nombre»                                                                                              |
+| @s7 sin JS                 | `hero.test.tsx` → @s5 (F-07), sobre el HTML del prerender                                                                                                  |
+| @s8 cero terceros          | `hero.test.tsx` → href local o `data:`, nunca http · puerta F-05 del build                                                                                 |
+| @s9 responsive             | `hero-estilos.test.ts` → «@s9 el <svg> mide en em el ancho de su viewBox» (3 tests)                                                                        |
 
 ## Lo que cazó el `judge` (rechazo, y con razón)
 

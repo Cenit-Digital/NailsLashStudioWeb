@@ -35,15 +35,19 @@
 ## Mis sabotajes reproducidos (no me fié — MEDÍ)
 
 ### Sabotaje A — vaciar el 2º EXTRACTOR (seccionesNavegables -> [])
+
 Parcheé el fichero, corrí la suite de la puerta, restauré. Resultado: 5 tests ROJOS (@s3 x2, @s5 x2, @s9). El extractor de secciones está genuinamente mordido por tests. Tree limpio tras restaurar.
 
 ### Sabotaje B — quitar la GUARDA de vacuidad del 2º extractor (if !seDerivoAlgunaSeccion)
+
 Neutralicé la guarda (false && ...), corrí, restauré. Resultado: exactamente 1 test ROJO: @s19, y ningún otro. Confirma que la guarda del 2º extractor EXISTE y MUERDE, y que @s19 la cubre sin redundancia que tape un hueco. Es el BLOQUEANTE que la revisión del contrato cazó; está cerrado.
 
 ### Sabotaje C — pnpm build con una nav de ancla muerta (#noexiste)
+
 Inyecté a href=#noexiste en la nav del dist/ construido y corrí las CINCO puertas por separado. Resultado: cascaron EXIT 0 · placeholders EXIT 0 · contraste EXIT 0 · terceros EXIT 0 · anclas EXIT 1, acusando: / — ancla de la nav sin destino en la página: ancla #noexiste -> id noexiste. Rompe SOLO la puerta de anclas, y ACUSA (no gruñe). Es @s4 sobre el artefacto real. dist/ restaurado.
 
 ### Verde != funciona — medido sobre los BYTES de dist/index.html (readFileSync, jamás jsdom)
+
 nav horneada aria-label=Principal OK · botón aria-expanded=false (y CERO =true) OK · href #servicios-titulo y #contacto-titulo horneados OK · footer landmark OK · URL de Facebook + tel: OK · CERO instagram.com OK · CERO /aviso-legal y /privacidad OK · CERO resto de radix OK · ids servicios-titulo/contacto-titulo presentes OK · marca Nails Lash Studio OK.
 
 ## Disciplina TDD
@@ -57,7 +61,7 @@ nav horneada aria-label=Principal OK · botón aria-expanded=false (y CERO =true
 - Funciones cortas, un motivo de cambio, nombres reveladores. if INDEPENDIENTES (no else if) para acusarlas todas (@s5): puerta-anclas.ts:110-131. Falla cerrada con la causa (@s8): :170-181.
 - Contrato de errores correcto: canal de error (lineas) + codigoSalida; el humilde hace process.exit (tools/puerta-anclas.ts:54). La puerta NUNCA declara «no hay anclas rotas» en un fallo (aseverado en @s6/@s7/@s8/@s19).
 - className CONDICIONAL: ninguno. Grep de .tsx: el único match cond?a:b es un COMENTARIO en cabecera.test.tsx:71; todos los className reales son constantes (estilos.X). El estado va en aria-expanded. Invariante E1.c respetado.
-- Las DOS listas: los 3 .tsx + puerta-anclas.ts están en mutate de stryker.config.json:28-31 Y en coverage.include (src/lib/**/*.ts, src/components/**/*.tsx) de vitest.config.ts:15. Sin esto la mutación daría 100% por vacuidad.
+- Las DOS listas: los 3 .tsx + puerta-anclas.ts están en mutate de stryker.config.json:28-31 Y en coverage.include (src/lib/**/\*.ts, src/components/**/*.tsx) de vitest.config.ts:15. Sin esto la mutación daría 100% por vacuidad.
 - radix-ui fuera de package.json (0 en dependencies) y 0 ocurrencias en pnpm-lock.yaml (B-6, lockfile actualizado). 0 imports de radix en src/.
 - Anti-tautología: @s17 ancla contra el literal 820px escrito A MANO (no hay símbolo JS que importar); @s11 contra 76 px a mano; SERVICIOS/CONTACTO/FACEBOOK literales a mano. Ningún import de la constante vigilada para compararse contra ella.
 - perTest: ningún cálculo en el cuerpo de un describe; los fixtures son funciones llamadas DENTRO del it; en los describe solo datos literales. Sin supervivientes falsos por recolección.
@@ -74,9 +78,11 @@ nav horneada aria-label=Principal OK · botón aria-expanded=false (y CERO =true
 Bloqueantes: 0.
 
 Menores: 1.
+
 1. @s12 y @s16 aseveran sobre renderToString(Componente), no sobre readFileSync de dist/index.html, pese a que el contrato insiste sobre los BYTES de dist/. Mitigado y NO bloqueante: (a) renderToString es el MISMO motor de prerender que usa vite-react-ssg y NO es jsdom, así que honra el espíritu anti-jsdom (estado pre-hidratación); (b) la puerta de anclas verifica la nav horneada sobre los BYTES reales en cada build (0 anclas -> @s7 rompería); (c) yo medí los BYTES de dist/index.html a mano y cumplen todas las aserciones de @s12/@s16. Ningún @s queda descubierto. Recomendación para F-07+: un test que lea dist/index.html cerraría la LETRA del contrato además del espíritu.
 
 ## Checkpoints
+
 - C1 — arnés completo, bin/harness init exit 0: [x]
 - C2 — estado coherente, 1 in_progress, done con tests: [x]
 - C3 — arquitectura respetada (decisor puro + humilde; radix REMOVIDO; sin logs/TODOs): [x]
@@ -86,10 +92,13 @@ Menores: 1.
 - C7 — prueba de mutación: PENDIENTE del mutation_tester (corre DESPUÉS de esta aprobación, él solo, sin otro Stryker vivo): [ ]
 
 ## Cambios requeridos
+
 Ninguno. Se aprueba. La puerta C7 (mutación, umbral 1.0, 0 exclusiones) queda para el mutation_tester.
 
 # =============================================================================================
+
 # Review del delta (rondas 2-3) — 2026-07-18
+
 # =============================================================================================
 
 **Veredicto del delta:** APROBADO — 27/27 cubiertos, 0 bloqueantes, 1 menor (heredado, no reintroducido).
@@ -148,8 +157,8 @@ puesto alguno rojo. No lo hizo.
   - `if (coincidencia === null)` -> `if (false)`: **1 ROJO** (@s23 f1, TypeError `null[1]`).
   - BlockStatement vacío (`continue` eliminado): **1 ROJO** (@s23 f1).
   - (extra) `if (headings.has(referencia))` -> `if (true)`: **1 ROJO** (@s23 f2).
-  Ningún mutante del guard resiste -> el refactor mató el equivalente SIN crear otro. No hay que
-  rechazar.
+    Ningún mutante del guard resiste -> el refactor mató el equivalente SIN crear otro. No hay que
+    rechazar.
 
 ## 4. Los tests de la ronda 2 muerden (sabotaje manual)
 

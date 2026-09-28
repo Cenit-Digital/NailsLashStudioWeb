@@ -259,7 +259,9 @@ export function ejecutarPuertaDeTerceros(
     // confianza. Es literalmente cómo se evaporaron los 3 bloqueantes AA del stack base [V].
     return {
       codigoSalida: CODIGO_FALLO,
-      lineas: [`la puerta de terceros no pudo completar la inspección: ${motivoDelReventon(error)}`],
+      lineas: [
+        `la puerta de terceros no pudo completar la inspección: ${motivoDelReventon(error)}`,
+      ],
     }
   }
 }
@@ -274,7 +276,9 @@ function inspeccionarArtefacto(peticion: PeticionPuertaTerceros): ResultadoPuert
   if (paresEsperados.length === 0) {
     return {
       codigoSalida: CODIGO_FALLO,
-      lineas: ['la lista de pares de fuente esperados está vacía: no hay ninguna fuente que exigirle al artefacto'],
+      lineas: [
+        'la lista de pares de fuente esperados está vacía: no hay ninguna fuente que exigirle al artefacto',
+      ],
     }
   }
 
@@ -287,7 +291,9 @@ function inspeccionarArtefacto(peticion: PeticionPuertaTerceros): ResultadoPuert
   if (recursos.length === 0) {
     return {
       codigoSalida: CODIGO_FALLO,
-      lineas: ['no se inspeccionó ningún recurso html o css del artefacto: no hay nada sobre lo que concluir'],
+      lineas: [
+        'no se inspeccionó ningún recurso html o css del artefacto: no hay nada sobre lo que concluir',
+      ],
     }
   }
 

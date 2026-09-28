@@ -10,20 +10,20 @@
 >
 > **Resultado: 1 REFUTADA de raíz, 6 MATIZADAS, 1 CONFIRMADA. Ninguna decisión de F-06 «de fondo»
 > cae; lo que caen son TRES de los cinco criterios de aceptación y la puerta_legal.** El patrón de
-> F-04/F-05, otra vez: *la decisión de construir cabecera+nav+pie es correcta; casi todo el
-> «cómo» escrito en el troceado es falso o insatisfacible.*
+> F-04/F-05, otra vez: _la decisión de construir cabecera+nav+pie es correcta; casi todo el
+> «cómo» escrito en el troceado es falso o insatisfacible._
 
 ---
 
 ## 0. Las bombas: TRES de los cinco criterios de aceptación no se pueden destilar tal cual
 
-| # | Acceptance de `feature_list.json` §6 | Veredicto | Por qué |
-| --- | --- | --- | --- |
-| @1 | *«cubre TODAS las secciones de la página, no 7 de 11»* | **INSATISFACIBLE (C1)** | Hoy la página tiene **2 secciones**, y sus ids viven en los `<h2>`, no en los `<section>`. «TODAS las secciones» de una página que aún no existe. Es **A-23 otra vez**. |
-| @2 | *«scroll-padding-top (scroll-margin NO actúa al tabular)»* | **FALSO (B2)** | **Ninguna fuente primaria** dice que scroll-margin no actúe al tabular. El scroll al Tab es **UA-defined**. |
-| @4 | *«se deriva de la altura REAL de la cabecera»* | **INSOSTENIBLE BAJO SSG (D1)** | En CSS puro **no existe** forma de leer la altura de un elemento; la única vía es JS, y el HTML horneado del SSG **no la tiene hasta que hidrata**. |
+| #   | Acceptance de `feature_list.json` §6                       | Veredicto                      | Por qué                                                                                                                                                                 |
+| --- | ---------------------------------------------------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| @1  | _«cubre TODAS las secciones de la página, no 7 de 11»_     | **INSATISFACIBLE (C1)**        | Hoy la página tiene **2 secciones**, y sus ids viven en los `<h2>`, no en los `<section>`. «TODAS las secciones» de una página que aún no existe. Es **A-23 otra vez**. |
+| @2  | _«scroll-padding-top (scroll-margin NO actúa al tabular)»_ | **FALSO (B2)**                 | **Ninguna fuente primaria** dice que scroll-margin no actúe al tabular. El scroll al Tab es **UA-defined**.                                                             |
+| @4  | _«se deriva de la altura REAL de la cabecera»_             | **INSOSTENIBLE BAJO SSG (D1)** | En CSS puro **no existe** forma de leer la altura de un elemento; la única vía es JS, y el HTML horneado del SSG **no la tiene hasta que hidrata**.                     |
 
-Y la **`puerta_legal`** (*«WCAG SC 2.4.11»*) está **rozando el AAA** (B1). Tres de cinco criterios
+Y la **`puerta_legal`** (_«WCAG SC 2.4.11»_) está **rozando el AAA** (B1). Tres de cinco criterios
 y la puerta legal a reescribir **antes** de la spec.
 
 ---
@@ -36,23 +36,23 @@ suficiente** (no advisory), y el Understanding **nombra literalmente** los stick
 
 ### 🔴 Pero el listón NO es «foco no oscurecido». Es «not entirely hidden».
 
-| SC | Nivel | Texto literal |
-| --- | --- | --- |
-| **2.4.11** | **AA** | *«the component is **not entirely hidden** due to author-created content»* |
-| **2.4.12** | **AAA** | *«**no part** of the component is hidden by author-created content»* |
+| SC         | Nivel   | Texto literal                                                              |
+| ---------- | ------- | -------------------------------------------------------------------------- |
+| **2.4.11** | **AA**  | _«the component is **not entirely hidden** due to author-created content»_ |
+| **2.4.12** | **AAA** | _«**no part** of the component is hidden by author-created content»_       |
 
-**Oscurecimiento PARCIAL es CONFORME en AA.** Escribir *«el foco no queda oscurecido»* atribuye de
+**Oscurecimiento PARCIAL es CONFORME en AA.** Escribir _«el foco no queda oscurecido»_ atribuye de
 facto el listón del **AAA** bajo etiqueta AA. Es **exactamente** el fallo de F-03 (el 1.4.11 no iba
 de «bordes de control») y F-04 (el 2.4.7 no exige contraste/grosor). **Tercera reincidencia si se
 copia tal cual.**
 
 **Y no tiene ningún umbral numérico** [V]: los 66px/70px/5rem **NO son WCAG**, son criterio de
-proyecto. Prohibido justificar un número citando 2.4.11. **Alcance:** solo *«receives keyboard
-focus»* — un ancla `#id` que aterriza bajo la cabecera **no viola 2.4.11** si el destino no recibe
+proyecto. Prohibido justificar un número citando 2.4.11. **Alcance:** solo _«receives keyboard
+focus»_ — un ancla `#id` que aterriza bajo la cabecera **no viola 2.4.11** si el destino no recibe
 foco de teclado (eso es criterio de proyecto/UX).
 
-> **Consecuencia:** la `puerta_legal` se reescribe a *«ningún componente que reciba foco de teclado
-> queda ENTERAMENTE oculto (SC 2.4.11 AA, "not entirely hidden")»*, C43 como técnica suficiente
+> **Consecuencia:** la `puerta_legal` se reescribe a _«ningún componente que reciba foco de teclado
+> queda ENTERAMENTE oculto (SC 2.4.11 AA, "not entirely hidden")»_, C43 como técnica suficiente
 > elegida por el proyecto, y **cero números atribuidos a la norma**. → **B-1**.
 
 ---
@@ -61,15 +61,15 @@ foco de teclado (eso es criterio de proyecto/UX).
 
 El acceptance @2 lo afirma como hecho. **Ninguna fuente primaria lo sostiene** — ni CSSOM View, ni
 CSS Scroll Snap, ni el HTML Living Standard. Al contrario, CSS Scroll Snap §1 describe las dos
-propiedades **simétricamente** para las *scroll-into-view operations*.
+propiedades **simétricamente** para las _scroll-into-view operations_.
 
 **La realidad, con cita:**
 
-- El scroll que dispara **Tab** es **comportamiento del UA, no normado**: los *focusing steps* del
+- El scroll que dispara **Tab** es **comportamiento del UA, no normado**: los _focusing steps_ del
   HTML **no contienen ningún paso de scroll**; el único sitio donde la spec ordena hacer scroll es
-  el **método `focus()`** («*If preventScroll is false, then scroll a target into view*»).
-- `scroll-padding` se define sobre el **CONTENEDOR** de scroll como *«optimal viewing region ... for
-  ALL scroll containers»* — cubre **todas** las operaciones de scroll-into-view y paging.
+  el **método `focus()`** («_If preventScroll is false, then scroll a target into view_»).
+- `scroll-padding` se define sobre el **CONTENEDOR** de scroll como _«optimal viewing region ... for
+  ALL scroll containers»_ — cubre **todas** las operaciones de scroll-into-view y paging.
 - `scroll-margin` es **por-elemento**; su expansión del border-box (snap area) está normada **solo
   para `:target` y `scrollIntoView()`**.
 
@@ -87,7 +87,7 @@ propiedades **simétricamente** para las *scroll-into-view operations*.
 coincidencias**. Las 17 que existen viven todas en `.memoria-cache/`, `docs/research/` y scratch.
 **El prototipo de este proyecto NO tiene ni una `@media`** — resuelve con `flex-wrap: wrap`.
 
-Es *«no copiar del base»* **por cuarta vez** (F-03 tokens, F-04 JSON-LD, F-05 fuentes, F-06 el
+Es _«no copiar del base»_ **por cuarta vez** (F-03 tokens, F-04 JSON-LD, F-05 fuentes, F-06 el
 breakpoint). El 767 = 768−1 es el `md` de Bootstrap/Tailwind, **convención de framework, no una
 medida de este diseño**.
 
@@ -97,8 +97,8 @@ medida de este diseño**.
 - **Con la fallback `sans-serif` (el estado pre-swap del SSG):** envuelve a **793px**.
 - → **Banda 793–806px.** El borde operativo para el HTML pre-hidratación es **793** (fallback).
 
-**Y `SC 1.4.10 Reflow` (la única norma que ata anchos) exige solo** *«a width equivalent to 320 CSS
-pixels»* sin scroll bidireccional — **cero menciones de breakpoint**. La cabecera del prototipo **ya
+**Y `SC 1.4.10 Reflow` (la única norma que ata anchos) exige solo** _«a width equivalent to 320 CSS
+pixels»_ sin scroll bidireccional — **cero menciones de breakpoint**. La cabecera del prototipo **ya
 cumple 1.4.10 hoy** (medido: sin desborde a 320px). **El menú móvil NO se justifica por Reflow.**
 
 > **Consecuencia:** si F-06 introduce un breakpoint, es `max-width: 820px` (**margen sobre toda la
@@ -157,8 +157,8 @@ ninguna petición externa ni CSS** — F-05 a salvo, verificado con build real.
 prerenderiza completo.
 
 > 🔴 **Y esto deja la puerta anti-404 de F-04 CIEGA**: si los enlaces del menú viven solo en el
-> `Portal`, **no están en el HTML** y la puerta pasa en verde sin verificar nada. *«No se rompe:
-> MIENTE POR OMISIÓN. Es peor.»*
+> `Portal`, **no están en el HTML** y la puerta pasa en verde sin verificar nada. _«No se rompe:
+> MIENTE POR OMISIÓN. Es peor.»_
 
 **Dos hechos más:**
 
@@ -192,30 +192,30 @@ faq).
 hoy (7 de 7)** — incluida `#contacto`, porque el id real es `contacto-titulo`, no `contacto`.
 
 **Y la puerta anti-404 de F-04 NO lo caza:** `RUTA_INTERNA = /^\/(?!\/)/` (`puerta-cascaron.ts:552`)
-**excluye las anclas por diseño** (*«#ancla es un salto dentro de la misma página»*). Una nav con 7
+**excluye las anclas por diseño** (_«#ancla es un salto dentro de la misma página»_). Una nav con 7
 anclas muertas **pasaría las cuatro puertas en verde**.
 
 ### Quién construye cada sección (cruzado con las 20 features)
 
-| Sección | Feature | Estado |
-| --- | --- | --- |
-| `top` | F-07 hero_marca | pending |
-| `unas` `pestañas` `cejas` | F-09 catalogo_servicios | pending (**`facial` NO existe** — F-09 lo corrige) |
-| `contacto` | F-12 + F-10 + F-11 | pending |
-| `faq` | F-15 | pending |
-| `colores` | F-19 probador_color | **blocked** |
-| `equipo` | F-18 equipo | **blocked, «NO empezar spec»** |
-| `reserva` | — | **no se construye** (sustituida por F-13) |
-| **`destacados` `ofertas`** | **NINGUNA** | 🔴 **huérfanos: 0 ocurrencias en `feature_list.json`** |
+| Sección                    | Feature                 | Estado                                                 |
+| -------------------------- | ----------------------- | ------------------------------------------------------ |
+| `top`                      | F-07 hero_marca         | pending                                                |
+| `unas` `pestañas` `cejas`  | F-09 catalogo_servicios | pending (**`facial` NO existe** — F-09 lo corrige)     |
+| `contacto`                 | F-12 + F-10 + F-11      | pending                                                |
+| `faq`                      | F-15                    | pending                                                |
+| `colores`                  | F-19 probador_color     | **blocked**                                            |
+| `equipo`                   | F-18 equipo             | **blocked, «NO empezar spec»**                         |
+| `reserva`                  | —                       | **no se construye** (sustituida por F-13)              |
+| **`destacados` `ofertas`** | **NINGUNA**             | 🔴 **huérfanos: 0 ocurrencias en `feature_list.json`** |
 
 **F-06 depende solo de `cascaron_semantico` (done). CERO destinos de F-06 existen o pueden existir
 hoy.**
 
 > **Consecuencia — el entregable de más valor de F-06 NO es la nav, es una PUERTA que no existe:**
-> *«todo `href="#id"` de la nav resuelve a un id presente en el `dist/`, y falla cerrada»*. Esa
+> _«todo `href="#id"` de la nav resuelve a un id presente en el `dist/`, y falla cerrada»_. Esa
 > puerta mata **además** el bug de `#facial`. Y el acceptance @1 se reescribe como **igualdad de
-> conjuntos** derivada del DOM: *«la nav enlaza EXACTAMENTE a las secciones que EXISTEN en el
-> artefacto, ni una de más (ancla muerta) ni una de menos (sección inalcanzable)»* — hoy da
+> conjuntos** derivada del DOM: _«la nav enlaza EXACTAMENTE a las secciones que EXISTEN en el
+> artefacto, ni una de más (ancla muerta) ni una de menos (sección inalcanzable)»_ — hoy da
 > `{servicios, contacto} = 2`, y **crece solo** según cierran F-07/F-09/etc. → **B-4**. Los
 > huérfanos `destacados`/`ofertas` → **B-7**. Y F-06 **no construye secciones**: su alcance es
 > cabecera + nav + pie + la puerta de anclas + el scroll-padding derivado.
@@ -265,9 +265,9 @@ tocar `MINIMO_DE_PARES`), F-01 placeholders no dispara. Pero:
 ### 🔴 (a) El pie con `<a href="/aviso-legal">` ROMPE el build
 
 **Medido:** 2 violaciones «href interno sin fichero en dist/». Es **literalmente la fila 1 de la
-tabla de `@s24`** (el bug del cliente). La nota *«el pie con los huecos de los enlaces legales»* de
-`feature_list.json:101` es **troceado viejo que A-17 ya derogó**: F-04 (línea 64) reparte *«F-04 NO
-emite los enlaces legales del pie: eso es F-16»*. **F-06 NO emite enlaces legales.**
+tabla de `@s24`** (el bug del cliente). La nota _«el pie con los huecos de los enlaces legales»_ de
+`feature_list.json:101` es **troceado viejo que A-17 ya derogó**: F-04 (línea 64) reparte _«F-04 NO
+emite los enlaces legales del pie: eso es F-16»_. **F-06 NO emite enlaces legales.**
 
 ### 🔴 (b) Un `className={cond ? 'a' : 'b'}` en TSX es INMATABLE bajo la regla del propio repo
 
@@ -294,22 +294,22 @@ condicional.** Es una colisión entre dos reglas del repo, no un fallo de Stryke
   «100% de mutación» con «el marcado está cubierto».
 
 > **Y todo esto es [NV] hasta el primer `pnpm build` real**: se midió contra las funciones puras con
-> fixtures propios, no contra un `dist/` real. *«Verde ≠ funciona»*: el primer build de F-06 es
+> fixtures propios, no contra un `dist/` real. _«Verde ≠ funciona»_: el primer build de F-06 es
 > obligatorio y puede desmentir cualquier cosa (F-04 se llevó sus sustos justo ahí).
 
 ---
 
 ## 9. Las preguntas abiertas que van a la puerta humana
 
-| # | Qué | Por qué no lo decido yo |
-| --- | --- | --- |
-| **B-1** | La `puerta_legal` (*«SC 2.4.11 foco no oscurecido»*) **roza el AAA**. Propuesta: reescribir a *«not entirely hidden» (AA)*, C43 como técnica de proyecto, cero números atribuidos a la norma. | Cambia la puerta legal declarada. |
-| **B-2** | Acceptance @2 (*«scroll-margin no actúa al tabular»*) es **falso** y @4 (*«se deriva de la altura real»*) es **insostenible bajo SSG**. Propuesta: reescribir @2 con la razón correcta (scroll-padding va en el contenedor) y @4 en dos capas (suelo CSS estático medido + afinado JS opcional). | Cambia dos criterios de aceptación. |
-| **B-3** | El breakpoint **767 es herencia muerta**; el medido es **793–806px**. Propuesta: `820px` como criterio de proyecto medido, **si hay menú móvil** (depende de B-5). | Cambia un criterio y un número. |
-| **B-4** | Acceptance @1 (*«TODAS las secciones, no 7 de 11»*) es **insatisfacible** (hoy 2 secciones). Propuesta: **igualdad de conjuntos** derivada del DOM + **una puerta de anclas vivas nueva** (el entregable de más valor de F-06). | Reescribe el criterio central y añade una puerta. Es **A-23 otra vez**. |
-| **B-5** | 🔴 **¿Menú móvil, sí o no?** Si **no** (CSS puro, como el prototipo): no aplica el patrón de memoria, no hace falta Radix, `radix-ui` **sale de `dependencies`**. Si **sí**: rama JS con red CSS + breakpoint 820px, o Radix. Es la **bifurcación de diseño** de la que cuelgan B-3, B-6 y el patrón A3. | Decisión de **producto y arquitectura**. |
-| **B-6** | Si hay menú móvil: **¿Radix `Dialog` o `<button aria-expanded>` + `<nav>`?** Si Radix: **decidir `Portal` sí/no** (con Portal deja la anti-404 ciega → escenario obligatorio). Si no se usa Radix: **sale de `dependencies`**. | Decisión de arquitectura + dependencia. |
-| **B-7** | `destacados` y `ofertas` son **huérfanos** (0 features los construyen). ¿La nav los ignora, o se registran como features/`no_se_construyen`? | Decisión de alcance del producto. |
+| #       | Qué                                                                                                                                                                                                                                                                                                      | Por qué no lo decido yo                                                 |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| **B-1** | La `puerta_legal` (_«SC 2.4.11 foco no oscurecido»_) **roza el AAA**. Propuesta: reescribir a _«not entirely hidden» (AA)_, C43 como técnica de proyecto, cero números atribuidos a la norma.                                                                                                            | Cambia la puerta legal declarada.                                       |
+| **B-2** | Acceptance @2 (_«scroll-margin no actúa al tabular»_) es **falso** y @4 (_«se deriva de la altura real»_) es **insostenible bajo SSG**. Propuesta: reescribir @2 con la razón correcta (scroll-padding va en el contenedor) y @4 en dos capas (suelo CSS estático medido + afinado JS opcional).         | Cambia dos criterios de aceptación.                                     |
+| **B-3** | El breakpoint **767 es herencia muerta**; el medido es **793–806px**. Propuesta: `820px` como criterio de proyecto medido, **si hay menú móvil** (depende de B-5).                                                                                                                                       | Cambia un criterio y un número.                                         |
+| **B-4** | Acceptance @1 (_«TODAS las secciones, no 7 de 11»_) es **insatisfacible** (hoy 2 secciones). Propuesta: **igualdad de conjuntos** derivada del DOM + **una puerta de anclas vivas nueva** (el entregable de más valor de F-06).                                                                          | Reescribe el criterio central y añade una puerta. Es **A-23 otra vez**. |
+| **B-5** | 🔴 **¿Menú móvil, sí o no?** Si **no** (CSS puro, como el prototipo): no aplica el patrón de memoria, no hace falta Radix, `radix-ui` **sale de `dependencies`**. Si **sí**: rama JS con red CSS + breakpoint 820px, o Radix. Es la **bifurcación de diseño** de la que cuelgan B-3, B-6 y el patrón A3. | Decisión de **producto y arquitectura**.                                |
+| **B-6** | Si hay menú móvil: **¿Radix `Dialog` o `<button aria-expanded>` + `<nav>`?** Si Radix: **decidir `Portal` sí/no** (con Portal deja la anti-404 ciega → escenario obligatorio). Si no se usa Radix: **sale de `dependencies`**.                                                                           | Decisión de arquitectura + dependencia.                                 |
+| **B-7** | `destacados` y `ofertas` son **huérfanos** (0 features los construyen). ¿La nav los ignora, o se registran como features/`no_se_construyen`?                                                                                                                                                             | Decisión de alcance del producto.                                       |
 
 **Decididos por mí y declarados en el contrato** (medidos o de proyecto): el pie **NO emite enlaces
 legales** (A-17, ya cerrada; es de F-16) · el estado condicional va en un **atributo consultable**

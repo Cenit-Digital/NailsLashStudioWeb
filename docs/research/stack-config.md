@@ -41,24 +41,24 @@ referencia canónica.
 
 ## 2. Inventario de archivos leídos
 
-| Archivo | Estado | Nota |
-|---|---|---|
-| `WebEmpresa/package.json` | Leído | 65 líneas |
-| `WebEmpresa/vite.config.ts` | Leído | 14 líneas |
-| `WebEmpresa/tsconfig.json` | Leído | 23 líneas |
-| `WebEmpresa/eslint.config.js` | Leído | 25 líneas |
-| `WebEmpresa/.prettierrc.json` | Leído | 8 líneas |
-| `WebEmpresa/.prettierignore` | Leído | 26 líneas |
-| `WebEmpresa/stryker.config.json` | Leído | 40 líneas |
-| `WebEmpresa/vitest.config.ts` | Leído | 19 líneas |
-| `WebEmpresa/vitest.setup.ts` | Leído | 1 línea |
-| `WebEmpresa/.nvmrc` | Leído | `22` |
-| `WebEmpresa/.editorconfig` | Leído | 9 líneas |
-| `WebEmpresa/pnpm-workspace.yaml` | Leído | 16 líneas |
-| `WebEmpresa/init.sh` | Leído | 71 líneas |
-| `WebEmpresa/pnpm-lock.yaml` | Leído (parcial) | `lockfileVersion: '9.0'` |
-| `WebEmpresa/harness.config.json` | **NO EXISTE** | Ver §1.1 |
-| `WebEmpresa/eslint.config.*` (TS) | No aplica | es `.js`, no `.ts` |
+| Archivo                           | Estado          | Nota                     |
+| --------------------------------- | --------------- | ------------------------ |
+| `WebEmpresa/package.json`         | Leído           | 65 líneas                |
+| `WebEmpresa/vite.config.ts`       | Leído           | 14 líneas                |
+| `WebEmpresa/tsconfig.json`        | Leído           | 23 líneas                |
+| `WebEmpresa/eslint.config.js`     | Leído           | 25 líneas                |
+| `WebEmpresa/.prettierrc.json`     | Leído           | 8 líneas                 |
+| `WebEmpresa/.prettierignore`      | Leído           | 26 líneas                |
+| `WebEmpresa/stryker.config.json`  | Leído           | 40 líneas                |
+| `WebEmpresa/vitest.config.ts`     | Leído           | 19 líneas                |
+| `WebEmpresa/vitest.setup.ts`      | Leído           | 1 línea                  |
+| `WebEmpresa/.nvmrc`               | Leído           | `22`                     |
+| `WebEmpresa/.editorconfig`        | Leído           | 9 líneas                 |
+| `WebEmpresa/pnpm-workspace.yaml`  | Leído           | 16 líneas                |
+| `WebEmpresa/init.sh`              | Leído           | 71 líneas                |
+| `WebEmpresa/pnpm-lock.yaml`       | Leído (parcial) | `lockfileVersion: '9.0'` |
+| `WebEmpresa/harness.config.json`  | **NO EXISTE**   | Ver §1.1                 |
+| `WebEmpresa/eslint.config.*` (TS) | No aplica       | es `.js`, no `.ts`       |
 
 ---
 
@@ -85,22 +85,22 @@ Fuente: `WebEmpresa/package.json`.
 
 ### 3.2 Scripts (literal, `package.json:13-28`)
 
-| Script | Comando exacto | Línea |
-|---|---|---|
-| `dev` | `vite` | :14 |
-| `dev:ssr` | `vite-react-ssg dev` | :15 |
-| `build` | `vite-react-ssg build` | :16 |
-| `preview` | `vite preview` | :17 |
-| `typecheck` | `tsc --noEmit` | :18 |
-| `lint` | `eslint .` | :19 |
-| `lint:fix` | `eslint . --fix` | :20 |
-| `format` | `prettier --write .` | :21 |
-| `format:check` | `prettier --check .` | :22 |
-| `test` | `vitest run` | :23 |
-| `test:watch` | `vitest` | :24 |
-| `coverage` | `vitest run --coverage` | :25 |
-| `mutation` | `stryker run` | :26 |
-| `verify` | `bash ./init.sh` | :27 |
+| Script         | Comando exacto          | Línea |
+| -------------- | ----------------------- | ----- |
+| `dev`          | `vite`                  | :14   |
+| `dev:ssr`      | `vite-react-ssg dev`    | :15   |
+| `build`        | `vite-react-ssg build`  | :16   |
+| `preview`      | `vite preview`          | :17   |
+| `typecheck`    | `tsc --noEmit`          | :18   |
+| `lint`         | `eslint .`              | :19   |
+| `lint:fix`     | `eslint . --fix`        | :20   |
+| `format`       | `prettier --write .`    | :21   |
+| `format:check` | `prettier --check .`    | :22   |
+| `test`         | `vitest run`            | :23   |
+| `test:watch`   | `vitest`                | :24   |
+| `coverage`     | `vitest run --coverage` | :25   |
+| `mutation`     | `stryker run`           | :26   |
+| `verify`       | `bash ./init.sh`        | :27   |
 
 > **Ojo**: el script se llama **`mutation`**, no `mutate` (`package.json:26`). [VERIFICADO]
 > **Ojo**: **no existe** script `install` ni `ci`. [VERIFICADO]
@@ -109,47 +109,47 @@ Fuente: `WebEmpresa/package.json`.
 
 Rango: `package.json:29-39`. Resuelta: `pnpm-lock.yaml` (sección `importers`). [VERIFICADO]
 
-| Paquete | Rango (`package.json`) | Resuelta (lock) |
-|---|---|---|
-| `@fontsource/dm-sans` | `^5.0.0` (:30) | 5.2.8 |
-| `@fontsource/outfit` | `^5.0.0` (:31) | 5.2.8 |
-| `@vercel/firewall` | `^1.2.1` (:32) | 1.2.1 |
-| `autoskills` | `^0.3.6` (:33) | 0.3.6 |
-| `radix-ui` | `^1.6.0` (:34) | 1.6.0 |
-| `react` | `^19.2.0` (:35) | **19.2.7** |
-| `react-dom` | `^19.2.0` (:36) | **19.2.7** |
-| `react-router-dom` | `^6.30.0` (:37) | 6.30.4 |
-| `resend` | `^6.17.1` (:38) | 6.17.1 |
+| Paquete               | Rango (`package.json`) | Resuelta (lock) |
+| --------------------- | ---------------------- | --------------- |
+| `@fontsource/dm-sans` | `^5.0.0` (:30)         | 5.2.8           |
+| `@fontsource/outfit`  | `^5.0.0` (:31)         | 5.2.8           |
+| `@vercel/firewall`    | `^1.2.1` (:32)         | 1.2.1           |
+| `autoskills`          | `^0.3.6` (:33)         | 0.3.6           |
+| `radix-ui`            | `^1.6.0` (:34)         | 1.6.0           |
+| `react`               | `^19.2.0` (:35)        | **19.2.7**      |
+| `react-dom`           | `^19.2.0` (:36)        | **19.2.7**      |
+| `react-router-dom`    | `^6.30.0` (:37)        | 6.30.4          |
+| `resend`              | `^6.17.1` (:38)        | 6.17.1          |
 
 ### 3.4 DevDependencies — rango vs resuelta
 
 Rango: `package.json:40-64`. [VERIFICADO]
 
-| Paquete | Rango | Resuelta |
-|---|---|---|
-| `@eslint/js` | `^9.39.0` (:41) | 9.39.4 |
-| `@stryker-mutator/core` | `^9.6.0` (:42) | **9.6.1** |
-| `@stryker-mutator/vitest-runner` | `^9.6.0` (:43) | 9.6.1 |
-| `@testing-library/jest-dom` | `^6.6.0` (:44) | 6.9.1 |
-| `@testing-library/react` | `^16.3.0` (:45) | 16.3.2 |
-| `@testing-library/user-event` | `^14.6.0` (:46) | 14.6.1 |
-| `@types/node` | `^22.10.0` (:47) | 22.20.0 |
-| `@types/react` | `^19.2.0` (:48) | 19.2.17 |
-| `@types/react-dom` | `^19.2.0` (:49) | 19.2.3 |
-| `@vitejs/plugin-react-swc` | `^3.11.0` (:50) | 3.11.0 |
-| `@vitest/coverage-v8` | `^4.0.0` (:51) | 4.1.9 |
-| `eslint` | `^9.39.0` (:52) | 9.39.4 |
-| `eslint-plugin-react-hooks` | `^5.2.0` (:53) | 5.2.0 |
-| `eslint-plugin-react-refresh` | `^0.4.20` (:54) | 0.4.26 |
-| `globals` | `^15.15.0` (:55) | 15.15.0 |
-| `jsdom` | `^25.0.0` (:56) | 25.0.1 |
-| `prettier` | `^3.4.0` (:57) | 3.9.3 |
-| `sass` | `^1.80.0` (:58) | 1.100.0 |
-| `typescript` | `^5.9.0` (:59) | 5.9.3 |
-| `typescript-eslint` | `^8.46.0` (:60) | 8.62.0 |
-| `vite` | `^7.3.0` (:61) | **7.3.6** |
-| `vite-react-ssg` | `0.9.0` **exacto, sin `^`** (:62) | 0.9.0 |
-| `vitest` | `^4.0.0` (:63) | **4.1.9** |
+| Paquete                          | Rango                             | Resuelta  |
+| -------------------------------- | --------------------------------- | --------- |
+| `@eslint/js`                     | `^9.39.0` (:41)                   | 9.39.4    |
+| `@stryker-mutator/core`          | `^9.6.0` (:42)                    | **9.6.1** |
+| `@stryker-mutator/vitest-runner` | `^9.6.0` (:43)                    | 9.6.1     |
+| `@testing-library/jest-dom`      | `^6.6.0` (:44)                    | 6.9.1     |
+| `@testing-library/react`         | `^16.3.0` (:45)                   | 16.3.2    |
+| `@testing-library/user-event`    | `^14.6.0` (:46)                   | 14.6.1    |
+| `@types/node`                    | `^22.10.0` (:47)                  | 22.20.0   |
+| `@types/react`                   | `^19.2.0` (:48)                   | 19.2.17   |
+| `@types/react-dom`               | `^19.2.0` (:49)                   | 19.2.3    |
+| `@vitejs/plugin-react-swc`       | `^3.11.0` (:50)                   | 3.11.0    |
+| `@vitest/coverage-v8`            | `^4.0.0` (:51)                    | 4.1.9     |
+| `eslint`                         | `^9.39.0` (:52)                   | 9.39.4    |
+| `eslint-plugin-react-hooks`      | `^5.2.0` (:53)                    | 5.2.0     |
+| `eslint-plugin-react-refresh`    | `^0.4.20` (:54)                   | 0.4.26    |
+| `globals`                        | `^15.15.0` (:55)                  | 15.15.0   |
+| `jsdom`                          | `^25.0.0` (:56)                   | 25.0.1    |
+| `prettier`                       | `^3.4.0` (:57)                    | 3.9.3     |
+| `sass`                           | `^1.80.0` (:58)                   | 1.100.0   |
+| `typescript`                     | `^5.9.0` (:59)                    | 5.9.3     |
+| `typescript-eslint`              | `^8.46.0` (:60)                   | 8.62.0    |
+| `vite`                           | `^7.3.0` (:61)                    | **7.3.6** |
+| `vite-react-ssg`                 | `0.9.0` **exacto, sin `^`** (:62) | 0.9.0     |
+| `vitest`                         | `^4.0.0` (:63)                    | **4.1.9** |
 
 > `vite-react-ssg` es la **única** dependencia clavada a versión exacta
 > (`package.json:62`). [VERIFICADO] [INFERENCIA] Es deliberado: es el paquete que
@@ -177,12 +177,14 @@ ssgOptions: {                  // :8-13
   formatting: 'none',          // :12
 }
 ```
+
 - El build NO es `vite build`: es `vite-react-ssg build` (`package.json:16`), que lee
   `ssgOptions`. Punto de entrada: `src/main.tsx` (`vite.config.ts:10`).
 
 ### 4.2 `tsconfig.json` (23 líneas) [VERIFICADO]
 
 Estricto y sin emisión:
+
 ```
 target: ES2022 (:3) · lib: [ES2023, DOM, DOM.Iterable] (:5) · module: ESNext (:6)
 moduleResolution: bundler (:7) · moduleDetection: force (:8)
@@ -194,6 +196,7 @@ skipLibCheck: true (:19)
 types: ["node","vite/client","vitest/globals","@testing-library/jest-dom"] (:20)
 include: ["src","vite.config.ts","vitest.config.ts","vitest.setup.ts"] (:22)
 ```
+
 > Hay **un solo** `tsconfig.json`: no existe `tsconfig.app.json` ni `tsconfig.node.json`.
 > [VERIFICADO por listado de directorio]
 
@@ -208,6 +211,7 @@ plugins: react-hooks, react-refresh (:16-19)
 rules: ...reactHooks.configs.recommended.rules (:21)
        'react-refresh/only-export-components': ['warn', { allowConstantExport: true }] (:22)
 ```
+
 > Es `.js` (no `.ts`) y usa `tseslint.config()` (`eslint.config.js:7`). **No** usa
 > `tseslint.configs.recommendedTypeChecked`: el chequeo de tipos lo cubre `tsc --noEmit`
 > aparte (`package.json:18`). [INFERENCIA sobre :10 + :18]
@@ -215,9 +219,16 @@ rules: ...reactHooks.configs.recommended.rules (:21)
 ### 4.4 `.prettierrc.json` (8 líneas) [VERIFICADO]
 
 ```json
-{ "semi": false, "singleQuote": true, "trailingComma": "all",
-  "printWidth": 100, "tabWidth": 2, "endOfLine": "lf" }
+{
+  "semi": false,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "printWidth": 100,
+  "tabWidth": 2,
+  "endOfLine": "lf"
+}
 ```
+
 `.prettierignore` (26 líneas) excluye `pnpm-lock.yaml`, `dist`, `coverage`, `reports`,
 `.stryker-tmp` (:1-5), código vendorizado `.claude/ponytail/`, `.claude/skills/` (:9-10),
 `.agents/` (:14), el HTML de diseño (:18), `design` (:21) y
@@ -240,6 +251,7 @@ coverage: { provider: 'v8',                            // :13
             include: ['src/lib/**/*.ts'],              // :15
             exclude: ['src/**/*.test.*','src/**/*.d.ts'] }  // :16
 ```
+
 `vitest.setup.ts:1` → `import '@testing-library/jest-dom/vitest'` (una sola línea).
 
 > Los tests **conviven con el código** en `src/` (`vitest.config.ts:11`), NO hay carpeta
@@ -272,6 +284,7 @@ coverage: { provider: 'v8',                            // :13
 `src/lib/contact.ts`.
 
 El comentario `stryker.config.json:3` fija la doctrina:
+
 > "Prueba de mutación (RF-CODE-001 / GU-HARNESS-001). Valida que los tests muerden.
 > Umbral: 100% sobre las líneas tocadas por la feature."
 
@@ -282,15 +295,16 @@ El comentario `stryker.config.json:3` fija la doctrina:
 ### 4.7 `pnpm-workspace.yaml` (16 líneas) [VERIFICADO]
 
 ```yaml
-allowBuilds:                    # :5-9
+allowBuilds: # :5-9
   '@swc/core': true
   esbuild: true
   '@parcel/watcher': true
-peerDependencyRules:            # :12-16
+peerDependencyRules: # :12-16
   allowedVersions:
     'react-helmet-async>react': '19'
     'react-helmet-async>react-dom': '19'
 ```
+
 Comentario `:1`: "Ajustes de pnpm (v11): el hogar de estos settings dejó de ser
 package.json." Comentario `:3-4`: `allowBuilds` "reemplaza a onlyBuiltDependencies".
 
@@ -309,6 +323,7 @@ El lock declara `settings: autoInstallPeers: true`, `excludeLinksFromLockfile: f
 acumula `EXIT_CODE` y sigue, para reportar todos los fallos de golpe (:10, :65-70).
 
 **Bloque 1 — Entorno (:12-23)**
+
 - `node` presente, si no `exit 1` (:13)
 - Node ≥ 22 vía `parseInt(process.versions.node,10) >= 22` (:15)
 - `pnpm` presente, si no: "ejecuta: corepack enable pnpm" (:20)
@@ -321,12 +336,14 @@ acumula `EXIT_CODE` y sigue, para reportar todos los fallos de golpe (:10, :65-7
 `stryker.config.json`.
 
 **Bloque 3 — `feature_list.json` (:34-55)**: valida por Node embebido que
+
 - los estados ∈ `{pending, spec_ready, in_progress, done, blocked}` (:39)
 - **como máximo 1 feature en `in_progress`** (:41)
 - toda feature con `sdd: true` en estado `spec_ready|in_progress|done` tiene su
   `features/<name>.feature` (:43-50)
 
 **Bloque 4 — Calidad (:58-61)**
+
 ```bash
 pnpm -s typecheck   # :59
 pnpm -s lint        # :60
@@ -345,25 +362,25 @@ pnpm -s test        # :61  (redirige a /tmp/we_test.log)
 
 ### 5.1 Verificación de existencia
 
-| Comprobación | Resultado | Fuente |
-|---|---|---|
-| ¿Existe `pnpm@11.9.0`? | **SÍ** | `npm view pnpm@11.9.0 version` → `11.9.0` |
-| Publicada el | 2026-06-23T15:43:46.512Z | `npm view pnpm@11.9.0 time` |
-| `pnpm` `latest` hoy | **11.13.0** | `npm view pnpm dist-tags` → `"latest": "11.13.0"` |
-| `engines` de `pnpm@11.9.0` | **`{"node": ">=22.13"}`** | https://registry.npmjs.org/pnpm/11.9.0 |
-| `engines` de `pnpm@10.21.0` | `{"node": ">=18.12"}` | `npm view pnpm@10.21.0 engines` |
+| Comprobación                | Resultado                 | Fuente                                            |
+| --------------------------- | ------------------------- | ------------------------------------------------- |
+| ¿Existe `pnpm@11.9.0`?      | **SÍ**                    | `npm view pnpm@11.9.0 version` → `11.9.0`         |
+| Publicada el                | 2026-06-23T15:43:46.512Z  | `npm view pnpm@11.9.0 time`                       |
+| `pnpm` `latest` hoy         | **11.13.0**               | `npm view pnpm dist-tags` → `"latest": "11.13.0"` |
+| `engines` de `pnpm@11.9.0`  | **`{"node": ">=22.13"}`** | https://registry.npmjs.org/pnpm/11.9.0            |
+| `engines` de `pnpm@10.21.0` | `{"node": ">=18.12"}`     | `npm view pnpm@10.21.0 engines`                   |
 
 Todas [VERIFICADO]. **`pnpm@11.9.0` no es una versión inventada**: existe, está publicada
 y hay 4 releases posteriores (11.10.0, 11.11.0, 11.12.0, 11.13.0).
 
 ### 5.2 Entorno local medido [VERIFICADO]
 
-| Cosa | Valor | Comando |
-|---|---|---|
-| pnpm instalada | **10.21.0** | `pnpm --version` |
-| Node instalada | **v22.15.0** | `node --version` |
-| corepack | 0.32.0 | `corepack --version` |
-| Ruta de pnpm | `/c/Users/vhurt/AppData/Roaming/npm/pnpm` | `which pnpm` |
+| Cosa           | Valor                                     | Comando              |
+| -------------- | ----------------------------------------- | -------------------- |
+| pnpm instalada | **10.21.0**                               | `pnpm --version`     |
+| Node instalada | **v22.15.0**                              | `node --version`     |
+| corepack       | 0.32.0                                    | `corepack --version` |
+| Ruta de pnpm   | `/c/Users/vhurt/AppData/Roaming/npm/pnpm` | `which pnpm`         |
 
 > La ruta indica que pnpm está instalada **vía npm global**, no vía corepack shim.
 > [INFERENCIA sobre `which pnpm`]
@@ -372,15 +389,17 @@ y hay 4 releases posteriores (11.10.0, 11.11.0, 11.12.0, 11.13.0).
 
 pnpm v10 trae `managePackageManagerVersions` con **default `true`**, y la doc oficial dice
 literalmente:
+
 > "When enabled, pnpm will automatically download and run the version of pnpm specified in
 > the `packageManager` field of `package.json`. This is the same field used by Corepack."
 > — https://pnpm.io/10.x/settings (managePackageManagerVersions)
 
 ⇒ **pnpm 10.21.0, al ejecutarse dentro de WebEmpresa, descarga y ejecuta pnpm 11.9.0 sola.**
-No hay que hacer nada. La 10.21.0 actúa de *bootstrapper*. [INFERENCIA directa de la doc]
+No hay que hacer nada. La 10.21.0 actúa de _bootstrapper_. [INFERENCIA directa de la doc]
 
 En pnpm v11 ese ajuste **se eliminó** y lo sustituye `pmOnFail`, cuyo default es `download`
 — el mismo comportamiento — https://pnpm.io/settings :
+
 > "`managePackageManagerVersions: true` → `pmOnFail: download` (default)".
 > Opciones de `pmOnFail`: `download` | `error` | `warn` | `ignore`.
 
@@ -406,6 +425,7 @@ de `22` a secas, para que el entorno sea reproducible.
 
 De https://pnpm.io/blog/releases/11.0 y
 https://github.com/pnpm/pnpm/releases/tag/v11.0.0:
+
 - "Node.js 22+ required — support for Node 18, 19, 20, and 21 is dropped".
 - "pnpm no longer reads the `pnpm` field in `package.json`". → WebEmpresa **ya cumple**:
   no tiene campo `pnpm` en `package.json` y movió los ajustes a `pnpm-workspace.yaml`
@@ -427,14 +447,14 @@ https://github.com/pnpm/pnpm/releases/tag/v11.0.0:
 
 ### 6.1 Mapeo directo
 
-| Puerta del arnés | Comando exacto | Derivado de |
-|---|---|---|
-| `install` | `pnpm install --frozen-lockfile` | **[INFERENCIA]** — no hay script `install`; `init.sh:22` solo comprueba `node_modules` y sugiere `pnpm install` |
-| `lint` | `pnpm typecheck && pnpm lint` | `package.json:18` + `:19`, en el orden de `init.sh:59-60` |
-| `test` | `pnpm test` (= `vitest run`) | `package.json:23`, usado en `init.sh:61` |
-| `mutate` | `pnpm mutation` (= `stryker run`) | `package.json:26` |
-| `mutate` con target | `pnpm exec stryker run --mutate {{target}}` | **[INFERENCIA]** — ver §6.3 |
-| `build` | `pnpm build` (= `vite-react-ssg build`) | `package.json:16` |
+| Puerta del arnés    | Comando exacto                              | Derivado de                                                                                                     |
+| ------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `install`           | `pnpm install --frozen-lockfile`            | **[INFERENCIA]** — no hay script `install`; `init.sh:22` solo comprueba `node_modules` y sugiere `pnpm install` |
+| `lint`              | `pnpm typecheck && pnpm lint`               | `package.json:18` + `:19`, en el orden de `init.sh:59-60`                                                       |
+| `test`              | `pnpm test` (= `vitest run`)                | `package.json:23`, usado en `init.sh:61`                                                                        |
+| `mutate`            | `pnpm mutation` (= `stryker run`)           | `package.json:26`                                                                                               |
+| `mutate` con target | `pnpm exec stryker run --mutate {{target}}` | **[INFERENCIA]** — ver §6.3                                                                                     |
+| `build`             | `pnpm build` (= `vite-react-ssg build`)     | `package.json:16`                                                                                               |
 
 > **Por qué `lint` = typecheck **y** lint**: el schema del arnés solo tiene 5 ranuras
 > (`install/lint/test/mutate/build`, `harness.schema.json:26-30`) y **no hay ranura
@@ -488,6 +508,7 @@ listado]: el stack está por crear.
 ```
 
 Decisiones y su porqué:
+
 - **`paths.tests: "src"`** (no el default `"tests"` de `harness.schema.json:40`): en este
   stack los tests viven junto al código, `include: ['src/**/*.{test,spec}.{ts,tsx}']`
   (`vitest.config.ts:11`). [VERIFICADO]
@@ -497,7 +518,7 @@ Decisiones y su porqué:
   `break: 100` ⇒ `1.0` en el arnés. **Son dos escalas distintas: no copiar el 100 tal cual.**
   [INFERENCIA sobre ambas fuentes]
 - **`mutation.targets: []`**: la lista de WebEmpresa (`stryker.config.json:12-30`) es de
-  *sus* componentes; para NailsLash hay que reconstruirla con los módulos propios. Dejarla
+  _sus_ componentes; para NailsLash hay que reconstruirla con los módulos propios. Dejarla
   vacía hasta que exista `src/`. [INFERENCIA]
 
 ### 6.3 Nota sobre `mutate {{target}}`
@@ -505,6 +526,7 @@ Decisiones y su porqué:
 El motor sustituye `{{target}}` en `commands.mutate` (`.harness/harness.mjs:58`, `:251-252`)
 y `bin/harness mutate [target]` lo pasa como argumento (`.harness/harness.mjs:298`).
 [VERIFICADO]
+
 - `pnpm mutation` (sin target) ⇒ usa la lista `mutate` de `stryker.config.json`.
 - Para soportar target puntual: `pnpm exec stryker run --mutate {{target}}`.
   **[NO VERIFICADO]** que `--mutate` acepte un único fichero por CLI en Stryker 9.6 con esa
@@ -515,12 +537,12 @@ y `bin/harness mutate [target]` lo pasa como argumento (`.harness/harness.mjs:29
 
 ### 6.4 Diferencia de puertas: `init.sh` (WebEmpresa) vs `bin/harness` (arnés nuevo)
 
-| | WebEmpresa `init.sh` | Arnés `bin/harness` |
-|---|---|---|
-| Orden | entorno → archivos base → feature_list → typecheck → lint → test | init → lint → test; `verify` = init + mutación |
-| Mutación en verify | **NO** (`init.sh:58-61`) | **SÍ** (`.harness/harness.mjs:14`, `:262-265`) |
-| Config | scripts hardcodeados en `init.sh` | `harness.config.json` |
-| Invocación | `pnpm verify` → `bash ./init.sh` (`package.json:27`) | `bin/harness verify` / `bin\harness.ps1 verify` |
+|                    | WebEmpresa `init.sh`                                             | Arnés `bin/harness`                             |
+| ------------------ | ---------------------------------------------------------------- | ----------------------------------------------- |
+| Orden              | entorno → archivos base → feature_list → typecheck → lint → test | init → lint → test; `verify` = init + mutación  |
+| Mutación en verify | **NO** (`init.sh:58-61`)                                         | **SÍ** (`.harness/harness.mjs:14`, `:262-265`)  |
+| Config             | scripts hardcodeados en `init.sh`                                | `harness.config.json`                           |
+| Invocación         | `pnpm verify` → `bash ./init.sh` (`package.json:27`)             | `bin/harness verify` / `bin\harness.ps1 verify` |
 
 [VERIFICADO] NailsLashStudioWeb usa el arnés nuevo (tiene `bin/harness`, `bin/harness.ps1`,
 `.harness/harness.mjs`, `init.ps1`), por lo que **la mutación sí entra en `verify`** — una
@@ -530,18 +552,18 @@ puerta **más estricta** que la de WebEmpresa.
 
 ## 7. Lo que NO he podido verificar
 
-| # | Afirmación / hueco | Por qué no está verificado | Qué haría falta |
-|---|---|---|---|
-| 1 | `WebEmpresa/harness.config.json` | **No existe el archivo.** El encargo lo daba por hecho | Nada que leer: WebEmpresa usa `init.sh`. Confirmar con el equipo si se piensa migrar WebEmpresa al arnés agnóstico |
-| 2 | Si pnpm 11 sube `lockfileVersion` desde `9.0` | Ni `pnpm.io/migration` ni las notas de v11.0.0 lo dicen explícitamente | Ejecutar `pnpm install` con pnpm 11.9.0 en una copia y diffear `pnpm-lock.yaml:1`; o buscar el changelog del paquete `@pnpm/lockfile.types` |
-| 3 | Sintaxis exacta `stryker run --mutate <file>` en Stryker 9.6 | No consultada la doc de StrykerJS | Leer https://stryker-mutator.io/docs/stryker-js/configuration/#mutate-string y probar `pnpm exec stryker run --mutate src/lib/x.ts` |
-| 4 | Que `pnpm install --frozen-lockfile` sea el comando de install acordado | **Inferido**: no hay script `install`; `init.sh:22` solo dice `pnpm install` | Decisión de equipo. En CI `--frozen-lockfile` es lo correcto; en local, `pnpm install` a secas |
-| 5 | Que las puertas pasen HOY en WebEmpresa | **No he ejecutado** `pnpm verify` / `pnpm test` / `pnpm mutation` (tarea de lectura) | Ejecutar `bash ./init.sh` y `pnpm mutation` en WebEmpresa |
-| 6 | Coherencia lock ↔ `pnpm-workspace.yaml` v11 | `pnpm-lock.yaml` es de 07-jul y declara `settings:` de estilo v10; el workspace ya habla de v11 | `pnpm install` con 11.9.0 y ver si reescribe el lock |
-| 7 | Por qué `engines.node` es `>=22.12.0` y no `>=22.13` | No hay comentario ni commit que lo explique | `git log -p -- package.json` en WebEmpresa |
-| 8 | Versiones/decisiones de contenido de NailsLash (servicios, precios, horarios) | **Fuera de mi área** | Otro investigador / el cliente |
-| 9 | Si `radix-ui` (paquete unificado) es la vía elegida vs `@radix-ui/react-*` | Solo consta la línea `package.json:34` | Decisión de diseño; revisar `project-spec.md` |
-| 10 | `autoskills` y `@vercel/firewall` como deps de **producción** | Constan en `package.json:32-33` pero desconozco su rol | Revisar `src/` y `api/` de WebEmpresa; `skills-lock.json` |
+| #   | Afirmación / hueco                                                            | Por qué no está verificado                                                                      | Qué haría falta                                                                                                                             |
+| --- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `WebEmpresa/harness.config.json`                                              | **No existe el archivo.** El encargo lo daba por hecho                                          | Nada que leer: WebEmpresa usa `init.sh`. Confirmar con el equipo si se piensa migrar WebEmpresa al arnés agnóstico                          |
+| 2   | Si pnpm 11 sube `lockfileVersion` desde `9.0`                                 | Ni `pnpm.io/migration` ni las notas de v11.0.0 lo dicen explícitamente                          | Ejecutar `pnpm install` con pnpm 11.9.0 en una copia y diffear `pnpm-lock.yaml:1`; o buscar el changelog del paquete `@pnpm/lockfile.types` |
+| 3   | Sintaxis exacta `stryker run --mutate <file>` en Stryker 9.6                  | No consultada la doc de StrykerJS                                                               | Leer https://stryker-mutator.io/docs/stryker-js/configuration/#mutate-string y probar `pnpm exec stryker run --mutate src/lib/x.ts`         |
+| 4   | Que `pnpm install --frozen-lockfile` sea el comando de install acordado       | **Inferido**: no hay script `install`; `init.sh:22` solo dice `pnpm install`                    | Decisión de equipo. En CI `--frozen-lockfile` es lo correcto; en local, `pnpm install` a secas                                              |
+| 5   | Que las puertas pasen HOY en WebEmpresa                                       | **No he ejecutado** `pnpm verify` / `pnpm test` / `pnpm mutation` (tarea de lectura)            | Ejecutar `bash ./init.sh` y `pnpm mutation` en WebEmpresa                                                                                   |
+| 6   | Coherencia lock ↔ `pnpm-workspace.yaml` v11                                   | `pnpm-lock.yaml` es de 07-jul y declara `settings:` de estilo v10; el workspace ya habla de v11 | `pnpm install` con 11.9.0 y ver si reescribe el lock                                                                                        |
+| 7   | Por qué `engines.node` es `>=22.12.0` y no `>=22.13`                          | No hay comentario ni commit que lo explique                                                     | `git log -p -- package.json` en WebEmpresa                                                                                                  |
+| 8   | Versiones/decisiones de contenido de NailsLash (servicios, precios, horarios) | **Fuera de mi área**                                                                            | Otro investigador / el cliente                                                                                                              |
+| 9   | Si `radix-ui` (paquete unificado) es la vía elegida vs `@radix-ui/react-*`    | Solo consta la línea `package.json:34`                                                          | Decisión de diseño; revisar `project-spec.md`                                                                                               |
+| 10  | `autoskills` y `@vercel/firewall` como deps de **producción**                 | Constan en `package.json:32-33` pero desconozco su rol                                          | Revisar `src/` y `api/` de WebEmpresa; `skills-lock.json`                                                                                   |
 
 ---
 
@@ -582,18 +604,18 @@ puerta **más estricta** que la de WebEmpresa.
 
 ### 8.3 Qué features/tareas implica (backlog de arranque)
 
-| # | Tarea | Fuente |
-|---|---|---|
-| T1 | Crear `package.json` con `packageManager: pnpm@11.13.0` y `engines.node >=22.13.0` | §5.4, §8.1 |
-| T2 | `.nvmrc` con versión completa (`22.15.0`) en vez de `22` | §5.4 |
-| T3 | Rellenar `harness.config.json` con el bloque de §6.2 | `harness.config.json:6-12` está vacío |
-| T4 | Copiar `tsconfig.json`, `eslint.config.js`, `.prettierrc.json`, `.editorconfig`, `vitest.config.ts`, `vitest.setup.ts` de WebEmpresa | §4 |
-| T5 | `pnpm-workspace.yaml` con `allowBuilds` (`@swc/core`, `esbuild`, `@parcel/watcher`) | `pnpm-workspace.yaml:5-9` |
-| T6 | `stryker.config.json` con `break: 100` y `mutate` reconstruido para los módulos de NailsLash | §4.6 |
-| T7 | Verificar T1-T6 con `bin\harness.ps1 init` (Windows) | CLAUDE.md |
-| T8 | Decidir `install`: `--frozen-lockfile` (CI) vs `pnpm install` (local) | §7 #4 |
-| T9 | Revisar si `@vercel/firewall`, `resend`, `autoskills` aplican a este proyecto (WebEmpresa los usa; NailsLash quizá no) | §7 #10 |
-| T10 | Confirmar sintaxis `--mutate {{target}}` contra doc de StrykerJS | §7 #3 |
+| #   | Tarea                                                                                                                                | Fuente                                |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------- |
+| T1  | Crear `package.json` con `packageManager: pnpm@11.13.0` y `engines.node >=22.13.0`                                                   | §5.4, §8.1                            |
+| T2  | `.nvmrc` con versión completa (`22.15.0`) en vez de `22`                                                                             | §5.4                                  |
+| T3  | Rellenar `harness.config.json` con el bloque de §6.2                                                                                 | `harness.config.json:6-12` está vacío |
+| T4  | Copiar `tsconfig.json`, `eslint.config.js`, `.prettierrc.json`, `.editorconfig`, `vitest.config.ts`, `vitest.setup.ts` de WebEmpresa | §4                                    |
+| T5  | `pnpm-workspace.yaml` con `allowBuilds` (`@swc/core`, `esbuild`, `@parcel/watcher`)                                                  | `pnpm-workspace.yaml:5-9`             |
+| T6  | `stryker.config.json` con `break: 100` y `mutate` reconstruido para los módulos de NailsLash                                         | §4.6                                  |
+| T7  | Verificar T1-T6 con `bin\harness.ps1 init` (Windows)                                                                                 | CLAUDE.md                             |
+| T8  | Decidir `install`: `--frozen-lockfile` (CI) vs `pnpm install` (local)                                                                | §7 #4                                 |
+| T9  | Revisar si `@vercel/firewall`, `resend`, `autoskills` aplican a este proyecto (WebEmpresa los usa; NailsLash quizá no)               | §7 #10                                |
+| T10 | Confirmar sintaxis `--mutate {{target}}` contra doc de StrykerJS                                                                     | §7 #3                                 |
 
 > **`resend` (`package.json:38`) y `@vercel/firewall` (`package.json:32`)** sugieren
 > formulario de contacto por email y protección de endpoint. [INFERENCIA] Para un salón con
@@ -616,6 +638,7 @@ puerta **más estricta** que la de WebEmpresa.
 `TemplateSSDUncleBobBettatech/examples/node-notes-cli/harness.config.json`.
 
 **URLs oficiales**:
+
 - https://registry.npmjs.org/pnpm/11.9.0 — `engines: {"node": ">=22.13"}`
 - https://pnpm.io/settings — `pmOnFail` (default `download`), migración desde
   `managePackageManagerVersions`

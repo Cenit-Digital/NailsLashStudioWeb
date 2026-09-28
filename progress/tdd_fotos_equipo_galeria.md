@@ -26,8 +26,8 @@
   habría dejado un escenario del contrato contradiciendo el código a propósito.
 - `@s8` reescrito: la leyenda pasa de declarar 2 cosas (perfiles + reseñas) a declarar 3 (perfiles +
   fotos de banco de imágenes + reseñas). Copy propuesto (sin puerta humana formal en esta sesión,
-  igual que D2/D3 del contrato original): *"Equipo, fotos y reseñas de ejemplo · perfiles de muestra y
-  fotos de banco de imágenes, pendientes de confirmar con el salón"*.
+  igual que D2/D3 del contrato original): _"Equipo, fotos y reseñas de ejemplo · perfiles de muestra y
+  fotos de banco de imágenes, pendientes de confirmar con el salón"_.
 - Bloque "AMPLIACIÓN — EL MONOGRAMA" (@s26-@s31) sustituido por "AMPLIACIÓN — FOTOS REALES": mismo
   rango de escenarios, ahora describen fotos en vez de iniciales.
 
@@ -43,16 +43,16 @@
    verdes** (confirma ROJO: ni el monograma antiguo compila con el nuevo test, ni el código actual
    tiene fotos).
 2. **GREEN**: `src/lib/demo/equipo-demo.ts` gana `foto: string` y `alt: string` en `ProfesionalDemo`
-   + 7 imports de `src/assets/trabajos/*.jpg` + los 7 pares foto/alt del encargo, y `LEYENDA_EQUIPO`
-   se actualiza. `Equipo.tsx`: el `<div className={estilos.foto} aria-hidden="true"><span
-   className={estilos.monograma}>{inicialDe(...)}</span></div>` se sustituye por `<div
-   className={estilos.foto}><img src={profesional.foto} alt={profesional.alt} width={800}
-   height={600} loading="lazy" /></div>` (constantes `ANCHO_FOTO`/`ALTO_FOTO`, medidas de verdad de
-   los 13 JPEG con un parser de cabecera JPEG — las 13 son 800×600). `pnpm exec vitest run
-   src/components/equipo.test.tsx` → **59/59 verdes**.
+   - 7 imports de `src/assets/trabajos/*.jpg` + los 7 pares foto/alt del encargo, y `LEYENDA_EQUIPO`
+     se actualiza. `Equipo.tsx`: el `<div className={estilos.foto} aria-hidden="true"><span
+className={estilos.monograma}>{inicialDe(...)}</span></div>` se sustituye por `<div
+className={estilos.foto}><img src={profesional.foto} alt={profesional.alt} width={800}
+height={600} loading="lazy" /></div>` (constantes `ANCHO_FOTO`/`ALTO_FOTO`, medidas de verdad de
+     los 13 JPEG con un parser de cabecera JPEG — las 13 son 800×600). `pnpm exec vitest run
+src/components/equipo.test.tsx` → **59/59 verdes**.
 3. **REFACTOR (verde)**: se borra `inicialDe` de `src/components/equipo-logica.ts` (sin referencias),
    se borra la regla `.monograma` de `equipo.module.scss` (queda `.foto { overflow:hidden; img {
-   width/height:100%; object-fit:cover } }` para que la imagen rellene el hueco 4/3) y se borra su
+width/height:100%; object-fit:cover } }` para que la imagen rellene el hueco 4/3) y se borra su
    test en `equipo-estilos.test.ts`. Re-run → sigue verde.
 
 ## TRABAJO B — Galería (`src/components/Galeria.tsx`, sin tests hasta hoy)
@@ -61,14 +61,15 @@
    una con nombre accesible = alt, 6 srcs reconocibles por fichero, dimensiones 800×600 +
    `loading="lazy"`, sin `ph-woman`/sin origen externo, la nota honesta con el nuevo texto, y los
    botones de flecha ("Anterior"/"Siguiente") con nombre accesible. `pnpm exec vitest run
-   src/components/galeria.test.tsx` → **5 fallos / 2 verdes** (los 6 tiles de hoy están vacíos:
+src/components/galeria.test.tsx` → **5 fallos / 2 verdes** (los 6 tiles de hoy están vacíos:
    `<div aria-hidden="true" />`, sin `<img>`).
 2. **GREEN**: `Galeria.tsx` importa las 6 fotos de `src/assets/trabajos/`, cada tile pasa a `<div
-   className={estilos.tile}><img src alt width={800} height={600} loading="lazy" /></div>` (se quita
-   el `aria-hidden` del tile: la foto ya aporta información) y la nota pasa a *"Galería de muestra ·
-   fotos de banco de imágenes, las fotos reales del salón se añaden antes de publicar."* — sigue
+className={estilos.tile}><img src alt width={800} height={600} loading="lazy" /></div>` (se quita
+   el `aria-hidden` del tile: la foto ya aporta información) y la nota pasa a _"Galería de muestra ·
+   fotos de banco de imágenes, las fotos reales del salón se añaden antes de publicar."_ — sigue
    siendo cierta, ahora también declara que son de banco. `galeria.module.scss`: `.tile` gana
    `overflow:hidden` + regla `img { object-fit:cover }`. → **7/7 verdes**.
+
 - `Galeria.tsx` NO se añade a `stryker.config.json` (instrucción explícita del encargo): no tiene
   mutación propia, cubierto solo por estos 7 tests de comportamiento.
 

@@ -9,6 +9,7 @@ Auditor: `a11y_seo_auditor`. Fecha: 2026-09-28. Solo lectura, salvo este informe
 `progress/a11y_nailbot.md` no existe, y tampoco `progress/judge_nailbot_chat_compartido.md` ni `progress/security_nailbot.md`. Aun así, `progress/tdd_nailbot_chat_compartido.md:18` los cita como si existieran, y no hay rastro de ellos en `git log --all`.
 
 He reconstruido «hallazgo a hallazgo» a partir de tres fuentes:
+
 - `progress/judge_nailbot_flotante.md` (B1 = el mismo bloqueante 2.2.2);
 - `progress/tdd_nailbot_flotante.md:45-57`;
 - `progress/tdd_nailbot_chat_compartido.md:55`.
@@ -33,6 +34,7 @@ El lead tiene que persistir esos tres informes o dejar anotado que se perdieron 
 **Qué se cambió.** `src/components/nailbot-arte.module.scss:36-132`: las 13 reglas animadas usan ahora longhands (`animation-name`, `-duration`, `-timing-function` y `-iteration-count`) y ninguna declara `animation-play-state`. La regla de pausa `.arte[data-animacion="pausada"] *` (`:139-141`) ya no compite en la cascada por esa propiedad, así que se aplica aunque su especificidad (0,2,0) sea menor que la de las reglas animadas (0,3,0). No hay `!important` (HS-15 respetado). No hay ninguna regla global de `animation` en `src/styles/` que pueda reponer el estado (grep: solo `hero.module.scss` y `nailbot-flotante.module.scss` usan el shorthand, y ninguna toca el arte).
 
 **Medido en Chrome** (1280 px y ~500 px):
+
 - Con `data-animacion="activa"`, las 13 piezas están en `running`.
 - Con `data-animacion="pausada"`, las 13 dan `paused` tanto en `getAnimations()[0].playState` como en el `animation-play-state` calculado. El `currentTime` de las 13 no cambia en 700 ms, es decir, se congelan de verdad.
 - Al volver a `activa`, las 13 pasan a `running`.
@@ -46,16 +48,17 @@ Esto coincide con la medición en vivo del lead (`progress/current.md:44-45`).
 ### 1.2 SC 2.4.7 Focus Visible (AA): halo y forma redonda. RESUELTO
 
 Estilos en `nailbot-flotante.module.scss`:
+
 - `.lanzador:focus-visible` (`:54-61`) tiene especificidad (0,2,0) y gana a la regla global `:focus-visible` (0,1,0) de `_base.scss:18-22`, entre en el orden que entre.
 - `.pausa`, `.cerrarBocadillo` y `.cerrarDialogo:focus-visible` (`:63-70`) siguen el mismo patrón.
 
 Medido en Chrome (reglas globales cargadas DESPUÉS, como en el bundle):
 
-| Control | `:focus-visible` | `border-radius` | outline | box-shadow |
-|---|---|---|---|---|
-| Lanzador | true | `50%` | 3px `rgb(162,62,95)` (`--accent-dark`), offset 6px | sombra + halo blanco de 12px |
-| Pausa | true | `50%` | 3px, offset 2px | halo de 7px |
-| «Cerrar el chat» | true | `50%` | 3px, offset 2px | halo de 7px |
+| Control          | `:focus-visible` | `border-radius` | outline                                            | box-shadow                   |
+| ---------------- | ---------------- | --------------- | -------------------------------------------------- | ---------------------------- |
+| Lanzador         | true             | `50%`           | 3px `rgb(162,62,95)` (`--accent-dark`), offset 6px | sombra + halo blanco de 12px |
+| Pausa            | true             | `50%`           | 3px, offset 2px                                    | halo de 7px                  |
+| «Cerrar el chat» | true             | `50%`           | 3px, offset 2px                                    | halo de 7px                  |
 
 El anillo del lanzador ocupa 6-9 px y queda entero sobre el halo, que ocupa 0-12 px. `--accent-dark` sobre blanco da **6,2:1** (cálculo propio). Así el foco se ve también sobre el pie oscuro (`--ink`).
 
@@ -76,6 +79,7 @@ Nota: a 1280 px, un punto a 8 px a la izquierda del disco da el `<svg>` del arte
 ### 1.5 `forced-colors`. RESUELTO para el lanzador
 
 `nailbot-flotante.module.scss:217-222` pone `border: 2px solid ButtonText` en el lanzador, que en colores forzados se queda sin anillo `box-shadow` y sin degradado. Lo demás se sostiene solo:
+
 - La pausa y «Cerrar el chat» ya tienen borde, que se fuerza a un color del sistema.
 - Los iconos usan `currentColor`.
 - El outline de foco sobrevive, porque `outline-color` se fuerza.
@@ -103,6 +107,7 @@ Medido a ~500 px y a 320 px: el `<dialog>` ocupa `[0,0,vw,alto]` y «Cerrar el c
 ### 1.9 SEO
 
 Sin cambios de SEO:
+
 - El flotante solo existe en cliente: `renderToString(<Home/>)` no contiene `<dialog` ni el lanzador (test `nailbot-flotante.test.tsx:87-107`).
 - Sigue habiendo un solo `<h1>` (test `:115`).
 - El `<h2>` del panel solo existe en cliente y dentro de un diálogo cerrado.
@@ -151,6 +156,7 @@ Sin cambios de SEO:
 ### MENOR-3: faltan guardas de bytes para las curas a11y que no son de la pausa
 
 Stryker no ve SCSS, y ninguna de estas curas tiene test:
+
 - el `border-radius: 50%` y el halo de `:focus-visible` (`nailbot-flotante.module.scss:54-70`);
 - `pointer-events` (`:18-23`);
 - `forced-colors` (`:217-222`);
@@ -171,20 +177,20 @@ Un `animation-play-state: running` dentro de una regla animada, o una regla de m
 
 ### Informativo (sin acción)
 
-El lanzador está fuera de todo landmark a propósito (L14, `features/nailbot_flotante.feature:99`). La regla *best-practice* `region` de axe lo marcará, pero no es un criterio WCAG (SC 1.3.1 no exige que todo esté en un landmark). Queda justificado.
+El lanzador está fuera de todo landmark a propósito (L14, `features/nailbot_flotante.feature:99`). La regla _best-practice_ `region` de axe lo marcará, pero no es un criterio WCAG (SC 1.3.1 no exige que todo esté en un landmark). Queda justificado.
 
 ---
 
 ## Resumen para el lead
 
-| Hallazgo previo | Estado | Evidencia |
-|---|---|---|
-| BLOQUEANTE SC 2.2.2: la pausa no congelaba | RESUELTO | Chrome: 13/13 `paused` y `currentTime` fijo; guarda `estilos.test.ts:127-134` que muerde HEAD |
-| Foco del lanzador cuadrado y sin halo | RESUELTO | Chrome: `50%`, halo de 12 px, anillo 6,2:1 |
-| Esc con el foco en la × | RESUELTO | `NailbotFlotante.tsx:104-111` + test `:437-447` |
-| `pointer-events` | RESUELTO | `elementFromPoint` en los huecos devuelve la página |
-| `forced-colors` | RESUELTO (lanzador) | `module.scss:217-222`; el panel está en MENOR-2 |
-| Placeholder y `outline: none` del campo | RESUELTO | Chrome: `#6F525A`, opacidad 1 (6,4:1); `outline` 3px |
-| Panel móvil (`box-sizing`) | RESUELTO | Chrome: el panel cabe; efectos colaterales en IMPORTANTE-1 y MENOR-1 |
+| Hallazgo previo                            | Estado              | Evidencia                                                                                     |
+| ------------------------------------------ | ------------------- | --------------------------------------------------------------------------------------------- |
+| BLOQUEANTE SC 2.2.2: la pausa no congelaba | RESUELTO            | Chrome: 13/13 `paused` y `currentTime` fijo; guarda `estilos.test.ts:127-134` que muerde HEAD |
+| Foco del lanzador cuadrado y sin halo      | RESUELTO            | Chrome: `50%`, halo de 12 px, anillo 6,2:1                                                    |
+| Esc con el foco en la ×                    | RESUELTO            | `NailbotFlotante.tsx:104-111` + test `:437-447`                                               |
+| `pointer-events`                           | RESUELTO            | `elementFromPoint` en los huecos devuelve la página                                           |
+| `forced-colors`                            | RESUELTO (lanzador) | `module.scss:217-222`; el panel está en MENOR-2                                               |
+| Placeholder y `outline: none` del campo    | RESUELTO            | Chrome: `#6F525A`, opacidad 1 (6,4:1); `outline` 3px                                          |
+| Panel móvil (`box-sizing`)                 | RESUELTO            | Chrome: el panel cabe; efectos colaterales en IMPORTANTE-1 y MENOR-1                          |
 
 Nuevos: 0 bloqueantes, 2 importantes (IMPORTANTE-1 barra horizontal por `.chat` en `content-box`; IMPORTANTE-2 título tapado por la × a 320 px con texto ampliado) y 5 menores.

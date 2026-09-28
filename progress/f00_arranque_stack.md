@@ -7,14 +7,14 @@
 
 ## 1. Resultado de las 6 comprobaciones de aceptación
 
-| # | Comprobación | Resultado |
-|---|---|---|
-| 1 | `pnpm install` | 🟢 VERDE (exit 0) |
-| 2 | `pnpm typecheck` | 🟢 VERDE (exit 0) |
-| 3 | `pnpm lint` | 🟢 VERDE (exit 0) |
-| 4 | `pnpm test` | 🟢 VERDE (exit 0) — 1 test, 1 fichero |
-| 5 | `pnpm build` | 🟢 VERDE (exit 0) — **prerender SSG confirmado** |
-| 6 | `bin/harness init` | 🟢 VERDE (exit 0) |
+| #   | Comprobación       | Resultado                                        |
+| --- | ------------------ | ------------------------------------------------ |
+| 1   | `pnpm install`     | 🟢 VERDE (exit 0)                                |
+| 2   | `pnpm typecheck`   | 🟢 VERDE (exit 0)                                |
+| 3   | `pnpm lint`        | 🟢 VERDE (exit 0)                                |
+| 4   | `pnpm test`        | 🟢 VERDE (exit 0) — 1 test, 1 fichero            |
+| 5   | `pnpm build`       | 🟢 VERDE (exit 0) — **prerender SSG confirmado** |
+| 6   | `bin/harness init` | 🟢 VERDE (exit 0)                                |
 
 **0 fallos, 0 errores, 0 warnings** en los 6. Extras verificados: `harness.config.json` valida
 contra `harness.schema.json` (ajv, draft-7) y `prettier --check` pasa sobre todos los ficheros
@@ -62,7 +62,7 @@ Done in 9s using pnpm v11.9.0
 ```
 
 > Nota: `Done in ... using pnpm v11.9.0` con `pnpm --version` local = **10.21.0**. Confirma
-> empíricamente lo que el informe §6.2 predijo: la 10.21.0 hace de *bootstrapper* de la 11.9.0
+> empíricamente lo que el informe §6.2 predijo: la 10.21.0 hace de _bootstrapper_ de la 11.9.0
 > declarada en `packageManager`. **No hubo que hacer nada.**
 > Los `(X is available)` son avisos informativos de pnpm sobre versiones nuevas, no warnings del
 > proyecto: los rangos `^` son los del base y se mantienen a propósito.
@@ -126,14 +126,23 @@ dist/static-loader-data-manifest-ugnw3r1isj.json  0.05 KiB
 viaja horneado en el HTML estático, con `data-server-rendered="true"`.
 
 ```html
-<!DOCTYPE html><html lang="es"><head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script type="module" async="" crossorigin="" src="/assets/app-w2TVQT9I.js"></script>
-    <link rel="stylesheet" crossorigin="" href="/assets/app-BYbDMLiU.css">
+    <link rel="stylesheet" crossorigin="" href="/assets/app-BYbDMLiU.css" />
   </head>
   <body>
-    <div id="root" data-server-rendered="true"><h1>Nails &amp; Lash Studio</h1><script>...</script></div>
+    <div id="root" data-server-rendered="true">
+      <h1>Nails &amp; Lash Studio</h1>
+      <script>
+        ...
+      </script>
+    </div>
+  </body>
+</html>
 ```
 
 #### 6. `bash bin/harness init`
@@ -204,19 +213,19 @@ Calcados **literalmente** del base (byte a byte salvo lo listado en §3): `tscon
 
 ## 3. Divergencias con el repo base (WebEmpresa) y su motivo
 
-| # | Divergencia | Motivo |
-|---|---|---|
-| D-1 | `name`: `webempresa` → **`nails-lash-studio-web`** | Encargo (obligatorio). |
-| D-2 | `engines.node`: `>=22.12.0` → **`>=22.13.0`** | Informe §6.2: la pnpm 11.9.0 que el propio repo declara en `packageManager` exige `node >=22.13`. El `>=22.12.0` del base abre una ventana de rotura (Node ≥22.12 y <22.13) — bomba de relojería en CI. |
-| D-3 | `.nvmrc`: `22` → **`22.15.0`** | Informe §6.2: versión completa; `22` a secas permite resolver a una 22.12.x y reproducir D-2. Es la Node local verificada. |
-| D-4 | **Eliminadas** `resend` y `@vercel/firewall` de `dependencies` | Decisión 3 = entrega por WhatsApp, **sin backend** → no habrá `/api`. `resend` es email transaccional de servidor y `@vercel/firewall` protege endpoints. El informe (línea 972) es explícito: «*con la decisión 3 (WhatsApp, sin backend) no aplica*». Con `/api` fuera, ambas serían dependencias muertas. |
-| D-5 | **Eliminado** el script `verify` (`bash ./init.sh`) de `package.json` | En el base, `verify` = solo `init.sh` (que **no** corre mutación). Aquí el arnés es el dueño de esa puerta y su `verify` = init **+ mutación** (informe §6.1). Mantener un `pnpm verify` más laxo que `bin/harness verify` sería una trampa: invitaría a cerrar sesión sin mutación. Puerta única: `bin/harness verify`. |
-| D-6 | `index.html` **sin** el script anti-FOUC de tema ni `<link rel="icon">` | Decisión 5: **no hay tema oscuro** → el script (que espeja `src/lib/theme.ts` y la clave `cenit-theme`) no tiene nada que aplicar y arrastraría código muerto de otro proyecto. El favicon se omite porque aún no existe el asset: enlazarlo daría un 404. |
-| D-7 | `stryker.config.json` con **`mutate: []`** (el base lista 17 ficheros) | Los 17 targets del base son ficheros de WebEmpresa que aquí no existen. Por convención del stack quedan **fuera** de mutación `App.tsx`, `main.tsx`, `pages/*` y `styles/*` → el esqueleto no tiene, por definición, **nada legítimo que mutar**. Cada feature añadirá los suyos (`mutate` es lista explícita, **no un glob**). Consecuencia importante: ver hallazgo H-2. |
-| D-8 | `.prettierignore` sin las entradas propias de WebEmpresa (ponytail, `design/`, HTML de diseño) | Esos artefactos no existen aquí. Se conservan las genéricas y se añade `.memoria-cache/`. |
-| D-9 | `.gitignore`: añadidos `dist-ssr/`, `.vite-react-ssg-temp/`, `reports/` | El `.gitignore` de la plantilla es genérico (Python + Node); faltaban los artefactos propios de este stack. `.vite-react-ssg-temp/` y `reports/` los genera el build/mutación. |
-| D-10 | `main.tsx` **sin** los 8 `import '@fontsource/...'` del base | Elegir tipografía es **diseño**, y el esqueleto lo tiene prohibido: Outfit/DM Sans son las tipografías de marca de **Cénit Digital**, no del salón. Las deps `@fontsource/*` **se conservan** (el mecanismo y las versiones son los del base, informe §6.3), pero la feature de diseño elegirá las familias y añadirá sus imports. |
-| D-11 | `App.tsx` sin `Layout` y con una sola ruta; `styles/main.scss` sin `@use` de parciales | No hay `Layout` ni `_tokens/_reset/_base` todavía: son features. `main.scss` solo declara `color-scheme: light` (decisión 5, ya tomada; no es diseño nuevo). |
+| #    | Divergencia                                                                                    | Motivo                                                                                                                                                                                                                                                                                                                                                                     |
+| ---- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D-1  | `name`: `webempresa` → **`nails-lash-studio-web`**                                             | Encargo (obligatorio).                                                                                                                                                                                                                                                                                                                                                     |
+| D-2  | `engines.node`: `>=22.12.0` → **`>=22.13.0`**                                                  | Informe §6.2: la pnpm 11.9.0 que el propio repo declara en `packageManager` exige `node >=22.13`. El `>=22.12.0` del base abre una ventana de rotura (Node ≥22.12 y <22.13) — bomba de relojería en CI.                                                                                                                                                                    |
+| D-3  | `.nvmrc`: `22` → **`22.15.0`**                                                                 | Informe §6.2: versión completa; `22` a secas permite resolver a una 22.12.x y reproducir D-2. Es la Node local verificada.                                                                                                                                                                                                                                                 |
+| D-4  | **Eliminadas** `resend` y `@vercel/firewall` de `dependencies`                                 | Decisión 3 = entrega por WhatsApp, **sin backend** → no habrá `/api`. `resend` es email transaccional de servidor y `@vercel/firewall` protege endpoints. El informe (línea 972) es explícito: «_con la decisión 3 (WhatsApp, sin backend) no aplica_». Con `/api` fuera, ambas serían dependencias muertas.                                                               |
+| D-5  | **Eliminado** el script `verify` (`bash ./init.sh`) de `package.json`                          | En el base, `verify` = solo `init.sh` (que **no** corre mutación). Aquí el arnés es el dueño de esa puerta y su `verify` = init **+ mutación** (informe §6.1). Mantener un `pnpm verify` más laxo que `bin/harness verify` sería una trampa: invitaría a cerrar sesión sin mutación. Puerta única: `bin/harness verify`.                                                   |
+| D-6  | `index.html` **sin** el script anti-FOUC de tema ni `<link rel="icon">`                        | Decisión 5: **no hay tema oscuro** → el script (que espeja `src/lib/theme.ts` y la clave `cenit-theme`) no tiene nada que aplicar y arrastraría código muerto de otro proyecto. El favicon se omite porque aún no existe el asset: enlazarlo daría un 404.                                                                                                                 |
+| D-7  | `stryker.config.json` con **`mutate: []`** (el base lista 17 ficheros)                         | Los 17 targets del base son ficheros de WebEmpresa que aquí no existen. Por convención del stack quedan **fuera** de mutación `App.tsx`, `main.tsx`, `pages/*` y `styles/*` → el esqueleto no tiene, por definición, **nada legítimo que mutar**. Cada feature añadirá los suyos (`mutate` es lista explícita, **no un glob**). Consecuencia importante: ver hallazgo H-2. |
+| D-8  | `.prettierignore` sin las entradas propias de WebEmpresa (ponytail, `design/`, HTML de diseño) | Esos artefactos no existen aquí. Se conservan las genéricas y se añade `.memoria-cache/`.                                                                                                                                                                                                                                                                                  |
+| D-9  | `.gitignore`: añadidos `dist-ssr/`, `.vite-react-ssg-temp/`, `reports/`                        | El `.gitignore` de la plantilla es genérico (Python + Node); faltaban los artefactos propios de este stack. `.vite-react-ssg-temp/` y `reports/` los genera el build/mutación.                                                                                                                                                                                             |
+| D-10 | `main.tsx` **sin** los 8 `import '@fontsource/...'` del base                                   | Elegir tipografía es **diseño**, y el esqueleto lo tiene prohibido: Outfit/DM Sans son las tipografías de marca de **Cénit Digital**, no del salón. Las deps `@fontsource/*` **se conservan** (el mecanismo y las versiones son los del base, informe §6.3), pero la feature de diseño elegirá las familias y añadirá sus imports.                                         |
+| D-11 | `App.tsx` sin `Layout` y con una sola ruta; `styles/main.scss` sin `@use` de parciales         | No hay `Layout` ni `_tokens/_reset/_base` todavía: son features. `main.scss` solo declara `color-scheme: light` (decisión 5, ya tomada; no es diseño nuevo).                                                                                                                                                                                                               |
 
 **Deps conservadas pese a la duda** (regla «si dudas, déjalas»): `radix-ui`, `react-router-dom`,
 `@fontsource/dm-sans`, `@fontsource/outfit`, `autoskills` (este repo también vendoriza skills:
@@ -249,7 +258,7 @@ instalar `pwsh`. Mientras tanto, **en este repo la puerta se invoca con `bash bi
 ### H-2 🟠 `bin/harness verify` estará ROJO hasta la primera feature con lógica
 
 Consecuencia directa de D-7, y la primera manifestación concreta de lo que el informe §6.1 ya avisaba
-(«*este repo tiene la puerta más estricta que su propio repo base*»: `init.sh` del base no corre mutación,
+(«_este repo tiene la puerta más estricta que su propio repo base_»: `init.sh` del base no corre mutación,
 `verify` del arnés sí). Con `mutate: []`, Stryker **no sale 0, sale 1**:
 
 ```
@@ -284,7 +293,7 @@ que no reinventara el bloque). Decisión tuya.
 ### H-4 🟡 Actividad concurrente en el repo durante la ejecución
 
 Al empezar, `src/` estaba vacío, no había `package.json` y `feature_list.json` tenía **1 feature de ejemplo**.
-Durante la sesión aparecieron un `pnpm-workspace.yaml` autogenerado por pnpm (un *stub* con
+Durante la sesión aparecieron un `pnpm-workspace.yaml` autogenerado por pnpm (un _stub_ con
 `'@swc/core': set this to true or false`), un `node_modules/` y un `pnpm-lock.yaml`; y `harness init` ahora
 reporta **20 features** sin que `feature_list.json` figure como modificado en `git status`.
 
@@ -298,7 +307,7 @@ No lo he causado yo y no he tocado `feature_list.json`. Por si el lockfile se ha
 `pnpm format:check` sale 1, pero **ninguno** de los ficheros es mío: son de la plantilla (`examples/`,
 `README.md`, `project-spec.md`, `feature_list.json`, `harness.schema.json`, `progress/current.md`, `docs/`…),
 que nunca pasaron por Prettier. `prettier --check` sobre los ficheros que he creado sale **0**
-(*All matched files use Prettier code style!*).
+(_All matched files use Prettier code style!_).
 
 No está en la puerta: `commands.lint` = `pnpm typecheck && pnpm lint` = `tsc` + `eslint`, **sin Prettier**
 (igual que en el base). No he tocado esos 64 ficheros: un `prettier --write .` masivo generaría un diff

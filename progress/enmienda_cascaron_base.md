@@ -1,4 +1,5 @@
 # ENMIENDA 1 a `features/cascaron_semantico.feature` — puerta anti-404 bajo una base de despliegue
+
 # declarada (2026-07-25)
 
 > Registro de decisión del `gherkin_author`. Amplía el contrato ya aprobado de F-04
@@ -39,8 +40,8 @@ no sabe traducir la URL pública (con el prefijo de `base`) a la ruta lógica de
 
 Sin `base` declarada (el estado de HOY), «interno» = «empieza por `/`» y «existe» = «está
 literalmente en `rutasDelArtefacto`». Con `base` declarada a una subcarpeta same-origin
-root-absoluta legítima (p. ej. `/NailsLashStudioWeb/`), el invariante real que A-17 protege — *«el
-destino de un enlace del propio sitio existe en el artefacto que este build produjo»* — exige
+root-absoluta legítima (p. ej. `/NailsLashStudioWeb/`), el invariante real que A-17 protege — _«el
+destino de un enlace del propio sitio existe en el artefacto que este build produjo»_ — exige
 traducir la URL pública a la ruta lógica **quitando el prefijo de la base antes de comparar**:
 
 - Un href que **empieza por el prefijo de `base`** → el **RESTO** (lo que queda tras quitar el
@@ -103,11 +104,11 @@ nuevos, numerados a partir del último tag libre del fichero (`@s35` era el más
 `@s37`, `@s38`), en vez de sufijos tipo `@s23b` (sin precedente en este repo — grep de `@s\d+[a-z]`
 sobre `features/` → 0 resultados).
 
-| Escenario | Qué cubre | Resultado |
-| --- | --- | --- |
-| `@s36` | href con prefijo de `base` + resto que NO es ruta lógica (dos filas: ruta inexistente, mayúscula distinta) | 1 violación (sigue siendo 404 real) |
-| `@s37` | href con prefijo de `base` + resto que SÍ es ruta lógica (fila `/NailsLashStudioWeb/` → home); href SIN prefijo cuando hay `base` (fila `/otra-cosa`) | 0 violaciones |
-| `@s38` | el resto se resuelve como ruta lógica genérica (`/servicios`, no solo la home), con fixture de dos rutas sobre el decisor puro | 0 violaciones |
+| Escenario | Qué cubre                                                                                                                                             | Resultado                           |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| `@s36`    | href con prefijo de `base` + resto que NO es ruta lógica (dos filas: ruta inexistente, mayúscula distinta)                                            | 1 violación (sigue siendo 404 real) |
+| `@s37`    | href con prefijo de `base` + resto que SÍ es ruta lógica (fila `/NailsLashStudioWeb/` → home); href SIN prefijo cuando hay `base` (fila `/otra-cosa`) | 0 violaciones                       |
+| `@s38`    | el resto se resuelve como ruta lógica genérica (`/servicios`, no solo la home), con fixture de dos rutas sobre el decisor puro                        | 0 violaciones                       |
 
 Se añadió también una línea-comentario (no un cambio de comportamiento) justo después de @s24,
 señalando hacia @s36-@s38, para que quien lea el escenario del caso de hoy sepa que existe la
@@ -120,6 +121,7 @@ extensión — sin tocar su `Given`/`When`/`Then`.
 compartido nuevo (p. ej. `src/lib/vite-config.ts`).**
 
 Razones:
+
 1. `baseDeclarada(config: string)` es una función de una sola responsabilidad (extraer el valor de
    `base:` de un texto), ya escrita, ya con su regex (`BASE_DE_VITE`) acotada y ya validada con
    mutación 100 % por la ENMIENDA 1 de `cero_terceros.feature` — no hay razón para reescribirla ni

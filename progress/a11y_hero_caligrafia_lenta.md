@@ -59,7 +59,8 @@ cesa y no se reinicia (3).
 
 **Defendible.** Razonamiento por las dos caras:
 
-*Por qué NO es incumplimiento:*
+_Por qué NO es incumplimiento:_
+
 1. El texto normativo dice «there is a mechanism for the user to pause, stop, or hide it» — y el
    mecanismo EXISTE, en la propia página, operable por todo input y conforme en sí mismo (la
    definición de «mechanism» exige que cumpla los SC del nivel reclamado: 2.1.1 ✅, 4.1.2 ✅,
@@ -72,7 +73,8 @@ cesa y no se reinicia (3).
 3. Precedente aceptado: los skip links invisibles hasta recibir foco (G1) — un mecanismo A
    (2.4.1) puede ser invisible en reposo.
 
-*Por qué NO es cumplimiento estricto:*
+_Por qué NO es cumplimiento estricto:_
+
 1. NINGUNA técnica suficiente publicada (G4, G186, G187, SCR22…) documenta un control invisible:
    todos los ejemplos de G186 son controles visibles y su lógica presupone que el usuario puede
    ENCONTRARLO. Aquí no hay técnica publicada que ampare la forma — se cumple el criterio, no la
@@ -130,9 +132,9 @@ cesa y no se reinicia (3).
 **VEREDICTO DEL EJE: APTO.**
 
 - El anillo lo pinta el `:focus-visible` GLOBAL: `outline: 3px solid var(--border-interactive)`
-  + `outline-offset: 2px` (`src/styles/_base.scss:18-22`). La hoja del hero NO declara NINGÚN
-  `outline` (aseverado por bytes, `hero-estilos.test.ts:423-425`) y no hay `outline: none` que
-  alcance al botón en el resto del repo (el de `reserva.module.scss:144` está scoped a su módulo).
+  - `outline-offset: 2px` (`src/styles/_base.scss:18-22`). La hoja del hero NO declara NINGÚN
+    `outline` (aseverado por bytes, `hero-estilos.test.ts:423-425`) y no hay `outline: none` que
+    alcance al botón en el resto del repo (el de `reserva.module.scss:144` está scoped a su módulo).
 - **¿Visible de verdad contra el fondo del hero?** El fondo es
   `radial-gradient(--accent-soft #F7DDE8 → --bg #FDF4F7 al 62%)` (`_demo.scss:107`); el rótulo
   cae en la zona alta → peor caso `--accent-soft`. Calculado: `#AB5F79` da **≈3,55:1 sobre
@@ -241,14 +243,14 @@ botón nativo cuyo diseño veta el texto visible es exactamente el caso en que A
 
 ## Resumen de hallazgos
 
-| # | Impacto | Eje | Hallazgo | Referencia |
-|---|---------|-----|----------|------------|
-| A-1 | 🟡 | 1 | Descubribilidad del mecanismo para vidente (solo `cursor:pointer`; foco = anillo mudo). **Cumplimiento defendible, no estricto** — veto del cliente documentado; sin técnica publicada que lo ampare, sin SC A/AA que lo condene | `hero.module.scss:200`, `Hero.tsx:186-193`, feature :36-41 |
-| A-2 | 🟡 | 3 | Pérdida de foco a `<body>` cuando el botón se desmonta estando enfocado (Enter o fin de reloj) | `Hero.tsx:191,106-108` |
-| A-3 | 🟡 | 1 | Sin JS/antes de hidratar la animación CSS corre sin mecanismo (baseline WCAG con JS lo salva; riesgo residual real de 90 s) | `Hero.tsx:80-92`, `hero.test.tsx:552-556` |
-| A-5 | 🔵 | 1/4 | `matchMedia` sin listener de `change`: toggles de preferencia en caliente dejan botón huérfano o animación sin control | `Hero.tsx:84-92` |
-| A-6 | 🔵 | 7 | 90 s de repaint no compositado (dashoffset/offset-distance): vigilar INP/batería en la verificación en vivo | `hero.module.scss:86,97-100` |
-| A-7 | 🔵 | 7 | Eyebrow `<p>` vacío en el HTML (preexistente, fuera del delta) | `Hero.tsx:119` |
+| #   | Impacto | Eje | Hallazgo                                                                                                                                                                                                                         | Referencia                                                 |
+| --- | ------- | --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| A-1 | 🟡      | 1   | Descubribilidad del mecanismo para vidente (solo `cursor:pointer`; foco = anillo mudo). **Cumplimiento defendible, no estricto** — veto del cliente documentado; sin técnica publicada que lo ampare, sin SC A/AA que lo condene | `hero.module.scss:200`, `Hero.tsx:186-193`, feature :36-41 |
+| A-2 | 🟡      | 3   | Pérdida de foco a `<body>` cuando el botón se desmonta estando enfocado (Enter o fin de reloj)                                                                                                                                   | `Hero.tsx:191,106-108`                                     |
+| A-3 | 🟡      | 1   | Sin JS/antes de hidratar la animación CSS corre sin mecanismo (baseline WCAG con JS lo salva; riesgo residual real de 90 s)                                                                                                      | `Hero.tsx:80-92`, `hero.test.tsx:552-556`                  |
+| A-5 | 🔵      | 1/4 | `matchMedia` sin listener de `change`: toggles de preferencia en caliente dejan botón huérfano o animación sin control                                                                                                           | `Hero.tsx:84-92`                                           |
+| A-6 | 🔵      | 7   | 90 s de repaint no compositado (dashoffset/offset-distance): vigilar INP/batería en la verificación en vivo                                                                                                                      | `hero.module.scss:86,97-100`                               |
+| A-7 | 🔵      | 7   | Eyebrow `<p>` vacío en el HTML (preexistente, fuera del delta)                                                                                                                                                                   | `Hero.tsx:119`                                             |
 
 **0 bloqueantes.** Los tres 🟡 son constancia y riesgo documentado, no correcciones exigibles: A-1
 está conciliado con el cliente por contrato; A-2 y A-3 son mejoras de una línea/decisión de

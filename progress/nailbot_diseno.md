@@ -17,16 +17,16 @@
 
 ## 2. Decisiones del humano (AskUserQuestion, 2026-09-27)
 
-| # | Pregunta | Respuesta |
-|---|---|---|
-| H1 | ¿Qué abre el robot? | **Panel de chat → WhatsApp** (guion local hoy; IA real con el servidor, sin rehacer la UI) |
-| H2 | ¿Y el chat de #reserva? | **Un asistente compartido**: el mismo cerebro en la sección Reserva y en el panel del robot |
-| H3 | Animación y SC 2.2.2 | **Bucle + mini control de pausa**; con reduced-motion, quieto |
-| H4 | Bocadillo | **Sí, descartable**: aparece una vez, se cierra con × o Esc, no vuelve en esa visita |
-| H5 | ¿Por qué se retiró el botón verde (commit 479d541)? | «Era un botón de WhatsApp flotante con el logo de WhatsApp, que no es lo que queremos. Queremos un robotito que pegue con la estética del negocio y además induzca al cliente a reservar una cita a través del ChatBot» → **nada de verde ni logo de WhatsApp en el flotante** |
-| H6 | Nombre | **Nailbot** |
-| H7 | IA futura | **Claude** (con API key propia de la Console en el servidor; NO se usa ni se guarda ninguna clave) |
-| H8 | Publicación | **Push directo a main** (el deploy a Pages ya pide aprobación manual) |
+| #   | Pregunta                                            | Respuesta                                                                                                                                                                                                                                                                      |
+| --- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| H1  | ¿Qué abre el robot?                                 | **Panel de chat → WhatsApp** (guion local hoy; IA real con el servidor, sin rehacer la UI)                                                                                                                                                                                     |
+| H2  | ¿Y el chat de #reserva?                             | **Un asistente compartido**: el mismo cerebro en la sección Reserva y en el panel del robot                                                                                                                                                                                    |
+| H3  | Animación y SC 2.2.2                                | **Bucle + mini control de pausa**; con reduced-motion, quieto                                                                                                                                                                                                                  |
+| H4  | Bocadillo                                           | **Sí, descartable**: aparece una vez, se cierra con × o Esc, no vuelve en esa visita                                                                                                                                                                                           |
+| H5  | ¿Por qué se retiró el botón verde (commit 479d541)? | «Era un botón de WhatsApp flotante con el logo de WhatsApp, que no es lo que queremos. Queremos un robotito que pegue con la estética del negocio y además induzca al cliente a reservar una cita a través del ChatBot» → **nada de verde ni logo de WhatsApp en el flotante** |
+| H6  | Nombre                                              | **Nailbot**                                                                                                                                                                                                                                                                    |
+| H7  | IA futura                                           | **Claude** (con API key propia de la Console en el servidor; NO se usa ni se guarda ninguna clave)                                                                                                                                                                             |
+| H8  | Publicación                                         | **Push directo a main** (el deploy a Pages ya pide aprobación manual)                                                                                                                                                                                                          |
 
 ## 3. Decisiones del lead (con su porqué)
 
@@ -116,24 +116,26 @@ horneado con `renderToString`). Ficheros nuevos a `stryker.config.json` → `mut
 
 **Guion (4 pasos; el 3.º se salta con «Un sábado»):**
 
-| Paso | Mensaje de Nailbot | Opciones |
-|---|---|---|
-| servicio | «¡Hola! Soy Nailbot 💅, el asistente automático de Nails Lash Studio. ¿Qué te apetece reservar?» | «Uñas» · «Pestañas» · «Cejas» |
-| día | «¡Me encanta! ¿Qué día te viene mejor?» | «Entre semana» · «Un sábado» · «Lo antes posible» |
-| franja | «¿Prefieres alguna franja horaria?» | «Por la mañana» · «Por la tarde» · «Me es indiferente» |
-| (sábado) | en lugar del paso franja: «Los sábados abrimos de {HORARIO.sabado con « a » en vez de «-»}, así que te busco hueco por la mañana.» → franja = «Por la mañana» y se pasa al paso nombre en el MISMO turno | — |
-| nombre | «¡Casi lo tenemos! ¿A qué nombre hago la solicitud? Si lo prefieres, puedes saltártelo.» | campo «Tu nombre» (placeholder «Escribe tu nombre…», botón «Enviar») + opción «Prefiero no decirlo» |
+| Paso     | Mensaje de Nailbot                                                                                                                                                                                       | Opciones                                                                                            |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| servicio | «¡Hola! Soy Nailbot 💅, el asistente automático de Nails Lash Studio. ¿Qué te apetece reservar?»                                                                                                         | «Uñas» · «Pestañas» · «Cejas»                                                                       |
+| día      | «¡Me encanta! ¿Qué día te viene mejor?»                                                                                                                                                                  | «Entre semana» · «Un sábado» · «Lo antes posible»                                                   |
+| franja   | «¿Prefieres alguna franja horaria?»                                                                                                                                                                      | «Por la mañana» · «Por la tarde» · «Me es indiferente»                                              |
+| (sábado) | en lugar del paso franja: «Los sábados abrimos de {HORARIO.sabado con « a » en vez de «-»}, así que te busco hueco por la mañana.» → franja = «Por la mañana» y se pasa al paso nombre en el MISMO turno | —                                                                                                   |
+| nombre   | «¡Casi lo tenemos! ¿A qué nombre hago la solicitud? Si lo prefieres, puedes saltártelo.»                                                                                                                 | campo «Tu nombre» (placeholder «Escribe tu nombre…», botón «Enviar») + opción «Prefiero no decirlo» |
 
 Ejemplo del sábado con el dato actual `'10:00-14:00'`: «Los sábados abrimos de 10:00 a 14:00, así que
 te busco hueco por la mañana.»
 
 **Resumen final (burbuja de Nailbot):**
+
 - con nombre: «¡Gracias, {nombre}! ✨ Tu solicitud: {servicio} · {día} · {franja}. Pulsa el botón para
   enviársela al salón por WhatsApp y allí te confirmarán la hora exacta.»
 - sin nombre: «¡Gracias! ✨ Tu solicitud: {servicio} · {día} · {franja}. Pulsa el botón para
   enviársela al salón por WhatsApp y allí te confirmarán la hora exacta.»
 
 **Mensaje de WhatsApp (`mensajeReserva`, ampliada):**
+
 - con nombre (IDÉNTICO al actual): «Hola, quiero reservar: {servicio} · {día} · {franja}. Me llamo
   {nombre} y os escribo desde la web. ¿Podéis confirmarme la hora exacta?»
 - sin nombre: «Hola, quiero reservar: {servicio} · {día} · {franja}. Os escribo desde la web.
@@ -144,6 +146,7 @@ decides si lo envías. El salón lo usará solo para gestionar tu cita.»
 **Enlace final:** «Enviar la reserva por WhatsApp» (como hoy) · **Reinicio:** «Reservar otra cita» (como hoy).
 
 **Flotante (F-24):**
+
 - Lanzador `aria-label`: «Abrir el chat con Nailbot para reservar cita»
 - Pausa `aria-label`: «Pausar la animación de Nailbot» (+ `aria-pressed`)
 - Bocadillo: «¿Te pinto una cita? 💅» (destacado) + «Soy Nailbot y te ayudo a reservar.»;

@@ -26,9 +26,9 @@
      de datos personales (art. 4.2 RGPD) y el salón decide los fines y medios → es **responsable**
      (art. 4.7 RGPD). **[V]**
    - **Los logs del hosting** (Vercel, según el stack acordado): registran la IP del visitante.
-     La IP es dato personal en los términos de *Breyer* (C-582/14) y del considerando 30 RGPD. **[V]**
+     La IP es dato personal en los términos de _Breyer_ (C-582/14) y del considerando 30 RGPD. **[V]**
    - **Google Fonts**, si se carga desde `fonts.googleapis.com`: el navegador del visitante
-     transmite su IP a Google. Por analogía con *Fashion ID* (C-40/17), el titular de la web es
+     transmite su IP a Google. Por analogía con _Fashion ID_ (C-40/17), el titular de la web es
      **corresponsable de la recogida y transmisión**. **[V]** (la analogía es **[I]**, ver §2.4)
 
 2. **Google Fonts: auto-hospedar las fuentes. Decisión cerrada, sin coste y sin debate.**
@@ -36,7 +36,7 @@
    ni del EDPB específicamente sobre Google Fonts** — lo he buscado y no lo he encontrado **[?]**.
    La sentencia alemana de Múnich que todo el mundo cita (100 € de indemnización) es de un
    tribunal **de primera instancia alemán**, no vincula en España, y **su razonamiento principal
-   está hoy erosionado**: se apoyaba en que EE. UU. no ofrecía nivel adecuado (post-*Schrems II*),
+   está hoy erosionado**: se apoyaba en que EE. UU. no ofrecía nivel adecuado (post-_Schrems II_),
    y desde el **10 de julio de 2023** existe **decisión de adecuación** para el EU-US Data Privacy
    Framework, al que **Google LLC está adherido**. **[V]**
    → O sea: **el argumento del art. 44 RGPD ya no es el argumento fuerte.** El argumento que
@@ -77,7 +77,7 @@ El RGPD no define el tratamiento por la existencia de un servidor propio, sino p
 > extracción, consulta, utilización, **comunicación por transmisión**, difusión o cualquier otra
 > forma de habilitación de acceso, cotejo o interconexión, limitación, supresión o destrucción;
 
-*Fuente:* [Texto consolidado del RGPD publicado por la AEPD](https://www.aepd.es/documento/reglamento-ue-2016-679-consolidado.pdf), art. 4.2.
+_Fuente:_ [Texto consolidado del RGPD publicado por la AEPD](https://www.aepd.es/documento/reglamento-ue-2016-679-consolidado.pdf), art. 4.2.
 (Verificado extrayendo el PDF oficial con `pdftotext`; el texto reproducido es literal.)
 
 Y **art. 4.7 RGPD**, literal:
@@ -86,7 +86,7 @@ Y **art. 4.7 RGPD**, literal:
 > servicio u otro organismo que, **solo o junto con otros, determine los fines y medios del
 > tratamiento**; […]
 
-*Fuente:* ídem, art. 4.7.
+_Fuente:_ ídem, art. 4.7.
 
 → La prueba no es "¿tengo servidor?", sino "¿decido yo para qué y cómo se tratan estos datos?".
 El salón decide publicar la web, decide que el canal sea WhatsApp y decide qué se pregunta en el
@@ -94,30 +94,31 @@ mensaje precompuesto. **[I]** (la subsunción es mía; el texto legal es **[V]**
 
 #### 2.1.2 Vía 1 — La solicitud por WhatsApp (la determinante) **[V] + [I]**
 
-Según `progress/current.md:65-66`, el diseño previsto es: *"el calendario compone la solicitud y
-abre WhatsApp"*. Análisis:
+Según `progress/current.md:65-66`, el diseño previsto es: _"el calendario compone la solicitud y
+abre WhatsApp"_. Análisis:
 
-| Momento | ¿Hay tratamiento por el titular? | Por qué |
-| --- | --- | --- |
-| El usuario rellena el calendario en el navegador | **No** (los datos no salen del dispositivo) **[I]** | No hay recogida por el titular; es procesamiento local del propio usuario |
-| El usuario pulsa y se abre WhatsApp con el mensaje | **No, por parte del titular** **[I]** | Es navegación iniciada por el usuario hacia un tercero (ver §2.4.5) |
-| **El usuario envía el mensaje y llega al salón** | **SÍ, inequívocamente** **[V]** | El salón **recoge y conserva** nombre, teléfono, servicio, fecha → art. 4.2 |
+| Momento                                            | ¿Hay tratamiento por el titular?                    | Por qué                                                                     |
+| -------------------------------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------- |
+| El usuario rellena el calendario en el navegador   | **No** (los datos no salen del dispositivo) **[I]** | No hay recogida por el titular; es procesamiento local del propio usuario   |
+| El usuario pulsa y se abre WhatsApp con el mensaje | **No, por parte del titular** **[I]**               | Es navegación iniciada por el usuario hacia un tercero (ver §2.4.5)         |
+| **El usuario envía el mensaje y llega al salón**   | **SÍ, inequívocamente** **[V]**                     | El salón **recoge y conserva** nombre, teléfono, servicio, fecha → art. 4.2 |
 
 **El punto clave:** el tratamiento existe **aunque la web sea un HTML estático**. El tratamiento no
-ocurre *en la web*, ocurre **en el teléfono del salón**, y la web es el canal que lo origina. **[I]**
+ocurre _en la web_, ocurre **en el teléfono del salón**, y la web es el canal que lo origina. **[I]**
 
 **Consecuencia — art. 13.1 RGPD**, literal:
 
 > 1. **Cuando se obtengan de un interesado datos personales relativos a él**, el responsable del
-> tratamiento, **en el momento en que estos se obtengan**, le facilitará toda la información
-> indicada a continuación: […]
+>    tratamiento, **en el momento en que estos se obtengan**, le facilitará toda la información
+>    indicada a continuación: […]
 
-*Fuente:* [RGPD consolidado AEPD](https://www.aepd.es/documento/reglamento-ue-2016-679-consolidado.pdf), art. 13.1.
+_Fuente:_ [RGPD consolidado AEPD](https://www.aepd.es/documento/reglamento-ue-2016-679-consolidado.pdf), art. 13.1.
 
 **Matiz honesto y relevante para el diseño [I]:** en rigor, los datos se obtienen **cuando llega
 el mensaje a WhatsApp**, no cuando el usuario está en la web. Un purista podría decir que basta
 con informar en la primera respuesta de WhatsApp. **Pero:**
-- El art. 13 exige informar **"en el momento en que estos se obtengan"** — informar *después* de
+
+- El art. 13 exige informar **"en el momento en que estos se obtengan"** — informar _después_ de
   tenerlos ya es tarde. **[V]**
 - La única forma práctica de informar **antes o en el momento** es **en la web, junto al botón que
   abre WhatsApp**. **[I]**
@@ -138,7 +139,7 @@ Que la IP es dato personal está resuelto por el TJUE en **Breyer (C-582/14)**, 
 > disponga de medios legales que le permitan identificar a la persona interesada** gracias a la
 > información adicional de que dispone el proveedor de acceso a Internet.
 
-*Fuente:* [TJUE, C-582/14, *Breyer*, 19/10/2016, EUR-Lex CELEX:62014CJ0582](https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:62014CJ0582), fallo y ap. 49.
+_Fuente:_ [TJUE, C-582/14, _Breyer_, 19/10/2016, EUR-Lex CELEX:62014CJ0582](https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:62014CJ0582), fallo y ap. 49.
 
 Y el **considerando 30 RGPD**:
 
@@ -146,12 +147,12 @@ Y el **considerando 30 RGPD**:
 > dispositivos, aplicaciones, herramientas y protocolos, como **direcciones de los protocolos de
 > internet** […]
 
-*Fuente:* [RGPD, considerando 30 (BOE, DOUE-L-2016-80807)](https://www.boe.es/buscar/doc.php?id=DOUE-L-2016-80807).
-Concordante con **art. 4.1 RGPD**, que incluye expresamente *"un identificador en línea"* entre
+_Fuente:_ [RGPD, considerando 30 (BOE, DOUE-L-2016-80807)](https://www.boe.es/buscar/doc.php?id=DOUE-L-2016-80807).
+Concordante con **art. 4.1 RGPD**, que incluye expresamente _"un identificador en línea"_ entre
 los identificadores que hacen identificable a una persona.
 
-**Nota de rigor [I]:** *Breyer* es un criterio **relativo** — la IP es dato personal *para quien
-tiene medios legales razonables de identificar*. No es "la IP siempre es dato personal para todos".
+**Nota de rigor [I]:** _Breyer_ es un criterio **relativo** — la IP es dato personal _para quien
+tiene medios legales razonables de identificar_. No es "la IP siempre es dato personal para todos".
 Para el salón, con logs de Vercel, la vía legal existiría (requerimiento a la operadora vía
 autoridad). En la práctica, tratar la IP como dato personal es la postura prudente y la que asume
 la propia AEPD en su guía de cookies. **[I]**
@@ -167,8 +168,8 @@ informe recomienda **no** hacer.
 
 #### 2.1.5 Lo que NO exime: la excepción doméstica **[V]**
 
-El **art. 2.2.c RGPD** excluye el tratamiento *"por una persona física en el curso de una actividad
-exclusivamente personal o doméstica"*. Un salón de uñas y pestañas es **actividad económica** →
+El **art. 2.2.c RGPD** excluye el tratamiento _"por una persona física en el curso de una actividad
+exclusivamente personal o doméstica"_. Un salón de uñas y pestañas es **actividad económica** →
 **la excepción no aplica**. **[V]** (texto del art. 2.2.c verificado en EUR-Lex;
 la subsunción es trivial pero es **[I]**).
 
@@ -184,7 +185,7 @@ Criterio de la **AEPD**, literal de su FAQ sobre el deber de información:
 > La cláusula informativa de protección de datos (conocida habitualmente como política de
 > privacidad) da cumplimiento al deber de información del responsable.
 
-*Fuente:* [AEPD — 2.6 El deber de información](https://www.aepd.es/preguntas-frecuentes/2-tus-obligaciones-como-responsable-del-tratamiento/6-el-deber-de-informacion)
+_Fuente:_ [AEPD — 2.6 El deber de información](https://www.aepd.es/preguntas-frecuentes/2-tus-obligaciones-como-responsable-del-tratamiento/6-el-deber-de-informacion)
 y [FAQ-0248](https://www.aepd.es/preguntas-frecuentes/2-tus-obligaciones-como-responsable-del-tratamiento/6-el-deber-de-informacion/FAQ-0248-sobre-si-el-usuario-tiene-que-dar-consentimiento-a-clausula-de-privacidad). **[V]**
 
 La AEPD además aclara un punto que **evita un error de diseño frecuente**: la política de
@@ -194,7 +195,7 @@ privacidad **no se "acepta"**. Literal:
 > concreto, en aquellos casos en los que sea la base de licitud, de lo que es la información sobre
 > las condiciones generales del tratamiento de datos que figuran en la cláusula informativa.
 
-*Fuente:* [AEPD FAQ-0248](https://www.aepd.es/preguntas-frecuentes/2-tus-obligaciones-como-responsable-del-tratamiento/6-el-deber-de-informacion/FAQ-0248-sobre-si-el-usuario-tiene-que-dar-consentimiento-a-clausula-de-privacidad). **[V]**
+_Fuente:_ [AEPD FAQ-0248](https://www.aepd.es/preguntas-frecuentes/2-tus-obligaciones-como-responsable-del-tratamiento/6-el-deber-de-informacion/FAQ-0248-sobre-si-el-usuario-tiene-que-dar-consentimiento-a-clausula-de-privacidad). **[V]**
 
 → **Prohibido**: casilla "acepto la política de privacidad" como si fuera un contrato. Se **informa**,
 no se pide consentimiento a la información. **[I]** (derivado del criterio AEPD **[V]**)
@@ -204,24 +205,26 @@ no se pide consentimiento a la información. **[I]** (derivado del criterio AEPD
 Texto literal verificado ([RGPD consolidado AEPD](https://www.aepd.es/documento/reglamento-ue-2016-679-consolidado.pdf), art. 13):
 
 **Apartado 1** — en el momento de obtener los datos:
-| Letra | Contenido |
-| --- | --- |
-| a) | la identidad y los datos de contacto del responsable y, en su caso, de su representante |
-| b) | los datos de contacto del delegado de protección de datos, en su caso |
-| c) | los fines del tratamiento a que se destinan los datos personales **y la base jurídica** |
-| d) | cuando el tratamiento se base en el art. 6.1.f), **los intereses legítimos** perseguidos |
-| e) | los destinatarios o las categorías de destinatarios, en su caso |
-| f) | en su caso, la **intención de transferir a un tercer país** y la existencia o ausencia de decisión de adecuación […] |
+
+| Letra | Contenido                                                                                                            |
+| ----- | -------------------------------------------------------------------------------------------------------------------- |
+| a)    | la identidad y los datos de contacto del responsable y, en su caso, de su representante                              |
+| b)    | los datos de contacto del delegado de protección de datos, en su caso                                                |
+| c)    | los fines del tratamiento a que se destinan los datos personales **y la base jurídica**                              |
+| d)    | cuando el tratamiento se base en el art. 6.1.f), **los intereses legítimos** perseguidos                             |
+| e)    | los destinatarios o las categorías de destinatarios, en su caso                                                      |
+| f)    | en su caso, la **intención de transferir a un tercer país** y la existencia o ausencia de decisión de adecuación […] |
 
 **Apartado 2** — además:
-| Letra | Contenido |
-| --- | --- |
-| a) | el **plazo de conservación** o los criterios para determinarlo |
-| b) | la existencia del derecho a **acceso, rectificación, supresión, limitación, oposición y portabilidad** |
-| c) | cuando el tratamiento se base en consentimiento (6.1.a / 9.2.a), el derecho a **retirarlo** en cualquier momento |
-| d) | el derecho a **presentar una reclamación ante una autoridad de control** |
-| e) | si facilitar los datos es requisito legal/contractual y las **consecuencias de no facilitarlos** |
-| f) | la existencia de **decisiones automatizadas**, incluida la elaboración de perfiles (art. 22) |
+
+| Letra | Contenido                                                                                                        |
+| ----- | ---------------------------------------------------------------------------------------------------------------- |
+| a)    | el **plazo de conservación** o los criterios para determinarlo                                                   |
+| b)    | la existencia del derecho a **acceso, rectificación, supresión, limitación, oposición y portabilidad**           |
+| c)    | cuando el tratamiento se base en consentimiento (6.1.a / 9.2.a), el derecho a **retirarlo** en cualquier momento |
+| d)    | el derecho a **presentar una reclamación ante una autoridad de control**                                         |
+| e)    | si facilitar los datos es requisito legal/contractual y las **consecuencias de no facilitarlos**                 |
+| f)    | la existencia de **decisiones automatizadas**, incluida la elaboración de perfiles (art. 22)                     |
 
 #### 2.2.2 Se puede (y conviene) hacerlo **por capas** — art. 11 LOPDGDD **[V]**
 
@@ -232,24 +235,25 @@ Texto literal verificado ([RGPD consolidado AEPD](https://www.aepd.es/documento/
 > inmediata a la restante información**.
 
 **Art. 11.2** — la información básica (capa 1) mínima:
+
 > a) La identidad del responsable del tratamiento y de su representante, en su caso.
 > b) La finalidad del tratamiento.
 > c) La posibilidad de ejercer los derechos establecidos en los artículos 15 a 22 del Reglamento (UE) 2016/679.
 
-*Fuente:* [BOE — LO 3/2018 (LOPDGDD), art. 11](https://www.boe.es/buscar/act.php?id=BOE-A-2018-16673&p=20181206&tn=1#a11). **[V]**
+_Fuente:_ [BOE — LO 3/2018 (LOPDGDD), art. 11](https://www.boe.es/buscar/act.php?id=BOE-A-2018-16673&p=20181206&tn=1#a11). **[V]**
 
 Criterio AEPD sobre **cómo** redactarla — literal de la FAQ-0247:
 
 > concisa, transparente, inteligible y de fácil acceso, con un lenguaje claro y sencillo
 
-*Fuente:* [AEPD FAQ-0247](https://www.aepd.es/preguntas-frecuentes/2-tus-obligaciones-como-responsable-del-tratamiento/6-el-deber-de-informacion/FAQ-0247-como-debo-cumplir-con-el-deber-de-informar). **[V]**
+_Fuente:_ [AEPD FAQ-0247](https://www.aepd.es/preguntas-frecuentes/2-tus-obligaciones-como-responsable-del-tratamiento/6-el-deber-de-informacion/FAQ-0247-como-debo-cumplir-con-el-deber-de-informar). **[V]**
 
 → **Diseño:** capa 1 breve junto al botón de WhatsApp; capa 2 = página `/privacidad` completa. **[I]**
 
 #### 2.2.3 Base jurídica de la reserva por WhatsApp **[I]**
 
-**Art. 6.1.b RGPD**: *"el tratamiento es necesario para la ejecución de un contrato […] o para la
-aplicación a petición de este de medidas precontractuales"*. **[V]** (texto)
+**Art. 6.1.b RGPD**: _"el tratamiento es necesario para la ejecución de un contrato […] o para la
+aplicación a petición de este de medidas precontractuales"_. **[V]** (texto)
 
 → Una **solicitud de cita** es precisamente una **medida precontractual a petición del interesado**.
 La base natural es el **art. 6.1.b**, **no el consentimiento**. **[I]**
@@ -265,12 +269,12 @@ casillas. Con 6.1.b, no. **[I]**
 Es un error muy extendido creer que un negocio pequeño está exento. **Art. 30.5 RGPD**, literal:
 
 > 5. Las obligaciones indicadas en los apartados 1 y 2 no se aplicarán a ninguna empresa ni
-> organización que emplee a menos de 250 personas, **a menos que** el tratamiento que realice pueda
-> entrañar un riesgo para los derechos y libertades de los interesados, **no sea ocasional**, o
-> incluya categorías especiales de datos personales indicadas en el artículo 9, apartado 1, o
-> datos personales relativos a condenas e infracciones penales a que se refiere el artículo 10.
+>    organización que emplee a menos de 250 personas, **a menos que** el tratamiento que realice pueda
+>    entrañar un riesgo para los derechos y libertades de los interesados, **no sea ocasional**, o
+>    incluya categorías especiales de datos personales indicadas en el artículo 9, apartado 1, o
+>    datos personales relativos a condenas e infracciones penales a que se refiere el artículo 10.
 
-*Fuente:* [RGPD consolidado AEPD](https://www.aepd.es/documento/reglamento-ue-2016-679-consolidado.pdf), art. 30.5 (extraído literal del PDF oficial).
+_Fuente:_ [RGPD consolidado AEPD](https://www.aepd.es/documento/reglamento-ue-2016-679-consolidado.pdf), art. 30.5 (extraído literal del PDF oficial).
 
 **La condición es disyuntiva ("o"), no acumulativa** — basta que se cumpla **una**. Lo verifiqué
 expresamente porque una lectura automatizada me devolvió primero "tres condiciones simultáneamente",
@@ -280,7 +284,7 @@ lo cual es **incorrecto**. Confirmado por la AEPD:
 > their processing could pose a risk to the rights and freedoms of data subjects, **is not
 > occasional**, or includes special categories of data […]
 
-*Fuente:* [AEPD FAQ-0249 — ¿Estoy obligado a elaborar un RAT?](https://www.aepd.es/preguntas-frecuentes/2-tus-obligaciones-como-responsable-del-tratamiento/7-registro-de-actividades-de-tratamiento/FAQ-0249-estoy-obligado-a-elaborar-un-rat). **[V]**
+_Fuente:_ [AEPD FAQ-0249 — ¿Estoy obligado a elaborar un RAT?](https://www.aepd.es/preguntas-frecuentes/2-tus-obligaciones-como-responsable-del-tratamiento/7-registro-de-actividades-de-tratamiento/FAQ-0249-estoy-obligado-a-elaborar-un-rat). **[V]**
 
 → Gestionar citas de clientes es **la actividad ordinaria y continuada** del salón → **no es
 ocasional** → **RAT obligatorio**. **[I]** (subsunción; la norma es **[V]**)
@@ -290,7 +294,7 @@ ocasional** → **RAT obligatorio**. **[I]** (subsunción; la norma es **[V]**)
 **c) Riesgo de categorías especiales (art. 9 RGPD) — atención. [I]**
 
 Un salón de **pestañas** y **depilación** recibe, por WhatsApp y en texto libre, mensajes del tipo
-*"soy alérgica al adhesivo"*, *"estoy embarazada"*, *"tengo la piel reactiva"*. Eso son **datos de
+_"soy alérgica al adhesivo"_, _"estoy embarazada"_, _"tengo la piel reactiva"_. Eso son **datos de
 salud** → **categorías especiales (art. 9.1)** → régimen reforzado **y**, por sí solo, **otra** razón
 que activa el RAT. **[I]**
 No es hipotético en este sector, pero **no lo he verificado** contra los mensajes reales del salón
@@ -301,13 +305,13 @@ No es hipotético en este sector, pero **no lo he verificado** contra los mensaj
 > El tratamiento de los datos personales de un menor de edad únicamente podrá fundarse en su
 > consentimiento **cuando sea mayor de catorce años**.
 
-*Fuente:* [BOE — LO 3/2018, art. 7](https://www.boe.es/buscar/act.php?id=BOE-A-2018-16673). **[V]**
+_Fuente:_ [BOE — LO 3/2018, art. 7](https://www.boe.es/buscar/act.php?id=BOE-A-2018-16673). **[V]**
 Relevancia: **[?]** — depende de si el salón atiende a menores; hay que preguntarlo.
 
 #### 2.2.5 Lo que la política de privacidad **no** cubre: el aviso legal (LSSI) **[V]**
 
 Son **documentos distintos** y ambos obligatorios. La **Ley 34/2002 (LSSI-CE), art. 10** obliga al
-prestador a facilitar *"de forma permanente, fácil, directa y gratuita"*:
+prestador a facilitar _"de forma permanente, fácil, directa y gratuita"_:
 
 > a) Su nombre o denominación social; su residencia o domicilio o, en su defecto, la dirección de
 > uno de sus establecimientos permanentes en España; su dirección de correo electrónico y cualquier
@@ -316,7 +320,7 @@ prestador a facilitar *"de forma permanente, fácil, directa y gratuita"*:
 …más datos registrales (b), autorización administrativa si procede (c), profesión regulada (d),
 **NIF (e)**, precios (f) y códigos de conducta (g).
 
-*Fuente:* [BOE — Ley 34/2002, art. 10](https://www.boe.es/buscar/act.php?id=BOE-A-2002-13758). **[V]**
+_Fuente:_ [BOE — Ley 34/2002, art. 10](https://www.boe.es/buscar/act.php?id=BOE-A-2002-13758). **[V]**
 
 Una web informativa de un negocio **sí** es "servicio de la sociedad de la información" aunque no
 venda online, si representa actividad económica. **[V]** (según la exposición de motivos y el ámbito
@@ -341,8 +345,8 @@ email del titular, el aviso legal **no se puede escribir**, y la política de pr
 > necesario, para la prestación de un servicio de la sociedad de la información expresamente
 > solicitado por el destinatario**.
 
-*Fuente:* [AEPD — Guía sobre el uso de las cookies, **mayo 2024**](https://www.aepd.es/guias/guia-cookies.pdf), pág. 8. **[V]**
-(Versión verificada extrayendo el PDF: la portada dice *"MAYO 2024 — Guía actualizada en mayo 2024"*.)
+_Fuente:_ [AEPD — Guía sobre el uso de las cookies, **mayo 2024**](https://www.aepd.es/guias/guia-cookies.pdf), pág. 8. **[V]**
+(Versión verificada extrayendo el PDF: la portada dice _"MAYO 2024 — Guía actualizada en mayo 2024"_.)
 
 Alcance según la propia AEPD, literal:
 
@@ -351,12 +355,12 @@ Alcance según la propia AEPD, literal:
 > o bugs**, etc.) **para almacenar y recuperar datos de un equipo terminal** […] La citada norma
 > también resulta de aplicación al empleo de **técnicas de fingerprinting**.
 
-*Fuente:* ídem. **[V]**
+_Fuente:_ ídem. **[V]**
 
-**Relevante:** la AEPD define *web beacon* como *"imágenes […] almacenadas en un segundo sitio y que
+**Relevante:** la AEPD define _web beacon_ como _"imágenes […] almacenadas en un segundo sitio y que
 permiten al titular de ese segundo sitio registrar la visita del usuario mediante la información que
 el navegador de éste proporciona al descargar la imagen (**dirección IP**, sistema operativo, versión
-de navegador, etc.)"*. **[V]** — Es la figura **más cercana** a Google Fonts que la AEPD contempla,
+de navegador, etc.)"_. **[V]** — Es la figura **más cercana** a Google Fonts que la AEPD contempla,
 pero **no es la misma** (ver §2.4.3).
 
 **Consecuencia para este proyecto [I]:** si la web no usa cookies ni analítica —y el diseño previsto
@@ -385,7 +389,7 @@ retiene la Google Fonts API. Intenté `developers.google.com/fonts/faq/privacy` 
 → **Y es un hueco que no bloquea la decisión**, precisamente porque la recomendación es no depender
 de la palabra de Google.
 
-#### 2.4.2 El marco jurídico que sí está verificado: *Fashion ID* (C-40/17) **[V]**
+#### 2.4.2 El marco jurídico que sí está verificado: _Fashion ID_ (C-40/17) **[V]**
 
 Es **la** referencia aplicable, y es del **TJUE**, no de un juzgado local. Hechos: una web insertaba
 el botón "Me gusta" de Facebook, lo que hacía que **el navegador del visitante transmitiera su IP y
@@ -405,13 +409,13 @@ Fallo, apartados clave:
 - Tanto el administrador como el proveedor deben perseguir **un interés legítimo** con esas
   operaciones (ap. 97).
 
-*Fuente:* [TJUE, C-40/17, *Fashion ID*, 29/07/2019, EUR-Lex CELEX:62017CJ0040](https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:62017CJ0040). **[V]**
+_Fuente:_ [TJUE, C-40/17, _Fashion ID_, 29/07/2019, EUR-Lex CELEX:62017CJ0040](https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:62017CJ0040). **[V]**
 
 **Aplicación a Google Fonts [I]:** la estructura es **idéntica** — recurso de un tercero incrustado,
 carga **automática**, transmisión de la IP sin intervención del usuario. Por tanto: el titular de la
 web sería **corresponsable de la recogida y transmisión** de la IP a Google, con las obligaciones de
 **base jurídica** e **información** que ello conlleva.
-**Esto es una analogía razonada, no un pronunciamiento**: *Fashion ID* trataba un botón social con
+**Esto es una analogía razonada, no un pronunciamiento**: _Fashion ID_ trataba un botón social con
 finalidad publicitaria, no una fuente tipográfica con finalidad de presentación. Un tribunal podría
 distinguir ambos casos. **[I]**
 
@@ -419,7 +423,7 @@ distinguir ambos casos. **[I]**
 
 Documento: **Guidelines 2/2023 on Technical Scope of Art. 5(3) of ePrivacy Directive, Versión 2.0,
 adoptadas el 7 de octubre de 2024.**
-*Fuente:* [EDPB Guidelines 2/2023 v2.0 (PDF)](https://www.edpb.europa.eu/system/files/2024-10/edpb_guidelines_202302_technical_scope_art_53_eprivacydirective_v2_en_0.pdf).
+_Fuente:_ [EDPB Guidelines 2/2023 v2.0 (PDF)](https://www.edpb.europa.eu/system/files/2024-10/edpb_guidelines_202302_technical_scope_art_53_eprivacydirective_v2_en_0.pdf).
 (Verificado extrayendo el PDF con `pdftotext`; las citas son literales y se indica el nº de párrafo.)
 
 **a) El instructor y el receptor pueden ser entidades distintas — ap. 34:**
@@ -435,21 +439,21 @@ excluye** la aplicación del art. 5(3). **[V]**
 **b) Tracking basado solo en IP — aps. 54-56 (el más citado, y el más malinterpretado):**
 
 > 54. Some providers are developing solutions that **only rely on the collection of one component,
-> namely the IP address, in order to track the navigation of the user** […] In that context Article
-> 5(3) ePD could apply even though the instruction to make the IP available has been made by a
-> different entity than the receiving one.
+>     namely the IP address, in order to track the navigation of the user** […] In that context Article
+>     5(3) ePD could apply even though the instruction to make the IP available has been made by a
+>     different entity than the receiving one.
 
 > 55. However, gaining access to IP addresses would only trigger the application of Article 5(3) ePD
-> in cases where **this information originates from the terminal equipment** of a subscriber or user.
-> While it is not systematically the case (for example when CGNAT is activated), the static outbound
-> IPv4 originating from a user's router would fall within that case, as well as IPv6 addresses […]
-> **Unless the entity can ensure that the IP address does not originate from the terminal equipment
-> of a user or subscriber, it has to take all the steps pursuant to the Article 5(3) ePD.**
+>     in cases where **this information originates from the terminal equipment** of a subscriber or user.
+>     While it is not systematically the case (for example when CGNAT is activated), the static outbound
+>     IPv4 originating from a user's router would fall within that case, as well as IPv6 addresses […]
+>     **Unless the entity can ensure that the IP address does not originate from the terminal equipment
+>     of a user or subscriber, it has to take all the steps pursuant to the Article 5(3) ePD.**
 
 > 56. […] it is important to once again recall that **the applicability of this article does not
-> systematically mean that consent needs to be collected**. The EDPB thus reminds that in each case
-> it would have to be assessed **if a consent is needed or whether an exemption** under Article 5(3)
-> ePD could apply.
+>     systematically mean that consent needs to be collected**. The EDPB thus reminds that in each case
+>     it would have to be assessed **if a consent is needed or whether an exemption** under Article 5(3)
+>     ePD could apply.
 
 **Lectura honesta [I]:** el ap. 54 habla de soluciones cuyo **propósito es rastrear** ("in order to
 track the navigation of the user"). **Google Fonts no se presenta como una solución de tracking.**
@@ -478,21 +482,21 @@ la recomendación que hago: la recomendación se sostiene igual, y por motivos m
 
 **LG München I, sentencia de 20/01/2022, asunto 3 O 17493/20.** Condenó al titular de una web a
 cesar en el uso de Google Fonts dinámico y a pagar **100 €** de indemnización, razonando que la IP se
-transmitía a un servidor de Google en EE. UU. donde *"no se garantiza un nivel adecuado de protección
-de datos"* (invocando *Schrems II*).
+transmitía a un servidor de Google en EE. UU. donde _"no se garantiza un nivel adecuado de protección
+de datos"_ (invocando _Schrems II_).
 
-*Fuente:* referencia del asunto en [dejure.org — LG München I, 20.01.2022 - 3 O 17493/20](https://dejure.org/dienste/vernetzung/rechtsprechung?Text=3+O+17493/20).
+_Fuente:_ referencia del asunto en [dejure.org — LG München I, 20.01.2022 - 3 O 17493/20](https://dejure.org/dienste/vernetzung/rechtsprechung?Text=3+O+17493/20).
 **[V] con reserva:** he verificado la existencia y el contenido esencial del fallo mediante fuentes
 jurídicas secundarias alemanas; **no he accedido al texto oficial de la sentencia** → §3.
 
 **Por qué NO es la carta ganadora que se suele presentar:**
 
-| Objeción | Peso |
-| --- | --- |
-| Es un tribunal **alemán de primera instancia** (Landgericht) | **No vincula en España** ni crea doctrina. **[I]** |
-| No es AEPD, ni EDPB, ni TJUE | El encargo pedía criterio AEPD/EDPB: **no existe sobre Google Fonts**. **[?]** |
-| **Su razonamiento central ha caducado en parte** | Se apoyaba en la ausencia de nivel adecuado en EE. UU. Ver abajo. **[V]** |
-| Generó una **ola de cartas extorsivas** en Alemania | El propio uso masivo del fallo por *Abmahner* le resta autoridad práctica. **[I]** |
+| Objeción                                                     | Peso                                                                               |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| Es un tribunal **alemán de primera instancia** (Landgericht) | **No vincula en España** ni crea doctrina. **[I]**                                 |
+| No es AEPD, ni EDPB, ni TJUE                                 | El encargo pedía criterio AEPD/EDPB: **no existe sobre Google Fonts**. **[?]**     |
+| **Su razonamiento central ha caducado en parte**             | Se apoyaba en la ausencia de nivel adecuado en EE. UU. Ver abajo. **[V]**          |
+| Generó una **ola de cartas extorsivas** en Alemania          | El propio uso masivo del fallo por _Abmahner_ le resta autoridad práctica. **[I]** |
 
 **El cambio que casi nadie actualiza — la decisión de adecuación de 2023 [V]:**
 
@@ -504,7 +508,7 @@ entidades adheridas al **EU-U.S. Data Privacy Framework**. Literal de la Comisi�
 > companies participating in the Framework, **without having to put in place additional data
 > protection safeguards**.
 
-*Fuentes:* [Decisión de Ejecución (UE) 2023/1795 — EUR-Lex](https://eur-lex.europa.eu/eli/dec_impl/2023/1795/oj/eng) ·
+_Fuentes:_ [Decisión de Ejecución (UE) 2023/1795 — EUR-Lex](https://eur-lex.europa.eu/eli/dec_impl/2023/1795/oj/eng) ·
 [Comisión Europea — nota de prensa IP/23/3721](https://ec.europa.eu/commission/presscorner/detail/en/ip_23_3721). **[V]**
 
 Y **Google LLC está adherido**. Declaración oficial de Google:
@@ -512,7 +516,7 @@ Y **Google LLC está adherido**. Declaración oficial de Google:
 > Google LLC (and Google's wholly owned U.S. subsidiary companies, unless explicitly excluded)
 > comply with the EU-U.S. and Switzerland-U.S. Data Privacy Frameworks (DPFs) […]
 
-*Fuentes:* [Google — Data transfer frameworks](https://policies.google.com/privacy/frameworks) ·
+_Fuentes:_ [Google — Data transfer frameworks](https://policies.google.com/privacy/frameworks) ·
 ficha de participante en [dataprivacyframework.gov](https://www.dataprivacyframework.gov/list). **[V]**
 **[?]** — no he podido leer la ficha concreta de Google en `dataprivacyframework.gov` (el listado es
 una app interactiva); la adhesión la verifico por la **declaración oficial del propio Google**, y el
@@ -525,7 +529,7 @@ capítulo V:
 > internacional si […] el responsable y el encargado del tratamiento cumplen las condiciones
 > establecidas en el presente capítulo […]
 
-*Fuente:* [RGPD consolidado AEPD](https://www.aepd.es/documento/reglamento-ue-2016-679-consolidado.pdf), art. 44. **[V]**
+_Fuente:_ [RGPD consolidado AEPD](https://www.aepd.es/documento/reglamento-ue-2016-679-consolidado.pdf), art. 44. **[V]**
 
 → Con la decisión de adecuación vigente, la transferencia a Google LLC **se ampara en el art. 45**
 (adecuación) y **deja de ser el problema**. **[I]**
@@ -542,14 +546,14 @@ Esto es, en realidad, **un argumento a favor de auto-hospedar**: elimina la depe
 
 Distinción importante y que evita una conclusión errónea:
 
-| | Google Fonts | Enlace `wa.me` |
-| --- | --- | --- |
+|                                        | Google Fonts                        | Enlace `wa.me`                       |
+| -------------------------------------- | ----------------------------------- | ------------------------------------ |
 | Cómo se produce la conexión al tercero | **Automática**, al cargar la página | **El usuario pulsa** deliberadamente |
-| ¿Interviene la voluntad del usuario? | No | **Sí** |
-| Analogía *Fashion ID* / píxel EDPB | Encaja | **No encaja** |
+| ¿Interviene la voluntad del usuario?   | No                                  | **Sí**                               |
+| Analogía _Fashion ID_ / píxel EDPB     | Encaja                              | **No encaja**                        |
 
-*Fashion ID* y el ap. 47 del EDPB giran sobre transmisiones **automáticas** que *"otherwise would not
-have occurred"*. Un hipervínculo que el usuario decide pulsar es **navegación del propio usuario**
+_Fashion ID_ y el ap. 47 del EDPB giran sobre transmisiones **automáticas** que _"otherwise would not
+have occurred"_. Un hipervínculo que el usuario decide pulsar es **navegación del propio usuario**
 hacia un tercero, como cualquier enlace externo. **[I]**
 
 → **Conclusión [I]:** el botón de WhatsApp **no** convierte al salón en corresponsable de lo que Meta
@@ -563,21 +567,22 @@ enlace-vs-recurso-incrustado. Es mi inferencia a partir del criterio de automati
 **Recomendación: auto-hospedar las fuentes.** Razonamiento honesto:
 
 **Lo que NO voy a afirmar:**
+
 - ❌ "Google Fonts es ilegal" → **no verificado, y probablemente falso** con la adecuación vigente.
 - ❌ "La AEPD prohíbe Google Fonts" → **NO EXISTE tal pronunciamiento** (§3).
 - ❌ "El EDPB exige consentimiento para Google Fonts" → **sobrelectura** de las Guidelines (ap. 56).
 
 **Lo que sí sostengo:**
 
-| Criterio | Google Fonts (CDN) | Auto-hospedaje |
-| --- | --- | --- |
-| ¿Comunica la IP del visitante a un tercero? | Sí **[I]** | **No** |
-| ¿Obliga a análisis de corresponsabilidad (*Fashion ID*)? | Sí, discutible **[I]** | **No aplica** |
-| ¿Obliga a informar de transferencia internacional (art. 13.1.f)? | Sí **[I]** | **No** |
-| ¿Depende de una decisión de adecuación revocable? | Sí **[V]** | **No** |
-| ¿Expone a reclamaciones aunque se acabe ganando? | Sí **[I]** | **No** |
-| Coste de implementarlo | — | **≈ 0** (`@fontsource` o descarga + `@font-face`) **[I]** |
-| Rendimiento | Peor: DNS + TLS + conexión extra a otro origen **[I]** | **Mejor** |
+| Criterio                                                         | Google Fonts (CDN)                                     | Auto-hospedaje                                            |
+| ---------------------------------------------------------------- | ------------------------------------------------------ | --------------------------------------------------------- |
+| ¿Comunica la IP del visitante a un tercero?                      | Sí **[I]**                                             | **No**                                                    |
+| ¿Obliga a análisis de corresponsabilidad (_Fashion ID_)?         | Sí, discutible **[I]**                                 | **No aplica**                                             |
+| ¿Obliga a informar de transferencia internacional (art. 13.1.f)? | Sí **[I]**                                             | **No**                                                    |
+| ¿Depende de una decisión de adecuación revocable?                | Sí **[V]**                                             | **No**                                                    |
+| ¿Expone a reclamaciones aunque se acabe ganando?                 | Sí **[I]**                                             | **No**                                                    |
+| Coste de implementarlo                                           | —                                                      | **≈ 0** (`@fontsource` o descarga + `@font-face`) **[I]** |
+| Rendimiento                                                      | Peor: DNS + TLS + conexión extra a otro origen **[I]** | **Mejor**                                                 |
 
 **La decisión no se toma por miedo legal, se toma por ingeniería:** auto-hospedar es **más rápido,
 más simple, elimina una dependencia externa y hace que toda esta sección del informe sea irrelevante**.
@@ -587,22 +592,22 @@ Cuando una duda jurídica cuesta más analizarla que eliminarla, se elimina. **[
 
 ## 3. Tabla: lo que NO he podido verificar
 
-| # | Afirmación / dato | Estado | Qué haría falta para verificarlo | ¿Bloquea? |
-| --- | --- | --- | --- | --- |
-| 1 | **Pronunciamiento de la AEPD sobre Google Fonts** | **No consta.** Búsquedas en `aepd.es` sin resultado | Búsqueda exhaustiva en el buscador de resoluciones AEPD; consulta directa a la AEPD | No — la recomendación no depende de él |
-| 2 | **Pronunciamiento del EDPB sobre Google Fonts** | **No consta.** Las Guidelines 2/2023 **no** lo mencionan | Revisar todas las guidelines/opiniones del EDPB | No |
-| 3 | **Qué registra y retiene Google en la Fonts API** (declaración oficial) | **[?]** `fonts.google.com/faq#privacy` es SPA JS; `developers.google.com/fonts/faq/privacy` redirige | Abrir la FAQ en navegador real (Chrome MCP) y leer la sección de privacidad | No — se resuelve auto-hospedando |
-| 4 | **Texto oficial de la sentencia LG München I 3 O 17493/20** | **[V] parcial** — verificada vía fuentes jurídicas secundarias alemanas | Texto en `gesetze-bayern.de` o base oficial de jurisprudencia alemana | No |
-| 5 | **Estado "activo" de la certificación DPF de Google LLC a día de hoy** | **[?]** — la adhesión la declara Google oficialmente; el estado actual no leído | Consultar ficha de participante en `dataprivacyframework.gov` con navegador | No |
-| 6 | **Razón social, NIF, domicilio, email y teléfono del titular** | **[?] — NO TENEMOS** (`progress/current.md:78-83`, `:128-129`) | **Cliente**. Sin esto no hay art. 10 LSSI ni art. 13.1.a RGPD | **SÍ — BLOQUEA LA PUBLICACIÓN** |
-| 7 | **¿Vercel ofrece DPA (art. 28) y en qué términos? ¿Retención de logs? ¿Subencargados?** | **[?]** | Leer el DPA y la lista de subencargados de Vercel; verificar su adhesión al DPF | **SÍ** — antes de publicar |
-| 8 | **¿El stack Vite/SSG en Vercel introduce cookies o analítica por defecto?** | **[?]** | Cargar el build en un navegador y auditar cookies + peticiones de red | **SÍ** — determina si hace falta banner |
-| 9 | **¿El salón usa WhatsApp Business o WhatsApp normal? ¿Con qué términos?** | **[?]** | Cliente + términos de WhatsApp Business aplicables | Parcial — afecta a la redacción |
-| 10 | **¿Se reciben datos de salud (alergias, embarazo) por WhatsApp?** | **[?]** — muy probable en este sector **[I]** | Preguntar al cliente por el contenido real de los mensajes | Parcial — activa art. 9 |
-| 11 | **¿El salón atiende a menores de 14 años?** | **[?]** | Cliente | Parcial — art. 7 LOPDGDD |
-| 12 | **Plazos de conservación de las solicitudes de cita** | **[?]** | Decisión del cliente + criterio de prescripción aplicable | **SÍ** — art. 13.2.a lo exige |
-| 13 | **Distinción enlace-pulsado vs. recurso-incrustado confirmada por autoridad** | **[I]** — inferencia propia (§2.4.5) | Pronunciamiento AEPD/EDPB específico sobre hipervínculos a terceros | No |
-| 14 | **¿Existe obligación de DPD (art. 37 RGPD / art. 34 LOPDGDD)?** | **[?]** — presumiblemente **no** para un salón **[I]** | Contrastar art. 34 LOPDGDD contra la actividad real | No |
+| #   | Afirmación / dato                                                                       | Estado                                                                                               | Qué haría falta para verificarlo                                                    | ¿Bloquea?                               |
+| --- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | --------------------------------------- |
+| 1   | **Pronunciamiento de la AEPD sobre Google Fonts**                                       | **No consta.** Búsquedas en `aepd.es` sin resultado                                                  | Búsqueda exhaustiva en el buscador de resoluciones AEPD; consulta directa a la AEPD | No — la recomendación no depende de él  |
+| 2   | **Pronunciamiento del EDPB sobre Google Fonts**                                         | **No consta.** Las Guidelines 2/2023 **no** lo mencionan                                             | Revisar todas las guidelines/opiniones del EDPB                                     | No                                      |
+| 3   | **Qué registra y retiene Google en la Fonts API** (declaración oficial)                 | **[?]** `fonts.google.com/faq#privacy` es SPA JS; `developers.google.com/fonts/faq/privacy` redirige | Abrir la FAQ en navegador real (Chrome MCP) y leer la sección de privacidad         | No — se resuelve auto-hospedando        |
+| 4   | **Texto oficial de la sentencia LG München I 3 O 17493/20**                             | **[V] parcial** — verificada vía fuentes jurídicas secundarias alemanas                              | Texto en `gesetze-bayern.de` o base oficial de jurisprudencia alemana               | No                                      |
+| 5   | **Estado "activo" de la certificación DPF de Google LLC a día de hoy**                  | **[?]** — la adhesión la declara Google oficialmente; el estado actual no leído                      | Consultar ficha de participante en `dataprivacyframework.gov` con navegador         | No                                      |
+| 6   | **Razón social, NIF, domicilio, email y teléfono del titular**                          | **[?] — NO TENEMOS** (`progress/current.md:78-83`, `:128-129`)                                       | **Cliente**. Sin esto no hay art. 10 LSSI ni art. 13.1.a RGPD                       | **SÍ — BLOQUEA LA PUBLICACIÓN**         |
+| 7   | **¿Vercel ofrece DPA (art. 28) y en qué términos? ¿Retención de logs? ¿Subencargados?** | **[?]**                                                                                              | Leer el DPA y la lista de subencargados de Vercel; verificar su adhesión al DPF     | **SÍ** — antes de publicar              |
+| 8   | **¿El stack Vite/SSG en Vercel introduce cookies o analítica por defecto?**             | **[?]**                                                                                              | Cargar el build en un navegador y auditar cookies + peticiones de red               | **SÍ** — determina si hace falta banner |
+| 9   | **¿El salón usa WhatsApp Business o WhatsApp normal? ¿Con qué términos?**               | **[?]**                                                                                              | Cliente + términos de WhatsApp Business aplicables                                  | Parcial — afecta a la redacción         |
+| 10  | **¿Se reciben datos de salud (alergias, embarazo) por WhatsApp?**                       | **[?]** — muy probable en este sector **[I]**                                                        | Preguntar al cliente por el contenido real de los mensajes                          | Parcial — activa art. 9                 |
+| 11  | **¿El salón atiende a menores de 14 años?**                                             | **[?]**                                                                                              | Cliente                                                                             | Parcial — art. 7 LOPDGDD                |
+| 12  | **Plazos de conservación de las solicitudes de cita**                                   | **[?]**                                                                                              | Decisión del cliente + criterio de prescripción aplicable                           | **SÍ** — art. 13.2.a lo exige           |
+| 13  | **Distinción enlace-pulsado vs. recurso-incrustado confirmada por autoridad**           | **[I]** — inferencia propia (§2.4.5)                                                                 | Pronunciamiento AEPD/EDPB específico sobre hipervínculos a terceros                 | No                                      |
+| 14  | **¿Existe obligación de DPD (art. 37 RGPD / art. 34 LOPDGDD)?**                         | **[?]** — presumiblemente **no** para un salón **[I]**                                               | Contrastar art. 34 LOPDGDD contra la actividad real                                 | No                                      |
 
 ---
 
@@ -610,39 +615,39 @@ Cuando una duda jurídica cuesta más analizarla que eliminarla, se elimina. **[
 
 ### 4.1 Qué EXIGE
 
-| # | Exigencia | Fuente | Momento |
-| --- | --- | --- | --- |
-| E1 | **Página de política de privacidad** (`/privacidad`) con todo el art. 13.1 y 13.2 | Art. 13 RGPD; art. 11 LOPDGDD; AEPD FAQ-0248 **[V]** | Antes de publicar |
-| E2 | **Página de aviso legal** (`/aviso-legal`) con nombre/denominación, domicilio, email, **NIF**, datos registrales si procede | Art. 10 LSSI **[V]** | Antes de publicar |
-| E3 | **Información en capa 1 junto al botón de WhatsApp** + enlace a capa 2 | Art. 13.1 ("en el momento en que estos se obtengan") + art. 11 LOPDGDD **[V]** | Feature de reservas |
-| E4 | **Enlace a privacidad y aviso legal en el pie**, en todas las páginas ("permanente, fácil, directa y gratuita") | Art. 10 LSSI **[V]** | Layout base |
-| E5 | **Auto-hospedar las fuentes**; cero peticiones a `fonts.googleapis.com` / `fonts.gstatic.com` | Decisión de ingeniería sobre base de §2.4 **[I]** | Feature de estilos |
-| E6 | **RAT** (documento interno, no web) | Art. 30.5 RGPD; AEPD FAQ-0249 **[V]** | Entregable al cliente |
-| E7 | **Contrato de encargo con el hosting** | Art. 28 RGPD **[V]** | Antes de publicar |
-| E8 | Informar de que **el canal de contacto es WhatsApp (Meta)** como destinatario/canal | Art. 13.1.e **[V]** | Política de privacidad |
+| #   | Exigencia                                                                                                                   | Fuente                                                                         | Momento                |
+| --- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ---------------------- |
+| E1  | **Página de política de privacidad** (`/privacidad`) con todo el art. 13.1 y 13.2                                           | Art. 13 RGPD; art. 11 LOPDGDD; AEPD FAQ-0248 **[V]**                           | Antes de publicar      |
+| E2  | **Página de aviso legal** (`/aviso-legal`) con nombre/denominación, domicilio, email, **NIF**, datos registrales si procede | Art. 10 LSSI **[V]**                                                           | Antes de publicar      |
+| E3  | **Información en capa 1 junto al botón de WhatsApp** + enlace a capa 2                                                      | Art. 13.1 ("en el momento en que estos se obtengan") + art. 11 LOPDGDD **[V]** | Feature de reservas    |
+| E4  | **Enlace a privacidad y aviso legal en el pie**, en todas las páginas ("permanente, fácil, directa y gratuita")             | Art. 10 LSSI **[V]**                                                           | Layout base            |
+| E5  | **Auto-hospedar las fuentes**; cero peticiones a `fonts.googleapis.com` / `fonts.gstatic.com`                               | Decisión de ingeniería sobre base de §2.4 **[I]**                              | Feature de estilos     |
+| E6  | **RAT** (documento interno, no web)                                                                                         | Art. 30.5 RGPD; AEPD FAQ-0249 **[V]**                                          | Entregable al cliente  |
+| E7  | **Contrato de encargo con el hosting**                                                                                      | Art. 28 RGPD **[V]**                                                           | Antes de publicar      |
+| E8  | Informar de que **el canal de contacto es WhatsApp (Meta)** como destinatario/canal                                         | Art. 13.1.e **[V]**                                                            | Política de privacidad |
 
 ### 4.2 Qué PROHÍBE
 
-| # | Prohibición | Motivo |
-| --- | --- | --- |
-| P1 | **Publicar la web sin los datos reales del titular** | Art. 10 LSSI + art. 13.1.a RGPD. Confirma `progress/current.md:82` **[V]** |
-| P2 | **Casilla "acepto la política de privacidad"** | La información **no se consiente**; AEPD FAQ-0248 **[V]** |
-| P3 | **Pedir consentimiento para la reserva** | La base correcta es art. 6.1.b (medidas precontractuales) **[I]** |
-| P4 | **Inventar datos en las páginas legales** (NIF ficticio, domicilio de ejemplo) | Un aviso legal falso es peor que ninguno. Coherente con la puerta de build (`progress/current.md:94-97`) **[I]** |
-| P5 | **Cargar Google Fonts desde CDN** | §2.4.6 **[I]** |
-| P6 | **Banner de cookies "por si acaso"** | Si no hay cookies, un banner es fricción injustificada e informa de tratamientos inexistentes **[I]** |
-| P7 | **Pedir más datos de los necesarios** en el mensaje precompuesto | Minimización, art. 5.1.c RGPD **[I]** |
+| #   | Prohibición                                                                    | Motivo                                                                                                           |
+| --- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| P1  | **Publicar la web sin los datos reales del titular**                           | Art. 10 LSSI + art. 13.1.a RGPD. Confirma `progress/current.md:82` **[V]**                                       |
+| P2  | **Casilla "acepto la política de privacidad"**                                 | La información **no se consiente**; AEPD FAQ-0248 **[V]**                                                        |
+| P3  | **Pedir consentimiento para la reserva**                                       | La base correcta es art. 6.1.b (medidas precontractuales) **[I]**                                                |
+| P4  | **Inventar datos en las páginas legales** (NIF ficticio, domicilio de ejemplo) | Un aviso legal falso es peor que ninguno. Coherente con la puerta de build (`progress/current.md:94-97`) **[I]** |
+| P5  | **Cargar Google Fonts desde CDN**                                              | §2.4.6 **[I]**                                                                                                   |
+| P6  | **Banner de cookies "por si acaso"**                                           | Si no hay cookies, un banner es fricción injustificada e informa de tratamientos inexistentes **[I]**            |
+| P7  | **Pedir más datos de los necesarios** en el mensaje precompuesto               | Minimización, art. 5.1.c RGPD **[I]**                                                                            |
 
 ### 4.3 Features que implica
 
-| Feature propuesta | Descripción | Testeable |
-| --- | --- | --- |
-| `paginas_legales` | `/privacidad` y `/aviso-legal` generadas desde una **fuente de datos única** del titular. **Todo campo del titular es placeholder** → la puerta de build de `progress/current.md:94-97` **debe cubrir estas páginas**. | Sí: test de que el build falla si algún campo legal es placeholder |
-| `fuentes_autohospedadas` | `@fontsource` o `@font-face` con WOFF2 locales. | **Sí: test que falla si el HTML/CSS construido contiene `fonts.googleapis.com` o `fonts.gstatic.com`** |
-| `sin_terceros` | Verificar que el build no emite peticiones a orígenes externos. | Sí: test sobre el build que detecta URLs de terceros |
-| `aviso_privacidad_reserva` | Capa 1 + enlace a `/privacidad` en el punto de composición de la solicitud. | Sí: test de presencia y de que enlaza a `/privacidad` |
-| `footer_legal` | Enlaces permanentes en todas las páginas. | Sí: test por página |
-| `minimizacion_mensaje_whatsapp` | El mensaje precompuesto pide solo: servicio, fecha/hora preferida y nombre. **No** pedir datos de salud. | Sí: test del *snapshot* del mensaje generado |
+| Feature propuesta               | Descripción                                                                                                                                                                                                            | Testeable                                                                                              |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `paginas_legales`               | `/privacidad` y `/aviso-legal` generadas desde una **fuente de datos única** del titular. **Todo campo del titular es placeholder** → la puerta de build de `progress/current.md:94-97` **debe cubrir estas páginas**. | Sí: test de que el build falla si algún campo legal es placeholder                                     |
+| `fuentes_autohospedadas`        | `@fontsource` o `@font-face` con WOFF2 locales.                                                                                                                                                                        | **Sí: test que falla si el HTML/CSS construido contiene `fonts.googleapis.com` o `fonts.gstatic.com`** |
+| `sin_terceros`                  | Verificar que el build no emite peticiones a orígenes externos.                                                                                                                                                        | Sí: test sobre el build que detecta URLs de terceros                                                   |
+| `aviso_privacidad_reserva`      | Capa 1 + enlace a `/privacidad` en el punto de composición de la solicitud.                                                                                                                                            | Sí: test de presencia y de que enlaza a `/privacidad`                                                  |
+| `footer_legal`                  | Enlaces permanentes en todas las páginas.                                                                                                                                                                              | Sí: test por página                                                                                    |
+| `minimizacion_mensaje_whatsapp` | El mensaje precompuesto pide solo: servicio, fecha/hora preferida y nombre. **No** pedir datos de salud.                                                                                                               | Sí: test del _snapshot_ del mensaje generado                                                           |
 
 ### 4.4 Recomendación sobre el orden de trabajo **[I]**
 
@@ -658,7 +663,7 @@ Cuando una duda jurídica cuesta más analizarla que eliminarla, se elimina. **[
 
 ### 4.5 Riesgo señalado al orquestador **[I]**
 
-La decisión 3 (`progress/current.md:65-67`) prevé que *"a futuro"* haya backend para reservas.
+La decisión 3 (`progress/current.md:65-67`) prevé que _"a futuro"_ haya backend para reservas.
 **Cuando eso ocurra, este análisis cambia sustancialmente**: habrá recogida directa en servidor,
 probablemente datos de salud estructurados (art. 9), posible necesidad de EIPD (art. 35) y de
 cifrado. Conviene que quede escrito en el ADR para no repetir la investigación.
@@ -668,6 +673,7 @@ cifrado. Conviene que quede escrito en el ADR para no repetir la investigación.
 ## 5. Fuentes citadas
 
 **Normativa**
+
 - [RGPD (Reglamento UE 2016/679) — texto consolidado publicado por la AEPD (PDF)](https://www.aepd.es/documento/reglamento-ue-2016-679-consolidado.pdf) — arts. 4.1, 4.2, 4.7, 4.8, 6.1, 13, 30.5, 44
 - [RGPD — EUR-Lex CELEX:32016R0679](https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:32016R0679) — arts. 2.2.c, 45
 - [RGPD — considerandos, BOE DOUE-L-2016-80807](https://www.boe.es/buscar/doc.php?id=DOUE-L-2016-80807) — considerando 30
@@ -677,6 +683,7 @@ cifrado. Conviene que quede escrito en el ADR para no repetir la investigación.
 - [Comisión Europea — nota de prensa IP/23/3721 (10/07/2023)](https://ec.europa.eu/commission/presscorner/detail/en/ip_23_3721)
 
 **AEPD**
+
 - [Guía sobre el uso de las cookies — mayo 2024 (PDF)](https://www.aepd.es/guias/guia-cookies.pdf)
 - [2.6 El deber de información](https://www.aepd.es/preguntas-frecuentes/2-tus-obligaciones-como-responsable-del-tratamiento/6-el-deber-de-informacion)
 - [FAQ-0247 — ¿Cómo debo cumplir con el deber de informar?](https://www.aepd.es/preguntas-frecuentes/2-tus-obligaciones-como-responsable-del-tratamiento/6-el-deber-de-informacion/FAQ-0247-como-debo-cumplir-con-el-deber-de-informar)
@@ -684,17 +691,21 @@ cifrado. Conviene que quede escrito en el ADR para no repetir la investigación.
 - [FAQ-0249 — ¿Estoy obligado a elaborar un RAT?](https://www.aepd.es/preguntas-frecuentes/2-tus-obligaciones-como-responsable-del-tratamiento/7-registro-de-actividades-de-tratamiento/FAQ-0249-estoy-obligado-a-elaborar-un-rat)
 
 **EDPB**
+
 - [Guidelines 2/2023 on Technical Scope of Art. 5(3) of ePrivacy Directive, v2.0, adoptadas 07/10/2024 (PDF)](https://www.edpb.europa.eu/system/files/2024-10/edpb_guidelines_202302_technical_scope_art_53_eprivacydirective_v2_en_0.pdf) — aps. 34, 47, 50-51, 54-56
 
 **Jurisprudencia**
-- [TJUE, C-582/14, *Breyer*, 19/10/2016](https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:62014CJ0582)
-- [TJUE, C-40/17, *Fashion ID*, 29/07/2019](https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:62017CJ0040)
-- [LG München I, 20/01/2022, 3 O 17493/20 — referencia en dejure.org](https://dejure.org/dienste/vernetzung/rechtsprechung?Text=3+O+17493/20) *(verificado vía fuentes secundarias; texto oficial no consultado)*
+
+- [TJUE, C-582/14, _Breyer_, 19/10/2016](https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:62014CJ0582)
+- [TJUE, C-40/17, _Fashion ID_, 29/07/2019](https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:62017CJ0040)
+- [LG München I, 20/01/2022, 3 O 17493/20 — referencia en dejure.org](https://dejure.org/dienste/vernetzung/rechtsprechung?Text=3+O+17493/20) _(verificado vía fuentes secundarias; texto oficial no consultado)_
 
 **Google**
+
 - [Google — Data transfer frameworks](https://policies.google.com/privacy/frameworks)
-- [Data Privacy Framework — listado de participantes](https://www.dataprivacyframework.gov/list) *(no legible sin navegador)*
+- [Data Privacy Framework — listado de participantes](https://www.dataprivacyframework.gov/list) _(no legible sin navegador)_
 
 **Archivos del proyecto**
+
 - `progress/current.md:52,62,65-67,78-83,94-97,128-129`
 - `project-spec.md` (plantilla sin rellenar a fecha de este informe)

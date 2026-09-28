@@ -40,15 +40,15 @@ Luminancias relativas (fórmula WCAG, sRGB linealizado):
 `L(#FDF4F7)=0.9230 · L(#FFFFFF)=1.0000 · L(#A23E5F)=0.1195 · L(#AB5F79)=0.1822 · L(#6F525A)=0.1015`
 Ratio = (L₁+0.05)/(L₂+0.05).
 
-| Par (elemento → colores) | Cálculo | Ratio | Umbral | ✔ |
-|---|---|---|---|---|
-| Punto ACTIVO `--accent-dark #A23E5F` vs fondo `#FDF4F7` | (0.9730)/(0.1695) | **5.74:1** | 3:1 | ✔ |
-| ESTADO activo vs inactivo: relleno `#A23E5F` vs `#FFFFFF` | (1.05)/(0.1695) | **6.19:1** | 3:1 | ✔ |
-| Borde punto/flechas `--border-interactive #AB5F79` vs fondo `#FDF4F7` | (0.9730)/(0.2322) | **4.19:1** | 3:1 | ✔ |
-| Borde `#AB5F79` vs relleno del control `#FFFFFF` | (1.05)/(0.2322) | **4.52:1** | 3:1 | ✔ |
-| Glifos ← → ▶ ❙❙ `#A23E5F` vs `#FFFFFF` | (1.05)/(0.1695) | **6.19:1** | 3:1 (4.5 si texto) | ✔ |
-| Anillo de foco global `#AB5F79` vs `#FDF4F7` (`_base.scss:18-22`) | — | **4.19:1** | 3:1* | ✔ |
-| Nota `--muted #6F525A` vs `#FDF4F7` (SC 1.4.3, texto 13 px) | (0.9730)/(0.1515) | **6.42:1** | 4.5:1 | ✔ |
+| Par (elemento → colores)                                              | Cálculo           | Ratio      | Umbral             | ✔   |
+| --------------------------------------------------------------------- | ----------------- | ---------- | ------------------ | --- |
+| Punto ACTIVO `--accent-dark #A23E5F` vs fondo `#FDF4F7`               | (0.9730)/(0.1695) | **5.74:1** | 3:1                | ✔   |
+| ESTADO activo vs inactivo: relleno `#A23E5F` vs `#FFFFFF`             | (1.05)/(0.1695)   | **6.19:1** | 3:1                | ✔   |
+| Borde punto/flechas `--border-interactive #AB5F79` vs fondo `#FDF4F7` | (0.9730)/(0.2322) | **4.19:1** | 3:1                | ✔   |
+| Borde `#AB5F79` vs relleno del control `#FFFFFF`                      | (1.05)/(0.2322)   | **4.52:1** | 3:1                | ✔   |
+| Glifos ← → ▶ ❙❙ `#A23E5F` vs `#FFFFFF`                                | (1.05)/(0.1695)   | **6.19:1** | 3:1 (4.5 si texto) | ✔   |
+| Anillo de foco global `#AB5F79` vs `#FDF4F7` (`_base.scss:18-22`)     | —                 | **4.19:1** | 3:1*               | ✔   |
+| Nota `--muted #6F525A` vs `#FDF4F7` (SC 1.4.3, texto 13 px)           | (0.9730)/(0.1515) | **6.42:1** | 4.5:1              | ✔   |
 
 \* El 3:1 del indicador de foco es SC 2.4.13 (AAA), no exigible; se anota porque cumple igualmente.
 
@@ -151,15 +151,15 @@ visibles.
 
 ## Resumen
 
-| Eje | Veredicto |
-|---|---|
-| 1 · SC 2.2.2 Pause, Stop, Hide | **APTO** |
-| 2 · SC 1.4.11 Non-text Contrast | **APTO** (todos los pares ≥ 4.19:1) |
-| 3 · Patrón carousel APG | **APTO** |
-| 4 · SC 2.1.1 Teclado | **APTO** · 🟡 aviso SC 2.5.8 (puntos de 12 px) |
-| 5 · prefers-reduced-motion | **APTO** · 🔵 sin listener de cambio |
-| 6 · 3D y legibilidad | **APTO** · 🔵 tarjeta invisible clicable |
-| 7 · SEO técnico | **APTO** · 🔵 lazy en viewport (deuda declarada) |
+| Eje                             | Veredicto                                        |
+| ------------------------------- | ------------------------------------------------ |
+| 1 · SC 2.2.2 Pause, Stop, Hide  | **APTO**                                         |
+| 2 · SC 1.4.11 Non-text Contrast | **APTO** (todos los pares ≥ 4.19:1)              |
+| 3 · Patrón carousel APG         | **APTO**                                         |
+| 4 · SC 2.1.1 Teclado            | **APTO** · 🟡 aviso SC 2.5.8 (puntos de 12 px)   |
+| 5 · prefers-reduced-motion      | **APTO** · 🔵 sin listener de cambio             |
+| 6 · 3D y legibilidad            | **APTO** · 🔵 tarjeta invisible clicable         |
+| 7 · SEO técnico                 | **APTO** · 🔵 lazy en viewport (deuda declarada) |
 
 **APTO CON AVISOS**: ningún bloqueante AA. El aviso 🟡 (2.5.8) se sostiene hoy en la excepción de
 control equivalente; se recomienda cerrarlo con el área de 24 px antes de publicar.

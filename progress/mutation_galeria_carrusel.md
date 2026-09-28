@@ -3,13 +3,14 @@
 **Veredicto:** ESCALADO (FAIL: 98.44 % y 97.87 % < umbral 100 %; 1 sobreviviente MATABLE +
 2 equivalentes de libro DOCUMENTADOS SIN EXCLUIR — la exclusión es decisión del lead)
 **Score:** detectados/total:
-  - `src/components/galeria-logica.ts` → 63/64 = **98.44 %** (1 sobreviviente)
-  - `src/components/Galeria.tsx` → 92/94 = **97.87 %** (2 sobrevivientes)
-**Comandos:** `bin/harness mutate src/components/galeria-logica.ts` y después
-`bin/harness mutate src/components/Galeria.tsx` (secuencial, sin `--testFiles`, como manda
-stryker.config.json)
-**Runner:** StrykerJS 9.6.1 · vitest.stryker.config.ts · galeria-logica.ts Done in 26 s (exit 1) ·
-Galeria.tsx Done in 36 s (exit 1) — `thresholds.break = 100`
+
+- `src/components/galeria-logica.ts` → 63/64 = **98.44 %** (1 sobreviviente)
+- `src/components/Galeria.tsx` → 92/94 = **97.87 %** (2 sobrevivientes)
+  **Comandos:** `bin/harness mutate src/components/galeria-logica.ts` y después
+  `bin/harness mutate src/components/Galeria.tsx` (secuencial, sin `--testFiles`, como manda
+  stryker.config.json)
+  **Runner:** StrykerJS 9.6.1 · vitest.stryker.config.ts · galeria-logica.ts Done in 26 s (exit 1) ·
+  Galeria.tsx Done in 36 s (exit 1) — `thresholds.break = 100`
 
 ## Tabla (clear-text de Stryker)
 
@@ -33,9 +34,9 @@ Galeria.tsx Done in 36 s (exit 1) — `thresholds.break = 100`
 
 ### Matable con UN test (1)
 
-- **src/components/galeria-logica.ts:153:10**  `EqualityOperator`
+- **src/components/galeria-logica.ts:153:10** `EqualityOperator`
   - original: `return desplazamientoX < 0 ? 1 : -1`
-  - mutado:   `return desplazamientoX <= 0 ? 1 : -1`
+  - mutado: `return desplazamientoX <= 0 ? 1 : -1`
   - Por qué sobrevive: `<` y `<=` solo difieren en `desplazamientoX === 0`, y ese valor solo
     ALCANZA el ternario si la guarda `Math.abs(desplazamientoX) < umbral` (línea 149) no dispara,
     es decir, con `umbral <= 0`. Todos los tests de `pasosDelArrastre` inyectan umbral > 0
@@ -52,9 +53,9 @@ Galeria.tsx Done in 36 s (exit 1) — `thresholds.break = 100`
 
 ### EQUIVALENTES genuinos (2) — documentados, NO excluidos (decisión del lead)
 
-- **src/components/Galeria.tsx:86:62**  `BooleanLiteral` — **el previsto por el hallazgo 9 del judge**
+- **src/components/Galeria.tsx:86:62** `BooleanLiteral` — **el previsto por el hallazgo 9 del judge**
   - original: `const [arranqueExplicito, setArranqueExplicito] = useState(false)`
-  - mutado:   `const [arranqueExplicito, setArranqueExplicito] = useState(true)`
+  - mutado: `const [arranqueExplicito, setArranqueExplicito] = useState(true)`
   - Verificación (razonada contra `debeRotar` y los flujos de `entra()`/`alternarRotacion`):
     1. El ÚNICO lector de `arranqueExplicito` es `debeRotar` (`Galeria.tsx:92`), con precedencias
        `pausadoPorElUsuario → false` · `arranqueExplicito → true` · si no `!raton && !foco`
@@ -75,9 +76,9 @@ Galeria.tsx Done in 36 s (exit 1) — `thresholds.break = 100`
     anticipó el judge. No hay test que pueda matarlo sin romper la construcción del componente.
     NO añado exclusión al fichero (ni lo perseguiría con tests): lo reporto para decisión del lead.
 
-- **src/components/Galeria.tsx:124:6**  `ArrayDeclaration`
-  - original: `}, [])`  (deps del efecto de `matchMedia`, `Galeria.tsx:94-124`)
-  - mutado:   `}, ["Stryker was here"])`
+- **src/components/Galeria.tsx:124:6** `ArrayDeclaration`
+  - original: `}, [])` (deps del efecto de `matchMedia`, `Galeria.tsx:94-124`)
+  - mutado: `}, ["Stryker was here"])`
   - Por qué es equivalente: React compara las deps elemento a elemento con `Object.is` entre
     renders. `[]` no re-ejecuta nunca el efecto; `["Stryker was here"]` compara el MISMO literal de
     string en cada render → nunca difiere → TAMPOCO re-ejecuta nunca. En ambas versiones el efecto
@@ -89,9 +90,11 @@ Galeria.tsx Done in 36 s (exit 1) — `thresholds.break = 100`
   - NO añado exclusión: lo reporto para decisión del lead (exclusión documentada o rediseño).
 
 ## Exclusiones Stryker
+
 NINGUNA nueva. No hay `// Stryker disable` en `galeria-logica.ts` ni en `Galeria.tsx`.
 
 ## Escalado (decisión para el `craftsman_lead`)
+
 1. **153:10** (matable) → `tdd_craftsman`: test del caso degenerado `pasosDelArrastre(0, 0)` o
    rediseño por signo → re-judge → re-mutación de `galeria-logica.ts`.
 2. **86:62 y 124:6** (equivalentes genuinos verificados) → decidir: exclusión documentada
@@ -101,6 +104,7 @@ NINGUNA nueva. No hay `// Stryker disable` en `galeria-logica.ts` ni en `Galeria
    está en CHANGES_REQUESTED; la resolución vive en el diario del `tdd_craftsman`).
 
 ## Nota de proceso
+
 Solo mido y reporto: NO toqué `src/`, ni tests, ni configuración. La feature NO cierra con estos
 números: el umbral es 100 % y hay un sobreviviente matable. Los dos equivalentes quedan verificados
 y justificados aquí, pero su exclusión NO la ejecuto yo.
@@ -109,12 +113,13 @@ y justificados aquí, pero su exclusión NO la ejecuto yo.
 
 **Fecha:** 2026-07-23 · **Veredicto final:** PASS
 **Score:** detectados/puntuados:
-  - `src/components/galeria-logica.ts` → 60/60 = **100.00 %** (exit 0)
-  - `src/components/Galeria.tsx` → 93/93 = **100.00 %** (exit 0)
-**Comandos:** los MISMOS de la primera medición, secuencial: `bin/harness mutate
+
+- `src/components/galeria-logica.ts` → 60/60 = **100.00 %** (exit 0)
+- `src/components/Galeria.tsx` → 93/93 = **100.00 %** (exit 0)
+  **Comandos:** los MISMOS de la primera medición, secuencial: `bin/harness mutate
 src/components/galeria-logica.ts` (Done in 32 s) y después `bin/harness mutate
 src/components/Galeria.tsx` (Done in 36 s). StrykerJS 9.6.1 · `thresholds.break = 100` ·
-«Final mutation score of 100.00 is greater than or equal to break threshold 100» en ambas.
+  «Final mutation score of 100.00 is greater than or equal to break threshold 100» en ambas.
 
 ### Tabla (clear-text de Stryker)
 

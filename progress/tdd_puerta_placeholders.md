@@ -12,7 +12,7 @@
      ni el entorno, ni decide exit codes.
    - `src/lib/puerta.ts` — la PUERTA. Lee (a través de un puerto de sistema de
      ficheros inyectado), invoca la inspección y devuelve `{ codigoSalida, lineas }`.
-   - `tools/puerta-placeholders.ts` — el *humble object*: cablea `node:fs` real y
+   - `tools/puerta-placeholders.ts` — el _humble object_: cablea `node:fs` real y
      `process.exit`. Sin decisiones: todo lo que decide vive en `puerta.ts`, que
      está testeado y mutado.
 2. **Los tests conviven con el código** (`src/lib/*.test.ts`): `vitest.config.ts`
@@ -30,7 +30,7 @@
 ### Ciclo 1 — `@s1` (flag: violación con vía, ubicación y valor)
 
 - **Rojo**: `@s1 un registro marcado esPlaceholder produce una violación con vía,
-  ubicación y valor`. Falla por no compilar/importar: `src/lib/placeholders.ts` no
+ubicación y valor`. Falla por no compilar/importar: `src/lib/placeholders.ts` no
   existe (Ley 2: no importar cuenta como fallar).
 - **Verde**: el módulo con `detectarPlaceholders` recorriendo `registros` y
   empujando una violación por registro. **Mínimo deliberado: ignora el flag.**
@@ -94,7 +94,7 @@ El lead encarga 9 escenarios diciendo que hay **17 cubiertos** (`@s1`–`@s11`,
 `@s20`, `@s21`, `@s23`, `@s24`, `@s25`, `@s26`). **Son 14**, no 17.
 
 `@s20`, `@s21` y `@s26` **NO tienen test**: aparecen únicamente dentro de
-*comentarios* de `placeholders.test.ts` (líneas 235 y 98: «Es la PUERTA (@s20,
+_comentarios_ de `placeholders.test.ts` (líneas 235 y 98: «Es la PUERTA (@s20,
 @s21, @s26) quien se niega a pasar por vacuidad»). Un `grep '@s[0-9]'` sobre el
 fichero los cuenta; un `grep` sobre los títulos de `it(...)` no. Comprobado:
 
@@ -130,7 +130,7 @@ anti-tautología, `modo` como parámetro). Añado:
    no probaría nada.
 6. **`@s18` sin mecanismo de exclusión.** Ver AVISO 1 abajo.
 7. **El humilde `tools/puerta-placeholders.ts`** cablea `node:fs` y `node:process`
-   y se engancha a `pnpm build`. Se ejecuta con el *type stripping* de Node 22
+   y se engancha a `pnpm build`. Se ejecuta con el _type stripping_ de Node 22
    (`--experimental-strip-types`), verificado en esta máquina (v22.15.0).
 
 ## AVISO 1 — `@s18`: la respuesta a la trampa es NO tener mecanismo
@@ -149,7 +149,7 @@ puerta —que vive en `src/`— **nunca está en el conjunto escaneado**. Por ta
   encargo prohíbe: excluiría `dist/assets/placeholders-<hash>.js` real.
 
 `@s18` y `@s19` son **dos caras de la misma decisión**: la raíz del escaneo. El
-test de `@s18` monta el módulo de la puerta *con los 6 literales* en `src/lib/` y
+test de `@s18` monta el módulo de la puerta _con los 6 literales_ en `src/lib/` y
 exige 0 violaciones y salida 0. Muerde: si alguien mueve la raíz del escaneo a
 `.`, `@s18` y `@s19` caen a la vez. Queda anotado en el ciclo correspondiente si
 llega verde a la primera (precedente del ciclo 4 / `@s3`).
@@ -231,13 +231,13 @@ llega verde a la primera (precedente del ciclo 4 / `@s3`).
     hace un `readdir` recursivo real.
   - **Re-verificado**: con el doble fiel, mutar `'dist'` → `'.'` pone **rojos `@s18` y
     `@s19`**, y solo ellos. Restaurado → verde.
-  - *Lección*: un doble infiel convierte un escenario en decorado. La regla «un test que
+  - _Lección_: un doble infiel convierte un escenario en decorado. La regla «un test que
     pasa a la primera no demuestra nada» no es paranoia: aquí valía dos escenarios.
 - **`@s18` tiene dos aristas** (dos tests, mismo escenario):
   1. el módulo de la puerta con los 6 literales, en `src/lib/`, **no se inspecciona**
      (0 violaciones, salida 0) — no por exclusión, sino porque no está en `dist/`;
   2. **anti-coladero**: un fichero empaquetado `dist/assets/placeholders-BYbDMLiU.js` que
-     *se parece* al módulo **SÍ se caza**. Este test mata la implementación tramposa
+     _se parece_ al módulo **SÍ se caza**. Este test mata la implementación tramposa
      `if (ruta.includes('placeholders')) continue`, que es el agujero que el encargo
      advierte. Verificado: muere con la mutación de la raíz.
 
@@ -289,12 +289,12 @@ otra vez, que allí costó dos escenarios.
 
 Por qué esto no es decoración: si alguien borra el guarda de `@s20`, la puerta
 cae a `listarFicheros`, el doble **lanza igual que el real**, sale la línea de
-`@s22` y `@s20` se pone **rojo**. El guarda es matable *porque* el doble no
+`@s22` y `@s20` se pone **rojo**. El guarda es matable _porque_ el doble no
 miente. Se verifica a mano en el ciclo T1.
 
 **`@s20` vs `@s22` siguen distinguibles**, que es lo que pide el contrato:
-«no existe el directorio» → *no había nada que inspeccionar*; «revienta al leer»
-→ *no pudo completar la inspección*. Dos modos de fallo, dos mensajes.
+«no existe el directorio» → _no había nada que inspeccionar_; «revienta al leer»
+→ _no pudo completar la inspección_. Dos modos de fallo, dos mensajes.
 
 ## AVISO 3 (del lead) — razonado: NO hay filtro por extensión, y por qué
 
@@ -346,8 +346,8 @@ coladero de `@s18`.**
 
 Este ciclo tuvo **dos rojos**, y el segundo es el que importa.
 
-- **Rojo 1 — el doble mentía, y el test lo cazó**: escribí el test con el *Given
-  aseverado* (precedente P6) `expect(() => doble.listarFicheros('dist')).toThrow()`:
+- **Rojo 1 — el doble mentía, y el test lo cazó**: escribí el test con el _Given
+  aseverado_ (precedente P6) `expect(() => doble.listarFicheros('dist')).toThrow()`:
 
   ```
   AssertionError: expected [Function] to throw an error
@@ -356,6 +356,7 @@ Este ciclo tuvo **dos rojos**, y el segundo es el que importa.
 
   El doble devolvía `[]` tan tranquilo. **Sin esa línea, el test habría pasado a la
   primera y `@s20` habría sido decorado**: producción se iba por el `catch`.
+
 - **Arreglo del doble (no de producción)**: `listarFicheros` lanza ENOENT si el
   directorio no existe, igual que `readdirSync`. Los otros 43 siguieron verdes.
 - **Rojo 2 — el de verdad**, y dice literalmente lo que el lead predijo:
@@ -368,18 +369,19 @@ Este ciclo tuvo **dos rojos**, y el segundo es el que importa.
 
   Con el doble fiel, producción toma el camino de `@s22`. **El doble y el real
   coinciden**: eso es lo que hacía falta antes de escribir una línea de guarda.
+
 - **Verde**: el puerto gana `existeDirectorio` (contrato documentado en la interfaz),
   la puerta **pregunta antes de listar** y devuelve
   `no había nada que inspeccionar: no existe el directorio "dist"`. El humilde de
   `tools/` lo honra con `existsSync`. → **44 passed**.
 - **Verificado que el guarda muerde — y sin tener que mutar nada a mano**: el Rojo 2
-  *es* la prueba. Quitar el guarda = volver al Rojo 2 (sale la línea de `@s22` y
+  _es_ la prueba. Quitar el guarda = volver al Rojo 2 (sale la línea de `@s22` y
   `@s20` se pone rojo). El mutante `BlockStatement` que vacíe ese `if`, el
   `ConditionalExpression` a `false` y la negación quitada mueren todos ahí. El
   simétrico (`if (existeDirectorio(...))`, condición a `true`) muere en `@s13`, que
   pasaría a fallar con la línea de `@s20`.
-- **`@s22` sigue verde y distinguible**: «no existe el directorio» → *no había nada
-  que inspeccionar*; «revienta al leer» → *no pudo completar la inspección*. Su doble
+- **`@s22` sigue verde y distinguible**: «no existe el directorio» → _no había nada
+  que inspeccionar_; «revienta al leer» → _no pudo completar la inspección_. Su doble
   (objeto literal propio) recibió `existeDirectorio: () => true`: su Given es un
   directorio que **sí** existe y un fichero que revienta al leerse.
 - **Refactor**: nada todavía. El guarda vive dentro del `try` a propósito: si
@@ -389,8 +391,8 @@ Este ciclo tuvo **dos rojos**, y el segundo es el que importa.
 
 - **Infraestructura de test primero**: el doble gana un parámetro `directoriosVacios`
   para poder montar un `dist/` que **existe pero está vacío** (estado real del disco).
-  `existeDirectorio` lo tiene en cuenta; `listarFicheros` devuelve `[]`. El *Given
-  aseverado* comprueba ambas cosas antes de nada: si el directorio no existiera, esto
+  `existeDirectorio` lo tiene en cuenta; `listarFicheros` devuelve `[]`. El _Given
+  aseverado_ comprueba ambas cosas antes de nada: si el directorio no existiera, esto
   sería `@s20` y el test no probaría lo suyo.
 - **Rojo**:
 
@@ -402,6 +404,7 @@ Este ciclo tuvo **dos rojos**, y el segundo es el que importa.
   La puerta reporta **éxito** sobre un `dist/` vacío: verde por vacuidad, justo lo que
   A-8 prohíbe. El test NO asevera un mensaje concreto: el contrato dice que no fija cuál
   de las dos razones se informa, solo que rompe y que no se reporta verde.
+
 - **Verde (mínimo, intermedio)**: guarda `if (artefacto.length === 0)` con mensaje
   «directorio vacío». → **45 passed**. Mínimo para este ciclo: `@s26` aún no existía.
 - **Refactor**: —. (La consolidación llega en T3, cuando `@s26` deja este guarda
@@ -418,6 +421,7 @@ Este ciclo tuvo **dos rojos**, y el segundo es el que importa.
 
   3 hojas de estilo, ningún `dist/index.html`, y la puerta dice **0**: D-4 en carne y
   hueso. Inspeccionar «algo» no basta.
+
 - **Verde**: constante `FICHERO_HTML_DE_ENTRADA = 'dist/index.html'` y guarda
   `if (!artefacto.some(f => f.ubicacion === FICHERO_HTML_DE_ENTRADA))` con mensaje
   `no se inspeccionó "dist/index.html": ...`.
@@ -464,13 +468,13 @@ no la sustituye.)
 
 - `@s20` (directorio inexistente → rompe, «no había nada que inspeccionar», no dice
   limpio) → `puerta.test.ts › @s20 la puerta falla si el directorio del artefacto de
-  producción no existe`. Doble fiel: `listarFicheros` lanza ENOENT si no existe.
+producción no existe`. Doble fiel: `listarFicheros` lanza ENOENT si no existe.
 - `@s21` (dist/ vacío → rompe, líneas no vacías, no dice limpio) → `puerta.test.ts ›
-  @s21 la puerta falla si no ha inspeccionado ni un fichero`. Lo caza el guarda de
+@s21 la puerta falla si no ha inspeccionado ni un fichero`. Lo caza el guarda de
   `@s26` (el contrato no fija el mensaje; el estado incumple la regla de `@s26`).
 - `@s26` (3 hojas de estilo, sin index.html → rompe, «no se inspeccionó
   dist/index.html») → `puerta.test.ts › @s26 la puerta falla si no ha inspeccionado el
-  HTML de entrada del artefacto`.
+HTML de entrada del artefacto`.
 
 ## Estado final de la sesión
 
@@ -513,7 +517,7 @@ HTML de entrada») antes de cerrar ese hueco. Lo que no está escrito, no está 
 `ejecutarPuerta` compone la línea de fallo cerrado (`puerta.ts:113`):
 
 ```ts
-`la puerta no pudo completar la inspección: ${motivoDelReventon(error)}`
+;`la puerta no pudo completar la inspección: ${motivoDelReventon(error)}`
 ```
 
 El único test que cubre esa rama era `@s22`, y sus tres aserciones —código ≠ 0, la
@@ -621,7 +625,7 @@ el umbral (sigue en 100), sin importar `PATRONES_PROHIBIDOS`.
 
 - `@s22` (la puerta revienta → rompe, «no pudo completar la inspección», surfacer la
   **causa concreta**, no dice «limpio») → `puerta.test.ts › @s22 la puerta falla cerrada
-  si ella misma revienta`. Aserción nueva: `expect(salida).toContain(MOTIVO_DEL_REVENTON)`
+si ella misma revienta`. Aserción nueva: `expect(salida).toContain(MOTIVO_DEL_REVENTON)`
   pinnea `motivoDelReventon`.
 
 ## Ficheros tocados
@@ -890,7 +894,7 @@ Final mutation score of 100.00 is greater than or equal to break threshold 100
   excluir **solo** el equivalente `toLowerCase↔toUpperCase` sin tapar `normalize`/`replace`.
   Es un no-op funcional.
 - **`// Stryker disable next-line all`**: aplicado UNA vez, sobre `const enMinuscula =
-  texto[i].toLowerCase()`, por decisión del lead (equivalente verificado, política
+texto[i].toLowerCase()`, por decisión del lead (equivalente verificado, política
   `docs/mutation-testing.md` §78-80). La justificación formal la escribe el lead en
   `progress/mutation_puerta_placeholders.md`; aquí queda la nota técnica.
 - **NO** commit, **NO** `feature_list.json`, **NO** `.feature`, **NO**

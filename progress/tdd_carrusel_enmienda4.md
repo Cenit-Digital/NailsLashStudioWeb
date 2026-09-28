@@ -27,7 +27,7 @@
 - Comprobado por grep que `claveDeRotacion`/`etiquetaDeRotacion` (las funciones EN SÍ, en
   `galeria-logica.ts`) se quedaban sin NINGÚN llamador en `src/` fuera de su propio describe
   dedicado en `galeria-logica.test.ts` (`@s8 @s11 @s12 la etiqueta del control de rotación CAMBIA
-  con el estado`, 3 tests). Regla dura del repo: "código que nadie pidió no existe" — no hay razón
+con el estado`, 3 tests). Regla dura del repo: "código que nadie pidió no existe" — no hay razón
   de peso para conservar una etiqueta y un data-estado de un control que ya no se monta nunca, así
   que se retiraron las dos funciones de `galeria-logica.ts` y su describe dedicado (import +
   bloque) de `galeria-logica.test.ts`. Nada más de `galeria-logica.ts`/`carrusel-logica.ts` se
@@ -43,13 +43,13 @@
 Mismo criterio en `galeria.test.tsx` y en `resenas.test.tsx` (buscando el rótulo `(@sN de
 galería)` en el segundo fichero):
 
-| Tag  | `galeria.test.tsx`                                                             | `resenas.test.tsx` (rótulo `(@sN de galería)`)                    |
-|------|----------------------------------------------------------------------------------|---------------------------------------------------------------------|
-| —    | `describe('Galería — los botones de flecha tienen nombre accesible', …)` (sin tag, el más antiguo, 1 test) | (no tenía equivalente propio)                                       |
-| @s8  | `describe('@s8 el control de rotación es el PRIMER tabulable…', …)` (8 tests: 7 rojos + 1 huérfano) | `describe('@s8 (@s8 de galería) el control de rotación…', …)` (6 tests: 5 rojos + 1 huérfano) |
-| @s11 | `describe('@s11 «Iniciar» arranca la rotación AHORA…', …)` (2 tests)              | `describe('@s8 (@s11 de galería) «Iniciar» arranca AHORA…', …)` (2 tests) |
-| @s16 | `describe('@s16 las flechas mueven UNA posición…', …)` (it.each ×4 + 1 test = 5 tests) | `describe('@s8 (@s16 de galería) las flechas mueven UNA posición…', …)` (it.each ×4 + 1 test = 5 tests) |
-| @s24 | `describe('@s24 los mandos flotan SOBRE el marco…', …)` (2 tests)                 | `describe('@s8 (@s24 de galería) los mandos de cristal flotan…', …)` (2 tests) |
+| Tag  | `galeria.test.tsx`                                                                                         | `resenas.test.tsx` (rótulo `(@sN de galería)`)                                                          |
+| ---- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| —    | `describe('Galería — los botones de flecha tienen nombre accesible', …)` (sin tag, el más antiguo, 1 test) | (no tenía equivalente propio)                                                                           |
+| @s8  | `describe('@s8 el control de rotación es el PRIMER tabulable…', …)` (8 tests: 7 rojos + 1 huérfano)        | `describe('@s8 (@s8 de galería) el control de rotación…', …)` (6 tests: 5 rojos + 1 huérfano)           |
+| @s11 | `describe('@s11 «Iniciar» arranca la rotación AHORA…', …)` (2 tests)                                       | `describe('@s8 (@s11 de galería) «Iniciar» arranca AHORA…', …)` (2 tests)                               |
+| @s16 | `describe('@s16 las flechas mueven UNA posición…', …)` (it.each ×4 + 1 test = 5 tests)                     | `describe('@s8 (@s16 de galería) las flechas mueven UNA posición…', …)` (it.each ×4 + 1 test = 5 tests) |
+| @s24 | `describe('@s24 los mandos flotan SOBRE el marco…', …)` (2 tests)                                          | `describe('@s8 (@s24 de galería) los mandos de cristal flotan…', …)` (2 tests)                          |
 
 "Huérfano" = test que YA pasaba (su aserción no dependía del control retirado) pero cuyo ÚNICO
 sujeto (el describe entero) desapareció con el escenario: se retira junto al bloque, no se salva
@@ -72,12 +72,12 @@ seguir con el siguiente. Mapa `@s → qué cambió → test`:
   exigía `getByRole('button', { name: 'Anterior' })`/`'Siguiente'` (existencia), ahora se exige
   `queryByRole(...)).toBeNull()` (ausencia), con la misma precisión. Test:
   `'@s2 la nota honesta sigue horneada, carácter a carácter, y ya NO existe ningún «Anterior» ni
-  «Siguiente»'`.
+«Siguiente»'`.
 - **@s6** — se borró SOLO el `it` que aseveraba `aria-controls` de las flechas hacia la pista; el
   resto del describe (`role=group`, `aria-roledescription`, `aria-labelledby`, las seis
   diapositivas nunca ocultas, el orden del DOM) se dejó intacto, en los dos ficheros.
 - **@s7** — CONFIRMADO sin cambio en el `.feature`, pero su segundo test (`'parada por el
-  usuario'`) usaba `click(control())` para llegar al estado `rotando=no, foco=no`: ese control ya
+usuario'`) usaba `click(control())` para llegar al estado `rotando=no, foco=no`: ese control ya
   no existe. Se cambió el mecanismo a `fireEvent.mouseEnter(carruselDe(container))` (raton=true),
   que la propia ENMIENDA 4 señala como la vía que sobrevive para esa fila. El `Then`
   (`aria-live="polite"`) no cambió. Mismo arreglo en `resenas.test.tsx`.
@@ -114,25 +114,25 @@ seguir con el siguiente. Mapa `@s → qué cambió → test`:
 
 ## Mapa `@s → test` (trazabilidad)
 
-| `@s` (galería) | Estado tras ENMIENDA 4 | Cobertura en `galeria.test.tsx` | Cobertura en `resenas.test.tsx` |
-|---|---|---|---|
-| @s1  | sin cambio (implementación ajustada) | `describe('@s1 …')`, 2 tests | — (F-14 no lo hereda por separado) |
-| @s2  | AJUSTADO | `describe('@s2 …')`, 5 tests | `describe('@s1 …')` @s1/@s2 propios de reseñas |
-| @s3–@s5 | sin cambio | `galeria-logica.test.ts` | (importa `galeria-logica.ts`) |
-| @s6  | AJUSTADO | `describe('@s6 …')`, 5 tests | `describe('@s8 (@s6 de galería) …')`, 4 tests |
-| @s7  | CONFIRMADO (mecanismo de test ajustado) | `describe('@s7 …')`, 2 tests | `describe('@s8 (@s7 de galería) …')`, 2 tests |
-| @s8  | **RETIRADO** | *(bloque borrado)* | *(bloque borrado)* |
-| @s9  | CONFIRMADO sin cambio | `describe('@s9 …')`, 2 tests | `describe('@s8 (@s9 de galería) …')`, 3 tests |
-| @s10 | AJUSTADO | `describe('@s10 …')`, 2 tests | `describe('@s8 (@s10 de galería) …')`, 2 tests |
-| @s11 | **RETIRADO** | *(bloque borrado)* | *(bloque borrado)* |
-| @s12 | AJUSTADO | `describe('@s12 …')`, 8 tests | `describe('@s8 (@s12 de galería) …')`, 8 tests |
-| @s13–@s15 | sin cambio | `galeria-estilos.test.ts` (no tocado) | `resenas-estilos.test.ts` propio (no tocado) |
-| @s16 | **RETIRADO** | *(bloque borrado)* | *(bloque borrado)* |
-| @s17–@s19 | sin cambio | describes `@s17`/`@s18`/`@s19` intactos | describes `(@s17/@s18/@s19 de galería)` intactos |
-| @s20 | AJUSTADO | `describe('@s20 …')`, 5 tests | `describe('@s8 (@s20 de galería) …')`, 4 tests |
-| @s21–@s22 | sin cambio (puro, sin UI) | `carrusel-logica.test.ts` (no tocado) | ídem |
-| @s23 | AJUSTADO | 2 describes `@s23`, 9 tests | describe `(@s23 de galería)` ×2, + desambiguación |
-| @s24 | **RETIRADO** | *(bloque borrado)* | *(bloque borrado)* |
+| `@s` (galería) | Estado tras ENMIENDA 4                  | Cobertura en `galeria.test.tsx`         | Cobertura en `resenas.test.tsx`                   |
+| -------------- | --------------------------------------- | --------------------------------------- | ------------------------------------------------- |
+| @s1            | sin cambio (implementación ajustada)    | `describe('@s1 …')`, 2 tests            | — (F-14 no lo hereda por separado)                |
+| @s2            | AJUSTADO                                | `describe('@s2 …')`, 5 tests            | `describe('@s1 …')` @s1/@s2 propios de reseñas    |
+| @s3–@s5        | sin cambio                              | `galeria-logica.test.ts`                | (importa `galeria-logica.ts`)                     |
+| @s6            | AJUSTADO                                | `describe('@s6 …')`, 5 tests            | `describe('@s8 (@s6 de galería) …')`, 4 tests     |
+| @s7            | CONFIRMADO (mecanismo de test ajustado) | `describe('@s7 …')`, 2 tests            | `describe('@s8 (@s7 de galería) …')`, 2 tests     |
+| @s8            | **RETIRADO**                            | _(bloque borrado)_                      | _(bloque borrado)_                                |
+| @s9            | CONFIRMADO sin cambio                   | `describe('@s9 …')`, 2 tests            | `describe('@s8 (@s9 de galería) …')`, 3 tests     |
+| @s10           | AJUSTADO                                | `describe('@s10 …')`, 2 tests           | `describe('@s8 (@s10 de galería) …')`, 2 tests    |
+| @s11           | **RETIRADO**                            | _(bloque borrado)_                      | _(bloque borrado)_                                |
+| @s12           | AJUSTADO                                | `describe('@s12 …')`, 8 tests           | `describe('@s8 (@s12 de galería) …')`, 8 tests    |
+| @s13–@s15      | sin cambio                              | `galeria-estilos.test.ts` (no tocado)   | `resenas-estilos.test.ts` propio (no tocado)      |
+| @s16           | **RETIRADO**                            | _(bloque borrado)_                      | _(bloque borrado)_                                |
+| @s17–@s19      | sin cambio                              | describes `@s17`/`@s18`/`@s19` intactos | describes `(@s17/@s18/@s19 de galería)` intactos  |
+| @s20           | AJUSTADO                                | `describe('@s20 …')`, 5 tests           | `describe('@s8 (@s20 de galería) …')`, 4 tests    |
+| @s21–@s22      | sin cambio (puro, sin UI)               | `carrusel-logica.test.ts` (no tocado)   | ídem                                              |
+| @s23           | AJUSTADO                                | 2 describes `@s23`, 9 tests             | describe `(@s23 de galería)` ×2, + desambiguación |
+| @s24           | **RETIRADO**                            | _(bloque borrado)_                      | _(bloque borrado)_                                |
 
 ## Resultado final
 
@@ -177,6 +177,7 @@ precedencia real del patrón APG (arranque explícito > ratón/foco) sin que nad
 — el problema no es la función pura, es el CABLEADO muerto en los componentes.
 
 Por eso:
+
 - **`galeria-logica.ts`**: `debeRotar`/`EstadoDeRotacion.arranqueExplicito` NO se tocan en su
   firma ni comportamiento; solo se amplía el docblock del campo para dejar explícito que HOY
   ningún componente lo alcanza con `true` (mismo patrón que las notas de "MUTANTE EQUIVALENTE" ya
@@ -186,7 +187,7 @@ Por eso:
 - **`Galeria.tsx` / `Resenas.tsx`**: retirado el `useState(false)` de `arranqueExplicito` y su
   comentario de "mutante equivalente" (que documentaba precisamente la inobservabilidad ahora
   resuelta retirando el estado); la llamada a `debeRotar` pasa el literal `arranqueExplicito:
-  false` con un comentario que explica por qué (el botón que lo activaba se retiró a mano, commit
+false` con un comentario que explica por qué (el botón que lo activaba se retiró a mano, commit
   `9cf32a9`); `entra()` deja de resetear el estado retirado — queda como `(poner) => poner(true)`,
   con su docblock actualizado (ya no "cancela el arranque explícito": ese concepto no vive en el
   componente).
@@ -199,6 +200,7 @@ Por eso:
 
 **Hallazgos MENORES del mismo veredicto, corregidos de paso** (prosa, no afectan compilación ni
 tests):
+
 - `galeria.test.tsx:1119` (antes 1120) — el comentario citaba `boton-whatsapp-montaje.test.tsx`
   (ya borrado en otra rebanada) como el fichero que "también vigila" que la galería siga dentro de
   `<main>`. Corregido: ya no cita un fichero inexistente.
@@ -210,6 +212,7 @@ tests):
   botón flotante se retiró (commit `479d541`).
 
 **Verificación tras el cambio:**
+
 - `pnpm typecheck`: **0 errores**.
 - `pnpm lint`: **0 errores**.
 - `pnpm test` (suite completa): **1299/1299 verdes, 39 ficheros** — MISMO recuento que antes del
@@ -218,13 +221,13 @@ tests):
 
 ### Trazabilidad del remate
 
-| Hallazgo del judge | Fichero(s) | Acción | Verificación |
-|---|---|---|---|
-| 1 [BLOQUEANTE] `arranqueExplicito` cableado muerto | `Galeria.tsx`, `Resenas.tsx` | Retirado `useState`, su paso a `debeRotar` (ahora literal `false`) y el reseteo en `entra()` | grep `arranqueExplicito`/`setArranqueExplicito` en `src/` → solo `galeria-logica.ts` (función pura) y `galeria-logica.test.ts` (sus tests dedicados) |
-| 4 [Menor] docblock de `arranqueExplicito` desactualizado | `galeria-logica.ts:98-104` | Ampliado el docblock: hoy sin consumidor real vía UI, capacidad reutilizable de la función pura | lectura directa |
-| — [Menor, Retiro 1] cita a fichero borrado | `galeria.test.tsx:1119-1121` | Comentario corregido, sin cita a `boton-whatsapp-montaje.test.tsx` | lectura directa |
-| — [Menor, Retiro 1] cita a fichero borrado | `features/galeria_carrusel.feature:241` | Nota corregida, cita `galeria.test.tsx:1119-1128` | lectura directa |
-| — [Menor, Retiro 1] constante borrada nombrada en docblock | `reserva-demo.ts:1-5` | Docblock corregido, sin nombrar `BOTON_WHATSAPP_FLOTANTE_TEXTO` | lectura directa |
+| Hallazgo del judge                                         | Fichero(s)                              | Acción                                                                                          | Verificación                                                                                                                                         |
+| ---------------------------------------------------------- | --------------------------------------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 [BLOQUEANTE] `arranqueExplicito` cableado muerto         | `Galeria.tsx`, `Resenas.tsx`            | Retirado `useState`, su paso a `debeRotar` (ahora literal `false`) y el reseteo en `entra()`    | grep `arranqueExplicito`/`setArranqueExplicito` en `src/` → solo `galeria-logica.ts` (función pura) y `galeria-logica.test.ts` (sus tests dedicados) |
+| 4 [Menor] docblock de `arranqueExplicito` desactualizado   | `galeria-logica.ts:98-104`              | Ampliado el docblock: hoy sin consumidor real vía UI, capacidad reutilizable de la función pura | lectura directa                                                                                                                                      |
+| — [Menor, Retiro 1] cita a fichero borrado                 | `galeria.test.tsx:1119-1121`            | Comentario corregido, sin cita a `boton-whatsapp-montaje.test.tsx`                              | lectura directa                                                                                                                                      |
+| — [Menor, Retiro 1] cita a fichero borrado                 | `features/galeria_carrusel.feature:241` | Nota corregida, cita `galeria.test.tsx:1119-1128`                                               | lectura directa                                                                                                                                      |
+| — [Menor, Retiro 1] constante borrada nombrada en docblock | `reserva-demo.ts:1-5`                   | Docblock corregido, sin nombrar `BOTON_WHATSAPP_FLOTANTE_TEXTO`                                 | lectura directa                                                                                                                                      |
 
 ## Remate — mutantes de `prefers-reduced-motion` matados (2026-07-24)
 
@@ -255,12 +258,12 @@ definitiva).
    `matchMedia`, devuelta junto a `escuchar`/`dejarDeEscuchar`): sin este cambio no hay forma de
    inspeccionar CON QUÉ argumento se llamó de verdad a `window.matchMedia`.
 2. **Test nuevo** `'@s12 window.matchMedia se consulta con la media query EXACTA de movimiento
-   reducido'` / `'@s8 window.matchMedia se consulta con la media query EXACTA de movimiento
-   reducido'`: `expect(matchMedia).toHaveBeenCalledWith('(prefers-reduced-motion: reduce)')`, literal
+reducido'` / `'@s8 window.matchMedia se consulta con la media query EXACTA de movimiento
+reducido'`: `expect(matchMedia).toHaveBeenCalledWith('(prefers-reduced-motion: reduce)')`, literal
    escrito a mano (anti-tautología: nunca se importa `CONSULTA_MOVIMIENTO_REDUCIDO` de producción).
    Mata **`StringLiteral`** `Galeria.tsx:84:38` / `Resenas.tsx:68:38`.
 3. **Ampliado** `'@s12 a los 12000 ms sigue centrada la PRIMERA: arrancó pausado y no se movió ni
-   una posición'` / `'@s8 a los 12000 ms sigue centrado el PRIMERO...'`: entre el `render` y el
+una posición'` / `'@s8 a los 12000 ms sigue centrado el PRIMERO...'`: entre el `render` y el
    `avanzar(12000)` original se inserta un checkpoint `avanzar(2000)` + `expect(centrada(...)).toBe(0)`
    (mismo patrón que `@s10`, tiempo NO múltiplo de 12000) antes de completar los 10000 ms restantes
    con la aserción final intacta. Mata **`ConditionalExpression` 135:11, `BlockStatement` 135:32,
@@ -280,14 +283,14 @@ dos ficheros a la vez sin correr).
 
 ### Trazabilidad (delta sobre la tabla `@s12` ya existente)
 
-| Mutante superviviente (línea:col) | Fichero | Test que lo mata |
-|---|---|---|
-| `StringLiteral` 84:38 | `Galeria.tsx` | `@s12 window.matchMedia se consulta con la media query EXACTA...` |
-| `ConditionalExpression`/`BlockStatement`/`BooleanLiteral` 135:11/135:32/136:20 | `Galeria.tsx` | `@s12 a los 12000 ms sigue centrada la PRIMERA...` (checkpoint `avanzar(2000)`) |
+| Mutante superviviente (línea:col)                                                                      | Fichero       | Test que lo mata                                                                                            |
+| ------------------------------------------------------------------------------------------------------ | ------------- | ----------------------------------------------------------------------------------------------------------- |
+| `StringLiteral` 84:38                                                                                  | `Galeria.tsx` | `@s12 window.matchMedia se consulta con la media query EXACTA...`                                           |
+| `ConditionalExpression`/`BlockStatement`/`BooleanLiteral` 135:11/135:32/136:20                         | `Galeria.tsx` | `@s12 a los 12000 ms sigue centrada la PRIMERA...` (checkpoint `avanzar(2000)`)                             |
 | `BlockStatement`/`ConditionalExpression`/`BlockStatement`/`BooleanLiteral` 142:71/143:13/143:29/144:22 | `Galeria.tsx` | `@s12 activar la preferencia con la página abierta pausa la rotación EN CURSO` (checkpoint `avanzar(8000)`) |
-| `StringLiteral` 68:38 | `Resenas.tsx` | `@s8 window.matchMedia se consulta con la media query EXACTA...` |
-| `ConditionalExpression`/`BlockStatement`/`BooleanLiteral` 111:11/111:32/112:20 | `Resenas.tsx` | `@s8 a los 12000 ms sigue centrado el PRIMERO...` (checkpoint `avanzar(2000)`) |
-| `BlockStatement`/`ConditionalExpression`/`BlockStatement`/`BooleanLiteral` 117:71/118:13/118:29/119:22 | `Resenas.tsx` | `@s8 activar la preferencia con la página abierta pausa la rotación EN CURSO` (checkpoint `avanzar(8000)`) |
+| `StringLiteral` 68:38                                                                                  | `Resenas.tsx` | `@s8 window.matchMedia se consulta con la media query EXACTA...`                                            |
+| `ConditionalExpression`/`BlockStatement`/`BooleanLiteral` 111:11/111:32/112:20                         | `Resenas.tsx` | `@s8 a los 12000 ms sigue centrado el PRIMERO...` (checkpoint `avanzar(2000)`)                              |
+| `BlockStatement`/`ConditionalExpression`/`BlockStatement`/`BooleanLiteral` 117:71/118:13/118:29/119:22 | `Resenas.tsx` | `@s8 activar la preferencia con la página abierta pausa la rotación EN CURSO` (checkpoint `avanzar(8000)`)  |
 
 ### Verificación de cierre
 

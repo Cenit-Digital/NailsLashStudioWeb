@@ -14,22 +14,27 @@ es una preparación de despliegue. Se documenta aquí porque toca `src/`.
 ## Qué se hizo
 
 ### 1. `src/main.tsx`
+
 ```diff
 -export const createRoot = ViteReactSSG({ routes })
 +export const createRoot = ViteReactSSG({ routes, basename: import.meta.env.BASE_URL })
 ```
+
 `import.meta.env.BASE_URL` vale `'/'` en dev, build normal y todos los tests (default nativo de
 Vite cuando `base` no se declara). Cero cambio de comportamiento.
 
 ### 2. `src/components/Cabecera.tsx`
+
 ```diff
 -      <a href="/" className={estilos.marca}>
 +      <a href={import.meta.env.BASE_URL} className={estilos.marca}>
 ```
+
 Verificado: `src/components/cabecera.test.tsx` no asevera el `href` de la marca literalmente (solo
 texto/rol), así que no hubo que tocar ningún test.
 
 ### 3. `vite.config.ts` — INTENTADO Y REVERTIDO
+
 Se añadió `base: process.env.PAGES_BASE_PATH ?? '/'`, tal y como pide la documentación oficial de
 `vite-react-ssg`. Al correr `pnpm build` (sin `PAGES_BASE_PATH`, el caso normal) el build terminó
 en `exit 1`:
@@ -101,7 +106,9 @@ workflow de despliegue tras el build) — más frágil y no es lo que documenta 
 ## Verificación (estado final, con `vite.config.ts` revertido)
 
 ### Build normal (sin `PAGES_BASE_PATH`) — CERO regresión frente al `main` original
+
 Las CINCO puertas en verde:
+
 ```
 ✓ Puerta del cascarón: ...
 ✓ Puerta de placeholders: ...
@@ -109,7 +116,9 @@ Las CINCO puertas en verde:
 ✓ Puerta de terceros: ...
 ✓ Puerta de anclas vivas: ...
 ```
+
 `dist/index.html`, extraído con `readFileSync` + regex (no jsdom):
+
 ```
 marca link: <a href="/" class="_marca_1s54z_23">Nails Lash Studio</a>
 scripts: [ '/assets/app-B1Dws2Nl.js' ]
@@ -119,14 +128,17 @@ asset links (primeros 5): [
   ...
 ]
 ```
+
 Byte a byte idéntico al comportamiento anterior: `href="/"`, assets en `/assets/...`.
 
 ### Build bajo subruta (`PAGES_BASE_PATH=/NailsLashStudioWeb/`) — NO REALIZADO
+
 No se pudo verificar porque el mecanismo que lo produciría (`base` dinámico en `vite.config.ts`)
 está revertido por el bloqueo de arriba. Pendiente de la decisión del humano sobre la
 recomendación.
 
 ### Suite completa, typecheck, lint
+
 - `pnpm typecheck` → 0 errores.
 - `pnpm lint` → 0 errores.
 - `pnpm test` → **1301/1301** (mismo recuento que antes de empezar). Ningún test tuvo que
@@ -134,6 +146,7 @@ recomendación.
   `Cabecera.tsx`, tal y como anticipaba la tarea.
 
 ## Ficheros tocados (estado final)
+
 - `src/main.tsx` — cambio aplicado y verificado (queda).
 - `src/components/Cabecera.tsx` — cambio aplicado y verificado (queda).
 - `vite.config.ts` — cambio aplicado, verificado que rompe F-05, **revertido**; solo queda un
@@ -160,6 +173,7 @@ Dos ciclos Rojo-Verde-Refactor sobre `src/lib/puerta-terceros.ts`:
    `PREFIJO_PROTOCOLO_RELATIVO`), extraída a la función nombrada `esRutaPropiaRootAbsoluta`.
 
 **Trazabilidad — @s27 (8 filas de la tabla amendada) → test, en `src/lib/puerta-terceros.test.ts`**:
+
 - fila 1 (`no declara base` → 0) → `it('@s27 un vite.config.ts que no declara base no emite...')`
 - filas 2-4 (`/`, `/subcarpeta/`, `/NailsLashStudioWeb/` → 0) → `it.each` "es una ruta same-origin
   root-absoluta: no emite ninguna violación por base"
@@ -180,7 +194,7 @@ Se aplicó el cambio literalmente pedido y se midió con builds reales. **El bui
 porque el problema nunca fue "qué valores literales de `base` se aceptan" (eso es lo que la
 enmienda amplió), sino que `violacionesDeBase` lee el TEXTO CRUDO de `vite.config.ts` **sin
 evaluarlo** (a propósito — está escrito así en el propio `.feature`, sin tocar por la enmienda:
-*"No se importa la config: se lee como texto"*). El texto de una expresión dinámica
+_"No se importa la config: se lee como texto"_). El texto de una expresión dinámica
 (`process.env.PAGES_BASE_PATH ?? '/'`) nunca empieza por `/` — SIEMPRE empieza por `process` —, así
 que la puerta la marca como violación **sin importar el valor real de la variable de entorno**, esté
 definida o no:
@@ -232,6 +246,7 @@ El plan de despliegue ya en marcha (`progress/deploy_github_pages.md`: repo hech
 Pages activado por API, `.github/workflows/deploy-pages.yml` ya escrito asumiendo que
 `PAGES_BASE_PATH` funciona) **no se puede completar solo con F-05**. Hacen falta, como mínimo, DOS
 enmiendas más, cada una con su propio escenario aprobado por el humano:
+
 1. Una forma de que `violacionesDeBase` reconozca el valor REAL que tomará `base` en el build de
    CI sin dejar de ser una función pura que no evalúa `process.env` arbitrariamente — por ejemplo,
    que el HUMILDE (`tools/puerta-terceros.ts`, sin lógica hoy) resuelva `process.env.PAGES_BASE_PATH`
@@ -240,9 +255,9 @@ enmiendas más, cada una con su propio escenario aprobado por el humano:
 2. Una enmienda a `features/puerta_cascaron.feature` (F-01, `done`) que enseñe a
    `violacionesDeEnlaces` a resolver los `href` internos QUITÁNDOLES el prefijo de `base` antes de
    comprobar que el fichero existe en `dist/`.
-Ninguna de las dos está autorizada por el `.feature` que esta sesión tenía en mano (`cero_terceros`,
-@s27) ni por el alcance que se me dio (`puerta-terceros.ts`, su test y `vite.config.ts`). Quedan
-declaradas, no resueltas — igual que la deuda de F-01 que A-27 ya declaró y no cerró.
+   Ninguna de las dos está autorizada por el `.feature` que esta sesión tenía en mano (`cero_terceros`,
+   @s27) ni por el alcance que se me dio (`puerta-terceros.ts`, su test y `vite.config.ts`). Quedan
+   declaradas, no resueltas — igual que la deuda de F-01 que A-27 ya declaró y no cerró.
 
 ## Remate final — subruta desbloqueada de verdad, 2026-07-25
 
@@ -252,6 +267,7 @@ de `features/cascaron_semantico.feature` (@s36/@s37/@s38, `gherkin_author`, 2026
 DOS causas que el remate anterior dejó declaradas y no resueltas. **Estado final: DESBLOQUEADO.**
 
 ### 1. `baseDeclarada` exportada (`src/lib/puerta-terceros.ts`)
+
 Solo visibilidad: `function baseDeclarada` → `export function baseDeclarada`. Cero cambio de lógica
 (su cuerpo no se tocó). Sin test nuevo: es un cambio de visibilidad sobre una función ya cubierta al
 100 % por `puerta-terceros.test.ts`, y ningún escenario nuevo la ejercita distinto.
@@ -296,6 +312,7 @@ significa "sin base declarada").
 principio (se escribieron ya con nombre revelador en el ciclo VERDE, sin números mágicos).
 
 **Trazabilidad — @s → test:**
+
 - @s36 (con prefijo, resto que NO es ruta lógica → sigue violación) →
   `it.each` "@s36 con base declarada, un href con su prefijo pero sin ruta lógica tras él sigue
   siendo violación" (2 filas: `/NailsLashStudioWeb/inexistente`, `/NailsLashStudioWeb/Servicios`)
@@ -308,10 +325,11 @@ principio (se escribieron ya con nombre revelador en el ciclo VERDE, sin número
   resuelve como CUALQUIER ruta lógica, no solo la home" (fixture de dos rutas: `/` y `/servicios`)
 - @s23/@s24 (sin `base`, el caso de hoy) → **NINGÚN test existente se tocó.** Los ~30 call sites de
   `inspeccionarSitio(paginas, rutasEsperadas)` y los de `ejecutarPuertaDelCascaron({ artefacto,
-  rutasEsperadas })` sin `base` siguen compilando y pasando sin cambio de una sola línea — el default
+rutasEsperadas })` sin `base` siguen compilando y pasando sin cambio de una sola línea — el default
   `null` en ambos niveles es exactamente lo que lo permite.
 
 ### 3. `tools/puerta-cascaron.ts` (el humilde)
+
 Importa `baseDeclarada` de `../src/lib/puerta-terceros.ts` (mismo patrón de import relativo con
 extensión `.ts` explícita que ya usa el resto del repo bajo el type-stripping de Node 22), lee
 `vite.config.ts` con `readFileSync` (mismo patrón que `tools/puerta-terceros.ts`) y pasa
@@ -319,26 +337,32 @@ extensión `.ts` explícita que ya usa el resto del repo bajo el type-stripping 
 lógica propia, sin test propio, fuera de `mutate` — el mismo contrato que ya tenía este fichero.
 
 ### 4. `vite.config.ts` — `base` literal fija
+
 `base: '/NailsLashStudioWeb/'` como literal simple, SIN condicional ni variable de entorno (decisión
 del `craftsman_lead`: no hay dominio propio todavía, es temporal hasta que el cliente pague y se
 despliegue en servidor propio). Confirmado que `vitest.config.ts` es un fichero separado sin `base`
 declarado: los 1310 tests de la suite ven siempre `import.meta.env.BASE_URL === '/'`, sin excepción.
 
 ### 5. Verificación de build REAL bajo `/NailsLashStudioWeb/` (el ÚNICO build que existe ya)
+
 `pnpm build` con `dist/` limpio → **exit 0, las CINCO puertas en verde**, incluida:
+
 ```
 ✓ Puerta del cascarón: las 1 ruta(s) del artefacto llevan horneados el idioma, el title, la
 description, la canónica, un h1, los landmarks y el JSON-LD, y ningún enlace interno apunta a la
 nada.
 ```
+
 Inspección de `dist/index.html` con `readFileSync` + regex (nunca jsdom):
+
 - Enlace de marca: `<a href="/NailsLashStudioWeb/" class="_marca_1s54z_23">Nails Lash Studio</a>`
 - Script: `/NailsLashStudioWeb/assets/app-BTzMgq7U.js`
 - Assets (primeros 5): todos prefijados `/NailsLashStudioWeb/assets/...`
-La puerta anti-404 NO lo marca como roto — confirmado por la línea `✓ Puerta del cascarón` sin
-ninguna línea `✗` en la salida del build.
+  La puerta anti-404 NO lo marca como roto — confirmado por la línea `✓ Puerta del cascarón` sin
+  ninguna línea `✗` en la salida del build.
 
 ### 6. `pnpm typecheck`, `pnpm lint`, `pnpm test` (suite completa)
+
 - `pnpm typecheck` → 0 errores.
 - `pnpm lint` (ESLint) → 0 errores.
 - `pnpm test` → **1310/1310** (1303 de antes de esta sesión + 7 tests nuevos: 5 de
@@ -347,11 +371,12 @@ ninguna línea `✗` en la salida del build.
 - `pnpm format:check` (Prettier) sale con avisos en 183 ficheros del repo, la MAYORÍA nunca tocados
   por esta sesión (`README.md`, `project-spec.md`, decenas de `progress/*.md`, componentes ajenos a
   esta tarea): es ruido preexistente de terminaciones de línea CRLF/LF del checkout de Windows (`git
-  diff` avisa "CRLF will be replaced by LF" incluso en ficheros que esta sesión NO editó), no una
+diff` avisa "CRLF will be replaced by LF" incluso en ficheros que esta sesión NO editó), no una
   regresión introducida aquí. Fuera del checklist de esta tarea (`typecheck`/`lint`/`test`), y no se
   tocó ningún fichero ajeno para "arreglarlo".
 
 ### Ficheros tocados en este remate
+
 - `src/lib/puerta-terceros.ts` — `baseDeclarada` exportada (sin cambio de lógica).
 - `src/lib/puerta-cascaron.ts` — `esEnlaceRoto` (nueva), `violacionesDeEnlaces`,
   `violacionesDeLaPagina`, `inspeccionarSitio` y `PeticionPuertaCascaron`/`inspeccionarArtefacto`
@@ -363,6 +388,7 @@ ninguna línea `✗` en la salida del build.
 - `vite.config.ts` — `base: '/NailsLashStudioWeb/'` literal.
 
 ### Estado final
+
 **DESBLOQUEADO.** El plan de despliegue de GitHub Pages DE PROYECTO (`.github/workflows/deploy-pages.yml`,
 ya escrito por una sesión anterior, fuera del alcance de esta tarea y no tocado) puede completarse:
 `pnpm build` produce un artefacto autocontenido bajo `/NailsLashStudioWeb/`, con las cinco puertas —
@@ -391,9 +417,10 @@ de la fila existente `/otra-cosa`, 10 caracteres — más corta que `base`, por 
 Para cumplir la Ley 2 (un test que no demuestra nada no sirve) se verificó el mordisco a mano,
 aplicando temporalmente los DOS mutantes exactos del informe sobre `esEnlaceRoto` y corriendo solo
 `@s37`:
+
 - `if (!ruta.startsWith(base))` → `if (false)`: la fila nueva pasó a ROJO
   (`expected [] but got [{ ruta: '/', regla: 'href interno sin fichero en dist/', valor:
-  '/pagina-que-no-tiene-nada-que-ver-con-la-base' }]`); el resto de `@s37` (incluida `/otra-cosa`)
+'/pagina-que-no-tiene-nada-que-ver-con-la-base' }]`); el resto de `@s37` (incluida `/otra-cosa`)
   siguió VERDE, confirmando que la fila nueva es la única que distingue este mutante.
 - `if (!ruta.startsWith(base)) { return false }` → `if (!ruta.startsWith(base)) {}` (bloque vacío):
   mismo resultado, mismo mensaje de fallo.
@@ -442,6 +469,7 @@ concatenación, tal y como predecía la identidad algebraica.
   regresión del comportamiento real.
 
 ### Ficheros tocados en este remate
+
 - `features/cascaron_semantico.feature` — 1 fila nueva en la tabla `Examples` de `@s37`.
 - `src/lib/puerta-cascaron.test.ts` — 1 fila nueva en el `it.each` de `@s37`.
 - `src/lib/puerta-cascaron.ts` — línea 599 refactorizada (ternario redundante eliminado), comentario

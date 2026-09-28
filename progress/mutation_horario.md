@@ -17,11 +17,11 @@
 
 Supervivientes exactos:
 
-| # | Ubicación | Mutador | Mutación | Familia |
-| - | --------- | ------- | -------- | ------- |
-| 1 | `horario.ts:122:51` | `ConditionalExpression` | `excepciones.find((e) => e.fecha === fecha)` → `find((e) => true)` | test insuficiente |
-| 2 | `horario.ts:201:11` | `ArrayDeclaration` | `{ dias: ['Sunday'], … }` → `{ dias: [], … }` | equivalente (dato muerto) |
-| 3 | `horario.ts:201:12` | `StringLiteral` | `{ dias: ['Sunday'], … }` → `{ dias: [''], … }` | equivalente (dato muerto) |
+| #   | Ubicación           | Mutador                 | Mutación                                                           | Familia                   |
+| --- | ------------------- | ----------------------- | ------------------------------------------------------------------ | ------------------------- |
+| 1   | `horario.ts:122:51` | `ConditionalExpression` | `excepciones.find((e) => e.fecha === fecha)` → `find((e) => true)` | test insuficiente         |
+| 2   | `horario.ts:201:11` | `ArrayDeclaration`      | `{ dias: ['Sunday'], … }` → `{ dias: [], … }`                      | equivalente (dato muerto) |
+| 3   | `horario.ts:201:12` | `StringLiteral`         | `{ dias: ['Sunday'], … }` → `{ dias: [''], … }`                    | equivalente (dato muerto) |
 
 ## Reparación
 

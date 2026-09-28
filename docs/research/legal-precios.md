@@ -16,7 +16,7 @@
 
 La pregunta se refiere al **"art. 6 ter"** de la Directiva 98/6/CE. El artículo que
 regula los anuncios de reducción de precios tras la Directiva Ómnibus es el
-**artículo 6 bis** (en inglés *Article 6a*), no el 6 ter. Todo este informe usa la
+**artículo 6 bis** (en inglés _Article 6a_), no el 6 ter. Todo este informe usa la
 numeración correcta: **art. 6 bis**.
 
 ---
@@ -28,18 +28,18 @@ incluido, pero la famosa regla de los 30 días **no es legalmente exigible a los
 servicios de un salón** — aunque igualmente debemos cumplirla de facto, porque un
 "antes 35 €" falso es publicidad engañosa por otra vía.
 
-| # | Decisión | Base | Confianza |
-|---|----------|------|-----------|
-| **D1** | **Publicamos precios de todos los servicios** en la web y en el local. | Ley 11/1998 CM art. 14.2 (norma autonómica aplicable en Las Rozas) | Verificado |
-| **D2** | **Todos los precios se muestran con IVA incluido**, como precio final completo. Nada de "+ IVA" ni "IVA no incluido". | TRLGDCU art. 20.1.c); Ley 11/1998 CM art. 14.2; LSSI art. 10.1.f) | Verificado |
-| **D3** | **NO invocamos el RD 3423/2000** como base legal de la web. Regula *productos*, no servicios, y excluye expresamente los productos suministrados con ocasión de una prestación de servicios. Solo entra en juego si el salón **vende producto físico** (esmaltes, cosmética) — ahí sí aplica en pleno. | RD 3423/2000 arts. 1.1 y 1.2 | Verificado |
-| **D4** | **La regla del "precio anterior más bajo de los últimos 30 días" (art. 6 bis DIP) NO obliga jurídicamente a nuestros servicios.** La Comisión Europea lo dice de forma literal y expresa: la Directiva "no se aplica a los servicios". | Directrices de la Comisión 2021/C 526/02, §1.1; Directiva 98/6/CE arts. 1 y 3.2 | Verificado |
-| **D5** | **Aun así, la aplicamos voluntariamente como puerto seguro.** Un "antes 35 €" que nunca se cobró realmente es un **acto de engaño** sobre "el precio o su modo de fijación, o la existencia de una ventaja específica con respecto al precio" — y eso **sí** aplica a servicios y sí es sancionable. La regla de 30 días es el estándar de prueba más defendible y ya es el estándar mental del consumidor y del inspector. | Ley 3/1991 art. 5.1.e); TRLGDCU arts. 19 y 20 | Verificado (norma) + Inferencia (idoneidad como puerto seguro) |
-| **D6** | Si mostramos **reseñas/testimonios** en la web, deben ser de clientes reales y verificables, con información sobre el método de verificación. | TRLGDCU art. 20.4, redacción dada por Ley 10/2025 | Verificado |
+| #      | Decisión                                                                                                                                                                                                                                                                                                                                                                                                                    | Base                                                                            | Confianza                                                      |
+| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| **D1** | **Publicamos precios de todos los servicios** en la web y en el local.                                                                                                                                                                                                                                                                                                                                                      | Ley 11/1998 CM art. 14.2 (norma autonómica aplicable en Las Rozas)              | Verificado                                                     |
+| **D2** | **Todos los precios se muestran con IVA incluido**, como precio final completo. Nada de "+ IVA" ni "IVA no incluido".                                                                                                                                                                                                                                                                                                       | TRLGDCU art. 20.1.c); Ley 11/1998 CM art. 14.2; LSSI art. 10.1.f)               | Verificado                                                     |
+| **D3** | **NO invocamos el RD 3423/2000** como base legal de la web. Regula _productos_, no servicios, y excluye expresamente los productos suministrados con ocasión de una prestación de servicios. Solo entra en juego si el salón **vende producto físico** (esmaltes, cosmética) — ahí sí aplica en pleno.                                                                                                                      | RD 3423/2000 arts. 1.1 y 1.2                                                    | Verificado                                                     |
+| **D4** | **La regla del "precio anterior más bajo de los últimos 30 días" (art. 6 bis DIP) NO obliga jurídicamente a nuestros servicios.** La Comisión Europea lo dice de forma literal y expresa: la Directiva "no se aplica a los servicios".                                                                                                                                                                                      | Directrices de la Comisión 2021/C 526/02, §1.1; Directiva 98/6/CE arts. 1 y 3.2 | Verificado                                                     |
+| **D5** | **Aun así, la aplicamos voluntariamente como puerto seguro.** Un "antes 35 €" que nunca se cobró realmente es un **acto de engaño** sobre "el precio o su modo de fijación, o la existencia de una ventaja específica con respecto al precio" — y eso **sí** aplica a servicios y sí es sancionable. La regla de 30 días es el estándar de prueba más defendible y ya es el estándar mental del consumidor y del inspector. | Ley 3/1991 art. 5.1.e); TRLGDCU arts. 19 y 20                                   | Verificado (norma) + Inferencia (idoneidad como puerto seguro) |
+| **D6** | Si mostramos **reseñas/testimonios** en la web, deben ser de clientes reales y verificables, con información sobre el método de verificación.                                                                                                                                                                                                                                                                               | TRLGDCU art. 20.4, redacción dada por Ley 10/2025                               | Verificado                                                     |
 
 **Por qué D5 importa más que D4:** la respuesta puramente formal ("6 bis no aplica a
 servicios, luego podemos poner el 'antes' que queramos") es **falsa y peligrosa**. Lo
-que decae es la regla *tasada* de los 30 días; lo que **no** decae es la prohibición
+que decae es la regla _tasada_ de los 30 días; lo que **no** decae es la prohibición
 general de engañar sobre el precio. La consecuencia práctica es que, sin la regla de
 los 30 días, no tenemos un criterio seguro que nos proteja — así que adoptarla
 voluntariamente nos **mejora** la posición probatoria, no nos la empeora.
@@ -67,7 +67,7 @@ Este es el hallazgo que reorienta toda la pregunta.
 
 > "productos suministrados con ocasión de una **prestación de servicios**"
 
-*Fuente:* [BOE-A-2000-24118, texto consolidado](https://www.boe.es/buscar/act.php?id=BOE-A-2000-24118)
+_Fuente:_ [BOE-A-2000-24118, texto consolidado](https://www.boe.es/buscar/act.php?id=BOE-A-2000-24118)
 
 **Consecuencia:** una manicura, una extensión de pestañas o un esmaltado semipermanente
 son **prestaciones de servicios**, no productos. El RD 3423/2000 **no es la base legal**
@@ -105,7 +105,7 @@ Y sobre el contenido de esa información de precio:
 > o incrementos eventuales correspondientes a operaciones complementarias o
 > especiales."
 
-*Fuente:* [BOE-A-1998-20651, texto consolidado](https://boe.es/buscar/act.php?id=BOE-A-1998-20651)
+_Fuente:_ [BOE-A-1998-20651, texto consolidado](https://boe.es/buscar/act.php?id=BOE-A-1998-20651)
 (la ley consta como vigente; última actualización reflejada, 26/12/2024).
 
 **Lectura para la web:** el art. 14.2 impone dos cosas distintas:
@@ -117,7 +117,7 @@ Y sobre el contenido de esa información de precio:
    **ofertas concretas** de servicios [...] deben incorporar el precio".
 
 **Matiz importante (inferencia, no hecho):** el art. 14.2 exige el precio en las
-*ofertas concretas*. Es defendible que una web puramente descriptiva ("hacemos
+_ofertas concretas_. Es defendible que una web puramente descriptiva ("hacemos
 manicura") sin oferta concreta no active literalmente la obligación. **Pero** en cuanto
 la web presente un servicio como oferta concreta contratable — y más aún si hay reserva
 online — el precio es obligatorio. Dado que el objetivo del proyecto es captar reservas,
@@ -136,7 +136,7 @@ servicios ofertados**.
 > disponibilidad/anuncio de hojas de reclamaciones son objeto de **inspección
 > municipal**."
 
-*Fuente:* [Comunidad de Madrid — "Peluquerías y centros de belleza: sus derechos como consumidor"](https://www.comunidad.madrid/servicios/consumo/peluquerias-centros-belleza-derechos-consumidor)
+_Fuente:_ [Comunidad de Madrid — "Peluquerías y centros de belleza: sus derechos como consumidor"](https://www.comunidad.madrid/servicios/consumo/peluquerias-centros-belleza-derechos-consumidor)
 
 Esta página **no cita el número de norma**, por lo que la usamos como confirmación
 del criterio administrativo, no como base legal. La base legal es la Ley 11/1998 art. 14.2.
@@ -160,9 +160,9 @@ El art. 20.2 añade la exigencia de forma:
 > "en términos claros, comprensibles, veraces y en un formato que garantice su
 > accesibilidad"
 
-*Fuente:* [BOE-A-2007-20555, texto consolidado](https://www.boe.es/buscar/act.php?id=BOE-A-2007-20555)
+_Fuente:_ [BOE-A-2007-20555, texto consolidado](https://www.boe.es/buscar/act.php?id=BOE-A-2007-20555)
 
-*Modificaciones relevantes del art. 20 verificadas en las notas del BOE:* Real
+_Modificaciones relevantes del art. 20 verificadas en las notas del BOE:_ Real
 Decreto-ley 24/2021 (art. 82.2, en vigor 28/05/2022), Ley 4/2022, y **Ley 10/2025**
 (apartados 1.c y 4). Sobre la Ley 10/2025, ver §2.6.
 
@@ -174,12 +174,12 @@ afecte" (ya citado en §2.2).
 > "información clara y exacta sobre el precio del producto o servicio, indicando **si
 > incluye o no los impuestos aplicables**"
 
-*Fuente:* [Ley 34/2002, BOE-A-2002-13758](https://www.boe.es/buscar/act.php?id=BOE-A-2002-13758)
+_Fuente:_ [Ley 34/2002, BOE-A-2002-13758](https://www.boe.es/buscar/act.php?id=BOE-A-2002-13758)
 
-**Matiz técnico:** el art. 10.1.f) LSSI, aisladamente, exige *indicar si incluye o no*
+**Matiz técnico:** el art. 10.1.f) LSSI, aisladamente, exige _indicar si incluye o no_
 los impuestos — literalmente permitiría precios sin IVA si se advierte. **Pero** el
 TRLGDCU art. 20.1.c) es más exigente para ofertas a consumidores (precio final
-*completo, incluidos los impuestos*), y prevalece en B2C. **Conclusión: IVA incluido,
+_completo, incluidos los impuestos_), y prevalece en B2C. **Conclusión: IVA incluido,
 sin excepción**, y la web debe decirlo explícitamente ("Precios con IVA incluido").
 
 **Tipo de IVA aplicable:** el tipo general del IVA es del 21 % (Ley 37/1992 art. 90.Uno)
@@ -205,7 +205,7 @@ aplicable desde el **28/05/2022**):
 Los apartados 3, 4 y 5 contienen opciones para los Estados miembros (productos
 perecederos; productos con menos de 30 días en el mercado; reducciones progresivas).
 
-*Fuente:* [Directiva 98/6/CE, texto consolidado a 28/05/2022, EUR-Lex CELEX 01998L0006-20220528](https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX%3A01998L0006-20220528)
+_Fuente:_ [Directiva 98/6/CE, texto consolidado a 28/05/2022, EUR-Lex CELEX 01998L0006-20220528](https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX%3A01998L0006-20220528)
 
 **El ámbito de la Directiva excluye los servicios.** Art. 1:
 
@@ -216,7 +216,7 @@ perecederos; productos con menos de 30 días en el mercado; reducciones progresi
 Y el art. 3.2 excluye "los productos suministrados con ocasión de una prestación de
 servicios".
 
-*Fuente:* [Directiva 98/6/CE, EUR-Lex CELEX 31998L0006](https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:31998L0006)
+_Fuente:_ [Directiva 98/6/CE, EUR-Lex CELEX 31998L0006](https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:31998L0006)
 
 **La Comisión Europea lo confirma de forma expresa y literal** — esta es la cita
 decisiva del informe:
@@ -228,7 +228,7 @@ decisiva del informe:
 > "Por lo tanto, la DIP, **incluido su artículo 6 bis, no se aplica a los servicios**
 > (incluidos los servicios digitales) ni a los contenidos digitales."
 
-*Fuente:* [Comunicación de la Comisión — Directrices sobre la interpretación y la aplicación del artículo 6 bis de la Directiva 98/6/CE, 2021/C 526/02, EUR-Lex CELEX 52021XC1229(06)](https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:52021XC1229(06))
+_Fuente:_ [Comunicación de la Comisión — Directrices sobre la interpretación y la aplicación del artículo 6 bis de la Directiva 98/6/CE, 2021/C 526/02, EUR-Lex CELEX 52021XC1229(06)](<https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:52021XC1229(06)>)
 
 **Las transposiciones españolas también se limitan a productos**, lo que cierra el
 círculo:
@@ -247,7 +247,7 @@ círculo:
   El ámbito de la LOCM (art. 1.2) es el comercio minorista: "ofertar la venta de
   cualquier clase de **artículos**" a destinatarios finales. **No cubre servicios.**
 
-  *Fuente:* [Ley 7/1996, BOE-A-1996-1072, texto consolidado](https://www.boe.es/buscar/act.php?id=BOE-A-1996-1072)
+  _Fuente:_ [Ley 7/1996, BOE-A-1996-1072, texto consolidado](https://www.boe.es/buscar/act.php?id=BOE-A-1996-1072)
 
 - **Ley 11/1998 CM art. 14.4** — igualmente limitado a productos:
 
@@ -255,7 +255,7 @@ círculo:
   > tanto en cada uno de ellos como en los lugares de exhibición, el precio anterior
   > aplicado y el rebajado."
 
-  *Fuente:* [BOE-A-1998-20651](https://boe.es/buscar/act.php?id=BOE-A-1998-20651)
+  _Fuente:_ [BOE-A-1998-20651](https://boe.es/buscar/act.php?id=BOE-A-1998-20651)
 
 **Conclusión verificada:** ni la norma UE, ni la LOCM, ni la ley madrileña imponen la
 regla de los 30 días a los **servicios**. Para una manicura, **no existe obligación
@@ -283,7 +283,7 @@ El **art. 7** añade las omisiones engañosas:
 > destinatario adopte o pueda adoptar una decisión relativa a su comportamiento
 > económico con el debido conocimiento de causa."
 
-*Fuente:* [Ley 3/1991, BOE-A-1991-628, texto consolidado](https://www.boe.es/buscar/act.php?id=BOE-A-1991-628)
+_Fuente:_ [Ley 3/1991, BOE-A-1991-628, texto consolidado](https://www.boe.es/buscar/act.php?id=BOE-A-1991-628)
 (art. 5 modificado por Ley 29/2009 y por RDL 24/2021).
 
 **Cómo encaja con el TRLGDCU:** el art. 19 TRLGDCU somete a este régimen las prácticas
@@ -312,7 +312,7 @@ piñas anunciados con reducción. El Tribunal declaró que el art. 6 bis, aparta
 > como el precio más reducido aplicado durante los treinta días inmediatamente
 > anteriores."
 
-*Fuente:* [EUR-Lex CELEX 62023CJ0330](https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=celex%3A62023CJ0330)
+_Fuente:_ [EUR-Lex CELEX 62023CJ0330](https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=celex%3A62023CJ0330)
 
 **Advertencia de alcance:** C-330/23 versa sobre **bienes**. **No** extiende el art. 6
 bis a los servicios. Lo cito porque muestra que el TJUE interpreta la regla de forma
@@ -360,7 +360,7 @@ se regulan los servicios de atención a la clientela** (BOE 27/12/2025, en vigor
   utilizado el bien o servicio, e informar del **método de verificación** empleado y del
   procesamiento de las reseñas.
 
-*Fuentes:* [Ley 10/2025, BOE-A-2025-26698](https://www.boe.es/buscar/act.php?id=BOE-A-2025-26698) ·
+_Fuentes:_ [Ley 10/2025, BOE-A-2025-26698](https://www.boe.es/buscar/act.php?id=BOE-A-2025-26698) ·
 [TRLGDCU consolidado, notas de modificación del art. 20](https://www.boe.es/buscar/act.php?id=BOE-A-2007-20555)
 
 **Impacto directo:** si la web lleva testimonios de clientas, **no pueden ser inventados
@@ -390,18 +390,18 @@ IVA es **objeto de inspección municipal** en campañas específicas sobre peluq
 
 ## 3. Lo que NO he podido verificar
 
-| # | Afirmación / dato | Por qué no está verificado | Qué haría falta |
-|---|---|---|---|
-| 1 | **Tipo de IVA aplicable a manicura/pestañas (¿21 %?)** | El PDF oficial AEAT "Tipos impositivos en el IVA 2026" no se pudo parsear (binario); la consulta DGT V3504-13 devolvió solo el buscador, no el documento. Solo tengo fuentes secundarias (blogs fiscales), **descartadas por regla del proyecto**. | Descargar el PDF de AEAT y leerlo manualmente, o consultar el buscador DGT (petete.tributos.hacienda.gob.es) por nº de consulta. **Confirmar con la gestoría del salón.** No bloquea la web: el requisito es "precio final con impuestos", no un tipo concreto. |
-| 2 | **Cuantías vigentes de las sanciones (Ley 11/1998 art. 53)** | Lecturas contradictorias del consolidado (pesetas vs. euros actualizados). | Leer el PDF consolidado de BOE-A-1998-20651 íntegro y sus disposiciones de actualización; verificar interacción con arts. 47-51 TRLGDCU tras RDL 24/2021 / Ley 4/2022. |
-| 3 | **Texto literal íntegro del TRLGDCU art. 20.1.c) en su redacción vigente** (tras Ley 10/2025) | Obtuve una paráfrasis fiel y las notas de modificación, no la transcripción literal completa del apartado c) vigente. | Leer el art. 20 en el consolidado BOE con el selector de fecha en 2026. |
-| 4 | **TRLGDCU art. 60** (información precontractual) en lo relativo al precio | Los dos intentos de fetch se truncaron antes de llegar al Libro Segundo. | Leer directamente `https://www.boe.es/buscar/act.php?id=BOE-A-2007-20555#a60`. Relevante si hay **reserva/contratación online**. |
-| 5 | **Estado del RDL 4/2026** (aparece en las notas de modificación del art. 20 TRLGDCU y una lectura sugiere que fue "dejado sin efecto") | No verificado si fue convalidado, derogado o está vigente. | Consultar BOE-A-2026-3084 y su acuerdo de convalidación. Probablemente irrelevante (versa sobre accesibilidad a bienes y servicios en emergencias). |
-| 6 | **¿El salón vende PRODUCTO físico** (esmaltes, cosmética, kits) además de servicios? | `project-spec.md` es la **plantilla en blanco**, sin datos de negocio. No hay ninguna fuente en el repo. | Preguntar al cliente. **Determina si aplica el RD 3423/2000 y la LOCM art. 20 en pleno** — cambia el alcance legal de forma sustancial. |
-| 7 | **Precios y promociones reales del salón** (¿existe realmente un "29 € antes 35 €"?) | Dato de negocio; no hay fuente. El ejemplo del enunciado es hipotético. | Pedir al cliente la tarifa real y el **histórico de precios con fechas** (imprescindible para justificar cualquier "antes"). |
-| 8 | **¿Existe ordenanza municipal de Las Rozas** con requisitos adicionales de exhibición de precios? | Solo verifiqué normativa estatal, autonómica (CM) y encontré referencias a ordenanzas del **Ayuntamiento de Madrid** — que **NO** aplican en Las Rozas (municipio distinto). | Consultar la sede electrónica del Ayuntamiento de Las Rozas de Madrid y el BOCM. |
-| 9 | **Norma que obliga a las hojas de reclamaciones** en la CM y su cartel anunciador | La página de comunidad.madrid lo afirma pero no cita norma. | Localizar el decreto autonómico de hojas de reclamaciones de la CM. Afecta al contenido del aviso legal / página de contacto. |
-| 10 | **¿Aplica el art. 14.2 Ley 11/1998 a la web** o solo a la cartelería del establecimiento? | El precepto habla de "ofertas concretas [...] a través de soportes publicitarios y/o informativos" — mi lectura de que la web queda incluida es **inferencia**, no doctrina verificada. | Criterio de la Dirección General de Consumo de la CM, o revisión por abogado/a de consumo. **No cambia D1**: publicamos precios igualmente. |
+| #   | Afirmación / dato                                                                                                                      | Por qué no está verificado                                                                                                                                                                                                                         | Qué haría falta                                                                                                                                                                                                                                                 |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Tipo de IVA aplicable a manicura/pestañas (¿21 %?)**                                                                                 | El PDF oficial AEAT "Tipos impositivos en el IVA 2026" no se pudo parsear (binario); la consulta DGT V3504-13 devolvió solo el buscador, no el documento. Solo tengo fuentes secundarias (blogs fiscales), **descartadas por regla del proyecto**. | Descargar el PDF de AEAT y leerlo manualmente, o consultar el buscador DGT (petete.tributos.hacienda.gob.es) por nº de consulta. **Confirmar con la gestoría del salón.** No bloquea la web: el requisito es "precio final con impuestos", no un tipo concreto. |
+| 2   | **Cuantías vigentes de las sanciones (Ley 11/1998 art. 53)**                                                                           | Lecturas contradictorias del consolidado (pesetas vs. euros actualizados).                                                                                                                                                                         | Leer el PDF consolidado de BOE-A-1998-20651 íntegro y sus disposiciones de actualización; verificar interacción con arts. 47-51 TRLGDCU tras RDL 24/2021 / Ley 4/2022.                                                                                          |
+| 3   | **Texto literal íntegro del TRLGDCU art. 20.1.c) en su redacción vigente** (tras Ley 10/2025)                                          | Obtuve una paráfrasis fiel y las notas de modificación, no la transcripción literal completa del apartado c) vigente.                                                                                                                              | Leer el art. 20 en el consolidado BOE con el selector de fecha en 2026.                                                                                                                                                                                         |
+| 4   | **TRLGDCU art. 60** (información precontractual) en lo relativo al precio                                                              | Los dos intentos de fetch se truncaron antes de llegar al Libro Segundo.                                                                                                                                                                           | Leer directamente `https://www.boe.es/buscar/act.php?id=BOE-A-2007-20555#a60`. Relevante si hay **reserva/contratación online**.                                                                                                                                |
+| 5   | **Estado del RDL 4/2026** (aparece en las notas de modificación del art. 20 TRLGDCU y una lectura sugiere que fue "dejado sin efecto") | No verificado si fue convalidado, derogado o está vigente.                                                                                                                                                                                         | Consultar BOE-A-2026-3084 y su acuerdo de convalidación. Probablemente irrelevante (versa sobre accesibilidad a bienes y servicios en emergencias).                                                                                                             |
+| 6   | **¿El salón vende PRODUCTO físico** (esmaltes, cosmética, kits) además de servicios?                                                   | `project-spec.md` es la **plantilla en blanco**, sin datos de negocio. No hay ninguna fuente en el repo.                                                                                                                                           | Preguntar al cliente. **Determina si aplica el RD 3423/2000 y la LOCM art. 20 en pleno** — cambia el alcance legal de forma sustancial.                                                                                                                         |
+| 7   | **Precios y promociones reales del salón** (¿existe realmente un "29 € antes 35 €"?)                                                   | Dato de negocio; no hay fuente. El ejemplo del enunciado es hipotético.                                                                                                                                                                            | Pedir al cliente la tarifa real y el **histórico de precios con fechas** (imprescindible para justificar cualquier "antes").                                                                                                                                    |
+| 8   | **¿Existe ordenanza municipal de Las Rozas** con requisitos adicionales de exhibición de precios?                                      | Solo verifiqué normativa estatal, autonómica (CM) y encontré referencias a ordenanzas del **Ayuntamiento de Madrid** — que **NO** aplican en Las Rozas (municipio distinto).                                                                       | Consultar la sede electrónica del Ayuntamiento de Las Rozas de Madrid y el BOCM.                                                                                                                                                                                |
+| 9   | **Norma que obliga a las hojas de reclamaciones** en la CM y su cartel anunciador                                                      | La página de comunidad.madrid lo afirma pero no cita norma.                                                                                                                                                                                        | Localizar el decreto autonómico de hojas de reclamaciones de la CM. Afecta al contenido del aviso legal / página de contacto.                                                                                                                                   |
+| 10  | **¿Aplica el art. 14.2 Ley 11/1998 a la web** o solo a la cartelería del establecimiento?                                              | El precepto habla de "ofertas concretas [...] a través de soportes publicitarios y/o informativos" — mi lectura de que la web queda incluida es **inferencia**, no doctrina verificada.                                                            | Criterio de la Dirección General de Consumo de la CM, o revisión por abogado/a de consumo. **No cambia D1**: publicamos precios igualmente.                                                                                                                     |
 
 ---
 
@@ -409,18 +409,18 @@ IVA es **objeto de inspección municipal** en campañas específicas sobre peluq
 
 ### 4.1 Lo que EXIGE (requisitos duros para la web)
 
-| ID | Requisito | Fuente |
-|----|-----------|--------|
-| **R1** | Cada servicio ofertado en la web muestra **precio**. | Ley 11/1998 CM art. 14.2 |
-| **R2** | Los precios son **precio final completo con IVA incluido**. Prohibido "+ IVA". | TRLGDCU art. 20.1.c) |
-| **R3** | Leyenda visible **"Precios con IVA incluido"** en la sección de tarifas. | LSSI art. 10.1.f) (obliga a indicar si incluye o no impuestos) |
-| **R4** | Información de precio **clara, comprensible, veraz y accesible**. Enlaza con requisitos de a11y. | TRLGDCU art. 20.2 |
-| **R5** | Si un servicio tiene **suplementos** (largo extra, retirada de esmaltado, diseños, refuerzos), se informan **junto al precio base**, no en letra pequeña ni solo en el salón. | Ley 11/1998 art. 14.2 ("suplementos o incrementos eventuales correspondientes a operaciones complementarias o especiales"); Ley 3/1991 art. 7 (omisiones engañosas) |
-| **R6** | Si el precio no puede fijarse de antemano (ej. "desde X €"), informar de la **base de cálculo**. Un "desde" debe corresponder a un servicio realmente disponible a ese precio. | TRLGDCU art. 20.1.c) |
-| **R7** | Todo "**antes X €**" debe ser cierto y **documentado** con histórico de fechas. Regla adoptada: precio más bajo realmente aplicado en los **30 días** previos. | Ley 3/1991 art. 5.1.e) (norma) + decisión D5 (puerto seguro voluntario) |
-| **R8** | Las **reseñas/testimonios** son de clientes reales; se informa del **método de verificación**. | TRLGDCU art. 20.4 (red. Ley 10/2025) |
-| **R9** | Ofertas promocionales **claramente identificables como tales**, con condiciones de acceso "fáciles de acceder" y expresadas "de forma clara e inequívoca". | LSSI art. 20.2 |
-| **R10** | Si se venden **productos físicos**: aplica RD 3423/2000 (precio de venta y, cuando proceda, precio por unidad de medida) y LOCM art. 20 (regla de 30 días **obligatoria**). **Condicionado a verificación #6.** | RD 3423/2000 arts. 3.1 y 3.5; LOCM art. 20 |
+| ID      | Requisito                                                                                                                                                                                                       | Fuente                                                                                                                                                              |
+| ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **R1**  | Cada servicio ofertado en la web muestra **precio**.                                                                                                                                                            | Ley 11/1998 CM art. 14.2                                                                                                                                            |
+| **R2**  | Los precios son **precio final completo con IVA incluido**. Prohibido "+ IVA".                                                                                                                                  | TRLGDCU art. 20.1.c)                                                                                                                                                |
+| **R3**  | Leyenda visible **"Precios con IVA incluido"** en la sección de tarifas.                                                                                                                                        | LSSI art. 10.1.f) (obliga a indicar si incluye o no impuestos)                                                                                                      |
+| **R4**  | Información de precio **clara, comprensible, veraz y accesible**. Enlaza con requisitos de a11y.                                                                                                                | TRLGDCU art. 20.2                                                                                                                                                   |
+| **R5**  | Si un servicio tiene **suplementos** (largo extra, retirada de esmaltado, diseños, refuerzos), se informan **junto al precio base**, no en letra pequeña ni solo en el salón.                                   | Ley 11/1998 art. 14.2 ("suplementos o incrementos eventuales correspondientes a operaciones complementarias o especiales"); Ley 3/1991 art. 7 (omisiones engañosas) |
+| **R6**  | Si el precio no puede fijarse de antemano (ej. "desde X €"), informar de la **base de cálculo**. Un "desde" debe corresponder a un servicio realmente disponible a ese precio.                                  | TRLGDCU art. 20.1.c)                                                                                                                                                |
+| **R7**  | Todo "**antes X €**" debe ser cierto y **documentado** con histórico de fechas. Regla adoptada: precio más bajo realmente aplicado en los **30 días** previos.                                                  | Ley 3/1991 art. 5.1.e) (norma) + decisión D5 (puerto seguro voluntario)                                                                                             |
+| **R8**  | Las **reseñas/testimonios** son de clientes reales; se informa del **método de verificación**.                                                                                                                  | TRLGDCU art. 20.4 (red. Ley 10/2025)                                                                                                                                |
+| **R9**  | Ofertas promocionales **claramente identificables como tales**, con condiciones de acceso "fáciles de acceder" y expresadas "de forma clara e inequívoca".                                                      | LSSI art. 20.2                                                                                                                                                      |
+| **R10** | Si se venden **productos físicos**: aplica RD 3423/2000 (precio de venta y, cuando proceda, precio por unidad de medida) y LOCM art. 20 (regla de 30 días **obligatoria**). **Condicionado a verificación #6.** | RD 3423/2000 arts. 3.1 y 3.5; LOCM art. 20                                                                                                                          |
 
 ### 4.2 Lo que PROHÍBE
 
@@ -436,13 +436,13 @@ IVA es **objeto de inspección municipal** en campañas específicas sobre peluq
 
 ### 4.3 Features / tareas que implica
 
-| Feature | Descripción | Prioridad |
-|---|---|---|
-| `precios_servicios` | Modelo de datos de servicio con `precio_con_iva` (**no** `precio_base`+IVA calculado en vista: el precio final es el dato canónico), `suplementos[]`, `precio_desde: bool`. Render obligatorio del precio. | Alta |
-| `leyenda_iva` | Componente/leyenda "Precios con IVA incluido" en tarifas. | Alta |
-| `descuentos_con_historico` | Si se implementa "antes/ahora": campo `precio_anterior` **derivado** de un histórico con fechas, no escrito a mano. Sin histórico ≥30 días, la UI **no** renderiza el "antes". Invariante testeable. | Media (solo si hay promos) |
-| `testimonios_verificados` | Testimonios reales + nota de método de verificación. | Media |
-| `aviso_legal` | Debe citar la base legal **correcta**: Ley 11/1998 CM art. 14.2, TRLGDCU art. 20, LSSI art. 10 — **no** el RD 3423/2000 (no aplica a servicios). Incluir datos identificativos del art. 10 LSSI. | Alta |
+| Feature                    | Descripción                                                                                                                                                                                                | Prioridad                  |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| `precios_servicios`        | Modelo de datos de servicio con `precio_con_iva` (**no** `precio_base`+IVA calculado en vista: el precio final es el dato canónico), `suplementos[]`, `precio_desde: bool`. Render obligatorio del precio. | Alta                       |
+| `leyenda_iva`              | Componente/leyenda "Precios con IVA incluido" en tarifas.                                                                                                                                                  | Alta                       |
+| `descuentos_con_historico` | Si se implementa "antes/ahora": campo `precio_anterior` **derivado** de un histórico con fechas, no escrito a mano. Sin histórico ≥30 días, la UI **no** renderiza el "antes". Invariante testeable.       | Media (solo si hay promos) |
+| `testimonios_verificados`  | Testimonios reales + nota de método de verificación.                                                                                                                                                       | Media                      |
+| `aviso_legal`              | Debe citar la base legal **correcta**: Ley 11/1998 CM art. 14.2, TRLGDCU art. 20, LSSI art. 10 — **no** el RD 3423/2000 (no aplica a servicios). Incluir datos identificativos del art. 10 LSSI.           | Alta                       |
 
 ### 4.4 Recomendación de diseño (inferencia)
 
@@ -478,6 +478,7 @@ convierte D5 en un invariante verificable por test en lugar de una promesa.
 ## Fuentes consultadas
 
 **Normativa española (BOE, textos consolidados)**
+
 - [RD 3423/2000, indicación de precios de los productos — BOE-A-2000-24118](https://www.boe.es/buscar/act.php?id=BOE-A-2000-24118)
 - [Ley 11/1998, Protección de los Consumidores de la Comunidad de Madrid — BOE-A-1998-20651](https://boe.es/buscar/act.php?id=BOE-A-1998-20651)
 - [RDL 1/2007, TRLGDCU — BOE-A-2007-20555](https://www.boe.es/buscar/act.php?id=BOE-A-2007-20555)
@@ -488,13 +489,16 @@ convierte D5 en un invariante verificable por test en lugar de una promesa.
 - [RDL 24/2021, transposición de directivas — BOE-A-2021-17910](https://www.boe.es/diario_boe/txt.php?id=BOE-A-2021-17910)
 
 **Normativa y doctrina UE (EUR-Lex)**
+
 - [Directiva 98/6/CE, texto original — CELEX 31998L0006](https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:31998L0006)
 - [Directiva 98/6/CE, consolidado a 28/05/2022 (con art. 6 bis) — CELEX 01998L0006-20220528](https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX%3A01998L0006-20220528)
-- [Directrices de la Comisión sobre el art. 6 bis, 2021/C 526/02 — CELEX 52021XC1229(06)](https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:52021XC1229(06))
+- [Directrices de la Comisión sobre el art. 6 bis, 2021/C 526/02 — CELEX 52021XC1229(06)](<https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:52021XC1229(06)>)
 - [STJUE C-330/23, Aldi Süd, 26/09/2024 — CELEX 62023CJ0330](https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=celex%3A62023CJ0330)
 
 **Administración autonómica**
+
 - [Comunidad de Madrid — Peluquerías y centros de belleza: sus derechos como consumidor](https://www.comunidad.madrid/servicios/consumo/peluquerias-centros-belleza-derechos-consumidor)
 
 **Repositorio**
+
 - `project-spec.md:1-29` — plantilla sin rellenar; sin datos de negocio disponibles.

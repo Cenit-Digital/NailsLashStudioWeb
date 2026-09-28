@@ -8,8 +8,8 @@
 > `.claude/…/subagents/workflows/wf_338f9d98-0f1/journal.jsonl` + `.experimentos-tmp/veredictos-f07/`.
 >
 > **Resultado: 0 refutadas de raíz, 6 MATIZADAS, 1 CONFIRMADA por vía adversarial (A1), 1 con un
-> punto NO_VERIFICABLE clave (A2).** El patrón de siempre: *la decisión de fondo es correcta; el
-> «cómo» del troceado tiene errores y confusiones.* Y esta feature estrena una **fase de
+> punto NO_VERIFICABLE clave (A2).** El patrón de siempre: _la decisión de fondo es correcta; el
+> «cómo» del troceado tiene errores y confusiones._ Y esta feature estrena una **fase de
 > verificación EN VIVO con Chrome** (el usuario aportó la extensión), porque el LCP y el clip-path
 > **no son verificables en fuente primaria de texto**.
 
@@ -17,27 +17,27 @@
 
 ## 0. Las bombas de F-07
 
-| # | Afirmación del troceado | Veredicto | Qué pasa |
-| --- | --- | --- | --- |
-| acc.6 | *«El hook de IntersectionObserver es SSR-safe…»* | **NO APLICA (A7)** | El hero es **above-the-fold**; el observer es el patrón B (scroll-reveal de F-08+). Es **herencia**. → **C-1** |
-| acc.5 | *«El elemento LCP … es legible en ≤1,2s»* + puerta_legal *«LCP ≤2,5s»* | **MEZCLA DOS COSAS (A2)** | ≤1,2s es la **duración de animación** que el audit recomienda; ≤2,5s es el **LCP** (norma). No es conflicto, pero **el LCP no es puerta unitaria** → [NV]/en-vivo. → **C-2** |
-| acc.1 | *«el estado base es el estado final visible»* | **CIERTO pero INSUFICIENTE (A3)** | Medido: el estado base visible **protege el reposo** (reduced-motion/sin-JS) pero **NO acorta el reveal**. Si el hero es el LCP, `both`+delay lo retrasa a **~5,3s**. → **C-3** (decisión de producto) |
-| acc.2 | *«reduced-motion … obligatorio»* | **CRITERIO DE PROYECTO, no WCAG A/AA (A4)** | Ningún SC de nivel A/AA obliga a respetar `prefers-reduced-motion` para animación de **carga**. → **C-4** |
+| #     | Afirmación del troceado                                                | Veredicto                                   | Qué pasa                                                                                                                                                                                               |
+| ----- | ---------------------------------------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| acc.6 | _«El hook de IntersectionObserver es SSR-safe…»_                       | **NO APLICA (A7)**                          | El hero es **above-the-fold**; el observer es el patrón B (scroll-reveal de F-08+). Es **herencia**. → **C-1**                                                                                         |
+| acc.5 | _«El elemento LCP … es legible en ≤1,2s»_ + puerta_legal _«LCP ≤2,5s»_ | **MEZCLA DOS COSAS (A2)**                   | ≤1,2s es la **duración de animación** que el audit recomienda; ≤2,5s es el **LCP** (norma). No es conflicto, pero **el LCP no es puerta unitaria** → [NV]/en-vivo. → **C-2**                           |
+| acc.1 | _«el estado base es el estado final visible»_                          | **CIERTO pero INSUFICIENTE (A3)**           | Medido: el estado base visible **protege el reposo** (reduced-motion/sin-JS) pero **NO acorta el reveal**. Si el hero es el LCP, `both`+delay lo retrasa a **~5,3s**. → **C-3** (decisión de producto) |
+| acc.2 | _«reduced-motion … obligatorio»_                                       | **CRITERIO DE PROYECTO, no WCAG A/AA (A4)** | Ningún SC de nivel A/AA obliga a respetar `prefers-reduced-motion` para animación de **carga**. → **C-4**                                                                                              |
 
 ---
 
 ## 1. A1 — SC 2.2.2 · **el `bob infinite` lo incumple LIMPIAMENTE (nivel A)**
 
 > El verificador devolvió **basura de relleno** (`«test»`/`«a»`/`«b»`) — el mismo patrón que F-05
-> cazó. Su **refutador lo destapó** (*«verificación vacía/fabricada»*) y **rehízo la verificación
+> cazó. Su **refutador lo destapó** (_«verificación vacía/fabricada»_) y **rehízo la verificación
 > bien**. La conclusión y la cita de abajo son del refutador, contra fuente primaria.
 
 **SC 2.2.2 Pause, Stop, Hide, nivel A** [V: w3.org/TR/WCAG22/], bullet «Moving, blinking, scrolling»:
 
-> *«For any moving, blinking or scrolling information that (1) starts automatically, (2) lasts more
+> _«For any moving, blinking or scrolling information that (1) starts automatically, (2) lasts more
 > than five seconds, and (3) is presented in parallel with other content, there is a mechanism for
 > the user to pause, stop, or hide it unless the movement … is part of an activity where it is
-> essential.»*
+> essential.»_
 
 El `bob 2.4s ease-in-out infinite` del indicador «desliza»: (1) arranca automático en la carga,
 (2) **`infinite` → dura > 5s**, (3) en paralelo con el resto del hero; no es esencial y no tiene
@@ -46,7 +46,7 @@ suficiente): **quitar `infinite`** (`animation-iteration-count` finito). El `<bu
 prototipo es control de **repetición**, NO de parada.
 
 🔴 **El `paintReveal` (4,8s < 5s) NO dispara 2.2.2** [V]. Solo el `bob` infinito. Y **corregido de
-higiene**: `docs/research/audit-a11y.md:386` dice *«para cumplir SC 2.2.2 en AA»* — **2.2.2 es
+higiene**: `docs/research/audit-a11y.md:386` dice _«para cumplir SC 2.2.2 en AA»_ — **2.2.2 es
 nivel A**, no AA (error de nivel en ese doc, no en el troceado).
 
 ---
@@ -61,16 +61,16 @@ degradado (no `url()`) **no es elegible**.
 
 ¿Un texto recortado por `clip-path:inset(0 100% 0 0)` (invisible pero `opacity:1`) se excluye del
 LCP **como el `opacity:0`**? **web.dev solo documenta `opacity:0`.** Y la spec de **Element Timing /
-Largest Contentful Paint del W3C mide el texto por su *border box ∩ viewport*** — que **NO cambia
+Largest Contentful Paint del W3C mide el texto por su _border box ∩ viewport_** — que **NO cambia
 con `clip-path`**. Es decir: **la LETRA de la spec más bien REFUTA la equivalencia** (el clip-path
-no reduciría el área que el LCP cuenta). Chromium *podría* anular el área vía el clip del property
+no reduciría el área que el LCP cuenta). Chromium _podría_ anular el área vía el clip del property
 tree, pero **depende de si la animación está compositada y del timing → solo medible en Chrome
 real**. → **NO_VERIFICABLE en fuente primaria; se mide EN VIVO con Chrome.**
 
 ### 🔴 El LCP NO es una puerta de build unitaria
 
-Vitest+jsdom no tiene layout ni paint. El audit (§3.6) ya lo dice: *«un build desplegado +
-Lighthouse + CrUX»*. **Lo testeable con un test unitario (leyendo el CSS/HTML):** que el estado base
+Vitest+jsdom no tiene layout ni paint. El audit (§3.6) ya lo dice: _«un build desplegado +
+Lighthouse + CrUX»_. **Lo testeable con un test unitario (leyendo el CSS/HTML):** que el estado base
 del titular **no tenga `opacity:0` ni `clip-path` oculto** (CSS estático, como F-06 hizo con el
 scroll-padding), y que la **duración de la animación** esté acotada. **Lo [NV]/en-vivo:** el número
 LCP real. → **C-2.**
@@ -78,7 +78,7 @@ LCP real. → **C-2.**
 ### La discrepancia ≤1,2s vs ≤2,5s — resuelta
 
 `docs/research/audit-perf.md` §3.6: el **≤1,2s es la DURACIÓN de animación** que el audit
-recomienda (*«La animación debe recortarse a ≤1,2s»*), NO un umbral de LCP. El **≤2,5s es el LCP**.
+recomienda (_«La animación debe recortarse a ≤1,2s»_), NO un umbral de LCP. El **≤2,5s es el LCP**.
 **No es conflicto**: son dos cosas distintas, y el contrato debe separarlas.
 
 ---
@@ -90,17 +90,17 @@ recomienda (*«La animación debe recortarse a ≤1,2s»*), NO un umbral de LCP.
 
 - **El prototipo pinta el hero INVISIBLE al cargar, incluso SIN JS.** Causa exacta:
   `animation-fill-mode: both` incluye `backwards`, que **durante el `animation-delay` aplica el
-  keyframe inicial (oculto)** [V: CSS Animations L1, `backwards`: *«During the period defined by
+  keyframe inicial (oculto)** [V: CSS Animations L1, `backwards`: _«During the period defined by
   animation-delay, the animation will apply the property values defined in the keyframe that will
-  start the first iteration»*]. Medido: «Studio» `opacity:0` durante **4,4s**; «Nails Lash»
+  start the first iteration»_]. Medido: «Studio» `opacity:0` durante **4,4s**; «Nails Lash»
   `clip-path` recortado durante el delay. Y **con JS deshabilitado** el HTML estático ya pinta
   invisible (`getAnimations()==1`: los `@keyframes` corren sin JS).
 - **El prototipo NO tiene `@media (prefers-reduced-motion: reduce)`** → quien pide menos movimiento
   se traga los 4,8s + 4,4s.
 - **La forma correcta funciona, MEDIDO**: base visible explícita + oculto solo en el `0%` +
   `@media reduce{ animation:none }`. Bajo `reduce`: `getAnimations()==0` y el elemento computa su
-  base visible (`clip-path: inset(0px)`, `opacity: 1`) [V: `animation-name: none` → *«there will be
-  no animation … no effect … does not affect the computed value»*].
+  base visible (`clip-path: inset(0px)`, `opacity: 1`) [V: `animation-name: none` → _«there will be
+  no animation … no effect … does not affect the computed value»_].
 
 ### 🔴 LA TRAMPA MAYOR, MEDIDA: el estado base visible NO arregla el LCP
 
@@ -112,16 +112,41 @@ suficiente para un LCP bueno; hay que ACORTAR la animación.** → **C-3** (deci
 ### La forma EXACTA del CSS del hero (en un SCSS module, NO inline)
 
 ```scss
-.heroMarca {                         // el <h1>/marca (el LCP)
-  clip-path: inset(0 0 0 0);         // BASE = estado final VISIBLE
-  animation: paintReveal <DUR> cubic-bezier(.5,0,.25,1) <DELAY> both;
+.heroMarca {
+  // el <h1>/marca (el LCP)
+  clip-path: inset(0 0 0 0); // BASE = estado final VISIBLE
+  animation: paintReveal <DUR> cubic-bezier(0.5, 0, 0.25, 1) <DELAY> both;
 }
-@keyframes paintReveal { 0% { clip-path: inset(0 100% 0 0); } 100% { clip-path: inset(0 0 0 0); } }
+@keyframes paintReveal {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
 
-.heroStudio { opacity: 1; animation: fadeUp <DUR> <DELAY> both; }
-@keyframes fadeUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: none; } }
+.heroStudio {
+  opacity: 1;
+  animation: fadeUp <DUR> <DELAY> both;
+}
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
 
-@media (prefers-reduced-motion: reduce) { .heroMarca, .heroStudio { animation: none; } }  // OBLIGATORIO (falta en el proto)
+@media (prefers-reduced-motion: reduce) {
+  .heroMarca,
+  .heroStudio {
+    animation: none;
+  }
+} // OBLIGATORIO (falta en el proto)
 ```
 
 **Sin IntersectionObserver** (A7): el hero es above-the-fold; el observer dejaría el contenido
@@ -133,18 +158,19 @@ invisible sin JS. `<DUR>`/`<DELAY>` los fija **C-3**.
 
 Ningún SC de nivel A/AA obliga a respetar `prefers-reduced-motion` para la animación de **carga**
 del hero [V]:
-- **SC 2.2.2 (A)** solo aplica a movimiento que *«lasts more than five seconds»* → el `paintReveal`
-  (4,8s) **no lo dispara**; el único gancho A es el `bob` infinito (§1), y 2.2.2 pide *«un mecanismo
-  para pausar/parar/ocultar»*, **NO nombra `prefers-reduced-motion`** (es una forma de cumplirlo).
-- **SC 2.3.3 Animation from Interactions es AAA** y solo cubre animación *«triggered by
-  interaction»* (scroll/click), **NO la de carga** [V]. C39 (usar `prefers-reduced-motion`) es
-  técnica **suficiente** para 2.3.3, y *«Techniques are not required to meet WCAG»*.
+
+- **SC 2.2.2 (A)** solo aplica a movimiento que _«lasts more than five seconds»_ → el `paintReveal`
+  (4,8s) **no lo dispara**; el único gancho A es el `bob` infinito (§1), y 2.2.2 pide _«un mecanismo
+  para pausar/parar/ocultar»_, **NO nombra `prefers-reduced-motion`** (es una forma de cumplirlo).
+- **SC 2.3.3 Animation from Interactions es AAA** y solo cubre animación _«triggered by
+  interaction»_ (scroll/click), **NO la de carga** [V]. C39 (usar `prefers-reduced-motion`) es
+  técnica **suficiente** para 2.3.3, y _«Techniques are not required to meet WCAG»_.
 - **`prefers-reduced-motion` NO desactiva animaciones por sí solo** [V: Media Queries L5] — es solo
   un detector de la preferencia; **el AUTOR debe escribir la `@media`**. El prototipo no la tiene.
 
-> **Redacción para el contrato (C-4):** *«Por CRITERIO DE PROYECTO, bajo `@media
-> (prefers-reduced-motion: reduce)` el hero se presenta en su estado final visible y legible sin
-> movimiento residual.»* **PROHIBIDO** *«WCAG obliga»* o *«obligatorio»* a secas.
+> **Redacción para el contrato (C-4):** _«Por CRITERIO DE PROYECTO, bajo `@media
+(prefers-reduced-motion: reduce)` el hero se presenta en su estado final visible y legible sin
+> movimiento residual.»_ **PROHIBIDO** _«WCAG obliga»_ o _«obligatorio»_ a secas.
 
 ---
 
@@ -152,7 +178,7 @@ del hero [V]:
 
 **Un h1 con dos `<span>`** (reestilizando el `<h1>{NOMBRE}</h1>` de F-04; **no** añadir otro: la
 puerta de cascarón exige exactamente uno). El `<div>Studio</div>` del prototipo es **INVÁLIDO dentro
-de un h1** [V: HTML LS — h1 admite *«Phrasing content»*; `div` es *«Flow content»* sin phrasing] →
+de un h1** [V: HTML LS — h1 admite _«Phrasing content»_; `div` es _«Flow content»_ sin phrasing] →
 **`<span>`**.
 
 🔴 **El nombre accesible es «Nails Lash Studio» SOLO con un text node `{' '}` REAL entre los spans.**
@@ -167,8 +193,8 @@ alternativa limpia (estructurar `{marca, tipo}` en `site.ts`) tocaría F-02 (fue
 
 **El eyebrow** («Uñas · Pestañas · Cejas»): **no tiene fuente de datos hoy** — las categorías son
 **F-09 (pending)**; `site.ts` no las tiene. Va como **`<p>`, NUNCA un heading**. → **aplazar a F-09**
-(preferido) **o** reutilizar `RECLAMO` (`seo.ts:17` = *«Uñas, pestañas y cejas en Las Rozas de
-Madrid»*). **NUNCA hardcodear «Facial»** (no existe). → **C-7.**
+(preferido) **o** reutilizar `RECLAMO` (`seo.ts:17` = _«Uñas, pestañas y cejas en Las Rozas de
+Madrid»_). **NUNCA hardcodear «Facial»** (no existe). → **C-7.**
 
 Y **el hero como `h1+p` SIN `<section aria-labelledby>` NO activa la puerta de anclas de F-06**
 [V, medido con `seccionesNavegables`]: ni con un `id` suelto. **No envolver en `<section>`.**
@@ -177,7 +203,7 @@ Y **el hero como `h1+p` SIN `<section aria-labelledby>` NO activa la puerta de a
 
 ## 6. A6 — La «animación de pincel» · **es el `paintReveal` (CSS puro), NO el `brush.png`**
 
-🔴 **Desconflación clave** (que el propio brief del lead confundía): la *«animación de pincel»* del
+🔴 **Desconflación clave** (que el propio brief del lead confundía): la _«animación de pincel»_ del
 título de F-07 es el **`paintReveal`** (clip-path que revela el texto de izquierda a derecha como
 una pincelada) — **efecto SOLO-CSS, cero asset**. El **`brush.png`** es un adorno físico separado
 (`alt=""`, `pointer-events:none`) movido por **`brushSweep`**, que barre por encima.
@@ -201,8 +227,8 @@ viewport, F-08+). El hero es above-the-fold: **no hay nada que «entre en vista�
 un observer en el hero sería **producción sin motivo (Ley 1)**. → **C-1: retirar el acceptance 6.**
 
 **(b) `font-display: swap` DESBLOQUEA el LCP, no lo perjudica** [V: web.dev/articles/optimize-lcp:
-*«If you set a font-display value of anything other than auto or block, then text will always be
-visible during load, and LCP won't be blocked on an additional network request»*]. El titular se
+_«If you set a font-display value of anything other than auto or block, then text will always be
+visible during load, and LCP won't be blocked on an additional network request»_]. El titular se
 pinta **de inmediato en la fuente de fallback**; el LCP se cronometra ahí.
 
 🔴 **Pero el `dist` preloadea 12 fuentes** (Manrope 400/500/600/700 + Gilda 400 + Great Vibes 400,
@@ -223,8 +249,8 @@ font es **criterio de proyecto**, no puerta WCAG (1.4.8 es AAA).
 - **CASCARÓN (F-04):** `cuantosH1` cuenta etiquetas `<h1>` → spans dentro siguen siendo **1** h1
   [medido]. El `<Head>` (title/description/canónica/JSON-LD) intacto. 🔴 **Trampa: `cuantosH1` NO
   valida el anidamiento** — un `<div>` dentro del h1 pasa la puerta pero es HTML inválido (§5).
-- **CONTRASTE (F-03):** el par `--ink`/`--bg` **YA ESTÁ** en `MATRIZ_DE_USO` (línea 247, *«titular
-  sobre el fondo»*, ratio **7,06**). **NO hace falta fila nueva ni subir `MINIMO_DE_PARES`** si el
+- **CONTRASTE (F-03):** el par `--ink`/`--bg` **YA ESTÁ** en `MATRIZ_DE_USO` (línea 247, _«titular
+  sobre el fondo»_, ratio **7,06**). **NO hace falta fila nueva ni subir `MINIMO_DE_PARES`** si el
   titular usa `--ink`. 🔴 **PELIGRO: pintar el titular con `--accent`/`--brush` #C05576 como TEXTO da
   4,05 < 4,5 → puerta ROJA** [medido]. Usar `--ink`. Y **NO añadir rama de «texto grande 3:1»** para
   colar un rosa (reintroduce el mutante inmortal que F-03 evitó a propósito).
@@ -234,21 +260,21 @@ font es **criterio de proyecto**, no puerta WCAG (1.4.8 es AAA).
 - **PLACEHOLDERS (F-01):** el hero no hornea patrón ni binario (el brush se aplaza, §6). No toca.
 - **STRYKER/VITEST:** si F-07 crea `src/components/Hero.tsx`, **añadirlo a mano a `mutate` de
   `stryker.config.json`** (lista explícita; `vitest.config.ts` ya lo cubre por glob). Si es CSS puro
-  + JSX estático, **casi no da mutantes útiles** (los atributos JSX literales no se mutan); si hay
-  lógica (derivación de NOMBRE, guarda del split), esa sí se muta. El estado va en atributos
-  consultables, **nunca en className condicional** (lección MenuNavegación, F-06).
+  - JSX estático, **casi no da mutantes útiles** (los atributos JSX literales no se mutan); si hay
+    lógica (derivación de NOMBRE, guarda del split), esa sí se muta. El estado va en atributos
+    consultables, **nunca en className condicional** (lección MenuNavegación, F-06).
 
 ---
 
 ## 9. Las preguntas que van a la puerta humana
 
-| # | Qué | Por qué no lo decido yo |
-| --- | --- | --- |
-| **C-1** | El **acceptance 6 (IntersectionObserver) NO aplica** al hero (above-the-fold; es del patrón B de F-08+). **Propuesta: retirarlo.** | Cambia un criterio de aceptación. |
-| **C-2** | El acceptance del **LCP mezcla** ≤1,2s (duración animación, testeable) con LCP ≤2,5s (norma). **Propuesta: separarlos** — el CSS estático (base visible + duración) es puerta unitaria; el **LCP real es [NV]/verificación EN VIVO con Chrome**. | Cambia criterios y define qué es puerta vs en-vivo. |
+| #       | Qué                                                                                                                                                                                                                                                                                                   | Por qué no lo decido yo                                         |
+| ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| **C-1** | El **acceptance 6 (IntersectionObserver) NO aplica** al hero (above-the-fold; es del patrón B de F-08+). **Propuesta: retirarlo.**                                                                                                                                                                    | Cambia un criterio de aceptación.                               |
+| **C-2** | El acceptance del **LCP mezcla** ≤1,2s (duración animación, testeable) con LCP ≤2,5s (norma). **Propuesta: separarlos** — el CSS estático (base visible + duración) es puerta unitaria; el **LCP real es [NV]/verificación EN VIVO con Chrome**.                                                      | Cambia criterios y define qué es puerta vs en-vivo.             |
 | **C-3** | 🔴 **DECISIÓN DE PRODUCTO:** el estado base visible **no acorta el reveal**; con la animación del prototipo (delay 0,5s + 4,8s) el LCP del titular se retrasa a **~5,3s**. **¿Se ACORTA la animación (a ≤1,2s, como recomienda el audit, para un LCP bueno) o se mantiene el reveal largo de marca?** | Es un trade-off de producto: animación de marca vs rendimiento. |
-| **C-5** | El indicador **«desliza» (`bob infinite`)** incumple SC 2.2.2 (A). **Propuesta: si F-07 lo hornea, sin `infinite` (iteración finita); o aplazarlo a F-08** (depende de que haya scroll). | Alcance + decisión de a11y. |
-| **C-7** | El **eyebrow** no tiene fuente de datos hoy (categorías = F-09). **Propuesta: aplazar el contenido a F-09** y dejar en F-07 solo la estructura (`<p>`), o reutilizar `RECLAMO`. | Alcance/producto. |
+| **C-5** | El indicador **«desliza» (`bob infinite`)** incumple SC 2.2.2 (A). **Propuesta: si F-07 lo hornea, sin `infinite` (iteración finita); o aplazarlo a F-08** (depende de que haya scroll).                                                                                                              | Alcance + decisión de a11y.                                     |
+| **C-7** | El **eyebrow** no tiene fuente de datos hoy (categorías = F-09). **Propuesta: aplazar el contenido a F-09** y dejar en F-07 solo la estructura (`<p>`), o reutilizar `RECLAMO`.                                                                                                                       | Alcance/producto.                                               |
 
 **Decididos por mí y declarados** (medidos o de proyecto): el hero es **1 h1 con dos `<span>` +
 `{' '}` text node**, derivado de NOMBRE por `lastIndexOf` con guarda · el titular usa **`--ink`**

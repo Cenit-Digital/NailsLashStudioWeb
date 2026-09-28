@@ -5,7 +5,7 @@
 > APROBADA POR EL HUMANO EL 2026-07-17** (→ **43**), **tras la escalada de la prueba de mutación**.
 > Las **cuatro** preguntas (A-23, A-24, A-27, A-28) **cerradas**; **las 21 marcas `⏸` retiradas**.
 > **El estado vigente es §Ampliación por mutación (2026-07-17)**, al final del fichero.
-> *(El «37 escenarios» de antes era previo a la ronda de reparación, que añadió @s38/@s39/@s40.)*
+> _(El «37 escenarios» de antes era previo a la ronda de reparación, que añadió @s38/@s39/@s40.)_
 >
 > **Fuentes leídas, en este orden:** `project-spec.md` §Feature 5 (la FUENTE) ·
 > `progress/f05_verificacion_previa.md` (los HECHOS; **manda donde contradiga**) ·
@@ -29,36 +29,36 @@ La marca `⏸` va **en la cabecera del fichero, en el primer bloque visible**, c
 expresa al `tdd_craftsman` de **parar mientras siga puesta**. **Precedente de F-03: el craftsman se
 negó a implementar con la marca puesta, y tenía razón.**
 
-| # | Qué espera la puerta | Qué hace el contrato mientras tanto |
-| --- | --- | --- |
-| **A-23** | reescribir acceptance 2 (*«PETICIÓN AUTOMÁTICA»*) y 5 (mutadores **reales**) | los destila **como propuesta**, marcados ⏸ en la traza |
-| **A-24** | `puerta_legal` = atribución normativa falsa; y la descripción de F-11 | **NO hereda ninguna de las dos frases**; escribe el criterio de proyecto |
-| **A-27** | ¿deuda de binarios de F-01 declarada, o escenario nuevo en una feature `done`? | **cero escenarios sobre `tools/puerta-placeholders.ts`**; declarada en @s34 |
-| **A-28** | ¿`latin-ext` (+6 woff2) o se acepta el tofu? | destila la propuesta (aceptar); **@s28 avisa de que su tabla cambia si la puerta decide otra cosa** |
+| #        | Qué espera la puerta                                                           | Qué hace el contrato mientras tanto                                                                 |
+| -------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
+| **A-23** | reescribir acceptance 2 (_«PETICIÓN AUTOMÁTICA»_) y 5 (mutadores **reales**)   | los destila **como propuesta**, marcados ⏸ en la traza                                              |
+| **A-24** | `puerta_legal` = atribución normativa falsa; y la descripción de F-11          | **NO hereda ninguna de las dos frases**; escribe el criterio de proyecto                            |
+| **A-27** | ¿deuda de binarios de F-01 declarada, o escenario nuevo en una feature `done`? | **cero escenarios sobre `tools/puerta-placeholders.ts`**; declarada en @s34                         |
+| **A-28** | ¿`latin-ext` (+6 woff2) o se acepta el tofu?                                   | destila la propuesta (aceptar); **@s28 avisa de que su tabla cambia si la puerta decide otra cosa** |
 
 ---
 
 ## 2. Mapa `acceptance` → `@s`
 
-| Acceptance de `feature_list.json` §5 | Escenarios | Nota |
-| --- | --- | --- |
-| **A1** `detectarOrigenesExternos(html\|css)` devuelve los orígenes externos, con allowlist vacía | @s1, @s2, @s3, @s4, @s5, @s6, @s7, @s8, @s9, @s19, @s25, @s34 | ✅ destilado tal cual |
-| **A2** ⏸ *«el build falla si el artefacto contiene CUALQUIER origen externo»* | **positivo:** @s26, @s27, @s35 · **negativo:** @s10, @s11, @s12, @s13, @s14, @s15, @s16, @s17, @s18 | 🔴 **INSATISFACIBLE** → **A-23**. Destilada la propuesta: *«ninguna **PETICIÓN AUTOMÁTICA**»* |
-| **A3** ni una petición a `fonts.googleapis.com` ni a `fonts.gstatic.com` | @s4, @s26, @s29 | ✅ los **dos** orígenes, en filas separadas |
-| **A4** no se solicita `wght@300` | @s4, @s28, @s29 | ✅ el 300 entra como `@font-face` de peso 300 → conjunto distinto → violación |
-| **A5** ⏸ *«mutar la comparación de origen o el predicado de allowlist rompe un test»* | @s20, @s21, @s23, @s24, @s7, @s30 | 🔴 **INMEDIBLE** → **A-23**. Destilada la propuesta, **nombrando mutadores reales** |
-| Guarda anti-vacuidad + falla cerrada (spec §Modos de error) | @s28, @s29, @s30, @s31, @s32, @s33 | no está en el acceptance; **la spec la exige como obligatoria** |
+| Acceptance de `feature_list.json` §5                                                             | Escenarios                                                                                          | Nota                                                                                          |
+| ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| **A1** `detectarOrigenesExternos(html\|css)` devuelve los orígenes externos, con allowlist vacía | @s1, @s2, @s3, @s4, @s5, @s6, @s7, @s8, @s9, @s19, @s25, @s34                                       | ✅ destilado tal cual                                                                         |
+| **A2** ⏸ _«el build falla si el artefacto contiene CUALQUIER origen externo»_                    | **positivo:** @s26, @s27, @s35 · **negativo:** @s10, @s11, @s12, @s13, @s14, @s15, @s16, @s17, @s18 | 🔴 **INSATISFACIBLE** → **A-23**. Destilada la propuesta: _«ninguna **PETICIÓN AUTOMÁTICA**»_ |
+| **A3** ni una petición a `fonts.googleapis.com` ni a `fonts.gstatic.com`                         | @s4, @s26, @s29                                                                                     | ✅ los **dos** orígenes, en filas separadas                                                   |
+| **A4** no se solicita `wght@300`                                                                 | @s4, @s28, @s29                                                                                     | ✅ el 300 entra como `@font-face` de peso 300 → conjunto distinto → violación                 |
+| **A5** ⏸ _«mutar la comparación de origen o el predicado de allowlist rompe un test»_            | @s20, @s21, @s23, @s24, @s7, @s30                                                                   | 🔴 **INMEDIBLE** → **A-23**. Destilada la propuesta, **nombrando mutadores reales**           |
+| Guarda anti-vacuidad + falla cerrada (spec §Modos de error)                                      | @s28, @s29, @s30, @s31, @s32, @s33                                                                  | no está en el acceptance; **la spec la exige como obligatoria**                               |
 
 ### Mapa mutante → escenario (la reescritura de A5 que va a la puerta)
 
-| Mutador **REAL** de Stryker 9.6.1 | Muere en |
-| --- | --- |
-| `FilterRemoval` (`.filter(p)` → `origenes`) | **@s20 y SOLO @s20** |
-| `BooleanLiteral` (el `!` del predicado) | @s21 (y cualquiera con ≥1 origen) |
-| `ArrayDeclaration` (`[…]` → `[]`) | @s30 (la guarda de la guarda) |
-| `EqualityOperator`, `StringLiteral` | @s23, @s26, @s27 |
-| `MethodExpression` (`toLowerCase`⇄`toUpperCase`, `startsWith`⇄`endsWith`) | @s7, @s11, @s23 |
-| `Regex` (`^`/`$`) | @s24 |
+| Mutador **REAL** de Stryker 9.6.1                                         | Muere en                          |
+| ------------------------------------------------------------------------- | --------------------------------- |
+| `FilterRemoval` (`.filter(p)` → `origenes`)                               | **@s20 y SOLO @s20**              |
+| `BooleanLiteral` (el `!` del predicado)                                   | @s21 (y cualquiera con ≥1 origen) |
+| `ArrayDeclaration` (`[…]` → `[]`)                                         | @s30 (la guarda de la guarda)     |
+| `EqualityOperator`, `StringLiteral`                                       | @s23, @s26, @s27                  |
+| `MethodExpression` (`toLowerCase`⇄`toUpperCase`, `startsWith`⇄`endsWith`) | @s7, @s11, @s23                   |
+| `Regex` (`^`/`$`)                                                         | @s24                              |
 
 ❌ **`.includes` NO se muta en Stryker 9.6.1** [V, dos vías]. **Cero escenarios lo mencionan**, y el
 `.feature` lo **prohíbe expresamente** en @s21 y en la cabecera.
@@ -68,7 +68,7 @@ negó a implementar con la marca puesta, y tenía razón.**
 ## 3. Decisiones de destilación
 
 1. **El eje es «petición automática ≠ hiperenlace»**, y **el negativo pesa tanto como el positivo**
-   (9 escenarios de 37). Sin @s10..@s18, *«detectar todo lo que parezca una URL»* pasa @s1..@s9
+   (9 escenarios de 37). Sin @s10..@s18, _«detectar todo lo que parezca una URL»_ pasa @s1..@s9
    igual de bien, y **F-05 rompe F-04 y F-02, las dos `done`**.
 2. **@s6 y @s11 son gemelos y van juntos.** La regla del conjunto tokenizado **no se puede anclar
    con uno solo**: `"alternate"` es **prefijo** de `"alternate stylesheet"`, así que cualquier
@@ -76,18 +76,18 @@ negó a implementar con la marca puesta, y tenía razón.**
    refutador cazó (§1).
 3. **@s16 (`disabled`) contrasta a propósito con @s3 y @s5.** En @s3/@s5 la spec **no decide** y
    F-05 **elige** (criterio de proyecto, declarado). En @s16 **la spec sí decide** («return false»)
-   y F-05 **obedece**. *La diferencia entre «no hay letra, elijo» y «hay letra, la ignoro» es la
-   credibilidad del contrato.*
+   y F-05 **obedece**. _La diferencia entre «no hay letra, elijo» y «hay letra, la ignoro» es la
+   credibilidad del contrato._
 4. **@s19 NO mata a `FilterRemoval` — y está escrito en su propio comentario.** Es el error más
-   probable de esta feature: *«la allowlist real es vacía, ya está cubierto»*. **Medido: es
+   probable de esta feature: _«la allowlist real es vacía, ya está cubierto»_. **Medido: es
    equivalente.** Por eso @s20 lleva triple 🔴 y la instrucción de no borrarlo.
-5. **@s21 existe aunque lo mate cualquier escenario con ≥1 origen**, para que *«quitar el `!` NO es
-   equivalente; excluirlo sería FRAUDULENTO»* esté **en un sitio citable** cuando el informe de
+5. **@s21 existe aunque lo mate cualquier escenario con ≥1 origen**, para que _«quitar el `!` NO es
+   equivalente; excluirlo sería FRAUDULENTO»_ esté **en un sitio citable** cuando el informe de
    Stryker apriete.
 6. **La guarda es lista declarada, no `MINIMO_DE_PARES`** (forma de F-04, no de F-03). Razón
    decisiva: **ninguno de los 16 mutadores muta literales numéricos** → un `18` **no genera
-   mutante**; `ArrayDeclaration` **sí ataca la lista** → **@s30 lo mata**. *La forma elegida es la
-   que se puede demostrar viva.*
+   mutante**; `ArrayDeclaration` **sí ataca la lista** → **@s30 lo mata**. _La forma elegida es la
+   que se puede demostrar viva._
 7. **@s28 cuenta PARES `[familia, peso]`, JAMÁS ficheros**: cada `@font-face` emite `woff2` **y**
    `woff` (**12 ficheros para 6 pares**) y un `.woff2` <4096 B **no deja fichero** (@s17).
 8. **@s26 y @s27 son una pinza, y ninguna sobra.** La de la salida cubre `--base` por CLI y
@@ -116,7 +116,7 @@ negó a implementar con la marca puesta, y tenía razón.**
 
 ## 5. Avisos al lead (5) — ✅ **LOS 4 PRIMEROS, RESUELTOS EN LA PUERTA DEL 2026-07-17**
 
-*Histórico. El estado vigente está en §Puerta humana, al final.*
+_Histórico. El estado vigente está en §Puerta humana, al final._
 
 1. ~~**A-23 bloquea.** Destilada la propuesta del lead. **El contrato no está aprobado.**~~
    → ✅ **APROBADA la propuesta: acceptance 2 y 5 reescritos. Umbral 1.0, 0 exclusiones.**
@@ -161,8 +161,8 @@ ese mutante no existe»**. **Falso y al revés.** Remedido por mí:
 - `regex-mutator.js` (instrumenter 9.6.1 instalado) **no tiene ni una línea sobre anclas**: delega
   el patrón **entero** en `weaponRegex.mutate(pattern, flags, {mutationLevels:[1]})`.
 - Ejecutando **weapon-regex 1.3.6**: **`/\s+/` — la tokenización de `rel` que el propio contrato
-  manda, sin una sola ancla → 2 mutantes** (*Quantifier removal*, *Predefined character class
-  negation*). La extracción de `url()` → **10 mutantes, 0 anclas**. Un patrón **con** anclas
+  manda, sin una sola ancla → 2 mutantes** (_Quantifier removal_, _Predefined character class
+  negation_). La extracción de `url()` → **10 mutantes, 0 anclas**. Un patrón **con** anclas
   (`^/assets/.*$`) → 3 mutantes, **solo 2 son anclas**.
 
 → Fila reescrita (weapon-regex nivel 1, 5 familias, **toda regex literal genera mutantes tenga o no
@@ -190,9 +190,9 @@ implementación correcta** (6 pares → «faltan 5» → exit 1; `[]` → dispar
 
 → Añadidos los otros 5 `@font-face` + la lista literal de 6 pares. **Y decidido explícitamente lo
 que el contrato no decidía:** el fixture **declara `font-weight: 400`**, así que el par bajo prueba
-es `("Manrope",400)` **sin ambigüedad y sin que nadie tenga que suponer nada**. *No se destila regla
+es `("Manrope",400)` **sin ambigüedad y sin que nadie tenga que suponer nada**. _No se destila regla
 de defaulting (`font-weight` ausente → 400): ningún escenario la exige → sería producción sin test
-rojo, la misma razón por la que F-05 no lleva `existe*`.*
+rojo, la misma razón por la que F-05 no lleva `existe*`._
 
 ### 3. @s28/@s30 + ANTI-TAUTOLOGÍA — prohibición absoluta falsa + mecanismo de muerte falso
 
@@ -210,32 +210,32 @@ rojo, la misma razón por la que F-05 no lleva `existe*`.*
   (dentro de `mutate`), **cableada por el humilde** como `tools/puerta-cascaron.ts:44`.
 
 → **@s38 añadido** (el ancla, forma @s26/@s27 de F-04). **@s30 se queda**: vigila el
-*comportamiento* ante lista vacía — otra cosa, y también hace falta. *Nota honesta escrita en el
+_comportamiento_ ante lista vacía — otra cosa, y también hace falta. _Nota honesta escrita en el
 contrato: esto hace que la lista declarada **necesite un ancla que `MINIMO_DE_PARES = 18` no
-necesitaba**; la decisión se sostiene por las razones 1 y 2, no por la 3.*
+necesitaba**; la decisión se sostiene por las razones 1 y 2, no por la 3._
 
 ## Los GRAVES y MENORES aplicados (18)
 
-| # | Dónde | Qué se corrigió |
-| --- | --- | --- |
-| 4 | @s5 | **Inerte**: «ninguna página usa la clase» no entra por ningún parámetro (la entrada son los BYTES). Era un duplicado **más débil** de @s4 fila 4. → **Outline de pinza** con el HTML entrando de verdad por `recursos`: las dos filas dan el mismo resultado, **y eso es la aserción**. |
-| 5 | @s37 | `Then` no medible contra `{codigoSalida, lineas}` (único «se reconoce» del fichero); «par» sin peso; las 4 filas colapsaban a exit≠0 por 5 pares faltantes. → Reescrito: artefacto de 6 `@font-face`, salida real, par con peso, + Given de `vite.config.ts`. |
-| 6 | @s23 | La tabla **no mataba a `endsWith`**: el caso que el comentario nombraba (`evil-fonts.googleapis.com`) **no era fila**. Medido: `endsWith` sobrevivía **las 7**. → Fila añadida. |
-| 7 | @s34 | **Inerte**: `Then` no observable + fixture **sin contenido** → un humilde **sin filtro** pasaba las 4 filas. → Partido en **@s34** (comportamiento, **nace rojo si el filtro se rompe**) y **@s40** (ancla, forma `diferidos.test.ts:89-96`). |
-| 8 | @s17 + cabecera | **6.192 B era ERROR DE ÁMBITO** marcado [V] dos veces: es `outfit-latin-ext-100-normal.woff2`, de la dependencia **muerta** que F-05 da de baja. Mínimo real **14.044 B** (**3,4×**, no 1,5×). Las 3 familias de F-05 **ni están instaladas** → el §4 solo podía medir el ámbito equivocado. **El hecho era autodestructivo.** |
-| 9 | global | **Ningún escenario aseveraba la allowlist `[]` de PRODUCCIÓN** (34/34 pasos la inyectan). Un `["fonts.googleapis.com"]` en el humilde dejaba **los 37 escenarios y el build VERDES** y embarcaba Google Fonts. → **@s39 añadido**. |
-| 10 | cabecera l.52 + @s12 + @s35 | **El `<a href>` a Facebook NO EXISTE** (comprobado por mí: **0** en `dist/index.html`; vive como literal en `app-*.js`; **ningún `.tsx` renderiza `REDES`**). → @s12 pasa de descriptivo a **preventivo**; @s35 lo marca «lo añadirá F-12». **El recuento de 10 se conserva: lo falso era el mecanismo.** |
-| 11 | @s34 + cabecera | «Las **únicas** URL de los `.js` son mensajes de error y namespaces» **falso**: hay **3 clases**, y la 3ª son **los datos de F-02/F-04 que Rollup inlinea** (24, no 21). **La razón verdadera es más fuerte**: un grep del `.js` **acusaría a dos features `done`**. |
-| 12 | @s24 + @s8 + cabecera | «El `^` fue **EL ÚNICO SUPERVIVIENTE REAL DEL REPO**» **falso** (F-01 tuvo 2; **F-04 tuvo 58**) y **§2 apunta al regex del teléfono de F-01, no al `^` de F-03**. → Reescrito con las dos veces y sus fuentes verdaderas. |
-| 13 | @s10 | Llamaba «**tabla normativa**» a la tabla de §4.6.8, que la spec declara **literalmente no normativa** — **la tabla que @s6 existe para desautorizar**. Autocontradicción a 100 líneas. |
-| 14 | @s17 + cabecera | «`grep -rn 'woff'` sobre la lógica de assets de Vite 7 → **CERO RESULTADOS**» **falso**: da **5 aciertos**, y **son la lógica de assets**. Frase **autorrefutante** (citaba `config.js`, donde `woff` sale 4 veces). Conclusión intacta vía `shouldInline`. |
-| 15 | cabecera + @s13 + @s35 | La prueba de A-23 estaba **8/10 fuera del alcance `(html\|css)`**. → **Separada por alcances**, y **es más fuerte**: la puerta ve **DOS**, los **dos de F-04**, y **bastan solos**. **F-02 no puede romperse por esta puerta.** |
-| 16 | @s35 | «LAS DIEZ URL» **falso** por aritmética (enumeraba 8) y por relevancia (7 viven en `.js` que la puerta no lee). |
-| 17 | cabecera + @s6 + @s7 | «tokens separados **por espacio**» **más estrecho que la norma** («split on **ASCII whitespace**»): **4 de los 5 separadores daban falso negativo**, justo el caso de @s6. + fila TAB en @s7. Y la case-insensibilidad es **de la comparación de keywords**, no de la tokenización. |
-| 18 | @s20 + mapa | «**@s20 Y SOLO @s20**» **falso**: la **1ª fila de @s23 también mata** `FilterRemoval` (cumple el predicado que @s20 enuncia). **Ninguno se borra.** |
-| 19 | @s1 | `construccion` era el **mismo placeholder** en Given y Then → exigía **en silencio** devolver la etiqueta de cierre (6 de 14 filas la llevaban). → Columna **partida** en `marcado` / `construccion` + regla escrita. |
-| 20 | @s1 | **No había ni un `http://` positivo** en los 25 escenarios del detector → borrar `http:` de la lista blanca daba **67/67 en verde**. → Fila `http://` añadida. |
-| 21 | cabecera A-23 | «176/176 `@font-face`» **sin ámbito**: solo cuadra sumando `@fontsource-variable/manrope`, **el paquete que el contrato prohíbe**. → **164/164** en las 3 familias que F-05 hornea. |
+| #   | Dónde                       | Qué se corrigió                                                                                                                                                                                                                                                                                                                |
+| --- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 4   | @s5                         | **Inerte**: «ninguna página usa la clase» no entra por ningún parámetro (la entrada son los BYTES). Era un duplicado **más débil** de @s4 fila 4. → **Outline de pinza** con el HTML entrando de verdad por `recursos`: las dos filas dan el mismo resultado, **y eso es la aserción**.                                        |
+| 5   | @s37                        | `Then` no medible contra `{codigoSalida, lineas}` (único «se reconoce» del fichero); «par» sin peso; las 4 filas colapsaban a exit≠0 por 5 pares faltantes. → Reescrito: artefacto de 6 `@font-face`, salida real, par con peso, + Given de `vite.config.ts`.                                                                  |
+| 6   | @s23                        | La tabla **no mataba a `endsWith`**: el caso que el comentario nombraba (`evil-fonts.googleapis.com`) **no era fila**. Medido: `endsWith` sobrevivía **las 7**. → Fila añadida.                                                                                                                                                |
+| 7   | @s34                        | **Inerte**: `Then` no observable + fixture **sin contenido** → un humilde **sin filtro** pasaba las 4 filas. → Partido en **@s34** (comportamiento, **nace rojo si el filtro se rompe**) y **@s40** (ancla, forma `diferidos.test.ts:89-96`).                                                                                  |
+| 8   | @s17 + cabecera             | **6.192 B era ERROR DE ÁMBITO** marcado [V] dos veces: es `outfit-latin-ext-100-normal.woff2`, de la dependencia **muerta** que F-05 da de baja. Mínimo real **14.044 B** (**3,4×**, no 1,5×). Las 3 familias de F-05 **ni están instaladas** → el §4 solo podía medir el ámbito equivocado. **El hecho era autodestructivo.** |
+| 9   | global                      | **Ningún escenario aseveraba la allowlist `[]` de PRODUCCIÓN** (34/34 pasos la inyectan). Un `["fonts.googleapis.com"]` en el humilde dejaba **los 37 escenarios y el build VERDES** y embarcaba Google Fonts. → **@s39 añadido**.                                                                                             |
+| 10  | cabecera l.52 + @s12 + @s35 | **El `<a href>` a Facebook NO EXISTE** (comprobado por mí: **0** en `dist/index.html`; vive como literal en `app-*.js`; **ningún `.tsx` renderiza `REDES`**). → @s12 pasa de descriptivo a **preventivo**; @s35 lo marca «lo añadirá F-12». **El recuento de 10 se conserva: lo falso era el mecanismo.**                      |
+| 11  | @s34 + cabecera             | «Las **únicas** URL de los `.js` son mensajes de error y namespaces» **falso**: hay **3 clases**, y la 3ª son **los datos de F-02/F-04 que Rollup inlinea** (24, no 21). **La razón verdadera es más fuerte**: un grep del `.js` **acusaría a dos features `done`**.                                                           |
+| 12  | @s24 + @s8 + cabecera       | «El `^` fue **EL ÚNICO SUPERVIVIENTE REAL DEL REPO**» **falso** (F-01 tuvo 2; **F-04 tuvo 58**) y **§2 apunta al regex del teléfono de F-01, no al `^` de F-03**. → Reescrito con las dos veces y sus fuentes verdaderas.                                                                                                      |
+| 13  | @s10                        | Llamaba «**tabla normativa**» a la tabla de §4.6.8, que la spec declara **literalmente no normativa** — **la tabla que @s6 existe para desautorizar**. Autocontradicción a 100 líneas.                                                                                                                                         |
+| 14  | @s17 + cabecera             | «`grep -rn 'woff'` sobre la lógica de assets de Vite 7 → **CERO RESULTADOS**» **falso**: da **5 aciertos**, y **son la lógica de assets**. Frase **autorrefutante** (citaba `config.js`, donde `woff` sale 4 veces). Conclusión intacta vía `shouldInline`.                                                                    |
+| 15  | cabecera + @s13 + @s35      | La prueba de A-23 estaba **8/10 fuera del alcance `(html\|css)`**. → **Separada por alcances**, y **es más fuerte**: la puerta ve **DOS**, los **dos de F-04**, y **bastan solos**. **F-02 no puede romperse por esta puerta.**                                                                                                |
+| 16  | @s35                        | «LAS DIEZ URL» **falso** por aritmética (enumeraba 8) y por relevancia (7 viven en `.js` que la puerta no lee).                                                                                                                                                                                                                |
+| 17  | cabecera + @s6 + @s7        | «tokens separados **por espacio**» **más estrecho que la norma** («split on **ASCII whitespace**»): **4 de los 5 separadores daban falso negativo**, justo el caso de @s6. + fila TAB en @s7. Y la case-insensibilidad es **de la comparación de keywords**, no de la tokenización.                                            |
+| 18  | @s20 + mapa                 | «**@s20 Y SOLO @s20**» **falso**: la **1ª fila de @s23 también mata** `FilterRemoval` (cumple el predicado que @s20 enuncia). **Ninguno se borra.**                                                                                                                                                                            |
+| 19  | @s1                         | `construccion` era el **mismo placeholder** en Given y Then → exigía **en silencio** devolver la etiqueta de cierre (6 de 14 filas la llevaban). → Columna **partida** en `marcado` / `construccion` + regla escrita.                                                                                                          |
+| 20  | @s1                         | **No había ni un `http://` positivo** en los 25 escenarios del detector → borrar `http:` de la lista blanca daba **67/67 en verde**. → Fila `http://` añadida.                                                                                                                                                                 |
+| 21  | cabecera A-23               | «176/176 `@font-face`» **sin ámbito**: solo cuadra sumando `@fontsource-variable/manrope`, **el paquete que el contrato prohíbe**. → **164/164** en las 3 familias que F-05 hornea.                                                                                                                                            |
 
 ## Las 2 RECHAZADAS — con medición, no con opinión
 
@@ -251,8 +251,8 @@ no muerden.** Queda escrito en @s7 y @s24 para que nadie las reintroduzca «de m
 2. **`url('a"b')` NO mata `[^']`→`[']`.** Espera **0**, y la mutación **no mueve la cuenta** (con
    comillas o sin ellas, `a"b` no es externo). Lo que sí lo mata es **un `url()` externo con comillas
    simples** — medido: **1 → 0**.
-   *(Y `url( … )` con espacios **no mata `\s*`→`\S*` del cierre**, como se afirmaba: `[^)]*` ya se
-   come el espacio final. Sí mata el `\s*` de **apertura** y `[^)]`→`[)]`. La fila entra por eso.)*
+   _(Y `url( … )` con espacios **no mata `\s*`→`\S*` del cierre**, como se afirmaba: `[^)]*` ya se
+   come el espacio final. Sí mata el `\s*` de **apertura** y `[^)]`→`[)]`. La fila entra por eso.)_
 
 ## A-23 reformulada (🔴 CAMBIA) — ✅ **CERRADA: el humano eligió (a) el 2026-07-17**
 
@@ -263,7 +263,7 @@ Con **umbral 1.0 y 0 exclusiones** (`harness.config.json`; `stryker.config.json`
   verdad** y **asevera el origen, no la cuenta**. **Es lo que hizo F-03** (19 % → 100 % **sin tocar
   producción, solo arreglando los tests**) **y lo que ya funcionó en F-04** (58 supervivientes,
   **0 exclusiones**).
-- ❌ **(b) RECHAZADA:** *no* se acepta justificar supervivientes `Regex` en
+- ❌ **(b) RECHAZADA:** _no_ se acepta justificar supervivientes `Regex` en
   `progress/mutation_cero_terceros.md`, y **el umbral de F-05 NO baja: sigue siendo 1.0.**
 
 ⚠️ **HONESTIDAD, Y ESTÁ ESCRITA EN EL CONTRATO:** los **13 supervivientes** y el **78,99 %** están
@@ -275,9 +275,9 @@ HUMANO — no lo excluye en silencio ni baja el umbral por su cuenta.**
 
 ## ~~Lo que NO se cerró~~ → ✅ **CERRADO TODO EL 2026-07-17. Ver §Puerta humana al final.**
 
-*Sección histórica: decía «A-23, A-24, A-27 y A-28 siguen abiertas; la marca ⏸ se queda y el
+_Sección histórica: decía «A-23, A-24, A-27 y A-28 siguen abiertas; la marca ⏸ se queda y el
 contrato NO está aprobado». **Ya no.** El humano las cerró las cuatro. Se conserva el rastro
-porque el razonamiento de arriba es lo que leyó para decidir.*
+porque el razonamiento de arriba es lo que leyó para decidir._
 
 ## Fuentes primarias remedidas por mí en esta ronda
 
@@ -310,12 +310,12 @@ Aquí se **registra el hecho**. El acta vive en `feature_list.json` §5 → camp
 
 ## Las 4 decisiones
 
-| # | Decisión del humano | Efecto |
-|---|---|---|
-| **A-23** | ✅ **APROBADA la propuesta del lead.** Acceptance **2** y **5** **REESCRITOS** en `feature_list.json` §5: el 2 → *«una **PETICIÓN AUTOMÁTICA** a un origen externo»*; el 5 nombra **mutadores REALES** y **PROHÍBE** pedir que se mute `.includes`. 🔴 **Eligió la opción (a): SIN supervivientes `Regex` preaprobados.** | **UMBRAL 1.0 INTACTO, 0 EXCLUSIONES.** La opción (b) —justificar supervivientes y bajar el umbral— **RECHAZADA**. **Si un `Regex` resiste → el `tdd_craftsman` ESCALA AL HUMANO.** El contrato ya no destila una *propuesta*: destila **el acceptance vigente**. |
-| **A-24** | ✅ **APROBADA.** `puerta_legal` de **F-05 y de F-11** corregidas en `feature_list.json`. | **La justificación de F-05 es CRITERIO DE PROYECTO, NO una norma.** Las prohibiciones de vocabulario del `.feature` pasan de lectura del lead a **letra del `feature_list`**. |
-| **A-27** | ✅ **APROBADA la postura del lead: la deuda se queda DECLARADA.** | **F-05 NO toca `tools/puerta-placeholders.ts` ni `features/puerta_placeholders.feature` (Ley 1).** F-05 **sí** filtra por extensión en **su propia** puerta (@s34, @s40). **La deuda de F-01 sigue VIVA y DECLARADA.** |
-| **A-28** | ✅ **APROBADA la propuesta del lead: SOLO subset `latin`** (`U+0000-00FF`, todo el español). | **`PARES_DE_FUENTE_ESPERADOS` NO CAMBIA: los 6 pares se quedan.** @s28 y @s38 intactos. **Límite DECLARADO por escrito:** `Ł`/`ř`/`ğ` → **TOFU sin error**; **`latin-ext` entrará el día que exista un nombre REAL que lo exija, CON SU ESCENARIO.** |
+| #        | Decisión del humano                                                                                                                                                                                                                                                                                                       | Efecto                                                                                                                                                                                                                                                           |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **A-23** | ✅ **APROBADA la propuesta del lead.** Acceptance **2** y **5** **REESCRITOS** en `feature_list.json` §5: el 2 → _«una **PETICIÓN AUTOMÁTICA** a un origen externo»_; el 5 nombra **mutadores REALES** y **PROHÍBE** pedir que se mute `.includes`. 🔴 **Eligió la opción (a): SIN supervivientes `Regex` preaprobados.** | **UMBRAL 1.0 INTACTO, 0 EXCLUSIONES.** La opción (b) —justificar supervivientes y bajar el umbral— **RECHAZADA**. **Si un `Regex` resiste → el `tdd_craftsman` ESCALA AL HUMANO.** El contrato ya no destila una _propuesta_: destila **el acceptance vigente**. |
+| **A-24** | ✅ **APROBADA.** `puerta_legal` de **F-05 y de F-11** corregidas en `feature_list.json`.                                                                                                                                                                                                                                  | **La justificación de F-05 es CRITERIO DE PROYECTO, NO una norma.** Las prohibiciones de vocabulario del `.feature` pasan de lectura del lead a **letra del `feature_list`**.                                                                                    |
+| **A-27** | ✅ **APROBADA la postura del lead: la deuda se queda DECLARADA.**                                                                                                                                                                                                                                                         | **F-05 NO toca `tools/puerta-placeholders.ts` ni `features/puerta_placeholders.feature` (Ley 1).** F-05 **sí** filtra por extensión en **su propia** puerta (@s34, @s40). **La deuda de F-01 sigue VIVA y DECLARADA.**                                           |
+| **A-28** | ✅ **APROBADA la propuesta del lead: SOLO subset `latin`** (`U+0000-00FF`, todo el español).                                                                                                                                                                                                                              | **`PARES_DE_FUENTE_ESPERADOS` NO CAMBIA: los 6 pares se quedan.** @s28 y @s38 intactos. **Límite DECLARADO por escrito:** `Ł`/`ř`/`ğ` → **TOFU sin error**; **`latin-ext` entrará el día que exista un nombre REAL que lo exija, CON SU ESCENARIO.**             |
 
 ## Lo que hice, y lo que NO
 
@@ -384,19 +384,19 @@ aseveraba una tolerancia que ningún test sostenía** — «una promesa sin puer
 
 **Filas nuevas en escenarios que YA existen** (la forma que ya usó F-01 con `@s5`):
 
-| Escenario | Fila añadida | Mata | Medido [V] |
-| --- | --- | --- | --- |
-| **@s1** | `<img src="https://cdn.tercero.com/a b.png">` | `terceros.ts:278` `ConditionalExpression` | `valor` = `…/a%20b.png`; el mutante da `…/a` |
-| **@s1** | `<img src = "https://cdn.tercero.com/a.png">` | `terceros.ts:58` `Regex` (`\s*`→`\S*`) | 1 origen; `construccion` conserva los espacios |
-| **@s9** | `\| http://[ \| 0 \| … no parsea y NO LANZA \|` | `terceros.ts:241` `OptionalChaining` | 0 orígenes, **sin excepción** |
+| Escenario | Fila añadida                                    | Mata                                      | Medido [V]                                     |
+| --------- | ----------------------------------------------- | ----------------------------------------- | ---------------------------------------------- |
+| **@s1**   | `<img src="https://cdn.tercero.com/a b.png">`   | `terceros.ts:278` `ConditionalExpression` | `valor` = `…/a%20b.png`; el mutante da `…/a`   |
+| **@s1**   | `<img src = "https://cdn.tercero.com/a.png">`   | `terceros.ts:58` `Regex` (`\s*`→`\S*`)    | 1 origen; `construccion` conserva los espacios |
+| **@s9**   | `\| http://[ \| 0 \| … no parsea y NO LANZA \|` | `terceros.ts:241` `OptionalChaining`      | 0 orígenes, **sin excepción**                  |
 
 **Escenarios nuevos — y SOLO porque no encajaban en ninguno de los 40** (se comprobó uno a uno):
 
-| Nuevo | Qué fija | Mata | Por qué NO encajaba |
-| --- | --- | --- | --- |
-| **@s41** | HTML malformado: `<link>` sin `rel`; `<link rel>` sin `href` **con la base a un tercero**; `<img src="http://[">` | **los 4 del grupo A** (`:257-258`) **y el `:299`** | @s2/@s3/@s7 fijan `rel` **en el `Given`** (no hay fila que lo quite); **@s18 es «resuelven al PROPIO sitio»** y esto **no** resuelve al propio sitio: es un tercero **que no se pide**; @s1 exige **exactamente 1** |
-| **@s42** | `<base>` sin href **seguido de** `<base href>` a un tercero → **1 origen** (HTML LS §4.6.5: gana el primer `<base>` **con href**) | `terceros.ts:240` | el `Given` de **@s9 inyecta UN solo `<base href="<base>">` por plantilla**: no hay fila que meta **DOS** `<base>`, uno sin atributo |
-| **@s43** | un recurso **`html` con `@font-face` inline** → **exit 0**, y **NO** acusa `("Impostora", 400)` | `puerta-terceros.ts:159` | **@s28 no es Outline** (no admite filas) y el `Then` de **@s29 exige exit ≠ 0**; éste exige **0** |
+| Nuevo    | Qué fija                                                                                                                          | Mata                                               | Por qué NO encajaba                                                                                                                                                                                                 |
+| -------- | --------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **@s41** | HTML malformado: `<link>` sin `rel`; `<link rel>` sin `href` **con la base a un tercero**; `<img src="http://[">`                 | **los 4 del grupo A** (`:257-258`) **y el `:299`** | @s2/@s3/@s7 fijan `rel` **en el `Given`** (no hay fila que lo quite); **@s18 es «resuelven al PROPIO sitio»** y esto **no** resuelve al propio sitio: es un tercero **que no se pide**; @s1 exige **exactamente 1** |
+| **@s42** | `<base>` sin href **seguido de** `<base href>` a un tercero → **1 origen** (HTML LS §4.6.5: gana el primer `<base>` **con href**) | `terceros.ts:240`                                  | el `Given` de **@s9 inyecta UN solo `<base href="<base>">` por plantilla**: no hay fila que meta **DOS** `<base>`, uno sin atributo                                                                                 |
+| **@s43** | un recurso **`html` con `@font-face` inline** → **exit 0**, y **NO** acusa `("Impostora", 400)`                                   | `puerta-terceros.ts:159`                           | **@s28 no es Outline** (no admite filas) y el `Then` de **@s29 exige exit ≠ 0**; éste exige **0**                                                                                                                   |
 
 ## 🔴 Los dos hechos que se pierden al copiar — **MEDIDOS, y escritos donde duelen**
 
@@ -421,7 +421,7 @@ caza**. Por lo mismo, el `Then` de **@s43 acusa el par concreto**, no solo el c�
   el informe: los 10 son reales y el análisis del `mutation_tester` se sostiene entero.**
 - **Fila medida y NO añadida, y queda escrito para que nadie la proponga «de memoria»:** un
   **`<base>` sin href A SECAS** — **no mata `:240`** (ver arriba). Va **en el comentario de @s42**,
-  no como fila. *Es la misma disciplina que @s24 y @s7 ya escribieron.*
+  no como fila. _Es la misma disciplina que @s24 y @s7 ya escribieron._
 - **`http://[` no es un capricho:** es un host IPv6 sin cerrar, **la forma más corta que hace que el
   parser WHATWG devuelva `null`**. Un `.invalid` **no serviría: parsea perfectamente.**
 

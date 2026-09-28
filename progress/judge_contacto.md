@@ -8,6 +8,7 @@ APROBADO por la puerta humana el 2026-07-18). Bitacora: `progress/tdd_contacto.m
 Baseline 729 -> **765 tests** verdes (+36). Verificado EN VIVO por el juez (no de fe).
 
 ## Puertas ejecutadas (medidas, no citadas)
+
 - `pnpm typecheck` -> exit 0.
 - `pnpm lint` (eslint) -> exit 0.
 - `pnpm test` (vitest) -> **765 passed / 26 files**, exit 0.
@@ -15,6 +16,7 @@ Baseline 729 -> **765 tests** verdes (+36). Verificado EN VIVO por el juez (no d
   terceros · **anclas vivas** (igualdad de conjuntos de F-06 INTACTA).
 
 ## Cobertura de escenarios (@s <-> test) — 15/15
+
 - @s1: [x] `site.test.ts` (URL exacta · NO el handle alternativo @nail_lash_studio_ · host/sin-@/cierra barra)
 - @s2: [x] `site.test.ts` it.each cadena-vacia / solo-arroba / arroba-con-espacio -> LANZA y no emite `...instagram.com//`
 - @s3: [x] `site.test.ts` nailslash.studio_ sin @ -> LANZA (D-1a falla cerrada)
@@ -32,12 +34,14 @@ Baseline 729 -> **765 tests** verdes (+36). Verificado EN VIVO por el juez (no d
 - @s15: [x] `contacto-fuente.test.ts` (.tsx con 0 instagram.com · site.ts con el host en la region de instagramHref)
 
 ## Disciplina TDD
+
 - Produccion sin test que la pida? **NO.** instagramHref (site.ts:121-137) la exigen @s1/@s2/@s3/@s4/@s14;
   render de Contacto.tsx lo exigen @s4/@s5/@s10/@s12/@s14; .module.scss .telefono+@media lo exige @s6.
   El horario visible (deuda F-10) NO se anadio: no esta en el contrato -> alcance NO inflado (bien).
 - Evidencia de Rojo->Verde->Refactor? **SI.** Bitacora con 7 ciclos + 4 sabotajes revertidos.
 
 ## Verificacion de que los tests MUERDEN (2 sabotajes, reproducidos y revertidos por el juez)
+
 1. Quitar la barra final de instagramHref (site.ts:136) -> **@s1 ROJO** (2 tests). Revertido byte-identico
    desde backup; repo limpio.
 2. Hornear el host en Contacto.tsx:31 (href literal https://www.instagram.com/nailslash.studio_/) ->
@@ -46,6 +50,7 @@ Baseline 729 -> **765 tests** verdes (+36). Verificado EN VIVO por el juez (no d
    Revertido byte-identico; repo limpio.
 
 ## Verificacion del checklist de la tarea
+
 1. **F-02 NO reabierto:** git diff --numstat -> site.test.ts 70 insert / **0 del**; site.ts **0 del**.
    telHref / waHref / numeroNacional / NAP / registros y sus 37 tests INTACTOS. Aditivo puro. OK.
 2. **instagramHref mutable + anti-tautologia:** derivacion pura (valida @, slice, regex de cuerpo,
@@ -66,6 +71,7 @@ Baseline 729 -> **765 tests** verdes (+36). Verificado EN VIVO por el juez (no d
 9. **Sin regresion:** typecheck 0 · lint 0 · test 765 · build exit 0 con 5 puertas. OK.
 
 ## Calidad (lente de artesano)
+
 - instagramHref (site.ts:121-137): funcion corta, un solo motivo de cambio; constantes con nombre
   (HOST_INSTAGRAM, PREFIJO_HANDLE, USUARIO_INSTAGRAM_VALIDO); sin numeros magicos
   (slice(PREFIJO_HANDLE.length)); errores nombrados y ruidosos (falla cerrada, hermana de numeroNacional).
@@ -75,6 +81,7 @@ Baseline 729 -> **765 tests** verdes (+36). Verificado EN VIVO por el juez (no d
   textoPlano), anti-tautologia, autoritativo sobre bytes de dist/ (no jsdom).
 
 ## Checkpoints
+
 - C1 (arnes completo, init verde): [x]
 - C2 (estado coherente, 1 sola feature in_progress = F-12): [x]
 - C3 (arquitectura, 0 deps nuevas, sin debug/TODO sueltos): [x]
@@ -84,6 +91,7 @@ Baseline 729 -> **765 tests** verdes (+36). Verificado EN VIVO por el juez (no d
 - C7 (mutacion >= umbral 1.0) -> puerta del mutation_tester, corre DESPUES de esta aprobacion: [ ] (pendiente)
 
 ## Menores (no bloqueantes)
+
 1. **@s14, segunda asercion tautologica.** En contacto.test.tsx:82-83 y contacto-horneado.test.ts:163-164
    la asercion COMPARTEN el cuerpo comprueba que dos literales escritos A MANO contienen la subcadena
    nailslash.studio_ (expect(IG_URL).toContain(...) / expect(handle).toContain(...)): es siempre cierta y
@@ -96,5 +104,6 @@ Baseline 729 -> **765 tests** verdes (+36). Verificado EN VIVO por el juez (no d
    suite crece, valorar aislar el dist/ por fichero build-based en vez de serializar todo.
 
 ## Cambios requeridos
+
 Ninguno. Se aprueba. Siguiente puerta: mutation_tester (umbral 1.0 sobre src/lib/site.ts —instagramHref—
 y src/components/Contacto.tsx; 0 exclusiones; si algun mutante resiste, se ESCALA, no se excluye).

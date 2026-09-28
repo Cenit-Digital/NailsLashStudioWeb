@@ -123,28 +123,28 @@ precioAnteriorMostrable(historico, ahora) → number | null
 
 ## Contrato de la UI
 
-| | |
-| --- | --- |
-| **Entrada** | El catálogo importado de `src/lib/catalogo.ts` (fuente única). Ningún nombre, precio ni categoría escrito a mano en el JSX. |
-| **Salida (render)** | La sección `#servicios` (ya presente, F-06) pasa de andamiaje a las **3 categorías**; cada una lista sus servicios; cada servicio muestra sus **variantes** con su `precioConIva`; **una** leyenda **«Precios con IVA incluido»**; un aviso visible **«Precios de muestra — pendientes de confirmar con el salón»** mientras los precios sean placeholder. |
-| **Precio** | Se muestra el `precioConIva` **tal cual** + la leyenda. Un «desde» muestra además su **base**. |
-| **«Antes»** | Se renderiza **solo si** `precioAnteriorMostrable(...)` devuelve un número. `null` → no aparece nada. |
-| **Puerta F-01 (placeholder)** | Los precios placeholder producen **violación** en `detectarPlaceholders` (vía flag, `esPlaceholder: true` → `'marcado'`). Es el «precio placeholder que rompe el build» **a nivel de mecanismo** (probado por test unitario). El **cableado en vivo** al humilde queda **DIFERIDO + ANCLADO** — ver DECISIÓN Q-A. |
-| **Accesibilidad** | El catálogo es **oferta precontractual**: `art. 20.2` exige formato accesible con atención a personas vulnerables → hereda las puertas de F-03 (contraste) y F-04 (semántica). El precio y su leyenda no pueden comunicarse solo por color. |
-| **Modo de error** | Precio no numérico / negativo / `NaN`, categoría fuera del conjunto cerrado, `precioDesde` sin `baseDesde`, catálogo vacío → **falla cerrada** (lanza o excluye del render), como `numeroNacional` en `site.ts` y las puertas del proyecto. |
+|                               |                                                                                                                                                                                                                                                                                                                                                            |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Entrada**                   | El catálogo importado de `src/lib/catalogo.ts` (fuente única). Ningún nombre, precio ni categoría escrito a mano en el JSX.                                                                                                                                                                                                                                |
+| **Salida (render)**           | La sección `#servicios` (ya presente, F-06) pasa de andamiaje a las **3 categorías**; cada una lista sus servicios; cada servicio muestra sus **variantes** con su `precioConIva`; **una** leyenda **«Precios con IVA incluido»**; un aviso visible **«Precios de muestra — pendientes de confirmar con el salón»** mientras los precios sean placeholder. |
+| **Precio**                    | Se muestra el `precioConIva` **tal cual** + la leyenda. Un «desde» muestra además su **base**.                                                                                                                                                                                                                                                             |
+| **«Antes»**                   | Se renderiza **solo si** `precioAnteriorMostrable(...)` devuelve un número. `null` → no aparece nada.                                                                                                                                                                                                                                                      |
+| **Puerta F-01 (placeholder)** | Los precios placeholder producen **violación** en `detectarPlaceholders` (vía flag, `esPlaceholder: true` → `'marcado'`). Es el «precio placeholder que rompe el build» **a nivel de mecanismo** (probado por test unitario). El **cableado en vivo** al humilde queda **DIFERIDO + ANCLADO** — ver DECISIÓN Q-A.                                          |
+| **Accesibilidad**             | El catálogo es **oferta precontractual**: `art. 20.2` exige formato accesible con atención a personas vulnerables → hereda las puertas de F-03 (contraste) y F-04 (semántica). El precio y su leyenda no pueden comunicarse solo por color.                                                                                                                |
+| **Modo de error**             | Precio no numérico / negativo / `NaN`, categoría fuera del conjunto cerrado, `precioDesde` sin `baseDesde`, catálogo vacío → **falla cerrada** (lanza o excluye del render), como `numeroNacional` en `site.ts` y las puertas del proyecto.                                                                                                                |
 
 ---
 
 ## Qué es PLACEHOLDER vs qué es ESTRUCTURA
 
-| | Placeholder (**bloquea publicar**) | Estructura (**se construye y testea YA**) |
-| --- | --- | --- |
-| **Precios** | **Todos** los `precioConIva` (`esPlaceholder: true`). Treatwell es [NV como tarifa]; el titular no publica precios | El **modelo** de precio, la leyenda de IVA, el «desde»+base, `suplementos[]` |
-| **IVA sí/no** | **[NV]** si los precios lo incluyen (P-3). La leyenda «con IVA incluido» solo es verídica cuando el cliente lo confirme | La **exigencia** «precio final con impuestos» (art. 20.1.c) y su leyenda |
-| **Lista de servicios** | Qué servicios concretos y sus nombres/duraciones exactas (39/43, [NV] como oficial; anomalías Treatwell ítems 21/28 **no se corrigen en silencio**) | Que hay **3 categorías**, con el patrón `servicio → variantes[]` |
-| **Categorías** | — | **Uñas · Pestañas · Cejas** son reales **[V-LEAD]** y su conjunto es cerrado |
-| **Pestañas** | **[NV]** si se siguen ofreciendo (P-4) + sin precios en ninguna fuente | La categoría existe en la web del titular → se construye con datos placeholder |
-| **«Antes»/ofertas** | **Ninguna verificada** (B-7). Sin histórico con fechas, no se publica | La **lógica de negativa** (`precioAnteriorMostrable`) |
+|                        | Placeholder (**bloquea publicar**)                                                                                                                  | Estructura (**se construye y testea YA**)                                      |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| **Precios**            | **Todos** los `precioConIva` (`esPlaceholder: true`). Treatwell es [NV como tarifa]; el titular no publica precios                                  | El **modelo** de precio, la leyenda de IVA, el «desde»+base, `suplementos[]`   |
+| **IVA sí/no**          | **[NV]** si los precios lo incluyen (P-3). La leyenda «con IVA incluido» solo es verídica cuando el cliente lo confirme                             | La **exigencia** «precio final con impuestos» (art. 20.1.c) y su leyenda       |
+| **Lista de servicios** | Qué servicios concretos y sus nombres/duraciones exactas (39/43, [NV] como oficial; anomalías Treatwell ítems 21/28 **no se corrigen en silencio**) | Que hay **3 categorías**, con el patrón `servicio → variantes[]`               |
+| **Categorías**         | —                                                                                                                                                   | **Uñas · Pestañas · Cejas** son reales **[V-LEAD]** y su conjunto es cerrado   |
+| **Pestañas**           | **[NV]** si se siguen ofreciendo (P-4) + sin precios en ninguna fuente                                                                              | La categoría existe en la web del titular → se construye con datos placeholder |
+| **«Antes»/ofertas**    | **Ninguna verificada** (B-7). Sin histórico con fechas, no se publica                                                                               | La **lógica de negativa** (`precioAnteriorMostrable`)                          |
 
 ---
 
@@ -153,38 +153,38 @@ precioAnteriorMostrable(historico, ahora) → number | null
 1. **Variante sin aplanar.** Un servicio con S/M/L expone `variantes.length === 3`
    con tres `precioConIva` distintos; **no** aparecen tres servicios hermanos
    «Manicura S / M / L». Un servicio sin tallas → `variantes.length === 1`,
-   `etiqueta: ''`. *Mutante:* aplanar / colapsar la anidación.
+   `etiqueta: ''`. _Mutante:_ aplanar / colapsar la anidación.
 2. **Precio placeholder que rompe el build (mecanismo).**
    `detectarPlaceholders({ registros: registrosCatalogo })` devuelve **≥1
    violación** por flag mientras los precios sean placeholder; con todos a
    `esPlaceholder: false` devuelve `[]`. Es el `@s34`/`@s10` visto desde F-09.
-   *Mutante:* invertir la guarda del flag, `=== false` → `!== false`.
+   _Mutante:_ invertir la guarda del flag, `=== false` → `!== false`.
 3. **`precio_anterior` sin histórico → no renderiza.**
    `precioAnteriorMostrable(historicoVacío, ahora) === null`; con un histórico de
    fechas válido devuelve el número. La UI ante `null` no pinta «antes».
-   *Mutante:* la guarda de existencia del histórico, el comparador de fechas
+   _Mutante:_ la guarda de existencia del histórico, el comparador de fechas
    (`hasta < ahora`, `desde > ahora`), el `< / <=`.
 4. **Oferta caducada / futura.** `hasta` ya pasado → `null` (no «antes»); `desde`
-   en el futuro → `null`. *Mutante:* los operadores de fecha.
+   en el futuro → `null`. _Mutante:_ los operadores de fecha.
 5. **«Desde X €» declara su base.** `precioDesde: true` ⇒ `baseDesde` no vacío, y
    el «desde» = mínimo de las variantes disponibles. `precioDesde: true` sin
-   `baseDesde` → falla cerrada. *Mutante:* quitar la exigencia de base;
+   `baseDesde` → falla cerrada. _Mutante:_ quitar la exigencia de base;
    `min` → `max`.
 6. **Precio final con IVA, sin cálculo en vista.** El número mostrado es
    idéntico a `precioConIva.euros`; no hay multiplicación por 1,21 ni por ningún
    tipo en el render. La leyenda «Precios con IVA incluido» aparece **exactamente
-   una vez**. *Mutante:* introducir aritmética de IVA / duplicar o borrar la
+   una vez**. _Mutante:_ introducir aritmética de IVA / duplicar o borrar la
    leyenda.
 7. **Conjunto de categorías cerrado.** El conjunto es **exactamente**
    `{Uñas, Pestañas, Cejas}`; «Facial» y «Depilación» **no aparecen** (igualdad
-   de conjuntos, como la puerta de anclas de F-06). *Mutante:* renombrar o añadir
+   de conjuntos, como la puerta de anclas de F-06). _Mutante:_ renombrar o añadir
    una categoría.
 8. **Colección vacía.** Categoría con `servicios: []` → no se renderiza como una
    tarjeta rota (o muestra «próximamente»); catálogo con 0 categorías → la puerta
    de estructura **falla cerrada** (exige las 3 categorías), nunca verde por
-   vacuidad. *Mutante:* el `length > 0`.
+   vacuidad. _Mutante:_ el `length > 0`.
 9. **Entrada inválida.** `euros` `NaN`/negativo/no numérico, `id` de categoría
-   fuera del conjunto → rechazo. *Mutante:* la validación numérica.
+   fuera del conjunto → rechazo. _Mutante:_ la validación numérica.
 
 ---
 
@@ -247,6 +247,7 @@ A-11 (F-02 dejó `site.email` fuera): «un rojo que siempre está rojo deja de s
 señal». La máquina de `src/lib/diferidos.test.ts` existe justo para esto.
 
 **RECOMENDACIÓN: DIFERIR + ANCLAR.**
+
 - Los precios se declaran `esPlaceholder: true` en `catalogo.ts`.
 - El **mecanismo** se prueba con un test unitario (`detectarPlaceholders` sobre
   los `registros` del catálogo devuelve violación) — eso **es** «precio
@@ -259,7 +260,7 @@ señal». La máquina de `src/lib/diferidos.test.ts` existe justo para esto.
   F-10/F-11/F-12 conservan un verify verde. Cuando el cliente dé precios reales,
   se cambia el dato y el flag a `false` y se cablea con un cambio de una línea.
 
-*Alternativa descartada:* cablear en vivo ahora → rojo permanente en
+_Alternativa descartada:_ cablear en vivo ahora → rojo permanente en
 init/verify/CI, el mismo argumento con el que F-04 rechazó `seo.ts`. **Decide el
 humano en la puerta** (es una excepción explícita al patrón, o su confirmación).
 
@@ -270,20 +271,21 @@ con IVA incluido» Y un aviso visible «Precios de muestra — pendientes de
 confirmar».** Es lo que **demuestra de verdad** la UI de precios (el núcleo del
 catálogo: leyenda, «desde»+base, variantes) siendo honestos. Los números son de
 muestra, no los euros de Treatwell presentados como confirmados.
-*Alternativa:* «Consultar / desde —» genérico — más seguro pero no ejercita la UI
+_Alternativa:_ «Consultar / desde —» genérico — más seguro pero no ejercita la UI
 de precios ni el «desde/base», que es lo testeable y lo que aporta la demo.
 
 ### Q-C — ¿qué servicios/variantes placeholder por categoría?
 
 **RECOMENDACIÓN: un conjunto pequeño y representativo, con nombres reales
 [V-LEAD/V] y precios placeholder:**
-- **Uñas:** al menos un servicio con **variantes S/M/L** (p.ej. *Manicura
-  Semipermanente* S/M/L — patrón real y verificado) para ejercitar el modelo no
-  aplanado; + un servicio de **precio único** (p.ej. *Nail Art*); + un servicio
-  **«desde» con base** (p.ej. *Uñas de gel, desde …*).
-- **Pestañas:** los que la web del titular anuncia sin precio (*lifting*,
-  *extensiones pelo a pelo*, *tinte*) → todos placeholder.
-- **Cejas:** *diseño*, *tinte*, *laminado* [web del titular] → placeholder.
+
+- **Uñas:** al menos un servicio con **variantes S/M/L** (p.ej. _Manicura
+  Semipermanente_ S/M/L — patrón real y verificado) para ejercitar el modelo no
+  aplanado; + un servicio de **precio único** (p.ej. _Nail Art_); + un servicio
+  **«desde» con base** (p.ej. _Uñas de gel, desde …_).
+- **Pestañas:** los que la web del titular anuncia sin precio (_lifting_,
+  _extensiones pelo a pelo_, _tinte_) → todos placeholder.
+- **Cejas:** _diseño_, _tinte_, _laminado_ [web del titular] → placeholder.
 
 **Prohibido:** presentar el catálogo como completo (39/43); inventar duraciones o
 «corregir» las anomalías de Treatwell (ítems 21/28); copiar textos descriptivos
@@ -322,4 +324,5 @@ El componente de render es aparte y solo importa. **IVA nunca calculado en vista
   canal de reserva.
 - La **nota de reseñas** (4,9) es **F-14**: no entra aquí.
 </content>
+
 </invoke>

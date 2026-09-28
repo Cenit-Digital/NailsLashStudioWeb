@@ -47,20 +47,25 @@ Tu salida final es **un único bloque** en `progress/judge_<name>.md`:
 **Veredicto:** APPROVED | CHANGES_REQUESTED
 
 ## Cobertura de escenarios (@s ↔ test)
+
 - @s1: [x] cubierto por `test_count_archivo_vacio`
-- @s2: [ ]  ← sin test que lo verifique
+- @s2: [ ] ← sin test que lo verifique
 
 ## Disciplina TDD
+
 - ¿Producción sin test que la pida? NO / SÍ (cita archivo:línea)
 - ¿Evidencia de Rojo→Verde→Refactor? SÍ / NO
 
 ## Calidad
+
 - (hallazgos concretos, con archivo:línea)
 
 ## Checkpoints
+
 - C1..C7: [x]/[ ]
 
 ## Cambios requeridos (si aplica)
+
 1. ...
 ```
 
@@ -69,7 +74,9 @@ Tu respuesta en chat es **una sola línea**:
 ```
 APPROVED -> progress/judge_<name>.md
 ```
+
 o
+
 ```
 CHANGES_REQUESTED -> progress/judge_<name>.md
 ```

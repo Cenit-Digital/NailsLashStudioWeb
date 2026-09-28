@@ -20,16 +20,16 @@
 
 ## Mapa @s → test
 
-| @s | Tests (fichero → describe/it) |
-|---|---|
-| @s4 token único | `hero-estilos.test.ts` → «@s4 un ÚNICO token…» (6 tests: token 90s/una vez, sin duración suelta ≤1 s, escribir+recorrer=var+linear, UN reloj, retirarse calc, revelarStudio calc + aparecer 0.3s) |
-| @s4 orden/total | `hero-estilos.test.ts` → «@s4 «STUDIO» entra CUANDO…» (retardo ≥ fin del trazo; total = 90 800 ms EXACTOS) |
-| @s4 un solo reloj (lógica↔hoja) | `hero-logica.test.ts` → «@s4/@s12 el reloj del timeout es EL MISMO…» (SEGUNDOS_DE_TRAZO=90=token por bytes; SEGUNDOS_DE_SALIDA=0.8 leído del calc+duración; ceremonia=90 800) |
-| @s10 | `hero.test.tsx` → «@s10 el rótulo es el control…» (4 tests: botón nativo sin texto, FUERA del h1 con estructura F-07 intacta, foco por tab, NO viaja en el horneado) + `hero-estilos.test.ts` → «@s10/@s14 el control sin cromo…» (transparente, cursor pointer, sin outline) + `hero-logica.test.ts` tabla `debeMontarseElControl` |
-| @s11 | `hero.test.tsx` → «@s11 activar el control…» (clic, Enter, Espacio → data-firma «cliente» + botón desmontado) + `hero-estilos.test.ts` → «@s11/@s12 la firma completada…» (bloque data-firma cliente/reloj → animation: none a las 3 piezas) + `hero-logica.test.ts` tabla `firmaCompletada` |
-| @s12 | `hero.test.tsx` → «@s12 el control SOLO existe mientras…» (90 799 ms: vivo; 90 800: desmontado y fase «reloj»; anti-fuga: clic + avance NO re-etiqueta «cliente») + `hero-logica.test.ts` `milisegundosDeCeremonia()` |
-| @s13 | `hero.test.tsx` → «@s13 con movimiento reducido…» (sin botón en ningún momento ni tras 90,8 s, fase sigue «corriendo», sin botón en el horneado) — el rótulo visible al instante lo protege la hoja (@s3/@s5, intactos) |
-| @s14 | `hero.test.tsx` → «@s14 el control no roba clics…» (clic en el eyebrow NO completa; el botón es hijo directo de la escena) + `hero-estilos.test.ts` @s14 (absolute + inset 0 sobre escena relativa, nunca fixed) |
+| @s                              | Tests (fichero → describe/it)                                                                                                                                                                                                                                                                                                       |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| @s4 token único                 | `hero-estilos.test.ts` → «@s4 un ÚNICO token…» (6 tests: token 90s/una vez, sin duración suelta ≤1 s, escribir+recorrer=var+linear, UN reloj, retirarse calc, revelarStudio calc + aparecer 0.3s)                                                                                                                                   |
+| @s4 orden/total                 | `hero-estilos.test.ts` → «@s4 «STUDIO» entra CUANDO…» (retardo ≥ fin del trazo; total = 90 800 ms EXACTOS)                                                                                                                                                                                                                          |
+| @s4 un solo reloj (lógica↔hoja) | `hero-logica.test.ts` → «@s4/@s12 el reloj del timeout es EL MISMO…» (SEGUNDOS_DE_TRAZO=90=token por bytes; SEGUNDOS_DE_SALIDA=0.8 leído del calc+duración; ceremonia=90 800)                                                                                                                                                       |
+| @s10                            | `hero.test.tsx` → «@s10 el rótulo es el control…» (4 tests: botón nativo sin texto, FUERA del h1 con estructura F-07 intacta, foco por tab, NO viaja en el horneado) + `hero-estilos.test.ts` → «@s10/@s14 el control sin cromo…» (transparente, cursor pointer, sin outline) + `hero-logica.test.ts` tabla `debeMontarseElControl` |
+| @s11                            | `hero.test.tsx` → «@s11 activar el control…» (clic, Enter, Espacio → data-firma «cliente» + botón desmontado) + `hero-estilos.test.ts` → «@s11/@s12 la firma completada…» (bloque data-firma cliente/reloj → animation: none a las 3 piezas) + `hero-logica.test.ts` tabla `firmaCompletada`                                        |
+| @s12                            | `hero.test.tsx` → «@s12 el control SOLO existe mientras…» (90 799 ms: vivo; 90 800: desmontado y fase «reloj»; anti-fuga: clic + avance NO re-etiqueta «cliente») + `hero-logica.test.ts` `milisegundosDeCeremonia()`                                                                                                               |
+| @s13                            | `hero.test.tsx` → «@s13 con movimiento reducido…» (sin botón en ningún momento ni tras 90,8 s, fase sigue «corriendo», sin botón en el horneado) — el rótulo visible al instante lo protege la hoja (@s3/@s5, intactos)                                                                                                             |
+| @s14                            | `hero.test.tsx` → «@s14 el control no roba clics…» (clic en el eyebrow NO completa; el botón es hijo directo de la escena) + `hero-estilos.test.ts` @s14 (absolute + inset 0 sobre escena relativa, nunca fixed)                                                                                                                    |
 
 @s1-@s3, @s5-@s9: tests preexistentes, 0 tocados, todos verdes tras cada ciclo.
 
@@ -87,7 +87,7 @@
 - **ROJO**: 3 tests DOM (clic / Enter / Espacio → `data-firma="cliente"` + botón desmontado; el
   estado inicial «corriendo» se asevera ANTES de activar) + 1 de bytes (bloque
   `.escena[data-firma='cliente'], .escena[data-firma='reloj'] { .trazo,.aplicador,.heroStudio
-  { animation: none } }`).
+{ animation: none } }`).
 - **VERDE**: `setFase` + `onClick={() => setFase('cliente')}` + `data-firma={fase}` en la escena +
   el bloque completada en la hoja (la BASE ya es el estado final: sin reflow).
 - **DECISIÓN (desvío documentado del brief §3b)**: el gancho CSS es `data-firma` (selector de
@@ -149,14 +149,14 @@
 
 ### Mapa @s → test (delta)
 
-| @s | Tests |
-|---|---|
-| @s15 bytes | `hero-estilos.test.ts` → «@s15 las animaciones viven condicionadas…» (4: bases de trazo/aplicador/heroStudio SIN `animation:`; bloque `:global(.caligrafia-lista)` anima las TRES piezas; las CINCO animaciones dentro del bloque; fuera de él todo `animation` restante es `none`) |
-| @s15 DOM | `hero.test.tsx` → «@s15 la clase de «lista» y el botón nacen y mueren JUNTOS» (2: al montar con movimiento permitido clase+botón en el MISMO render; completar retira clase CON botón) |
-| @s7 ampliado | `hero.test.tsx` → «@s7 sin JavaScript el rótulo nace COMPLETO y ESTÁTICO» (renderToString sin `caligrafia-lista`) |
-| @s13 ampliado | `hero.test.tsx` → @s13 «la clase de «lista» NO se añade bajo reduce» (ni al montar ni tras 90,8 s) |
-| @s16 | `hero.test.tsx` → «@s16 el foco no cae al vacío…» (4: clic con userEvent —que enfoca al pulsar—, Enter, fin de reloj con el foco puesto → la escena `tabindex="-1"` recibe el foco; NEGATIVA: sin foco en el botón el fin de reloj NO lo roba) |
-| @s17 | `hero.test.tsx` → «@s17 activar reduce a MITAD de firma la completa…» (4: change matches:true → clase y botón fuera al instante; matches:false sobre firma en marcha NO la toca; desactivar tras completar NO rearranca nada y el reloj quedó limpio (90,8 s después sigue `corriendo`); unmount → removeEventListener con EXACTAMENTE el manejador registrado en «change») |
+| @s            | Tests                                                                                                                                                                                                                                                                                                                                                                       |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| @s15 bytes    | `hero-estilos.test.ts` → «@s15 las animaciones viven condicionadas…» (4: bases de trazo/aplicador/heroStudio SIN `animation:`; bloque `:global(.caligrafia-lista)` anima las TRES piezas; las CINCO animaciones dentro del bloque; fuera de él todo `animation` restante es `none`)                                                                                         |
+| @s15 DOM      | `hero.test.tsx` → «@s15 la clase de «lista» y el botón nacen y mueren JUNTOS» (2: al montar con movimiento permitido clase+botón en el MISMO render; completar retira clase CON botón)                                                                                                                                                                                      |
+| @s7 ampliado  | `hero.test.tsx` → «@s7 sin JavaScript el rótulo nace COMPLETO y ESTÁTICO» (renderToString sin `caligrafia-lista`)                                                                                                                                                                                                                                                           |
+| @s13 ampliado | `hero.test.tsx` → @s13 «la clase de «lista» NO se añade bajo reduce» (ni al montar ni tras 90,8 s)                                                                                                                                                                                                                                                                          |
+| @s16          | `hero.test.tsx` → «@s16 el foco no cae al vacío…» (4: clic con userEvent —que enfoca al pulsar—, Enter, fin de reloj con el foco puesto → la escena `tabindex="-1"` recibe el foco; NEGATIVA: sin foco en el botón el fin de reloj NO lo roba)                                                                                                                              |
+| @s17          | `hero.test.tsx` → «@s17 activar reduce a MITAD de firma la completa…» (4: change matches:true → clase y botón fuera al instante; matches:false sobre firma en marcha NO la toca; desactivar tras completar NO rearranca nada y el reloj quedó limpio (90,8 s después sigue `corriendo`); unmount → removeEventListener con EXACTAMENTE el manejador registrado en «change») |
 
 ### Ciclo A — @s15 + @s7/@s13 ampliados (A-3): el arranque en el montaje
 

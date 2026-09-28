@@ -66,6 +66,7 @@ fuera del alcance de esta sesión de limpieza.
 ## Resultado typecheck / lint / test
 
 ### Antes (estado heredado, no medido por mí de forma aislada — se infiere de los cabos sueltos
+
 descritos por quien encargó la tarea): `pnpm typecheck` fallaba por el import roto de
 `../components/BotonWhatsApp` en `home.tsx`; `pnpm test` fallaba en los 3 ficheros huérfanos de
 `boton-whatsapp*` (no podían importar el componente borrado).

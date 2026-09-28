@@ -9,43 +9,46 @@
 > implementar. Precedente F-05/F-06 (A-23 redux). Ver la sección «Puerta humana 2026-07-18» al final.
 
 ## Escenarios: 17 (@s1..@s13, @s16, @s15, @s17, @s14; @s16 añadido en la ronda de reparación —partición
+
 ## corte===0—; @s15/@s14 se definen tras el resto, junto a su condición C-5, para no renumerar; @s17
+
 ## AÑADIDO en la ampliación 2026-07-18 —tipografía del titular—, colocado ANTES del @s14 aplazado para
+
 ## que la cola de trazabilidad F-08 siga siendo la última del fichero)
 
 ## Mapa acceptance de `feature_list.json §7` → @s
 
-| # | Acceptance original | Destilación | @s |
-| - | ------------------- | ----------- | -- |
-| 1 | «El estado base en CSS es el estado final VISIBLE; el oculto vive solo en el 0% del keyframe» | Se lee el SCSS: base visible (@s1) + oculto SOLO en el 0% (@s2) | **@s1, @s2** |
-| 2 | «Con prefers-reduced-motion: reduce el hero se ve completo y legible» | `@media (prefers-reduced-motion: reduce){ animation: none }` en el SCSS — CRITERIO DE PROYECTO (C-4), NO «WCAG obliga» | **@s3** |
-| 3 | «El HTML prerenderizado (sin JS) muestra el nombre visible: fetch del HTML crudo, no jsdom» | Bytes de `dist/` (readFileSync + string), sin `opacity:0`/`clip-path` oculto horneado; red anti-observer | **@s5** |
-| 4 | «La animación bob no es infinite (SC 2.2.2 A)» | ✅ C-5 (2026-07-18): **APLAZADO A F-08** (el bob depende de scroll, hoy no lo hay). @s14 se conserva por trazabilidad; el `tdd_craftsman` NO lo implementa en F-07 | **@s14** APLAZADO F-08 |
-| 5 | «El elemento LCP no tiene opacity:0 en ningún momento y es legible en ≤1,2s (hoy ~5,3s)» | ✅ C-2 (2026-07-18), SEPARADO en dos ejes: base sin `opacity:0`/`clip-path` oculto → @s1; DURACIÓN acotada ≤1,2s (C-3) → @s4; **NÚMERO LCP real → [NV] / verificación EN VIVO con Chrome (NO escenario unitario)** | **@s1, @s4** + nota LCP |
-| 6 | «El hook de IntersectionObserver es SSR-safe…» | ✅ C-1 (2026-07-18): **RETIRADO** (no aplica; above-the-fold; `grep`=0 [V]). Cubierto NEGATIVAMENTE por @s5 (visible sin JS) | **retirado** → @s5 |
-| 7 | **AMPLIACIÓN 2026-07-18** «La tipografía de marca del titular: `.heroMarca` («Nails Lash») en Great Vibes (fallback cursive), `.heroStudio` («Studio») en Manrope (fallback sans-serif); se lee el `.module.scss` y se RE-VERIFICA EN VIVO con Chrome» | Se lee el SCSS (bytes, como @s1/@s3/@s9): `font-family` de `.heroMarca` = `'Great Vibes'`+cursive, de `.heroStudio` = `'Manrope'`+sans-serif, nombres A MANO; el eje [NV] «qué fuente PINTA el navegador» → verificación EN VIVO con Chrome (`document.fonts.check` + `font-family` computado) | **@s17** + nota [NV] Chrome |
+| #   | Acceptance original                                                                                                                                                                                                                                    | Destilación                                                                                                                                                                                                                                                                                    | @s                          |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| 1   | «El estado base en CSS es el estado final VISIBLE; el oculto vive solo en el 0% del keyframe»                                                                                                                                                          | Se lee el SCSS: base visible (@s1) + oculto SOLO en el 0% (@s2)                                                                                                                                                                                                                                | **@s1, @s2**                |
+| 2   | «Con prefers-reduced-motion: reduce el hero se ve completo y legible»                                                                                                                                                                                  | `@media (prefers-reduced-motion: reduce){ animation: none }` en el SCSS — CRITERIO DE PROYECTO (C-4), NO «WCAG obliga»                                                                                                                                                                         | **@s3**                     |
+| 3   | «El HTML prerenderizado (sin JS) muestra el nombre visible: fetch del HTML crudo, no jsdom»                                                                                                                                                            | Bytes de `dist/` (readFileSync + string), sin `opacity:0`/`clip-path` oculto horneado; red anti-observer                                                                                                                                                                                       | **@s5**                     |
+| 4   | «La animación bob no es infinite (SC 2.2.2 A)»                                                                                                                                                                                                         | ✅ C-5 (2026-07-18): **APLAZADO A F-08** (el bob depende de scroll, hoy no lo hay). @s14 se conserva por trazabilidad; el `tdd_craftsman` NO lo implementa en F-07                                                                                                                             | **@s14** APLAZADO F-08      |
+| 5   | «El elemento LCP no tiene opacity:0 en ningún momento y es legible en ≤1,2s (hoy ~5,3s)»                                                                                                                                                               | ✅ C-2 (2026-07-18), SEPARADO en dos ejes: base sin `opacity:0`/`clip-path` oculto → @s1; DURACIÓN acotada ≤1,2s (C-3) → @s4; **NÚMERO LCP real → [NV] / verificación EN VIVO con Chrome (NO escenario unitario)**                                                                             | **@s1, @s4** + nota LCP     |
+| 6   | «El hook de IntersectionObserver es SSR-safe…»                                                                                                                                                                                                         | ✅ C-1 (2026-07-18): **RETIRADO** (no aplica; above-the-fold; `grep`=0 [V]). Cubierto NEGATIVAMENTE por @s5 (visible sin JS)                                                                                                                                                                   | **retirado** → @s5          |
+| 7   | **AMPLIACIÓN 2026-07-18** «La tipografía de marca del titular: `.heroMarca` («Nails Lash») en Great Vibes (fallback cursive), `.heroStudio` («Studio») en Manrope (fallback sans-serif); se lee el `.module.scss` y se RE-VERIFICA EN VIVO con Chrome» | Se lee el SCSS (bytes, como @s1/@s3/@s9): `font-family` de `.heroMarca` = `'Great Vibes'`+cursive, de `.heroStudio` = `'Manrope'`+sans-serif, nombres A MANO; el eje [NV] «qué fuente PINTA el navegador» → verificación EN VIVO con Chrome (`document.fonts.check` + `font-family` computado) | **@s17** + nota [NV] Chrome |
 
 ## Casos límite de la spec (§Feature 7) → @s
 
-| Caso límite | @s |
-| ----------- | -- |
-| 1. HTML sin JS → nombre VISIBLE (obligatorio) | @s5 |
-| 2. reduced-motion → hero completo y legible | @s3 |
-| 3. base sin `opacity:0`/`clip-path` oculto (oculto solo en 0%) | @s1 (+@s2) |
-| 4. NOMBRE sin espacio → guarda, no compone «Nails LashStudio» ni indexa con -1 | @s13 |
-| 5. nombre accesible «Nails Lash Studio» (17); pegados → «Nails LashStudio» (16) → fallo | @s7, @s8 |
+| Caso límite                                                                                           | @s                 |
+| ----------------------------------------------------------------------------------------------------- | ------------------ |
+| 1. HTML sin JS → nombre VISIBLE (obligatorio)                                                         | @s5                |
+| 2. reduced-motion → hero completo y legible                                                           | @s3                |
+| 3. base sin `opacity:0`/`clip-path` oculto (oculto solo en 0%)                                        | @s1 (+@s2)         |
+| 4. NOMBRE sin espacio → guarda, no compone «Nails LashStudio» ni indexa con -1                        | @s13               |
+| 5. nombre accesible «Nails Lash Studio» (17); pegados → «Nails LashStudio» (16) → fallo               | @s7, @s8           |
 | 6. `bob infinite` → viola SC 2.2.2 (A); finito Y ≤5s → conforme (APLAZADO A F-08 por C-5, 2026-07-18) | @s14 APLAZADO F-08 |
-| 7. titular con `--accent` como texto → 4,05 < 4,5 → puerta de contraste ROJA | @s9 |
-| 8. duración por encima del límite de C-3 → fallo del eje testeable | @s4 |
-| 9. hero en `<section>` → activaría la puerta de anclas de F-06; no se envuelve | @s11 |
+| 7. titular con `--accent` como texto → 4,05 < 4,5 → puerta de contraste ROJA                          | @s9                |
+| 8. duración por encima del límite de C-3 → fallo del eje testeable                                    | @s4                |
+| 9. hero en `<section>` → activaría la puerta de anclas de F-06; no se envuelve                        | @s11               |
 
 ## Otros comportamientos medidos de la spec → @s
 
-| Comportamiento | @s |
-| -------------- | -- |
-| UN solo `<h1>` tras el hero; hijos `<span>` (no `<div>`) | @s6 |
-| derivación marca/tipo por `lastIndexOf(' ')` (la lógica mutable) | @s12 |
-| mutantes de la derivación (I-6, umbral 1.0) | @s15 |
+| Comportamiento                                                                                     | @s   |
+| -------------------------------------------------------------------------------------------------- | ---- |
+| UN solo `<h1>` tras el hero; hijos `<span>` (no `<div>`)                                           | @s6  |
+| derivación marca/tipo por `lastIndexOf(' ')` (la lógica mutable)                                   | @s12 |
+| mutantes de la derivación (I-6, umbral 1.0)                                                        | @s15 |
 | eyebrow `<p>`, nunca heading; estructura, no contenido (C-7 APROBADO 2026-07-18: contenido a F-09) | @s10 |
 
 ## Las CINCO preguntas a la puerta humana — CERRADAS POR EL HUMANO EL 2026-07-18 (todas como proponía el lead)
@@ -125,7 +128,7 @@ todas (@s4 fija ≤1,2s por C-3; @s14 se aplaza a F-08 por C-5).
    añadir a mano el fichero a la lista `mutate` de `stryker.config.json` (lista explícita, sin glob).
 
 4. **🔴 GRAVE — @s14 confundía LETRA (≤5s) con TÉCNICA (finitud).** `iteration-count:3` sobre `bob
-   2,4s` = 7,2s es finito y >5s → sigue incumpliendo SC 2.2.2 (A).
+2,4s` = 7,2s es finito y >5s → sigue incumpliendo SC 2.2.2 (A).
    → El Then ahora asevera la **DURACIÓN TOTAL** (count × duración por iteración) ≤ 5s —espejo de @s4—,
    además de la finitud; se separa (a) letra (≤5s) de (b) técnica (≠ infinite). El «5» es el LITERAL
    WCAG, no un número horneado de C-3 (C-3 cerrada el 2026-07-18 con ≤1,2s; el «5» de @s14 sigue siendo

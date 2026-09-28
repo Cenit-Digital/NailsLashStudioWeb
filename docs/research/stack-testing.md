@@ -62,18 +62,18 @@ minutos; con `--mutate <fichero>` tarda ~1 min y con rango de líneas ~7 s
 Ejecutado en `WebEmpresa/` leyendo el `package.json` de cada paquete en
 `node_modules`, no de memoria:
 
-| Paquete | Versión instalada | Rango declarado (`package.json:40-64`) |
-|---|---|---|
-| `vitest` | **4.1.9** | `^4.0.0` (`package.json:63`) |
-| `jsdom` | **25.0.1** | `^25.0.0` (`package.json:56`) |
-| `@testing-library/react` | **16.3.2** | `^16.3.0` (`package.json:45`) |
-| `@testing-library/jest-dom` | **6.9.1** | `^6.6.0` (`package.json:44`) |
-| `@testing-library/user-event` | **14.6.1** | `^14.6.0` (`package.json:46`) |
-| `@stryker-mutator/core` | **9.6.1** | `^9.6.0` (`package.json:42`) |
-| `@stryker-mutator/vitest-runner` | **9.6.1** | `^9.6.0` (`package.json:43`) |
-| `react` | **19.2.7** | `^19.2.0` (`package.json:36`) |
-| `@vitejs/plugin-react-swc` | **3.11.0** | `^3.11.0` (`package.json:50`) |
-| `@vitest/coverage-v8` | **4.1.9** | `^4.0.0` (`package.json:51`) |
+| Paquete                          | Versión instalada | Rango declarado (`package.json:40-64`) |
+| -------------------------------- | ----------------- | -------------------------------------- |
+| `vitest`                         | **4.1.9**         | `^4.0.0` (`package.json:63`)           |
+| `jsdom`                          | **25.0.1**        | `^25.0.0` (`package.json:56`)          |
+| `@testing-library/react`         | **16.3.2**        | `^16.3.0` (`package.json:45`)          |
+| `@testing-library/jest-dom`      | **6.9.1**         | `^6.6.0` (`package.json:44`)           |
+| `@testing-library/user-event`    | **14.6.1**        | `^14.6.0` (`package.json:46`)          |
+| `@stryker-mutator/core`          | **9.6.1**         | `^9.6.0` (`package.json:42`)           |
+| `@stryker-mutator/vitest-runner` | **9.6.1**         | `^9.6.0` (`package.json:43`)           |
+| `react`                          | **19.2.7**        | `^19.2.0` (`package.json:36`)          |
+| `@vitejs/plugin-react-swc`       | **3.11.0**        | `^3.11.0` (`package.json:50`)          |
+| `@vitest/coverage-v8`            | **4.1.9**         | `^4.0.0` (`package.json:51`)           |
 
 Motor y gestor exigidos (`WebEmpresa/package.json:8-12`):
 `"packageManager": "pnpm@11.9.0"`, `engines.node: ">=22.12.0"`, `engines.pnpm: ">=10"`.
@@ -113,15 +113,15 @@ export default defineConfig({
 
 Lectura línea a línea, con la fuente oficial de cada opción:
 
-| Línea | Opción | Qué implica | Fuente oficial |
-|---|---|---|---|
-| `:5` | `plugins: [react()]` | El JSX/TSX se transpila con SWC en los tests, igual que en build. | Config real, `vitest.config.ts:5` |
-| `:7` | `globals: true` | `describe/it/expect` disponibles sin importar. **El default de Vitest es `false`** — "By default, `vitest` does not provide global APIs for explicitness". Requiere `types: ["vitest/globals"]` en tsconfig. | https://vitest.dev/config/globals (verificado) |
-| `:8` | `environment: 'jsdom'` | El **default de Vitest es `'node'`**; hay que activar jsdom explícitamente. Built-ins: `'node'`, `'jsdom'`, `'happy-dom'`, `'edge-runtime'`. Se puede sobreescribir por fichero con el docblock `// @vitest-environment jsdom`. | https://vitest.dev/config/environment y https://vitest.dev/guide/environment (verificado) |
-| `:9` | `setupFiles: ['./vitest.setup.ts']` | "Paths to setup files resolved relative to the `root`. They will run **before each _test file_** in the same process." Vitest ignora los exports de esos ficheros. | https://vitest.dev/config/setupfiles (verificado, cita textual) |
-| `:10` | `css: false` | Los CSS/SCSS **no** se procesan en test. **Consecuencia dura:** `styles.foo` de un `*.module.scss` no devuelve la clase real, así que **los tests no pueden aseverar clases CSS**. (Inferencia mía a partir de la config; el estilo de los tests reales lo confirma: ninguno asevera `className`, ver §2.6.) |
-| `:11` | `include: ['src/**/*.{test,spec}.{ts,tsx}']` | Los tests viven **junto al código** en `src/`, no en un `tests/` aparte. | Config real + `find src` (24 ficheros de test, §2.6.1) |
-| `:12-17` | `coverage` | Proveedor v8; **cobertura solo de `src/lib/**/*.ts`** (la lógica pura), no de componentes. | `vitest.config.ts:15` |
+| Línea    | Opción                                       | Qué implica                                                                                                                                                                                                                                                                                                  | Fuente oficial                                                                            |
+| -------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| `:5`     | `plugins: [react()]`                         | El JSX/TSX se transpila con SWC en los tests, igual que en build.                                                                                                                                                                                                                                            | Config real, `vitest.config.ts:5`                                                         |
+| `:7`     | `globals: true`                              | `describe/it/expect` disponibles sin importar. **El default de Vitest es `false`** — "By default, `vitest` does not provide global APIs for explicitness". Requiere `types: ["vitest/globals"]` en tsconfig.                                                                                                 | https://vitest.dev/config/globals (verificado)                                            |
+| `:8`     | `environment: 'jsdom'`                       | El **default de Vitest es `'node'`**; hay que activar jsdom explícitamente. Built-ins: `'node'`, `'jsdom'`, `'happy-dom'`, `'edge-runtime'`. Se puede sobreescribir por fichero con el docblock `// @vitest-environment jsdom`.                                                                              | https://vitest.dev/config/environment y https://vitest.dev/guide/environment (verificado) |
+| `:9`     | `setupFiles: ['./vitest.setup.ts']`          | "Paths to setup files resolved relative to the `root`. They will run **before each _test file_** in the same process." Vitest ignora los exports de esos ficheros.                                                                                                                                           | https://vitest.dev/config/setupfiles (verificado, cita textual)                           |
+| `:10`    | `css: false`                                 | Los CSS/SCSS **no** se procesan en test. **Consecuencia dura:** `styles.foo` de un `*.module.scss` no devuelve la clase real, así que **los tests no pueden aseverar clases CSS**. (Inferencia mía a partir de la config; el estilo de los tests reales lo confirma: ninguno asevera `className`, ver §2.6.) |
+| `:11`    | `include: ['src/**/*.{test,spec}.{ts,tsx}']` | Los tests viven **junto al código** en `src/`, no en un `tests/` aparte.                                                                                                                                                                                                                                     | Config real + `find src` (24 ficheros de test, §2.6.1)                                    |
+| `:12-17` | `coverage`                                   | Proveedor v8; **cobertura solo de `src/lib/**/*.ts`** (la lógica pura), no de componentes.                                                                                                                                                                                                                   | `vitest.config.ts:15`                                                                     |
 
 > **Observación mía (inferencia):** que `coverage.include` sea solo `src/lib/**` y en
 > cambio `stryker.mutate` incluya también `src/components/**` indica que la casa
@@ -140,6 +140,7 @@ en el setup file y declararlo en `setupFiles: ['./vitest-setup.js']`
 (verificado en https://github.com/testing-library/jest-dom, sección Usage/Vitest).
 
 **Lo que NO hay y conviene notar:**
+
 - **No hay `cleanup()` manual ni `afterEach(cleanup)`.** No aparece en el setup.
   > **Inferencia mía (NO verificada en doc oficial):** `@testing-library/react`
   > hace auto-cleanup cuando detecta un `afterEach` global, lo cual encaja con
@@ -184,14 +185,23 @@ Nota: `strict: true`, `noUnusedLocals: true`, `noUnusedParameters: true`
   "coverageAnalysis": "perTest",
   "vitest": { "configFile": "vitest.config.ts" },
   "mutate": [
-    "src/lib/seo.ts", "src/lib/nav.ts", "src/lib/theme.ts",
-    "src/lib/useIsMobile.ts", "src/lib/useReveal.ts",
-    "src/components/HeaderNav.tsx", "src/components/MobileMenu.tsx",
-    "src/components/Logo.tsx", "src/components/ThemeToggle.tsx",
-    "src/components/Footer.tsx", "src/components/Layout.tsx",
-    "src/components/Hero.tsx", "src/components/Servicios.tsx",
-    "src/components/Sectores.tsx", "src/components/Paquetes.tsx",
-    "src/components/Contacto.tsx", "src/lib/contact.ts"
+    "src/lib/seo.ts",
+    "src/lib/nav.ts",
+    "src/lib/theme.ts",
+    "src/lib/useIsMobile.ts",
+    "src/lib/useReveal.ts",
+    "src/components/HeaderNav.tsx",
+    "src/components/MobileMenu.tsx",
+    "src/components/Logo.tsx",
+    "src/components/ThemeToggle.tsx",
+    "src/components/Footer.tsx",
+    "src/components/Layout.tsx",
+    "src/components/Hero.tsx",
+    "src/components/Servicios.tsx",
+    "src/components/Sectores.tsx",
+    "src/components/Paquetes.tsx",
+    "src/components/Contacto.tsx",
+    "src/lib/contact.ts"
   ],
   "thresholds": { "high": 100, "low": 90, "break": 100 },
   "tempDirName": ".stryker-tmp",
@@ -201,16 +211,16 @@ Nota: `strict: true`, `noUnusedLocals: true`, `noUnusedParameters: true`
 
 #### 2.3.2 Qué significa cada clave
 
-| Clave | Valor | Evidencia / fuente |
-|---|---|---|
-| `testRunner` | `"vitest"` | `stryker.config.json:5` |
-| `plugins` | `["@stryker-mutator/vitest-runner"]` | `stryker.config.json:6`. La doc oficial confirma que el runner se instala aparte: "Install `@stryker-mutator/vitest-runner` locally within your project folder" (https://stryker-mutator.io/docs/stryker-js/vitest-runner/) |
-| `coverageAnalysis` | `"perTest"` | `stryker.config.json:8`. **Redundante:** la doc oficial del vitest-runner dice que "Your `coverageAnalysis` property is **ignored**. The vitest runner plugin will always use `"perTest"` coverage analysis" (verificado). Es decir, esta línea no hace nada — pero tampoco daña. Semántica de `perTest`: "Only the tests that cover a specific mutant are executed for each mutant. Your tests should be _able to run independently of each other and in random order_" (https://stryker-mutator.io/docs/stryker-js/configuration/) |
-| `vitest.configFile` | `"vitest.config.ts"` | `stryker.config.json:9-11`. Doc oficial: "Specify a 'vitest.config.js' file to be loaded. By default vitest will look for a `vitest.config.js` (or `.ts`) file in the root" (verificado) |
-| `mutate` | **Lista explícita de 17 ficheros** | `stryker.config.json:12-30`. **No es un glob.** Es una lista que el `tdd_craftsman` va ampliando feature a feature. Doc oficial de `mutate`: "With `mutate` you configure the subset of files or just one specific file to be mutated. These should be your _production code files_, and definitely not your test files" (verificado) |
-| `thresholds` | `high:100, low:90, break:100` | `stryker.config.json:31-35`. Doc oficial: "`mutation score < break`: Error! Stryker will exit with exit code 1" (verificado). Con `break: 100`, **cualquier mutante superviviente rompe la build**. Confirmado empíricamente: ver el `ERROR ... setting exit code to 1 (failure)` en §2.5.3 |
-| `tempDirName` | `".stryker-tmp"` | `stryker.config.json:36`. Existe en disco (`ls -a` muestra `.stryker-tmp/`) |
-| `htmlReporter.fileName` | `"reports/mutation/index.html"` | `stryker.config.json:37-39`; el directorio `reports/` existe en el repo |
+| Clave                   | Valor                                | Evidencia / fuente                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ----------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `testRunner`            | `"vitest"`                           | `stryker.config.json:5`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `plugins`               | `["@stryker-mutator/vitest-runner"]` | `stryker.config.json:6`. La doc oficial confirma que el runner se instala aparte: "Install `@stryker-mutator/vitest-runner` locally within your project folder" (https://stryker-mutator.io/docs/stryker-js/vitest-runner/)                                                                                                                                                                                                                                                                                                          |
+| `coverageAnalysis`      | `"perTest"`                          | `stryker.config.json:8`. **Redundante:** la doc oficial del vitest-runner dice que "Your `coverageAnalysis` property is **ignored**. The vitest runner plugin will always use `"perTest"` coverage analysis" (verificado). Es decir, esta línea no hace nada — pero tampoco daña. Semántica de `perTest`: "Only the tests that cover a specific mutant are executed for each mutant. Your tests should be _able to run independently of each other and in random order_" (https://stryker-mutator.io/docs/stryker-js/configuration/) |
+| `vitest.configFile`     | `"vitest.config.ts"`                 | `stryker.config.json:9-11`. Doc oficial: "Specify a 'vitest.config.js' file to be loaded. By default vitest will look for a `vitest.config.js` (or `.ts`) file in the root" (verificado)                                                                                                                                                                                                                                                                                                                                             |
+| `mutate`                | **Lista explícita de 17 ficheros**   | `stryker.config.json:12-30`. **No es un glob.** Es una lista que el `tdd_craftsman` va ampliando feature a feature. Doc oficial de `mutate`: "With `mutate` you configure the subset of files or just one specific file to be mutated. These should be your _production code files_, and definitely not your test files" (verificado)                                                                                                                                                                                                |
+| `thresholds`            | `high:100, low:90, break:100`        | `stryker.config.json:31-35`. Doc oficial: "`mutation score < break`: Error! Stryker will exit with exit code 1" (verificado). Con `break: 100`, **cualquier mutante superviviente rompe la build**. Confirmado empíricamente: ver el `ERROR ... setting exit code to 1 (failure)` en §2.5.3                                                                                                                                                                                                                                          |
+| `tempDirName`           | `".stryker-tmp"`                     | `stryker.config.json:36`. Existe en disco (`ls -a` muestra `.stryker-tmp/`)                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `htmlReporter.fileName` | `"reports/mutation/index.html"`      | `stryker.config.json:37-39`; el directorio `reports/` existe en el repo                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 
 #### 2.3.3 Ficheros excluidos
 
@@ -248,6 +258,7 @@ WebEmpresa se integra con el arnés **solo por `init.sh` + scripts de pnpm**.
 pnpm coverage`, `pnpm mutation` (Stryker), `pnpm verify` / `./init.sh`.
 
 `WebEmpresa/package.json:26-27`:
+
 ```json
 "mutation": "stryker run",
 "verify": "bash ./init.sh"
@@ -294,9 +305,9 @@ Aquí el arnés es el motor agnóstico:
   comando ({{py}} → intérprete, **{{target}} → objetivo**)".
 - `.harness/harness.mjs:250-252`:
   ```js
-  const target = process.argv[3] || '';
-  console.log(`$ ${resolveCmd(cfg.commands.mutate, { target })}\n`);
-  process.exit(run(cfg.commands.mutate, { tokens: { target } }).status);
+  const target = process.argv[3] || ''
+  console.log(`$ ${resolveCmd(cfg.commands.mutate, { target })}\n`)
+  process.exit(run(cfg.commands.mutate, { tokens: { target } }).status)
   ```
   → **`bin/harness mutate <target>` inyecta `<target>` en `{{target}}`**.
 - `.harness/harness.mjs:246-248`: si `commands.mutate` está vacío, falla con
@@ -331,9 +342,11 @@ todo. `docs/mutation-testing.md:70-73` de este repo confirma la recomendación
 token.
 
 > **Inferencia mía (recomendación, no verificada por ninguna fuente):** declarar
+>
 > ```json
 > "mutate": "pnpm exec stryker run --mutate {{target}}"
 > ```
+>
 > tiene el problema de que, sin argumento, `{{target}}` se resuelve a cadena vacía
 > (`harness.mjs:250`, `target = process.argv[3] || ''`) y quedaría
 > `stryker run --mutate ` (flag sin valor). **No he verificado qué hace Stryker con
@@ -367,6 +380,7 @@ All files | 100.00 |  100.00 |       13 |         0 |          0 |        0 |   
 INFO MutationTestReportHelper Final mutation score of 100.00 is greater than or equal to break threshold 100
 INFO MutationTestExecutor Done in 58 seconds.
 ```
+
 (13 killed + 3 timeout, 0 supervivientes, **58 s**.)
 
 #### 2.5.2 Afinar aún más: rango de mutación (líneas)
@@ -376,6 +390,7 @@ Doc oficial (https://stryker-mutator.io/docs/stryker-js/configuration/, verifica
 > "It is possible to specify exactly which code blocks to mutate by means of a
 > _mutation range_. This can be done postfixing your file with
 > `:startLine[:startColumn]-endLine[:endColumn]`."
+>
 > - `"src/app.js:1-11"` → muta líneas 1 a 11.
 > - `"src/app.js:5:4-6:4"` → de línea 5 col 4 a línea 6 col 4.
 >
@@ -387,10 +402,12 @@ Doc oficial (https://stryker-mutator.io/docs/stryker-js/configuration/, verifica
 ```bash
 pnpm exec stryker run --mutate "src/lib/nav.ts:19-19"
 ```
+
 ```
 All files | 100.00 |  100.00 |        3 |         0 |          0 |        0 |        0 |
 INFO Final mutation score of 100.00 is greater than or equal to break threshold 100
 ```
+
 → **3 mutantes en vez de 16, en ~7 segundos.** Esto es exactamente lo que el
 pipeline necesita para "mutación sobre las líneas tocadas por la feature"
 (`docs/mutation-testing.md:73-75`).
@@ -411,11 +428,11 @@ El `--help` local anuncia:
 Suena a la herramienta perfecta para acotar. **No lo es en este stack.**
 Ejecuté las tres variantes sobre el **mismo** fichero:
 
-| Comando ejecutado | Score obtenido | Mutantes |
-|---|---|---|
-| `--mutate src/lib/nav.ts` | **100.00** ✅ | 13 killed, 3 timeout, **0 survived** |
-| `--mutate src/lib/nav.ts --testFiles src/lib/nav.test.ts` | **0.00** ❌ | 0 killed, **16 survived** |
-| `--mutate src/lib/nav.ts --testFiles "**/nav.test.ts"` | **0.00** ❌ | 0 killed, **16 survived** |
+| Comando ejecutado                                         | Score obtenido | Mutantes                             |
+| --------------------------------------------------------- | -------------- | ------------------------------------ |
+| `--mutate src/lib/nav.ts`                                 | **100.00** ✅  | 13 killed, 3 timeout, **0 survived** |
+| `--mutate src/lib/nav.ts --testFiles src/lib/nav.test.ts` | **0.00** ❌    | 0 killed, **16 survived**            |
+| `--mutate src/lib/nav.ts --testFiles "**/nav.test.ts"`    | **0.00** ❌    | 0 killed, **16 survived**            |
 
 Salida literal de la variante con `--testFiles` (ruta exacta):
 
@@ -501,7 +518,7 @@ comportamiento.
    (`Contacto.behavior.test.tsx:45`), `aria-describedby` (`:46`), `aria-hidden`
    (`ThemeToggle.test.tsx:120`), `data-icon` (`:86`), `data-theme`
    (`:147`), `data-reveal` / `data-in-view` (`useReveal.test.tsx:89,114`).
-   > **Inferencia mía:** exponer `data-icon` en el SVG es un *hook de test*
+   > **Inferencia mía:** exponer `data-icon` en el SVG es un _hook de test_
    > deliberado, porque sin CSS no hay otra forma estable de identificar el icono.
 4. **Anti-tautología explícita.** Documentado en los propios comentarios:
    `useIsMobile.test.tsx:8-15` — el fake compara contra el literal
@@ -511,7 +528,7 @@ comportamiento.
    los tests de 'móvil' fallan → **el mutante muere**".
    Idéntico razonamiento en `ThemeToggle.test.tsx:9-15`.
    **Esto es la clave de por qué llegan al 100% de mutación.** Los tests están
-   escritos *pensando en qué mutante los mataría*.
+   escritos _pensando en qué mutante los mataría_.
 5. **`userEvent` para interacción, `fireEvent` solo para lo que `userEvent` no
    puede** (p. ej. rellenar un honeypot oculto:
    `Contacto.behavior.test.tsx:172`).
@@ -586,7 +603,9 @@ function fakeMatchMedia(prefersDark: boolean) {
     },
   })) as unknown as typeof window.matchMedia
   return {
-    setDark: (value: boolean) => { current = value },
+    setDark: (value: boolean) => {
+      current = value
+    },
     emitChange: () => listenersByQuery.get(DARK_QUERY)?.forEach((cb) => cb()),
     activeListeners: () => listenersByQuery.get(DARK_QUERY)?.size ?? 0,
   }
@@ -672,7 +691,7 @@ Tests que vale la pena copiar tal cual (`useReveal.test.tsx:72-143`), porque cub
 los cuatro casos que la mutación exige:
 
 - **Degradación sin API**: `vi.stubGlobal('IntersectionObserver', undefined)` → el
-  contenido queda visible (`:72-81`). *(Importante para SSG/SSR.)*
+  contenido queda visible (`:72-81`). _(Importante para SSG/SSR.)_
 - **Opciones exactas**: `expect(observer.options?.rootMargin).toBe(REVEAL_ROOT_MARGIN)`
   **y** `expect(REVEAL_ROOT_MARGIN).toBe('-40% 0px -40% 0px')` (`:101-104`) — la
   doble aserción es lo que mata al mutante de literal.
@@ -832,18 +851,18 @@ describe('nav', () => {
 
 ## 3. Lo que NO he podido verificar
 
-| # | Afirmación / duda | Estado | Qué haría falta para verificarlo |
-|---|---|---|---|
-| 1 | **Causa raíz del 0% con `--testFiles`** | Comportamiento **verificado** (reproducido 2×, ruta y glob); causa **desconocida**. La doc de `testFiles` no cita límites por runner; la del vitest-runner no menciona `testFiles`. | Abrir issue/buscar en el repo de `@stryker-mutator/vitest-runner`; correr con `--logLevel trace` e inspeccionar `.stryker-tmp`. **Mientras tanto: no usar `--testFiles`.** |
-| 2 | Que `@testing-library/react` haga **auto-cleanup** con `globals: true` sin `afterEach(cleanup)` | **Inferencia**, no verificada en doc oficial. Hecho verificado: `vitest.setup.ts:1` es una sola línea y no hay `cleanup`. | Leer la doc oficial de `@testing-library/react` (sección auto-cleanup / `RTL_SKIP_AUTO_CLEANUP`) o el código de `node_modules/@testing-library/react`. |
-| 3 | Que Vitest **exija instalar `jsdom` aparte** | **Desconocido.** La doc oficial consultada (vitest.dev/config/environment y /guide/environment) **no lo dice explícitamente**. Verificado solo que WebEmpresa lo declara en `devDependencies` (`package.json:56`). | Buscar en la doc de Vitest 4 la nota de instalación de entornos, o probar a desinstalar jsdom y correr. |
-| 4 | Qué hace `stryker run --mutate` con **valor vacío** (caso `{{target}}` sin argumento) | **Desconocido.** Relevante porque `harness.mjs:250` resuelve `target` a `''`. | Ejecutar `pnpm exec stryker run --mutate ""` y observar. Decide si hace falta wrapper. |
-| 5 | Por qué `src/App.tsx`, `src/main.tsx`, `src/lib/site.ts`, `src/pages/*`, `CheckIcon/SectorIcon/ServiceMockup/Header` **no están** en `mutate` | **Desconocido.** Verificado que no están (`stryker.config.json:12-30`). No hallé justificación documental. | Revisar `progress/mutation_*.md` de WebEmpresa o preguntar al autor. |
-| 6 | Que `css: false` sea la razón de no aseverar clases CSS | **Inferencia mía** (consistente con los 24 tests, ninguno asevera `className`). | Doc oficial de la opción `css` de Vitest; o poner `css: true` y ver si `styles.x` resuelve. |
-| 7 | **Tiempo total** de `pnpm mutation` sobre los 17 ficheros | **Desconocido.** Solo medí módulos sueltos: 58 s (`nav.ts` completo), ~7 s (rango de 1 línea), ~20 s (corridas fallidas). | Ejecutar `pnpm mutation` completo y cronometrar. |
-| 8 | Si `init.sh` de WebEmpresa **funciona en Windows nativo** | **Dudoso, no verificado.** Verificado que usa `/tmp/we_test.log` (`init.sh:61`) y que `pnpm verify` = `bash ./init.sh` (`package.json:27`). | Irrelevante para nosotros: este repo usa `init.ps1` / `bin/harness.ps1`. |
-| 9 | Versión de `eslint.config.js` / reglas de lint de WebEmpresa | **No investigado** (fuera del área asignada). | Leer `WebEmpresa/eslint.config.js`. |
-| 10 | Todo el **contenido del negocio** (servicios, precios, horarios de Nails&Lash Studio) | **Desconocido y fuera de esta área.** Nada de este informe aporta datos del salón. | Otra investigación. |
+| #   | Afirmación / duda                                                                                                                             | Estado                                                                                                                                                                                                             | Qué haría falta para verificarlo                                                                                                                                           |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Causa raíz del 0% con `--testFiles`**                                                                                                       | Comportamiento **verificado** (reproducido 2×, ruta y glob); causa **desconocida**. La doc de `testFiles` no cita límites por runner; la del vitest-runner no menciona `testFiles`.                                | Abrir issue/buscar en el repo de `@stryker-mutator/vitest-runner`; correr con `--logLevel trace` e inspeccionar `.stryker-tmp`. **Mientras tanto: no usar `--testFiles`.** |
+| 2   | Que `@testing-library/react` haga **auto-cleanup** con `globals: true` sin `afterEach(cleanup)`                                               | **Inferencia**, no verificada en doc oficial. Hecho verificado: `vitest.setup.ts:1` es una sola línea y no hay `cleanup`.                                                                                          | Leer la doc oficial de `@testing-library/react` (sección auto-cleanup / `RTL_SKIP_AUTO_CLEANUP`) o el código de `node_modules/@testing-library/react`.                     |
+| 3   | Que Vitest **exija instalar `jsdom` aparte**                                                                                                  | **Desconocido.** La doc oficial consultada (vitest.dev/config/environment y /guide/environment) **no lo dice explícitamente**. Verificado solo que WebEmpresa lo declara en `devDependencies` (`package.json:56`). | Buscar en la doc de Vitest 4 la nota de instalación de entornos, o probar a desinstalar jsdom y correr.                                                                    |
+| 4   | Qué hace `stryker run --mutate` con **valor vacío** (caso `{{target}}` sin argumento)                                                         | **Desconocido.** Relevante porque `harness.mjs:250` resuelve `target` a `''`.                                                                                                                                      | Ejecutar `pnpm exec stryker run --mutate ""` y observar. Decide si hace falta wrapper.                                                                                     |
+| 5   | Por qué `src/App.tsx`, `src/main.tsx`, `src/lib/site.ts`, `src/pages/*`, `CheckIcon/SectorIcon/ServiceMockup/Header` **no están** en `mutate` | **Desconocido.** Verificado que no están (`stryker.config.json:12-30`). No hallé justificación documental.                                                                                                         | Revisar `progress/mutation_*.md` de WebEmpresa o preguntar al autor.                                                                                                       |
+| 6   | Que `css: false` sea la razón de no aseverar clases CSS                                                                                       | **Inferencia mía** (consistente con los 24 tests, ninguno asevera `className`).                                                                                                                                    | Doc oficial de la opción `css` de Vitest; o poner `css: true` y ver si `styles.x` resuelve.                                                                                |
+| 7   | **Tiempo total** de `pnpm mutation` sobre los 17 ficheros                                                                                     | **Desconocido.** Solo medí módulos sueltos: 58 s (`nav.ts` completo), ~7 s (rango de 1 línea), ~20 s (corridas fallidas).                                                                                          | Ejecutar `pnpm mutation` completo y cronometrar.                                                                                                                           |
+| 8   | Si `init.sh` de WebEmpresa **funciona en Windows nativo**                                                                                     | **Dudoso, no verificado.** Verificado que usa `/tmp/we_test.log` (`init.sh:61`) y que `pnpm verify` = `bash ./init.sh` (`package.json:27`).                                                                        | Irrelevante para nosotros: este repo usa `init.ps1` / `bin/harness.ps1`.                                                                                                   |
+| 9   | Versión de `eslint.config.js` / reglas de lint de WebEmpresa                                                                                  | **No investigado** (fuera del área asignada).                                                                                                                                                                      | Leer `WebEmpresa/eslint.config.js`.                                                                                                                                        |
+| 10  | Todo el **contenido del negocio** (servicios, precios, horarios de Nails&Lash Studio)                                                         | **Desconocido y fuera de esta área.** Nada de este informe aporta datos del salón.                                                                                                                                 | Otra investigación.                                                                                                                                                        |
 
 ---
 
@@ -889,7 +908,7 @@ describe('nav', () => {
    el vitest-runner de Stryker no los soporta (verificado en su doc oficial).
 6. **Prohibido dar por buena la mutación con `pnpm mutation` a secas** durante el
    ciclo TDD si tarda minutos: usar el rango acotado y dejar la corrida completa
-   para la puerta de cierre. *(Recomendación mía, no norma verificada.)*
+   para la puerta de cierre. _(Recomendación mía, no norma verificada.)_
 
 ### 4.3 Qué FEATURES implica (inferencias de diseño, a validar en la spec)
 
@@ -897,15 +916,15 @@ Del stack heredado salen piezas reutilizables que probablemente serán features 
 salón. **Ninguna de estas está confirmada como requisito del negocio** — son
 candidatas basadas en lo que WebEmpresa ya tiene resuelto y testeado al 100%:
 
-| Pieza WebEmpresa | Reutilizable en Nails&Lash | Plantilla de test lista |
-|---|---|---|
-| `Contacto.tsx` + `lib/contact.ts` (validación, honeypot, `role=status`/`role=alert`) | Formulario de contacto / solicitud de cita | §2.6.5 (`Contacto.behavior.test.tsx`) |
-| `useReveal` (IntersectionObserver + `data-in-view`) | Animaciones al hacer scroll en galería de trabajos | §2.6.4 (`useReveal.test.tsx`) |
-| `useIsMobile` (matchMedia + `useSyncExternalStore`) | Menú móvil | §2.6.3 (`useIsMobile.test.tsx`) |
-| `ThemeToggle` + `lib/theme.ts` (light/dark/system, persistencia) | **Dudoso** para un salón de belleza — decisión de diseño | §2.6.3 (`ThemeToggle.test.tsx`) |
-| `lib/nav.ts` (NAV_LINKS + CTA) | Navegación por anclas | §2.6.6 (`nav.test.ts`) |
-| `lib/seo.ts` | Metadatos / SEO local (Las Rozas) | `seo.test.ts` (no transcrito) |
-| `MobileMenu`, `Footer`, `Layout`, `Hero` | Estructura base | tests homónimos |
+| Pieza WebEmpresa                                                                     | Reutilizable en Nails&Lash                               | Plantilla de test lista               |
+| ------------------------------------------------------------------------------------ | -------------------------------------------------------- | ------------------------------------- |
+| `Contacto.tsx` + `lib/contact.ts` (validación, honeypot, `role=status`/`role=alert`) | Formulario de contacto / solicitud de cita               | §2.6.5 (`Contacto.behavior.test.tsx`) |
+| `useReveal` (IntersectionObserver + `data-in-view`)                                  | Animaciones al hacer scroll en galería de trabajos       | §2.6.4 (`useReveal.test.tsx`)         |
+| `useIsMobile` (matchMedia + `useSyncExternalStore`)                                  | Menú móvil                                               | §2.6.3 (`useIsMobile.test.tsx`)       |
+| `ThemeToggle` + `lib/theme.ts` (light/dark/system, persistencia)                     | **Dudoso** para un salón de belleza — decisión de diseño | §2.6.3 (`ThemeToggle.test.tsx`)       |
+| `lib/nav.ts` (NAV_LINKS + CTA)                                                       | Navegación por anclas                                    | §2.6.6 (`nav.test.ts`)                |
+| `lib/seo.ts`                                                                         | Metadatos / SEO local (Las Rozas)                        | `seo.test.ts` (no transcrito)         |
+| `MobileMenu`, `Footer`, `Layout`, `Hero`                                             | Estructura base                                          | tests homónimos                       |
 
 **Riesgo señalado (inferencia):** el `useReveal` degrada bien sin
 `IntersectionObserver` (`useReveal.test.tsx:72-81`), lo cual importa porque el
@@ -939,6 +958,7 @@ node node_modules/@stryker-mutator/core/bin/stryker.js run --mutate "src/lib/nav
 ```
 
 Fuentes oficiales consultadas:
+
 - https://stryker-mutator.io/docs/stryker-js/configuration/ (mutate, mutation range, testFiles, thresholds, coverageAnalysis)
 - https://stryker-mutator.io/docs/stryker-js/vitest-runner/ (instalación, `vitest.configFile`, limitaciones)
 - https://vitest.dev/config/environment (default `'node'`, lista de entornos)

@@ -8,14 +8,14 @@ ESCRITA (servicio + día + franja + nombre urlencoded vía `mensajeReserva`/`waH
 **Esto contradice el contrato aprobado `features/reserva_chat.feature`**, ya implementado y en HEAD
 (commit `31d233e`):
 
-- `@s22` dice literalmente: *"La sección NO compone la solicitud ni envía nada — eso sigue siendo
-  F-13"* y el `Then` exige que el mensaje del enlace de WhatsApp *"NO contenga ningún nombre de
-  servicio, ninguna fecha, ninguna hora ni ningún nombre de persona: no hay composición dinámica"*.
+- `@s22` dice literalmente: _"La sección NO compone la solicitud ni envía nada — eso sigue siendo
+  F-13"_ y el `Then` exige que el mensaje del enlace de WhatsApp _"NO contenga ningún nombre de
+  servicio, ninguna fecha, ninguna hora ni ningún nombre de persona: no hay composición dinámica"_.
 - La sección "FRONTERA CON F-13" del `.feature` (líneas 38-44) declara esa frontera "SIGUE INTACTA" y
   que la composición real de la solicitud es la feature `solicitud_whatsapp` (id 13 en
   `feature_list.json`), estado `"pending"` — sin `project-spec.md`, sin `.feature` propio, sin puerta
-  humana. Es, además, la MISMA lógica que su `acceptance` pide textualmente: *"componerMensajeWhatsApp
-  aplica encodeURIComponent... y omite los campos ausentes sin escribir undefined"*.
+  humana. Es, además, la MISMA lógica que su `acceptance` pide textualmente: _"componerMensajeWhatsApp
+  aplica encodeURIComponent... y omite los campos ausentes sin escribir undefined"_.
 - El test existente `reserva.test.tsx` `@s22` ya asevera activamente que el href NO contiene
   "Uñas"/"Pestañas"/"Cejas", ninguna hora ni "Marta": implementar TRABAJO 1 tal cual pondría ese test
   en rojo por diseño, es decir, exige REESCRIBIR un escenario aprobado, no añadir uno nuevo.
@@ -43,11 +43,11 @@ No se tocó `Reserva.tsx` para este trabajo (los cambios que SÍ tiene el ficher
      `@s15` — `burbujas[última]` tiene `data-de="bot"`.
   2. `StringLiteral` línea 78 (`setBorrador('')` dentro de `enviarNombre`). Probado **equivalente**
      dado el invariante del propio guion: el paso "nombre" es SIEMPRE el último (`FLUJO_CHAT.length
-     === 4`), así que tras `enviarNombre()` el input se desmonta en el mismo render (`hecho=true`) y
+=== 4`), así que tras `enviarNombre()` el input se desmonta en el mismo render (`hecho=true`) y
      ese `setBorrador('')` nunca llega a pintarse; la única vía para volver a ver el input es
      `reiniciar()`, que ya limpia el borrador de forma independiente (documentado en el propio `@s17`
-     del `.feature`: *"El reinicio limpia LOS CINCO estados... si uno se olvidara, el siguiente
-     resumen mezclaría datos de dos personas distintas"*). **Fix: REFACTOR, no exclusión** — se borró
+     del `.feature`: _"El reinicio limpia LOS CINCO estados... si uno se olvidara, el siguiente
+     resumen mezclaría datos de dos personas distintas"_). **Fix: REFACTOR, no exclusión** — se borró
      la línea muerta (Ley 3: no dejar código que ningún test puede exigir).
   3. `StringLiteral` línea 85 (`setBorrador('')` dentro de `reiniciar`). Con la línea 78 ya borrada,
      esta SÍ es observable: sin ella, tras completar el chat con "Marta" y pulsar "Reservar otra
@@ -61,6 +61,7 @@ No se tocó `Reserva.tsx` para este trabajo (los cambios que SÍ tiene el ficher
 - Ningún `className` condicional tocado (ya usaba `data-de` + `claveBurbuja` desde la sesión previa).
 
 ### Trazabilidad de los tests nuevos/tocados
+
 - `@s15` (resumen interpolado) → añadida aserción `data-de="bot"` en la burbuja final.
 - `@s17` ("sin rastro de las respuestas previas") → nuevo test: el campo de nombre vuelve VACÍO tras
   reiniciar y re-recorrer el guion.
@@ -76,6 +77,7 @@ lo asignan a F-11 (`mapa_como_llegar`, `pending`). Es una deriva preexistente, n
 la dejo anotada para que el lead decida si se retira, se re-contrata o F-11 se abre formalmente.
 
 ## Verificación final (medida)
+
 - `pnpm typecheck` → 0.
 - `pnpm lint` → 0 errores, 0 warnings.
 - `pnpm test` → **947/947** (33 ficheros; 946 + 1 test nuevo).

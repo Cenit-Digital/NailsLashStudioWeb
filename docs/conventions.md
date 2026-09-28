@@ -15,18 +15,18 @@
 - **Manejo de errores uniforme**: un tipo/base de error de dominio; la capa
   de interfaz captura, informa por el canal de error y sale con código != 0.
   Nunca propagar stack traces crudos al usuario.
-- **Comentarios: solo el *por qué* no obvio.** Los nombres hacen el resto. Sin
+- **Comentarios: solo el _por qué_ no obvio.** Los nombres hacen el resto. Sin
   comentarios decorativos ni obviedades.
 - **Tests co-locados o en `tests/`**, uno por módulo, con nombres
   descriptivos que digan qué comportamiento verifican.
 
 ## Ejemplos concretos (referencia)
 
-| Stack     | Formato/Lint         | Tests            | Ver                              |
-| --------- | -------------------- | ---------------- | -------------------------------- |
-| Python    | PEP 8, líneas ≤ 100  | `unittest`       | `examples/python-notes-cli`      |
-| Node/TS   | ESLint + Prettier    | `node --test`    | `examples/node-notes-cli`        |
-| Node/TS (web) | ESLint 9 flat + Prettier | Vitest + TL | El repo WebEmpresa que inspiró la plantilla |
+| Stack         | Formato/Lint             | Tests         | Ver                                         |
+| ------------- | ------------------------ | ------------- | ------------------------------------------- |
+| Python        | PEP 8, líneas ≤ 100      | `unittest`    | `examples/python-notes-cli`                 |
+| Node/TS       | ESLint + Prettier        | `node --test` | `examples/node-notes-cli`                   |
+| Node/TS (web) | ESLint 9 flat + Prettier | Vitest + TL   | El repo WebEmpresa que inspiró la plantilla |
 
 ## Rellena: convenciones de tu proyecto
 

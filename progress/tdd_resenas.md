@@ -172,11 +172,11 @@ existente). Corrida dirigida final: **358 verdes** en 9 ficheros (los 7 del lote
 
 **Mutación (con las DOS exclusiones ratificadas): 100 % en los tres objetivos.**
 
-| Fichero | Score | Detalle |
-|---|---|---|
-| `src/components/carrusel-logica.ts` | **100.00 %** | 80/80 killed |
-| `src/components/Resenas.tsx` | **100.00 %** | 113/113 killed |
-| `src/components/Galeria.tsx` | **100.00 %** | 123/123 killed |
+| Fichero                             | Score        | Detalle        |
+| ----------------------------------- | ------------ | -------------- |
+| `src/components/carrusel-logica.ts` | **100.00 %** | 80/80 killed   |
+| `src/components/Resenas.tsx`        | **100.00 %** | 113/113 killed |
+| `src/components/Galeria.tsx`        | **100.00 %** | 123/123 killed |
 
 ### Bloque A — el coordinador del teclado (diseño elegido y por qué)
 

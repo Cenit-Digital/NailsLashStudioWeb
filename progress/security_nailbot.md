@@ -20,6 +20,7 @@ Resultado: SECURE. Crítico 0, alto 0, medio 0, bajo 2 (no bloqueantes).
 - **Envío automático:** el chat no envía nada solo. No hay `window.open` ni `location` (@s12, chat-nailbot.test.tsx:557-570), y el aviso de capa 1 describe el enlace (@s7).
 
 ### BAJO-1: URIError con un surrogate suelto que tumba el render (ya existía)
+
 - **Dónde:** chat-nailbot-logica.ts:171 (`valor.trim()` conserva `\uD83D` suelto) -> ChatNailbot.tsx:156 -> site.ts:107 (`encodeURIComponent` lanza `URIError: URI malformed`, comprobado en Node).
 - **Qué pasa:** la excepción ocurre dentro del render del paso 'hecho'. En `src/` no hay ningún error boundary, así que React 19 desmonta la raíz entera y la home se queda en blanco. Afecta a los dos puntos de montaje: Reserva.tsx:49 y NailbotFlotante.tsx:198.
 - **Quién puede provocarlo:** solo la propia persona, pegando texto UTF-16 mal formado o partiendo un emoji. No hay vector de terceros: el estado del chat no lee URL, hash, storage ni red.
@@ -27,11 +28,13 @@ Resultado: SECURE. Crítico 0, alto 0, medio 0, bajo 2 (no bloqueantes).
 - **Arreglo en una línea:** en `conNombre`, `valor.replace(/[\uD800-\uDFFF]/gu, '�').trim()` (con la bandera `u` solo casa surrogates sueltos; `toWellFormed` es ES2024 y el tsconfig usa lib ES2023). Necesita una fila de contrato, así que lo decide el lead. No bloquea.
 
 ### BAJO-2: prueba de extremo a extremo con un nombre de forma maliciosa (opcional)
+
 - **Dónde:** chat-nailbot.test.tsx:274-298. El round-trip `decodeURIComponent(href)` con nombres inofensivos también pasaría con `encodeURI`.
 - **Por qué no es un hueco hoy:** lo cubren de forma indirecta waHref @s6 (datos_negocio_fuente_unica, filas `&` y `#`) y el ancla `waHref(` de @s12.
 - **Si se quiere blindar en el chat:** una fila con `Ana&text=x#y?z` que compruebe que el href crudo tiene un solo `?` y nada sin codificar después de `?text=`.
 
 ## 2. Secretos: ninguno
+
 - **Working tree** (sin node_modules/.git): buscados `sk-`, `sk-ant-`, `sk-proj-`, `api_key`, `ANTHROPIC`, `OPENAI`, `x-api-key`, `Bearer`, `ghp_`, `AKIA`, `AIza` y `PRIVATE KEY`, con patrón de valor largo (24 caracteres o más). Resultado: 0 valores. Las coincidencias son prosa: docs/research/asistente-robot/03-claude-api.md, 06-diseno-servidor-futuro.md:17-21 y :54, y project-spec.md:219, siempre con prefijo y elipsis (`sk-proj-…`, `sk-ant-api03-...`).
 - **Historial:** `git log -p -8` da 0 valores largos. `git log --all -S sk-proj-` y `-S sk-ant-` solo encuentran 6a59347, y todas sus apariciones son prefijos con `…` o `...`. Sigue pendiente, fuera del repo, que el titular revoque la clave `sk-proj-…` que se pegó en una sesión (lo recoge project-spec.md:219).
 - **dist/:** 0 coincidencias. dist/ está en .gitignore:6 y no tiene seguimiento.
@@ -39,6 +42,7 @@ Resultado: SECURE. Crítico 0, alto 0, medio 0, bajo 2 (no bloqueantes).
 - **.claude/launch.json** (sin seguimiento): solo `pnpm exec vite --port 5199 --strictPort`, sin secretos. Vite escucha por defecto en localhost. Si se sube a un PR, `.claude/` activa la etiqueta `permissions-change` de guard-sensitive-paths.yml, que no bloquea. Un push directo a main no la activa.
 
 ## 3. Red, storage, analítica y terceros: ninguno en el código nuevo
+
 - **Código de la app:** ChatNailbot.tsx, chat-nailbot-logica.ts, NailbotFlotante.tsx, nailbot-flotante-logica.ts, NailbotArte.tsx, nailbot-demo.ts y reserva-logica.ts. No hay fetch, XMLHttpRequest, sendBeacon, WebSocket, EventSource, local/sessionStorage, indexedDB, cookie, gtag, dataLayer, `import()` dinámico ni URLs `http(s)`.
 - **SCSS nuevo:** no hay `url()`, `@import` externos ni `@font-face`.
 - **SVG de NailbotArte:** no tiene `href`, `<image>`, `<use>` ni `foreignObject`, así que no carga subrecursos.
@@ -46,6 +50,7 @@ Resultado: SECURE. Crítico 0, alto 0, medio 0, bajo 2 (no bloqueantes).
 - **Dependencias:** package.json y pnpm-lock.yaml no cambian, ni en el working tree ni en los tres commits de Nailbot. No hay vulnerabilidades nuevas que auditar.
 
 ## 4. Revisado y descartado (sin riesgo real)
+
 - **tools/mutate.mjs:36-40:** usa `spawnSync` con `shell:true` y cita con `JSON.stringify`, que no es un escape correcto para cmd.exe (`\"`, `%VAR%`). Pero `argv` solo lo pasa quien desarrolla, y la CI (harness-ci.yml:56-81) solo llama a `mutate` con rutas fijas de ejemplos. No hay entrada no confiable, y la versión anterior (array con `shell:true`) era igual o peor.
 - **vitest.setup.ts:** el doble de `showModal`/`close` solo existe en tests y no llega al bundle.
 - **Referer al pulsar wa.me:** con la política por defecto (`strict-origin-when-cross-origin`) solo sale el origen de GitHub Pages, sin datos personales.

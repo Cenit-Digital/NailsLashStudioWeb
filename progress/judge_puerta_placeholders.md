@@ -16,25 +16,27 @@ contra dist/ real) -> exit 0, "el artefacto de produccion no tiene placeholders"
 Contados por titulo de it()/it.each(), no por comentario.
 
 Capa pura — src/lib/placeholders.test.ts:
-- @s1  [x] un registro marcado esPlaceholder produce violacion con via, ubicacion y valor
-- @s2  [x] flag en false + contenido real -> sin violacion
+
+- @s1 [x] un registro marcado esPlaceholder produce violacion con via, ubicacion y valor
+- @s2 [x] flag en false + contenido real -> sin violacion
 - @s24 [x] registro de JSON que no declara el flag -> violacion que declara que FALTA
-- @s3  [x] entrada vacia -> lista vacia
-- @s4  [x] los seis patrones prohibidos (it.each x6)
-- @s5  [x] el telefono no escapa por espaciado/guiones/prefijo (it.each x6)
-- @s6  [x] el telefono real con espacios no dispara el patron
-- @s7  [x] patrones de texto: otra caja y sin acentos (it.each x7)
-- @s8  [x] tres infracciones -> tres violaciones
+- @s3 [x] entrada vacia -> lista vacia
+- @s4 [x] los seis patrones prohibidos (it.each x6)
+- @s5 [x] el telefono no escapa por espaciado/guiones/prefijo (it.each x6)
+- @s6 [x] el telefono real con espacios no dispara el patron
+- @s7 [x] patrones de texto: otra caja y sin acentos (it.each x7)
+- @s8 [x] tres infracciones -> tres violaciones
 - @s23 [x] marcado + patron -> dos violaciones, una por via
-- @s9  [x] determinismo: misma entrada, misma lista, mismo orden
+- @s9 [x] determinismo: misma entrada, misma lista, mismo orden
 - @s25 [x] orden por aparicion, no por orden de la lista de patrones
 - @s10 [x] marcado con contenido real es violacion igual
 - @s11 [x] dato inventado nuevo sin marcar y sin patron: la puerta NO lo caza
 
 Capa puerta — src/lib/puerta.test.ts:
-- @s12 [x] produccion con violacion -> codigo != 0  (+ engancho: build invoca la puerta)
+
+- @s12 [x] produccion con violacion -> codigo != 0 (+ engancho: build invoca la puerta)
 - @s13 [x] artefacto limpio -> codigo 0
-- @s14 [x] desarrollo con placeholders NO falla  (+ engancho: dev NO invoca la puerta)
+- @s14 [x] desarrollo con placeholders NO falla (+ engancho: dev NO invoca la puerta)
 - @s15 [x] el informe acusa: causa, ubicacion y valor
 - @s16 [x] literal a mano en la plantilla ausente de los datos -> lo caza el artefacto
 - @s17 [x] imagen inlinada como data: URI -> la caza la via por flag

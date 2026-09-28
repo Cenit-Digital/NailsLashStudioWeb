@@ -12,8 +12,8 @@ duda real.
 ## Lo que la investigación encontró (documentación oficial de GitHub, verificada 2026-07-25)
 
 1. **GitHub Pages exige repo público en plan Free.** Cita literal de la documentación oficial:
-   *"If the account that owns the repository uses GitHub Free or GitHub Free for organizations,
-   the repository must be public."* Verificado contra la API real: la organización `Cenit-Digital`
+   _"If the account that owns the repository uses GitHub Free or GitHub Free for organizations,
+   the repository must be public."_ Verificado contra la API real: la organización `Cenit-Digital`
    estaba en plan `free` y el repo `NailsLashStudioWeb` era `private`. Con GitHub Team (~4$/mes),
    el CÓDIGO puede seguir privado, pero el SITIO publicado sigue siendo público para cualquiera con
    el enlace igualmente — un sitio de Pages con acceso restringido de verdad exige GitHub

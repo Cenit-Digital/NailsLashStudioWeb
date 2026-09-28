@@ -9,45 +9,45 @@
 > **AMPLIADO EL 2026-07-18 → 27 escenarios, @s1..@s27** (tras la escalada de mutación). Los 20 de abajo
 > quedan INTACTOS; @s21..@s27 + 7 filas en @s18 se detallan en §«Ampliación del contrato» al final.
 
-## 20 escenarios, @s1..@s20  (18 originales + @s19/@s20 añadidos en la ronda de reparación)
+## 20 escenarios, @s1..@s20 (18 originales + @s19/@s20 añadidos en la ronda de reparación)
 
 > **Numeración:** @s19 y @s20 se DEFINEN físicamente junto a sus hermanos (@s19 tras @s7; @s20 tras
 > @s3) pero conservan los números 19/20 para NO renumerar @s4..@s18, que la revisión adversarial ya
 > cita por su tag. Tags monótonos como identificadores; el orden físico agrupa por tema.
 
-| @s | Comportamiento | Grupo |
-| --- | --- | --- |
-| @s1 | ancla `#id` a id ausente → violación (ancla muerta); 4 filas incl. `#facial`, `#servicios`/`#contacto` vs id-de-`<h2>` | puerta de anclas (decisor puro) |
-| @s2 | nav con todas las anclas resueltas → 0 violaciones (camino feliz = home.tsx hoy) | ídem |
-| @s3 | sección navegable (`<section aria-labelledby>`→heading real) con id que la nav no enlaza → violación (inalcanzable) | ídem (otra mitad igualdad de conjuntos) |
-| @s20 | heading con id que NINGUNA `<section>` referencia → NO navegable → 0 violaciones (DISTINGUE la regla de @s3) | ídem (hermano de @s3, reparación) |
-| @s4 | la puerta de anclas (`#x`) es DISTINTA y COMPLEMENTARIA de la anti-404 (`/x`) | deslinde obligatorio |
-| @s5 | informe: una línea por violación, determinista, mismo orden | ídem |
-| @s6 | artefacto ausente / 0 páginas → exit ≠ 0 (vacuidad) | humilde / falla cerrada |
-| @s7 | 0 anclas inspeccionadas → exit ≠ 0 (vacuidad OBLIGATORIA, patrón @s28 F-04) | ídem |
-| @s19 | 0 SECCIONES navegables derivadas → exit ≠ 0 (vacuidad OBLIGATORIA del 2.º extractor, GEMELO de @s7) | ídem (reparación, BLOQUEANTE) |
-| @s8 | la puerta revienta → falla cerrada, build roto | ídem |
-| @s9 | nav consistente → exit 0 (camino feliz del build) | ídem |
-| @s10 | `dev` NO invoca la puerta | ídem |
-| @s11 | `scroll-padding-top` suelo ≥ altura máxima RE-MEDIDA, sustituye 5rem; SCSS | Capa 1 (B-2) |
-| @s12 | HTML CRUDO de `dist/`: cabecera+marca, nav+aria-label, pie horneados (SSR-safe) | marcado |
-| @s13 | el pie NO emite enlaces legales (rompería anti-404) | choque puertas (E1.a) |
-| @s14 | `<a>` a Facebook (URL verbatim de site.ts:47) pasa las 3 puertas de enlaces; Instagram ELIDIDO (es handle, no URL) | choque puertas (E1.b) |
-| @s15 | estado condicional en atributo consultable (`aria-expanded`), NO className condicional | menú móvil (E1.c) |
-| @s16 | HTML CRUDO hornea el menú «cerrado» + enlaces presentes (mata trampa Radix/Portal) | menú móvil (SSR) |
-| @s17 | breakpoint = literal `820px`, leído del SCSS, anclado al literal a mano | menú móvil (B-3) |
-| @s18 | mutar el predicado/igualdad/vacuidad/breakpoint rompe un test | mutación (I-6) |
+| @s   | Comportamiento                                                                                                         | Grupo                                   |
+| ---- | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| @s1  | ancla `#id` a id ausente → violación (ancla muerta); 4 filas incl. `#facial`, `#servicios`/`#contacto` vs id-de-`<h2>` | puerta de anclas (decisor puro)         |
+| @s2  | nav con todas las anclas resueltas → 0 violaciones (camino feliz = home.tsx hoy)                                       | ídem                                    |
+| @s3  | sección navegable (`<section aria-labelledby>`→heading real) con id que la nav no enlaza → violación (inalcanzable)    | ídem (otra mitad igualdad de conjuntos) |
+| @s20 | heading con id que NINGUNA `<section>` referencia → NO navegable → 0 violaciones (DISTINGUE la regla de @s3)           | ídem (hermano de @s3, reparación)       |
+| @s4  | la puerta de anclas (`#x`) es DISTINTA y COMPLEMENTARIA de la anti-404 (`/x`)                                          | deslinde obligatorio                    |
+| @s5  | informe: una línea por violación, determinista, mismo orden                                                            | ídem                                    |
+| @s6  | artefacto ausente / 0 páginas → exit ≠ 0 (vacuidad)                                                                    | humilde / falla cerrada                 |
+| @s7  | 0 anclas inspeccionadas → exit ≠ 0 (vacuidad OBLIGATORIA, patrón @s28 F-04)                                            | ídem                                    |
+| @s19 | 0 SECCIONES navegables derivadas → exit ≠ 0 (vacuidad OBLIGATORIA del 2.º extractor, GEMELO de @s7)                    | ídem (reparación, BLOQUEANTE)           |
+| @s8  | la puerta revienta → falla cerrada, build roto                                                                         | ídem                                    |
+| @s9  | nav consistente → exit 0 (camino feliz del build)                                                                      | ídem                                    |
+| @s10 | `dev` NO invoca la puerta                                                                                              | ídem                                    |
+| @s11 | `scroll-padding-top` suelo ≥ altura máxima RE-MEDIDA, sustituye 5rem; SCSS                                             | Capa 1 (B-2)                            |
+| @s12 | HTML CRUDO de `dist/`: cabecera+marca, nav+aria-label, pie horneados (SSR-safe)                                        | marcado                                 |
+| @s13 | el pie NO emite enlaces legales (rompería anti-404)                                                                    | choque puertas (E1.a)                   |
+| @s14 | `<a>` a Facebook (URL verbatim de site.ts:47) pasa las 3 puertas de enlaces; Instagram ELIDIDO (es handle, no URL)     | choque puertas (E1.b)                   |
+| @s15 | estado condicional en atributo consultable (`aria-expanded`), NO className condicional                                 | menú móvil (E1.c)                       |
+| @s16 | HTML CRUDO hornea el menú «cerrado» + enlaces presentes (mata trampa Radix/Portal)                                     | menú móvil (SSR)                        |
+| @s17 | breakpoint = literal `820px`, leído del SCSS, anclado al literal a mano                                                | menú móvil (B-3)                        |
+| @s18 | mutar el predicado/igualdad/vacuidad/breakpoint rompe un test                                                          | mutación (I-6)                          |
 
-## Mapa acceptance de `feature_list.json` §6 → @s  (✅ TRES reescritos y APROBADOS en la puerta, A-23 REDUX)
+## Mapa acceptance de `feature_list.json` §6 → @s (✅ TRES reescritos y APROBADOS en la puerta, A-23 REDUX)
 
-| Acceptance original | Veredicto verificación | Destilado (decisión aprobada 2026-07-17) → @s |
-| --- | --- | --- |
-| @1 «cubre TODAS las secciones, no 7 de 11» | **INSATISFACIBLE [V]** (hoy 2 secciones, ids en `<h2>`) | **B-4**: igualdad de conjuntos derivada del DOM + puerta de anclas → **@s1, @s2, @s3** (+@s4, @s5) |
-| @2 «scroll-padding-top; scroll-margin NO actúa al tabular» | **FALSO [V]** (scroll al Tab es UA) | **B-2**: razón correcta (va en el CONTENEDOR) → **@s11** (nota) |
-| @3 (implícito) «el foco no queda tapado por la cabecera sticky» | puerta_legal roza el AAA | **B-1**: listón AA «not entirely hidden», 0 números a la norma → **@s11** (nota) |
-| @4 «se deriva de la altura REAL de la cabecera» | **INSOSTENIBLE bajo SSG [V]** | **B-2 Capa 1**: suelo estático RE-MEDIDO, sustituye 5rem → **@s11** |
-| @5 «existe red CSS en el MISMO breakpoint literal que la query JS; mutar breakpoint/predicado rompe un test» | breakpoint 767 herencia muerta | **@s17** (literal 820px anclado al SCSS) + **@s18** (mutantes) |
-| `puerta_legal` «WCAG SC 2.4.11 (foco no oscurecido)» | **ROZA EL AAA [V]** | **B-1**: reescrita → nota de **@s11** |
+| Acceptance original                                                                                          | Veredicto verificación                                  | Destilado (decisión aprobada 2026-07-17) → @s                                                      |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| @1 «cubre TODAS las secciones, no 7 de 11»                                                                   | **INSATISFACIBLE [V]** (hoy 2 secciones, ids en `<h2>`) | **B-4**: igualdad de conjuntos derivada del DOM + puerta de anclas → **@s1, @s2, @s3** (+@s4, @s5) |
+| @2 «scroll-padding-top; scroll-margin NO actúa al tabular»                                                   | **FALSO [V]** (scroll al Tab es UA)                     | **B-2**: razón correcta (va en el CONTENEDOR) → **@s11** (nota)                                    |
+| @3 (implícito) «el foco no queda tapado por la cabecera sticky»                                              | puerta_legal roza el AAA                                | **B-1**: listón AA «not entirely hidden», 0 números a la norma → **@s11** (nota)                   |
+| @4 «se deriva de la altura REAL de la cabecera»                                                              | **INSOSTENIBLE bajo SSG [V]**                           | **B-2 Capa 1**: suelo estático RE-MEDIDO, sustituye 5rem → **@s11**                                |
+| @5 «existe red CSS en el MISMO breakpoint literal que la query JS; mutar breakpoint/predicado rompe un test» | breakpoint 767 herencia muerta                          | **@s17** (literal 820px anclado al SCSS) + **@s18** (mutantes)                                     |
+| `puerta_legal` «WCAG SC 2.4.11 (foco no oscurecido)»                                                         | **ROZA EL AAA [V]**                                     | **B-1**: reescrita → nota de **@s11**                                                              |
 
 Comportamientos de la spec §Feature 6 «casos límite» → @s: caso 1 (0 secciones/anclas muertas)→@s1/@s6;
 caso 2 (`#facial`)→@s1; caso 3 (`#contacto` vs `contacto-titulo`)→@s1; caso 4 (vacuidad)→@s6/@s7/@s8;
@@ -175,9 +175,9 @@ solo se registra el hecho y se retiran las marcas `⏸` del contrato. `feature_l
 Examples quedan idénticos; solo cambiaron cabecera, comentarios y marcas):
 
 1. **Cabecera:** el bloque `⏸⏸ ESTE CONTRATO NO ESTÁ APROBADO` → bloque `✅ APROBADO POR LA PUERTA
-   HUMANA EL 2026-07-17` con las 7 decisiones literales y la liberación del `tdd_craftsman`.
+HUMANA EL 2026-07-17` con las 7 decisiones literales y la liberación del `tdd_craftsman`.
 2. **@s3 (nota de la regla «sección navegable»):** `⏸ PROPUESTA MEDIDA, PENDIENTE DE PUERTA` → `✅
-   FIJADA POR LA PUERTA HUMANA`; ya no es `[NV]` para el TDD. Se CONSERVA @s20 (el Example que la
+FIJADA POR LA PUERTA HUMANA`; ya no es `[NV]` para el TDD. Se CONSERVA @s20 (el Example que la
    distingue).
 3. **@s20 (nota):** `⏸ PENDIENTE DE PUERTA` → `✅ FIJADO POR LA PUERTA HUMANA`.
 4. **@s15 (nota):** `⏸ PROPUESTA` → `✅ DECIDIDO`: CSS puro + `aria-expanded`, sin Radix, firme.
@@ -207,21 +207,21 @@ tres criterios reescritos como APROBADOS. **NO se reintrodujo** ninguna atribuci
 filas nuevas en @s18** (el mapa de mutantes). El humano APROBÓ el 2026-07-18 AMPLIAR el contrato tras la
 escalada de la prueba de mutación (`progress/mutation_header_nav_footer.md`: 135/156 = 86,54 %, 21
 supervivientes REALES verificados por SABOTAJE MANUAL). Precedente EXACTO: **F-01** (la fila `600 123 456`
-de @s5) y **F-05** (+3 escenarios) — *la mutación no encontró código de más, encontró CONTRATO DE MENOS*.
+de @s5) y **F-05** (+3 escenarios) — _la mutación no encontró código de más, encontró CONTRATO DE MENOS_.
 Las guardas defensivas y las extracciones son CORRECTAS y SE QUEDAN; faltaban los escenarios que las
 EXIJAN. **La producción NO se tocó.**
 
 ### Mapa: los 6 grupos + 1 del informe → escenario nuevo → mutantes que mata
 
-| Grupo (informe §3/§4) | Escenario nuevo | Mutantes de `puerta-anclas.ts` (o `.tsx`) que mata |
-| --- | --- | --- |
-| A — `<a>` de nav SIN href | **@s21** (Scenario) | `:51:20` OptionalChaining · `:53:11` ConditionalExpression |
-| B — `id=""` no es destino | **@s22** (Scenario) | `:71:5` MethodExpression · `:71:83` ConditionalExpression · `:71:90` StringLiteral |
-| C — `<section>` cuyo aria-labelledby no resuelve | **@s23** (Outline, 2 filas) | `:89:24` OptionalChaining · `:91:9` ConditionalExpression (+ CUBRE `:89:69` NoCoverage) |
-| D — texto EXACTO de `describir()` | **@s24** (Outline, 2 filas) | `:30:35` · `:31:35` StringLiteral · `:127:16` StringLiteral · `:143:5` ConditionalExpression · `:143:25` StringLiteral |
-| E — artefacto multi-página mixto | **@s25** (Scenario) | `:215:35` · `:227:33` MethodExpression (`.some`→`.every`) |
-| F — espacios alrededor del `=` | **@s26** (Outline, 3 filas) | `:36:23` x2 · `:67:21` · `:82:29` x2 (todas `Regex`) |
-| MenuNavegacion — `aria-controls` ↔ `id` | **@s27** (Scenario) | `MenuNavegacion.tsx:5:18` StringLiteral |
+| Grupo (informe §3/§4)                            | Escenario nuevo             | Mutantes de `puerta-anclas.ts` (o `.tsx`) que mata                                                                     |
+| ------------------------------------------------ | --------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| A — `<a>` de nav SIN href                        | **@s21** (Scenario)         | `:51:20` OptionalChaining · `:53:11` ConditionalExpression                                                             |
+| B — `id=""` no es destino                        | **@s22** (Scenario)         | `:71:5` MethodExpression · `:71:83` ConditionalExpression · `:71:90` StringLiteral                                     |
+| C — `<section>` cuyo aria-labelledby no resuelve | **@s23** (Outline, 2 filas) | `:89:24` OptionalChaining · `:91:9` ConditionalExpression (+ CUBRE `:89:69` NoCoverage)                                |
+| D — texto EXACTO de `describir()`                | **@s24** (Outline, 2 filas) | `:30:35` · `:31:35` StringLiteral · `:127:16` StringLiteral · `:143:5` ConditionalExpression · `:143:25` StringLiteral |
+| E — artefacto multi-página mixto                 | **@s25** (Scenario)         | `:215:35` · `:227:33` MethodExpression (`.some`→`.every`)                                                              |
+| F — espacios alrededor del `=`                   | **@s26** (Outline, 3 filas) | `:36:23` x2 · `:67:21` · `:82:29` x2 (todas `Regex`)                                                                   |
+| MenuNavegacion — `aria-controls` ↔ `id`          | **@s27** (Scenario)         | `MenuNavegacion.tsx:5:18` StringLiteral                                                                                |
 
 Además, **@s18 (mapa de mutantes, Scenario Outline) recibe 7 filas nuevas**, una por grupo, cada una
 citando el escenario donde muere (honra su propia nota: «se añadirá CON SU FILA cuando la mutación lo

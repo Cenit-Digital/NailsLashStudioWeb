@@ -43,7 +43,7 @@ con el JSON-LD de F-04. Modelado como **dato**, no como copy, porque tendrá **e
 - **No entra / no se reabre:** `src/lib/site.ts` (F-02, `done`) **no cambia de forma**: F-10 lo
   **lee** y **parsea**, no lo reescribe (D3). El artefacto que emite el JSON-LD ya existe (F-04);
   F-10 solo **añade** la propiedad `openingHoursSpecification` a esa emisión (D4), que F-04 dejó
-  **reservada** (`seo.ts` §183: *"horario → A-19: es de F-10. Cuando entre, openingHoursSpecification (@s35)"*).
+  **reservada** (`seo.ts` §183: _"horario → A-19: es de F-10. Cuando entre, openingHoursSpecification (@s35)"_).
 - **No se inventa:** los **festivos** y el **cierre de agosto** NO se escriben. Para la DEMO la
   lista de excepciones va **vacía** (estado honesto: no se anuncia ningún cierre especial). Es la
   parte `bloqueada_para_publicar` (D5).
@@ -52,7 +52,7 @@ con el JSON-LD de F-04. Modelado como **dato**, no como copy, porque tendrá **e
 
 1. **`src/lib/horario.ts`** expone la lógica; **no** duplica el dato: el horario semanal se
    **deriva** de `HORARIO` de `site.ts` (F-02), que es `{ lunesAViernes: '10:00-20:00',
-   sabado: '10:00-14:00', domingo: 'cerrado' }` **[V, triple fuente]**.
+sabado: '10:00-14:00', domingo: 'cerrado' }` **[V, triple fuente]**.
 2. **Modelo estructurado (dato, no copy):** un horario semanal = para cada uno de los 7 días,
    una lista de **franjas** `{ abre, cierra }` en minutos-desde-medianoche (Europe/Madrid).
    L-V → `[{600, 1200}]` (10:00–20:00); Sábado → `[{600, 840}]` (10:00–14:00); Domingo → `[]`
@@ -75,16 +75,16 @@ con el JSON-LD de F-04. Modelado como **dato**, no como copy, porque tendrá **e
 
 ## Contrato (firmas puras)
 
-| | |
-| - | - |
-| **`estaAbierto(ahora: Date): boolean`** | **Entrada:** un instante (`Date`, epoch UTC). **Salida:** `true` sii la hora de pared correspondiente en **Europe/Madrid** cae en `[abre, cierra)` de alguna franja del día (excepciones primero, luego semanal). **Puro**, determinista, DST-safe vía `Intl`. **No** invoca `new Date()`. Liga el horario semanal canónico (de F-02) y la lista de excepciones **vacía** de la DEMO |
-| **núcleo puro** `abiertoEn(instanteMadrid, horarioSemanal, excepciones): boolean` | El motor testeable con horarios y excepciones **arbitrarios** (pasados como argumento). `estaAbierto` es el fino ligador sobre él. Necesario para **ejercitar y mutar la rama de excepciones sin inventar festivos** en producción (ver Casos límite y D5) |
-| **`parsearFranjas(texto: string): Franja[]`** | **Entrada:** una cadena de F-02 (`'10:00-20:00'`, `'cerrado'`). **Salida:** `[{abre, cierra}]` o `[]` para `'cerrado'`. **Puro**. Traduce el dato-string de F-02 al modelo en minutos |
-| **`aMinutos(hhmm: string): number`** | `'10:00' → 600`, `'20:00' → 1200`, `'14:00' → 840`. `hora*60 + minuto`. **Puro** |
-| **`horarioParaUI(horarioSemanal): FilaHorario[]`** | 3 filas `{ dias, franja }` en castellano; franjas vacías → `'Cerrado'`. **Puro**. El copy vive aquí |
-| **`openingHoursSpecification(horarioSemanal): OpeningHoursSpecification[]`** | El array schema.org: `dayOfWeek` (enum EN, L-V agrupado), `opens`/`closes` `'HH:MM'`, `@type: 'OpeningHoursSpecification'`; días cerrados omitidos. **Puro**. Se inyecta en el JSON-LD de F-04 |
-| **Zona** | **Europe/Madrid** SIEMPRE, vía `Intl.DateTimeFormat`. Nunca la zona de la máquina/navegador. El DST lo resuelve `Intl` |
-| **Determinismo** | Todo puro. Ningún acceso a reloj/fs/entorno. El reloj se **inyecta** como `Date` |
+|                                                                                   |                                                                                                                                                                                                                                                                                                                                                                                      |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **`estaAbierto(ahora: Date): boolean`**                                           | **Entrada:** un instante (`Date`, epoch UTC). **Salida:** `true` sii la hora de pared correspondiente en **Europe/Madrid** cae en `[abre, cierra)` de alguna franja del día (excepciones primero, luego semanal). **Puro**, determinista, DST-safe vía `Intl`. **No** invoca `new Date()`. Liga el horario semanal canónico (de F-02) y la lista de excepciones **vacía** de la DEMO |
+| **núcleo puro** `abiertoEn(instanteMadrid, horarioSemanal, excepciones): boolean` | El motor testeable con horarios y excepciones **arbitrarios** (pasados como argumento). `estaAbierto` es el fino ligador sobre él. Necesario para **ejercitar y mutar la rama de excepciones sin inventar festivos** en producción (ver Casos límite y D5)                                                                                                                           |
+| **`parsearFranjas(texto: string): Franja[]`**                                     | **Entrada:** una cadena de F-02 (`'10:00-20:00'`, `'cerrado'`). **Salida:** `[{abre, cierra}]` o `[]` para `'cerrado'`. **Puro**. Traduce el dato-string de F-02 al modelo en minutos                                                                                                                                                                                                |
+| **`aMinutos(hhmm: string): number`**                                              | `'10:00' → 600`, `'20:00' → 1200`, `'14:00' → 840`. `hora*60 + minuto`. **Puro**                                                                                                                                                                                                                                                                                                     |
+| **`horarioParaUI(horarioSemanal): FilaHorario[]`**                                | 3 filas `{ dias, franja }` en castellano; franjas vacías → `'Cerrado'`. **Puro**. El copy vive aquí                                                                                                                                                                                                                                                                                  |
+| **`openingHoursSpecification(horarioSemanal): OpeningHoursSpecification[]`**      | El array schema.org: `dayOfWeek` (enum EN, L-V agrupado), `opens`/`closes` `'HH:MM'`, `@type: 'OpeningHoursSpecification'`; días cerrados omitidos. **Puro**. Se inyecta en el JSON-LD de F-04                                                                                                                                                                                       |
+| **Zona**                                                                          | **Europe/Madrid** SIEMPRE, vía `Intl.DateTimeFormat`. Nunca la zona de la máquina/navegador. El DST lo resuelve `Intl`                                                                                                                                                                                                                                                               |
+| **Determinismo**                                                                  | Todo puro. Ningún acceso a reloj/fs/entorno. El reloj se **inyecta** como `Date`                                                                                                                                                                                                                                                                                                     |
 
 **Modelo de datos (tipos):**
 
@@ -103,20 +103,20 @@ Intervalo **semiabierto `[abre, cierra)`**: la apertura es **inclusiva**, el cie
 (anclados a **literales escritos a mano** —10:00, 20:00, 14:00—, nunca a la constante importada de
 producción; regla anti-tautología del repo):
 
-| Instante (hora de pared Madrid) | Esperado | Qué mutante mata |
-| - | - | - |
-| Lunes **09:59** | **cerrado** | comparador de apertura `minutos >= abre` (mutar a `>` → 09:59 seguiría cerrado pero 10:00 caería) |
-| Lunes **10:00** exacto | **abierto** | apertura **inclusiva**: mutar `>=` → `>` lo rompe |
-| Lunes **19:59** | **abierto** | — |
-| Lunes **20:00** exacto | **cerrado** | cierre **exclusivo**: mutar `minutos < cierra` → `<=` lo rompe |
-| Lunes **20:01** | **cerrado** | límite de la franja |
-| Lunes **00:00** | **cerrado** | fuera de toda franja |
-| Sábado **13:59** | **abierto** | franja corta del sábado |
-| Sábado **14:00** exacto | **cerrado** | límite del sábado (10:00–**14:00**); mutar el `840` lo rompe |
-| Sábado **14:30** | **cerrado** | — |
-| Domingo (cualquier hora) | **cerrado** | día sin franjas (`[]`); mutar la lista vacía lo rompe |
-| **Excepción** con `franjas: []` en una fecha que sería laborable, **10:30** | **cerrado** | la excepción **manda** sobre el semanal (rama de excepciones) |
-| **Excepción** con franjas propias en un **domingo** | **abierto en esa franja** | la excepción **abre** un día normalmente cerrado |
+| Instante (hora de pared Madrid)                                             | Esperado                  | Qué mutante mata                                                                                  |
+| --------------------------------------------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------- |
+| Lunes **09:59**                                                             | **cerrado**               | comparador de apertura `minutos >= abre` (mutar a `>` → 09:59 seguiría cerrado pero 10:00 caería) |
+| Lunes **10:00** exacto                                                      | **abierto**               | apertura **inclusiva**: mutar `>=` → `>` lo rompe                                                 |
+| Lunes **19:59**                                                             | **abierto**               | —                                                                                                 |
+| Lunes **20:00** exacto                                                      | **cerrado**               | cierre **exclusivo**: mutar `minutos < cierra` → `<=` lo rompe                                    |
+| Lunes **20:01**                                                             | **cerrado**               | límite de la franja                                                                               |
+| Lunes **00:00**                                                             | **cerrado**               | fuera de toda franja                                                                              |
+| Sábado **13:59**                                                            | **abierto**               | franja corta del sábado                                                                           |
+| Sábado **14:00** exacto                                                     | **cerrado**               | límite del sábado (10:00–**14:00**); mutar el `840` lo rompe                                      |
+| Sábado **14:30**                                                            | **cerrado**               | —                                                                                                 |
+| Domingo (cualquier hora)                                                    | **cerrado**               | día sin franjas (`[]`); mutar la lista vacía lo rompe                                             |
+| **Excepción** con `franjas: []` en una fecha que sería laborable, **10:30** | **cerrado**               | la excepción **manda** sobre el semanal (rama de excepciones)                                     |
+| **Excepción** con franjas propias en un **domingo**                         | **abierto en esa franja** | la excepción **abre** un día normalmente cerrado                                                  |
 
 **Notas de mutación (umbral 1.0, 0 exclusiones — política del repo desde F-03):**
 
@@ -168,20 +168,20 @@ Recomiendo: **solo el horario semanal** en la DEMO. Se **construye y testea** `e
 para F-13), pero **no se renderiza** un badge en vivo. Razón: bajo SSG un badge horneado es una
 **mentira** (congela el instante del build) y uno que solo aparece tras hidratar es la
 **rama-solo-JS-en-SSG** que la memoria del repo prohíbe (misma familia que el "horneado invisible"
-que cazó F-07). El consumidor real de `estaAbierto` es F-13 (franjas de reserva). *Alternativa:* un
+que cazó F-07). El consumidor real de `estaAbierto` es F-13 (franjas de reserva). _Alternativa:_ un
 badge en vivo como **isla client-only** (no horneada, con estado neutro en el prerender), que sería
 una mejora **posterior** y cuidada, no parte de la DEMO de F-10.
 
 **D2 — Intervalo de las franjas: ¿`[abre, cierra)` semiabierto (10:00 abierto, 20:00 cerrado)?**
 Recomiendo: **sí**, semiabierto. "Cierra a las 20:00" significa cerrado a las 20:00:00; y da dos
-comparadores limpios que la mutación distingue (apertura `>=`, cierre `<`). *Alternativa
-descartada:* cerrado-cerrado `[abre, cierra]` (20:00 aún "abierto") — contradice el sentido de
+comparadores limpios que la mutación distingue (apertura `>=`, cierre `<`). _Alternativa
+descartada:_ cerrado-cerrado `[abre, cierra]` (20:00 aún "abierto") — contradice el sentido de
 "cierre" y ensucia el límite.
 
 **D3 — ¿F-10 reabre `site.ts` para estructurar el horario, o lo lee y parsea?**
 Recomiendo: **lo lee y parsea**. F-10 deriva su `HorarioSemanal` de las cadenas `HORARIO` de F-02;
 `site.ts` **no cambia de forma**. Mantiene la **fuente única** (I-7) y respeta "una feature a la
-vez" + "no reabrir un módulo `done`". *Alternativa descartada:* subir `HORARIO` en `site.ts` a
+vez" + "no reabrir un módulo `done`". _Alternativa descartada:_ subir `HORARIO` en `site.ts` a
 estructura y derivar las cadenas — reabre F-02 (rompe sus `registros`/tests) por comodidad, y
 duplicar el dato en un constante propia de F-10 es justo la divergencia que I-7 existe para evitar.
 
@@ -190,7 +190,7 @@ Recomiendo: F-10 aporta la función pura `openingHoursSpecification(horario)` y 
 propiedad al JSON-LD** que emite F-04 (extensión **aditiva**: F-04 la dejó **reservada** —A-19,
 @s35— y su puerta ya valida que sea esta clave y **nunca** `openingHours`). Formato: `dayOfWeek`
 en la **enumeración inglesa** de schema.org (`Monday`…`Saturday`; el copy español vive solo en la
-UI, D6), L-V **agrupado** en un array, Sábado solo, **Domingo omitido** (cerrado). *Alternativa:*
+UI, D6), L-V **agrupado** en un array, Sábado solo, **Domingo omitido** (cerrado). _Alternativa:_
 representar el cerrado con `opens===closes` — descartada por ruidosa; omitir es lo idiomático.
 
 **D5 — Excepciones en la DEMO: ¿lista vacía honesta, o marcador placeholder que rompa F-01?**
@@ -206,7 +206,7 @@ igual, vía el núcleo puro con excepciones a mano (no queda código muerto).
 **D6 — Presentación: ¿3 filas fijas (L-V / S / D) o agrupación dinámica de días iguales? Copy.**
 Recomiendo: **3 filas fijas** que reflejan las 3 claves de F-02 (menos superficie de mutación, sin
 lógica de agrupación que pruebe de más). Copy propuesto: `Lunes a Viernes` · `Sábado` · `Domingo`;
-franja `10:00–20:00` (guion largo); cerrado → `Cerrado`. *Confirmar el copy exacto y el separador.*
+franja `10:00–20:00` (guion largo); cerrado → `Cerrado`. _Confirmar el copy exacto y el separador._
 
 **D7 — Tipo de retorno de `estaAbierto`: ¿booleano, o estado rico ("abre a las 10:00")?**
 Recomiendo: **booleano** para F-10 (mínimo, cumple el acceptance 1). Un estado rico ("abre en 2 h",

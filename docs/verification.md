@@ -33,8 +33,9 @@ concreto. El `judge` rechaza si falta cobertura. El mapa vive en
 
 ```markdown
 ## Trazabilidad
+
 - @s1 (archivo vacío → 0) → test_count_archivo_vacio
-- @s2 (varias notas → 3)  → test_count_varias_notas
+- @s2 (varias notas → 3) → test_count_varias_notas
 - @s3 (no muta el archivo) → test_count_no_muta_archivo
 ```
 
@@ -79,9 +80,9 @@ un regex). El 100 % era falso.
 **Regla dura del arnés. Medida en F-04, 2026-07-17.** Es la **imagen especular** de la mentira de
 los timeouts, y es **más peligrosa**:
 
-| Síntoma | Score | Efecto |
-| ------- | ----- | ------ |
-| `# timeout` > 0 | falso **ALTO** | **esconde** supervivientes reales |
+| Síntoma                       | Score          | Efecto                                    |
+| ----------------------------- | -------------- | ----------------------------------------- |
+| `# timeout` > 0               | falso **ALTO** | **esconde** supervivientes reales         |
 | `tests per mutant` desplomado | falso **BAJO** | **inventa** supervivientes que no existen |
 
 **Por qué es peor la de abajo:** un 100 % te da confianza de más y lo cuestionas; **un 7 % no lo
@@ -90,12 +91,13 @@ basura hasta que el número suba**.
 
 **Medido en F-04, sobre EL MISMO CÓDIGO y LOS MISMOS TESTS:**
 
-| | tests/mutante | Dry run | Score |
-| - | ------------- | ------- | ----- |
-| Tanda sana | **19,68** | 242 tests en **11 s** | **98,97 %** |
-| Tanda envenenada | **1,35** | 246 tests en **3 s** | **7,05 %** |
+|                  | tests/mutante | Dry run               | Score       |
+| ---------------- | ------------- | --------------------- | ----------- |
+| Tanda sana       | **19,68**     | 242 tests en **11 s** | **98,97 %** |
+| Tanda envenenada | **1,35**      | 246 tests en **3 s**  | **7,05 %**  |
 
 Tres señales que la delatan, y basta una:
+
 1. **El score no es determinista** entre tandas del mismo código. Un score no determinista **no
    es un score**.
 2. **`tests per mutant` cae en picado**: Stryker ejecuta el test EQUIVOCADO contra el mutante.
@@ -164,7 +166,7 @@ solo datos literales.
 - ❌ **Una constante que decide una guarda y que ningún test fija.** → si bajarla
   no pone rojo nada, la guarda se puede desactivar en silencio y el build seguirá
   «verde». Ánclala contra un **literal escrito a mano** (no contra el símbolo
-  importado: eso es tautología). *Una auditoría sin puerta no existe.*
+  importado: eso es tautología). _Una auditoría sin puerta no existe._
 
 ## Verificación final antes de cerrar
 
