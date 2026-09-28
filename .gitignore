@@ -52,3 +52,6 @@ Thumbs.db
 
 # Configuración local del servidor de vista previa del IDE (no se versiona)
 .claude/launch.json
+
+# Permisos y ajustes PERSONALES de Claude Code en este proyecto (no se versionan)
+.claude/settings.local.json
