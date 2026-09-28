@@ -79,3 +79,8 @@ versión funcional ANTES de cerrar el pipeline SDD. **No está `done`.**
 - `tdd_craftsman` — Feature en curso: F-04 — cascaron_semantico (ENMIENDA 4). Escenarios a recorrer: @s42
   (home-horneado), @s43 (contacto-horneado), @s44 (los 5 experimentos de trampas-del-horneado). Diario:
   `progress/tdd_cascaron_enmienda4.md`. F-04 sigue `done` (no se toca `feature_list.json`).
+- `tdd_craftsman` — @s42/@s43/@s44 VERDE: los 3 build-based lanzan con `NODE_ENV=production` (resto heredado);
+  sus negativas nacieron ROJAS (368/365 en home y contacto; 13-14/10-11 en los 5 experimentos). `bin/harness init`
+  exit 0 (47/47, 1535/1535; 96,3 s antes → 90,0 s después), `pnpm build` exit 0 con las 5 puertas (`dist/` en
+  producción, `app-CWmDYxle.js`). No-mutable declarado; `vitest.stryker.config.ts` sigue excluyendo los 3. Observado:
+  vitest exporta `MODE=test` y el modo de Vite sigue siendo `test` (bundle idéntico por sha256). Pendiente: `judge`.

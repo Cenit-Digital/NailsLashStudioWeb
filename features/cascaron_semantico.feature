@@ -175,7 +175,7 @@
 
 # =============================================================================================
 # ENMIENDA 4 (2026-09-28): LOS TESTS QUE CONSTRUYEN EL SITIO LO CONSTRUYEN EN MODO PRODUCCIÓN.
-# @s1-@s41 SE PRESERVAN INTACTOS; SE AÑADEN @s42, @s43 Y @s44.
+# @s1-@s41 SE PRESERVAN INTACTOS; SE AÑADEN @s42, @s43 Y @s44 (Y @s45, AMPLIACIÓN DEL MISMO DÍA).
 # =============================================================================================
 # ORIGEN: lo «Observado, fuera del alcance» de `progress/tdd_cascaron_enmienda2.md`, confirmado por el
 # judge (`progress/judge_cascaron_enmienda2.md` §4, «Punto 4»). Fuente en la spec: `project-spec.md`
@@ -204,6 +204,11 @@
 # DECISIÓN: esos builds se lanzan con `NODE_ENV=production` explícito en el entorno del SUBPROCESO (el
 # resto del entorno se hereda). QUIÉN LO DECIDE: el HUMANO, AskUserQuestion del 2026-09-28, respuesta
 # literal «Sí, modo producción».
+# AMPLIACIÓN (mismo día, tras el TDD de @s42-@s44; `progress/tdd_cascaron_enmienda4.md` «Observado»): el
+# modo NO lo fijaba solo `NODE_ENV=test`. Vitest exporta también `MODE=test` y vite-react-ssg lee `MODE`
+# ANTES que `NODE_ENV`: con solo `NODE_ENV=production` el bundle ya es idéntico al publicado, pero el modo de
+# Vite sigue siendo `test` (su log: «building client environment for test»). Por eso los tres lanzamientos
+# llevan también `MODE: 'production'`. → @s45
 #
 # QUÉ NO CAMBIA: NINGÚN escenario anterior (@s1-@s41) se toca, ni una letra, y lo que ya aseveran esos tres
 # ficheros sigue en verde sobre el build en producción. El DESPLIEGUE NO ESTABA AFECTADO:
@@ -1833,3 +1838,70 @@ Feature: Cáscara semántica horneada, JSON-LD escrito de cero y la puerta que m
     # Hoy (`NODE_ENV=test` heredado): anclas en VERDE en las 5 filas; 13 `jsxDEV` en `react19-nativa` y 14
     # en las cuatro `head-*`; 10 y 11 `fileName:"…"`. MEDIDO en una copia de `head-correcto` fuera del
     # repo con `NODE_ENV=production`: 95 213 B, 0 `jsxDEV`, 0 `fileName:` y el ancla presente. Satisfacible.
+
+  # ---------------------------------------------------------------------------
+  # El MODO de Vite de esos builds también es producción (AMPLIACIÓN de la ENMIENDA 4, 2026-09-28)
+  # ---------------------------------------------------------------------------
+  # @s1-@s44 (arriba) NO SE TOCAN. Ver la línea AMPLIACIÓN del banner ENMIENDA 4 y `project-spec.md`
+  # §Feature 4 → «Enmienda 4» → «Ampliación».
+  #
+  # PARA EL `tdd_craftsman`:
+  #   - La corrección: `MODE: 'production'` en el entorno del SUBPROCESO de cada lanzamiento, ADEMÁS de
+  #     `NODE_ENV: 'production'`, con el resto heredado. Es el valor que resuelve un `pnpm build` directo (sin
+  #     `MODE` ni `NODE_ENV`, `mode = … || 'production'`). MEDIDO en una copia de la app mínima fuera del
+  #     repo: `MODE=test NODE_ENV=production` → «building client environment for test»; `MODE=production
+  #     NODE_ENV=production` → «… for production»; sin `MODE` ni `NODE_ENV` → «… for production».
+  #   - La entrada es la SALIDA ESTÁNDAR del subproceso de build que el propio test YA lanza (medido: el log
+  #     de Vite sale por stdout), tal cual, sin filtrar. SIN BUILD NUEVO. En home/contacto es la salida del
+  #     mismo `execSync` de `pnpm build` del `beforeAll`, que hoy se descarta: se CONSERVA (si el build falla,
+  #     la que trae el error). En `trampas` es la del `execSync` que construye cada experimento dentro del
+  #     helper, NUNCA la `salida` que el helper ya guarda: esa es la de la PUERTA (`tools/puerta-cascaron.ts`),
+  #     no la del build, y no lleva el log de Vite (si se confunden, el ancla cae).
+  #   - ANCLA POSITIVA PRIMERO y sobre LA MISMA cadena capturada que la negativa: si la salida no se
+  #     capturara, viniera vacía o fuera otra, el 1er `Then` cae en ROJO y la negativa ya no puede pasar en
+  #     VACÍO.
+  #   - Literales A MANO: "building client environment for", "production" y "building client environment for
+  #     test". NUNCA se derivan de `process.env`, de `import.meta.env` ni de la config de Vite.
+  #   - «Seguida de» es INMEDIATO, tras un espacio: el log es `vite v7.3.6 building client environment for
+  #     production...`. MEDIDO con color forzado (`FORCE_COLOR=1`): el escape ANSI envuelve la frase entera, y
+  #     `building client environment for production` sigue saliendo sin nada en medio.
+  #   - La línea «building ssr environment for …» sale del MISMO modo (medido: cambia a la vez); ni se exige
+  #     ni se prohíbe aquí, para no duplicar.
+  #   - En `trampas`, como en @s44: se captura EN EL HELPER (todo build pasa por él), y el `it` que cita @s45
+  #     recorre las 5 filas escritas a mano por su nombre; nunca un bucle sobre una colección que podría
+  #     estar vacía.
+  #   - Nace en ROJO en las 7 filas con el lanzamiento de hoy (`NODE_ENV=production` con `MODE=test`
+  #     heredado: el log dice «for test»), con el ancla ya en VERDE. @s42-@s44 siguen en VERDE.
+  #
+  # NO SATISFACEN @s45 (ni su porqué):
+  #   - borrar, silenciar o no capturar el log (`logLevel: 'silent'`, un `customLogger`, `stdio: 'ignore'`
+  #     o `'inherit'`): la negativa pasaría en vacío, y el ancla lo impide (1er `Then` en ROJO);
+  #   - fijar `mode: 'production'` en `vite.config.ts`: MEDIDO, en la app que lo lee el log SÍ pasa a «for
+  #     production» aun con `MODE=test`, pero los 5 experimentos NO leen el `vite.config.ts` del repo
+  #     (escriben el suyo) y seguirían «for test»; además la decisión es el entorno del SUBPROCESO, y esa
+  #     configuración es la que publica el despliegue, que no estaba roto;
+  #   - cambiar el comando de build o el script `build` de `package.json`: es el que usa el despliegue;
+  #   - QUITAR `MODE` del entorno heredado en vez de fijarlo: el log diría «production» por la vía de
+  #     `NODE_ENV`, pero la decisión es el valor explícito con el resto del entorno heredado;
+  #   - poner `MODE`/`NODE_ENV` de producción a TODA la suite (config de Vitest, script `test`, CI):
+  #     cambiaría el modo de todos los tests de jsdom;
+  #   - aseverarlo sobre un build APARTE, sobre la salida de la puerta, o normalizando/filtrando el log en
+  #     el TEST antes de buscar.
+
+  @s45
+  Scenario Outline: el build <build> que lanza "<lanzador>" corre en modo de Vite "production", según su propio log
+    Given la salida estándar del build <build> que "<lanzador>" YA lanza en su beforeAll, capturada por el propio test
+    When se lee esa salida capturada, tal cual, sin filtrar
+    Then contiene al menos 1 vez el literal "building client environment for"
+    And cada una de esas apariciones va seguida, tras un espacio, del literal "production"
+    And esa misma salida contiene exactamente 0 veces el literal "building client environment for test"
+
+    Examples:
+      | lanzador                              | build                             |
+      | src/pages/home-horneado.test.ts       | "pnpm build"                      |
+      | src/pages/contacto-horneado.test.ts   | "pnpm build"                      |
+      | src/lib/trampas-del-horneado.test.tsx | del experimento "react19-nativa"  |
+      | src/lib/trampas-del-horneado.test.tsx | del experimento "head-espacio"    |
+      | src/lib/trampas-del-horneado.test.tsx | del experimento "head-mayusculas" |
+      | src/lib/trampas-del-horneado.test.tsx | del experimento "head-atributo"   |
+      | src/lib/trampas-del-horneado.test.tsx | del experimento "head-correcto"   |

@@ -13,12 +13,12 @@
 
 ## Estado: VERDE
 
-| Fichero                                 | Cambio                                                                                                                                                                                                                           |
-| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fichero                                 | Cambio                                                                                                                                                                                                                                                             |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `src/pages/home-horneado.test.ts`       | `env: { ...process.env, NODE_ENV: 'production' }` en el `execSync` del `beforeAll`. 4 tests de bytes de @s42. `modulosDeLaApp` filtra la extracción de @s39, que se reutiliza; `bundleDeLaApp` y `apariciones`. Constante `PREFIJO_DE_ASSETS` (REFACTOR). Cabecera |
-| `src/pages/contacto-horneado.test.ts`   | El mismo `env` en su `execSync`. 4 tests de bytes de @s43, con la extracción de `<script>` escrita AQUÍ (mismo criterio que @s39; el fichero no importa `src/` ni otro test). Cabecera                                              |
-| `src/lib/trampas-del-horneado.test.tsx` | El mismo `env` en el `execSync` de `construirExperimento`, que es el único que construye. La medición del bundle va DENTRO de ese helper y viaja en `Experimento`. 4 `it.each` × 5 filas escritas a mano (`FILAS_DE_S44`). Cabecera        |
-| `progress/current.md`                   | Nota de arranque y resultado                                                                                                                                                                                                     |
+| `src/pages/contacto-horneado.test.ts`   | El mismo `env` en su `execSync`. 4 tests de bytes de @s43, con la extracción de `<script>` escrita AQUÍ (mismo criterio que @s39; el fichero no importa `src/` ni otro test). Cabecera                                                                             |
+| `src/lib/trampas-del-horneado.test.tsx` | El mismo `env` en el `execSync` de `construirExperimento`, que es el único que construye. La medición del bundle va DENTRO de ese helper y viaja en `Experimento`. 4 `it.each` × 5 filas escritas a mano (`FILAS_DE_S44`). Cabecera                                |
+| `progress/current.md`                   | Nota de arranque y resultado                                                                                                                                                                                                                                       |
 
 No he tocado nada de producción (`src/` fuera de los tests), ni `vite.config.ts`, `vitest.config.ts`,
 `vitest.stryker.config.ts`, `stryker.config.json`, `harness.config.json`, `feature_list.json`, el
@@ -71,11 +71,11 @@ filtro `app-`) y este test. Nace VERDE. Sabotaje: prefijo `app_` →
 **Ciclo 2, 2º ancla (`:359`).** Añadí `bundleDeLaApp()`: quita el prefijo del `src` y lee bajo el
 `dist/assets/` de este build, nunca por glob. Nace VERDE. Tres sabotajes, los tres en ROJO:
 
-| Sabotaje (en el test)                                    | ROJO                                                                         |
-| -------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Sabotaje (en el test)                                      | ROJO                                                                         |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | el literal de la app mínima (`Av. de Atenas 75, Local 41`) | `expected '…' to contain 'Av. de Atenas 75, Local 41'` (y volcaba el bundle) |
-| leer bajo `dist/` en vez de `dist/assets/`               | `ENOENT: no such file or directory, open '…/dist/app-C6U4pjd1.js'`           |
-| resolver al `client-*.js` (otro chunk)                   | `expected 'import{r as LT,…' to contain 'Lo que dicen nuestras clientas'`    |
+| leer bajo `dist/` en vez de `dist/assets/`                 | `ENOENT: no such file or directory, open '…/dist/app-C6U4pjd1.js'`           |
+| resolver al `client-*.js` (otro chunk)                     | `expected 'import{r as LT,…' to contain 'Lo que dicen nuestras clientas'`    |
 
 **Ciclo 3, 0 `jsxDEV` (`:368`).** ROJO sobre el artefacto `NODE_ENV=test`:
 
@@ -156,11 +156,11 @@ criterio de @s39 (`ATRIBUTO`, `atributosDe`, `modulosDeLaApp(html)`), y el campo
 `leerBundleDeLaApp(dir, modulos)` en el helper, justo después de leer el HTML de ESE build, y el campo
 `Experimento.bundleDeLaApp`. 20/20. Tres sabotajes:
 
-| Sabotaje (en el test)                                   | ROJO                                                                                                   |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| el literal de la app real (`Lo que dicen nuestras clientas`) | ×5 `expected 0 to be greater than or equal to 1`                                                       |
-| leer el `client-*.js` del experimento                   | ×5 `expected 0 to be greater than or equal to 1`                                                       |
-| leer bajo `dist/` en vez de `dist/assets/`              | `ENOENT … .experimentos-tmp/react19-nativa/dist/app-Ba7jxfaF.js` en el `beforeAll`: `Test Files 1 failed`, los 20 tests saltados (falla cerrada; ver Decisión 4) |
+| Sabotaje (en el test)                                        | ROJO                                                                                                                                                             |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| el literal de la app real (`Lo que dicen nuestras clientas`) | ×5 `expected 0 to be greater than or equal to 1`                                                                                                                 |
+| leer el `client-*.js` del experimento                        | ×5 `expected 0 to be greater than or equal to 1`                                                                                                                 |
+| leer bajo `dist/` en vez de `dist/assets/`                   | `ENOENT … .experimentos-tmp/react19-nativa/dist/app-Ba7jxfaF.js` en el `beforeAll`: `Test Files 1 failed`, los 20 tests saltados (falla cerrada; ver Decisión 4) |
 
 **Ciclos 3 y 4 (`:436`, `:443`).** ROJO ×10, todavía sin tocar el `env`. Son las cifras del contrato:
 
@@ -231,7 +231,7 @@ porque no construye (y ninguna puerta lee `NODE_ENV`: lo comprobé con grep en `
    minúsculas, tres formas de comillas, gana el primer nombre repetido y nunca una subcadena de la
    etiqueta.
 6. **Literales a mano.** Son `'module'`, `'/NailsLashStudioWeb/assets/'`, `'/assets/'`, `app-`, `'.js'`,
-   `/jsxDEV/g`, `` /fileName:["'`]/g ``, «Lo que dicen nuestras clientas», «625 22 33 66» y «Av. de Atenas
+   `/jsxDEV/g`, ``/fileName:["'`]/g``, «Lo que dicen nuestras clientas», «625 22 33 66» y «Av. de Atenas
    75, Local 41». Ninguno se deriva de `vite.config.ts`, del manifiesto de Vite, de `import.meta.env` ni de
    `HOME_CON_HEAD`/`HOME_CON_METADATA_NATIVA`.
 
@@ -254,16 +254,16 @@ porque no hay lógica mutable nueva.
 
 ## Coste medido (`bin/harness init`, una corrida antes y una después)
 
-| Corrida                                          | Total (reloj) | `Duration` de vitest | `tests` de vitest | Ficheros | Tests |
-| ------------------------------------------------ | ------------- | -------------------- | ----------------- | -------- | ----- |
-| ANTES (HEAD, sin cambios, `NODE_ENV=test`)       | 96,3 s        | 84,58 s              | 45,26 s           | 47/47    | 1507  |
-| DESPUÉS (3 ficheros en producción, +28 tests)    | 90,0 s        | 78,49 s              | 39,96 s           | 47/47    | 1535  |
+| Corrida                                       | Total (reloj) | `Duration` de vitest | `tests` de vitest | Ficheros | Tests |
+| --------------------------------------------- | ------------- | -------------------- | ----------------- | -------- | ----- |
+| ANTES (HEAD, sin cambios, `NODE_ENV=test`)    | 96,3 s        | 84,58 s              | 45,26 s           | 47/47    | 1507  |
+| DESPUÉS (3 ficheros en producción, +28 tests) | 90,0 s        | 78,49 s              | 39,96 s           | 47/47    | 1535  |
 
 No sube: baja unos 6 s. La explicación plausible es que el build de producción emite menos JS (164 751 B
 frente a 262 070 B en la app real, y 95 213 B frente a ~150 800 B en cada experimento). Con una sola
 corrida por lado no afirmo que sea más rápido; afirmo que **no es más caro**. Las corridas aisladas por
-fichero lo confirman (home ~7-8,5 s y trampas ~19-20 s, antes y después). 1535 = 1507 + 4 (@s42) + 4
-(@s43) + 20 (@s44, 4 × 5 filas).
+fichero apuntan a lo mismo: home pasa de 8,57 s a 7,39 s y trampas de 19,73 s a 16,65 s (`Duration` de
+vitest, en modo test y en producción). 1535 = 1507 + 4 (@s42) + 4 (@s43) + 20 (@s44, 4 × 5 filas).
 
 ## Resultados de la verificación final
 
@@ -274,6 +274,10 @@ fichero lo confirman (home ~7-8,5 s y trampas ~19-20 s, antes y después). 1535 
 - `pnpm build` directo → **exit 0**, con las 5 puertas en ✓ (cascarón, placeholders, contraste,
   terceros con «hornea los 6 pares de fuente», y anclas). Vite: «building client environment for
   production». `dist/` queda en PRODUCCIÓN: `app-CWmDYxle.js`, 164 751 B, 0 `jsxDEV` y 0 `fileName:`.
+  - Una suite del lead (`bin/harness test`, en este mismo repo) volvió a escribir `dist/` a las 12:09:37.
+    Esperé a que terminara, para no pisarle el `dist/` compartido a mitad de sus tests build-based, y
+    relancé `pnpm build` directo a las 12:13:06. Resultado: exit 0, las 5 puertas en ✓, «for
+    production», `app-CWmDYxle.js` de 164 751 B con 0/0. Ese es el `dist/` que dejo.
 - **El artefacto de los tests es el de producción.** Reproduje fuera de vitest el entorno exacto que
   hereda el subproceso (ver abajo: `MODE=test`, `BASE_URL=/`, `DEV=1`, `PROD=`, `SSR=1`, `VITEST=true`)
   con `NODE_ENV=production`. Comparé por sha256 sus 32 ficheros de `dist/` (sin `index.html`) con los de
@@ -288,7 +292,7 @@ fichero lo confirman (home ~7-8,5 s y trampas ~19-20 s, antes y después). 1535 
 - **Vitest exporta también `MODE=test` al entorno, y vite-react-ssg lo lee ANTES que `NODE_ENV`.**
   - Vitest 4.1.10 (`cli-api.BK8pd4xc.js:14171-14173`) copia `viteConfig.env` a `process.env` con `??=`.
     Medido en un worker con una sonda desechable: `{"MODE":"test","NODE_ENV":"test","BASE_URL":"/",
-    "DEV":"1","PROD":"","SSR":"1","VITEST":"true"}`.
+"DEV":"1","PROD":"","SSR":"1","VITEST":"true"}`.
   - Como `mode = process.env.MODE || process.env.NODE_ENV || …` (`vite-react-ssg.DsKK_1op.mjs:704`),
     con la decisión del humano el modo de Vite de los builds de test sigue siendo `test` (su log dice
     «building client environment for test»). `import.meta.env.MODE` valdría `'test'` y se cargaría un

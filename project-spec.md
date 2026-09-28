@@ -1359,6 +1359,16 @@ vacío, contiene un literal de la app escrito a mano (ancla positiva) y NO conti
 Se mide el coste en `bin/harness init` antes y después, y `vitest.stryker.config.ts` sigue excluyendo
 `*-horneado.test.*` de la mutación. No-mutable: son tests build-based y su lanzamiento; se declara.
 
+**Ampliación (mismo día, tras el TDD de @s42-@s44; `progress/tdd_cascaron_enmienda4.md` «Observado»).**
+Vitest exporta también `MODE=test` al entorno de sus workers (medido: `{"MODE":"test","NODE_ENV":"test",…}`),
+y vite-react-ssg lee `MODE` ANTES que `NODE_ENV`. Con solo `NODE_ENV=production` el bundle ya es idéntico
+byte a byte al de `pnpm build` directo (sha256), pero el MODO de Vite sigue siendo `test`: su propio log dice
+«building client environment for test», `import.meta.env.MODE` valdría `'test'` y se cargaría un
+`.env.test` si existiera. La decisión del humano fue «modo producción», así que los tres lanzamientos
+llevan también `MODE: 'production'` (el valor que resuelve un `pnpm build` directo, sin `MODE` ni
+`NODE_ENV`). Se demuestra con la salida del propio build, que el test ya captura: contiene «building
+client environment for» (ancla) seguido de «production», y nunca «for test».
+
 ---
 
 ### Feature 5: `cero_terceros` — la petición que nunca sale, y la puerta que lo demuestra
