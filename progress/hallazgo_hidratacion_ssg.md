@@ -17,11 +17,11 @@ it along with the HTML.» (React instalado: 19.2.7).
 
 ## 2. Medido (20 cargas en frío por fila, CPU ralentizada ×4 por CDP, 1280×800)
 
-| Build | `<script type="module">` del bundle | Cargas rotas (#418 + página vacía) |
-|---|---|---|
-| HEAD `3c171ff` (actual) | `async` | 3/20 · 4/20 · 1/24 (tres tandas) |
-| `92d6b70` (ANTES de Nailbot) | `async` | 6/20 |
-| HEAD con `ssgOptions.script` retirado (por defecto `'sync'`) | sin atributo | **0/20 · 0/20 · 0/8** |
+| Build                                                        | `<script type="module">` del bundle | Cargas rotas (#418 + página vacía) |
+| ------------------------------------------------------------ | ----------------------------------- | ---------------------------------- |
+| HEAD `3c171ff` (actual)                                      | `async`                             | 3/20 · 4/20 · 1/24 (tres tandas)   |
+| `92d6b70` (ANTES de Nailbot)                                 | `async`                             | 6/20                               |
+| HEAD con `ssgOptions.script` retirado (por defecto `'sync'`) | sin atributo                        | **0/20 · 0/20 · 0/8**              |
 
 El bundle JS es BYTE A BYTE el mismo en las dos variantes de HEAD (`app-CWmDYxle.js`): solo cambia el
 atributo del `<script>`.

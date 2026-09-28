@@ -5,9 +5,11 @@ import { resolve } from 'node:path'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 /**
- * F-10 @s12 y @s14 — sobre el HTML CRUDO del artefacto de PRODUCCIÓN, leído por BYTES (readFileSync,
- * sin ejecutar JavaScript — I-8, NUNCA jsdom). «Verde ≠ funciona»: para las features de UI se
- * verifica con `pnpm build` + fetch del HTML crudo (feature_list.json §rules.notas).
+ * F-10 @s12 y @s14, F-14 @s6 y F-04 @s39/@s40 (ENMIENDA 2 de `cascaron_semantico.feature`) — sobre el
+ * HTML CRUDO del artefacto de PRODUCCIÓN, leído por BYTES (readFileSync, sin ejecutar JavaScript —
+ * I-8, NUNCA jsdom). «Verde ≠ funciona»: para las features de UI se verifica con `pnpm build` + fetch
+ * del HTML crudo (feature_list.json §rules.notas). @s39/@s40 REUTILIZAN el build de este `beforeAll`:
+ * el contrato prohíbe un build nuevo solo para ellos.
  *
  * 🔴 ESTE FICHERO NO IMPORTA NADA DE `src/lib/` NI DE `src/pages/`, Y ES DELIBERADO (patrón de
  * `trampas-del-horneado.test.tsx`): corre el BUILD REAL (lento) en `beforeAll`. Si importara
@@ -143,5 +145,110 @@ describe('@s6 (F-14) el JSON-LD horneado NO contiene aggregateRating ni review',
     expect(html).toContain('https://www.treatwell.es/establecimiento/nails-lash-studio/')
     expect(html).toContain('23/07/2026')
     // …nunca a los buscadores como propia (la negativa de arriba deja de ser vacua con esto verde).
+  })
+})
+
+/**
+ * F-04 @s39/@s40 — LA EXTRACCIÓN DE ELEMENTOS DEL HTML CRUDO, escrita A MANO aquí (este fichero no
+ * importa `src/lib/`). Es LA MISMA para cada ancla positiva y para su negativa: si no casara nada
+ * (atributos en otro orden, otra caja, otras comillas), el ancla cae en ROJO y la negativa ya no puede
+ * pasar en VACÍO. Mira NOMBRES de atributo (en minúsculas), nunca subcadenas de la etiqueta: el hash de
+ * un fichero es arbitrario y podría contener «async» o «image». Valores entre comillas dobles, simples
+ * o sin comillas; un atributo sin valor vale ''. Ante un nombre repetido gana el PRIMERO, como en el
+ * parser de HTML.
+ */
+const ATRIBUTO = /([^\s"'<>/=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g
+
+type Atributos = ReadonlyMap<string, string>
+
+function atributosDe(texto: string): Atributos {
+  const atributos = new Map<string, string>()
+
+  for (const [, nombre, dobles, simples, sinComillas] of texto.matchAll(ATRIBUTO)) {
+    const clave = nombre.toLowerCase()
+
+    if (!atributos.has(clave)) {
+      atributos.set(clave, dobles ?? simples ?? sinComillas ?? '')
+    }
+  }
+
+  return atributos
+}
+
+/** Los elementos `<etiqueta …>` del HTML crudo, sin distinguir mayúsculas en el nombre de la etiqueta. */
+function elementos(etiqueta: string): readonly Atributos[] {
+  const apertura = new RegExp(`<${etiqueta}(?=[\\s/>])([^>]*)>`, 'gi')
+
+  return [...html.matchAll(apertura)].map((encontrado) => atributosDe(encontrado[1]))
+}
+
+/** Un valor enumerado de HTML (`type`, `rel`, `as`, `loading`) se compara sin distinguir mayúsculas. */
+function valorDe(elemento: Atributos, nombre: string): string | undefined {
+  return elemento.get(nombre)?.toLowerCase()
+}
+
+/** @s39 — los `<script type="module">` cuyo `src` apunta al bundle: `/NailsLashStudioWeb/assets/….js`. */
+function modulosDelBundle(): readonly Atributos[] {
+  return elementos('script').filter((script) => {
+    const src = script.get('src') ?? ''
+
+    return (
+      valorDe(script, 'type') === 'module' &&
+      src.startsWith('/NailsLashStudioWeb/assets/') &&
+      src.endsWith('.js')
+    )
+  })
+}
+
+/**
+ * F-04 @s39 (ENMIENDA 2) — el módulo del bundle SIN `async`. HTML Living Standard §4.12.1: un módulo
+ * con `async` se evalúa «as soon as it is available (potentially before parsing completes)»; sin él,
+ * «when the page has finished parsing» — después del `<script>` del final del `<body>` que lleva el
+ * snapshot del router. `defer` ni se exige ni se prohíbe («has no effect on module scripts»).
+ */
+describe('@s39 (F-04) el script de módulo del bundle viaja SIN async en el HTML crudo de producción', () => {
+  it('@s39 ANCLA POSITIVA: hay exactamente 1 <script type="module"> con src "/NailsLashStudioWeb/assets/….js"', () => {
+    // El hash del nombre cambia en cada build y NO se fija.
+    expect(modulosDelBundle()).toHaveLength(1)
+  })
+
+  it('@s39 ese elemento NO lleva el atributo async en ninguna forma (async, async="", async="async") ni caja', () => {
+    // Misma extracción que el ancla. Los nombres ya vienen en minúsculas: «ASYNC» también es 'async'.
+    const [modulo] = modulosDelBundle()
+
+    expect([...modulo.keys()]).not.toContain('async')
+  })
+})
+
+/** @s40 — los `<link rel="preload">` del HTML crudo cuyo `as` vale `destino` (sin distinguir mayúsculas). */
+function precargasDe(destino: string): readonly Atributos[] {
+  return elementos('link').filter(
+    (link) => valorDe(link, 'rel') === 'preload' && valorDe(link, 'as') === destino,
+  )
+}
+
+/**
+ * F-04 @s40 (ENMIENDA 2) — CERO `<link rel="preload" as="image">`: las fotos son `loading="lazy"` y sin
+ * `crossorigin`, así que la precarga (`crossorigin=""`) no se reutiliza y se piden ANTES de desplazarse.
+ * Lo que se retira es la PRECARGA, nunca la foto. Las precargas de FUENTE siguen (su número es de F-05).
+ */
+describe('@s40 (F-04) el HTML crudo de producción no lleva ningún <link rel="preload" as="image">', () => {
+  it('@s40 ANCLA POSITIVA: al menos 1 <link rel="preload"> lleva as="font" — la extracción SÍ ve precargas', () => {
+    // Su NÚMERO no se fija aquí: es de F-05 (`cero_terceros.feature`).
+    expect(precargasDe('font').length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('@s40 ANCLA POSITIVA: al menos 1 <img> lleva loading="lazy" — las fotos SIGUEN horneadas', () => {
+    // Cierra el atajo de «arreglar» @s40 quitando las fotos importadas. Su número no se fija.
+    const perezosas = elementos('img').filter((img) => valorDe(img, 'loading') === 'lazy')
+
+    expect(perezosas.length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('@s40 exactamente 0 <link rel="preload"> llevan as="image", en cualquier orden de atributos y caja', () => {
+    // Misma extracción que el ancla de fuentes; se listan los href para que un fallo diga CUÁLES.
+    const deImagen = precargasDe('image').map((link) => link.get('href'))
+
+    expect(deImagen).toEqual([])
   })
 })
