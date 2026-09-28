@@ -185,7 +185,7 @@ export default defineConfig({
 
 | Opción | Default oficial | WebEmpresa | Efecto |
 | --- | --- | --- | --- |
-| `script` | `'sync'` | `'async'` | El JS no bloquea el parseo del HTML. |
+| `script` | `'sync'` | `'async'` | ~~El JS no bloquea el parseo del HTML.~~ **FALSO para módulos y RETIRADO el 2026-09-28** (F-04 ENMIENDA 2): un `type="module"` nunca bloquea el parseo; con `async` se evalúa «potentially before parsing completes» (HTML Standard §4.12.1) y la hidratación puede arrancar sin el snapshot del router → #418 y página vacía, medido. Ver `progress/hallazgo_hidratacion_ssg.md`. |
 | `entry` | `'src/main.ts'` | `'src/main.tsx'` | Necesario: el entry es `.tsx`, no `.ts`. |
 | `dirStyle` | `'flat'` | `'nested'` | `/foo/index.html` en vez de `/foo.html` → **URLs limpias sin `.html` ni rewrites**. |
 | `formatting` | `'none'` | `'none'` | Igual al default (redundante pero explícito). |

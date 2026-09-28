@@ -71,3 +71,17 @@ carácter U+FFFD crudo: comparaba U+FFFD con U+FFFD y estaba verde sin probar na
 mutantes `Regex` que el informe de concurrencia alta escondía como «timeout» (la regla del repo: «un
 informe con timeouts miente»). Cura: escapes `\u` en el fichero y una CONTRAPRUEBA que exige que
 `encodeURIComponent` lance `URIError` con la entrada sin sanear. Ver `progress/mutation_nailbot_chat_compartido.md` (#5).
+
+## Ronda delta y cierre (2026-09-28)
+
+- **B-N1 (judge delta, bloqueante):** `sinSurrogatesSueltos` usaba una aserción lookbehind que Safari/iOS
+  < 16.4 no soporta (el bundle se construye para `baseline-widely-available` = `safari16`, verificado en
+  `node_modules/vite/dist/node/chunks/logger.js:146-151`). Cura: una sola expresión «par válido o surrogate
+  suelto» con función de reemplazo que conserva los pares (`chat-nailbot-logica.ts:150-157`) y una guarda
+  de bytes con ancla positiva que prohíbe `(?<` en el cerebro (`chat-nailbot.test.tsx:609-613`). El judge
+  de cierre comprobó que la guarda MUERDE y comparó el saneador con `String.prototype.toWellFormed()` en
+  20 000 cadenas aleatorias: 0 diferencias. `dist/` sin ningún lookbehind (grep).
+- **Cierre:** judge APPROVED (`progress/judge_nailbot_chat_compartido_cierre.md`); mutación de cierre
+  100 % sin timeouts (`progress/mutation_nailbot_chat_compartido.md`, mediciones #8 y #9); `bin/harness
+  init` 46/46 ficheros y 1482/1482 tests; `pnpm build` con las 5 puertas. Verificación en vivo: ver
+  `progress/verificacion_viva_nailbot.md`.

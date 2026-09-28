@@ -1262,6 +1262,113 @@ violaciones → build verde → «protegidos».*
 - **A-11** (ya abierta) — si el **email** entra como registro placeholder, **no** se emite en el
   JSON-LD hasta que el cliente lo confirme.
 
+#### Enmienda 2 (2026-09-28): el horneado se hidrata sobre el documento COMPLETO, y sin precargas de foto que el `<img>` no reutiliza
+
+Origen: la verificación EN VIVO de F-24 con Chromium real (evidencia completa, con cifras y fuentes, en
+`progress/hallazgo_hidratacion_ssg.md`). Decidido por el `craftsman_lead` con la autonomía que el humano
+delegó el 2026-09-28 («hazlo tú el 100 % de forma autónoma»), mismo precedente que las enmiendas de la
+galería. Dos defectos PREEXISTENTES del horneado (se reproducen en `92d6b70`, antes de Nailbot):
+
+1. **El script de módulo del bundle viaja con `async`** (`vite.config.ts` → `ssgOptions.script: 'async'`).
+   El HTML Living Standard (§4.12.1) dice que un módulo con `async` se evalúa «as soon as it is
+   available (potentially before parsing completes)», y que sin él se evalúa «when the page has finished
+   parsing». vite-react-ssg hornea el snapshot del router (`window.__staticRouterHydrationData`) al FINAL
+   del `<body>` y el cliente lo lee al crear el router, antes de hidratar. Medido: con `async`, entre 1 y 6
+   de cada 20 cargas en frío (CPU ×4) lanzan el #418 de React y la home queda SIN CONTENIDO (0 `<h1>`,
+   0 secciones, sin robot); sin `async`, 0 de 48. **Decisión:** el módulo del bundle NO lleva `async`
+   (vuelve al valor por defecto de la librería, `'sync'`, que emite `<script type="module">`, diferido por
+   la norma). El «porqué» antiguo («el JS no bloquea el parseo», `docs/research/stack-ssg-seo.md`) era
+   falso para módulos: un módulo nunca bloquea el parseo.
+2. **vite-react-ssg inyecta `<link rel="preload" as="image" crossorigin="">`** para cada foto importada por
+   un módulo renderizado (hoy 13). Las 13 `<img>` son `loading="lazy"` y sin `crossorigin`: medido, las 13
+   se piden por red ANTES de desplazarse y cada una se descarga dos veces en `vite preview`, con dos avisos
+   de consola por foto. **Decisión:** el artefacto NO lleva ningún `<link rel="preload" as="image">`. La
+   precarga de la imagen del LCP (si algún día la hay) es de F-17 `pipeline_imagenes`, con fotos reales.
+   Las precargas de FUENTE (`as="font"`) NO se tocan en esta enmienda: cubren los 6 pares de fuente que
+   exige la puerta de F-05 (la Enmienda 3 retira después las que apuntan a un `.woff`).
+
+Acceptance de la enmienda: se asevera sobre el HTML CRUDO del artefacto REAL de producción (bytes de
+`dist/index.html` tras `pnpm build`, nunca jsdom), con ANCLA POSITIVA primero (hay exactamente un
+`<script type="module">` con `src` al bundle; hay precargas de fuente) y literales escritos a mano.
+Prohibido crear un build nuevo solo para esto: se reutiliza el build que ya corre la suite
+(`src/pages/home-horneado.test.ts`). Mutabilidad, declarada por escrito y no fingida (matizada tras el
+TDD y el judge, 2026-09-28): lo que vive en `vite.config.ts` (la ausencia de `ssgOptions.script` y el
+cableado de `onPageRendered`) no es mutable —no está en `mutate` y el test de bytes es build-based,
+excluido de Stryker—; la lógica de @s40 (`sinPrecargasDeImagen`, `src/lib/horneado.ts`) sí está en
+`mutate` y exige el 100 %. Tras la enmienda, la sonda de hidratación se repite en vivo con más cargas
+(sobre un `pnpm build` directo, nunca tras la suite: los builds de vitest heredan `NODE_ENV=test`) y
+tiene que dar 0. **Cumplido:** 0/40 cargas rotas con CPU ×4 y 0/20 con CPU ×6.
+
+#### Enmienda 3 (2026-09-28): solo se precargan las fuentes `.woff2`; el `.woff` queda de respaldo en `@font-face`
+
+Origen: medición del `craftsman_lead` con Chromium (CDP) sobre el build de producción, y **decisión del
+humano** del 2026-09-28 (AskUserQuestion: «Solo precargar .woff2»). vite-react-ssg (`renderPreloadLink`,
+rama `.woff/.woff2/.ttf`) inyecta un `<link rel="preload" as="font" type="font/woff2" crossorigin>` por
+CADA fichero de fuente del manifiesto: hoy 12 (6 `.woff2` + 6 `.woff`), y los 6 que apuntan a un `.woff`
+declaran además un `type` falso (`font/woff2`). Medido: en una carga en frío con la página recorrida
+entera, Chromium descarga los 12; retirando solo las 6 precargas `.woff`, pide **0** `.woff` y carga
+EXACTAMENTE las mismas caras (Manrope 400/600/700, Gilda Display 400, Great Vibes 400) desde los `.woff2`.
+Los 6 `.woff` pesan 124 440 bytes (más que los 6 `.woff2`, 119 540): se ahorran en cada visita. WOFF2
+lo soportan todos los navegadores del objetivo del build (`baseline-widely-available`: chrome107,
+edge107, firefox104, safari16; datos de `caniuse-lite` 1.0.30001805: primera versión con soporte Chrome
+36, Edge 14, Firefox 39, Safari 12).
+
+**Decisión:** el artefacto no lleva ningún `<link rel="preload" as="font">` hacia un `.woff`; las
+precargas `.woff2` se quedan, y el `.woff` SIGUE en el `src` de cada `@font-face` como respaldo (no se
+toca el CSS). Se retira en el mismo retoque puro del HTML de la Enmienda 2 (`src/lib/horneado.ts`,
+cableado en `ssgOptions.onPageRendered`). **F-05 no cambia:** su puerta cuenta los PARES
+`[familia, peso]` de los `@font-face` del CSS (`PARES_DE_FUENTE_ESPERADOS`, 6 pares), nunca las
+precargas, y ningún escenario de `cero_terceros.feature` fija el número de precargas.
+
+Acceptance: sobre los bytes del artefacto REAL (`dist/index.html` y el CSS de `dist/assets`), reutilizando
+el build de `src/pages/home-horneado.test.ts`, con ANCLAS POSITIVAS primero (hay precargas `as="font"`
+hacia `.woff2`; el CSS conserva `format("woff")` en sus `@font-face`) y cero precargas de fuente hacia un
+`.woff`. Lógica pura en `src/lib/horneado.ts`, TDD un test a la vez y mutación al 100 %. Fuera de alcance
+(anotado, no decidido): Manrope 500 se precarga y se declara, pero tras recorrer la home entera a
+1280 px `document.fonts` lo deja `unloaded` (no se ha auditado si alguna regla lo usa en otro estado o
+ancho); es la lista de F-05 y la decide F-05.
+
+#### Enmienda 4 (2026-09-28): los tests que construyen el sitio lo construyen en modo PRODUCCIÓN
+
+Origen: observación del `tdd_craftsman` de la Enmienda 2, confirmada por el judge
+(`progress/judge_cascaron_enmienda2.md` §4), y **decisión del humano** del 2026-09-28 (AskUserQuestion:
+«Sí, modo producción»). Los tests build-based (`src/pages/home-horneado.test.ts`,
+`src/pages/contacto-horneado.test.ts` y los experimentos de `src/lib/trampas-del-horneado.test.tsx`) lanzan
+el build desde Vitest con `execSync`, y heredan `NODE_ENV=test`; vite-react-ssg toma el modo de
+`process.env.MODE || process.env.NODE_ENV || … || 'production'` (`vite-react-ssg.DsKK_1op.mjs:704`).
+
+Medido por el `craftsman_lead` (mismo commit, dos builds): el HTML sale igual salvo los hashes (del bundle y
+el aleatorio `__VITE_REACT_SSG_HASH__`), pero el **JS NO**:
+
+| Build | `app-*.js` | `client-*.js` | `jsxDEV` en `app-*.js` | Rutas `fileName:"/…/src/…"` del disco |
+|---|---|---|---|---|
+| `NODE_ENV=test` (lo que hoy ven los tests) | 287 985 B | 354 070 B | 368 | sí |
+| `pnpm build` directo (lo que se publica) | 164 751 B | 180 764 B | 0 | no |
+
+Es decir: los tests que dicen aseverar «el artefacto REAL de producción» miran un bundle con React en modo
+DESARROLLO. Hoy no cambia ningún veredicto (todo lo aseverado vive en el HTML y las puertas), pero es un
+hueco de fidelidad: cualquier aserción futura sobre el JS, o sobre código que dependa de
+`import.meta.env.PROD`/`MODE`, divergiría en silencio. El despliegue NO está afectado: `deploy-pages.yml`
+ejecuta `pnpm build` en su propio paso después de la suite.
+
+**Decisión:** esos builds se lanzan con `NODE_ENV=production` explícito en el entorno del subproceso (el
+resto del entorno se hereda). **Acceptance:** un escenario que DEMUESTRA el modo por bytes, sin build
+nuevo: el bundle `app-*.js` que referencia el `<script type="module">` de `dist/index.html` existe, no está
+vacío, contiene un literal de la app escrito a mano (ancla positiva) y NO contiene `jsxDEV` ni rutas
+`fileName:"…"` del disco. Aplica a los tres ficheros build-based (cada uno con su propio artefacto).
+Se mide el coste en `bin/harness init` antes y después, y `vitest.stryker.config.ts` sigue excluyendo
+`*-horneado.test.*` de la mutación. No-mutable: son tests build-based y su lanzamiento; se declara.
+
+**Ampliación (mismo día, tras el TDD de @s42-@s44; `progress/tdd_cascaron_enmienda4.md` «Observado»).**
+Vitest exporta también `MODE=test` al entorno de sus workers (medido: `{"MODE":"test","NODE_ENV":"test",…}`),
+y vite-react-ssg lee `MODE` ANTES que `NODE_ENV`. Con solo `NODE_ENV=production` el bundle ya es idéntico
+byte a byte al de `pnpm build` directo (sha256), pero el MODO de Vite sigue siendo `test`: su propio log dice
+«building client environment for test», `import.meta.env.MODE` valdría `'test'` y se cargaría un
+`.env.test` si existiera. La decisión del humano fue «modo producción», así que los tres lanzamientos
+llevan también `MODE: 'production'` (el valor que resuelve un `pnpm build` directo, sin `MODE` ni
+`NODE_ENV`). Se demuestra con la salida del propio build, que el test ya captura: contiene «building
+client environment for» (ancla) seguido de «production», y nunca «for test».
+
 ---
 
 ### Feature 5: `cero_terceros` — la petición que nunca sale, y la puerta que lo demuestra
