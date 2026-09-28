@@ -26,3 +26,9 @@ src/styles/_tokens.scss
 # tiene el permiso `workflow`: GitHub rechaza el push). Quedan fuera de Prettier hasta que el humano
 # los formatee a mano con `pnpm exec prettier --write .github/workflows` y retire esta línea.
 .github/workflows/
+
+# Ajustes PERSONALES de Claude Code, locales de cada máquina y con el formato que escribe la propia
+# herramienta. Prettier solo lee el `.gitignore` y el `.prettierignore` del proyecto (no el gitignore
+# global donde suele estar este fichero), así que sin esta línea `format:check` —dentro de `lint`
+# desde la PR #14— fallaría en local por un fichero que ni siquiera está en el repo.
+.claude/settings.local.json

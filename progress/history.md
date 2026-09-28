@@ -59,6 +59,33 @@
     siguiente).
   - Los 3 workflows de `.github/workflows/` quedan fuera de Prettier: esta sesión no tiene permiso
     `workflow`.
+- **Cierre posterior (misma tarde)**:
+  - #13 y #14 fusionadas por el lead a petición expresa de Pablo («Hazlo tú todo… revisar y fusionar
+    las dos PRs»). Antes de fusionar la #14 se trajo `main`, se resolvió su único conflicto y se volvió
+    a pasar Prettier. `main` quedó en `14739c7` con la CI en verde.
+  - Se canceló el despliegue intermedio de `97915e6`, que publicaba el mismo sitio, para que solo hubiera
+    que aprobar uno.
+  - Pablo aprobó el despliegue de `14739c7` (run 36431428075). Su log dice `Created deployment for
+14739c7…` → `Reported success!`.
+  - Esta sesión no puede abrir `cenit-digital.github.io`: el proxy bloquea ese dominio, y también la
+    descarga del artefacto. Se verificó de otra forma:
+    - el artefacto publicado lleva los mismos ficheros con hash de contenido que el build verificado
+      (`app-CWmDYxle.js`, `client-BOiSO48a.js`, `app-Cgt1McRq.css`, fuentes y fotos);
+    - la verificación en vivo, repetida sobre un build del `main` exacto, dio 88/89. La que falta es el
+      caso ya aceptado del foco al reabrir;
+    - la sonda de hidratación dio 0/40 (CPU ×4) y 0/20 (CPU ×6).
+  - **Comprobación del humano** tras publicar, en sus palabras: «Ya lo he comprobado y en principio está
+    todo bien». No detalló cuáles de las pruebas en móvil real de arriba cubrió.
+  - **Aviso abierto (no es un error):** en el despliegue, GitHub avisa de que `actions/configure-pages@v5`,
+    `actions/upload-pages-artifact@v4` y `actions/deploy-pages@v4` están hechas para Node 20 y las fuerza
+    a Node 24. Las versiones que lo resuelven, según sus notas oficiales, son `configure-pages@v6`
+    («upgrade to node 24»), `deploy-pages@v5` («Update Node.js version to 24.x») y
+    `upload-pages-artifact@v5`, que usa upload-artifact v7, posterior a la v6 que ya corre en Node 24.
+    El cambio lo tiene que hacer el humano, porque esta sesión no tiene permiso `workflow`.
+  - **Defecto de la #14, corregido:** con `format:check` dentro de `lint`, un
+    `.claude/settings.local.json` local (los ajustes personales de Claude Code) hacía fallar
+    `bin/harness init` en esa máquina. Prettier solo lee el `.gitignore` y el `.prettierignore` del
+    proyecto, no el gitignore global donde estaba ese fichero. Se añade a los dos ignores del repo.
 
 ## 2026-07-25 — Despliegue en GitHub Pages (push a `main`): infraestructura + subruta `/NailsLashStudioWeb/` · CERRADA
 
