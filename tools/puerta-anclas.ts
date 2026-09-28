@@ -51,4 +51,7 @@ if (resultado.codigoSalida === 0) {
   console.error('\n✗ Puerta de anclas vivas: el build de producción NO puede publicarse.')
 }
 
-process.exit(resultado.codigoSalida)
+// process.exitCode y NO process.exit(): en Windows, salir a la fuerza con E/S pendiente dispara la
+// aserción de libuv «!(handle->flags & UV_HANDLE_CLOSING)» (nodejs/node#56645) y el build muere con
+// 0xC0000409 aunque la puerta pase. La documentación de Node recomienda dejar que el proceso termine solo.
+process.exitCode = resultado.codigoSalida

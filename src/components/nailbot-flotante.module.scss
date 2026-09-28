@@ -1,12 +1,11 @@
-// Nailbot flotante: lanzador fijo abajo a la derecha, control de pausa (SC 2.2.2), bocadillo y
-// panel <dialog> modal nativo. Brief: progress/nailbot_diseno.md · spec F-24 (project-spec.md).
+// Nailbot flotante (F-24): el contenedor fijo del lanzador, la pausa y el bocadillo, y el panel
+// <dialog> modal nativo. Contrato: features/nailbot_flotante.feature @s13.
 //
-// - Sin verde ni logo de WhatsApp en el lanzador (H5).
-// - Tamaño del lanzador = la MISMA custom property que alimenta el `scroll-padding-bottom` de
-//   `_base.scss` (HS-10): el foco que baja por la página no queda tapado por el robot (SC 2.4.11, C43).
+// - Nada de verde ni de logos de mensajería en esta hoja (H5): el lanzador es el robot.
+// - El tamaño del lanzador sale de `--nailbot-lanzador` (_base.scss), la MISMA fuente que el
+//   `scroll-padding-bottom` que evita tapar el foco (SC 2.4.11, C43; HS-10).
 // - z-index 40: por encima de los carruseles (7) y por debajo de la cabecera sticky (50) (HS-11).
-// - El anillo del lanzador es `--accent-dark` sobre `--bg`: par ya vigilado por la puerta de
-//   contraste (HS-17, SC 1.4.11).
+// - El anillo del lanzador es `--accent-dark` sobre `--bg`: par YA vigilado (HS-17, SC 1.4.11).
 
 .flotante {
   position: fixed;
@@ -16,15 +15,18 @@
   display: flex;
   align-items: flex-end;
   gap: 0.625rem;
-}
+  // Los huecos de la caja fija no capturan clics de la página: solo sus hijos los reciben.
+  pointer-events: none;
 
-.robot {
-  position: relative;
+  > * {
+    pointer-events: auto;
+  }
 }
 
 .lanzador {
   position: relative;
   display: block;
+  flex-shrink: 0;
   width: var(--nailbot-lanzador);
   height: var(--nailbot-lanzador);
   padding: 0;
@@ -46,20 +48,37 @@
   }
 }
 
+// Foco de teclado: anillo --accent-dark sobre un HALO blanco, para que se vea también cuando el robot
+// flota sobre el pie oscuro (--ink); y redondo: la regla global de :focus-visible (border-radius: 2px)
+// entra después en el bundle y lo volvería cuadrado.
 .lanzador:focus-visible {
+  border-radius: 50%;
   outline: 3px solid var(--accent-dark);
   outline-offset: 6px;
+  box-shadow:
+    0 10px 28px color-mix(in srgb, var(--ink) 22%, transparent),
+    0 0 0 12px var(--surface);
 }
 
+.pausa:focus-visible,
+.cerrarBocadillo:focus-visible,
+.cerrarDialogo:focus-visible {
+  border-radius: 50%;
+  outline: 3px solid var(--accent-dark);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 7px var(--surface);
+}
+
+// La pausa va pegada al robot, sobre su esquina superior izquierda (G186).
 .pausa {
   position: absolute;
-  top: -0.25rem;
-  left: -0.25rem;
+  right: calc(var(--nailbot-lanzador) - 24px);
+  bottom: calc(var(--nailbot-lanzador) - 24px);
   z-index: 1;
   display: grid;
   place-items: center;
-  width: 2rem;
-  height: 2rem;
+  width: 32px;
+  height: 32px;
   padding: 0;
   border: 1.5px solid var(--border-interactive);
   border-radius: 50%;
@@ -68,15 +87,16 @@
   cursor: pointer;
 
   svg {
-    width: 0.75rem;
-    height: 0.75rem;
+    width: 12px;
+    height: 12px;
   }
 }
 
 .bocadillo {
   position: relative;
   max-width: 13rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2.75rem;
+  margin-right: 0.5rem;
   padding: 0.625rem 2.25rem 0.625rem 0.875rem;
   background: var(--surface);
   border: 1px solid var(--line);
@@ -97,10 +117,10 @@
 
 .cerrarBocadillo {
   position: absolute;
-  top: 0.25rem;
-  right: 0.25rem;
-  width: 1.75rem;
-  height: 1.75rem;
+  top: 2px;
+  right: 2px;
+  width: 28px;
+  height: 28px;
   padding: 0;
   border: 0;
   border-radius: 50%;
@@ -113,10 +133,13 @@
 
 // — Panel: <dialog> modal nativo, anclado abajo a la derecha en escritorio —
 .dialogo {
+  // border-box: sin él, el relleno se SUMA al ancho y en móvil el panel desbordaba la pantalla
+  // (medido en Chrome a 375 px: 407×884 con «Cerrar el chat» cortado).
+  box-sizing: border-box;
   width: min(26rem, calc(100vw - 2rem));
   max-height: min(44rem, calc(100dvh - 2rem));
   margin: auto 1.25rem 1.25rem auto;
-  padding: 3.25rem 1rem 1rem;
+  padding: 1rem;
   border: 0;
   border-radius: 24px;
   background: var(--bg);
@@ -129,31 +152,23 @@
   background: color-mix(in srgb, var(--ink) 35%, transparent);
 }
 
+// El título va en el flujo, con margen a la derecha para la × (36px + 12px): si se parte en dos
+// líneas (texto al 150 %, 320px), se reparte en vez de montarse sobre «Cerrar el chat» (SC 1.4.4).
 .titulo {
-  position: absolute;
-  top: 1rem;
-  left: 1.25rem;
-  margin: 0;
+  margin: 0.25rem 3rem 0.875rem 0.25rem;
   color: var(--ink);
   font-family: 'Gilda Display', serif;
   font-size: 1.25rem;
   font-weight: 400;
 }
 
-.leyenda {
-  margin: 0.75rem 0 0;
-  color: var(--muted);
-  font-size: 0.75rem;
-  line-height: 1.4;
-  text-align: center;
-}
-
-.cerrarChat {
+// «Cerrar el chat» va el ÚLTIMO en el DOM (HS-12) y se coloca arriba a la derecha.
+.cerrarDialogo {
   position: absolute;
-  top: 0.625rem;
-  right: 0.625rem;
-  width: 2.25rem;
-  height: 2.25rem;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
   padding: 0;
   border: 1.5px solid var(--border-interactive);
   border-radius: 50%;
@@ -167,14 +182,14 @@
 @media (max-width: 600px) {
   .bocadillo {
     max-width: 10.5rem;
-    margin-bottom: 1.75rem;
+    margin-bottom: 2rem;
   }
 
   .dialogo {
-    width: 100%;
-    max-width: 100%;
-    height: 100%;
-    max-height: 100%;
+    width: 100vw;
+    max-width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
     margin: 0;
     border-radius: 0;
   }
@@ -184,16 +199,27 @@
   .bocadillo {
     animation: aparecer 0.35s ease-out;
   }
+
+  @keyframes aparecer {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
-@keyframes aparecer {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
+// Colores forzados (Windows): el anillo es box-shadow y el disco un degradado, y ambos desaparecen.
+@media (forced-colors: active) {
+  .lanzador {
+    border: 2px solid ButtonText;
   }
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  .dialogo {
+    border: 2px solid CanvasText;
   }
 }

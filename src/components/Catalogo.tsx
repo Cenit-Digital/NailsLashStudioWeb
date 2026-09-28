@@ -43,7 +43,10 @@ export function Catalogo() {
                     <span className={estilos.precio}>{servicio.precio}</span>
                   </div>
                 ))}
-                <a className={`demo-btn demo-btn--solido ${estilos.reservar}`} href="#reserva-titulo">
+                <a
+                  className={`demo-btn demo-btn--solido ${estilos.reservar}`}
+                  href="#reserva-titulo"
+                >
                   {categoria.textoBoton}
                 </a>
               </div>

@@ -2,8 +2,8 @@
 # CONTRATO — F-24 `nailbot_flotante`: el robot que se pinta las uñas en la esquina inferior derecha.
 # Lanzador SOLO-CLIENTE, animación en bucle con control de pausa (SC 2.2.2), bocadillo descartable
 # y un `<dialog>` modal NATIVO que monta su PROPIO ChatNailbot de F-23.
-# Estado: PROPUESTA hasta la puerta humana (gherkin_author, 2026-09-27). Sin entrada todavía en
-# `feature_list.json`. DEPENDE de F-23: su TDD NO empieza hasta que F-23 esté `done`.
+# Estado: APROBADO (gherkin_author, 2026-09-27). Entrada 24 de `feature_list.json` (ver su `puerta_humana`).
+# DEPENDE de F-23. Implementación y revisiones: progress/tdd_nailbot_flotante.md.
 # =============================================================================================
 # FUENTES, EN ORDEN DE MANDO
 #   1. `project-spec.md` → «Resolución del craftsman_lead a HS-8..HS-17 (2026-09-27)». MANDA sobre el

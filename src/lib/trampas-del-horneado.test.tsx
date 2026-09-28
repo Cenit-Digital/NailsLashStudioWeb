@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process'
+import { execFileSync, execSync } from 'node:child_process'
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
@@ -132,11 +132,8 @@ function construirExperimento(nombre: string, indexHtml: string, home: string): 
 
   // El build SSG REAL. Si vite-react-ssg lanzara por sí mismo, @s33 sobraría: su 1er `Then` es
   // justo que NO SE QUEJA. Que esto no lance es parte de la aserción.
-  execFileSync('pnpm', ['exec', 'vite-react-ssg', 'build'], {
-    cwd: dir,
-    stdio: 'pipe',
-    shell: true,
-  })
+  // Una sola cadena de comando (sin array de argumentos con shell: evita el aviso DEP0190 de Node).
+  execSync('pnpm exec vite-react-ssg build', { cwd: dir, stdio: 'pipe' })
 
   const html = readFileSync(resolve(dir, 'dist/index.html'), 'utf8')
 
@@ -152,7 +149,7 @@ function construirExperimento(nombre: string, indexHtml: string, home: string): 
         '--disable-warning=ExperimentalWarning',
         resolve('tools/puerta-cascaron.ts'),
       ],
-      { cwd: dir, stdio: 'pipe', shell: true },
+      { cwd: dir, stdio: 'pipe' },
     ).toString()
   } catch (error: unknown) {
     const fallo = error as { status: number; stdout: Buffer; stderr: Buffer }

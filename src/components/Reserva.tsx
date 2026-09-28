@@ -10,7 +10,7 @@ import estilos from './reserva.module.scss'
  * La columna izquierda es el copy VERBATIM del diseño (Opción-1-Rosa L248-256): eyebrow + h2 +
  * párrafo + dos enlaces (WhatsApp / llamar), ambos derivados de la fuente única F-02. NO lleva
  * calendario: ese widget vive en las tarjetas de `#equipo` (`features/equipo_reservas.feature`).
- * La columna derecha es el chat guiado de 4 pasos, extraído a `ChatNailbot.tsx` para COMPARTIRLO con
+ * La columna derecha es el chat guiado de cuatro pasos (tres con «Un sábado»), extraído a `ChatNailbot.tsx` para COMPARTIRLO con
  * el robot flotante (estado local, NO envía nada a ningún sitio: eso sigue siendo F-13).
  */
 const ID_RESERVA = 'reserva-titulo'

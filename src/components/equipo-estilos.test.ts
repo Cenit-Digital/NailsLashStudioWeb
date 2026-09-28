@@ -70,7 +70,9 @@ describe('equipo-estilos — corrección AA: los rellenos/texto pequeños van a 
     const dia = cuerpoDelBloque(scss(), /\.dia\s*\{/)
 
     expect(dia, 'falta el bloque .dia').not.toBeNull()
-    expect(dia as string).toMatch(/&\[aria-pressed='true'\]\s*\{\s*background:\s*var\(--accent-dark\)/)
+    expect(dia as string).toMatch(
+      /&\[aria-pressed='true'\]\s*\{\s*background:\s*var\(--accent-dark\)/,
+    )
   })
 
   it('el relleno de la hora ELEGIDA (derivado de aria-pressed, no de una clase) es var(--accent-dark)', () => {

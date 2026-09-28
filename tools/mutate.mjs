@@ -15,22 +15,28 @@
  * PROHIBIDO acotar con `--testFiles`: con este stack da un 0% falso.
  * Ver docs/research/00-fase0-informe.md §6.3.
  */
-import { spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process'
 
-const target = process.argv[2];
+const target = process.argv[2]
 
 if (target && target.startsWith('-')) {
   console.error(
     `[mutate] "${target}" parece una opción, no un fichero.\n` +
       `         Uso: bin/harness mutate [ruta/al/fichero.ts]\n` +
       `         Sin argumento se usa la lista "mutate" de stryker.config.json.`,
-  );
-  process.exit(2);
+  )
+  process.exit(2)
 }
 
-const args = ['stryker', 'run', ...(target ? ['--mutate', target] : [])];
+const args = ['stryker', 'run', ...(target ? ['--mutate', target] : [])]
 
-console.log(`[mutate] pnpm exec ${args.join(' ')}`);
+console.log(`[mutate] pnpm exec ${args.join(' ')}`)
 
-const res = spawnSync('pnpm', ['exec', ...args], { stdio: 'inherit', shell: true });
-process.exit(res.status ?? 1);
+// Una sola cadena de comando: pasar un array de argumentos con shell:true dispara el aviso DEP0190
+// de Node, y sin shell 'pnpm' (un .cmd en Windows) no arranca. Lo que no sea un token seguro
+// (letras, dígitos, . / : , - _) va entre comillas.
+const comando = ['pnpm', 'exec', ...args]
+  .map((a) => (/^[\w./:,-]+$/.test(a) ? a : JSON.stringify(a)))
+  .join(' ')
+const res = spawnSync(comando, { stdio: 'inherit', shell: true })
+process.exit(res.status ?? 1)

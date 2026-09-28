@@ -20,7 +20,8 @@ export interface SolicitudReserva {
   readonly servicio: string
   readonly dia: string
   readonly franja: string
-  readonly nombre: string
+  /** Opcional desde F-23 («Prefiero no decirlo»): si falta, el mensaje no menciona ningún nombre. */
+  readonly nombre?: string
 }
 
 /**
@@ -30,7 +31,13 @@ export interface SolicitudReserva {
  * `.tsx` NUNCA compone este texto inline: solo llama a esta función y se lo pasa a `waHref`.
  */
 export function mensajeReserva({ servicio, dia, franja, nombre }: SolicitudReserva): string {
-  return `Hola, quiero reservar: ${servicio} · ${dia} · ${franja}. Me llamo ${nombre} y os escribo desde la web. ¿Podéis confirmarme la hora exacta?`
+  // Sin nombre es CAMPO AUSENTE (reserva_chat @s23, fila nueva de F-23): nunca «Me llamo undefined».
+  const firma =
+    nombre === undefined
+      ? 'Os escribo desde la web.'
+      : `Me llamo ${nombre} y os escribo desde la web.`
+
+  return `Hola, quiero reservar: ${servicio} · ${dia} · ${franja}. ${firma} ¿Podéis confirmarme la hora exacta?`
 }
 
 /** El destino del autoscroll del hilo (@s18): lo MÍNIMO que `desplazarAlFinal` necesita de un nodo. */

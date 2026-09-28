@@ -488,14 +488,17 @@ Feature: Reserva rápida — la columna izquierda vuelve al diseño (texto + Wha
     # comprobación vive en `reserva-logica.ts` como predicado PURO para que Stryker la muerda por valor.
 
   @s15
-  Scenario: Completar el guion muestra el resumen interpolado y cierra el chat
+  Scenario: [AJUSTADO 2026-09-27, F-23] Completar el guion muestra el resumen interpolado y cierra el chat
     Given el chat con servicio "Uñas", día "Entre semana" y franja "Por la mañana" ya elegidos
     When escribo el nombre "Marta" y pulso el botón "Enviar"
-    Then la última burbuja es del bot y su texto es exactamente "¡Gracias, Marta! ✨ Tu solicitud: Uñas · Entre semana · Por la mañana. Te confirmaremos la hora exacta por WhatsApp. ¡Te esperamos en Nails Lash Studio!"
+    # [RETIRADO F-23] Then la última burbuja es del bot y su texto es exactamente "¡Gracias, Marta! ✨ Tu solicitud: Uñas · Entre semana · Por la mañana. Te confirmaremos la hora exacta por WhatsApp. ¡Te esperamos en Nails Lash Studio!"
+    Then [AJUSTADO F-23] la última burbuja es del bot y su texto es exactamente "¡Gracias, Marta! ✨ Tu solicitud: Uñas · Entre semana · Por la mañana. Envíasela al salón por WhatsApp con el enlace de abajo y allí te confirmarán la hora exacta."
     And el resumen contiene los TRES valores elegidos y el nombre, en ese orden, separados por " · "
     And ya NO se muestra el campo de texto ni ningún botón de opción
     And se muestra un botón cuyo nombre accesible es exactamente "Reservar otra cita"
-    # El resumen es VERBATIM de `Reserva.tsx:103`. 🔴 NO dice «en unos minutos» (v1 se lo inventaba):
+    # [AJUSTADO F-23, 2026-09-27] El resumen es el COPY CORREGIDO de HS-6 (nailbot_chat_compartido @s6):
+    # ya no promete «Te confirmaremos…» como si el chat enviara algo; dice que ELLA lo envía por el enlace.
+    # (Histórico:) El resumen era VERBATIM de `Reserva.tsx:103`. 🔴 NO dice «en unos minutos» (v1 se lo inventaba):
     # prometer un tiempo de respuesta que nadie ha verificado con el salón es exactamente el tipo de
     # promesa que este repo no hornea. La interpolación vive en `reserva-logica.ts` y se testea
     # también POR VALOR con otros cuatro valores distintos, para matar al mutante que fija uno.
@@ -516,10 +519,11 @@ Feature: Reserva rápida — la columna izquierda vuelve al diseño (texto + Wha
     # El `preventDefault` (Reserva.tsx:247) evita además que un formulario ancestro se envíe.
 
   @s17
-  Scenario: "Reservar otra cita" reinicia el guion sin rastro de las respuestas previas
+  Scenario: [AJUSTADO 2026-09-27, F-23] "Reservar otra cita" reinicia el guion sin rastro de las respuestas previas
     Given el chat con el resumen final ya mostrado
     When pulso el botón "Reservar otra cita"
-    Then el hilo muestra EXACTAMENTE UNA burbuja, y es el saludo "¡Hola! Soy el asistente de Nails Lash Studio ✨ ¿Qué te gustaría reservar?"
+    # [RETIRADO F-23] Then el hilo muestra EXACTAMENTE UNA burbuja, y es el saludo "¡Hola! Soy el asistente de Nails Lash Studio ✨ ¿Qué te gustaría reservar?"
+    Then [AJUSTADO F-23] el hilo muestra EXACTAMENTE UNA burbuja, y es el saludo de Nailbot que fija nailbot_chat_compartido.feature @s3, fila «servicio»
     And vuelven a mostrarse los tres botones de opción "Uñas", "Pestañas" y "Cejas"
     And ya no se muestra el botón "Reservar otra cita" ni el campo de texto
     And en el hilo no queda ninguna burbuja con "Marta", ni con "Uñas", ni con el resumen anterior
@@ -556,11 +560,13 @@ Feature: Reserva rápida — la columna izquierda vuelve al diseño (texto + Wha
     # sin mirar colores. Es la regla anti-clase-CSS del repo aplicada al pie de la letra.
 
   @s20
-  Scenario: El nombre se interpola VERBATIM y ninguna burbuja emite "undefined"
-    Given el chat con servicio "Cejas", día "Este fin de semana" y franja "Me es indiferente" elegidos
+  Scenario: [AJUSTADO 2026-09-27, F-23] El nombre se interpola VERBATIM y ninguna burbuja emite "undefined"
+    # [RETIRADO F-23] Given el chat con servicio "Cejas", día "Este fin de semana" y franja "Me es indiferente" elegidos
+    Given [AJUSTADO F-23] el chat con servicio "Cejas", día "Lo antes posible" y franja "Me es indiferente" elegidos
     When escribo el nombre "Mª Ángeles & Co." y pulso el botón "Enviar"
     Then la última burbuja contiene exactamente el fragmento "¡Gracias, Mª Ángeles & Co.! ✨"
-    And contiene exactamente el fragmento "Tu solicitud: Cejas · Este fin de semana · Me es indiferente."
+    # [RETIRADO F-23] And contiene exactamente el fragmento "Tu solicitud: Cejas · Este fin de semana · Me es indiferente."
+    And [AJUSTADO F-23] contiene exactamente el fragmento "Tu solicitud: Cejas · Lo antes posible · Me es indiferente."
     And el texto se muestra tal cual, sin entidades HTML escapadas a la vista ("&amp;" NO aparece como texto visible)
     And en NINGUNA burbuja del hilo aparece la palabra "undefined"
     # Caso límite del texto libre: acentos, superíndice, «&» y punto final. React escapa al insertar,
@@ -590,13 +596,14 @@ Feature: Reserva rápida — la columna izquierda vuelve al diseño (texto + Wha
     # ese es justo el cambio que rompe el build en silencio, y por eso se reutilizan las utilidades.
 
   @s22
-  Scenario: El enlace FIJO de la izquierda sigue siendo genérico y el chat sigue sin enviar nada por sí mismo — la frontera con F-13 se estrecha, no desaparece
+  Scenario: [AJUSTADO 2026-09-27, F-23] El enlace FIJO de la izquierda sigue siendo genérico y el chat sigue sin enviar nada por sí mismo — la frontera con F-13 se estrecha, no desaparece
     Given el HTML CRUDO prerenderizado de la ruta "/" con la sección "#reserva-titulo" y el chat completado en el navegador
     When se inspeccionan el href del enlace cuyo nombre accesible es exactamente "WhatsApp" y lo que hace el chat al terminar
     Then ese href SÍ contiene "?text=" con un mensaje genérico FIJO (ANCLA POSITIVA: el enlace lleva mensaje)
     And ese mensaje genérico NO contiene ningún nombre de servicio, ninguna fecha, ninguna hora ni ningún nombre de persona: sigue siendo la invitación fija a escribir, no una solicitud concreta
     And al completar el chat NO se abre WhatsApp automáticamente, NO se navega a ninguna URL y NO se hace ninguna petición de red: el enlace nuevo de la reserva (@s24) es para que LA CLIENTA lo pulse, el chat no lo dispara solo
     And los bytes de "src/components/Reserva.tsx" NO contienen "fetch(", ni "XMLHttpRequest", ni "window.location", ni "form action": nada sale del navegador sin que la clienta pulse un enlace
+    And [AJUSTADO F-23] esa misma guarda sobre el código del chat, que se mudó a "src/components/ChatNailbot.tsx" y "src/components/chat-nailbot-logica.ts", la asevera nailbot_chat_compartido.feature @s12 (no se duplica aquí)
     # FRONTERA con la feature id 13 (`solicitud_whatsapp`, `pending`), que SIGUE siendo la única vía
     # con disponibilidad REAL (franjas por profesional, no las fijas de este guion) y confirmación de
     # servidor. Lo que este contrato YA NO hace es fingir que el chat "confirma": compone un mensaje
@@ -604,7 +611,7 @@ Feature: Reserva rápida — la columna izquierda vuelve al diseño (texto + Wha
     # Pablo (ver cabecera v3), no una mejora improvisada de F-13.
 
   @s23
-  Scenario Outline: mensajeReserva compone, en castellano natural, los cuatro datos de la clienta — función PURA
+  Scenario Outline: [AJUSTADO 2026-09-27, F-23] mensajeReserva compone, en castellano natural, los cuatro datos de la clienta — función PURA
     Given la función "mensajeReserva" de "src/components/reserva-logica.ts" llamada con servicio "<servicio>", día "<dia>", franja "<franja>" y nombre "<nombre>"
     When se lee el texto que devuelve
     Then el texto devuelto es exactamente "<mensaje>"
@@ -613,6 +620,11 @@ Feature: Reserva rápida — la columna izquierda vuelve al diseño (texto + Wha
       | servicio | dia                | franja            | nombre           | mensaje                                                                                                                              |
       | Uñas     | Entre semana       | Por la mañana      | Marta            | Hola, quiero reservar: Uñas · Entre semana · Por la mañana. Me llamo Marta y os escribo desde la web. ¿Podéis confirmarme la hora exacta? |
       | Cejas    | Este fin de semana | Me es indiferente  | Mª Ángeles & Co. | Hola, quiero reservar: Cejas · Este fin de semana · Me es indiferente. Me llamo Mª Ángeles & Co. y os escribo desde la web. ¿Podéis confirmarme la hora exacta? |
+      | Cejas    | Lo antes posible   | Por la tarde       | (ausente)        | Hola, quiero reservar: Cejas · Lo antes posible · Por la tarde. Os escribo desde la web. ¿Podéis confirmarme la hora exacta? |
+
+    # [AJUSTADO F-23, 2026-09-27] Fila NUEVA: «(ausente)» = la llamada SIN la clave nombre («Prefiero no
+    # decirlo», nailbot_chat_compartido @s6). Es CAMPO AUSENTE: jamás «Me llamo undefined» ni «Me llamo  y».
+    # La fila de «Este fin de semana» se CONSERVA: es una entrada arbitraria de una función pura, no el guion.
 
     # La segunda fila (acentos, superíndice, «&») mata al mutante que fija UN valor o pierde un campo
     # del `Record`, mismo criterio que @s20 sobre el resumen del bot. `mensajeReserva` es PURA (sin

@@ -4,8 +4,9 @@
 # pide el mínimo (nombre OPCIONAL, nunca teléfono) y que NO envía nada por sí mismo. Un componente,
 # DOS instancias independientes: la de `#reserva` (horneada por el SSG) y la del panel del robot
 # flotante (F-24, solo cliente).
-# Estado: PROPUESTA hasta la puerta humana (gherkin_author, 2026-09-27). Sin entrada todavía en
-# `feature_list.json`: la crea el craftsman_lead.
+# Estado: APROBADO (gherkin_author, 2026-09-27). Entrada 23 de `feature_list.json`; su campo `puerta_humana`
+# registra cómo se aprobó (diseño en conversación + autonomía delegada; el humano canceló la espera sobre
+# los .feature y pidió publicar ya). Implementación y revisiones: progress/tdd_nailbot_chat_compartido.md.
 # =============================================================================================
 # FUENTES, EN ORDEN DE MANDO
 #   1. `project-spec.md` → «Resolución del craftsman_lead a HS-1..HS-7 (2026-09-27)». MANDA sobre el

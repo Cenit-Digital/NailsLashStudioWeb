@@ -3,8 +3,9 @@
 // (el anillo `--accent-dark` del lanzador) sí es un par vigilado.
 //
 // ESTADO BASE = POSE FINAL VISIBLE (memoria organizacional «estado-base-visible-ssg-reduced-motion»):
-// uñas pintadas, pincel en el bote, soplidos y destellos ocultos. Todas las @keyframes viven DENTRO
-// de `prefers-reduced-motion: no-preference` y solo corren con `data-animado='si'`.
+// uñas pintadas, pincel en el bote, soplidos y destellos ocultos. Todos los fotogramas clave viven DENTRO
+// de `prefers-reduced-motion: no-preference` y solo corren con el atributo `data-animacion` (el arte
+// del lanzador); sin él (el avatar del chat) el arte no se mueve nunca.
 .arte {
   --nb-carcasa: #ffffff;
   --nb-perfil: #e4b3c4;
@@ -32,310 +33,351 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .arte[data-animado='si'] {
-    .flota {
-      transform-origin: center;
-      animation: flotar 3.2s ease-in-out infinite;
-    }
-
-    .corazon {
-      transform-origin: center;
-      animation: latir 1.6s ease-in-out infinite;
-    }
-
-    .ojos {
-      transform-origin: center;
-      animation: parpadeo 4.6s ease-in-out infinite;
-    }
-
-    .labios {
-      transform-origin: center;
-      animation: soplar 7s ease-in-out infinite;
-    }
-
-    .manoUnas {
-      transform-origin: 50% 100%;
-      animation: lucir 7s ease-in-out infinite;
-    }
-
-    .manoPincel {
-      animation: pintar 7s ease-in-out infinite;
-    }
-
-    .esmalte1 {
-      animation: una1 7s ease-in-out infinite;
-    }
-
-    .esmalte2 {
-      animation: una2 7s ease-in-out infinite;
-    }
-
-    .esmalte3 {
-      animation: una3 7s ease-in-out infinite;
-    }
-
-    .esmalte4 {
-      animation: una4 7s ease-in-out infinite;
-    }
-
-    .soplido {
-      animation: soplo 7s ease-out infinite;
-    }
-
-    .brillo {
-      transform-origin: center;
-      animation: destello 7s ease-in-out infinite;
-    }
-
-    .brilloB {
-      transform-origin: center;
-      animation: destelloB 7s ease-in-out infinite;
-    }
+  .arte[data-animacion] .flota {
+    transform-origin: center;
+    animation-name: flotar;
+    animation-duration: 3.2s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
   }
 
-  // PAUSA (SC 2.2.2, técnica G4): congela en su sitio; al reanudar sigue desde ese fotograma.
-  .arte[data-animado='si'][data-animacion='pausada'] * {
+  .arte[data-animacion] .corazon {
+    transform-origin: center;
+    animation-name: latir;
+    animation-duration: 1.6s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+
+  .arte[data-animacion] .ojos {
+    transform-origin: center;
+    animation-name: parpadeo;
+    animation-duration: 4.6s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+
+  .arte[data-animacion] .labios {
+    transform-origin: center;
+    animation-name: soplar;
+    animation-duration: 7s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+
+  .arte[data-animacion] .manoUnas {
+    transform-origin: 50% 100%;
+    animation-name: lucir;
+    animation-duration: 7s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+
+  .arte[data-animacion] .manoPincel {
+    animation-name: pintar;
+    animation-duration: 7s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+
+  .arte[data-animacion] .esmalte1 {
+    animation-name: una1;
+    animation-duration: 7s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+
+  .arte[data-animacion] .esmalte2 {
+    animation-name: una2;
+    animation-duration: 7s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+
+  .arte[data-animacion] .esmalte3 {
+    animation-name: una3;
+    animation-duration: 7s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+
+  .arte[data-animacion] .esmalte4 {
+    animation-name: una4;
+    animation-duration: 7s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+
+  .arte[data-animacion] .soplido {
+    animation-name: soplo;
+    animation-duration: 7s;
+    animation-timing-function: ease-out;
+    animation-iteration-count: infinite;
+  }
+
+  .arte[data-animacion] .brillo {
+    transform-origin: center;
+    animation-name: destello;
+    animation-duration: 7s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+
+  .arte[data-animacion] .brilloB {
+    transform-origin: center;
+    animation-name: destelloB;
+    animation-duration: 7s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+
+  // PAUSA (SC 2.2.2, técnica G4): CONGELA en su sitio; al reanudar sigue desde ese fotograma.
+  // 🔴 Las reglas de arriba usan LONGHANDS a propósito: el shorthand de animación repone
+  // animation-play-state a running y, con más especificidad que esta regla, la pausa no congelaba
+  // nada en un navegador real (hallazgo del judge y del a11y_seo_auditor, 2026-09-28). Lo vigila
+  // nailbot-flotante-estilos.test.ts (@s12).
+  .arte[data-animacion='pausada'] * {
     animation-play-state: paused;
   }
-}
 
-@keyframes flotar {
-  0%,
-  100% {
-    transform: translateY(0);
+  @keyframes flotar {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-2.5px);
+    }
   }
 
-  50% {
-    transform: translateY(-2.5px);
-  }
-}
+  @keyframes latir {
+    0%,
+    100% {
+      transform: scale(1);
+    }
 
-@keyframes latir {
-  0%,
-  100% {
-    transform: scale(1);
-  }
+    20% {
+      transform: scale(1.2);
+    }
 
-  20% {
-    transform: scale(1.2);
-  }
-
-  40% {
-    transform: scale(1);
-  }
-}
-
-@keyframes parpadeo {
-  0%,
-  44%,
-  50%,
-  100% {
-    transform: scaleY(1);
+    40% {
+      transform: scale(1);
+    }
   }
 
-  47% {
-    transform: scaleY(0.08);
-  }
-}
+  @keyframes parpadeo {
+    0%,
+    44%,
+    50%,
+    100% {
+      transform: scaleY(1);
+    }
 
-// El pincel sale del bote, barre las 4 uñas con toques y vuelve al bote.
-@keyframes pintar {
-  0%,
-  4% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-
-  11% {
-    transform: translate(-60.7px, -17.5px) rotate(-10deg);
+    47% {
+      transform: scaleY(0.08);
+    }
   }
 
-  15% {
-    transform: translate(-60.7px, -15px) rotate(-10deg);
+  // El pincel sale del bote, barre las 4 uñas con toques y vuelve al bote.
+  @keyframes pintar {
+    0%,
+    4% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+
+    11% {
+      transform: translate(-60.7px, -17.5px) rotate(-10deg);
+    }
+
+    15% {
+      transform: translate(-60.7px, -15px) rotate(-10deg);
+    }
+
+    20% {
+      transform: translate(-55.7px, -19.9px) rotate(-8deg);
+    }
+
+    25% {
+      transform: translate(-55.7px, -17.4px) rotate(-8deg);
+    }
+
+    30% {
+      transform: translate(-50.7px, -19.3px) rotate(-6deg);
+    }
+
+    35% {
+      transform: translate(-50.7px, -16.8px) rotate(-6deg);
+    }
+
+    40% {
+      transform: translate(-45.7px, -16.9px) rotate(-4deg);
+    }
+
+    45% {
+      transform: translate(-45.7px, -14.4px) rotate(-4deg);
+    }
+
+    54%,
+    100% {
+      transform: translate(0, 0) rotate(0deg);
+    }
   }
 
-  20% {
-    transform: translate(-55.7px, -19.9px) rotate(-8deg);
+  // Cada uña se pinta cuando el pincel la toca (el 0 % oculta; la BASE, fuera del keyframe, es pintada).
+  @keyframes una1 {
+    0%,
+    13% {
+      opacity: 0;
+    }
+
+    16%,
+    94% {
+      opacity: 1;
+    }
+
+    99%,
+    100% {
+      opacity: 0;
+    }
   }
 
-  25% {
-    transform: translate(-55.7px, -17.4px) rotate(-8deg);
+  @keyframes una2 {
+    0%,
+    23% {
+      opacity: 0;
+    }
+
+    26%,
+    94% {
+      opacity: 1;
+    }
+
+    99%,
+    100% {
+      opacity: 0;
+    }
   }
 
-  30% {
-    transform: translate(-50.7px, -19.3px) rotate(-6deg);
+  @keyframes una3 {
+    0%,
+    33% {
+      opacity: 0;
+    }
+
+    36%,
+    94% {
+      opacity: 1;
+    }
+
+    99%,
+    100% {
+      opacity: 0;
+    }
   }
 
-  35% {
-    transform: translate(-50.7px, -16.8px) rotate(-6deg);
+  @keyframes una4 {
+    0%,
+    43% {
+      opacity: 0;
+    }
+
+    46%,
+    94% {
+      opacity: 1;
+    }
+
+    99%,
+    100% {
+      opacity: 0;
+    }
   }
 
-  40% {
-    transform: translate(-45.7px, -16.9px) rotate(-4deg);
+  // Tras pintar, levanta la mano para lucirla y sopla para secarla.
+  @keyframes lucir {
+    0%,
+    54%,
+    90%,
+    100% {
+      transform: translateY(0) rotate(0deg);
+    }
+
+    60%,
+    84% {
+      transform: translateY(-3px) rotate(-6deg);
+    }
   }
 
-  45% {
-    transform: translate(-45.7px, -14.4px) rotate(-4deg);
+  @keyframes soplar {
+    0%,
+    58%,
+    76%,
+    100% {
+      transform: scale(1, 1);
+    }
+
+    62%,
+    72% {
+      transform: scale(0.6, 1.2);
+    }
   }
 
-  54%,
-  100% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-}
+  @keyframes soplo {
+    0%,
+    61% {
+      opacity: 0;
+      transform: translate(0, 0);
+    }
 
-// Cada uña se pinta cuando el pincel la toca (el 0 % oculta; la BASE, fuera del keyframe, es pintada).
-@keyframes una1 {
-  0%,
-  13% {
-    opacity: 0;
-  }
+    65% {
+      opacity: 0.95;
+    }
 
-  16%,
-  94% {
-    opacity: 1;
-  }
+    75% {
+      opacity: 0;
+      transform: translate(-4px, 4px);
+    }
 
-  99%,
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes una2 {
-  0%,
-  23% {
-    opacity: 0;
+    100% {
+      opacity: 0;
+    }
   }
 
-  26%,
-  94% {
-    opacity: 1;
+  @keyframes destello {
+    0%,
+    76% {
+      opacity: 0;
+      transform: scale(0.2) rotate(0deg);
+    }
+
+    81% {
+      opacity: 1;
+      transform: scale(1) rotate(45deg);
+    }
+
+    88%,
+    100% {
+      opacity: 0;
+      transform: scale(0.2) rotate(90deg);
+    }
   }
 
-  99%,
-  100% {
-    opacity: 0;
-  }
-}
+  @keyframes destelloB {
+    0%,
+    79% {
+      opacity: 0;
+      transform: scale(0.2) rotate(0deg);
+    }
 
-@keyframes una3 {
-  0%,
-  33% {
-    opacity: 0;
-  }
+    84% {
+      opacity: 1;
+      transform: scale(1) rotate(45deg);
+    }
 
-  36%,
-  94% {
-    opacity: 1;
-  }
-
-  99%,
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes una4 {
-  0%,
-  43% {
-    opacity: 0;
-  }
-
-  46%,
-  94% {
-    opacity: 1;
-  }
-
-  99%,
-  100% {
-    opacity: 0;
-  }
-}
-
-// Tras pintar, levanta la mano para lucirla y sopla para secarla.
-@keyframes lucir {
-  0%,
-  54%,
-  90%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-
-  60%,
-  84% {
-    transform: translateY(-3px) rotate(-6deg);
-  }
-}
-
-@keyframes soplar {
-  0%,
-  58%,
-  76%,
-  100% {
-    transform: scale(1, 1);
-  }
-
-  62%,
-  72% {
-    transform: scale(0.6, 1.2);
-  }
-}
-
-@keyframes soplo {
-  0%,
-  61% {
-    opacity: 0;
-    transform: translate(0, 0);
-  }
-
-  65% {
-    opacity: 0.95;
-  }
-
-  75% {
-    opacity: 0;
-    transform: translate(-4px, 4px);
-  }
-
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes destello {
-  0%,
-  76% {
-    opacity: 0;
-    transform: scale(0.2) rotate(0deg);
-  }
-
-  81% {
-    opacity: 1;
-    transform: scale(1) rotate(45deg);
-  }
-
-  88%,
-  100% {
-    opacity: 0;
-    transform: scale(0.2) rotate(90deg);
-  }
-}
-
-@keyframes destelloB {
-  0%,
-  79% {
-    opacity: 0;
-    transform: scale(0.2) rotate(0deg);
-  }
-
-  84% {
-    opacity: 1;
-    transform: scale(1) rotate(45deg);
-  }
-
-  91%,
-  100% {
-    opacity: 0;
-    transform: scale(0.2) rotate(90deg);
+    91%,
+    100% {
+      opacity: 0;
+      transform: scale(0.2) rotate(90deg);
+    }
   }
 }

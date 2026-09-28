@@ -367,7 +367,8 @@
       "acceptance": [
         "El build falla si algún campo legal sigue siendo placeholder (esto se puede testear YA)",
         "La estructura de ambas páginas existe y es navegable",
-        "Ningún dato legal está hardcodeado en el JSX: todos vienen de la fuente única"
+        "Ningún dato legal está hardcodeado en el JSX: todos vienen de la fuente única",
+        "Completar la capa 1 del aviso de Nailbot (F-23, deuda A-23/HS-1): la identidad del responsable, los derechos y el enlace a la política, que hoy faltan porque esta página no existe"
       ],
       "puerta_legal": "LSSI art. 10.1 a) y f) · régimen sancionador art. 38.3.b) (infracción grave)",
       "depends_on": [
@@ -540,7 +541,7 @@
       ],
       "mutable": true,
       "sdd": true,
-      "status": "in_progress",
+      "status": "spec_ready",
       "puerta_humana": "Diseño aprobado por el humano en conversación el 2026-09-27: 8 decisiones por AskUserQuestion (panel de chat→WhatsApp, asistente compartido, bucle+pausa, bocadillo descartable, sin verde ni logo en el lanzador, nombre Nailbot, IA futura Claude, push directo a main) y el prototipo visual del arte («venga nos gusta, impleméntalo»). Autonomía explícita delegada para el resto («hazlo tú el 100% de forma autónoma», «dale ya impleméntalo», «ultracode»): mismo precedente que galeria_carrusel. El humano canceló la espera de la puerta sobre los .feature y pidió commit+push inmediato: se publicó una VÍA RÁPIDA (commit 302ddb4) ANTES del TDD formal; el TDD de esta feature trabaja por deltas contra el contrato y lo declara."
     }
   ],

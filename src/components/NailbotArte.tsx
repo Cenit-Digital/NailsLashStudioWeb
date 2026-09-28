@@ -10,22 +10,21 @@ import estilos from './nailbot-arte.module.scss'
  *
  * El ESTADO BASE es la pose final visible (uñas pintadas, pincel en el bote): sin animación
  * (prefers-reduced-motion, SSG o pausa) se ve completo. La animación solo corre con
- * `animado` y la PAUSA (SC 2.2.2) congela en su sitio vía el atributo `data-animacion`.
+ * el atributo `data-animacion` ("activa" | "pausada"); la PAUSA (SC 2.2.2) congela en su sitio.
  */
 interface NailbotArteProps {
-  readonly animado?: boolean
-  readonly pausado?: boolean
+  /** Solo la instancia del lanzador (F-24) lo pasa; sin él, el arte es ESTÁTICO (avatar del chat, F-23). */
+  readonly animacion?: 'activa' | 'pausada'
 }
 
-export function NailbotArte({ animado = false, pausado = false }: NailbotArteProps) {
+export function NailbotArte({ animacion }: NailbotArteProps) {
   return (
     <svg
       className={estilos.arte}
       viewBox="0 0 120 120"
       aria-hidden="true"
       focusable="false"
-      data-animado={animado ? 'si' : 'no'}
-      data-animacion={pausado ? 'pausada' : 'en-marcha'}
+      data-animacion={animacion}
     >
       <g className={estilos.flota}>
         {/* Antena con corazón */}

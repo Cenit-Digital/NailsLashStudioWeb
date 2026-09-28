@@ -3,7 +3,13 @@ import { renderToString } from 'react-dom/server'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { Equipo } from './Equipo'
-import { diaSemanaDe, diasOfrecidos, franjasDe, franjasOfrecibles, indiceCircular } from './equipo-logica'
+import {
+  diaSemanaDe,
+  diasOfrecidos,
+  franjasDe,
+  franjasOfrecibles,
+  indiceCircular,
+} from './equipo-logica'
 
 /**
  * feature `equipo_reservas` — la sección de equipo con reserva por profesional y carrusel de reseñas.

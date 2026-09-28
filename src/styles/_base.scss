@@ -47,11 +47,11 @@ html {
 
 // Tamaño del lanzador de Nailbot: una sola fuente para el botón y para el scroll-padding-bottom.
 :root {
-  --nailbot-lanzador: 6.5rem;
+  --nailbot-lanzador: 104px;
 }
 
 @media (max-width: 600px) {
   :root {
-    --nailbot-lanzador: 4.75rem;
+    --nailbot-lanzador: 76px;
   }
 }

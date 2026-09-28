@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process'
+import { execSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
@@ -27,10 +27,10 @@ let html = ''
 let codigoSalida = 0
 
 beforeAll(() => {
-  // El `pnpm build` REAL con las CINCO puertas. Se captura el código de salida (execFileSync lanza en
+  // El `pnpm build` REAL con las CINCO puertas. Se captura el código de salida (execSync lanza en
   // fallo con `.status`): @s10 exige exit 0 «con todas las puertas», en especial la de ANCLAS de F-06.
   try {
-    execFileSync('pnpm', ['build'], { stdio: 'pipe', shell: true })
+    execSync('pnpm build', { stdio: 'pipe' })
   } catch (error: unknown) {
     codigoSalida = (error as { status: number }).status
   }

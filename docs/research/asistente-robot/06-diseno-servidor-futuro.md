@@ -24,10 +24,14 @@
 
 ## 1. La costura que ya deja el código de hoy
 
-El guion vive detrás de una función PURA del tipo `responder(estado, entrada) → turno`
-(`src/components/nailbot-*.ts`, F-23). El día del servidor, esa costura se sustituye por un
-`fetch` al endpoint propio **sin tocar la UI** (`03` §D). La URL del endpoint NO es un secreto y puede
-ir en la configuración de la web; la clave, **nunca**.
+El guion vive detrás de una función PURA `responder(estado, entrada) → estado`
+(`src/components/chat-nailbot-logica.ts`, F-23). Es el ÚNICO punto que se sustituye el día del
+servidor. Con honestidad (HS-7), la costura **garantiza** la forma del estado que pinta la UI y un
+solo punto de sustitución; **no garantiza**: (a) la sincronía —un `fetch` es asíncrono y puede fallar,
+así que la UI necesitará un estado de espera («escribiendo…» en un `role="status"` aparte) y una salida
+de error (WhatsApp/teléfono directos)—; (b) el texto libre —hoy solo hay opciones cerradas y el
+nombre—; y (c) el copy legal —el art. 50.1 obliga a cambiar la leyenda de demo por el aviso de IA—.
+La URL del endpoint NO es un secreto y puede ir en la configuración de la web; la clave, **nunca**.
 
 ## 2. Arquitectura mínima
 

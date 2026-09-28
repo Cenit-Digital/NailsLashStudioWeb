@@ -49,3 +49,6 @@ Thumbs.db
 
 # Experimentos de build de @s32/@s33 (F-04): artefactos temporales, nunca versionados.
 .experimentos-tmp/
+
+# Configuración local del servidor de vista previa del IDE (no se versiona)
+.claude/launch.json

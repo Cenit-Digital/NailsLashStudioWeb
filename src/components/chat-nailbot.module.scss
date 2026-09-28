@@ -1,0 +1,199 @@
+// Nailbot, el chat de reserva compartido (F-23). Mudado de reserva.module.scss con sus nombres
+// (reserva_chat @s7 AJUSTADO) + los tres textos nuevos: .subtitulo, .leyenda y .aviso.
+//
+// La puerta de contraste es CIEGA a los .module.scss: los tres textos nuevos usan SOLO pares que
+// MATRIZ_DE_USO ya vigila (nailbot_chat_compartido @s13, HS-5 b):
+//   .subtitulo → --accent-dark sobre --accent-soft (fondo de .chatCabecera)
+//   .leyenda   → --muted sobre --surface
+//   .aviso     → --muted sobre --surface (fondo de .chatPie)
+// El chat no se mueve nunca: aquí no hay ni una sola animación.
+
+.chat {
+  // border-box: con width al 100 % y un borde de 1px, el chat desbordaba 2px dentro del panel.
+  box-sizing: border-box;
+  max-width: 410px;
+  width: 100%;
+  margin-inline: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 30px 60px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.chatCabecera {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: var(--accent-soft);
+  border-bottom: 1px solid var(--line);
+}
+
+// El avatar es el arte de Nailbot, quieto y encuadrado a la cara.
+.avatar {
+  position: relative;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1.5px solid var(--border-interactive);
+
+  svg {
+    position: absolute;
+    left: -46%;
+    top: -4%;
+    width: 192%;
+    height: 192%;
+  }
+}
+
+.chatNombre {
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+.subtitulo {
+  color: var(--accent-dark);
+  font-size: 0.75rem;
+}
+
+.leyenda {
+  margin: 0;
+  padding: 0.5rem 1rem;
+  background: var(--surface);
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.hilo {
+  height: 344px;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  background: var(--bg);
+}
+
+.burbujaBot,
+.burbujaUsuario {
+  max-width: 82%;
+  padding: 0.625rem 0.8125rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.burbujaBot {
+  align-self: flex-start;
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 4px 14px 14px 14px;
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.burbujaUsuario {
+  align-self: flex-end;
+  background: #dcf6e3;
+  color: #1c3b28;
+  border-radius: 14px 4px 14px 14px;
+}
+
+.chatPie {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding: 0.75rem;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+}
+
+.opciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chipChat {
+  background: var(--accent-soft);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  padding: 0.5625rem 0.875rem;
+  border-radius: 16px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: 'Manrope', system-ui, sans-serif;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--accent-dark);
+    color: var(--on-accent);
+    border-color: var(--accent-dark);
+  }
+}
+
+.entrada {
+  display: flex;
+  gap: 0.5rem;
+
+  input {
+    flex: 1;
+    min-width: 0;
+    background: var(--bg);
+    border: 1px solid var(--border-interactive);
+    border-radius: 20px;
+    padding: 0.6875rem 0.9375rem;
+    color: var(--text);
+    font-family: 'Manrope', system-ui, sans-serif;
+    font-size: 0.875rem;
+
+    // El placeholder por defecto (opacidad ~0,5 en Firefox) no llega a 4,5:1: --muted sobre --bg sí (par vigilado).
+    &::placeholder {
+      color: var(--muted);
+      opacity: 1;
+    }
+  }
+
+  button {
+    width: 2.75rem;
+    height: 2.75rem;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: none;
+    background: #25d366;
+    color: #08130c;
+    cursor: pointer;
+    font-size: 1.125rem;
+  }
+}
+
+.aviso {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.reiniciar {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--accent-dark);
+  color: var(--accent-dark);
+  padding: 0.75rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+
+  &:hover {
+    background: var(--accent-dark);
+    color: var(--on-accent);
+  }
+}

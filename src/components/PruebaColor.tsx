@@ -23,7 +23,9 @@ export function PruebaColor() {
         <div className="demo-encabezado">
           <p className="demo-eyebrow">Prueba tu color</p>
           <h2 className="demo-titulo">Encuentra tu tono perfecto</h2>
-          <p className="demo-intro">Toca un esmalte y descúbrelo sobre las uñas antes de tu cita.</p>
+          <p className="demo-intro">
+            Toca un esmalte y descúbrelo sobre las uñas antes de tu cita.
+          </p>
         </div>
 
         <div className={estilos.rejilla}>

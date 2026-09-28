@@ -1,124 +1,98 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 
+import {
+  NAILBOT_AVISO,
+  NAILBOT_CAMPO_NOMBRE,
+  NAILBOT_CAMPO_PLACEHOLDER,
+  NAILBOT_ENLACE_FINAL,
+  NAILBOT_ENVIAR,
+  NAILBOT_HILO_ETIQUETA,
+  NAILBOT_LEYENDA,
+  NAILBOT_NOMBRE,
+  NAILBOT_REINICIAR,
+  NAILBOT_SIN_NOMBRE,
+  NAILBOT_SUBTITULO,
+} from '../lib/demo/nailbot-demo'
 import { TELEFONO, waHref } from '../lib/site'
-import { claveBurbuja, desplazarAlFinal, mensajeReserva } from './reserva-logica'
-import estilos from './reserva.module.scss'
+import {
+  enfocarPrimerControl,
+  estadoInicial,
+  opcionesDelPaso,
+  responder,
+  type EntradaChat,
+  type EstadoChat,
+} from './chat-nailbot-logica'
+import estilos from './chat-nailbot.module.scss'
+import { NailbotArte } from './NailbotArte'
+import {
+  claveBurbuja,
+  desplazarAlFinal,
+  mensajeReserva,
+  type SolicitudReserva,
+} from './reserva-logica'
 
 /**
- * El chat guiado COMPARTIDO (decisión H2 de `progress/nailbot_diseno.md`: «un asistente compartido»).
- * Lo montan la sección `#reserva` (horneado en SSG, como siempre) y el panel del robot flotante
- * (`NailbotFlotante.tsx`, solo en cliente). Cada montaje tiene su estado propio.
+ * Nailbot, el chat de reserva COMPARTIDO (F-23, contrato features/nailbot_chat_compartido.feature).
+ * Lo montan `#reserva` (horneado en SSG) y el panel del robot flotante (F-24), cada uno con su estado.
  *
- * Extraído TAL CUAL de `Reserva.tsx` (mismo DOM, mismas clases de `reserva.module.scss`), así que el
- * contrato `features/reserva_chat.feature` (@s8-@s24) sigue describiéndolo sin enmienda. Estado local:
- * NO envía nada a ningún sitio; el mensaje lo manda la persona desde su WhatsApp (F-13).
- *
- * La costura del servidor futuro (IA real) está documentada en
- * `docs/research/asistente-robot/06-diseno-servidor-futuro.md`.
+ * Toda decisión vive en la función PURA `responder` (chat-nailbot-logica.ts); el copy, en
+ * src/lib/demo/nailbot-demo.ts. Aquí solo se CABLEA: estado, foco y enlace final. No envía nada: el
+ * mensaje lo manda la persona desde su WhatsApp (F-13).
  */
-interface MensajeChat {
-  readonly deBot: boolean
-  readonly texto: string
-}
-
-interface PasoChat {
-  readonly clave: string
-  readonly bot: string
-  readonly opciones?: readonly string[]
-}
-
-const FLUJO_CHAT: readonly PasoChat[] = [
-  {
-    clave: 'servicio',
-    bot: '¡Hola! Soy el asistente de Nails Lash Studio ✨ ¿Qué te gustaría reservar?',
-    opciones: ['Uñas', 'Pestañas', 'Cejas'],
-  },
-  {
-    clave: 'dia',
-    bot: '¡Perfecto! ¿Qué día te viene mejor?',
-    opciones: ['Entre semana', 'Este fin de semana', 'Lo antes posible'],
-  },
-  {
-    clave: 'franja',
-    bot: 'Genial. ¿Prefieres alguna franja horaria?',
-    opciones: ['Por la mañana', 'Por la tarde', 'Me es indiferente'],
-  },
-  { clave: 'nombre', bot: 'Casi listo. ¿A qué nombre hago la reserva?' },
-]
-
-function mensajeInicial(): MensajeChat[] {
-  return [{ deBot: true, texto: FLUJO_CHAT[0].bot }]
-}
-
-/** El href del CTA que entrega la reserva ya redactada (@s24): junta el número de F-02 con el
- * mensaje que compone la función PURA `mensajeReserva` a partir de las cuatro respuestas del guion. */
-function hrefReservaWhatsapp(respuestas: Record<string, string>): string {
-  const { servicio, dia, franja, nombre } = respuestas
-
-  return waHref(TELEFONO.legible, mensajeReserva({ servicio, dia, franja, nombre }))
-}
-
 export function ChatNailbot() {
-  const [mensajes, setMensajes] = useState<MensajeChat[]>(mensajeInicial)
-  const [paso, setPaso] = useState(0)
+  const [estado, setEstado] = useState<EstadoChat>(() => estadoInicial())
   const [borrador, setBorrador] = useState('')
-  const [hecho, setHecho] = useState(false)
-  const [respuestas, setRespuestas] = useState<Record<string, string>>({})
   const hilo = useRef<HTMLDivElement>(null)
+  const pie = useRef<HTMLDivElement>(null)
+  const actuo = useRef(false)
+  const idAviso = useId()
 
   useEffect(() => {
-    // El CÓMO (asignación de scrollTop, apta para jsdom) y la guarda del ref sin montar viven en
-    // `desplazarAlFinal` (reserva-logica.ts), ejercitados por VALOR (@s18): aquí solo se CABLEA.
+    // Autoscroll del hilo (reserva_chat @s18): el CÓMO vive en `desplazarAlFinal`.
     desplazarAlFinal(hilo.current)
-  }, [mensajes])
+  }, [estado.mensajes])
 
-  const avanzar = (valor: string) => {
-    const pasoActual = FLUJO_CHAT[paso]
-    const nuevasRespuestas = { ...respuestas, [pasoActual.clave]: valor }
-    const siguiente = paso + 1
-    const conUsuario: MensajeChat[] = [...mensajes, { deBot: false, texto: valor }]
-
-    if (siguiente < FLUJO_CHAT.length) {
-      setMensajes([...conUsuario, { deBot: true, texto: FLUJO_CHAT[siguiente].bot }])
-      setPaso(siguiente)
-    } else {
-      const resumen = `¡Gracias, ${nuevasRespuestas.nombre}! ✨ Tu solicitud: ${nuevasRespuestas.servicio} · ${nuevasRespuestas.dia} · ${nuevasRespuestas.franja}. Te confirmaremos la hora exacta por WhatsApp. ¡Te esperamos en Nails Lash Studio!`
-      setMensajes([...conUsuario, { deBot: true, texto: resumen }])
-      setHecho(true)
+  useEffect(() => {
+    // Tras cada acción de la persona, el foco pasa al primer control del paso nuevo; NUNCA al montar.
+    if (actuo.current) {
+      enfocarPrimerControl(pie.current)
     }
-    setRespuestas(nuevasRespuestas)
+  }, [estado])
+
+  const actuar = (entrada: EntradaChat) => {
+    actuo.current = true
+    setEstado((actual) => responder(actual, entrada))
   }
 
-  const enviarNombre = () => {
-    const valor = borrador.trim()
-    if (valor === '') return
-    avanzar(valor)
-  }
+  const enviarNombre = () => actuar({ tipo: 'nombre', valor: borrador })
 
   const reiniciar = () => {
-    setMensajes(mensajeInicial())
-    setPaso(0)
     setBorrador('')
-    setHecho(false)
-    setRespuestas({})
+    actuar({ tipo: 'reiniciar' })
   }
 
-  const pasoActual = FLUJO_CHAT[paso]
-  const esInput = !hecho && pasoActual.opciones === undefined
+  const opciones = opcionesDelPaso(estado.paso)
 
   return (
     <div className={estilos.chat}>
       <div className={estilos.chatCabecera}>
-        <div className={estilos.avatar} aria-hidden="true">
-          nl
+        <div className={estilos.avatar}>
+          <NailbotArte />
         </div>
         <div>
-          <div className={estilos.chatNombre}>Nails Lash Studio</div>
-          <div className={estilos.enLinea}>en línea</div>
+          <div className={estilos.chatNombre}>{NAILBOT_NOMBRE}</div>
+          <div className={estilos.subtitulo}>{NAILBOT_SUBTITULO}</div>
         </div>
       </div>
-      <div className={estilos.hilo} ref={hilo}>
-        {mensajes.map((m, i) => (
+      <p className={estilos.leyenda}>{NAILBOT_LEYENDA}</p>
+      <div
+        className={estilos.hilo}
+        ref={hilo}
+        role="log"
+        aria-live="polite"
+        aria-label={NAILBOT_HILO_ETIQUETA}
+      >
+        {estado.mensajes.map((m, i) => (
           <div
             key={i}
             data-de={m.deBot ? 'bot' : 'usuario'}
@@ -128,42 +102,66 @@ export function ChatNailbot() {
           </div>
         ))}
       </div>
-      <div className={estilos.chatPie}>
-        {!hecho && pasoActual.opciones && (
+      <div className={estilos.chatPie} ref={pie}>
+        {opciones.length > 0 && (
           <div className={estilos.opciones}>
-            {pasoActual.opciones.map((o) => (
-              <button key={o} type="button" className={estilos.chipChat} onClick={() => avanzar(o)}>
+            {opciones.map((o) => (
+              <button
+                key={o}
+                type="button"
+                className={estilos.chipChat}
+                onClick={() => actuar({ tipo: 'elegir', valor: o })}
+              >
                 {o}
               </button>
             ))}
           </div>
         )}
-        {esInput && (
-          <div className={estilos.entrada}>
-            <input
-              value={borrador}
-              placeholder="Escribe tu nombre…"
-              aria-label="Tu nombre"
-              onChange={(e) => setBorrador(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault()
-                  enviarNombre()
-                }
-              }}
-            />
-            <button type="button" aria-label="Enviar" onClick={enviarNombre}>
-              →
-            </button>
-          </div>
-        )}
-        {hecho && (
+        {estado.paso === 'nombre' && (
           <>
-            <a className="demo-btn demo-btn--wa" href={hrefReservaWhatsapp(respuestas)}>
-              Enviar la reserva por WhatsApp
+            <div className={estilos.entrada}>
+              <input
+                value={borrador}
+                placeholder={NAILBOT_CAMPO_PLACEHOLDER}
+                aria-label={NAILBOT_CAMPO_NOMBRE}
+                onChange={(e) => setBorrador(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    enviarNombre()
+                  }
+                }}
+              />
+              <button type="button" aria-label={NAILBOT_ENVIAR} onClick={enviarNombre}>
+                →
+              </button>
+            </div>
+            <div className={estilos.opciones}>
+              <button
+                type="button"
+                className={estilos.chipChat}
+                onClick={() => actuar({ tipo: 'sinNombre' })}
+              >
+                {NAILBOT_SIN_NOMBRE}
+              </button>
+            </div>
+          </>
+        )}
+        {estado.paso === 'hecho' && (
+          <>
+            <p id={idAviso} className={estilos.aviso}>
+              {NAILBOT_AVISO}
+            </p>
+            <a
+              className="demo-btn demo-btn--wa"
+              // Solo al terminar: `responder` garantiza servicio, día y franja (@s6); el nombre es opcional.
+              href={waHref(TELEFONO.legible, mensajeReserva(estado.respuestas as SolicitudReserva))}
+              aria-describedby={idAviso}
+            >
+              {NAILBOT_ENLACE_FINAL}
             </a>
             <button type="button" className={estilos.reiniciar} onClick={reiniciar}>
-              Reservar otra cita
+              {NAILBOT_REINICIAR}
             </button>
           </>
         )}

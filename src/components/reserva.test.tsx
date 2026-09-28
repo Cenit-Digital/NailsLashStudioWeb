@@ -29,7 +29,12 @@ const PARRAFO =
   'Elige servicio, día y franja horaria con nuestro asistente y te confirmamos la hora exacta por WhatsApp.'
 const ENLACE_WA = 'WhatsApp'
 const ENLACE_TEL = 'Llamar al estudio'
-const SALUDO = '¡Hola! Soy el asistente de Nails Lash Studio ✨ ¿Qué te gustaría reservar?'
+// [ENMIENDA F-23] El chat es Nailbot: literales A MANO de nailbot_chat_compartido.feature @s3 y @s6.
+const SALUDO =
+  '¡Hola! Soy Nailbot 💅, el asistente automático de Nails Lash Studio. ¿Qué te apetece reservar?'
+const PREGUNTA_DIA = '¡Me encanta! ¿Qué día te viene mejor?'
+const RESUMEN_MARTA =
+  '¡Gracias, Marta! ✨ Tu solicitud: Uñas · Entre semana · Por la mañana. Envíasela al salón por WhatsApp con el enlace de abajo y allí te confirmarán la hora exacta.'
 const RUTA_TSX = 'src/components/Reserva.tsx'
 
 function bytesTsx(): string {
@@ -60,7 +65,9 @@ describe('@s1 la columna izquierda hornea el eyebrow, el h2 con su id intacto y 
     expect(horneado).toContain('aria-labelledby="reserva-titulo"')
     expect((horneado.match(/<h2[\s>]/g) ?? []).length).toBe(1)
     // 🔴 El id NO cambia (puerta 5: igualdad de conjuntos nav↔secciones); cambia el TEXTO.
-    expect(horneado).toMatch(/<h2[^>]*id="reserva-titulo"[^>]*>¿Prefieres reservar por chat\?<\/h2>/)
+    expect(horneado).toMatch(
+      /<h2[^>]*id="reserva-titulo"[^>]*>¿Prefieres reservar por chat\?<\/h2>/,
+    )
   })
 
   it('@s1 sobre el h2 va el eyebrow «Reserva rápida» y bajo él el párrafo VERBATIM del prototipo', () => {
@@ -135,7 +142,9 @@ describe('@s3 el href de WhatsApp DERIVA de F-02 y lleva el texto demo urlencode
     const href = enlace?.[1] ?? ''
 
     expect(href).toContain('34625223366')
-    expect(href).toContain('?text=Hola%2C%20quiero%20reservar%20por%20chat%20en%20Nails%20Lash%20Studio.')
+    expect(href).toContain(
+      '?text=Hola%2C%20quiero%20reservar%20por%20chat%20en%20Nails%20Lash%20Studio.',
+    )
     expect(href).not.toMatch(/\s/)
     expect(href).not.toContain(',')
     expect(href).not.toContain('625 22 33 66')
@@ -216,18 +225,52 @@ describe('@s7 la hoja de estilos pierde los bloques que solo vestían al calenda
     return readFileSync('src/components/reserva.module.scss', 'utf8')
   }
 
-  it('@s7 declara los selectores vivos del chat y de las acciones (ancla positiva)', () => {
+  it('@s7 [AJUSTADO F-23] declara los selectores vivos de la sección (ancla positiva)', () => {
     const hoja = scss()
 
-    for (const selector of ['.rejilla', '.acciones', '.chat', '.chatCabecera', '.hilo', '.chipChat', '.entrada', '.reiniciar']) {
+    for (const selector of ['.reserva', '.rejilla', '.acciones']) {
       expect(hoja).toMatch(new RegExp(`\\${selector}\\b`))
+    }
+  })
+
+  it('@s7 [AJUSTADO F-23] YA NO declara los selectores del chat: se mudaron a chat-nailbot.module.scss', () => {
+    const hoja = scss()
+
+    expect(hoja).toMatch(/\.acciones\b/)
+    for (const selector of [
+      '.chat',
+      '.chatCabecera',
+      '.avatar',
+      '.chatNombre',
+      '.enLinea',
+      '.hilo',
+      '.burbujaBot',
+      '.burbujaUsuario',
+      '.chatPie',
+      '.opciones',
+      '.chipChat',
+      '.entrada',
+      '.reiniciar',
+    ]) {
+      expect(hoja, selector).not.toMatch(new RegExp(`\\${selector}\\b`))
     }
   })
 
   it('@s7 NO declara ninguno de los selectores del mini-calendario retirado', () => {
     const hoja = scss()
 
-    for (const selector of ['.paso', '.pasoTitulo', '.dia', '.diaActivo', '.diaDow', '.diaNum', '.cargando', '.chip', '.chipActivo', '.deshabilitado']) {
+    for (const selector of [
+      '.paso',
+      '.pasoTitulo',
+      '.dia',
+      '.diaActivo',
+      '.diaDow',
+      '.diaNum',
+      '.cargando',
+      '.chip',
+      '.chipActivo',
+      '.deshabilitado',
+    ]) {
       expect(hoja).not.toMatch(new RegExp(`\\${selector}\\b`))
     }
   })
@@ -240,27 +283,19 @@ describe('@s7 la hoja de estilos pierde los bloques que solo vestían al calenda
   })
 })
 
-describe('@s8 la cabecera del chat identifica al estudio con el nombre canónico y su estado', () => {
-  it('@s8 muestra "Nails Lash Studio" y "en línea"; el avatar "nl" es aria-hidden y no aporta nombre accesible', () => {
-    render(<Reserva />)
-
-    expect(screen.getByText('Nails Lash Studio')).toBeInTheDocument()
-    expect(screen.getByText('en línea')).toBeInTheDocument()
-    expect(screen.queryByText('nails lash studio')).toBeNull()
-
-    const avatar = screen.getByText('nl')
-    expect(avatar).toHaveAttribute('aria-hidden', 'true')
-    expect(screen.queryByRole('img', { name: 'nl' })).toBeNull()
-  })
-})
+// @s8 RETIRADO (ENMIENDA F-23, 2026-09-27): la cabecera «Nails Lash Studio» + «en línea» + avatar «nl»
+// la sustituye nailbot_chat_compartido @s1 (chat-nailbot.test.tsx). Tag no reutilizado.
 
 describe('@s9 el chat viaja HORNEADO: sin JS ya se ve el primer mensaje y sus tres opciones', () => {
   it('@s9 el hilo horneado tiene EXACTAMENTE una burbuja con el saludo y se hornean las tres opciones; sin input ni "Reservar otra cita"', () => {
     const horneado = renderToString(<Reserva />)
     const totalBurbujas =
-      (horneado.match(/data-de="bot"/g) ?? []).length + (horneado.match(/data-de="usuario"/g) ?? []).length
+      (horneado.match(/data-de="bot"/g) ?? []).length +
+      (horneado.match(/data-de="usuario"/g) ?? []).length
 
     expect(totalBurbujas).toBe(1)
+    // [AJUSTADO F-23] esa única burbuja es del BOT.
+    expect(horneado).toMatch(/data-de="bot"[^>]*>¡Hola! Soy Nailbot 💅/)
     expect(horneado).toContain(SALUDO)
     expect(horneado).toContain('>Uñas<')
     expect(horneado).toContain('>Pestañas<')
@@ -295,61 +330,18 @@ describe('@s11 elegir una opción añade mi respuesta y encadena la siguiente pr
 
     fireEvent.click(screen.getByRole('button', { name: 'Uñas' }))
 
-    expect(burbujasDe(container).map((b) => b.textContent)).toEqual([
-      SALUDO,
-      'Uñas',
-      '¡Perfecto! ¿Qué día te viene mejor?',
-    ])
+    expect(burbujasDe(container).map((b) => b.textContent)).toEqual([SALUDO, 'Uñas', PREGUNTA_DIA])
     expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual([
       'Entre semana',
-      'Este fin de semana',
+      'Un sábado',
       'Lo antes posible',
     ])
   })
 })
 
-describe('@s12 el guion es FIJO y tiene cuatro pasos, con las opciones de cada uno', () => {
-  it('@s12 paso 1: el mensaje es el saludo y las opciones son Uñas, Pestañas, Cejas', () => {
-    render(<Reserva />)
-
-    expect(screen.getByText(SALUDO)).toBeInTheDocument()
-    expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual(['Uñas', 'Pestañas', 'Cejas'])
-  })
-
-  it('@s12 paso 2: tras el servicio, pregunta el día con sus tres opciones', () => {
-    render(<Reserva />)
-    fireEvent.click(screen.getByRole('button', { name: 'Uñas' }))
-
-    expect(screen.getByText('¡Perfecto! ¿Qué día te viene mejor?')).toBeInTheDocument()
-    expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual([
-      'Entre semana',
-      'Este fin de semana',
-      'Lo antes posible',
-    ])
-  })
-
-  it('@s12 paso 3: tras el día, pregunta la franja con sus tres opciones', () => {
-    render(<Reserva />)
-    fireEvent.click(screen.getByRole('button', { name: 'Uñas' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Entre semana' }))
-
-    expect(screen.getByText('Genial. ¿Prefieres alguna franja horaria?')).toBeInTheDocument()
-    expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual([
-      'Por la mañana',
-      'Por la tarde',
-      'Me es indiferente',
-    ])
-  })
-
-  it('@s12 paso 4: tras la franja, pide el nombre y NO hay botones de opción (el guion no tiene un quinto paso)', () => {
-    render(<Reserva />)
-    avanzarHastaElNombre()
-
-    expect(screen.getByText('Casi listo. ¿A qué nombre hago la reserva?')).toBeInTheDocument()
-    // Solo queda el botón "Enviar" (glifo «→»): ningún chip de opción sobrevive al cuarto paso.
-    expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual(['→'])
-  })
-})
+// @s12 RETIRADO (ENMIENDA F-23, 2026-09-27): el guion de Nailbot (preguntas y botones de cada paso) lo
+// fija ÍNTEGRO nailbot_chat_compartido @s3 (chat-nailbot.test.tsx); el «no hay quinto paso», @s6.
+// Tag no reutilizado.
 
 describe('@s13 el cuarto paso pide el nombre por texto libre, sin botones de opción', () => {
   it('@s13 hay un campo con placeholder y nombre accesible correctos, y un botón "Enviar" cuyo nombre accesible NO es el glifo', () => {
@@ -362,6 +354,15 @@ describe('@s13 el cuarto paso pide el nombre por texto libre, sin botones de opc
     const enviar = screen.getByRole('button', { name: 'Enviar' })
     expect(enviar.textContent).toBe('→')
     expect(screen.queryByRole('button', { name: '→' })).toBeNull()
+  })
+
+  it('@s13 [AJUSTADO F-23] los botones del paso son EXACTAMENTE «Enviar» y «Prefiero no decirlo»: ningún chip del guion', () => {
+    render(<Reserva />)
+    avanzarHastaElNombre()
+
+    expect(
+      screen.getAllByRole('button').map((b) => b.getAttribute('aria-label') ?? b.textContent),
+    ).toEqual(['Enviar', 'Prefiero no decirlo'])
   })
 
   it('@s13 el campo NACE vacío: al aparecer por primera vez no trae nada preescrito', () => {
@@ -387,7 +388,9 @@ describe('@s14 enviar el nombre vacío o solo espacios no añade NADA al hilo', 
       const { container } = render(<Reserva />)
       avanzarHastaElNombre()
 
-      fireEvent.change(screen.getByPlaceholderText('Escribe tu nombre…'), { target: { value: escrito } })
+      fireEvent.change(screen.getByPlaceholderText('Escribe tu nombre…'), {
+        target: { value: escrito },
+      })
       fireEvent.click(screen.getByRole('button', { name: 'Enviar' }))
 
       expect(burbujasDe(container)).toHaveLength(7)
@@ -402,14 +405,12 @@ describe('@s15 completar el guion muestra el resumen interpolado y cierra el cha
     const { container } = render(<Reserva />)
     avanzarHastaElNombre()
 
-    fireEvent.change(screen.getByPlaceholderText('Escribe tu nombre…'), { target: { value: 'Marta' } })
+    fireEvent.change(screen.getByPlaceholderText('Escribe tu nombre…'), {
+      target: { value: 'Marta' },
+    })
     fireEvent.click(screen.getByRole('button', { name: 'Enviar' }))
 
-    expect(
-      screen.getByText(
-        '¡Gracias, Marta! ✨ Tu solicitud: Uñas · Entre semana · Por la mañana. Te confirmaremos la hora exacta por WhatsApp. ¡Te esperamos en Nails Lash Studio!',
-      ),
-    ).toBeInTheDocument()
+    expect(screen.getByText(RESUMEN_MARTA)).toBeInTheDocument()
     expect(screen.queryByPlaceholderText('Escribe tu nombre…')).toBeNull()
     // Solo el botón "Reservar otra cita" sigue en pie: ni chips ni input.
     expect(screen.getAllByRole('button')).toHaveLength(1)
@@ -433,11 +434,7 @@ describe('@s16 la tecla Enter equivale al botón de enviar; cualquier otra tecla
     fireEvent.keyDown(campo, { key: 'Enter' })
 
     expect(screen.getByText('Marta')).toBeInTheDocument()
-    expect(
-      screen.getByText(
-        '¡Gracias, Marta! ✨ Tu solicitud: Uñas · Entre semana · Por la mañana. Te confirmaremos la hora exacta por WhatsApp. ¡Te esperamos en Nails Lash Studio!',
-      ),
-    ).toBeInTheDocument()
+    expect(screen.getByText(RESUMEN_MARTA)).toBeInTheDocument()
   })
 
   it('@s16 Escape NO cambia nada: sigue con las mismas burbujas y el campo sigue con "Marta"', () => {
@@ -457,13 +454,19 @@ describe('@s17 "Reservar otra cita" reinicia el guion sin rastro de las respuest
   it('@s17 el hilo vuelve a tener EXACTAMENTE una burbuja (el saludo) y las tres opciones iniciales', () => {
     const { container } = render(<Reserva />)
     avanzarHastaElNombre()
-    fireEvent.change(screen.getByPlaceholderText('Escribe tu nombre…'), { target: { value: 'Marta' } })
+    fireEvent.change(screen.getByPlaceholderText('Escribe tu nombre…'), {
+      target: { value: 'Marta' },
+    })
     fireEvent.click(screen.getByRole('button', { name: 'Enviar' }))
 
     fireEvent.click(screen.getByRole('button', { name: 'Reservar otra cita' }))
 
     expect(burbujasDe(container).map((b) => b.textContent)).toEqual([SALUDO])
-    expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual(['Uñas', 'Pestañas', 'Cejas'])
+    expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual([
+      'Uñas',
+      'Pestañas',
+      'Cejas',
+    ])
     expect(screen.queryByRole('button', { name: 'Reservar otra cita' })).toBeNull()
     expect(screen.queryByPlaceholderText('Escribe tu nombre…')).toBeNull()
   })
@@ -471,7 +474,9 @@ describe('@s17 "Reservar otra cita" reinicia el guion sin rastro de las respuest
   it('@s17 el "rastro" también cubre el campo de nombre: al volver a llegar al cuarto paso, está VACÍO, no con "Marta"', () => {
     render(<Reserva />)
     avanzarHastaElNombre()
-    fireEvent.change(screen.getByPlaceholderText('Escribe tu nombre…'), { target: { value: 'Marta' } })
+    fireEvent.change(screen.getByPlaceholderText('Escribe tu nombre…'), {
+      target: { value: 'Marta' },
+    })
     fireEvent.click(screen.getByRole('button', { name: 'Enviar' }))
     fireEvent.click(screen.getByRole('button', { name: 'Reservar otra cita' }))
 
@@ -535,20 +540,22 @@ describe('@s19 quién habla en cada burbuja vive en un atributo CONSULTABLE, no 
 })
 
 describe('@s20 el nombre se interpola VERBATIM y ninguna burbuja emite "undefined"', () => {
-  it('@s20 con Cejas · Este fin de semana · Me es indiferente · "Mª Ángeles & Co.", el resumen contiene los fragmentos exactos', () => {
+  it('@s20 [AJUSTADO F-23] con Cejas · Lo antes posible · Me es indiferente · "Mª Ángeles & Co.", el resumen contiene los fragmentos exactos', () => {
     const { container } = render(<Reserva />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Cejas' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Este fin de semana' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Lo antes posible' }))
     fireEvent.click(screen.getByRole('button', { name: 'Me es indiferente' }))
-    fireEvent.change(screen.getByPlaceholderText('Escribe tu nombre…'), { target: { value: 'Mª Ángeles & Co.' } })
+    fireEvent.change(screen.getByPlaceholderText('Escribe tu nombre…'), {
+      target: { value: 'Mª Ángeles & Co.' },
+    })
     fireEvent.click(screen.getByRole('button', { name: 'Enviar' }))
 
     const burbujas = burbujasDe(container)
     const ultima = burbujas[burbujas.length - 1].textContent ?? ''
 
     expect(ultima).toContain('¡Gracias, Mª Ángeles & Co.! ✨')
-    expect(ultima).toContain('Tu solicitud: Cejas · Este fin de semana · Me es indiferente.')
+    expect(ultima).toContain('Tu solicitud: Cejas · Lo antes posible · Me es indiferente.')
     // El texto VISIBLE (textContent) muestra el «&» tal cual; «&amp;» es solo la representación en
     // el HTML fuente (React escapa al insertar), nunca el texto que lee la usuaria.
     expect(ultima).not.toContain('&amp;')
@@ -585,7 +592,9 @@ describe('@s22 la sección NO compone la solicitud ni envía nada — eso sigue 
 
     render(<Reserva />)
     avanzarHastaElNombre()
-    fireEvent.change(screen.getByPlaceholderText('Escribe tu nombre…'), { target: { value: 'Marta' } })
+    fireEvent.change(screen.getByPlaceholderText('Escribe tu nombre…'), {
+      target: { value: 'Marta' },
+    })
     fireEvent.click(screen.getByRole('button', { name: 'Enviar' }))
 
     expect(fetchEspiado).not.toHaveBeenCalled()
@@ -595,7 +604,12 @@ describe('@s22 la sección NO compone la solicitud ni envía nada — eso sigue 
 describe('@s23 mensajeReserva compone, en castellano natural, los cuatro datos de la clienta', () => {
   it('@s23 con Uñas · Entre semana · Por la mañana · "Marta" devuelve el texto EXACTO', () => {
     expect(
-      mensajeReserva({ servicio: 'Uñas', dia: 'Entre semana', franja: 'Por la mañana', nombre: 'Marta' }),
+      mensajeReserva({
+        servicio: 'Uñas',
+        dia: 'Entre semana',
+        franja: 'Por la mañana',
+        nombre: 'Marta',
+      }),
     ).toBe(
       'Hola, quiero reservar: Uñas · Entre semana · Por la mañana. Me llamo Marta y os escribo desde la web. ¿Podéis confirmarme la hora exacta?',
     )
@@ -613,9 +627,29 @@ describe('@s23 mensajeReserva compone, en castellano natural, los cuatro datos d
       'Hola, quiero reservar: Cejas · Este fin de semana · Me es indiferente. Me llamo Mª Ángeles & Co. y os escribo desde la web. ¿Podéis confirmarme la hora exacta?',
     )
   })
+
+  it('@s23 [AJUSTADO F-23] SIN nombre (campo ausente) no menciona ningún nombre: jamás «Me llamo undefined»', () => {
+    expect(
+      mensajeReserva({ servicio: 'Cejas', dia: 'Lo antes posible', franja: 'Por la tarde' }),
+    ).toBe(
+      'Hola, quiero reservar: Cejas · Lo antes posible · Por la tarde. Os escribo desde la web. ¿Podéis confirmarme la hora exacta?',
+    )
+  })
 })
 
 describe('@s24 al terminar el chat aparece, ANTES de "Reservar otra cita", un enlace con la reserva ya escrita', () => {
+  it('@s24 el enlace final reutiliza las clases GLOBALES demo-btn demo-btn--wa (MINIMO_DE_PARES no gana filas)', () => {
+    render(<Reserva />)
+    fireEvent.click(screen.getByRole('button', { name: 'Uñas' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Entre semana' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Por la mañana' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Prefiero no decirlo' }))
+
+    const enlace = screen.getByRole('link', { name: 'Enviar la reserva por WhatsApp' })
+    // Clases globales (observables con css:false), por el atributo `class`: jamás toHaveClass.
+    expect(enlace.getAttribute('class')?.split(/\s+/)).toEqual(['demo-btn', 'demo-btn--wa'])
+  })
+
   it('@s24 no existe antes de terminar; al terminar, va ANTES de "Reservar otra cita" con nombre accesible, href y mensaje correctos', () => {
     const { container } = render(<Reserva />)
     // ANTES de terminar (recién montado): el enlace NO existe.
@@ -627,7 +661,9 @@ describe('@s24 al terminar el chat aparece, ANTES de "Reservar otra cita", un en
 
     fireEvent.click(screen.getByRole('button', { name: 'Entre semana' }))
     fireEvent.click(screen.getByRole('button', { name: 'Por la mañana' }))
-    fireEvent.change(screen.getByPlaceholderText('Escribe tu nombre…'), { target: { value: 'Marta' } })
+    fireEvent.change(screen.getByPlaceholderText('Escribe tu nombre…'), {
+      target: { value: 'Marta' },
+    })
     fireEvent.click(screen.getByRole('button', { name: 'Enviar' }))
 
     // Solo "Reservar otra cita" sigue siendo un <button>; el nuevo CTA es un <a>.
@@ -638,7 +674,9 @@ describe('@s24 al terminar el chat aparece, ANTES de "Reservar otra cita", un en
 
     // "ANTES" en el DOM: su posición en el HTML precede a la del botón de reinicio.
     const html = container.innerHTML
-    expect(html.indexOf('Enviar la reserva por WhatsApp')).toBeLessThan(html.indexOf('Reservar otra cita'))
+    expect(html.indexOf('Enviar la reserva por WhatsApp')).toBeLessThan(
+      html.indexOf('Reservar otra cita'),
+    )
 
     const href = enlaceWa.getAttribute('href') ?? ''
     expect(href).toContain('34625223366')
