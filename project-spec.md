@@ -1262,6 +1262,38 @@ violaciones → build verde → «protegidos».*
 - **A-11** (ya abierta) — si el **email** entra como registro placeholder, **no** se emite en el
   JSON-LD hasta que el cliente lo confirme.
 
+#### Enmienda 2 (2026-09-28): el horneado se hidrata sobre el documento COMPLETO, y sin precargas de foto que el `<img>` no reutiliza
+
+Origen: la verificación EN VIVO de F-24 con Chromium real (evidencia completa, con cifras y fuentes, en
+`progress/hallazgo_hidratacion_ssg.md`). Decidido por el `craftsman_lead` con la autonomía que el humano
+delegó el 2026-09-28 («hazlo tú el 100 % de forma autónoma»), mismo precedente que las enmiendas de la
+galería. Dos defectos PREEXISTENTES del horneado (se reproducen en `92d6b70`, antes de Nailbot):
+
+1. **El script de módulo del bundle viaja con `async`** (`vite.config.ts` → `ssgOptions.script: 'async'`).
+   El HTML Living Standard (§4.12.1) dice que un módulo con `async` se evalúa «as soon as it is
+   available (potentially before parsing completes)», y que sin él se evalúa «when the page has finished
+   parsing». vite-react-ssg hornea el snapshot del router (`window.__staticRouterHydrationData`) al FINAL
+   del `<body>` y el cliente lo lee al crear el router, antes de hidratar. Medido: con `async`, entre 1 y 6
+   de cada 20 cargas en frío (CPU ×4) lanzan el #418 de React y la home queda SIN CONTENIDO (0 `<h1>`,
+   0 secciones, sin robot); sin `async`, 0 de 48. **Decisión:** el módulo del bundle NO lleva `async`
+   (vuelve al valor por defecto de la librería, `'sync'`, que emite `<script type="module">`, diferido por
+   la norma). El «porqué» antiguo («el JS no bloquea el parseo», `docs/research/stack-ssg-seo.md`) era
+   falso para módulos: un módulo nunca bloquea el parseo.
+2. **vite-react-ssg inyecta `<link rel="preload" as="image" crossorigin="">`** para cada foto importada por
+   un módulo renderizado (hoy 13). Las 13 `<img>` son `loading="lazy"` y sin `crossorigin`: medido, las 13
+   se piden por red ANTES de desplazarse y cada una se descarga dos veces en `vite preview`, con dos avisos
+   de consola por foto. **Decisión:** el artefacto NO lleva ningún `<link rel="preload" as="image">`. La
+   precarga de la imagen del LCP (si algún día la hay) es de F-17 `pipeline_imagenes`, con fotos reales.
+   Las precargas de FUENTE (`as="font"`) NO se tocan: son las 6 que exige la puerta de F-05.
+
+Acceptance de la enmienda: se asevera sobre el HTML CRUDO del artefacto REAL de producción (bytes de
+`dist/index.html` tras `pnpm build`, nunca jsdom), con ANCLA POSITIVA primero (hay exactamente un
+`<script type="module">` con `src` al bundle; hay precargas de fuente) y literales escritos a mano.
+Prohibido crear un build nuevo solo para esto: se reutiliza el build que ya corre la suite
+(`src/pages/home-horneado.test.ts`). No-mutable: `vite.config.ts` no está en `mutate` y el test es
+build-based (excluido de Stryker); se declara por escrito, no se finge. Tras la enmienda, la sonda de
+hidratación se repite en vivo con más cargas y tiene que dar 0.
+
 ---
 
 ### Feature 5: `cero_terceros` — la petición que nunca sale, y la puerta que lo demuestra

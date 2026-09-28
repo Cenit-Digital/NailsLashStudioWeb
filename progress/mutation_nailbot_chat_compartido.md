@@ -60,3 +60,52 @@ contenedores vacíos en ningún paso.
 `reserva-logica.ts` y `Reserva.tsx` (#3 + #4 + #5; sin cambios de código después). Ningún aviso de Stryker
 (el `_comment_ignorePatterns` desconocido se fundió en `_comment`) ni `DEP0190` (`tools/mutate.mjs` lanza
 una sola cadena de comando).
+
+## Re-medición de cierre (2026-09-28, sesión de cierre)
+
+Código medido: HEAD `3c171ff` (árbol limpio, sin cambios en `src/`, tests ni config). Motivo:
+`progress/current.md` («PENDIENTE al cortar la sesión») dejaba 9 timeouts de `chat-nailbot-logica.ts`
+sin re-medir a concurrencia 1 tras la última ronda (regex de `sinSurrogatesSueltos` SIN lookbehind).
+Acotado solo con `--mutate`, nunca `--testFiles`. Logs y copias del informe HTML en el scratchpad de
+la sesión, no en el repo.
+
+| # | Qué | Comando | Muertos | Timeouts | Supervivientes | Sin cobertura | Errores | Tiempo |
+|---|---|---|---|---|---|---|---|---|
+| 8 | Los 7 ficheros de F-23 y F-24, concurrencia por defecto (4 procesos) | `pnpm exec stryker run --mutate src/components/ChatNailbot.tsx,src/components/chat-nailbot-logica.ts,src/components/NailbotArte.tsx,src/components/NailbotFlotante.tsx,src/components/nailbot-flotante-logica.ts,src/components/Reserva.tsx,src/components/reserva-logica.ts` | 340 | **1** | 0 | 0 | 0 | 3 min 49 s |
+| 9 | El timeout de #8, en líneas completas, con `--concurrency 1` | `pnpm exec stryker run --mutate src/components/reserva-logica.ts:57-63 --concurrency 1` | 5 | **0** | 0 | 0 | 0 | 30 s |
+
+Detalle:
+
+- **#8**: 343 mutantes instrumentados = 340 muertos + 1 timeout + 2 `Ignored` (las deps `[]` de
+  `NailbotFlotante.tsx:81` y `:95`, los equivalentes ya justificados arriba). Score 100,00 %
+  (Stryker cuenta el timeout como detectado). Ningún `WARN` de Stryker en el log. La carga llegó a
+  7,3 de media en 4 núcleos durante la corrida.
+- **Los 9 timeouts pendientes de `chat-nailbot-logica.ts` no se repiten**: 106 muertos y 0 timeouts
+  (antes 97 + 9, el mismo total de 106). No queda nada que re-medir en ese fichero.
+- **El único timeout de #8** es `reserva-logica.ts:57`, `BlockStatement` (cuerpo entero de
+  `desplazarAlFinal`, L57:70-L63:2 → `{}`).
+- **#9**: acotado a las líneas 57-63 (las 5 mutantes de `desplazarAlFinal`). El antiguo timeout pasa a
+  **Killed** por una aserción de valor (`expected +0 to be 500`), no por reloj. Las otras cuatro
+  (`ConditionalExpression` true/false, `EqualityOperator`, `BlockStatement` de la guarda) también
+  mueren. **Ningún timeout escondía un superviviente.**
+
+### Veredicto por fichero (tras #8 + #9, 0 timeouts pendientes)
+
+| Fichero | Muertos / válidos | Score | Veredicto |
+|---|---|---|---|
+| `chat-nailbot-logica.ts` | 106 / 106 | 100 % | PASS |
+| `ChatNailbot.tsx` | 56 / 56 | 100 % | PASS |
+| `NailbotArte.tsx` | 1 / 1 | 100 % | PASS |
+| `NailbotFlotante.tsx` | 97 / 97 (+2 equivalentes excluidos con justificación) | 100 % | PASS |
+| `nailbot-flotante-logica.ts` | 62 / 62 | 100 % | PASS |
+| `reserva-logica.ts` | 15 / 15 (14 en #8 + el timeout muerto en #9) | 100 % | PASS |
+| `Reserva.tsx` | 4 / 4 | 100 % | PASS |
+| **Total** | **341 / 341** | **100 %** (umbral 100 %) | **PASS** |
+
+**Veredicto de mutación:** PASS. 0 supervivientes, 0 sin cobertura, 0 errores y 0 timeouts sin
+re-medir.
+
+**Aviso de proceso (no es de mutación):** en disco, los últimos veredictos del judge siguen siendo
+`CHANGES_REQUESTED` (`judge_nailbot_chat_compartido_delta.md` y `judge_nailbot_flotante_delta.md`).
+Este PASS **no** basta para marcar F-23 ni F-24 como `done`: falta la revisión delta pendiente que
+recoge `progress/current.md`. Si esa revisión obliga a tocar `src/`, esta medición caduca.

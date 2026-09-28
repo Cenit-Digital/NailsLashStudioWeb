@@ -60,3 +60,9 @@ versión funcional ANTES de cerrar el pipeline SDD. **No está `done`.**
   a concurrencia por defecto dio 100 %: 97 muertos, 9 timeouts, 0 supervivientes).
 - Por eso F-23 sigue `in_progress` y F-24 `spec_ready`: NO se marcan `done` hasta cerrar lo de arriba y
   una revisión delta rápida de los dos bloqueantes corregidos (lookbehind; test de pointer-events).
+
+## 2026-09-28 — Sesión de cierre
+
+- ENMIENDA 2 de F-04 escrita en `features/cascaron_semantico.feature` (@s39 módulo sin `async`, @s40 cero `<link rel="preload" as="image">`, sobre los bytes de `dist/index.html`); pendiente de TDD.
+- `tdd_craftsman` — Feature en curso: F-04 — cascaron_semantico (ENMIENDA 2). Escenarios a recorrer: @s39, @s40.
+  Diario: `progress/tdd_cascaron_enmienda2.md`.

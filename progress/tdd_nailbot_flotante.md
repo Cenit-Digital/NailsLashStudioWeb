@@ -59,3 +59,16 @@ judge F-24 (6 bloqueantes) y a11y (1 bloqueante) → atendidos:
 ## Verificación en vivo del lead
 
 Ver `progress/current.md` (sección de verificación en Chrome).
+
+## Ronda delta y cierre (2026-09-28)
+
+- **Cambio requerido del judge delta:** test de bytes del `pointer-events` del contenedor
+  (`nailbot-flotante-estilos.test.ts:188-196`: `.flotante` declara `none` y su regla hija anidada `> *`
+  devuelve `auto`). El judge de cierre demostró que MUERDE con 6 copias saboteadas de la hoja compiladas
+  con sass (`progress/judge_nailbot_flotante_cierre.md`).
+- **Deseables atendidos:** `animation-play-state` declarado UNA sola vez y en la regla `pausada`
+  (`:132-137`); ancla de `@media (forced-colors: active)` con los bordes del lanzador y del diálogo
+  (`:213-218`).
+- **Cierre:** judge APPROVED; mutación de cierre 100 % sin timeouts (`NailbotFlotante.tsx` 97/97 + 2
+  equivalentes justificados, `nailbot-flotante-logica.ts` 62/62). Verificación en vivo: ver
+  `progress/verificacion_viva_nailbot.md`.

@@ -73,6 +73,56 @@
 # contrato ya amendado.
 # =============================================================================================
 
+# =============================================================================================
+# ENMIENDA 2 (2026-09-28): EL HORNEADO SE HIDRATA SOBRE EL DOCUMENTO COMPLETO, Y SIN PRECARGAS DE
+# FOTO QUE EL `<img>` NO REUTILIZA. @s1-@s38 SE PRESERVAN INTACTOS; SE AÑADEN @s39 Y @s40.
+# =============================================================================================
+# ORIGEN: la verificación EN VIVO de F-24 (Nailbot) con Chromium real contra el build de producción
+# (`vite preview`). Evidencia, sondas y cifras completas: `progress/hallazgo_hidratacion_ssg.md`. Fuente
+# en la spec: `project-spec.md` §Feature 4 → «Enmienda 2 (2026-09-28)». Son dos defectos PREEXISTENTES
+# del horneado (se reproducen igual en `92d6b70`, anterior a Nailbot):
+#
+#   1. El `<script type="module">` del bundle viaja con `async` (`ssgOptions.script: 'async'`). HTML
+#      Living Standard §4.12.1, literal: «For module scripts, if the async attribute is present, then
+#      the module script and all its dependencies will be fetched in parallel to parsing, and the
+#      module script will be evaluated as soon as it is available (potentially before parsing
+#      completes). Otherwise, the module script and its dependencies will be fetched in parallel to
+#      parsing and evaluated when the page has finished parsing. (The defer attribute has no effect on
+#      module scripts.)». vite-react-ssg hornea el snapshot del router
+#      (`window.__staticRouterHydrationData`) al FINAL del `<body>` y el cliente lo lee ANTES de
+#      hidratar: con `async`, el módulo puede arrancar sin él. MEDIDO (cargas en frío, CPU ×4): con
+#      `async`, 3/20 · 4/20 · 1/24 en HEAD `3c171ff` y 6/20 en `92d6b70` lanzan el #418 de React y la
+#      home queda SIN CONTENIDO (0 `<h1>`, 0 `<section>`, sin robot: rompe también @s2 de
+#      `nailbot_flotante.feature`); sin `async`, 0/20 · 0/20 · 0/8. El bundle es byte a byte el mismo:
+#      solo cambia el atributo. El «porqué» antiguo de `async` («el JS no bloquea el parseo»,
+#      `docs/research/stack-ssg-seo.md`) era FALSO para módulos: un módulo nunca bloquea el parseo. → @s39
+#   2. vite-react-ssg inyecta `<link rel="preload" as="image" crossorigin="">` por cada foto importada
+#      por un módulo renderizado (hoy 13), y las 13 `<img>` son `loading="lazy"` y sin `crossorigin`:
+#      el modo de credenciales no casa y la precarga no se reutiliza. MEDIDO por CDP en `vite preview`:
+#      las 13 fotos se piden ANTES de desplazarse (≈ 509 KiB declarados perezosos, compitiendo con el
+#      LCP), 26 respuestas en total (cada foto DOS veces) y dos avisos de consola por foto. Matiz
+#      honesto: en GitHub Pages la segunda descarga podría salir de la caché HTTP, y eso NO se ha
+#      medido; la precarga anticipada y los avisos ocurren en cualquier servidor. → @s40
+#
+# QUIÉN LO DECIDE: el `craftsman_lead`, con la autonomía que el humano delegó el 2026-09-28 («hazlo tú
+# el 100 % de forma autónoma»), mismo precedente que las enmiendas de la galería.
+#
+# QUÉ NO CAMBIA: NINGÚN escenario anterior (@s1-@s38) se toca, ni una letra. Las precargas de FUENTE
+# (`as="font"`) SIGUEN: son las de F-05 (`cero_terceros.feature`) y su número se fija allí, no aquí. Las
+# fotos siguen `loading="lazy"`; la precarga de la imagen del LCP, si algún día la hay, es de F-17
+# (`pipeline_imagenes`), con fotos reales. `feature_list.json` no se toca (F-04 sigue `done`; mismo
+# patrón que la ENMIENDA 1).
+#
+# NO-MUTABLE, DECLARADO (no fingido): la corrección vive en `vite.config.ts`, que NO está en `mutate`
+# de `stryker.config.json`, y @s39/@s40 se aseveran en un test build-based (`*-horneado.test.*`),
+# excluido de la mutación por `vitest.stryker.config.ts`. Su defensa es el test por bytes sobre el
+# artefacto real, el `judge` y la sonda de hidratación repetida en vivo con más cargas (tiene que dar 0).
+#
+# OBSERVADO al verificar esta enmienda, FUERA DE SU ALCANCE (no se decide aquí; es de F-05): el
+# artefacto de HEAD lleva 12 `<link rel="preload" as="font">` (6 fuentes × {`.woff2`, `.woff`}), y las 6
+# que apuntan a un `.woff` declaran `type="font/woff2"`.
+# =============================================================================================
+
 # Contrato de la feature 4 (`cascaron_semantico`) de feature_list.json.
 # Destilado de project-spec.md → «Feature 4: cascaron_semantico — la cáscara HORNEADA, el JSON-LD
 # de cero y la puerta que mira dist/». Encarna T-6 («JSON-LD escrito de cero, sin aggregateRating»)
@@ -1461,3 +1511,62 @@ Feature: Cáscara semántica horneada, JSON-LD escrito de cero y la puerta que m
     # ruta interna que no sea la portada. F-04 hoy solo emite la home [V: `RUTAS_ESPERADAS = ['/']`],
     # así que este escenario usa un FIXTURE de dos rutas sobre el decisor PURO — el mismo argumento
     # que ya usa @s14 para no nacer inerte: los fixtures son gratis, escrito de otra forma es teatro.
+
+  # ---------------------------------------------------------------------------
+  # El HTML CRUDO de producción: hidratación sobre el documento completo y sin precargas de foto
+  # (ENMIENDA 2, 2026-09-28)
+  # ---------------------------------------------------------------------------
+  # @s1-@s38 (arriba) NO SE TOCAN. Ver el banner ENMIENDA 2 de la cabecera de este fichero y
+  # `progress/hallazgo_hidratacion_ssg.md`.
+  #
+  # PARA EL `tdd_craftsman`, VALE PARA LOS DOS ESCENARIOS:
+  #   - La entrada son los BYTES de `dist/index.html` que deja el `pnpm build` REAL que YA corre
+  #     `src/pages/home-horneado.test.ts` en su `beforeAll`. Se AMPLÍA ese fichero. PROHIBIDO lanzar un
+  #     build nuevo solo para esto y PROHIBIDO jsdom: jsdom no ve el HTML crudo, ve un árbol ya montado.
+  #   - Los literales se escriben A MANO en el test ("module", "/NailsLashStudioWeb/assets/", "async",
+  #     "preload", "font", "image", "lazy"). NUNCA se leen de `vite.config.ts` ni se deducen de
+  #     `ssgOptions`: un esperado derivado de la configuración vigilada no vigila nada (anti-tautología).
+  #   - El ANCLA POSITIVA va PRIMERO y se cuenta con LA MISMA extracción de elementos que la negativa.
+  #     Si la extracción no casara nada (atributos en otro orden, otra caja, comillas distintas), el ancla
+  #     cae en ROJO y la negativa ya no puede pasar en VACÍO. Un ancla medida con otro patrón no ancla nada.
+  #   - Los dos nacen en ROJO sobre el artefacto de HEAD `3c171ff` (medido: `async=""` en el módulo y 13
+  #     `<link rel="preload" as="image">`), con sus anclas ya en verde.
+
+  @s39
+  Scenario: el script de módulo del bundle viaja SIN async en el HTML crudo de producción
+    Given el fichero "dist/index.html" que deja el build REAL de producción, con base "/NailsLashStudioWeb/"
+    When se leen sus bytes y se extraen todos los elementos "<script" cuyo atributo "type" vale "module"
+    Then hay exactamente 1 elemento así cuyo atributo "src" empieza por "/NailsLashStudioWeb/assets/" y termina en ".js"
+    And ese elemento no lleva el atributo "async" en ninguna de sus formas: ni `async`, ni `async=""`, ni `async="async"`, en ninguna caja
+    # ANCLA POSITIVA PRIMERO (1er `Then`): sin ella, una extracción que no casara ningún `<script`
+    # dejaría el 2º `Then` en verde POR VACÍO. Hoy el ancla ya se cumple (un único módulo,
+    # `app-<hash>.js`); el hash cambia en cada build y NO se fija.
+    # El 2º `Then` mira el NOMBRE del atributo de ESE elemento, sin distinguir mayúsculas, NUNCA una
+    # subcadena de la etiqueta: el hash del nombre del fichero es arbitrario y podría contener «async».
+    # `defer` NI SE EXIGE NI SE PROHÍBE: la norma dice «The defer attribute has no effect on module
+    # scripts» (HTML Living Standard §4.12.1). Un módulo sin `async` YA se evalúa «when the page has
+    # finished parsing», es decir, después del `<script>` del final del `<body>` que lleva el snapshot
+    # del router. Exigir `defer` sería exigir un atributo inerte; prohibirlo, prohibir uno inofensivo.
+    # El «porqué» completo, con las cifras (con `async` entre 1 y 6 de cada 20 cargas en frío rompen;
+    # sin él, 0 de 48), está en el banner ENMIENDA 2.
+
+  @s40
+  Scenario: el HTML crudo de producción no lleva ningún <link rel="preload" as="image">
+    Given el fichero "dist/index.html" que deja el build REAL de producción, con base "/NailsLashStudioWeb/"
+    When se leen sus bytes y se extraen todos los elementos "<link" cuyo atributo "rel" vale "preload" y todos los elementos "<img"
+    Then al menos 1 de esos "<link" lleva as="font"
+    And al menos 1 de esos "<img" lleva loading="lazy"
+    And exactamente 0 de esos "<link" llevan as="image", sea cual sea el orden de sus atributos y sin distinguir mayúsculas
+    # ANCLAS POSITIVAS PRIMERO, y cada una cierra una forma distinta de pasar en VACÍO:
+    #   - `as="font"` (1er `Then`): demuestra que la extracción de `<link rel="preload">` SÍ encuentra
+    #     precargas. Si no casara ninguna, el 3er `Then` daría 0 por construcción. Su NÚMERO NO SE FIJA
+    #     AQUÍ: es de F-05 (`cero_terceros.feature`); hoy son 12 `<link>` (6 fuentes × `.woff2`/`.woff`),
+    #     y un test que escribiera 6 o 12 aquí duplicaría y contradiría la puerta de F-05.
+    #   - `<img loading="lazy">` (2º `Then`): las fotos SIGUEN horneadas. Cierra el atajo de «arreglar»
+    #     el escenario quitando las fotos importadas: sin fotos no hay precargas, pero tampoco equipo ni
+    #     galería. Lo que se retira es la PRECARGA, nunca la foto. Su número tampoco se fija (hoy 13): el
+    #     contenido de la página no es de esta enmienda.
+    # NO SATISFACE ESTE ESCENARIO (ni su porqué) añadir `crossorigin` a los `<img>` para que la precarga
+    # se reutilice: el 3er `Then` sigue exigiendo cero, y las fotos seguirían pidiéndose ANTES de
+    # desplazarse, contra su propio `loading="lazy"`. La precarga de la imagen del LCP, si algún día la
+    # hay, es de F-17 (`pipeline_imagenes`) y entrará con su propia enmienda de este escenario.
