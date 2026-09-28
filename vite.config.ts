@@ -1,7 +1,7 @@
 import react from '@vitejs/plugin-react-swc'
 import { defineConfig } from 'vite'
 
-import { sinPrecargasDeImagen } from './src/lib/horneado'
+import { sinPrecargasDeFuenteWoff, sinPrecargasDeImagen } from './src/lib/horneado'
 
 // https://vite.dev/config/ · SSG vía vite-react-ssg (ver package.json "build").
 // Vite 7 usa el API moderno de Dart Sass por defecto (sass-embedded), sin avisos de deprecación.
@@ -35,9 +35,11 @@ export default defineConfig({
     dirStyle: 'nested',
     formatting: 'none',
     // @s40 (ENMIENDA 2): vite-react-ssg inyecta SIEMPRE un `<link rel="preload" as="image">` por foto,
-    // sin opción para desactivarlo; las `<img>` son `loading="lazy"` y no lo reutilizan. Se retiran del
-    // HTML ya serializado, antes de escribirlo en `dist/`. La lógica (pura, testeada y mutada) vive en
-    // src/lib/horneado.ts; aquí solo se cablea.
-    onPageRendered: (_ruta, html) => sinPrecargasDeImagen(html),
+    // sin opción para desactivarlo; las `<img>` son `loading="lazy"` y no lo reutilizan. @s41 (ENMIENDA
+    // 3, decisión del humano): también precarga el `.woff` de cada fuente además del `.woff2`, y el
+    // navegador descargaba los dos; solo se precarga el `.woff2` (el `.woff` sigue de respaldo en el
+    // CSS). Se retiran del HTML ya serializado, antes de escribirlo en `dist/`. La lógica (pura,
+    // testeada y mutada) vive en src/lib/horneado.ts; aquí solo se cablea.
+    onPageRendered: (_ruta, html) => sinPrecargasDeFuenteWoff(sinPrecargasDeImagen(html)),
   },
 })

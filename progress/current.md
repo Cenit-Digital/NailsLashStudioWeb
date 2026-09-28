@@ -66,3 +66,13 @@ versión funcional ANTES de cerrar el pipeline SDD. **No está `done`.**
 - ENMIENDA 2 de F-04 escrita en `features/cascaron_semantico.feature` (@s39 módulo sin `async`, @s40 cero `<link rel="preload" as="image">`, sobre los bytes de `dist/index.html`); pendiente de TDD.
 - `tdd_craftsman` — Feature en curso: F-04 — cascaron_semantico (ENMIENDA 2). Escenarios a recorrer: @s39, @s40.
   Diario: `progress/tdd_cascaron_enmienda2.md`.
+- `tdd_craftsman` — @s39/@s40 VERDE: `bin/harness init` exit 0 (47/47, 1495/1495), `pnpm build` exit 0 con las 5
+  puertas, mutación de `src/lib/horneado.ts` 100 % (11/11, 0 timeouts). Pendiente: `judge` y la sonda de hidratación
+  en vivo repetida. F-04 sigue `done` (no se toca `feature_list.json`).
+- ENMIENDA 3 de F-04 escrita en `features/cascaron_semantico.feature` (@s41: solo precargas de fuente `.woff2`, cero hacia `.woff`, el CSS conserva `format("woff")` de respaldo; decisión del humano, AskUserQuestion 2026-09-28); pendiente de TDD.
+- `tdd_craftsman` — Feature en curso: F-04 — cascaron_semantico (ENMIENDA 3). Escenarios a recorrer: @s41 (más el nit
+  del judge de la ENMIENDA 2 en la cabecera de `src/lib/horneado.ts`). Diario: `progress/tdd_cascaron_enmienda3.md`.
+- ENMIENDA 4 de F-04 escrita en `features/cascaron_semantico.feature` (@s42 home-horneado, @s43 contacto-horneado, @s44 los 5 experimentos de trampas: el `app-*.js` que carga el HTML, con ancla de su app, sin `jsxDEV` ni `fileName:`; builds de test con `NODE_ENV=production`, decisión del humano, AskUserQuestion 2026-09-28); pendiente de TDD.
+- `tdd_craftsman` — @s41 VERDE: `bin/harness init` exit 0 (47/47, 1507/1507), `pnpm build` exit 0 con las 5 puertas
+  (`dist/index.html`: 6 precargas de fuente, todas `.woff2`, 0 `.woff`; el CSS conserva los 6 `format("woff")`),
+  mutación de `src/lib/horneado.ts` 100 % (23/23, 0 timeouts). Pendiente: `judge`. F-04 sigue `done`.

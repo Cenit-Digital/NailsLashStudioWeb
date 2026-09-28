@@ -1,15 +1,15 @@
 import { execSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 import { beforeAll, describe, expect, it } from 'vitest'
 
 /**
- * F-10 @s12 y @s14, F-14 @s6 y F-04 @s39/@s40 (ENMIENDA 2 de `cascaron_semantico.feature`) — sobre el
- * HTML CRUDO del artefacto de PRODUCCIÓN, leído por BYTES (readFileSync, sin ejecutar JavaScript —
- * I-8, NUNCA jsdom). «Verde ≠ funciona»: para las features de UI se verifica con `pnpm build` + fetch
- * del HTML crudo (feature_list.json §rules.notas). @s39/@s40 REUTILIZAN el build de este `beforeAll`:
- * el contrato prohíbe un build nuevo solo para ellos.
+ * F-10 @s12 y @s14, F-14 @s6 y F-04 @s39/@s40/@s41 (ENMIENDAS 2 y 3 de `cascaron_semantico.feature`)
+ * — sobre el HTML CRUDO del artefacto de PRODUCCIÓN (y, en @s41, el CSS de `dist/assets/`), leído por
+ * BYTES (readFileSync, sin ejecutar JavaScript — I-8, NUNCA jsdom). «Verde ≠ funciona»: para las
+ * features de UI se verifica con `pnpm build` + fetch del HTML crudo (feature_list.json §rules.notas).
+ * @s39-@s41 REUTILIZAN el build de este `beforeAll`: el contrato prohíbe un build nuevo solo para ellos.
  *
  * 🔴 ESTE FICHERO NO IMPORTA NADA DE `src/lib/` NI DE `src/pages/`, Y ES DELIBERADO (patrón de
  * `trampas-del-horneado.test.tsx`): corre el BUILD REAL (lento) en `beforeAll`. Si importara
@@ -149,7 +149,7 @@ describe('@s6 (F-14) el JSON-LD horneado NO contiene aggregateRating ni review',
 })
 
 /**
- * F-04 @s39/@s40 — LA EXTRACCIÓN DE ELEMENTOS DEL HTML CRUDO, escrita A MANO aquí (este fichero no
+ * F-04 @s39-@s41 — LA EXTRACCIÓN DE ELEMENTOS DEL HTML CRUDO, escrita A MANO aquí (este fichero no
  * importa `src/lib/`). Es LA MISMA para cada ancla positiva y para su negativa: si no casara nada
  * (atributos en otro orden, otra caja, otras comillas), el ancla cae en ROJO y la negativa ya no puede
  * pasar en VACÍO. Mira NOMBRES de atributo (en minúsculas), nunca subcadenas de la etiqueta: el hash de
@@ -250,5 +250,75 @@ describe('@s40 (F-04) el HTML crudo de producción no lleva ningún <link rel="p
     const deImagen = precargasDe('image').map((link) => link.get('href'))
 
     expect(deImagen).toEqual([])
+  })
+})
+
+/**
+ * @s41 — «termina en» es el FINAL de la URL, sin distinguir mayúsculas; NUNCA una subcadena: `x.woff2`
+ * no termina en `.woff`, y el hash de un nombre de fichero podría contener «woff».
+ */
+function terminaEn(url: string, extension: string): boolean {
+  return url.toLowerCase().endsWith(extension)
+}
+
+/** @s41 — los `href` de las precargas de fuente (la MISMA extracción de @s40) que terminan en `extension`. */
+function precargasDeFuenteHacia(extension: string): readonly string[] {
+  return precargasDe('font')
+    .map((link) => link.get('href') ?? '')
+    .filter((href) => terminaEn(href, extension))
+}
+
+const RUTA_ASSETS = resolve('dist/assets')
+
+/** @s41 — los bytes de cada `.css` de `dist/assets/` que deja el build del `beforeAll`. */
+function hojasDeEstilo(): readonly string[] {
+  return readdirSync(RUTA_ASSETS)
+    .filter((fichero) => fichero.endsWith('.css'))
+    .map((fichero) => readFileSync(resolve(RUTA_ASSETS, fichero), 'utf8'))
+}
+
+/**
+ * @s41 — el cuerpo de cada regla `@font-face`, y en él cada `url(…)` seguida del LITERAL `format("woff")`
+ * (si el minificador cambiara sus comillas, no casa: falla CERRADA). En un `@font-face` solo el
+ * descriptor `src` admite `url(…)`. La URL puede ir sin comillas (la forma de hoy), con dobles o simples.
+ */
+const REGLA_FONT_FACE = /@font-face\s*\{([^}]*)\}/gi
+const URL_CON_FORMATO_WOFF = /url\(\s*(?:"([^"]*)"|'([^']*)'|([^"')\s]*))\s*\)\s*format\("woff"\)/g
+
+/** @s41 — las URL de respaldo `format("woff")` de los `@font-face` del CSS que terminan en `.woff`. */
+function respaldosWoffDelCss(): readonly string[] {
+  return hojasDeEstilo()
+    .flatMap((css) => [...css.matchAll(REGLA_FONT_FACE)].map(([, cuerpo]) => cuerpo))
+    .flatMap((cuerpo) =>
+      [...cuerpo.matchAll(URL_CON_FORMATO_WOFF)].map(
+        ([, dobles, simples, sinComillas]) => dobles ?? simples ?? sinComillas,
+      ),
+    )
+    .filter((url) => terminaEn(url, '.woff'))
+}
+
+/**
+ * F-04 @s41 (ENMIENDA 3, decisión del humano) — solo se PRECARGAN las fuentes `.woff2`: vite-react-ssg
+ * inyecta una precarga por CADA fichero de fuente, y Chromium descargaba también los `.woff` (124 440
+ * bytes) sin usarlos. Lo que se retira es la PRECARGA: el `.woff` sigue de RESPALDO en el `src` de
+ * cada `@font-face` del CSS.
+ */
+describe('@s41 (F-04) el HTML crudo de producción solo precarga fuentes .woff2, y el CSS conserva el .woff de respaldo', () => {
+  it('@s41 ANCLA POSITIVA: al menos 1 <link rel="preload" as="font"> tiene un href que termina en ".woff2"', () => {
+    // MISMA extracción que la negativa. Su NÚMERO no se fija: la lista de fuentes es de F-05.
+    expect(precargasDeFuenteHacia('.woff2').length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('@s41 ANCLA POSITIVA: al menos 1 @font-face del CSS lleva en su src una url(…) que termina en ".woff" seguida de format("woff")', () => {
+    // MISMO criterio «termina en .woff» que la negativa: si no casara nunca, la negativa pasaría en
+    // VACÍO. También cae si no hay ningún .css en dist/assets/ o ninguna regla @font-face. Su número
+    // no se fija: los pares de fuente son de F-05.
+    expect(respaldosWoffDelCss().length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('@s41 exactamente 0 <link rel="preload" as="font"> tienen un href que termina en ".woff", en cualquier orden de atributos y caja', () => {
+    // Misma extracción que el 1er ancla y mismo criterio que el 2º; se listan los href para que un
+    // fallo diga CUÁLES. «Termina en .woff» es el final del valor: una precarga .woff2 no cuenta.
+    expect(precargasDeFuenteHacia('.woff')).toEqual([])
   })
 })
