@@ -113,14 +113,102 @@
 # (`pipeline_imagenes`), con fotos reales. `feature_list.json` no se toca (F-04 sigue `done`; mismo
 # patrón que la ENMIENDA 1).
 #
-# NO-MUTABLE, DECLARADO (no fingido): la corrección vive en `vite.config.ts`, que NO está en `mutate`
-# de `stryker.config.json`, y @s39/@s40 se aseveran en un test build-based (`*-horneado.test.*`),
-# excluido de la mutación por `vitest.stryker.config.ts`. Su defensa es el test por bytes sobre el
-# artefacto real, el `judge` y la sonda de hidratación repetida en vivo con más cargas (tiene que dar 0).
+# MUTABILIDAD, DECLARADA (no fingida; matizada tras el TDD, 2026-09-28). La corrección tiene dos partes:
+#   - NO-MUTABLE: lo que vive en `vite.config.ts` (fuera de `mutate` de `stryker.config.json`): la
+#     AUSENCIA de `ssgOptions.script` (@s39) y la línea que cablea `ssgOptions.onPageRendered` (@s40).
+#     @s39/@s40 se aseveran en un test build-based (`*-horneado.test.*`), excluido de la mutación por
+#     `vitest.stryker.config.ts`. Su defensa es el test por bytes sobre el artefacto real, el `judge` y
+#     la sonda de hidratación repetida en vivo con más cargas (tiene que dar 0).
+#   - MUTABLE: la lógica de @s40, `sinPrecargasDeImagen` (`src/lib/horneado.ts`), está en `mutate` y le
+#     aplica el umbral del 100 % con sus tests unitarios (`src/lib/horneado.test.ts`).
+# (Texto propuesto por el judge en `progress/judge_cascaron_enmienda2.md` §5; ningún escenario cambia.)
 #
 # OBSERVADO al verificar esta enmienda, FUERA DE SU ALCANCE (no se decide aquí; es de F-05): el
 # artefacto de HEAD lleva 12 `<link rel="preload" as="font">` (6 fuentes × {`.woff2`, `.woff`}), y las 6
 # que apuntan a un `.woff` declaran `type="font/woff2"`.
+# =============================================================================================
+
+# =============================================================================================
+# ENMIENDA 3 (2026-09-28): SOLO SE PRECARGAN LAS FUENTES `.woff2`; EL `.woff` QUEDA DE RESPALDO EN
+# `@font-face`. @s1-@s40 SE PRESERVAN INTACTOS; SE AÑADE @s41.
+# =============================================================================================
+# ORIGEN: lo OBSERVADO al final del banner ENMIENDA 2, medido por el `craftsman_lead` con Chromium (CDP)
+# sobre el build de producción. Fuente en la spec: `project-spec.md` §Feature 4 → «Enmienda 3
+# (2026-09-28)». vite-react-ssg (`renderPreloadLink`, rama `.woff/.woff2/.ttf`) inyecta un
+# `<link rel="preload" as="font" type="font/woff2" crossorigin>` por CADA fichero de fuente del
+# manifiesto: hoy 12 (6 `.woff2` + 6 `.woff`), y los 6 que apuntan a un `.woff` declaran además un
+# `type` FALSO (`font/woff2`). MEDIDO (carga en frío, página recorrida entera): Chromium descarga los 12;
+# retirando SOLO las 6 precargas `.woff`, pide 0 `.woff` y carga EXACTAMENTE las mismas caras (Manrope
+# 400/600/700, Gilda Display 400, Great Vibes 400) desde los `.woff2`. Los 6 `.woff` pesan 124 440 bytes
+# (más que los 6 `.woff2`, 119 540): se ahorran en CADA visita. WOFF2 lo soportan todos los navegadores
+# del objetivo del build (`baseline-widely-available`: chrome107, edge107, firefox104, safari16;
+# `caniuse-lite` 1.0.30001805: primera versión con soporte Chrome 36, Edge 14, Firefox 39, Safari 12). → @s41
+#
+# QUIÉN LO DECIDE: el HUMANO, no el `craftsman_lead`: AskUserQuestion del 2026-09-28, respuesta literal
+# «Solo precargar .woff2». (Diferencia con la ENMIENDA 2, que fue autonomía delegada.)
+#
+# QUÉ NO CAMBIA: NINGÚN escenario anterior (@s1-@s40) se toca, ni una letra. @s40 sigue en pie tal cual
+# (su ancla pide «al menos 1» `as="font"`, y quedan 6); su comentario «hoy son 12» es HISTÓRICO de la
+# ENMIENDA 2. El CSS NO SE TOCA: el `.woff` sigue como RESPALDO en el `src` de cada `@font-face`; lo que se
+# retira es la PRECARGA, nunca la fuente. F-05 (`cero_terceros.feature`) NO CAMBIA: su puerta cuenta los
+# PARES `[familia, peso]` de los `@font-face` del CSS (6 pares), nunca las precargas, y ningún escenario
+# suyo fija su número. Por eso esto es de F-04 y no de F-05, al contrario de lo que anticipaba el banner
+# ENMIENDA 2: la precarga la inyecta el HORNEADO, y el horneado es de esta feature. `feature_list.json`
+# no se toca (F-04 sigue `done`; mismo patrón que las ENMIENDAS 1 y 2).
+#
+# MUTABLE, AL CONTRARIO QUE LA ENMIENDA 2: la lógica vive en el retoque PURO del HTML de
+# `src/lib/horneado.ts` (el mismo de la ENMIENDA 2, cableado en `ssgOptions.onPageRendered`), que SÍ está
+# en `mutate`: TDD un test a la vez sobre fixtures escritos a mano y mutación al 100 %. El test sobre los
+# bytes de `dist/` es build-based (`*-horneado.test.*`, excluido de Stryker): demuestra que el cableado
+# llega al artefacto real, no sustituye a la mutación de la lógica.
+#
+# FUERA DE ALCANCE (anotado, NO decidido): Manrope 500 se precarga y se declara, pero tras recorrer la
+# home entera a 1280 px `document.fonts` lo deja `unloaded`; no se ha auditado si alguna regla lo usa en
+# otro estado o ancho. Es la lista de F-05 y la decide F-05.
+# =============================================================================================
+
+# =============================================================================================
+# ENMIENDA 4 (2026-09-28): LOS TESTS QUE CONSTRUYEN EL SITIO LO CONSTRUYEN EN MODO PRODUCCIÓN.
+# @s1-@s41 SE PRESERVAN INTACTOS; SE AÑADEN @s42, @s43 Y @s44.
+# =============================================================================================
+# ORIGEN: lo «Observado, fuera del alcance» de `progress/tdd_cascaron_enmienda2.md`, confirmado por el
+# judge (`progress/judge_cascaron_enmienda2.md` §4, «Punto 4»). Fuente en la spec: `project-spec.md`
+# §Feature 4 → «Enmienda 4 (2026-09-28)». Los tres ficheros build-based (`src/pages/home-horneado.test.ts`,
+# `src/pages/contacto-horneado.test.ts` y los experimentos de `src/lib/trampas-del-horneado.test.tsx`)
+# lanzan el build desde Vitest con `execSync` y HEREDAN `NODE_ENV=test`; vite-react-ssg toma el modo de
+# `process.env.MODE || process.env.NODE_ENV || … || 'production'` (`vite-react-ssg.DsKK_1op.mjs:704`).
+# MEDIDO por el `craftsman_lead` (mismo commit, dos builds): el HTML sale igual salvo los hashes (del
+# bundle y el aleatorio `__VITE_REACT_SSG_HASH__`), pero el JS NO:
+#
+#   Build                                      app-*.js    client-*.js   jsxDEV en app-*.js   fileName:"/…/src/…" del disco
+#   NODE_ENV=test (lo que hoy ven los tests)   287 985 B   354 070 B     368                  sí
+#   pnpm build directo (lo que se publica)     164 751 B   180 764 B     0                    no
+#
+# CONFIRMADO por el `gherkin_author` (2026-09-28) sobre los artefactos que dejó la suite en este repo:
+# `dist/assets/app-*.js` con 368 `jsxDEV` y 365 `fileName:"/home/user/NailsLashStudioWeb/src/…"`; cada uno
+# de los 5 experimentos de `trampas` con 13-14 `jsxDEV` y 10-11 `fileName:"…"`. El TAMAÑO en modo test
+# depende de la ruta del disco, incrustada en cada `fileName` (el mismo experimento pesa 150 800 B
+# construido bajo el repo y 151 251 B bajo una ruta más larga; en el repo, el `app-*.js` pesa 262 070 B):
+# lo estable es el RECUENTO, no los bytes. Es decir: los tests que dicen aseverar «el artefacto REAL de
+# producción» miran un bundle con React en modo DESARROLLO. Hoy no cambia ningún veredicto (todo lo
+# aseverado vive en el HTML y en las puertas), pero es un hueco de fidelidad: cualquier aserción futura
+# sobre el JS, o sobre código que dependa de `import.meta.env.PROD`/`MODE`, divergiría EN SILENCIO.
+# → @s42 (home-horneado), @s43 (contacto-horneado), @s44 (los 5 experimentos de trampas)
+#
+# DECISIÓN: esos builds se lanzan con `NODE_ENV=production` explícito en el entorno del SUBPROCESO (el
+# resto del entorno se hereda). QUIÉN LO DECIDE: el HUMANO, AskUserQuestion del 2026-09-28, respuesta
+# literal «Sí, modo producción».
+#
+# QUÉ NO CAMBIA: NINGÚN escenario anterior (@s1-@s41) se toca, ni una letra, y lo que ya aseveran esos tres
+# ficheros sigue en verde sobre el build en producción. El DESPLIEGUE NO ESTABA AFECTADO:
+# `.github/workflows/deploy-pages.yml` ejecuta `pnpm build` en su propio paso, después de la suite, y eso
+# es lo que se publica. `vitest.stryker.config.ts` SIGUE excluyendo `**/*-horneado.test.{ts,tsx}` de la
+# mutación. `vite.config.ts` y `feature_list.json` no se tocan (F-04 sigue `done`; mismo patrón que las
+# ENMIENDAS 1-3).
+#
+# NO-MUTABLE, DECLARADO (no fingido): lo que cambia es el LANZAMIENTO de los tests build-based (el entorno
+# de su `execSync`): son ficheros de test, fuera de `mutate`, y Stryker los excluye. Su defensa: los tres
+# escenarios por bytes nacen en ROJO sobre los artefactos de hoy (con sus anclas ya en VERDE), y el `judge`.
 # =============================================================================================
 
 # Contrato de la feature 4 (`cascaron_semantico`) de feature_list.json.
@@ -1570,3 +1658,172 @@ Feature: Cáscara semántica horneada, JSON-LD escrito de cero y la puerta que m
     # se reutilice: el 3er `Then` sigue exigiendo cero, y las fotos seguirían pidiéndose ANTES de
     # desplazarse, contra su propio `loading="lazy"`. La precarga de la imagen del LCP, si algún día la
     # hay, es de F-17 (`pipeline_imagenes`) y entrará con su propia enmienda de este escenario.
+
+  # ---------------------------------------------------------------------------
+  # El HTML CRUDO de producción: solo se precargan las fuentes `.woff2` (ENMIENDA 3, 2026-09-28)
+  # ---------------------------------------------------------------------------
+  # @s1-@s40 (arriba) NO SE TOCAN. Ver el banner ENMIENDA 3 de la cabecera de este fichero.
+  #
+  # PARA EL `tdd_craftsman`:
+  #   - La entrada son los BYTES de `dist/index.html` y de los ficheros `.css` de `dist/assets/` que deja
+  #     el `pnpm build` REAL que YA corre `src/pages/home-horneado.test.ts` en su `beforeAll`. Se AMPLÍA
+  #     ese fichero. PROHIBIDO lanzar un build nuevo y PROHIBIDO jsdom.
+  #   - La extracción de `<link>` es LA MISMA de @s40 (reutilízala, no escribas otra): orden de atributos
+  #     libre y sin distinguir mayúsculas en nombres ni valores.
+  #   - Literales A MANO en el test ("preload", "font", ".woff2", ".woff", `format("woff")`, "@font-face").
+  #     NUNCA se leen del manifiesto de Vite, de `@fontsource/*`, de `src/lib/horneado.ts` ni de la lista
+  #     de pares de F-05: un esperado derivado de lo vigilado no vigila nada (anti-tautología).
+  #   - La LÓGICA (retirar la precarga `.woff`, conservar la `.woff2` y todo lo demás) se hace por TDD en
+  #     `src/lib/horneado.ts` con fixtures escritos a mano, un test a la vez, y cita este tag; esos fixtures
+  #     SÍ cubren lo que el artefacto de hoy no trae (atributos en otro orden, `.WOFF` en mayúsculas, una
+  #     precarga `.woff2` que debe sobrevivir, una precarga que no es `as="font"`). Mutación al 100 %.
+  #   - Nace en ROJO sobre el artefacto de HEAD `95e701e` (medido: 6 precargas `as="font"` hacia `.woff`),
+  #     con sus dos anclas ya en verde (6 precargas hacia `.woff2`; 6 `@font-face` con `format("woff")`).
+
+  @s41
+  Scenario: el HTML crudo de producción solo precarga fuentes .woff2, y el CSS conserva el .woff de respaldo
+    Given el fichero "dist/index.html" y los ficheros ".css" de "dist/assets/" que deja el build REAL de producción, con base "/NailsLashStudioWeb/"
+    When se leen sus bytes y se extraen, del HTML, todos los elementos "<link" cuyo atributo "rel" vale "preload" y cuyo atributo "as" vale "font", y, del CSS, todas las reglas "@font-face"
+    Then al menos 1 de esos "<link" tiene un atributo "href" que termina en ".woff2"
+    And al menos 1 de esas reglas "@font-face" lleva en su "src" una entrada "url(…)" cuya URL termina en ".woff" seguida de format("woff")
+    And exactamente 0 de esos "<link" tienen un atributo "href" que termina en ".woff", sea cual sea el orden de sus atributos y sin distinguir mayúsculas
+    # ANCLAS POSITIVAS PRIMERO, y cada una cierra una forma distinta de pasar en VACÍO:
+    #   - 1er `Then` (precarga `.woff2`): MISMA extracción de `<link>` que el 3er `Then`. Si no casara
+    #     ningún `<link rel="preload" as="font">`, o no leyera su `href`, el 3er `Then` daría 0 por
+    #     construcción; aquí cae en ROJO. Su NÚMERO NO SE FIJA (hoy 6 tras la enmienda): la lista de
+    #     fuentes es de F-05, y un test que escribiera 6 duplicaría su puerta.
+    #   - 2º `Then` (respaldo `.woff` en el CSS): usa el MISMO criterio «la URL termina en `.woff`» que el
+    #     3er `Then`. Si ese criterio no casara nunca (p. ej. comparase con mayúsculas o exigiera comillas),
+    #     el 3er `Then` pasaría en VACÍO; aquí cae en ROJO. También cae si no se encuentra ningún `.css` en
+    #     `dist/assets/` o ninguna regla `@font-face`. Hoy la URL va SIN comillas (`url(/…/x.woff)`): la
+    #     extracción acepta `url(x)`, `url("x")` y `url('x')`. `format("woff")` es literal: si el minificador
+    #     cambiara sus comillas, el ancla cae en ROJO (falla cerrada), nunca en verde. Su número tampoco se
+    #     fija: los pares son de F-05.
+    #   - 3er `Then`: «termina en `.woff`» es el FINAL del valor de `href`, NUNCA una subcadena: `x.woff2`
+    #     no termina en `.woff`, y un hash de nombre de fichero podría contener «woff». Un criterio que
+    #     confundiera `.woff2` con `.woff` deja este `Then` en ROJO (falla cerrada), no en falso verde.
+    # El `type` y el `crossorigin` de las precargas `.woff2` que quedan NI SE EXIGEN NI SE PROHÍBEN aquí.
+    # NO SATISFACEN ESTE ESCENARIO (ni su porqué):
+    #   - quitar el `.woff` del `src` de los `@font-face` (o tocar el CSS): el 2º `Then` cae, y la decisión
+    #     del humano es conservarlo de respaldo;
+    #   - quitar TODAS las precargas de fuente: el 1er `Then` cae (y el ancla de @s40 con él);
+    #   - dejar las precargas `.woff` corrigiendo su `type` a `font/woff`: el `type` deja de mentir, pero
+    #     Chromium sigue descargando los 124 440 bytes, y el 3er `Then` sigue exigiendo 0;
+    #   - filtrar las precargas en el TEST en vez de en el artefacto, o comprobarlo sobre jsdom.
+
+  # ---------------------------------------------------------------------------
+  # Los tests que construyen el sitio lo construyen en modo PRODUCCIÓN (ENMIENDA 4, 2026-09-28)
+  # ---------------------------------------------------------------------------
+  # @s1-@s41 (arriba) NO SE TOCAN. Ver el banner ENMIENDA 4 de la cabecera de este fichero.
+  # Un escenario por fichero build-based, porque cada uno construye SU artefacto: @s42 → home-horneado,
+  # @s43 → contacto-horneado, @s44 → trampas-del-horneado (una fila por cada build de experimento).
+  #
+  # PARA EL `tdd_craftsman`, VALE PARA LOS TRES ESCENARIOS:
+  #   - SIN BUILD NUEVO: la entrada son los BYTES del artefacto que YA construye el `beforeAll` de CADA
+  #     fichero, y se AMPLÍA ese mismo fichero. PROHIBIDO un `*-horneado.test.*` nuevo, un `execSync` extra
+  #     o un build aparte «para comprobar el modo»: demostraría el modo de un build que NO es el que miran
+  #     las demás aserciones del fichero. PROHIBIDO jsdom: son bytes.
+  #   - EL BUNDLE SE RESUELVE DESDE EL HTML, NUNCA POR GLOB: es el fichero al que apunta el `src` del
+  #     `<script type="module">` del `index.html` que ese mismo fichero de test acaba de leer (se quita el
+  #     prefijo y se lee bajo el `dist/assets/` de ESE build). Un glob puede casar 0 ficheros (verde por
+  #     vacío) o el chunk equivocado: MEDIDO, `client-*.js` tiene 0 `jsxDEV` y 0 `fileName:` TAMBIÉN en modo
+  #     test (354 070 B de React de desarrollo sin un solo `jsxDEV`), así que una negativa sobre él pasa HOY
+  #     en vacío. Por eso el 1er `Then` exige el nombre `app-…js`.
+  #   - ANCLAS POSITIVAS PRIMERO (1er y 2º `Then`) y sobre LA MISMA cadena leída que las negativas: si la
+  #     extracción no casara el `<script>`, o la resolución leyera otro fichero o una cadena vacía, el ancla
+  #     cae en ROJO y las negativas ya no pueden pasar en VACÍO. Un ancla medida sobre otra lectura no ancla.
+  #   - Cada ancla es un literal de ESA app que la OTRA app no tiene (medido hoy: "Lo que dicen nuestras
+  #     clientas" y "625 22 33 66" están en el bundle de la app real y 0 veces en el de la app mínima; "Av.
+  #     de Atenas 75, Local 41" está en los 5 experimentos y 0 veces en el de la app real). Si un fichero
+  #     leyera por error el `dist/` del otro, su ancla cae.
+  #   - Literales A MANO en el test ("module", los prefijos, "app-", ".js", el literal ancla, "jsxDEV",
+  #     "fileName:"). NUNCA se derivan de `vite.config.ts`, del manifiesto de Vite, de `import.meta.env` ni,
+  #     en @s44, de las constantes con las que el propio fichero escribe la app mínima (`HOME_CON_HEAD`,
+  #     `HOME_CON_METADATA_NATIVA`): un esperado sacado de lo vigilado no vigila nada.
+  #   - El 4º `Then` cuenta `fileName:` seguido de `"`, `'` o `` ` ``: hoy son todas `fileName:"/…"`, y aceptar
+  #     las tres comillas impide que un cambio de minificador la deje pasar en vacío.
+  #   - Ni el TAMAÑO ni el HASH se fijan: el tamaño depende de la ruta del disco (banner) y el hash de cada
+  #     build. «Más de 0 bytes» es el único umbral de tamaño.
+  #   - La corrección es la DECISIÓN del humano: `NODE_ENV=production` en el entorno del SUBPROCESO de cada
+  #     `execSync` que construye, con el resto del entorno heredado.
+  #   - Nacen en ROJO sobre los artefactos de hoy (cifras en cada escenario), con sus dos anclas ya en VERDE.
+  #     Todo lo que ya aseveran estos tres ficheros tiene que seguir en VERDE con el build en producción.
+  #   - COSTE: mide `bin/harness init` (tiempo total y nº de tests) ANTES y DESPUÉS, y déjalo en el diario
+  #     (`progress/tdd_cascaron_enmienda4.md`). No es un `Then`: la spec no fija umbral, y un `Then` sin
+  #     umbral sería un paso vago. Si sube de forma apreciable, se reporta al lead; NUNCA se abarata cambiando
+  #     `pnpm build` por `vite-react-ssg build` en home/contacto (sus escenarios exigen las CINCO puertas).
+  #
+  # NO SATISFACEN @s42-@s44 (ni su porqué):
+  #   - demostrar el modo con un build APARTE (test nuevo, `execSync` extra, un `pnpm build` en otro paso):
+  #     no es el artefacto que miran las demás aserciones de cada fichero;
+  #   - fijar `mode: 'production'` SOLO en `vite.config.ts`: MEDIDO en la app mínima (misma cadena
+  #     vite-react-ssg + `@vitejs/plugin-react-swc`) con `NODE_ENV=test` heredado → sigue con 14 `jsxDEV` y
+  #     11 `fileName:"…"`. Además, los experimentos de @s44 NO leen el `vite.config.ts` del repo (escriben el
+  #     suyo), y la configuración que usa el despliegue no estaba rota;
+  #   - poner `NODE_ENV=production` a TODA la suite (script `test`, `vitest.config.ts`, `harness.config.json`
+  #     o la CI): la decisión es el entorno del SUBPROCESO, y eso cambiaría el modo de React de todos los
+  #     tests de jsdom;
+  #   - aseverar sobre `client-*.js`, sobre un glob de `dist/assets/` o sobre otro chunk: pasa HOY en vacío;
+  #   - arreglar uno o dos ficheros y no el tercero, o en @s44 solo algunos experimentos: cada escenario
+  #     exige SU artefacto, y @s44 cada uno de los 5 builds;
+  #   - retocar el bundle a posteriori, o filtrar `jsxDEV`/`fileName` en el TEST antes de contar.
+
+  @s42
+  Scenario: el build que lanza home-horneado es de producción: su bundle app-*.js no trae JSX de desarrollo ni rutas del disco
+    Given el fichero "dist/index.html" que deja el build REAL que YA lanza "src/pages/home-horneado.test.ts" en su beforeAll, con base "/NailsLashStudioWeb/"
+    When se leen sus bytes, se extraen los elementos "<script" cuyo atributo "type" vale "module", y se leen los bytes del fichero de "dist/assets/" al que apunta su atributo "src"
+    Then hay exactamente 1 elemento así cuyo "src" empieza por "/NailsLashStudioWeb/assets/app-" y termina en ".js"
+    And ese fichero existe, pesa más de 0 bytes y contiene el literal "Lo que dicen nuestras clientas"
+    And esos mismos bytes contienen exactamente 0 apariciones de "jsxDEV"
+    And esos mismos bytes contienen exactamente 0 apariciones de "fileName:" seguido de una comilla (", ' o `)
+    # Hoy (`NODE_ENV=test` heredado): 1er y 2º `Then` en VERDE; el 3º cuenta 368 y el 4º 365, todas
+    # `fileName:"/home/user/NailsLashStudioWeb/src/…"`.
+    # La extracción de elementos y atributos es LA MISMA que usa @s39 en este fichero (reutilízala, no
+    # escribas otra); lo que se añade es el filtro del nombre `app-` y la lectura del fichero apuntado.
+
+  @s43
+  Scenario: el build que lanza contacto-horneado es de producción: su bundle app-*.js no trae JSX de desarrollo ni rutas del disco
+    Given el fichero "dist/index.html" que deja el build REAL que YA lanza "src/pages/contacto-horneado.test.ts" en su beforeAll, con base "/NailsLashStudioWeb/"
+    When se leen sus bytes, se extraen los elementos "<script" cuyo atributo "type" vale "module", y se leen los bytes del fichero de "dist/assets/" al que apunta su atributo "src"
+    Then hay exactamente 1 elemento así cuyo "src" empieza por "/NailsLashStudioWeb/assets/app-" y termina en ".js"
+    And ese fichero existe, pesa más de 0 bytes y contiene el literal "625 22 33 66"
+    And esos mismos bytes contienen exactamente 0 apariciones de "jsxDEV"
+    And esos mismos bytes contienen exactamente 0 apariciones de "fileName:" seguido de una comilla (", ' o `)
+    # Mismo artefacto que @s42 (los dos ficheros construyen la app real en el mismo `dist/`, y corren en
+    # serie: `fileParallelism: false`), pero lo construye OTRO `beforeAll`: sin este escenario, arreglar
+    # solo `home-horneado` dejaría `contacto-horneado` aseverando sobre React de desarrollo. Su ancla es
+    # OTRO literal a propósito (el teléfono legible que ya asevera @s5 de F-12).
+    # Este fichero no importa nada de `src/` ni de otro test: la extracción se escribe AQUÍ, con el mismo
+    # criterio que la de @s39 (nombres de atributo sin distinguir mayúsculas; comillas dobles, simples o
+    # ninguna), nunca una subcadena de la etiqueta.
+    # Hoy: anclas en VERDE; 368 `jsxDEV` y 365 `fileName:"…"`.
+
+  @s44
+  Scenario Outline: cada build de experimento de trampas-del-horneado es de producción: "<experimento>"
+    Given el fichero ".experimentos-tmp/<experimento>/dist/index.html" que deja el build de la app MÍNIMA que YA construye "src/lib/trampas-del-horneado.test.tsx" en su beforeAll, sin base declarada
+    When se leen sus bytes, se extraen los elementos "<script" cuyo atributo "type" vale "module", y se leen los bytes del fichero de ".experimentos-tmp/<experimento>/dist/assets/" al que apunta su atributo "src"
+    Then hay exactamente 1 elemento así cuyo "src" empieza por "/assets/app-" y termina en ".js"
+    And ese fichero existe, pesa más de 0 bytes y contiene el literal "Av. de Atenas 75, Local 41"
+    And esos mismos bytes contienen exactamente 0 apariciones de "jsxDEV"
+    And esos mismos bytes contienen exactamente 0 apariciones de "fileName:" seguido de una comilla (", ' o `)
+
+    Examples:
+      | experimento     |
+      | react19-nativa  |
+      | head-espacio    |
+      | head-mayusculas |
+      | head-atributo   |
+      | head-correcto   |
+    # La medición va EN EL HELPER que construye cada experimento: todo build del fichero pasa por él, así
+    # que un experimento nuevo no puede escaparse. Se mide sobre los bytes que ESE build acaba de dejar y el
+    # resultado viaja con el experimento. El `it` que cita @s44 recorre las 5 filas ESCRITAS A MANO por su
+    # nombre: si alguna no se construyó o no se midió, cae en ROJO. PROHIBIDO un bucle sobre una colección
+    # que podría estar vacía (verde por vacío).
+    # Las 5 filas incluyen las que @s32/@s33 usan para ROMPER la cáscara (`react19-nativa` y las tres
+    # `head-*` mal escritas): en ellas se rompe el `<head>`, no el bundle, y hoy las 5 llevan su módulo.
+    # El prefijo es `/assets/` porque el `vite.config.ts` que el fichero escribe para la app mínima no
+    # declara `base` (medido: `/assets/app-<hash>.js` en los 5). El ancla está en las dos cáscaras
+    # (`HOME_CON_HEAD` y `HOME_CON_METADATA_NATIVA`), dentro del JSON-LD de la app mínima.
+    # Hoy (`NODE_ENV=test` heredado): anclas en VERDE en las 5 filas; 13 `jsxDEV` en `react19-nativa` y 14
+    # en las cuatro `head-*`; 10 y 11 `fileName:"…"`. MEDIDO en una copia de `head-correcto` fuera del
+    # repo con `NODE_ENV=production`: 95 213 B, 0 `jsxDEV`, 0 `fileName:` y el ancla presente. Satisfacible.
