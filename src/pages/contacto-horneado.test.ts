@@ -9,7 +9,9 @@ import { beforeAll, describe, expect, it } from 'vitest'
  * (readFileSync, sin ejecutar JavaScript — I-8, NUNCA jsdom: jsdom solo ve el estado post-hidratación
  * y el SSG tiene además el prerender, lección que F-04 pagó cara). «Verde ≠ funciona»: para las
  * features de UI se verifica con `pnpm build` + el HTML crudo (feature_list.json §rules.notas). Esta es
- * la capa AUTORITATIVA del contrato: @s4, @s5, @s7, @s8, @s9, @s10, @s11, @s12, @s14.
+ * la capa AUTORITATIVA del contrato: @s4, @s5, @s7, @s8, @s9, @s10, @s11, @s12, @s14. Y F-04 @s43
+ * (ENMIENDA 4 de `cascaron_semantico.feature`): el `app-*.js` al que apunta ese mismo HTML demuestra, por
+ * bytes, que el build de este `beforeAll` es de PRODUCCIÓN.
  *
  * 🔴 ESTE FICHERO NO IMPORTA NADA DE `src/`, Y ES DELIBERADO (patrón de `home-horneado.test.ts`): corre
  * el BUILD REAL (lento) en `beforeAll`. Si importara `site.ts`/`Contacto.tsx`, Stryker lo contaría como
@@ -29,8 +31,10 @@ let codigoSalida = 0
 beforeAll(() => {
   // El `pnpm build` REAL con las CINCO puertas. Se captura el código de salida (execSync lanza en
   // fallo con `.status`): @s10 exige exit 0 «con todas las puertas», en especial la de ANCLAS de F-06.
+  // F-04 @s43: `NODE_ENV=production` explícito en el SUBPROCESO (el resto se hereda); si heredara el
+  // `test` de Vitest, React saldría en DESARROLLO.
   try {
-    execSync('pnpm build', { stdio: 'pipe' })
+    execSync('pnpm build', { stdio: 'pipe', env: { ...process.env, NODE_ENV: 'production' } })
   } catch (error: unknown) {
     codigoSalida = (error as { status: number }).status
   }
@@ -168,5 +172,95 @@ describe('@s14 el texto visible del enlace de Instagram es el handle y es CONSIS
     // Escritos A MANO: si uno se hardcodeara con el handle alternativo, dejarían de compartir el cuerpo.
     expect(IG_URL).toContain('nailslash.studio_')
     expect('@nailslash.studio_').toContain('nailslash.studio_')
+  })
+})
+
+/**
+ * F-04 @s43 (ENMIENDA 4) — LA EXTRACCIÓN DE `<script>` DEL HTML CRUDO, escrita A MANO aquí (este fichero
+ * no importa nada de `src/` ni de otro test) con el MISMO criterio que la de @s39 en `home-horneado`:
+ * NOMBRES de atributo en minúsculas, nunca subcadenas de la etiqueta; valores entre comillas dobles,
+ * simples o sin comillas; un atributo sin valor vale ''; ante un nombre repetido gana el PRIMERO.
+ */
+const ATRIBUTO = /([^\s"'<>/=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g
+
+type Atributos = ReadonlyMap<string, string>
+
+function atributosDe(texto: string): Atributos {
+  const atributos = new Map<string, string>()
+
+  for (const [, nombre, dobles, simples, sinComillas] of texto.matchAll(ATRIBUTO)) {
+    const clave = nombre.toLowerCase()
+
+    if (!atributos.has(clave)) {
+      atributos.set(clave, dobles ?? simples ?? sinComillas ?? '')
+    }
+  }
+
+  return atributos
+}
+
+/** Los `<script …>` del HTML crudo, sin distinguir mayúsculas en el nombre de la etiqueta. */
+function scripts(): readonly Atributos[] {
+  return [...html.matchAll(/<script(?=[\s/>])([^>]*)>/gi)].map((encontrado) =>
+    atributosDe(encontrado[1]),
+  )
+}
+
+/** El prefijo con el que el HTML crudo apunta a `dist/assets/` (base "/NailsLashStudioWeb/"). */
+const PREFIJO_DE_ASSETS = '/NailsLashStudioWeb/assets/'
+
+/** @s43 — los `<script type="module">` cuyo `src` es el de la app: `/NailsLashStudioWeb/assets/app-….js`. */
+function modulosDeLaApp(): readonly Atributos[] {
+  return scripts().filter((script) => {
+    const src = script.get('src') ?? ''
+
+    return (
+      script.get('type')?.toLowerCase() === 'module' &&
+      src.startsWith(`${PREFIJO_DE_ASSETS}app-`) &&
+      src.endsWith('.js')
+    )
+  })
+}
+
+const RUTA_ASSETS = resolve('dist/assets')
+
+/**
+ * @s43 — los bytes del fichero al que apunta ese módulo: se quita el prefijo y se lee bajo el
+ * `dist/assets/` de ESTE build. NUNCA por glob. Si no hubiera módulo o fichero, `readFileSync` lanza.
+ */
+function bundleDeLaApp(): string {
+  const [modulo] = modulosDeLaApp()
+  const fichero = (modulo?.get('src') ?? '').slice(PREFIJO_DE_ASSETS.length)
+
+  return readFileSync(resolve(RUTA_ASSETS, fichero), 'utf8')
+}
+
+/** @s43 — cuántas veces casa `patron` (con `g`: sin él, `matchAll` lanza) en `texto`. */
+function apariciones(texto: string, patron: RegExp): number {
+  return [...texto.matchAll(patron)].length
+}
+
+describe('@s43 (F-04) el build que lanza contacto-horneado es de producción: su bundle app-*.js no trae JSX de desarrollo ni rutas del disco', () => {
+  it('@s43 ANCLA POSITIVA: hay exactamente 1 <script type="module"> cuyo src empieza por "/NailsLashStudioWeb/assets/app-" y termina en ".js"', () => {
+    expect(modulosDeLaApp()).toHaveLength(1)
+  })
+
+  it('@s43 ANCLA POSITIVA: ese fichero existe, pesa más de 0 bytes y contiene "625 22 33 66"', () => {
+    // El teléfono legible de @s5, OTRO literal que el de @s42 a propósito: es de la app REAL (0 veces
+    // en la mínima de trampas). Si el fichero no existiera, lanza: ROJO. Se CUENTA: un `toContain`
+    // fallido volcaría el bundle entero en el informe.
+    const bundle = bundleDeLaApp()
+
+    expect(bundle.length).toBeGreaterThan(0)
+    expect(apariciones(bundle, /625 22 33 66/g)).toBeGreaterThanOrEqual(1)
+  })
+
+  it('@s43 esos mismos bytes contienen exactamente 0 apariciones de "jsxDEV"', () => {
+    expect(apariciones(bundleDeLaApp(), /jsxDEV/g)).toBe(0)
+  })
+
+  it('@s43 esos mismos bytes contienen exactamente 0 apariciones de "fileName:" seguido de una comilla (", \' o `)', () => {
+    // Las tres comillas: hoy son todas `fileName:"/…"`, y un cambio de minificador no la deja en vacío.
+    expect(apariciones(bundleDeLaApp(), /fileName:["'`]/g)).toBe(0)
   })
 })

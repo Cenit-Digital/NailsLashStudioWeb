@@ -5,11 +5,12 @@ import { resolve } from 'node:path'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 /**
- * F-10 @s12 y @s14, F-14 @s6 y F-04 @s39/@s40/@s41 (ENMIENDAS 2 y 3 de `cascaron_semantico.feature`)
- * — sobre el HTML CRUDO del artefacto de PRODUCCIÓN (y, en @s41, el CSS de `dist/assets/`), leído por
- * BYTES (readFileSync, sin ejecutar JavaScript — I-8, NUNCA jsdom). «Verde ≠ funciona»: para las
- * features de UI se verifica con `pnpm build` + fetch del HTML crudo (feature_list.json §rules.notas).
- * @s39-@s41 REUTILIZAN el build de este `beforeAll`: el contrato prohíbe un build nuevo solo para ellos.
+ * F-10 @s12 y @s14, F-14 @s6 y F-04 @s39-@s42 (ENMIENDAS 2, 3 y 4 de `cascaron_semantico.feature`)
+ * — sobre el HTML CRUDO del artefacto de PRODUCCIÓN (en @s41, también el CSS de `dist/assets/`; en @s42,
+ * el `app-*.js` al que apunta el HTML), leído por BYTES (readFileSync, sin ejecutar JavaScript — I-8,
+ * NUNCA jsdom). «Verde ≠ funciona»: para las features de UI se verifica con `pnpm build` + fetch del HTML
+ * crudo (feature_list.json §rules.notas). @s39-@s42 REUTILIZAN el build de este `beforeAll`: el contrato
+ * prohíbe un build nuevo solo para ellos. @s42 demuestra que ese build es de PRODUCCIÓN.
  *
  * 🔴 ESTE FICHERO NO IMPORTA NADA DE `src/lib/` NI DE `src/pages/`, Y ES DELIBERADO (patrón de
  * `trampas-del-horneado.test.tsx`): corre el BUILD REAL (lento) en `beforeAll`. Si importara
@@ -24,9 +25,10 @@ let codigoSalida = 0
 
 beforeAll(() => {
   // El `pnpm build` REAL con las CINCO puertas. @s14 exige exit 0 «con todas las puertas»: se captura
-  // el código de salida (execSync lanza en fallo con `.status`).
+  // el código de salida (execSync lanza en fallo con `.status`). @s42: `NODE_ENV=production` explícito
+  // en el SUBPROCESO (el resto se hereda); si heredara el `test` de Vitest, React saldría en DESARROLLO.
   try {
-    execSync('pnpm build', { stdio: 'pipe' })
+    execSync('pnpm build', { stdio: 'pipe', env: { ...process.env, NODE_ENV: 'production' } })
   } catch (error: unknown) {
     codigoSalida = (error as { status: number }).status
   }
@@ -187,6 +189,9 @@ function valorDe(elemento: Atributos, nombre: string): string | undefined {
   return elemento.get(nombre)?.toLowerCase()
 }
 
+/** El prefijo con el que el HTML crudo apunta a `dist/assets/` (base "/NailsLashStudioWeb/"). */
+const PREFIJO_DE_ASSETS = '/NailsLashStudioWeb/assets/'
+
 /** @s39 — los `<script type="module">` cuyo `src` apunta al bundle: `/NailsLashStudioWeb/assets/….js`. */
 function modulosDelBundle(): readonly Atributos[] {
   return elementos('script').filter((script) => {
@@ -194,7 +199,7 @@ function modulosDelBundle(): readonly Atributos[] {
 
     return (
       valorDe(script, 'type') === 'module' &&
-      src.startsWith('/NailsLashStudioWeb/assets/') &&
+      src.startsWith(PREFIJO_DE_ASSETS) &&
       src.endsWith('.js')
     )
   })
@@ -320,5 +325,52 @@ describe('@s41 (F-04) el HTML crudo de producción solo precarga fuentes .woff2,
     // Misma extracción que el 1er ancla y mismo criterio que el 2º; se listan los href para que un
     // fallo diga CUÁLES. «Termina en .woff» es el final del valor: una precarga .woff2 no cuenta.
     expect(precargasDeFuenteHacia('.woff')).toEqual([])
+  })
+})
+
+/** @s42 — los módulos del bundle (la MISMA extracción de @s39) cuyo `src` es el de la app: `app-….js`. */
+function modulosDeLaApp(): readonly Atributos[] {
+  return modulosDelBundle().filter((script) =>
+    (script.get('src') ?? '').startsWith(`${PREFIJO_DE_ASSETS}app-`),
+  )
+}
+
+/**
+ * @s42 — los bytes del fichero al que apunta ese módulo: se quita el prefijo y se lee bajo el
+ * `dist/assets/` de ESTE build. NUNCA por glob. Si no hubiera módulo o fichero, `readFileSync` lanza.
+ */
+function bundleDeLaApp(): string {
+  const [modulo] = modulosDeLaApp()
+  const fichero = (modulo?.get('src') ?? '').slice(PREFIJO_DE_ASSETS.length)
+
+  return readFileSync(resolve(RUTA_ASSETS, fichero), 'utf8')
+}
+
+/** @s42 — cuántas veces casa `patron` (con `g`: sin él, `matchAll` lanza) en `texto`. */
+function apariciones(texto: string, patron: RegExp): number {
+  return [...texto.matchAll(patron)].length
+}
+
+describe('@s42 (F-04) el build que lanza home-horneado es de producción: su bundle app-*.js no trae JSX de desarrollo ni rutas del disco', () => {
+  it('@s42 ANCLA POSITIVA: hay exactamente 1 <script type="module"> cuyo src empieza por "/NailsLashStudioWeb/assets/app-" y termina en ".js"', () => {
+    expect(modulosDeLaApp()).toHaveLength(1)
+  })
+
+  it('@s42 ANCLA POSITIVA: ese fichero existe, pesa más de 0 bytes y contiene "Lo que dicen nuestras clientas"', () => {
+    // El literal es de la app REAL (0 veces en la mínima de trampas). Si no existiera, lanza: ROJO.
+    // Se CUENTA, como en las negativas: un `toContain` fallido volcaría el bundle entero en el informe.
+    const bundle = bundleDeLaApp()
+
+    expect(bundle.length).toBeGreaterThan(0)
+    expect(apariciones(bundle, /Lo que dicen nuestras clientas/g)).toBeGreaterThanOrEqual(1)
+  })
+
+  it('@s42 esos mismos bytes contienen exactamente 0 apariciones de "jsxDEV"', () => {
+    expect(apariciones(bundleDeLaApp(), /jsxDEV/g)).toBe(0)
+  })
+
+  it('@s42 esos mismos bytes contienen exactamente 0 apariciones de "fileName:" seguido de una comilla (", \' o `)', () => {
+    // Las tres comillas: hoy son todas `fileName:"/…"`, y un cambio de minificador no la deja en vacío.
+    expect(apariciones(bundleDeLaApp(), /fileName:["'`]/g)).toBe(0)
   })
 })

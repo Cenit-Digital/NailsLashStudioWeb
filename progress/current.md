@@ -76,3 +76,6 @@ versión funcional ANTES de cerrar el pipeline SDD. **No está `done`.**
 - `tdd_craftsman` — @s41 VERDE: `bin/harness init` exit 0 (47/47, 1507/1507), `pnpm build` exit 0 con las 5 puertas
   (`dist/index.html`: 6 precargas de fuente, todas `.woff2`, 0 `.woff`; el CSS conserva los 6 `format("woff")`),
   mutación de `src/lib/horneado.ts` 100 % (23/23, 0 timeouts). Pendiente: `judge`. F-04 sigue `done`.
+- `tdd_craftsman` — Feature en curso: F-04 — cascaron_semantico (ENMIENDA 4). Escenarios a recorrer: @s42
+  (home-horneado), @s43 (contacto-horneado), @s44 (los 5 experimentos de trampas-del-horneado). Diario:
+  `progress/tdd_cascaron_enmienda4.md`. F-04 sigue `done` (no se toca `feature_list.json`).
