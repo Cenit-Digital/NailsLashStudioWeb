@@ -21,3 +21,8 @@ public/sitemap.xml
 # mismo —`hexARgb` es insensible a la caja (@s3)—, pero el literal que el contrato fija no.
 # Entre reformatear y respetar el contrato, manda el contrato.
 src/styles/_tokens.scss
+
+# Los workflows de GitHub Actions NO los puede modificar la sesión de Claude Code (su token OAuth no
+# tiene el permiso `workflow`: GitHub rechaza el push). Quedan fuera de Prettier hasta que el humano
+# los formatee a mano con `pnpm exec prettier --write .github/workflows` y retire esta línea.
+.github/workflows/

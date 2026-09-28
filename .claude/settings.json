@@ -26,10 +26,6 @@
     ]
   },
   "permissions": {
-    "allow": [
-      "Bash(./init.sh)",
-      "Bash(bin/harness:*)",
-      "Bash(node .harness/harness.mjs:*)"
-    ]
+    "allow": ["Bash(./init.sh)", "Bash(bin/harness:*)", "Bash(node .harness/harness.mjs:*)"]
   }
 }

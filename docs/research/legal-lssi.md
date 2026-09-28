@@ -20,7 +20,7 @@ articulado versionado. **Todas las citas de este informe son de la versión VIGE
 **Qué hacemos:**
 
 1. **La web necesita un aviso legal.** La web de un salón real es un "servicio de la sociedad de la información"
-   (Anexo a) LSSI: el concepto alcanza a servicios *no remunerados por el destinatario* "en la medida en que
+   (Anexo a) LSSI: el concepto alcanza a servicios _no remunerados por el destinatario_ "en la medida en que
    constituyan una actividad económica para el prestador"). Por tanto **el art. 10 LSSI es de aplicación aunque la
    web sea un escaparate sin reservas online**.
 2. **Enlace permanente en el pie de TODAS las páginas.** El art. 10.2 dice que la obligación se cumple incluyendo
@@ -63,7 +63,7 @@ Art. 2.1 LSSI — vigente desde **2002-10-12**
 ([API BOE, bloque `a2`](https://www.boe.es/datosabiertos/api/legislacion-consolidada/id/BOE-A-2002-13758/texto/bloque/a2)):
 
 > 1. Esta Ley será de aplicación a los prestadores de servicios de la sociedad de la información establecidos en
-> España y a los servicios prestados por ellos.
+>    España y a los servicios prestados por ellos.
 
 **(b) Inferencia mía:** una web que promociona el catálogo y los precios de un salón comercial en activo
 constituye "una actividad económica para el prestador" aunque el visitante no pague por navegar. Es la lectura
@@ -79,27 +79,27 @@ sistemáticamente**: lo declaro como inferencia sólida, no como hecho verificad
 Encabezado del apartado 1 (literal):
 
 > 1. Sin perjuicio de los requisitos que en materia de información se establecen en la normativa vigente, el
-> prestador de servicios de la sociedad de la información estará obligado a disponer de los medios que permitan,
-> tanto a los destinatarios del servicio como a los órganos competentes, **acceder por medios electrónicos, de
-> forma permanente, fácil, directa y gratuita**, a la siguiente información:
+>    prestador de servicios de la sociedad de la información estará obligado a disponer de los medios que permitan,
+>    tanto a los destinatarios del servicio como a los órganos competentes, **acceder por medios electrónicos, de
+>    forma permanente, fácil, directa y gratuita**, a la siguiente información:
 
-| Letra | Texto literal (extracto) | ¿Aplica a Nails Lash Studio? | Estado del dato |
-|---|---|---|---|
-| **a)** | "Su nombre o denominación social; su residencia o domicilio o, en su defecto, la dirección de uno de sus establecimientos permanentes en España; **su dirección de correo electrónico** y cualquier otro dato que permita establecer con él una comunicación directa y efectiva." | **SÍ — siempre** | ❌ **BLOQUEANTE.** No tenemos denominación ni email (`datos-treatwell-ficha.md:36`, `:181`). El domicilio del local sí (`Av. Atenas 75, C.C. El Zoco, Local 41, 28232 Las Rozas`), pero **no consta si coincide con el domicilio del titular** |
-| **b)** | "Los datos de su inscripción en el Registro Mercantil en el que, **en su caso**, se encuentren inscritos o de aquel otro registro público en el que lo estuvieran para la adquisición de personalidad jurídica o a los solos efectos de publicidad." | **Condicional.** Solo si el titular está inscrito. Si es autónoma persona física, normalmente **no aplica** | ❓ Forma jurídica desconocida |
-| **c)** | "En el caso de que su actividad estuviese sujeta a un régimen de **autorización administrativa previa**, los datos relativos a dicha autorización y los identificativos del órgano competente encargado de su supervisión." | **Probablemente NO** — ver §2.3 | ❓ Ver §2.3 |
-| **d)** | "Si ejerce una **profesión regulada** deberá indicar: 1.º Los datos del Colegio profesional… 2.º El título académico oficial o profesional… 3.º El Estado de la UE o del EEE en el que se expidió dicho título… 4.º Las normas profesionales aplicables…" | **Probablemente NO** | ❓ **NO VERIFICADO**: no he comprobado si la estética/manicura es profesión regulada en España |
-| **e)** | "**El número de identificación fiscal** que le corresponda." | **SÍ — siempre** | ❌ **BLOQUEANTE.** No lo tenemos |
-| **f)** | "Cuando el servicio de la sociedad de la información **haga referencia a precios**, se facilitará información **clara y exacta sobre el precio** del producto o servicio, **indicando si incluye o no los impuestos aplicables** y, en su caso, sobre los gastos de envío." | **SÍ** — el catálogo lleva precios | ⚠️ **RIESGO ALTO.** Los 39 precios verificados de Treatwell **no indican si incluyen IVA**. Ver §2.5.1 |
-| **g)** | "Los códigos de conducta a los que, **en su caso**, esté adherido y la manera de consultarlos electrónicamente." | **Condicional** | ❓ Desconocido |
+| Letra  | Texto literal (extracto)                                                                                                                                                                                                                                                          | ¿Aplica a Nails Lash Studio?                                                                                | Estado del dato                                                                                                                                                                                                                                |
+| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **a)** | "Su nombre o denominación social; su residencia o domicilio o, en su defecto, la dirección de uno de sus establecimientos permanentes en España; **su dirección de correo electrónico** y cualquier otro dato que permita establecer con él una comunicación directa y efectiva." | **SÍ — siempre**                                                                                            | ❌ **BLOQUEANTE.** No tenemos denominación ni email (`datos-treatwell-ficha.md:36`, `:181`). El domicilio del local sí (`Av. Atenas 75, C.C. El Zoco, Local 41, 28232 Las Rozas`), pero **no consta si coincide con el domicilio del titular** |
+| **b)** | "Los datos de su inscripción en el Registro Mercantil en el que, **en su caso**, se encuentren inscritos o de aquel otro registro público en el que lo estuvieran para la adquisición de personalidad jurídica o a los solos efectos de publicidad."                              | **Condicional.** Solo si el titular está inscrito. Si es autónoma persona física, normalmente **no aplica** | ❓ Forma jurídica desconocida                                                                                                                                                                                                                  |
+| **c)** | "En el caso de que su actividad estuviese sujeta a un régimen de **autorización administrativa previa**, los datos relativos a dicha autorización y los identificativos del órgano competente encargado de su supervisión."                                                       | **Probablemente NO** — ver §2.3                                                                             | ❓ Ver §2.3                                                                                                                                                                                                                                    |
+| **d)** | "Si ejerce una **profesión regulada** deberá indicar: 1.º Los datos del Colegio profesional… 2.º El título académico oficial o profesional… 3.º El Estado de la UE o del EEE en el que se expidió dicho título… 4.º Las normas profesionales aplicables…"                         | **Probablemente NO**                                                                                        | ❓ **NO VERIFICADO**: no he comprobado si la estética/manicura es profesión regulada en España                                                                                                                                                 |
+| **e)** | "**El número de identificación fiscal** que le corresponda."                                                                                                                                                                                                                      | **SÍ — siempre**                                                                                            | ❌ **BLOQUEANTE.** No lo tenemos                                                                                                                                                                                                               |
+| **f)** | "Cuando el servicio de la sociedad de la información **haga referencia a precios**, se facilitará información **clara y exacta sobre el precio** del producto o servicio, **indicando si incluye o no los impuestos aplicables** y, en su caso, sobre los gastos de envío."       | **SÍ** — el catálogo lleva precios                                                                          | ⚠️ **RIESGO ALTO.** Los 39 precios verificados de Treatwell **no indican si incluyen IVA**. Ver §2.5.1                                                                                                                                         |
+| **g)** | "Los códigos de conducta a los que, **en su caso**, esté adherido y la manera de consultarlos electrónicamente."                                                                                                                                                                  | **Condicional**                                                                                             | ❓ Desconocido                                                                                                                                                                                                                                 |
 
 Apartado 2 (literal) — **dónde ponerlo**:
 
 > 2. La obligación de facilitar esta información se dará por cumplida si el prestador la incluye **en su página o
-> sitio de Internet** en las condiciones señaladas en el apartado 1.
+>    sitio de Internet** en las condiciones señaladas en el apartado 1.
 
 **(b) Inferencia mía sobre la ubicación:** la norma **no nombra** ninguna página "Aviso legal" ni obliga a un
-formato concreto. Lo que obliga es a que el acceso sea *permanente, fácil, directo y gratuito*. De ahí deduzco:
+formato concreto. Lo que obliga es a que el acceso sea _permanente, fácil, directo y gratuito_. De ahí deduzco:
 
 - **Enlace en el pie de todas las páginas** (no solo en la home) → satisface "permanente" y "fácil".
 - **Sin muro de cookies, registro ni pago** → satisface "gratuita" y "directa".
@@ -127,8 +127,8 @@ Ley 12/2012, de 26 de diciembre, de medidas urgentes de liberalización del come
 - **Art. 3.1** — vigente desde **2012-12-28**
   ([API, bloque `a3`](https://www.boe.es/datosabiertos/api/legislacion-consolidada/id/BOE-A-2012-15595/texto/bloque/a3)):
   > 1. Para el inicio y desarrollo de las actividades comerciales y servicios definidos en el artículo anterior,
-  > **no podrá exigirse** por parte de las administraciones o entidades del sector público **la obtención de
-  > licencia previa** de instalaciones, de funcionamiento o de actividad, ni otras de clase similar o análogas…
+  >    **no podrá exigirse** por parte de las administraciones o entidades del sector público **la obtención de
+  >    licencia previa** de instalaciones, de funcionamiento o de actividad, ni otras de clase similar o análogas…
 
 **(b) Inferencia:** un salón de uñas/pestañas encaja en el epígrafe 972.2 y un local en un centro comercial está
 con casi total seguridad por debajo de 750 m² → régimen de **declaración responsable**, no de autorización previa
@@ -167,14 +167,14 @@ que hará nuestra página de catálogo**. Exige al menos:
 Y además:
 
 > 2. …la información necesaria a incluir en la oferta comercial deberá facilitarse a los consumidores o usuarios,
-> **principalmente cuando se trate de personas consumidoras vulnerables**, en términos claros, comprensibles,
-> veraces y **en un formato que garantice su accesibilidad**…
-> 5. **La carga de la prueba** en relación con el cumplimiento de los requisitos de información establecidos en
-> este artículo **incumbirá al empresario**.
-> 6. El incumplimiento de lo dispuesto en los apartados anteriores será considerado una **práctica desleal por
-> engañosa** en el sentido del artículo 7 de la Ley 3/1991, de 10 de enero, de Competencia Desleal.
+>    **principalmente cuando se trate de personas consumidoras vulnerables**, en términos claros, comprensibles,
+>    veraces y **en un formato que garantice su accesibilidad**…
+> 3. **La carga de la prueba** en relación con el cumplimiento de los requisitos de información establecidos en
+>    este artículo **incumbirá al empresario**.
+> 4. El incumplimiento de lo dispuesto en los apartados anteriores será considerado una **práctica desleal por
+>    engañosa** en el sentido del artículo 7 de la Ley 3/1991, de 10 de enero, de Competencia Desleal.
 
-> ⚠️ **Diferencia con la LSSI que hay que entender bien.** El art. 10.1.f) LSSI permite decir *"si incluye o no"*
+> ⚠️ **Diferencia con la LSSI que hay que entender bien.** El art. 10.1.f) LSSI permite decir _"si incluye o no"_
 > los impuestos. El art. 20.1.c) TRLGDCU es **más estricto**: exige **"el precio final completo, incluidos los
 > impuestos"**. Frente a consumidores, **no basta con declarar "IVA no incluido"**: el precio mostrado debe ser
 > el final con impuestos. La norma más exigente manda.
@@ -182,12 +182,12 @@ Y además:
 **Art. 20.4 — reseñas (VIGENTE, y directamente relevante):**
 
 > 4. Las prácticas comerciales en las que un empresario facilite el acceso a las reseñas de los consumidores y
-> usuarios sobre bienes y servicios deberán contener información sobre el hecho de que el empresario **garantice o
-> no que dichas reseñas publicadas han sido efectuadas por consumidores y usuarios que han utilizado o adquirido
-> realmente** el bien o servicio. A tales efectos, el empresario deberá facilitar información clara a los
-> consumidores y usuarios **sobre la manera en que se procesan las reseñas**.
-> En cualquier caso… las reseñas emitidas deberán referirse a productos o servicios **adquiridos o utilizados en
-> los treinta días naturales anteriores** a la fecha de la reseña…
+>    usuarios sobre bienes y servicios deberán contener información sobre el hecho de que el empresario **garantice o
+>    no que dichas reseñas publicadas han sido efectuadas por consumidores y usuarios que han utilizado o adquirido
+>    realmente** el bien o servicio. A tales efectos, el empresario deberá facilitar información clara a los
+>    consumidores y usuarios **sobre la manera en que se procesan las reseñas**.
+>    En cualquier caso… las reseñas emitidas deberán referirse a productos o servicios **adquiridos o utilizados en
+>    los treinta días naturales anteriores** a la fecha de la reseña…
 
 **Impacto directo:** `datos-treatwell-ficha.md:220` propone usar "4,9 / 1231 opiniones" como prueba social. Si se
 muestran reseñas o su agregado, **el art. 20.4 obliga a declarar si garantizamos o no su autenticidad y cómo se
@@ -200,8 +200,8 @@ procesan**. Como las reseñas son de Treatwell y nosotros no controlamos su veri
 ([API, bloque `a60`](https://www.boe.es/datosabiertos/api/legislacion-consolidada/id/BOE-A-2007-20555/texto/bloque/a60)).
 
 > 1. **Antes de que el consumidor y usuario quede vinculado por un contrato y oferta correspondiente**, el
-> empresario deberá facilitarle de forma clara, comprensible y accesible, la información relevante, veraz y
-> suficiente sobre las características principales del contrato…
+>    empresario deberá facilitarle de forma clara, comprensible y accesible, la información relevante, veraz y
+>    suficiente sobre las características principales del contrato…
 
 Extremos relevantes del apartado 2:
 
@@ -214,10 +214,8 @@ Extremos relevantes del apartado 2:
 > h) **La existencia del derecho de desistimiento** que pueda corresponder al consumidor y usuario, el plazo y la
 > forma de ejercitarlo.
 > k) **El procedimiento para atender las reclamaciones** de los consumidores y usuarios, así como, en su caso, la
-> información sobre el sistema extrajudicial de resolución de conflictos prevista en el artículo 21.4.
-> 4. La información precontractual debe facilitarse al consumidor y usuario de forma gratuita y **al menos en
-> castellano**…
-> 5. **La carga de la prueba** en relación con el cumplimiento de los requisitos de información establecidos en
+> información sobre el sistema extrajudicial de resolución de conflictos prevista en el artículo 21.4. 4. La información precontractual debe facilitarse al consumidor y usuario de forma gratuita y **al menos en
+> castellano**… 5. **La carga de la prueba** en relación con el cumplimiento de los requisitos de información establecidos en
 > este artículo **incumbirá al empresario**.
 
 **Nota sobre el teléfono:** la LSSI **no** exige teléfono (art. 10.1.a) solo exige email + "cualquier otro dato").
@@ -240,8 +238,7 @@ Lista de 21 extremos (a–u), notablemente más extensa que el art. 60. Entre el
 > derecho, así como **el modelo de formulario de desistimiento**.
 > m) Cuando con arreglo al artículo 103 **no proceda el derecho de desistimiento, la indicación de que al
 > consumidor o usuario no le asiste dicho derecho**…
-> u) Cuando proceda, la posibilidad de recurrir a un **mecanismo extrajudicial de resolución de conflictos**…
-> 5. La información a que se refiere el apartado 1 **formará parte integrante del contrato** a distancia… y no se
+> u) Cuando proceda, la posibilidad de recurrir a un **mecanismo extrajudicial de resolución de conflictos**… 5. La información a que se refiere el apartado 1 **formará parte integrante del contrato** a distancia… y no se
 > alterará a menos que las partes dispongan expresamente lo contrario. **Corresponderá al empresario probar el
 > correcto cumplimiento de sus deberes informativos**…
 
@@ -283,7 +280,7 @@ depende si hay que dar 14 días de desistimiento sobre una cita ya reservada.
 > 🔴 **CORRECCIÓN IMPORTANTE — no citar la redacción de 2002.** En el texto original de la Ley 34/2002 este tipo
 > era el **art. 38.3.a)** y decía "El incumplimiento de lo establecido en los párrafos a) y f) del artículo 10.1",
 > **sin** el adverbio "significativo". Numerosas fuentes secundarias siguen citando "art. 38.3.a)". **En la
-> versión vigente es el art. 38.3.b) y exige que el incumplimiento sea *significativo*.** Lo he verificado
+> versión vigente es el art. 38.3.b) y exige que el incumplimiento sea _significativo_.** Lo he verificado
 > extrayendo la última `<version>` del bloque en la API del BOE. Cualquier documento del proyecto que cite este
 > precepto debe usar la letra **b)**.
 
@@ -294,8 +291,8 @@ depende si hay que dar 14 días de desistimiento sobre una cita ya reservada.
 > b) [Por la] comisión de infracciones **graves, multa de 30.001 hasta 150.000 euros**.
 > c) Por la comisión de infracciones **leves, multa de hasta 30.000 euros**.
 
-*(El "[Por la]" refleja una errata del propio texto consolidado del BOE, que en la letra b) dice literalmente
-"b) comisión de infracciones graves…". La transcribo tal cual para no falsear la fuente.)*
+_(El "[Por la]" refleja una errata del propio texto consolidado del BOE, que en la letra b) dice literalmente
+"b) comisión de infracciones graves…". La transcribo tal cual para no falsear la fuente.)_
 
 **Sanción accesoria — art. 39.4.a):**
 
@@ -305,25 +302,25 @@ depende si hay que dar 14 días de desistimiento sobre una cita ya reservada.
 
 **Cuadro de exposición LSSI para este proyecto:**
 
-| Incumplimiento | Tipo (vigente) | Calificación | Multa |
-|---|---|---|---|
-| Precios sin indicar impuestos (art. 10.1.f), de forma **significativa** | art. 38.3.b) | **GRAVE** | **30.001 – 150.000 €** + posible publicación de la sanción en la home |
-| Falta de nombre/domicilio/email (art. 10.1.a) de forma **significativa** | art. 38.3.b) | **GRAVE** | **30.001 – 150.000 €** |
-| Falta de **NIF** (art. 10.1.e) | art. 38.4.b) | **LEVE** | hasta 30.000 € |
-| Falta de datos registrales, autorización, profesión regulada, códigos de conducta (art. 10.1 b,c,d,g) | art. 38.4.b) | **LEVE** | hasta 30.000 € |
-| Falta de nombre/domicilio/email o precios **cuando no sea significativo** | art. 38.4.b) | **LEVE** | hasta 30.000 € |
+| Incumplimiento                                                                                        | Tipo (vigente) | Calificación | Multa                                                                 |
+| ----------------------------------------------------------------------------------------------------- | -------------- | ------------ | --------------------------------------------------------------------- |
+| Precios sin indicar impuestos (art. 10.1.f), de forma **significativa**                               | art. 38.3.b)   | **GRAVE**    | **30.001 – 150.000 €** + posible publicación de la sanción en la home |
+| Falta de nombre/domicilio/email (art. 10.1.a) de forma **significativa**                              | art. 38.3.b)   | **GRAVE**    | **30.001 – 150.000 €**                                                |
+| Falta de **NIF** (art. 10.1.e)                                                                        | art. 38.4.b)   | **LEVE**     | hasta 30.000 €                                                        |
+| Falta de datos registrales, autorización, profesión regulada, códigos de conducta (art. 10.1 b,c,d,g) | art. 38.4.b)   | **LEVE**     | hasta 30.000 €                                                        |
+| Falta de nombre/domicilio/email o precios **cuando no sea significativo**                             | art. 38.4.b)   | **LEVE**     | hasta 30.000 €                                                        |
 
 **Competencia sancionadora — art. 43.1, vigente desde 2025-01-23**
 ([API, bloque `a43`](https://www.boe.es/datosabiertos/api/legislacion-consolidada/id/BOE-A-2002-13758/texto/bloque/a43)):
 
 > 1. La imposición de sanciones por el incumplimiento de lo previsto en esta Ley corresponderá, en el caso de
-> infracciones muy graves, a la persona titular del **Ministerio de Asuntos Económicos y Transformación Digital**,
-> y en el de **infracciones graves y leves, a la persona titular de la Secretaría de Estado de Digitalización e
-> Inteligencia Artificial**.
+>    infracciones muy graves, a la persona titular del **Ministerio de Asuntos Económicos y Transformación Digital**,
+>    y en el de **infracciones graves y leves, a la persona titular de la Secretaría de Estado de Digitalización e
+>    Inteligencia Artificial**.
 
-*(Observación: el texto consolidado conserva la denominación ministerial "Ministerio de Asuntos Económicos y
+_(Observación: el texto consolidado conserva la denominación ministerial "Ministerio de Asuntos Económicos y
 Transformación Digital". **No he verificado** la denominación vigente del departamento en 2026 ni la norma de
-reestructuración que la haya cambiado; cito el BOE tal cual.)*
+reestructuración que la haya cambiado; cito el BOE tal cual.)_
 
 #### 2.5.2 TRLGDCU — infracciones (art. 47), calificación (art. 48) y sanciones (art. 49)
 
@@ -352,14 +349,14 @@ Y el apartado 3 eleva a **grave** lo que en principio es leve si concurre, entre
 ([API, bloque `a49`](https://www.boe.es/datosabiertos/api/legislacion-consolidada/id/BOE-A-2007-20555/texto/bloque/a49)):
 
 > 1. La imposición de sanciones deberá garantizar, en cualquier circunstancia, que **la comisión de una infracción
-> no resulte más beneficiosa para la parte infractora que el incumplimiento** de las normas infringidas. Sobre esta
-> base, las infracciones serán sancionadas con multa comprendida entre los siguientes importes máximos y mínimos:
-> a) **Infracciones leves: entre 150 y 10.000 euros**, pudiéndose sobrepasar esas cantidades hasta alcanzar entre
-> **dos y cuatro veces el beneficio ilícito** obtenido.
-> b) **Infracciones graves: entre 10.001 y 100.000 euros** pudiéndose sobrepasar… entre cuatro y seis veces el
-> beneficio ilícito obtenido.
-> c) **Infracciones muy graves: ent[r]e 100.001 y 1.000.000 de euros**, pudiéndose sobrepasar… entre seis y ocho
-> veces el beneficio ilícito obtenido.
+>    no resulte más beneficiosa para la parte infractora que el incumplimiento** de las normas infringidas. Sobre esta
+>    base, las infracciones serán sancionadas con multa comprendida entre los siguientes importes máximos y mínimos:
+>    a) **Infracciones leves: entre 150 y 10.000 euros**, pudiéndose sobrepasar esas cantidades hasta alcanzar entre
+>    **dos y cuatro veces el beneficio ilícito** obtenido.
+>    b) **Infracciones graves: entre 10.001 y 100.000 euros** pudiéndose sobrepasar… entre cuatro y seis veces el
+>    beneficio ilícito obtenido.
+>    c) **Infracciones muy graves: ent[r]e 100.001 y 1.000.000 de euros**, pudiéndose sobrepasar… entre seis y ocho
+>    veces el beneficio ilícito obtenido.
 
 Con una válvula de escape relevante para un negocio pequeño:
 
@@ -376,12 +373,12 @@ Y una regla que refuerza §1:
 **Atenuante muy accionable — art. 48.4:**
 
 > 4. Las infracciones que… merezcan en principio la calificación de grave o muy grave se considerarán
-> respectivamente como leve o grave **si antes de iniciarse el procedimiento sancionador el responsable corrigiera
-> diligentemente las irregularidades** en que consista la infracción siempre que no haya causado perjuicios
-> directos…
+>    respectivamente como leve o grave **si antes de iniciarse el procedimiento sancionador el responsable corrigiera
+>    diligentemente las irregularidades** en que consista la infracción siempre que no haya causado perjuicios
+>    directos…
 
-*(Es decir: corregir a tiempo rebaja un escalón. Argumento a favor de arreglar el aviso legal roto de la web
-actual **ya**, sin esperar al lanzamiento de la web nueva.)*
+_(Es decir: corregir a tiempo rebaja un escalón. Argumento a favor de arreglar el aviso legal roto de la web
+actual **ya**, sin esperar al lanzamiento de la web nueva.)_
 
 #### 2.5.3 Competencia autonómica (Comunidad de Madrid)
 
@@ -419,23 +416,23 @@ actual (cookies, formularios, RGPD). No extiendo la conclusión más allá de lo
 
 ## 3. Lo que NO he podido verificar
 
-| # | Dato no verificado | Por qué | Qué haría falta |
-|---|---|---|---|
-| 1 | **Denominación social / nombre y apellidos del titular** (art. 10.1.a) | No consta en Treatwell, ni en la web propia, ni en el repo | **Preguntar al negocio.** Alternativa: consulta al Registro Mercantil (solo si es sociedad) |
-| 2 | **NIF/CIF** (art. 10.1.e) | Ídem | **Preguntar al negocio.** Dato no deducible |
-| 3 | **Email de contacto** (art. 10.1.a — **exigido expresamente**) | No aparece en ninguna fuente (`datos-treatwell-ficha.md:36`) | **Preguntar al negocio.** Sin email no se cumple la letra a) |
-| 4 | **Forma jurídica** (autónoma / SL) y si está **inscrita en Registro Mercantil** (art. 10.1.b) | Desconocida | Preguntar al negocio; verificar en Registro Mercantil si procede |
-| 5 | **Si el domicilio del titular coincide con el local** (art. 10.1.a) | Solo consta la dirección del local | Preguntar al negocio |
-| 6 | **Si los precios de Treatwell incluyen IVA** (art. 10.1.f / art. 20.1.c) | Treatwell muestra "20 €" sin más | **Preguntar al negocio. Bloqueante:** es el punto de riesgo GRAVE |
-| 7 | **Si la estética/manicura es profesión regulada** en España (art. 10.1.d) | No he consultado la normativa de profesiones reguladas | Consultar el registro oficial de profesiones reguladas (Ministerio competente) |
-| 8 | **Si el salón presta micropigmentación/tatuaje/piercing** y si eso activa autorización sanitaria previa (art. 10.1.c) | No sé qué servicios presta ni he leído la normativa sanitaria madrileña | Preguntar al negocio + consultar normativa sanitaria de la Comunidad de Madrid |
-| 9 | **Superficie útil del local (<750 m²)** para la Ley 12/2012 | No consta | Preguntar al negocio (inferencia: obvio en un local de C.C., pero no verificado) |
-| 10 | **Adhesión a códigos de conducta** (art. 10.1.g) y a **arbitraje de consumo** (art. 60.2.k) | Desconocido | Preguntar al negocio |
-| 11 | **Si una cita de salón entra en el art. 103.l) TRLGDCU** ("esparcimiento") | Cuestión interpretativa; no he consultado jurisprudencia TJUE/TS | **Abogado.** Solo bloqueante si se implanta reserva propia |
-| 12 | **Concurrencia de cuantías art. 49 TRLGDCU vs. art. 53 Ley 11/1998 Madrid** | Conflicto norma básica estatal / norma autonómica preconstitucional al euro | **Abogado** especialista en consumo |
-| 13 | **Denominación vigente del ministerio competente** (art. 43.1 LSSI) | El texto consolidado del BOE conserva "Ministerio de Asuntos Económicos y Transformación Digital" | Verificar el RD de estructura ministerial vigente. *Impacto nulo en el producto* |
-| 14 | **Obligaciones de hoja de reclamaciones y cartel informativo** (Madrid) | Fuera del alcance de la pregunta | Investigación aparte. Afecta al local físico, y potencialmente al art. 60.2.k) en la web |
-| 15 | **Cookies / RGPD** | Fuera del alcance de esta pregunta | **Investigación aparte — es un bloqueante independiente.** Ver nota abajo |
+| #   | Dato no verificado                                                                                                    | Por qué                                                                                           | Qué haría falta                                                                             |
+| --- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| 1   | **Denominación social / nombre y apellidos del titular** (art. 10.1.a)                                                | No consta en Treatwell, ni en la web propia, ni en el repo                                        | **Preguntar al negocio.** Alternativa: consulta al Registro Mercantil (solo si es sociedad) |
+| 2   | **NIF/CIF** (art. 10.1.e)                                                                                             | Ídem                                                                                              | **Preguntar al negocio.** Dato no deducible                                                 |
+| 3   | **Email de contacto** (art. 10.1.a — **exigido expresamente**)                                                        | No aparece en ninguna fuente (`datos-treatwell-ficha.md:36`)                                      | **Preguntar al negocio.** Sin email no se cumple la letra a)                                |
+| 4   | **Forma jurídica** (autónoma / SL) y si está **inscrita en Registro Mercantil** (art. 10.1.b)                         | Desconocida                                                                                       | Preguntar al negocio; verificar en Registro Mercantil si procede                            |
+| 5   | **Si el domicilio del titular coincide con el local** (art. 10.1.a)                                                   | Solo consta la dirección del local                                                                | Preguntar al negocio                                                                        |
+| 6   | **Si los precios de Treatwell incluyen IVA** (art. 10.1.f / art. 20.1.c)                                              | Treatwell muestra "20 €" sin más                                                                  | **Preguntar al negocio. Bloqueante:** es el punto de riesgo GRAVE                           |
+| 7   | **Si la estética/manicura es profesión regulada** en España (art. 10.1.d)                                             | No he consultado la normativa de profesiones reguladas                                            | Consultar el registro oficial de profesiones reguladas (Ministerio competente)              |
+| 8   | **Si el salón presta micropigmentación/tatuaje/piercing** y si eso activa autorización sanitaria previa (art. 10.1.c) | No sé qué servicios presta ni he leído la normativa sanitaria madrileña                           | Preguntar al negocio + consultar normativa sanitaria de la Comunidad de Madrid              |
+| 9   | **Superficie útil del local (<750 m²)** para la Ley 12/2012                                                           | No consta                                                                                         | Preguntar al negocio (inferencia: obvio en un local de C.C., pero no verificado)            |
+| 10  | **Adhesión a códigos de conducta** (art. 10.1.g) y a **arbitraje de consumo** (art. 60.2.k)                           | Desconocido                                                                                       | Preguntar al negocio                                                                        |
+| 11  | **Si una cita de salón entra en el art. 103.l) TRLGDCU** ("esparcimiento")                                            | Cuestión interpretativa; no he consultado jurisprudencia TJUE/TS                                  | **Abogado.** Solo bloqueante si se implanta reserva propia                                  |
+| 12  | **Concurrencia de cuantías art. 49 TRLGDCU vs. art. 53 Ley 11/1998 Madrid**                                           | Conflicto norma básica estatal / norma autonómica preconstitucional al euro                       | **Abogado** especialista en consumo                                                         |
+| 13  | **Denominación vigente del ministerio competente** (art. 43.1 LSSI)                                                   | El texto consolidado del BOE conserva "Ministerio de Asuntos Económicos y Transformación Digital" | Verificar el RD de estructura ministerial vigente. _Impacto nulo en el producto_            |
+| 14  | **Obligaciones de hoja de reclamaciones y cartel informativo** (Madrid)                                               | Fuera del alcance de la pregunta                                                                  | Investigación aparte. Afecta al local físico, y potencialmente al art. 60.2.k) en la web    |
+| 15  | **Cookies / RGPD**                                                                                                    | Fuera del alcance de esta pregunta                                                                | **Investigación aparte — es un bloqueante independiente.** Ver nota abajo                   |
 
 > **Nota sobre cookies (fuera de alcance, pero señalado):** el **art. 22.2 LSSI** (vigente desde 2014-05-11,
 > [API, bloque `a22`](https://www.boe.es/datosabiertos/api/legislacion-consolidada/id/BOE-A-2002-13758/texto/bloque/a22))
@@ -453,8 +450,8 @@ actual (cookies, formularios, RGPD). No extiendo la conclusión más allá de lo
 1. **Página de aviso legal + enlace en el pie de TODAS las páginas.** Acceso permanente, fácil, directo y
    gratuito (art. 10.1 LSSI). No detrás de un banner de cookies ni de un modal bloqueante.
 2. **Contenido mínimo del aviso legal** (art. 10.1 LSSI): nombre/denominación · domicilio · **email** · **NIF** ·
-   datos registrales *(si procede)* · autorización *(si procede)* · profesión regulada *(si procede)* · códigos de
-   conducta *(si procede)*.
+   datos registrales _(si procede)_ · autorización _(si procede)_ · profesión regulada _(si procede)_ · códigos de
+   conducta _(si procede)_.
 3. **Precios con impuestos incluidos, en la propia página de catálogo** (art. 20.1.c TRLGDCU: "precio final
    completo, incluidos los impuestos"). La fórmula "IVA incluido" junto al precio, no en el aviso legal.
 4. **Identificación del empresario también en la oferta comercial** (art. 20.1.a: "Nombre, razón social y
@@ -468,8 +465,8 @@ actual (cookies, formularios, RGPD). No extiendo la conclusión más allá de lo
    personas consumidoras vulnerables). Refuerza el trabajo del `a11y_seo_auditor`: **la accesibilidad no es solo
    buena práctica, es requisito legal para la oferta comercial.**
 9. **Trazabilidad probatoria** (arts. 20.5, 60.5, 97.5 y 51.7 TRLGDCU: la carga de la prueba es del empresario).
-   *(Inferencia mía:* mantener el aviso legal y los precios versionados en git ya nos da un rastro de auditoría
-   con fecha. Es un argumento a favor de que los textos legales vivan en el repo y no en un CMS opaco.*)*
+   _(Inferencia mía:_ mantener el aviso legal y los precios versionados en git ya nos da un rastro de auditoría
+   con fecha. Es un argumento a favor de que los textos legales vivan en el repo y no en un CMS opaco._)_
 
 ### 4.2 Qué PROHÍBE
 
@@ -482,7 +479,7 @@ actual (cookies, formularios, RGPD). No extiendo la conclusión más allá de lo
 4. **Prohibido copiar el aviso legal de otra web o usar una plantilla genérica sin los datos reales.** Un aviso
    legal con datos de otro es equivalente a no tenerlo.
 5. **Prohibido repetir el patrón de la web actual**: enlace "Aviso Legal" que apunta a un 404 (verificado en §2.6).
-   *(Sugerencia: un test de enlaces del pie que falle si el aviso legal no responde 200.)*
+   _(Sugerencia: un test de enlaces del pie que falle si el aviso legal no responde 200.)_
 6. **Prohibido presentar las reseñas de Treatwell como verificadas por el salón** (art. 20.4).
 7. **Prohibido mostrar precios "desde" sin base de cálculo** cuando el precio no pueda fijarse con exactitud
    (art. 20.1.c, párrafo 2: "deberá informarse sobre la base de cálculo que permita al consumidor o usuario
@@ -490,18 +487,18 @@ actual (cookies, formularios, RGPD). No extiendo la conclusión más allá de lo
 
 ### 4.3 Qué FEATURES implica
 
-| Feature | Qué obliga | Estado |
-|---|---|---|
-| **Aviso legal** (página + enlace global en footer) | art. 10.1 LSSI | **BLOQUEADA** — faltan NIF, denominación, email |
-| **Precio con IVA en catálogo** | art. 20.1.c TRLGDCU / art. 10.1.f LSSI | **BLOQUEADA** — falta confirmar si los precios de Treatwell llevan IVA |
-| **Identidad + teléfono en la oferta comercial** | art. 20.1.a, art. 60.2.b | Parcial: teléfono verificado solo en web propia |
-| **Contenido en castellano** | art. 60.4 | Decisión de producto. Si hay multiidioma, castellano obligatorio |
-| **Bloque de reclamaciones / resolución de conflictos** | art. 60.2.k | **BLOQUEADA** — falta saber si está adherido a arbitraje de consumo |
-| **Disclaimer de procedencia de reseñas** | art. 20.4 | Accionable ya *(si se muestran reseñas)* |
-| **Accesibilidad del catálogo** | art. 20.2 | Accionable ya — y es requisito legal, no solo a11y |
-| **Reserva online propia** | dispararía art. 97 (21 extremos) + art. 98 + análisis del art. 103.l) | **Recomendación: NO construirla.** Enlazar a Treatwell (coincide con `datos-treatwell-ficha.md:218`) |
-| **Test automático del enlace de aviso legal** | Previene el fallo real de §2.6 | Accionable ya |
-| **Cookies / RGPD** | art. 22.2 LSSI + RGPD | **Fuera de este informe.** Bloqueante independiente sin investigar |
+| Feature                                                | Qué obliga                                                            | Estado                                                                                               |
+| ------------------------------------------------------ | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| **Aviso legal** (página + enlace global en footer)     | art. 10.1 LSSI                                                        | **BLOQUEADA** — faltan NIF, denominación, email                                                      |
+| **Precio con IVA en catálogo**                         | art. 20.1.c TRLGDCU / art. 10.1.f LSSI                                | **BLOQUEADA** — falta confirmar si los precios de Treatwell llevan IVA                               |
+| **Identidad + teléfono en la oferta comercial**        | art. 20.1.a, art. 60.2.b                                              | Parcial: teléfono verificado solo en web propia                                                      |
+| **Contenido en castellano**                            | art. 60.4                                                             | Decisión de producto. Si hay multiidioma, castellano obligatorio                                     |
+| **Bloque de reclamaciones / resolución de conflictos** | art. 60.2.k                                                           | **BLOQUEADA** — falta saber si está adherido a arbitraje de consumo                                  |
+| **Disclaimer de procedencia de reseñas**               | art. 20.4                                                             | Accionable ya _(si se muestran reseñas)_                                                             |
+| **Accesibilidad del catálogo**                         | art. 20.2                                                             | Accionable ya — y es requisito legal, no solo a11y                                                   |
+| **Reserva online propia**                              | dispararía art. 97 (21 extremos) + art. 98 + análisis del art. 103.l) | **Recomendación: NO construirla.** Enlazar a Treatwell (coincide con `datos-treatwell-ficha.md:218`) |
+| **Test automático del enlace de aviso legal**          | Previene el fallo real de §2.6                                        | Accionable ya                                                                                        |
+| **Cookies / RGPD**                                     | art. 22.2 LSSI + RGPD                                                 | **Fuera de este informe.** Bloqueante independiente sin investigar                                   |
 
 ### 4.4 Acción inmediata recomendada
 
@@ -513,7 +510,7 @@ publicación** y que ninguna investigación web puede sustituir:
 3. Domicilio del titular (si difiere del local)
 4. **Email de contacto real y atendido**
 5. Forma jurídica; si es sociedad: datos de inscripción en el Registro Mercantil (tomo, folio, hoja)
-6. **¿Los precios llevan IVA incluido?** ← *el de mayor riesgo económico*
+6. **¿Los precios llevan IVA incluido?** ← _el de mayor riesgo económico_
 7. ¿Adherida a arbitraje de consumo o a algún código de conducta?
 8. ¿Se presta micropigmentación / tatuaje / piercing? (posible autorización sanitaria)
 
@@ -526,13 +523,13 @@ publicación** y que ninguna investigación web puede sustituir:
 
 Todas las citas normativas proceden de textos **consolidados** del BOE vía su API de datos abiertos.
 
-| # | Norma | ID BOE | Bloques consultados | URL |
-|---|---|---|---|---|
-| 1 | Ley 34/2002 (LSSI-CE) | BOE-A-2002-13758 | `an`, `a2`, `a10`, `a22`, `a38`, `a39`, `a43` | https://www.boe.es/buscar/act.php?id=BOE-A-2002-13758 |
-| 2 | RDL 1/2007 (TRLGDCU) | BOE-A-2007-20555 | `a20`, `a47`, `a48`, `a49`, `a51`, `a60`, `a97`, `a103` | https://www.boe.es/buscar/act.php?id=BOE-A-2007-20555 |
-| 3 | Ley 12/2012 (liberalización del comercio) | BOE-A-2012-15595 | `a2`, `a3`, `an` | https://www.boe.es/buscar/act.php?id=BOE-A-2012-15595 |
-| 4 | Ley 11/1998 (Consumidores C. de Madrid) | BOE-A-1998-20651 | arts. 53, 56 (vía HTML) | https://www.boe.es/buscar/act.php?id=BOE-A-1998-20651 |
-| 5 | Web actual del salón (comprobación de estado HTTP) | — | footer, `/es/aviso-legal` | https://www.nailslashlasrozas.es/ |
+| #   | Norma                                              | ID BOE           | Bloques consultados                                     | URL                                                   |
+| --- | -------------------------------------------------- | ---------------- | ------------------------------------------------------- | ----------------------------------------------------- |
+| 1   | Ley 34/2002 (LSSI-CE)                              | BOE-A-2002-13758 | `an`, `a2`, `a10`, `a22`, `a38`, `a39`, `a43`           | https://www.boe.es/buscar/act.php?id=BOE-A-2002-13758 |
+| 2   | RDL 1/2007 (TRLGDCU)                               | BOE-A-2007-20555 | `a20`, `a47`, `a48`, `a49`, `a51`, `a60`, `a97`, `a103` | https://www.boe.es/buscar/act.php?id=BOE-A-2007-20555 |
+| 3   | Ley 12/2012 (liberalización del comercio)          | BOE-A-2012-15595 | `a2`, `a3`, `an`                                        | https://www.boe.es/buscar/act.php?id=BOE-A-2012-15595 |
+| 4   | Ley 11/1998 (Consumidores C. de Madrid)            | BOE-A-1998-20651 | arts. 53, 56 (vía HTML)                                 | https://www.boe.es/buscar/act.php?id=BOE-A-1998-20651 |
+| 5   | Web actual del salón (comprobación de estado HTTP) | —                | footer, `/es/aviso-legal`                               | https://www.nailslashlasrozas.es/                     |
 
 **Endpoint de la API usado** (reproducible):
 `https://www.boe.es/datosabiertos/api/legislacion-consolidada/id/<ID>/texto/bloque/<bloque>` con

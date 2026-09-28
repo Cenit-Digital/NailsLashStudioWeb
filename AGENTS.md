@@ -18,31 +18,31 @@
 
 ## 2. Mapa del repositorio
 
-| Archivo / carpeta          | Qué contiene                                                              | Cuándo leerlo                     |
-| -------------------------- | ------------------------------------------------------------------------- | --------------------------------- |
-| `harness.config.json`      | ⭐ Comandos de TU stack (test, mutación, lint…). El único punto no-agnóstico | Antes de tocar el arnés           |
-| `feature_list.json`        | Tareas con estado (`pending`/`spec_ready`/`in_progress`/`done`/`blocked`) | Siempre                           |
-| `progress/current.md`      | Estado de la sesión actual                                                | Siempre                           |
-| `progress/history.md`      | Bitácora append-only                                                      | Si necesitas contexto             |
-| `project-spec.md`          | Spec conversada por feature                                               | Antes de Gherkin o de implementar |
-| `features/<name>.feature`  | Escenarios Gherkin (contrato aprobado por el humano)                      | Antes del ciclo TDD               |
-| `docs/workflow.md`         | El pipeline completo y los insights de cada fase                          | Antes de coordinar                |
-| `docs/tdd.md`              | Las Tres Leyes; Rojo-Verde-Refactor                                       | Antes de escribir código          |
-| `docs/gherkin.md`          | Cómo escribir `.feature`; de Gherkin a test                               | Antes de redactar escenarios      |
-| `docs/mutation-testing.md` | Por qué y cómo; umbral; mutación por stack                                | Antes de validar la suite         |
-| `docs/architecture.md`     | Qué significa "hacer un buen trabajo"                                     | Antes de implementar              |
-| `docs/conventions.md`      | Estilo, nombres, estructura                                               | Antes de escribir código          |
-| `docs/verification.md`     | Cómo demostrar que funciona                                               | Antes de declarar `done`          |
-| `docs/configuration.md`    | Cómo adaptar `harness.config.json` a cualquier stack                      | Al portar a un nuevo lenguaje     |
-| `docs/tooling.md`          | Agentes de apoyo y hooks                                                  | Para entender el tooling          |
-| `docs/autonomous.md`       | El bot de evolución autónoma (solo-PR) y su puesta en marcha              | Para operar el bot de auto-mejora |
-| `docs/memoria-organizacional.md` | Patrones validados compartidos entre proyectos (memoria de la org)  | Al arrancar sesión (paso 2bis)    |
-| `scripts/sync-memoria.sh(.ps1)` | Sincroniza la memoria organizacional en `.memoria-cache/`           | Paso 2bis del Protocolo de arranque |
-| `CHECKPOINTS.md`           | Criterios objetivos de "estado final correcto"                           | Para auto-evaluarte               |
-| `.harness/harness.mjs`     | Motor agnóstico (lee la config y ejecuta tus comandos)                    | Si depuras el arnés               |
-| `.claude/agents/`          | 6 subagentes del pipeline + 3 de apoyo                                     | Si orquestas                      |
-| `examples/`                | Arneses completos y ejecutables (Python y Node/JS) de referencia          | Para ver el método en acción      |
-| `src/` · `tests/`          | Código de la aplicación y sus tests                                       | Para implementar / verificar      |
+| Archivo / carpeta                | Qué contiene                                                                 | Cuándo leerlo                       |
+| -------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------- |
+| `harness.config.json`            | ⭐ Comandos de TU stack (test, mutación, lint…). El único punto no-agnóstico | Antes de tocar el arnés             |
+| `feature_list.json`              | Tareas con estado (`pending`/`spec_ready`/`in_progress`/`done`/`blocked`)    | Siempre                             |
+| `progress/current.md`            | Estado de la sesión actual                                                   | Siempre                             |
+| `progress/history.md`            | Bitácora append-only                                                         | Si necesitas contexto               |
+| `project-spec.md`                | Spec conversada por feature                                                  | Antes de Gherkin o de implementar   |
+| `features/<name>.feature`        | Escenarios Gherkin (contrato aprobado por el humano)                         | Antes del ciclo TDD                 |
+| `docs/workflow.md`               | El pipeline completo y los insights de cada fase                             | Antes de coordinar                  |
+| `docs/tdd.md`                    | Las Tres Leyes; Rojo-Verde-Refactor                                          | Antes de escribir código            |
+| `docs/gherkin.md`                | Cómo escribir `.feature`; de Gherkin a test                                  | Antes de redactar escenarios        |
+| `docs/mutation-testing.md`       | Por qué y cómo; umbral; mutación por stack                                   | Antes de validar la suite           |
+| `docs/architecture.md`           | Qué significa "hacer un buen trabajo"                                        | Antes de implementar                |
+| `docs/conventions.md`            | Estilo, nombres, estructura                                                  | Antes de escribir código            |
+| `docs/verification.md`           | Cómo demostrar que funciona                                                  | Antes de declarar `done`            |
+| `docs/configuration.md`          | Cómo adaptar `harness.config.json` a cualquier stack                         | Al portar a un nuevo lenguaje       |
+| `docs/tooling.md`                | Agentes de apoyo y hooks                                                     | Para entender el tooling            |
+| `docs/autonomous.md`             | El bot de evolución autónoma (solo-PR) y su puesta en marcha                 | Para operar el bot de auto-mejora   |
+| `docs/memoria-organizacional.md` | Patrones validados compartidos entre proyectos (memoria de la org)           | Al arrancar sesión (paso 2bis)      |
+| `scripts/sync-memoria.sh(.ps1)`  | Sincroniza la memoria organizacional en `.memoria-cache/`                    | Paso 2bis del Protocolo de arranque |
+| `CHECKPOINTS.md`                 | Criterios objetivos de "estado final correcto"                               | Para auto-evaluarte                 |
+| `.harness/harness.mjs`           | Motor agnóstico (lee la config y ejecuta tus comandos)                       | Si depuras el arnés                 |
+| `.claude/agents/`                | 6 subagentes del pipeline + 3 de apoyo                                       | Si orquestas                        |
+| `examples/`                      | Arneses completos y ejecutables (Python y Node/JS) de referencia             | Para ver el método en acción        |
+| `src/` · `tests/`                | Código de la aplicación y sus tests                                          | Para implementar / verificar        |
 
 ## 3. Reglas duras (no negociables)
 

@@ -35,6 +35,7 @@ choque entre un guard de FUENTE y la instrumentación (ver
 `progress/mutation_boton_whatsapp.md`).
 
 Vía documentada (docs/mutation-testing.md, fichero declarado no-mutable):
+
 - `stryker.config.json`: QUITAR `src/components/BotonWhatsApp.tsx` de `mutate`
   (los 3 mutantes son de string-literal, presentacionales; el comportamiento lo
   guardan @s1..@s14 + el de montaje @s4). AÑADIR
@@ -46,7 +47,7 @@ Vía documentada (docs/mutation-testing.md, fichero declarado no-mutable):
 ## Ficheros tocados
 
 - NUEVO `src/components/equipo-logica.ts` (funciones puras + tipo `DiaOfrecido`
-  + constantes + imports de F-10, cuerpos verbatim).
+  - constantes + imports de F-10, cuerpos verbatim).
 - `src/components/Equipo.tsx` (importa de `./equipo-logica`; deja de exportar
   las 4 funciones y `DiaOfrecido`; markup y comportamiento intactos).
 - `src/components/equipo.test.tsx` (línea 5: funciones puras desde
@@ -58,7 +59,7 @@ Vía documentada (docs/mutation-testing.md, fichero declarado no-mutable):
 ## Verificación (targeted, sin build)
 
 - `pnpm exec vitest run equipo.test.tsx equipo-estilos.test.ts
-  boton-whatsapp.test.tsx boton-whatsapp-montaje.test.tsx` → **4 files, 81
+boton-whatsapp.test.tsx boton-whatsapp-montaje.test.tsx` → **4 files, 81
   tests PASSED**.
 - `pnpm typecheck` (`tsc --noEmit`) → **OK, sin errores**.
 - `pnpm lint` (`eslint .`) → **exit 0, 0 errores, 0 warnings** (los 4

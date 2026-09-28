@@ -93,7 +93,9 @@ export function canonicaDe(ruta: string, origen: string): string {
   if (!esOrigenAbsoluto(origen)) {
     // Falla cerrada (@s6): una canónica sobre un origen roto es sintácticamente plausible y
     // semánticamente basura — la puerta vería «una canónica» y pasaría.
-    throw new ErrorDeSeo(`el origen "${origen}" no es una URL absoluta: no hay canónica que componer`)
+    throw new ErrorDeSeo(
+      `el origen "${origen}" no es una URL absoluta: no hay canónica que componer`,
+    )
   }
 
   return `${origen}${ruta}`

@@ -35,6 +35,7 @@
 ## 3. Diseño del cambio
 
 ### 3a. La duración — un solo token
+
 - Variable CSS `--duracion-caligrafia: 90s` en la regla raíz del módulo del hero; TODAS las piezas
   derivan con `calc()`: `escribir`/`recorrer` = `var(--duracion-caligrafia)`; `retirarse` empieza en
   `calc(var(--duracion-caligrafia) - 0.4s + 0.1s)`; `revelarStudio` empieza en
@@ -47,6 +48,7 @@
 - `aparecer` (0.3s) queda igual.
 
 ### 3b. El rótulo como control (SC 2.2.2 sin cromo)
+
 - Un `<button>` TRANSPARENTE superpuesto al área del rótulo (posicionado absoluto DENTRO del
   contenedor del h1, SIN tocar la estructura protegida del `<h1>`): sin fondo, sin borde, sin
   texto visible; `cursor: pointer`; `aria-label` «Completar la firma» (o la redacción del
@@ -64,6 +66,7 @@
   `mutate` con break 100: cada rama matable.
 
 ### 3c. Trampas conocidas (no re-descubrir)
+
 - jsdom: sin `matchMedia` (stub), `setTimeout` tipado, sin renderizado real de animaciones CSS —
   las DURACIONES se aseveran por BYTES del SCSS (patrón galeria-estilos) y el comportamiento del
   botón por DOM; la experiencia real, EN VIVO.
@@ -96,6 +99,7 @@
 ## Contrato
 
 `features/hero.feature` ENMENDADO el 2026-07-23 — **14 escenarios totales** (9 previos + 5 nuevos).
+
 - **@s4 REESCRITO**: token único `--duracion-caligrafia: 90s`; todo deriva por `calc()`;
   `escribir`/`recorrer` = el token con curva `linear` (las dos, UN reloj: misma duración/retardo/
   curva); `retirarse` en `calc(... - 0.4s + 0.1s)` y `revelarStudio` en `calc(... + 0.2s)`.

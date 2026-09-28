@@ -27,22 +27,22 @@ documentado, recomendación entregada al `craftsman_lead`/humano.
 ## 2. El bloqueo exacto en el contrato original
 
 `@s27` (`Scenario Outline: la puerta asevera la config base de vite.config.ts, ADEMÁS de la
-salida`) fijaba, en su tabla de `Examples` y en el comentario que la acompañaba: *"pasa `base` no
-declarada o declarada EXACTAMENTE `'/'`; cualquier otra cosa es violación"*. La fila
+salida`) fijaba, en su tabla de `Examples` y en el comentario que la acompañaba: _"pasa `base` no
+declarada o declarada EXACTAMENTE `'/'`; cualquier otra cosa es violación"_. La fila
 `base es "/subcarpeta/"` daba código `1` (violación) — el mismo trato que
 `base es "https://cdn.evil.example/x/"`.
 
 ## 3. Análisis: los dos invariantes reales, no el literal exacto
 
 El comentario de cabecera de `@s26` (que `@s27` cita como "razón 1") da la razón EXACTA por la que
-la puerta exige rutas root-absolutas: *"la ruta es root-absoluta (`url(/assets/…woff2)`), NO
-relativa (...). Una puerta que exigiera `url(./…)` DA FALSO NEGATIVO."* — es decir, el invariante
+la puerta exige rutas root-absolutas: _"la ruta es root-absoluta (`url(/assets/…woff2)`), NO
+relativa (...). Una puerta que exigiera `url(./…)` DA FALSO NEGATIVO."_ — es decir, el invariante
 real que `@s26`/`@s27` protegen son **dos**, y son **distintos**:
 
 1. **Cero origen de terceros**: `base` no puede ser una URL absoluta con esquema/host
    (`https://cdn.evil.example/x/`) ni protocolo-relativa (`//cdn.tercero.com/`) — eso SÍ reescribe
    los `url()` del CSS hacia fuera del propio dominio (medido con un build real: `base:
-   'https://cdn.evil.example/x/'` produce `url(https://cdn.evil.example/x/assets/…woff2)`).
+'https://cdn.evil.example/x/'` produce `url(https://cdn.evil.example/x/assets/…woff2)`).
 2. **Ruta root-absoluta, no relativa**: `base` no puede ser una ruta relativa como `'./'` — eso
    rompe la propiedad de que los `url()` sean resolubles sin depender de dónde vive el documento
    que los referencia.
@@ -64,16 +64,16 @@ pasan solo con subcarpetas same-origin root-absolutas.
 
 ## 4. Qué cambió en la tabla de `@s27`, y por qué
 
-| Fila | Antes | Ahora | Motivo |
-| --- | --- | --- | --- |
-| `no se declara base` | `0` | `0` (sin cambio) | Estado real de hoy del repo; no depende del literal. |
-| `base es exactamente "/"` | `0` | `0` (sin cambio) | Caso trivial de ruta root-absoluta same-origin. |
-| `base es "/subcarpeta/"` | **`1`** | **`0`** (CAMBIA) | Empieza por `/`, no contiene `://`, no empieza por `//` → satisface los dos invariantes reales. Ancla la ampliación. |
-| `base es "/NailsLashStudioWeb/"` | (no existía) | **`0`** (NUEVA) | El caso REAL de despliegue que motiva la enmienda (GitHub Pages de proyecto). Sin esta fila, la ampliación quedaría anclada solo por un nombre genérico y no por el caso de negocio real. |
-| `base es "https://cdn.evil.example/x/"` | `1` | `1` (sin cambio) | Sigue conteniendo `://`: URL absoluta con esquema, origen de tercero. |
-| `base es "https://cdn.tercero.com/"` | `1` | `1` (sin cambio) | Igual razón que la anterior. |
-| `base es "//cdn.tercero.com/"` | (no existía) | **`1`** (NUEVA) | Ancla el caso protocolo-relativo específicamente para `base` (no para el CSS, que ya lo cubre `@s8`/`@s26`). Antes de la enmienda, este caso fallaba "porque no es el literal exacto"; con la regla nueva, expresada en tres condiciones independientes, hace falta una fila propia que obligue a que la condición "empieza por `//`" se implemente como rechazo explícito y no se confunda con "empieza por `/`" (que ahora SÍ pasa). Sin esta fila, una implementación que solo comprobara `startsWith('/')` pasaría erróneamente el protocolo-relativo. |
-| `base es "./"` | `1` | `1` (sin cambio) | Sigue sin empezar por `/`: ruta relativa, rompe el invariante de la ruta root-absoluta. Es la única fila que ancla ese invariante en solitario tras la ampliación. |
+| Fila                                    | Antes        | Ahora            | Motivo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| --------------------------------------- | ------------ | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `no se declara base`                    | `0`          | `0` (sin cambio) | Estado real de hoy del repo; no depende del literal.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `base es exactamente "/"`               | `0`          | `0` (sin cambio) | Caso trivial de ruta root-absoluta same-origin.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `base es "/subcarpeta/"`                | **`1`**      | **`0`** (CAMBIA) | Empieza por `/`, no contiene `://`, no empieza por `//` → satisface los dos invariantes reales. Ancla la ampliación.                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `base es "/NailsLashStudioWeb/"`        | (no existía) | **`0`** (NUEVA)  | El caso REAL de despliegue que motiva la enmienda (GitHub Pages de proyecto). Sin esta fila, la ampliación quedaría anclada solo por un nombre genérico y no por el caso de negocio real.                                                                                                                                                                                                                                                                                                                                                                  |
+| `base es "https://cdn.evil.example/x/"` | `1`          | `1` (sin cambio) | Sigue conteniendo `://`: URL absoluta con esquema, origen de tercero.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `base es "https://cdn.tercero.com/"`    | `1`          | `1` (sin cambio) | Igual razón que la anterior.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `base es "//cdn.tercero.com/"`          | (no existía) | **`1`** (NUEVA)  | Ancla el caso protocolo-relativo específicamente para `base` (no para el CSS, que ya lo cubre `@s8`/`@s26`). Antes de la enmienda, este caso fallaba "porque no es el literal exacto"; con la regla nueva, expresada en tres condiciones independientes, hace falta una fila propia que obligue a que la condición "empieza por `//`" se implemente como rechazo explícito y no se confunda con "empieza por `/`" (que ahora SÍ pasa). Sin esta fila, una implementación que solo comprobara `startsWith('/')` pasaría erróneamente el protocolo-relativo. |
+| `base es "./"`                          | `1`          | `1` (sin cambio) | Sigue sin empezar por `/`: ruta relativa, rompe el invariante de la ruta root-absoluta. Es la única fila que ancla ese invariante en solitario tras la ampliación.                                                                                                                                                                                                                                                                                                                                                                                         |
 
 Filas conservadas intactas (`no se declara base`, `base es exactamente "/"`,
 `https://cdn.evil.example/x/"`, `https://cdn.tercero.com/"`, `./"`): ninguna de ellas depende del

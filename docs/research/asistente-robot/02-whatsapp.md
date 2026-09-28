@@ -7,8 +7,9 @@
 > tabla de fuentes del final (URL + fecha «Updated» que muestra la página +
 > fecha de acceso).
 > **Convenciones:**
+>
 > - Lo no confirmable en fuente oficial va marcado **NO CONFIRMADO**.
-> - Lo que es interpretación o recomendación propia va marcado *(interpretación)*.
+> - Lo que es interpretación o recomendación propia va marcado _(interpretación)_.
 > - Por la norma de derechos de autor que sigue el investigador, las fuentes se
 >   dan como **paráfrasis fiel** en castellano (con URL y fecha), y solo hay
 >   **una cita literal** en todo el documento (sección 2.9). Los nombres de
@@ -25,9 +26,9 @@
    número completo en formato internacional sin `+`, ceros, paréntesis ni
    guiones [F1]. Es lo único que la web estática puede hacer hoy.
 2. **Un bot en WhatsApp exige servidor**: Meta entrega los mensajes entrantes
-   por *webhook* a un endpoint HTTPS público con certificado válido, verificado
+   por _webhook_ a un endpoint HTTPS público con certificado válido, verificado
    con `hub.verify_token`/`hub.challenge` y firmado con `X-Hub-Signature-256`
-   (HMAC-SHA256 con el *app secret*) [F5]. GitHub Pages no puede cumplir esto.
+   (HMAC-SHA256 con el _app secret_) [F5]. GitHub Pages no puede cumplir esto.
 3. **Ventana de atención de 24 h**: dentro, respuestas libres (texto, botones,
    listas, Flows…); fuera, solo plantillas aprobadas [F7]. Un bot reactivo vive
    dentro de la ventana; los recordatorios de cita del día siguiente requieren
@@ -49,12 +50,12 @@
    que haya vías de escalado a humano claras [F26]. Las Condiciones de Meta
    (§4.7, 23-sep-2026) prohíben a «Proveedores de IA» usar la plataforma cuando
    la IA es la funcionalidad principal [F27]; el asistente de un salón, donde la
-   IA es auxiliar, *parece* fuera de esa prohibición *(interpretación; Meta
-   decide a su criterio → **NO CONFIRMADO**)*.
+   IA es auxiliar, _parece_ fuera de esa prohibición _(interpretación; Meta
+   decide a su criterio → **NO CONFIRMADO**)_.
 7. **On-Premises API está muerta**: la última versión caducó el 23-oct-2025; solo
    existe la Cloud API [F19].
 8. **Identidad del usuario**: desde abril de 2026 los webhooks traen un
-   *business-scoped user ID* (BSUID, `user_id`) y el teléfono puede no venir si
+   _business-scoped user ID_ (BSUID, `user_id`) y el teléfono puede no venir si
    el cliente usa nombre de usuario [F22]. El bot debe indexar conversaciones
    por BSUID.
 9. **Indicador «escribiendo…» y marcar como leído** existen vía API (una sola
@@ -66,17 +67,17 @@
 
 ### 1.1 Formato oficial del enlace
 
-| Caso | Formato oficial [F1] |
-|---|---|
-| Abrir chat con un número | `https://wa.me/<number>` |
-| Abrir chat con mensaje precargado | `https://wa.me/<whatsappphonenumber>?text=<urlencodedtext>` |
-| Solo mensaje precargado (el usuario elige destinatario de su lista de contactos) | `https://wa.me/?text=<urlencodedtext>` |
+| Caso                                                                             | Formato oficial [F1]                                        |
+| -------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| Abrir chat con un número                                                         | `https://wa.me/<number>`                                    |
+| Abrir chat con mensaje precargado                                                | `https://wa.me/<whatsappphonenumber>?text=<urlencodedtext>` |
+| Solo mensaje precargado (el usuario elige destinatario de su lista de contactos) | `https://wa.me/?text=<urlencodedtext>`                      |
 
 - El texto debe ir **codificado para URL** (URL-encoded); el propio ejemplo de la
   FAQ codifica los espacios como `%20` [F1].
 - El mensaje precargado aparece automáticamente en el campo de texto del chat;
-  **no se envía solo**: el usuario tiene que pulsar enviar [F1] *(lo de «no se
-  envía solo» es deducción de «aparece en el campo de texto»; interpretación)*.
+  **no se envía solo**: el usuario tiene que pulsar enviar [F1] _(lo de «no se
+  envía solo» es deducción de «aparece en el campo de texto»; interpretación)_.
 
 ### 1.2 Requisitos del número
 
@@ -86,7 +87,7 @@
 - Ejemplo «correcto» de la FAQ: `https://wa.me/1XXXXXXXXXX`; ejemplo
   «incorrecto»: `https://wa.me/+001-(XXX)XXXXXXX` → es decir, **sin `+`, sin
   prefijo `00`, sin paréntesis ni guiones** [F1].
-- Aplicado a España *(interpretación)*: prefijo `34` + los 9 dígitos del número
+- Aplicado a España _(interpretación)_: prefijo `34` + los 9 dígitos del número
   → `https://wa.me/34XXXXXXXXX`. La FAQ no detalla qué «ceros» exactamente
   (se entiende el `00` de marcación internacional o un 0 troncal nacional; en
   España no hay 0 troncal).
@@ -96,7 +97,7 @@
 
 - La FAQ afirma que click to chat **funciona tanto en el teléfono como en
   WhatsApp Web** [F1].
-- Para los *short links* de la app WhatsApp Business (formato distinto, ver
+- Para los _short links_ de la app WhatsApp Business (formato distinto, ver
   1.5), la FAQ describe: si el cliente tiene WhatsApp instalado se abre el chat
   directamente; **desde un navegador web** se muestra una página con la
   información del negocio y un botón «Continue to chat» [F2].
@@ -108,13 +109,13 @@
 
 ### 1.4 Botón oficial «Chat on WhatsApp»
 
-- Existe un botón de marca «Chat on WhatsApp» sujeto a las *brand guidelines*,
+- Existe un botón de marca «Chat on WhatsApp» sujeto a las _brand guidelines_,
   en verde o blanco y en tres tamaños (pequeño, mediano, grande); la FAQ pide
   usarlo **sin modificarlo**, en su última versión y visible [F1].
 - **Solo está disponible en inglés** [F1] → para una web en castellano lo
-  razonable es un botón propio con texto en castellano *(interpretación; las
+  razonable es un botón propio con texto en castellano _(interpretación; las
   reglas de uso del logotipo de WhatsApp en un botón propio no se verificaron:
-  **NO CONFIRMADO**)*.
+  **NO CONFIRMADO**)_.
 
 ### 1.5 ¿Sigue siendo el método oficial en 2026?
 
@@ -123,9 +124,9 @@ aviso de retirada [F1]. Alternativas oficiales complementarias:
 
 - **Short link de la app WhatsApp Business**: se genera automáticamente al crear
   la cuenta (Herramientas > Short link), permite fijar un **mensaje por defecto**
-  y compartirlo en la web [F2]. Tiene la forma `wa.me/message/<código>` *(la
+  y compartirlo en la web [F2]. Tiene la forma `wa.me/message/<código>` _(la
   forma exacta del enlace de la app no aparece en la FAQ: **NO CONFIRMADO**; la
-  API sí documenta `https://wa.me/message/<código>` [F24])*.
+  API sí documenta `https://wa.me/message/<código>` [F24])_.
 - **QR codes y short links vía API** (solo con Cloud API): mensaje precargado de
   hasta 140 caracteres, máximo 2.000 QR/enlaces por número, sin analítica [F24].
 - **Nombres de usuario (usernames)** en WhatsApp Business: despliegue gradual en
@@ -151,8 +152,8 @@ aviso de retirada [F1]. Alternativas oficiales complementarias:
 
 ### 2.2 Suscripción
 
-- En **App Dashboard > WhatsApp > Configuration** (o *Use cases > Customize >
-  Configuration* si la app se creó con el caso de uso «Connect with customers
+- En **App Dashboard > WhatsApp > Configuration** (o _Use cases > Customize >
+  Configuration_ si la app se creó con el caso de uso «Connect with customers
   through WhatsApp») se rellenan **Callback URL** y **Verify token**; si la
   verificación pasa, aparece la lista de campos a los que suscribirse [F5].
 - Para un bot, el campo imprescindible es `messages` (mensajes entrantes y
@@ -188,7 +189,7 @@ X-Hub-Signature-256: sha256=<SHA256_PAYLOAD_HASH>
 - Validación [F5]: calcular un **HMAC-SHA256** usando la carga JSON como mensaje
   y el **app secret** como clave; compararlo con lo que va tras `sha256=` en la
   cabecera; si coinciden, la carga es válida; si no, descartarla.
-- *(Recomendación de implementación, interpretación)*: calcular el HMAC sobre
+- _(Recomendación de implementación, interpretación)_: calcular el HMAC sobre
   los **bytes crudos** del cuerpo antes de parsear el JSON, y comparar en tiempo
   constante.
 - Responder **HTTP 200** si es válida; en otro caso un 4xx [F5].
@@ -205,16 +206,36 @@ X-Hub-Signature-256: sha256=<SHA256_PAYLOAD_HASH>
 Forma de un mensaje entrante (ejemplo oficial resumido) [F9]:
 
 ```json
-{ "object": "whatsapp_business_account",
-  "entry": [ { "changes": [ { "field": "messages",
-    "value": { "messaging_product": "whatsapp",
-      "metadata": { "display_phone_number": "...", "phone_number_id": "..." },
-      "contacts": [ { "profile": { "name": "..." }, "wa_id": "..." } ],
-      "messages": [ { "from": "...", "id": "wamid....", "timestamp": "...",
-                      "type": "text", "text": { "body": "Hi!" } } ] } } ] } ] }
+{
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "changes": [
+        {
+          "field": "messages",
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": { "display_phone_number": "...", "phone_number_id": "..." },
+            "contacts": [{ "profile": { "name": "..." }, "wa_id": "..." }],
+            "messages": [
+              {
+                "from": "...",
+                "id": "wamid....",
+                "timestamp": "...",
+                "type": "text",
+                "text": { "body": "Hi!" }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
 ```
 
 **Identificadores (BSUID)** [F22]:
+
 - Desde **principios de abril de 2026** todos los webhooks de `messages` incluyen
   `user_id` (BSUID), exista o no nombre de usuario. Formato: código de país
   ISO + punto + hasta 128 alfanuméricos (p. ej. `ES.…`).
@@ -249,7 +270,7 @@ Authorization: Bearer <ACCESS_TOKEN>
 - **Límite por par negocio-usuario**: 1 mensaje cada 6 s al mismo usuario
   (~10/min); ráfagas de hasta 45 «tomando prestado» cupo futuro; al exceder,
   error `131056` [F8]. → El bot debe mandar **una respuesta consolidada**, no
-  muchas burbujas *(interpretación)*.
+  muchas burbujas _(interpretación)_.
 - Throughput por defecto: 80 mensajes/s por número [F8] (irrelevante para un
   salón).
 
@@ -284,8 +305,8 @@ Authorization: Bearer <ACCESS_TOKEN>
 ### 2.8 Contenido promocional dentro de respuestas libres
 
 Un mensaje sin plantilla solo tiene una categoría; aunque lleve contenido
-promocional, Meta no le aplica cargo de marketing adicional [F11]. *(Esto no
-exime de la política de mensajería; interpretación.)*
+promocional, Meta no le aplica cargo de marketing adicional [F11]. _(Esto no
+exime de la política de mensajería; interpretación.)_
 
 ### 2.9 Política: automatización y escalado a humano
 
@@ -314,7 +335,7 @@ peticiones de baja [F26].
 - La página de precios para «AI Providers» aclara que esa política **no cambia**
   cómo se cobra al resto de empresas [F12]; desde el 13-may-2026 Meta ya no
   cobra a los «AI Providers» por mensajes a usuarios de la UE/EEE [F12][F14].
-- *(Interpretación)*: un asistente de citas/FAQ del salón, en el que la IA es
+- _(Interpretación)_: un asistente de citas/FAQ del salón, en el que la IA es
   auxiliar al servicio del salón, no encaja en «IA como funcionalidad
   principal». **NO CONFIRMADO**: Meta no publica un criterio que lo garantice y
   se reserva la decisión.
@@ -335,12 +356,12 @@ peticiones de baja [F26].
 
 ### 3.2 Qué es gratis HOY (hasta el 30-sep-2026)
 
-| Concepto | Estado hasta 30-sep-2026 | Fuente |
-|---|---|---|
-| Mensajes **sin plantilla** (servicio) dentro de la ventana de 24 h | Gratis desde 1-nov-2024 | [F10] |
-| Plantillas de **utilidad** entregadas dentro de la ventana | Gratis desde 1-jul-2025 | [F10] |
-| Todo mensaje en una **ventana de punto de entrada gratuito (FEP)** de 72 h (usuario que llega desde anuncio «click to WhatsApp» o botón CTA de página de Facebook, en Android/iOS) | Gratis | [F10] |
-| Mensajes que el usuario envía al negocio | Nunca se cobran | [F10] |
+| Concepto                                                                                                                                                                           | Estado hasta 30-sep-2026 | Fuente |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ | ------ |
+| Mensajes **sin plantilla** (servicio) dentro de la ventana de 24 h                                                                                                                 | Gratis desde 1-nov-2024  | [F10]  |
+| Plantillas de **utilidad** entregadas dentro de la ventana                                                                                                                         | Gratis desde 1-jul-2025  | [F10]  |
+| Todo mensaje en una **ventana de punto de entrada gratuito (FEP)** de 72 h (usuario que llega desde anuncio «click to WhatsApp» o botón CTA de página de Facebook, en Android/iOS) | Gratis                   | [F10]  |
+| Mensajes que el usuario envía al negocio                                                                                                                                           | Nunca se cobran          | [F10]  |
 
 ### 3.3 Qué se cobra HOY
 
@@ -381,13 +402,13 @@ actualizaciones (Updated 25-ago-2026):
 `business.whatsapp.com/products/platform-pricing` (sin fecha visible, accedida
 2026-09-27) sigue diciendo que no se cobran los mensajes de servicio ni las
 respuestas de utilidad [F28]. La documentación para desarrolladores es más
-reciente y explícita [F10][F11]; *(interpretación)* tomarla como referencia y
+reciente y explícita [F10][F11]; _(interpretación)_ tomarla como referencia y
 **re-verificar después del 1-oct-2026**.
 
 ### 3.5 Dónde está la tabla oficial para España
 
-- **Tabla oficial**: developers.facebook.com → *Pricing on the WhatsApp Business
-  Platform* → sección de hojas de tarifas → fila **EUR**: «Tarifas en EUR» (CSV),
+- **Tabla oficial**: developers.facebook.com → _Pricing on the WhatsApp Business
+  Platform_ → sección de hojas de tarifas → fila **EUR**: «Tarifas en EUR» (CSV),
   «Niveles de volumen en EUR» (CSV) y «Tarifas y niveles de volumen en EUR»
   (PDF). Hay un bloque aparte con las hojas **vigentes desde el 1-oct-2026**
   (que ya incluyen las tarifas de servicio) [F10].
@@ -411,7 +432,7 @@ Business siguen siendo gratis**; los enviados **por la Cloud API** se cobran seg
 los precios de la API [F13]. Los mensajes enviados desde la app no abren,
 extienden ni afectan a las ventanas ni al precio de la API [F13].
 
-### 3.7 Estimación cualitativa para el salón *(interpretación, sin cifras)*
+### 3.7 Estimación cualitativa para el salón _(interpretación, sin cifras)_
 
 - Un bot reactivo con **menos de 1.000 respuestas al mes por número** quedaría
   dentro del tramo gratuito de servicio de Meta a partir del 1-oct-2026; por
@@ -438,7 +459,7 @@ llama «Coexistence» [F13].
 - App WhatsApp Business **versión 2.24.17 o superior**.
 - Quien integra **debe ser ya Solution Partner o Tech Provider**.
 - Saber usar la Cloud API; webhook capaz de aceptar y procesar webhooks.
-- Usar Embedded Signup con *session logging*.
+- Usar Embedded Signup con _session logging_.
 - Suscribirse además a los campos `account_update`, `history`,
   `smb_app_state_sync` y **`smb_message_echoes`** (mensajes que el dueño envía
   desde la app tras la conexión).
@@ -446,7 +467,7 @@ llama «Coexistence» [F13].
   desconectar y repetir. La app debe permanecer abierta durante la
   sincronización.
 
-**Consecuencia práctica** *(interpretación)*: el salón **no puede activar
+**Consecuencia práctica** _(interpretación)_: el salón **no puede activar
 Coexistence por su cuenta como simple «desarrollador directo»**. Opciones:
 (a) un **BSP/Solution Partner** que ofrezca Coexistence, o (b) convertirse en
 **Tech Provider**, lo que exige **verificación del negocio** y **App Review** con
@@ -464,22 +485,23 @@ de Tech Provider (la documentación no lo prohíbe ni lo describe).
 
 ### 4.4 Limitaciones y funciones que cambian [F13]
 
-| Función de la app | Tras conectar a la Cloud API | ¿La API lo soporta? |
-|---|---|---|
-| Chats 1:1 | Siguen; ahora se admite editar/anular mensajes | Sí; se pueden sincronizar los últimos **6 meses** |
-| Contactos | Sin cambios | Sí (sincronizables) |
-| Chats de grupo | Sin cambios | No (no se sincronizan) |
-| Mensajes temporales | **Se desactivan** en chats 1:1 | No |
-| Mensajes «ver una vez» | **Se desactivan** en chats 1:1 | No |
-| Ubicación en tiempo real | **Se desactiva** en chats 1:1 | No |
-| Listas de difusión | **Se desactivan**; las existentes quedan de solo lectura | No |
-| Llamadas de voz y vídeo | Sin cambios en la app | No |
-| Catálogo, pedidos, estados | Sin cambios en la app | No |
-| Mensajes de bienvenida/ausencia, automáticos, respuestas rápidas, etiquetas | Sin cambios en la app | No |
-| Perfil de empresa, canales | Sin cambios | No |
-| Dispositivos vinculados | Hasta 4 acompañantes; se **desvinculan todos** al conectar y se pueden volver a vincular; **no** se admiten WhatsApp para Windows ni WearOS | — |
+| Función de la app                                                           | Tras conectar a la Cloud API                                                                                                                | ¿La API lo soporta?                               |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| Chats 1:1                                                                   | Siguen; ahora se admite editar/anular mensajes                                                                                              | Sí; se pueden sincronizar los últimos **6 meses** |
+| Contactos                                                                   | Sin cambios                                                                                                                                 | Sí (sincronizables)                               |
+| Chats de grupo                                                              | Sin cambios                                                                                                                                 | No (no se sincronizan)                            |
+| Mensajes temporales                                                         | **Se desactivan** en chats 1:1                                                                                                              | No                                                |
+| Mensajes «ver una vez»                                                      | **Se desactivan** en chats 1:1                                                                                                              | No                                                |
+| Ubicación en tiempo real                                                    | **Se desactiva** en chats 1:1                                                                                                               | No                                                |
+| Listas de difusión                                                          | **Se desactivan**; las existentes quedan de solo lectura                                                                                    | No                                                |
+| Llamadas de voz y vídeo                                                     | Sin cambios en la app                                                                                                                       | No                                                |
+| Catálogo, pedidos, estados                                                  | Sin cambios en la app                                                                                                                       | No                                                |
+| Mensajes de bienvenida/ausencia, automáticos, respuestas rápidas, etiquetas | Sin cambios en la app                                                                                                                       | No                                                |
+| Perfil de empresa, canales                                                  | Sin cambios                                                                                                                                 | No                                                |
+| Dispositivos vinculados                                                     | Hasta 4 acompañantes; se **desvinculan todos** al conectar y se pueden volver a vincular; **no** se admiten WhatsApp para Windows ni WearOS | —                                                 |
 
 Otras limitaciones [F13]:
+
 - **Rendimiento fijo de 20 mensajes/s** para números en app + API.
 - Mensajes de clientes desde un acompañante no soportado **no disparan webhook**.
 - **Desconexión automática** (evento `PARTNER_REMOVED`) si el **dispositivo
@@ -492,7 +514,7 @@ Otras limitaciones [F13]:
 - Embedded Signup v2 y v3 quedan obsoletos el **15-oct-2026**; hay que usar v4
   [F13] (afecta al partner).
 
-*(Interpretación)*: si el salón tiene activados **mensajes de ausencia/bienvenida**
+_(Interpretación)_: si el salón tiene activados **mensajes de ausencia/bienvenida**
 en la app, seguirán funcionando en la app y podrían **duplicar** las respuestas
 del bot; conviene desactivarlos cuando el bot esté en marcha.
 
@@ -508,7 +530,7 @@ app en ese número. Alternativa: usar **otro número** dedicado al bot.
 
 ### 5.1 Alta directa en la Cloud API (desarrollador)
 
-Según *Get started* (Updated 16-jun-2026) y *About the platform* (Updated
+Según _Get started_ (Updated 16-jun-2026) y _About the platform_ (Updated
 4-ago-2026) [F9][F8]:
 
 1. Cuenta de Facebook o cuenta gestionada de Meta, y **registro como
@@ -540,7 +562,7 @@ hacen por el flujo de Embedded Signup [F3].
 
 - **Verificación del negocio**: no es requisito para empezar; es una de las vías
   para subir el límite de mensajería de 250 a 2.000 [F15]; mejora funciones
-  (más throughput, estado de *Official Business Account*) [F8]; **es obligatoria
+  (más throughput, estado de _Official Business Account_) [F8]; **es obligatoria
   para ser Tech Provider** [F18].
 - **Nombre visible**: pasa verificación automática al alcanzar un límite de
   mensajería superior; solo si se aprueba aparece en la cabecera del chat y en la
@@ -555,18 +577,18 @@ hacen por el flujo de Embedded Signup [F3].
 - Portfolio nuevo: **250**; ampliable a 2.000 (verificando el negocio, vía
   partner, o enviando 2.000 plantillas de alta calidad en 30 días), y después
   10.000 / 100.000 / ilimitado por escalado automático [F15].
-- *(Interpretación)*: un bot que **solo responde** dentro de la ventana no
+- _(Interpretación)_: un bot que **solo responde** dentro de la ventana no
   consume este límite; sí lo consumen los recordatorios por plantilla.
 
 ### 5.5 Cloud API directa vs. proveedor (BSP)
 
-| | Directa (el salón o su desarrollador) | Solution Partner (BSP) / Tech Provider |
-|---|---|---|
-| Alta | App de Meta propia + portfolio [F9] | Embedded Signup del partner [F3][F17] |
-| **Coexistence** (mantener la app) | **No** (requiere ser SP o TP) [F13] | **Sí**, si el partner lo ofrece [F13] |
-| Requisitos extra | Ninguno para empezar | TP: verificación + App Review [F18] |
-| Coste de Meta | Tarifas de §3 | Tarifas de §3 (+ cuota del BSP: **NO CONFIRMADO**) |
-| Control del código/bot | Total | Depende del partner (*interpretación*) |
+|                                   | Directa (el salón o su desarrollador) | Solution Partner (BSP) / Tech Provider             |
+| --------------------------------- | ------------------------------------- | -------------------------------------------------- |
+| Alta                              | App de Meta propia + portfolio [F9]   | Embedded Signup del partner [F3][F17]              |
+| **Coexistence** (mantener la app) | **No** (requiere ser SP o TP) [F13]   | **Sí**, si el partner lo ofrece [F13]              |
+| Requisitos extra                  | Ninguno para empezar                  | TP: verificación + App Review [F18]                |
+| Coste de Meta                     | Tarifas de §3                         | Tarifas de §3 (+ cuota del BSP: **NO CONFIRMADO**) |
+| Control del código/bot            | Total                                 | Depende del partner (_interpretación_)             |
 
 ### 5.6 On-Premises API: retirada
 
@@ -621,25 +643,25 @@ POST /<API_VERSION>/<WHATSAPP_BUSINESS_PHONE_NUMBER_ID>/messages
    real del salón en formato internacional, **sin `+`, espacios, guiones ni
    paréntesis** [F1].
 2. **Mensajes precargados por servicio** (p. ej. «Hola, quiero cita para
-   manicura semipermanente»). *(Interpretación)*: darles una forma estable y
+   manicura semipermanente»). _(Interpretación)_: darles una forma estable y
    fácil de reconocer (servicio + intención) facilitará que el futuro bot
    entienda el primer mensaje sin cambiar la web.
 3. **El mensaje no se envía solo**: el cliente lo ve en el campo de texto y pulsa
    enviar [F1]. La web **no puede saber** si se envió ni leer respuestas.
 4. **Botón propio en castellano** (el oficial «Chat on WhatsApp» solo existe en
-   inglés) [F1]; revisar las *brand guidelines* antes de usar el logotipo
+   inglés) [F1]; revisar las _brand guidelines_ antes de usar el logotipo
    (**NO CONFIRMADO** el detalle).
 5. **Probar en dispositivos reales**: móvil con app, escritorio con app de
    escritorio, escritorio solo con navegador (WhatsApp Web). El comportamiento de
    escritorio no está documentado con detalle (**NO CONFIRMADO**, §1.3).
 6. **Automatizaciones sin código disponibles hoy en la app WhatsApp Business**:
    short link con mensaje por defecto [F2]; respuestas rápidas y mensajes de
-   bienvenida/ausencia existen en la app [F13]. *(Interpretación)*: si más
+   bienvenida/ausencia existen en la app [F13]. _(Interpretación)_: si más
    adelante se activa Coexistence + bot, habrá que desactivar los mensajes
    automáticos de la app para no duplicar respuestas.
 7. **Nunca** poner en el front un token de Meta, el app secret ni la clave de la
-   API de Claude: en una web estática quedarían públicos *(interpretación; buena
-   práctica de seguridad)*.
+   API de Claude: en una web estática quedarían públicos _(interpretación; buena
+   práctica de seguridad)_.
 
 ### B. Arquitectura mínima el día que haya servidor
 
@@ -684,12 +706,12 @@ Decisiones y requisitos, con su base:
 5. **Escalado a humano obligatorio**: ofrecer siempre pasar con una persona, el
    teléfono del salón o la visita al local [F26]. Con Coexistence, el webhook
    `smb_message_echoes` indica que el dueño ha respondido desde la app [F13] →
-   *(interpretación)* usarlo para **pausar el bot** en ese chat.
+   _(interpretación)_ usarlo para **pausar el bot** en ese chat.
 6. **UX**: marcar como leído + «escribiendo…» al recibir; una sola respuesta
    consolidada (límite de 1 mensaje/6 s por usuario) [F8][F20][F21]; botones de
    respuesta rápida (máx. 3) o listas para elegir servicio [F7].
 7. **Secretos solo en el servidor**: token de usuario del sistema, app secret,
-   verify token y clave de Claude [F5][F9] *(la custodia es interpretación)*.
+   verify token y clave de Claude [F5][F9] _(la custodia es interpretación)_.
 8. **Costes a presupuestar** (a partir del 1-oct-2026): mensajes de servicio
    gratis hasta **1.000/mes por número**, después tarifa de España; plantillas
    siempre de pago; **método de pago obligatorio** para no cortar el servicio
@@ -708,37 +730,37 @@ Decisiones y requisitos, con su base:
 
 Todas accedidas el **2026-09-27**. «Updated» = fecha que muestra la propia página.
 
-| ID | Documento | URL | Updated |
-|---|---|---|---|
-| F1 | WhatsApp Help Center — How to use click to chat | https://faq.whatsapp.com/5913398998672934 | sin fecha visible |
-| F2 | WhatsApp Help Center — How to create short links (app WhatsApp Business) | https://faq.whatsapp.com/502291734918768 | sin fecha visible |
-| F3 | WhatsApp Help Center — How to get started on the WhatsApp Business Platform | https://faq.whatsapp.com/5773272372736965 | sin fecha visible |
-| F4 | WhatsApp Help Center — About usernames on WhatsApp Business | https://faq.whatsapp.com/1131753190029163 | sin fecha visible |
-| F5 | Meta for Developers — Create a webhook endpoint | https://developers.facebook.com/documentation/business-messaging/whatsapp/webhooks/create-webhook-endpoint/ | 17-jun-2026 |
-| F6 | Meta for Developers — Webhooks (WhatsApp, overview) | https://developers.facebook.com/documentation/business-messaging/whatsapp/webhooks/ | sin fecha visible (leída vía WebFetch) |
-| F7 | Meta for Developers — Service messages (ventana de 24 h, Messages API) | https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/send-messages/ | 21-may-2026 |
-| F8 | Meta for Developers — About the WhatsApp Business Platform | https://developers.facebook.com/documentation/business-messaging/whatsapp/about-the-platform/ | 4-ago-2026 |
-| F9 | Meta for Developers — WhatsApp Cloud API Get Started | https://developers.facebook.com/documentation/business-messaging/whatsapp/get-started/ | 16-jun-2026 |
-| F10 | Meta for Developers — Pricing on the WhatsApp Business Platform | https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing/ | 10-sep-2026 |
-| F11 | Meta for Developers — Upcoming pricing updates for Meta Business Agent, service and utility messages | https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing/non-template-messages/ | 25-ago-2026 |
-| F12 | Meta for Developers — New pricing policy for AI Providers | https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing/ai-providers | 1-sep-2026 |
-| F13 | Meta for Developers — Onboard WhatsApp Business app users («Coexistence») | https://developers.facebook.com/documentation/business-messaging/whatsapp/embedded-signup/onboarding-business-app-users/ | 26-jun-2026 |
-| F14 | Meta for Developers — WhatsApp changelog (entradas 8-abr-2025, 23-oct-2025, 15-abr-2026, 12-may-2026, 22-sep-2026) | https://developers.facebook.com/documentation/business-messaging/whatsapp/changelog | página viva |
-| F15 | Meta for Developers — Messaging limits | https://developers.facebook.com/documentation/business-messaging/whatsapp/messaging-limits/ | 21-may-2026 |
-| F16 | Meta for Developers — Display names | https://developers.facebook.com/documentation/business-messaging/whatsapp/display-names/ | 16-jun-2026 |
-| F17 | Meta for Developers — Business phone numbers | https://developers.facebook.com/documentation/business-messaging/whatsapp/business-phone-numbers/phone-numbers/ | 21-may-2026 |
-| F18 | Meta for Developers — Become a Tech Provider | https://developers.facebook.com/documentation/business-messaging/whatsapp/solution-providers/get-started-for-tech-providers/ | 20-ago-2026 |
-| F19 | Meta for Developers — On-Premises API Sunset | https://developers.facebook.com/docs/whatsapp/on-premises/sunset | sin fecha visible |
-| F20 | Meta for Developers — Mark messages as read | https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/mark-message-as-read/ | 2-jul-2026 |
-| F21 | Meta for Developers — Typing indicators | https://developers.facebook.com/documentation/business-messaging/whatsapp/typing-indicators/ | 17-jun-2026 |
-| F22 | Meta for Developers — Business-scoped user IDs | https://developers.facebook.com/documentation/business-messaging/whatsapp/business-scoped-user-ids/ | 15-sep-2026 |
-| F23 | Meta for Developers — Template review | https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/template-review/ | 17-jun-2026 |
-| F24 | Meta for Developers — QR Codes and Short Links | https://developers.facebook.com/documentation/business-messaging/whatsapp/qr-codes/ | 21-may-2026 |
-| F25 | Meta for Developers — Webhooks de Meta: Getting started (Graph API, genérico) | https://developers.facebook.com/docs/graph-api/webhooks/getting-started | sin fecha visible |
-| F26 | WhatsApp Business Messaging Policy | https://business.whatsapp.com/policy (redirige a https://whatsappbusiness.com/policy/) | 23-sep-2026 |
-| F27 | Meta Terms for WhatsApp Business Platform, §4.7 «Proveedores de IA» | https://www.whatsapp.com/legal/business-solution-terms (redirige a https://www.facebook.com/legal/Meta-Terms-for-WhatsApp-Business-Platform) | 23-sep-2026 |
-| F28 | WhatsApp Business — Platform Pricing (página comercial + calculadora) | https://business.whatsapp.com/products/platform-pricing (redirige a https://whatsappbusiness.com/products/platform-pricing/) | sin fecha visible |
-| F29 | Meta for Developers — Upcoming changes to messaging limits (ya en vigor) | https://developers.facebook.com/documentation/business-messaging/whatsapp/upcoming-messaging-limits-changes/ | 17-jun-2026 |
+| ID  | Documento                                                                                                          | URL                                                                                                                                          | Updated                                |
+| --- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| F1  | WhatsApp Help Center — How to use click to chat                                                                    | https://faq.whatsapp.com/5913398998672934                                                                                                    | sin fecha visible                      |
+| F2  | WhatsApp Help Center — How to create short links (app WhatsApp Business)                                           | https://faq.whatsapp.com/502291734918768                                                                                                     | sin fecha visible                      |
+| F3  | WhatsApp Help Center — How to get started on the WhatsApp Business Platform                                        | https://faq.whatsapp.com/5773272372736965                                                                                                    | sin fecha visible                      |
+| F4  | WhatsApp Help Center — About usernames on WhatsApp Business                                                        | https://faq.whatsapp.com/1131753190029163                                                                                                    | sin fecha visible                      |
+| F5  | Meta for Developers — Create a webhook endpoint                                                                    | https://developers.facebook.com/documentation/business-messaging/whatsapp/webhooks/create-webhook-endpoint/                                  | 17-jun-2026                            |
+| F6  | Meta for Developers — Webhooks (WhatsApp, overview)                                                                | https://developers.facebook.com/documentation/business-messaging/whatsapp/webhooks/                                                          | sin fecha visible (leída vía WebFetch) |
+| F7  | Meta for Developers — Service messages (ventana de 24 h, Messages API)                                             | https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/send-messages/                                            | 21-may-2026                            |
+| F8  | Meta for Developers — About the WhatsApp Business Platform                                                         | https://developers.facebook.com/documentation/business-messaging/whatsapp/about-the-platform/                                                | 4-ago-2026                             |
+| F9  | Meta for Developers — WhatsApp Cloud API Get Started                                                               | https://developers.facebook.com/documentation/business-messaging/whatsapp/get-started/                                                       | 16-jun-2026                            |
+| F10 | Meta for Developers — Pricing on the WhatsApp Business Platform                                                    | https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing/                                                           | 10-sep-2026                            |
+| F11 | Meta for Developers — Upcoming pricing updates for Meta Business Agent, service and utility messages               | https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing/non-template-messages/                                     | 25-ago-2026                            |
+| F12 | Meta for Developers — New pricing policy for AI Providers                                                          | https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing/ai-providers                                               | 1-sep-2026                             |
+| F13 | Meta for Developers — Onboard WhatsApp Business app users («Coexistence»)                                          | https://developers.facebook.com/documentation/business-messaging/whatsapp/embedded-signup/onboarding-business-app-users/                     | 26-jun-2026                            |
+| F14 | Meta for Developers — WhatsApp changelog (entradas 8-abr-2025, 23-oct-2025, 15-abr-2026, 12-may-2026, 22-sep-2026) | https://developers.facebook.com/documentation/business-messaging/whatsapp/changelog                                                          | página viva                            |
+| F15 | Meta for Developers — Messaging limits                                                                             | https://developers.facebook.com/documentation/business-messaging/whatsapp/messaging-limits/                                                  | 21-may-2026                            |
+| F16 | Meta for Developers — Display names                                                                                | https://developers.facebook.com/documentation/business-messaging/whatsapp/display-names/                                                     | 16-jun-2026                            |
+| F17 | Meta for Developers — Business phone numbers                                                                       | https://developers.facebook.com/documentation/business-messaging/whatsapp/business-phone-numbers/phone-numbers/                              | 21-may-2026                            |
+| F18 | Meta for Developers — Become a Tech Provider                                                                       | https://developers.facebook.com/documentation/business-messaging/whatsapp/solution-providers/get-started-for-tech-providers/                 | 20-ago-2026                            |
+| F19 | Meta for Developers — On-Premises API Sunset                                                                       | https://developers.facebook.com/docs/whatsapp/on-premises/sunset                                                                             | sin fecha visible                      |
+| F20 | Meta for Developers — Mark messages as read                                                                        | https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/mark-message-as-read/                                     | 2-jul-2026                             |
+| F21 | Meta for Developers — Typing indicators                                                                            | https://developers.facebook.com/documentation/business-messaging/whatsapp/typing-indicators/                                                 | 17-jun-2026                            |
+| F22 | Meta for Developers — Business-scoped user IDs                                                                     | https://developers.facebook.com/documentation/business-messaging/whatsapp/business-scoped-user-ids/                                          | 15-sep-2026                            |
+| F23 | Meta for Developers — Template review                                                                              | https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/template-review/                                         | 17-jun-2026                            |
+| F24 | Meta for Developers — QR Codes and Short Links                                                                     | https://developers.facebook.com/documentation/business-messaging/whatsapp/qr-codes/                                                          | 21-may-2026                            |
+| F25 | Meta for Developers — Webhooks de Meta: Getting started (Graph API, genérico)                                      | https://developers.facebook.com/docs/graph-api/webhooks/getting-started                                                                      | sin fecha visible                      |
+| F26 | WhatsApp Business Messaging Policy                                                                                 | https://business.whatsapp.com/policy (redirige a https://whatsappbusiness.com/policy/)                                                       | 23-sep-2026                            |
+| F27 | Meta Terms for WhatsApp Business Platform, §4.7 «Proveedores de IA»                                                | https://www.whatsapp.com/legal/business-solution-terms (redirige a https://www.facebook.com/legal/Meta-Terms-for-WhatsApp-Business-Platform) | 23-sep-2026                            |
+| F28 | WhatsApp Business — Platform Pricing (página comercial + calculadora)                                              | https://business.whatsapp.com/products/platform-pricing (redirige a https://whatsappbusiness.com/products/platform-pricing/)                 | sin fecha visible                      |
+| F29 | Meta for Developers — Upcoming changes to messaging limits (ya en vigor)                                           | https://developers.facebook.com/documentation/business-messaging/whatsapp/upcoming-messaging-limits-changes/                                 | 17-jun-2026                            |
 
 ### Pendiente / NO CONFIRMADO (resumen)
 

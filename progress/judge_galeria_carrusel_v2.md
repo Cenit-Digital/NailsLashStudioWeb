@@ -35,6 +35,7 @@ Las cifras CUADRAN con los dos diarios de remate (`tdd_galeria_carrusel.md`, `td
 ## 2) Enmienda 1 contra el contrato v2.1 — FIEL
 
 ### @s19 (el arrastre, cableado)
+
 - **Cableado donde el contrato lo fija:** `onPointerDown`/`onPointerUp` en el MARCO
   (`Galeria.tsx:238-240`, el ancestro con `overflow: hidden`), NO en cada tarjeta. La decisión
   sigue ÍNTEGRA en `pasosDelArrastre` (galeria-logica.ts:148-154, sin tocar): la subida llama a
@@ -57,6 +58,7 @@ Las cifras CUADRAN con los dos diarios de remate (`tdd_galeria_carrusel.md`, `td
 - El GESTO FÍSICO (dedo real) queda para la verificación EN VIVO, como el propio contrato acota.
 
 ### @s12 ampliado (la preferencia EN CALIENTE)
+
 - Producción: el MISMO efecto que lee `matches` al montar se suscribe con
   `addEventListener('change')` y devuelve su limpieza (Galeria.tsx:104-124); el manejador solo
   pausa con `cambio.matches === true` — `matches:false` es INERTE (no pausa, no arranca).
@@ -68,6 +70,7 @@ Las cifras CUADRAN con los dos diarios de remate (`tdd_galeria_carrusel.md`, `td
   (`toHaveBeenCalledWith('change', manejador)`). Las cuatro cláusulas del Then ampliado, cubiertas.
 
 ### @s15 ampliado (pointer-events por bytes)
+
 - `galeria.module.scss:132-142`: `pointer-events: none` en la MISMA regla `[data-distancia='3']`
   que ya declara `transition: none`, como pide la letra («esa MISMA regla»). Test por bytes:
   `galeria-estilos.test.ts:302-307` (`porDistancia(reglaBase('tarjeta'), 3)` — el mismo cuerpo de
@@ -75,6 +78,7 @@ Las cifras CUADRAN con los dos diarios de remate (`tdd_galeria_carrusel.md`, `td
   no anula ni la transición ni el pointer-events de la base. Rojo real acreditado (R8: 1 rojo).
 
 ### @s17 ampliado (diana de 24 px)
+
 - **La vía elegida es la que el contrato NO descartó:** círculo de 0.75rem — ANILLO DE 1px
   INCLUIDO — en el `::before` (scss:193-200); la caja del `<button>` mide 1.5rem×1.5rem invisible
   (grid centrado, `border: 0`, `background: transparent`, scss:183-191); el estado actual pinta el
@@ -90,14 +94,16 @@ Las cifras CUADRAN con los dos diarios de remate (`tdd_galeria_carrusel.md`, `td
   (tests :319-342, ya existentes, siguen verdes).
 
 ## 3) Hallazgo 8 (recomendado) — AÑADIDO
+
 `galeria.test.tsx:732-759` (@s11): tras «Iniciar» con el ratón encima, un ratón NUEVO
 (leave + enter) vuelve a pausar (12000 ms quietos) Y al salir reanuda sola — fija la cancelación
 de `entra()` (Galeria.tsx:159-162) y de paso re-verifica @s10. Sabotaje 4 (arranque pegajoso):
 1 rojo. El comportamiento ya no vive solo en el diario.
 
 ## 4) Los 8 matadores de Contacto/site — CONFORMES, sin tocar producción
+
 - **Producción intacta, verificado:** `git diff HEAD -- src/lib/site.ts src/components/Contacto.tsx
-  src/components/contacto.module.scss` → VACÍO. Solo cambian los dos ficheros de test.
+src/components/contacto.module.scss` → VACÍO. Solo cambian los dos ficheros de test.
 - **site.ts:125 y :133 (mensajes vaciados):** `site.test.ts:300-313` — `toThrow('empezar por "@"')`
   con `'nailslash.studio_'` y `toThrow('no es válido')` con `'@'` y `'@nails lash'`. Patrón F-02
   (`toThrow('teléfono')`), fragmentos a mano: el error deja de ser mudo. El otro hunk del diff es
@@ -119,6 +125,7 @@ de `entra()` (Galeria.tsx:159-162) y de paso re-verifica @s10. Sabotaje 4 (arran
   asignó. 0 exclusiones nuevas, como ordenó el v1.
 
 ## 5) Cobertura @s ↔ test (v2.1)
+
 - @s1..@s18: [x] sin regresión — los 125 tests del v1 siguen en disco y verdes (el detalle
   test a test está en `judge_galeria_carrusel.md` §1 y no se repite; los 20 nuevos solo AÑADEN).
 - @s19: [x] 8 tests DOM (`galeria.test.tsx:427-506`) + 5 por valor preexistentes
@@ -131,6 +138,7 @@ de `entra()` (Galeria.tsx:159-162) y de paso re-verifica @s10. Sabotaje 4 (arran
   los sabotajes 5-6 (resta invertida / puerta invertida).
 
 ## 6) Hallazgos NO bloqueantes (v2)
+
 1. La invisibilidad de la CAJA del punto (`background: transparent`, `border: 0`, scss:189-190) no
    se asevera por bytes — el contrato remite el ASPECTO a la verificación EN VIVO (decisión 4 del
    remate) y las medidas + la vía del `::before` sí están testeadas. Dejarlo así.
@@ -147,6 +155,7 @@ de `entra()` (Galeria.tsx:159-162) y de paso re-verifica @s10. Sabotaje 4 (arran
 6. Cerrado el hallazgo 6 del v1: `project-spec.md:2612` ya tiene la sección de la Feature 22.
 
 ## 7) Checkpoints
+
 - C1: [x] dirigidos 203/203 verdes · [~] `bin/harness init` a cargo del lead (corre en paralelo,
   instrucción expresa de no pisarlo).
 - C2: [ ] dos `in_progress` (hallazgo 4 arriba; del lead, no del craftsman).
@@ -161,6 +170,7 @@ de `entra()` (Galeria.tsx:159-162) y de paso re-verifica @s10. Sabotaje 4 (arran
   diarios.
 
 ## 8) Cambios requeridos
+
 Ninguno. Los cuatro del v1 están cerrados con tests que muerden (sabotajes acreditados y
 verificados aquí contra el código), la Enmienda 1 está implementada con fidelidad de letra, y el
 remate de Contacto mata exactamente los 8 supervivientes sin tocar producción. Quedan las puertas
@@ -174,6 +184,7 @@ Lo anterior queda juzgado en las secciones 1-8 de este archivo y NO se re-litiga
 **Veredicto del delta:** APROBADO
 
 ### Punto 1 — draggable={false} en las seis <img>
+
 - Producción: `Galeria.tsx:290` (`draggable={false}`), con la nota MEDIDA en `:282-283`.
 - Test: `galeria.test.tsx:508-520` — recorre los 6 pares fichero/alt ESCRITOS A MANO
   (`:17-24`, anti-tautología) y asevera `getAttribute('draggable') === 'false'` por nombre
@@ -182,12 +193,14 @@ Lo anterior queda juzgado en las secciones 1-8 de este archivo y NO se re-litiga
   TDD log: 1 rojo). Cubre la fila del contrato @s19 «las seis "<img" … draggable="false"». [x]
 
 ### Punto 2 — touch-action: pan-y en el marco, por bytes
+
 - Producción: `galeria.module.scss:58` (`touch-action: pan-y;`), DENTRO de la regla `.marco`
   (`:53-59`), con el porqué del `pointercancel` en `:55-57`.
 - Test: `galeria-estilos.test.ts:319-326` — `reglaBase('marco')` sobre los BYTES del SCSS,
   como exige la fila del contrato («se asevera leyendo sus BYTES»). [x]
 
 ### Punto 3 — rediseño de pasosDelArrastre (revisado con lupa adversarial)
+
 - Código: `galeria-logica.ts:148-158`. La guarda del umbral (`Math.abs(Δ) < umbral`, `:149`)
   queda INTACTA — el «sin comparador» del contrato se refiere al comparador de DIRECCIÓN
   (el ternario `Δ < 0 ? 1 : -1` del superviviente 153:10), que desaparece: `:157` deriva
@@ -210,6 +223,7 @@ Lo anterior queda juzgado en las secciones 1-8 de este archivo y NO se re-litiga
   de dirección muerden en lógica Y en DOM. [x]
 
 ### Punto 4 — las 2 exclusiones Stryker (y NO una tercera)
+
 - `Galeria.tsx:90` (`useState(false)` de `arranqueExplicito`): la justificación (`:86-89`)
   cita `progress/mutation_galeria_carrusel.md` (86:62), razona la inobservabilidad POR
   CONSTRUCCIÓN (único lector `debeRotar`, `entra()` cancela en el mismo lote) y da el
@@ -227,10 +241,12 @@ Lo anterior queda juzgado en las secciones 1-8 de este archivo y NO se re-litiga
   estabilidad del sandbox y citan su incidente medido. Ninguna exclusión encubierta. [x]
 
 ### Tests
+
 `pnpm exec vitest run` dirigido a los 3 ficheros de galería: **3 files, 148/148 verdes**
 (145 del v2 + los 3 del micro-ciclo, como declara el TDD log).
 
 ### Puertas que siguen abiertas (fuera de este pase, ya encargadas)
+
 - Re-mutación de `galeria-logica.ts` y `Galeria.tsx` (con el rediseño y las 2 exclusiones
   debería dar 100 %) — `mutation_tester`.
 - Verificación EN VIVO del gesto físico en Chrome (dedo real) — lead.

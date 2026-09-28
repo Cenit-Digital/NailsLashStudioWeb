@@ -3,6 +3,7 @@
 > Medición, sin editar código. Rama `fix/titles`. Corrida única de puertas.
 
 ## Puertas (una corrida)
+
 - **typecheck** `tsc --noEmit` → exit 0. VERDE.
 - **lint** `eslint .` → 0 errores, 4 warnings `react-refresh/only-export-components`
   en `src/components/Equipo.tsx` (68,90,99,108): exporta 4 funciones PURAS
@@ -18,6 +19,7 @@
   5. anclas vivas (igualdad de conjuntos nav ↔ secciones)
 
 ## Tests (`vitest run`, una corrida)
+
 - **888 verdes / 1 rojo / 0 skipped** (889 casos, 31 ficheros).
 - Rojo: `src/pages/home-horneado.test.ts` →
   `@s14 el build de producción con las CINCO puertas termina en código de salida 0`.
@@ -33,11 +35,12 @@
 - **Rojos del hero: 0** (la sesión paralela del hero los dejó en verde).
 
 ## Verificación sobre `dist/index.html` REAL (bytes)
+
 1. **Orden de `<h2>` por id** ✓: servicios-titulo → destacados-titulo → ofertas-titulo
    → **equipo-titulo** → **reserva-titulo** → contacto-titulo → faq-titulo.
    (Equipo tras Ofertas; Reserva tras Equipo.)
 2. **Nav** ✓: hornea los 7 enlaces de sección (incluye `href="#equipo-titulo"`)
-   + 1 CTA `#reserva-titulo` (Reservar). Igualdad de conjuntos confirmada por la puerta de anclas.
+   - 1 CTA `#reserva-titulo` (Reservar). Igualdad de conjuntos confirmada por la puerta de anclas.
 3. **Un solo `<h1>`** ✓ (exactamente 1).
 4. **7 profesionales en orden** ✓: Lucía, Carla, Andrea, Nerea, Marta, Paula, Sara.
 5. **Botón flotante FUERA de `<main>`** ✓: `#whatsapp-flotante` en offset 43532,
@@ -54,6 +57,7 @@
    (sección `#servicios-titulo`); **CERO en Equipo** (como se esperaba).
 
 ## Veredicto
+
 **NO_LISTO** — estrictamente porque `pnpm test` (la puerta canónica) queda en ROJO
 en la corrida completa. El rojo es un FLAKE de infra en F-10 (no del hero, no de
 nuestro código): pasa 6/6 aislado y el build en solitario sale verde con las 5 puertas.

@@ -19,16 +19,18 @@
 **Problema (judge_boton_whatsapp.md, cambio requerido nº 1):** el contrato
 `features/boton_whatsapp_flotante.feature` @s4 exige verificar, sobre el HTML
 prerenderizado de la home, que el enlace `id="whatsapp-flotante"`:
+
 1. aparece DESPUÉS del cierre de `</main>` (no vive en el landmark principal),
 2. es hermano de `<Pie/>`,
 3. NO está dentro de `#contacto`,
-con ANCLAS POSITIVAS que impidan pasar por vacuidad (la trampa `indexOf === -1`).
-El montaje FÍSICO era correcto (`src/pages/home.tsx`, `<BotonWhatsApp/>` hermano de
-`<Pie/>` tras `</main>`), pero NINGÚN test lo pineaba: una regresión que lo moviera
-a `<main>`/`#contacto`, lo duplicara o lo eliminara pasaba verde.
+   con ANCLAS POSITIVAS que impidan pasar por vacuidad (la trampa `indexOf === -1`).
+   El montaje FÍSICO era correcto (`src/pages/home.tsx`, `<BotonWhatsApp/>` hermano de
+   `<Pie/>` tras `</main>`), pero NINGÚN test lo pineaba: una regresión que lo moviera
+   a `<main>`/`#contacto`, lo duplicara o lo eliminara pasaba verde.
 
 **Corrección:** fichero NUEVO `src/pages/boton-whatsapp-montaje.test.tsx` con
 `describe('@s4 …')` y 3 `it`:
+
 - ANCLA POSITIVA PRIMERO: el prerender contiene `</main>` y `id="whatsapp-flotante"`.
 - Orden: `indexOf(id) > indexOf(</main>)` (ambos índices >= 0 gracias a la ancla).
 - La sección `#contacto` extraída (regex `aria-labelledby="contacto-titulo"`) SÍ trae
@@ -44,6 +46,7 @@ añadir la misma comprobación en la fase de build si el judge lo exige; el cont
 @s4 ya queda cubierto por un test real y determinista.
 
 **Reglas de test del repo respetadas:**
+
 - Anti-tautología: literales A MANO (`</main>`, `id="whatsapp-flotante"`,
   `tel:+34625223366`, `aria-labelledby="contacto-titulo"`); NO se importa el id de
   `BotonWhatsApp` ni `TELEFONO`. El sujeto es `<Home/>`.

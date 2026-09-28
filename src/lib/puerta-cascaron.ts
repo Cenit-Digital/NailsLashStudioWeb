@@ -241,7 +241,11 @@ function violacionesDeHorario(pagina: PaginaArtefacto, raiz: unknown): Violacion
   return nodosDe(raiz).flatMap(({ nodo, ruta }) =>
     Object.keys(nodo)
       .filter((clave) => clave.toLowerCase() === CLAVE_DE_HORARIO_PROHIBIDA)
-      .map((clave) => ({ ruta: pagina.ruta, regla: REGLA_HORARIO, valor: `"${clave}" en ${ruta}` })),
+      .map((clave) => ({
+        ruta: pagina.ruta,
+        regla: REGLA_HORARIO,
+        valor: `"${clave}" en ${ruta}`,
+      })),
   )
 }
 
@@ -306,7 +310,10 @@ function violacionesDelNodoAcordado(nodo: NodoJson): { regla: string; valor: str
     // DECISIÓN DE PROYECTO más estricta que el vocabulario: schema.org ADMITE `Text` [V].
     violaciones.push({ regla: REGLA_ADDRESS_NO_POSTAL, valor: JSON.stringify(address) })
   } else if (typeof address.streetAddress !== 'string' || address.streetAddress === '') {
-    violaciones.push({ regla: REGLA_ADDRESS_INCOMPLETA, valor: String(address.streetAddress ?? '') })
+    violaciones.push({
+      regla: REGLA_ADDRESS_INCOMPLETA,
+      valor: String(address.streetAddress ?? ''),
+    })
   }
 
   if (!esNodo(geo)) {
@@ -451,7 +458,8 @@ function violacionesDeLaPagina(
   base: string | null,
 ): ViolacionCascaron[] {
   const violaciones: ViolacionCascaron[] = []
-  const acusar = (regla: string, valor: string): number => violaciones.push({ ruta: pagina.ruta, regla, valor })
+  const acusar = (regla: string, valor: string): number =>
+    violaciones.push({ ruta: pagina.ruta, regla, valor })
 
   // `if` independientes, NUNCA `else if` (precedente F-01/@s23): cada infracción es
   // independiente y el informe las acusa TODAS (@s25).
@@ -632,9 +640,7 @@ function violacionesDeEnlaces(
  * Se acusa a la SEGUNDA que la usa, nombrando a la primera: así el informe apunta a la página
  * que hay que arreglar y dice contra quién colisiona.
  */
-function violacionesDeCanonicaRepetida(
-  paginas: readonly PaginaArtefacto[],
-): ViolacionCascaron[] {
+function violacionesDeCanonicaRepetida(paginas: readonly PaginaArtefacto[]): ViolacionCascaron[] {
   const violaciones: ViolacionCascaron[] = []
   const duenaDeLaCanonica = new Map<string, string>()
 

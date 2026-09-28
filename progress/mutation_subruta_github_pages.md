@@ -187,8 +187,9 @@ razonamiento que `/otra-cosa`).
 VERDE contra el código real (la puerta ya se comportaba bien; el hueco era de la suite, no del
 código). Se aplicaron a mano los dos mutantes del informe sobre `esEnlaceRoto` y se corrió
 `pnpm exec vitest run src/lib/puerta-cascaron.test.ts -t "@s37"`:
+
 - Mutante 1 (`if (false) { return false }`): la fila nueva pasó a FALLAR — `expected [] but got
-  [{ regla: 'href interno sin fichero en dist/', valor: '/pagina-que-no-tiene-nada-que-ver-con-la-base' }]`.
+[{ regla: 'href interno sin fichero en dist/', valor: '/pagina-que-no-tiene-nada-que-ver-con-la-base' }]`.
   El resto de `@s37` (incluida `/otra-cosa`) siguió en verde, confirmando que SOLO la fila nueva
   ejercita la guarda.
 - Mutante 2 (`if (!ruta.startsWith(base)) {}`, bloque vacío): mismo fallo, mismo mensaje.

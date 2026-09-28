@@ -664,7 +664,11 @@ describe('las URL que resuelven al propio sitio NO se detectan (@s18)', () => {
       '@font-face { src: url(/assets/manrope-latin-400-normal-BGsTXAXT.woff2); }',
       'ROOT-ABSOLUTA: es la forma REAL de Vite [V]',
     ],
-    ['html', '<script type="module" src="/assets/app-ti4oL6dR.js"></script>', 'el propio artefacto'],
+    [
+      'html',
+      '<script type="module" src="/assets/app-ti4oL6dR.js"></script>',
+      'el propio artefacto',
+    ],
     ['html', '<img src="a.png">', 'relativa, sin <base>: el propio sitio'],
     ['html', '<a href="#servicios">Servicios</a>', 'ancla dentro de la misma página'],
     [
@@ -810,7 +814,11 @@ describe('la allowlist compara el origen EXACTO — ni subcadena, ni prefijo, ni
     ['fonts.googleapis.co', 1, 'UN CARÁCTER de menos: NO se tapa'],
     ['fonts.googleapis.comm', 1, 'UN CARÁCTER de más: NO se tapa'],
     ['googleapis.com', 1, 'SUBCADENA del permitido: NO se tapa'],
-    ['fonts.googleapis.com.attacker.net', 1, 'SUFIJO ATACANTE: el permitido es PREFIJO. NO se tapa'],
+    [
+      'fonts.googleapis.com.attacker.net',
+      1,
+      'SUFIJO ATACANTE: el permitido es PREFIJO. NO se tapa',
+    ],
     ['attacker.net/fonts.googleapis.com', 1, 'el permitido va en la RUTA, no en el origen'],
   ])('@s23 con un <script src> a %s se detectan %i (%s)', (origen, detectados) => {
     expect(

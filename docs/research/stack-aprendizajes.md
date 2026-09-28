@@ -66,20 +66,20 @@ de WebEmpresa a `harness.config.json` — y **subir el umbral de mutación de 0.
 **[HECHO]** Tabla declarada en `WebEmpresa/docs/architecture.md:9-21` y confirmada
 contra las dependencias reales de `WebEmpresa/package.json:29-64`:
 
-| Capa | Herramienta | Versión real (`package.json`) |
-|---|---|---|
-| Framework | React + TypeScript | `react ^19.2.0` (:34), `typescript ^5.9.0` (:59) |
-| Bundler / dev | Vite | `vite ^7.3.0` (:61) |
-| SSG / rutas | vite-react-ssg + react-router-dom | `vite-react-ssg 0.9.0` (:62, **pineada sin `^`**), `react-router-dom ^6.30.0` (:37) |
-| Estilos | SCSS Modules + tokens CSS | `sass ^1.80.0` (:58) |
-| Primitivas UI | Radix UI | `radix-ui ^1.6.0` (:33) |
-| Fuentes | @fontsource | Outfit + DM Sans (:30-31) |
-| Tests | Vitest + Testing Library + jsdom | `vitest ^4.0.0` (:63), `jsdom ^25.0.0` (:56) |
-| Mutación | StrykerJS (vitest-runner) | `@stryker-mutator/core ^9.6.0` (:42) |
-| Lint / formato | ESLint 9 flat + Prettier | `eslint ^9.39.0` (:51) |
-| Gestor | pnpm | `packageManager: pnpm@11.9.0` (:8) |
-| Email | Resend | `resend ^6.17.1` (:38) |
-| Antiabuso | @vercel/firewall | `@vercel/firewall ^1.2.1` (:32) |
+| Capa           | Herramienta                       | Versión real (`package.json`)                                                       |
+| -------------- | --------------------------------- | ----------------------------------------------------------------------------------- |
+| Framework      | React + TypeScript                | `react ^19.2.0` (:34), `typescript ^5.9.0` (:59)                                    |
+| Bundler / dev  | Vite                              | `vite ^7.3.0` (:61)                                                                 |
+| SSG / rutas    | vite-react-ssg + react-router-dom | `vite-react-ssg 0.9.0` (:62, **pineada sin `^`**), `react-router-dom ^6.30.0` (:37) |
+| Estilos        | SCSS Modules + tokens CSS         | `sass ^1.80.0` (:58)                                                                |
+| Primitivas UI  | Radix UI                          | `radix-ui ^1.6.0` (:33)                                                             |
+| Fuentes        | @fontsource                       | Outfit + DM Sans (:30-31)                                                           |
+| Tests          | Vitest + Testing Library + jsdom  | `vitest ^4.0.0` (:63), `jsdom ^25.0.0` (:56)                                        |
+| Mutación       | StrykerJS (vitest-runner)         | `@stryker-mutator/core ^9.6.0` (:42)                                                |
+| Lint / formato | ESLint 9 flat + Prettier          | `eslint ^9.39.0` (:51)                                                              |
+| Gestor         | pnpm                              | `packageManager: pnpm@11.9.0` (:8)                                                  |
+| Email          | Resend                            | `resend ^6.17.1` (:38)                                                              |
+| Antiabuso      | @vercel/firewall                  | `@vercel/firewall ^1.2.1` (:32)                                                     |
 
 **[HECHO]** Node: `.nvmrc` = `22`; `engines.node: ">=22.12.0"`, `engines.pnpm: ">=10"`
 (`WebEmpresa/package.json:9-12`).
@@ -91,8 +91,8 @@ encontrado el ADR que lo justifique** → §3.
 
 **[HECHO] Regla de dependencias** (`WebEmpresa/docs/architecture.md:36-39`):
 `pages` → usa `components` y `lib`; `components` → usa `lib`; **`lib` no importa de
-`components` ni de `pages`**. Motivo declarado: *"La lógica con valor de negocio vive
-en `lib/` para poder testearla y mutarla sin renderizar."* Esto no es estética: es
+`components` ni de `pages`**. Motivo declarado: _"La lógica con valor de negocio vive
+en `lib/` para poder testearla y mutarla sin renderizar."_ Esto no es estética: es
 lo que hace que la mutación al 100% sea alcanzable — la lista `mutate` de Stryker
 está dominada por `src/lib/` (`WebEmpresa/stryker.config.json:12-30`).
 
@@ -100,23 +100,23 @@ está dominada por `src/lib/` (`WebEmpresa/stryker.config.json:12-30`).
 
 **[HECHO]** 15 features, **todas `done`** (`WebEmpresa/feature_list.json:11-198`):
 
-| # | Nombre | Qué es | Herencia para un salón |
-|---|---|---|---|
-| 1 | `infra_base` | Scaffolding del stack (:16) | Directa |
-| 2 | `nav` | Nav escritorio + menú móvil Radix Dialog (:30) | Directa |
-| 3 | `theme_selector` | 3 estados claro/oscuro/sistema, anti-FOUC (:42) | **Cuestionable** (§4) |
-| 4 | `footer` | Copyright año dinámico, aviso legal (:54) | Directa |
-| 5 | `layout_accesibilidad` | Skip-link + `<title>` por ruta (:66) | Directa |
-| 6 | `hero` | Propuesta de valor + 2 CTA + 4 stats (:78) | Adaptable |
-| 7 | `servicios` | 6 tarjetas de servicio (:90) | **Muy directa** (un salón tiene servicios) |
-| 8 | `sectores` | 4 tarjetas de sector (:102) | No aplica |
-| 9 | `paquetes` | 3 paquetes **sin precios** (:114) | Adaptable (§2.4.5) |
-| 10 | `contacto_seccion` | Estructura del formulario (:126) | Directa |
-| 11 | `contact_form` | Envío real con Resend + honeypot (:138) | **Muy directa** |
-| 12 | `marca` | Logo "Órbita" + tokens de tema (:150) | Patrón sí, arte no |
-| 13 | `fidelidad_referencia` | Reconciliar deriva vs diseño (:162) | Patrón de proceso |
-| 14 | `logo_draw_animation` | Animación CSS de "dibujado" (:176) | Patrón R1 |
-| 15 | `servicios_scroll_reveal` | Revelado en scroll con IntersectionObserver (:188) | **Directa** (hook reutilizable) |
+| #   | Nombre                    | Qué es                                             | Herencia para un salón                     |
+| --- | ------------------------- | -------------------------------------------------- | ------------------------------------------ |
+| 1   | `infra_base`              | Scaffolding del stack (:16)                        | Directa                                    |
+| 2   | `nav`                     | Nav escritorio + menú móvil Radix Dialog (:30)     | Directa                                    |
+| 3   | `theme_selector`          | 3 estados claro/oscuro/sistema, anti-FOUC (:42)    | **Cuestionable** (§4)                      |
+| 4   | `footer`                  | Copyright año dinámico, aviso legal (:54)          | Directa                                    |
+| 5   | `layout_accesibilidad`    | Skip-link + `<title>` por ruta (:66)               | Directa                                    |
+| 6   | `hero`                    | Propuesta de valor + 2 CTA + 4 stats (:78)         | Adaptable                                  |
+| 7   | `servicios`               | 6 tarjetas de servicio (:90)                       | **Muy directa** (un salón tiene servicios) |
+| 8   | `sectores`                | 4 tarjetas de sector (:102)                        | No aplica                                  |
+| 9   | `paquetes`                | 3 paquetes **sin precios** (:114)                  | Adaptable (§2.4.5)                         |
+| 10  | `contacto_seccion`        | Estructura del formulario (:126)                   | Directa                                    |
+| 11  | `contact_form`            | Envío real con Resend + honeypot (:138)            | **Muy directa**                            |
+| 12  | `marca`                   | Logo "Órbita" + tokens de tema (:150)              | Patrón sí, arte no                         |
+| 13  | `fidelidad_referencia`    | Reconciliar deriva vs diseño (:162)                | Patrón de proceso                          |
+| 14  | `logo_draw_animation`     | Animación CSS de "dibujado" (:176)                 | Patrón R1                                  |
+| 15  | `servicios_scroll_reveal` | Revelado en scroll con IntersectionObserver (:188) | **Directa** (hook reutilizable)            |
 
 **[HECHO]** Volumen final: **194 tests**, build SSG de 2 páginas, mutación 100%
 (`WebEmpresa/progress/history.md:236-237`). Recuento propio: 24 ficheros de test
@@ -126,16 +126,17 @@ sobre 26 ficheros fuente no-test (`find src`).
 
 **[HECHO] D1 — El pipeline SDD y su orden** (`WebEmpresa/docs/workflow.md:9-40`).
 El razonamiento textual, que es el activo real:
-- *"La puerta humana va sobre el contrato, no sobre el código. Aprobar el `.feature`
-  es barato; aprobar tarde (con código hecho) es caro."* (`:32-33`)
-- *"El review es el juego entero. Generar borradores es barato; el juicio que poda es
-  el valor escaso. El `judge` no edita: poda."* (`:36-37`)
-- *"Una suite verde solo dice que el código no explota. La mutación introduce defectos
-  y exige que algún test falle... es la medida real de si la red atrapa peces."* (`:38-40`)
+
+- _"La puerta humana va sobre el contrato, no sobre el código. Aprobar el `.feature`
+  es barato; aprobar tarde (con código hecho) es caro."_ (`:32-33`)
+- _"El review es el juego entero. Generar borradores es barato; el juicio que poda es
+  el valor escaso. El `judge` no edita: poda."_ (`:36-37`)
+- _"Una suite verde solo dice que el código no explota. La mutación introduce defectos
+  y exige que algún test falle... es la medida real de si la red atrapa peces."_ (`:38-40`)
 
 **[HECHO] D2 — Umbral de mutación = 100%, no 80%.** `WebEmpresa/stryker.config.json:31-35`:
-`{"high": 100, "low": 90, "break": 100}`, comentado como *"Umbral: 100% sobre las
-líneas tocadas por la feature"* (`:3`). **[HECHO]** Y se sostuvo de verdad: 100%
+`{"high": 100, "low": 90, "break": 100}`, comentado como _"Umbral: 100% sobre las
+líneas tocadas por la feature"_ (`:3`). **[HECHO]** Y se sostuvo de verdad: 100%
 (356/356) en el design system (`history.md:50-51`), 100% (98/98) en #13 (`:75-76`),
 100% (15/15) en #14 (`:180-181`), 100% (63 killed + 4 timeout / 67) en #15 (`:225-226`).
 
@@ -143,8 +144,8 @@ líneas tocadas por la feature"* (`:3`). **[HECHO]** Y se sostuvo de verdad: 100
 se acotó a los 4 ficheros tocados (`history.md:75-77`); en #14 a `Logo.tsx`+`Hero.tsx`
 (`:180`); en #15 a `useReveal.ts`+`Servicios.tsx` (`:225`).
 **[HECHO] Corolario honesto:** cuando un cambio es solo SCSS, la mutación es **N/A**
-y se dice — no se finge: *"Mutación: **N/A** — ningún fichero de la lista `mutate` de
-Stryker fue tocado"* (`:107-109`, y otra vez `:246-247`).
+y se dice — no se finge: _"Mutación: **N/A** — ningún fichero de la lista `mutate` de
+Stryker fue tocado"_ (`:107-109`, y otra vez `:246-247`).
 **[INFERENCIA]** Esto es una admisión implícita de que **Stryker no protege el CSS**.
 Toda la fidelidad visual y el responsive quedan fuera de la red de mutación. De ahí
 que el proyecto acabara inventando el idioma "leer el `.scss` y aseverar la regla"
@@ -152,24 +153,24 @@ que el proyecto acabara inventando el idioma "leer el `.scss` y aseverar la regl
 
 **[HECHO] D4 — Solo 3 agentes de apoyo, y se rechazaron 9.**
 `WebEmpresa/docs/tooling.md:80-89`: no se adoptaron `architect`/`backend-dev`/`devops`/
-`qa`/`code-reviewer`/`tech-writer` porque *"duplican o contradicen el arnés y el stack"*:
+`qa`/`code-reviewer`/`tech-writer` porque _"duplican o contradicen el arnés y el stack"_:
 `code-reviewer ≈ judge`, `qa + dev ≈ tdd_craftsman`, y `backend-dev`/`devops-engineer`
-*"asumen `src/server`, `prisma`, `Dockerfile`, CI… que este sitio estático (SSG) no
-tiene"*. Los 9 agentes existentes están en `WebEmpresa/.claude/agents/` (verificado
+_"asumen `src/server`, `prisma`, `Dockerfile`, CI… que este sitio estático (SSG) no
+tiene"_. Los 9 agentes existentes están en `WebEmpresa/.claude/agents/` (verificado
 con `ls`: los 6 del pipeline + `security_reviewer`, `a11y_seo_auditor`, `mentor`).
 
 **[HECHO] D5 — Agent Teams se descartó con verificación adversarial contra la doc
-oficial** (`WebEmpresa/docs/tooling.md:97-116`): `TeamCreate`/`TeamDelete` *"ya no
-existen"*, sigue experimental y desactivado por defecto, y *"el multi-panel no funciona
-en Windows"* (esta máquina es Windows 11). Fuente oficial citada allí:
+oficial** (`WebEmpresa/docs/tooling.md:97-116`): `TeamCreate`/`TeamDelete` _"ya no
+existen"_, sigue experimental y desactivado por defecto, y _"el multi-panel no funciona
+en Windows"_ (esta máquina es Windows 11). Fuente oficial citada allí:
 `https://code.claude.com/docs/en/agent-teams`.
 **[INFERENCIA]** El aprendizaje transferible no es "no uses Agent Teams", es: **la
 plantilla de moda se contrasta contra la doc oficial y contra la máquina real antes de
 adoptarla.** Ese hábito es exactamente el que este informe debe continuar.
 
 **[HECHO] D6 — Ponytail vendorizado, no como plugin** (`docs/tooling.md:30-35`):
-*"`/plugin marketplace add` es un comando interactivo del host que un agente no puede
-ejecutar; en el repo queda versionado, portable y activo."*
+_"`/plugin marketplace add` es un comando interactivo del host que un agente no puede
+ejecutar; en el repo queda versionado, portable y activo."_
 
 ### 2.4 Problemas que aparecieron y cómo se resolvieron
 
@@ -179,8 +180,8 @@ ejecutar; en el repo queda versionado, portable y activo."*
 #### 2.4.1 ⚠️ La regresión que los tests no podían ver (la lección más cara)
 
 **[HECHO]** `WebEmpresa/progress/history.md:113-153`, commit `0186643` /`7afda5d`.
-Síntoma reportado por Pablo: en móvil (~390px) los enlaces de nav aparecían *"siempre
-visibles"* superpuestos al hero.
+Síntoma reportado por Pablo: en móvil (~390px) los enlaces de nav aparecían _"siempre
+visibles"_ superpuestos al hero.
 
 **Causa raíz 1 [HECHO]** (`history.md:120-127`): la conmutación móvil/escritorio la
 decide **solo JS** (`useIsMobile` → `useSyncExternalStore`, con
@@ -189,9 +190,10 @@ en el HTML estático. En móvil, **antes de hidratar**, esa nav se muestra y **d
 324px** (medido: 607px de contenido en 283px) sobre el hero.
 
 **Por qué no lo cazó nadie [HECHO]** (`history.md:127-131`) — cito porque es el núcleo:
-> *"Los tests no lo cazaban (mockean `matchMedia` → solo prueban el estado
+
+> _"Los tests no lo cazaban (mockean `matchMedia` → solo prueban el estado
 > post-hidratación); la sesión responsive previa tampoco, porque midió por CDP el
-> estado **ya hidratado**."*
+> estado **ya hidratado**."_
 
 **Causa raíz 2 [HECHO]** (`:131-135`): con el drawer abierto, `.overlay`/`.panel`
 tenían `z-index:auto` vs cabecera sticky `z-index:50` → la cabecera pintaba sobre el
@@ -199,9 +201,9 @@ panel, ocultando el ✕. Se halló **al ir a verificar la causa 1**.
 
 **Fix [HECHO]** (`:136-141`): solo CSS, aditivo — `@media (max-width:767px){ .nav{
 display:none } }` con **breakpoint idéntico a `MOBILE_QUERY`**, y `z-index:100` en
-overlay/panel. Y los tests de regresión son **no tautológicos**: *"`@s4` lee el SCSS
+overlay/panel. Y los tests de regresión son **no tautológicos**: _"`@s4` lee el SCSS
 y aserta la media query; `@s5..@s8` compara los z-index numéricos contra el 50 real
-de la cabecera"* (`:141-143`).
+de la cabecera"_ (`:141-143`).
 
 **[HECHO]** También se descartó explícitamente un **falso positivo** ("Dialog abierto
 por defecto") midiendo sin clic (`:133-135`).
@@ -214,17 +216,17 @@ verificación debe incluir el HTML servido crudo.
 
 #### 2.4.2 El `<main>` que duplicaba el gutter
 
-**[HECHO]** `history.md:91-96` (commit `988795e`): *"la home iba envuelta en `<main>`
+**[HECHO]** `history.md:91-96` (commit `988795e`): _"la home iba envuelta en `<main>`
 con `max-width`+`padding`, lo que **duplicaba el gutter** (hero estrecho, títulos
-partidos en móvil) y **recortaba las bandas de color** en escritorio"*. Fix: `main` a
+partidos en móvil) y **recortaba las bandas de color** en escritorio"_. Fix: `main` a
 sangre completa, `.prose` autónomo para páginas de texto, y tokens `--gutter`/
 `--section-y` fluidos con `clamp` (`:94-96`).
 
 #### 2.4.3 El mutante superviviente por tautología en el fake
 
 **[HECHO]** `history.md:28-33`: primera corrida 97.37% con 1 superviviente
-(`useIsMobile.ts:4`, literal `MOBILE_QUERY`) *"por tautología en el fake de
-`matchMedia`"*. El fake usaba la propia constante, así que mutarla no rompía nada.
+(`useIsMobile.ts:4`, literal `MOBILE_QUERY`) _"por tautología en el fake de
+`matchMedia`"_. El fake usaba la propia constante, así que mutarla no rompía nada.
 Fix: anclar el fake **al literal** `'(max-width: 767px)'` → mutación 100% (38/38).
 
 **[INFERENCIA]** Regla general: **un doble de test nunca debe importar la constante
@@ -232,31 +234,31 @@ que valida**; debe repetir el literal. Si no, el test es un espejo, no una red.
 
 #### 2.4.4 El `judge` corrigiendo el contrato, no solo el código
 
-**[HECHO]** `history.md:60-63`: en #13 *"El lead corrigió `@s7` del contrato (la
+**[HECHO]** `history.md:60-63`: en #13 _"El lead corrigió `@s7` del contrato (la
 referencia usa `space-between` con 2 grupos; la corrección del hueco central es
-estructural —2 hijos, no 3—, no de CSS)"*. **[HECHO]** Y en #2 la puerta humana
-**cambió** el contrato: Pablo detectó que faltaba "Sectores" en el panel móvil, *"era
-un olvido del diseño de referencia"* (`:14-17`).
+estructural —2 hijos, no 3—, no de CSS)"_. **[HECHO]** Y en #2 la puerta humana
+**cambió** el contrato: Pablo detectó que faltaba "Sectores" en el panel móvil, _"era
+un olvido del diseño de referencia"_ (`:14-17`).
 **[INFERENCIA]** La puerta humana **funcionó**: cazó un defecto del diseño de
 referencia antes de escribir código. Es el argumento empírico para no saltársela.
 
 #### 2.4.5 Discrepancia Jira vs diseño: se señala, no se resuelve sola
 
-**[HECHO]** Feature #9 `paquetes` (`feature_list.json:114-119`): *"Sin precios fijos:
+**[HECHO]** Feature #9 `paquetes` (`feature_list.json:114-119`): _"Sin precios fijos:
 el diseño final no los muestra (discrepancia con el texto de WEB-5 en Jira, señalada,
-**no resuelta por mi cuenta**)"*, y se dejó en `acceptance`: *"Pendiente de decisión de
+**no resuelta por mi cuenta**)"_, y se dejó en `acceptance`: _"Pendiente de decisión de
 producto: si se muestran precios fijos, hay que ampliar este feature antes de darlo por
-done"*.
+done"_.
 **[INFERENCIA]** Patrón de conducta a heredar tal cual: ante un conflicto entre
 fuentes de verdad, el agente **no elige**; lo hace explícito y lo eleva. Para un salón
 con **precios reales**, esto es directamente aplicable (§4).
 
 #### 2.4.6 Fallos de infraestructura del propio agente
 
-**[HECHO]** Dos veces se cayó el `tdd_craftsman` a mitad: *"una corrida se cortó por
-watchdog del stream y se completó con una continuación determinista"* (`history.md:166-167`)
-y *"El `tdd_craftsman` cayó por un error transitorio de API tras dejar el test @s10
-escrito; el lead completó el cambio de SCSS"* (`:246-248`).
+**[HECHO]** Dos veces se cayó el `tdd_craftsman` a mitad: _"una corrida se cortó por
+watchdog del stream y se completó con una continuación determinista"_ (`history.md:166-167`)
+y _"El `tdd_craftsman` cayó por un error transitorio de API tras dejar el test @s10
+escrito; el lead completó el cambio de SCSS"_ (`:246-248`).
 **[INFERENCIA]** Esto valida la **regla anti-teléfono-descompuesto** del `CLAUDE.md`
 (resultados en disco, no en el chat): los artefactos en `progress/` permitieron
 retomar sin perder el trabajo.
@@ -265,11 +267,11 @@ retomar sin perder el trabajo.
 
 #### 2.5.1 ⭐ Patrón R1 — "el estado base es el estado final visible"
 
-**[HECHO]** Nació en #14 (`history.md:170-173`): *"**R1**: estado BASE = DIBUJADO (el
+**[HECHO]** Nació en #14 (`history.md:170-173`): _"**R1**: estado BASE = DIBUJADO (el
 oculto vive solo en el 0% de cada keyframe) → reduced-motion y prerender SSG muestran
-el logo completo."* **[HECHO]** Y se reutilizó explícitamente en #15
-(`feature_list.json:189`: *"SSG-safe (estado base = estado final visible, patrón R1 de
-la feature #14)"*), donde el oculto vive **solo** bajo
+el logo completo."_ **[HECHO]** Y se reutilizó explícitamente en #15
+(`feature_list.json:189`: _"SSG-safe (estado base = estado final visible, patrón R1 de
+la feature #14)"_), donde el oculto vive **solo** bajo
 `[data-reveal] .row:not([data-in-view])` dentro de
 `@media (prefers-reduced-motion: no-preference)` (`history.md:210-215`).
 
@@ -285,11 +287,12 @@ llevarse.
 
 **[HECHO]** `WebEmpresa/features/servicios_scroll_reveal.feature:8-19` documenta el
 porqué con una honestidad poco común:
-> *"la interpolación de la animación NO es verificable en jsdom (no hay
+
+> _"la interpolación de la animación NO es verificable en jsdom (no hay
 > IntersectionObserver real, ni layout, ni transition). El contrato testeable se parte
 > en DOS: (a) @s1..@s6 — la LÓGICA del hook... (b) @s7..@s13 — el CONTENIDO del SCSS
 > module: se lee `Servicios.module.scss` y se asevera la regla... **Ningún escenario
-> afirma la interpolación en el tiempo, solo la DEFINICIÓN de la regla en el fichero.**"*
+> afirma la interpolación en el tiempo, solo la DEFINICIÓN de la regla en el fichero.**"_
 
 **[INFERENCIA]** Es la respuesta pragmática al hueco de §2.3-D3 (Stryker no ve CSS).
 Es un patrón útil **y** con un límite que hay que decir en voz alta: aserta que la
@@ -299,12 +302,13 @@ navegador; la complementa.
 #### 2.5.3 Hook `useReveal` — genérico, SSR-safe, copiable tal cual
 
 **[HECHO]** `WebEmpresa/src/lib/useReveal.ts:1-35`. Cualidades verificadas en el código:
+
 - Guard SSR: `if (typeof IntersectionObserver === 'undefined') return` (`:20`).
 - Limpieza: `return () => observer.disconnect()` (`:32`).
 - Arma `data-reveal` en `useEffect`, **no en el render** — el comentario dice por qué:
-  *"(imperativo, en `useEffect`, no en el render: sin mismatch de hidratación)"* (`:8-9`).
-- **Genérico por `data-*`**: *"no conoce clases de estilo (cada sección decide su
-  animación en su SCSS module)"* (`:10-11`).
+  _"(imperativo, en `useEffect`, no en el render: sin mismatch de hidratación)"_ (`:8-9`).
+- **Genérico por `data-*`**: _"no conoce clases de estilo (cada sección decide su
+  animación en su SCSS module)"_ (`:10-11`).
 - Banda central exportada como constante: `REVEAL_ROOT_MARGIN = '-40% 0px -40% 0px'` (`:4`).
 
 **[HECHO]** Nota de mutación: lleva `// Stryker disable next-line all` sobre el guard
@@ -314,28 +318,30 @@ legítima al 100%.
 #### 2.5.4 ⭐ Formulario de contacto: la frontera de confianza, ya resuelta
 
 **[HECHO] El fallo original** (`WebEmpresa/progress/security_review.md:15-33`): el
-honeypot se comprobaba **solo en cliente**, así que `/api/contact` era *"un relé de
-email abierto"*: un `curl` en bucle *"**consume cuota/dinero de Resend** sin límite"* y
-*"puede usar tu dominio verificado para reenviar contenido arbitrario"*.
+honeypot se comprobaba **solo en cliente**, así que `/api/contact` era _"un relé de
+email abierto"_: un `curl` en bucle _"**consume cuota/dinero de Resend** sin límite"_ y
+_"puede usar tu dominio verificado para reenviar contenido arbitrario"_.
 
 **[HECHO] El fix ya está en el código** (`WebEmpresa/api/contact.ts`), y es copiable:
+
 - Honeypot **server-side** con **éxito silencioso**: `if (typeof body.empresa === 'string'
-  && body.empresa.trim() !== '') return Response.json({ ok: true })` (`:55-58`).
+&& body.empresa.trim() !== '') return Response.json({ ok: true })` (`:55-58`).
   (Devolver 200 y no enviar: el bot no aprende que fue detectado.)
 - Rate limit por IP: `checkRateLimit('contact-form', { request })` → 429 (`:42-46`).
 - Revalidación de formato en servidor: `EMAIL_RE` (`:32`, `:69-71`).
 - Topes de longitud: `MAX = { nombre: 120, email: 320, telefono: 40, sector: 60,
-  mensaje: 5000 }` (`:30`, `:72-80`).
+mensaje: 5000 }` (`:30`, `:72-80`).
 - Saneado CRLF **como defensa en profundidad**: `stripCrlf` (`:34`) con el motivo
-  escrito: *"quita CR/LF por si algún día se migra a SMTP crudo"* (`:33`).
+  escrito: _"quita CR/LF por si algún día se migra a SMTP crudo"_ (`:33`).
 - Errores genéricos al cliente: `'No se pudo enviar'` (`:108`) — no filtra el objeto
   `error` de Resend.
 - Method allow-list (`:38-40`), body malformado → 400 (`:48-53`).
 
 **[HECHO] ⚠️ TRAMPA OPERATIVA — la más importante de este informe.**
 `WebEmpresa/api/contact.ts:10-13` dice literalmente:
-> *"El rate limit requiere una regla **"contact-form" en el Firewall de Vercel
-> (dashboard)**; si no existe, **`checkRateLimit` es un no-op seguro**."*
+
+> _"El rate limit requiere una regla **"contact-form" en el Firewall de Vercel
+> (dashboard)**; si no existe, **`checkRateLimit` es un no-op seguro**."_
 
 **[INFERENCIA]** Traducción: **el código puede estar perfecto y el rate limit no
 existir**, en silencio, porque depende de configuración manual en un panel web fuera
@@ -346,27 +352,28 @@ puede cubrir. → §3.
 
 **[HECHO] Análisis de seguridad ya cerrado que NO hay que reabrir**
 (`security_review.md:57-78`):
-- **Inyección de cabeceras: no explotable** — *"el SDK de Resend usa su **API HTTP
-  (JSON)**, no SMTP crudo... viaja como valor JSON y se codifica (RFC 2047)"*. Además
+
+- **Inyección de cabeceras: no explotable** — _"el SDK de Resend usa su **API HTTP
+  (JSON)**, no SMTP crudo... viaja como valor JSON y se codifica (RFC 2047)"_. Además
   `to`/`from` salen de env, no del usuario.
-- **CSRF: no hace falta** — *"el endpoint no usa cookies ni sesión, así que no hay
-  estado autenticado que un CSRF pueda abusar"*. Se dejó anotado explícitamente *"para
-  que no se re-abra como hallazgo"*.
+- **CSRF: no hace falta** — _"el endpoint no usa cookies ni sesión, así que no hay
+  estado autenticado que un CSRF pueda abusar"_. Se dejó anotado explícitamente _"para
+  que no se re-abra como hallazgo"_.
 
 **[HECHO] Secretos** (`security_review.md:83-87`): `RESEND_API_KEY` solo se lee en
 `api/contact.ts` vía `process.env`, **sin prefijo `VITE_`**, nunca entra al bundle. La
-regla está escrita en `WebEmpresa/.env.example:6-8`: *"Vite solo expone al cliente las
+regla está escrita en `WebEmpresa/.env.example:6-8`: _"Vite solo expone al cliente las
 variables con prefijo `VITE_`. El resto son de build/servidor y NUNCA deben llegar al
-bundle del navegador."*
+bundle del navegador."_
 
 #### 2.5.5 Anti-FOUC: script inline + réplica pura testeable
 
 **[HECHO]** El script bloqueante en `WebEmpresa/index.html:10-28` aplica `data-theme`
 **antes del primer pintado**, con `try/catch` y fallback a `'light'` (`:24-26`).
 **[HECHO]** El patrón fino: `WebEmpresa/src/lib/theme.ts:78-88` mantiene una **réplica
-pura** de esa lógica, documentada como tal: *"Réplica pura de la lógica del script
-anti-FOUC del `index.html` (@s8)"*, y el `index.html` lo declara en el otro sentido:
-*"Espeja `src/lib/theme.ts:initialThemeAttribute`"* (`index.html:12-13`).
+pura** de esa lógica, documentada como tal: _"Réplica pura de la lógica del script
+anti-FOUC del `index.html` (@s8)"_, y el `index.html` lo declara en el otro sentido:
+_"Espeja `src/lib/theme.ts:initialThemeAttribute`"_ (`index.html:12-13`).
 
 **[INFERENCIA]** Es una **duplicación deliberada y bidireccionalmente documentada**:
 el script inline no puede importar módulos (sería tarde), así que se duplica y se testea
@@ -387,9 +394,10 @@ ruta (`src/pages/home.tsx:31`, `src/pages/aviso-legal.tsx:11`), OG por ruta
 
 **[HECHO] ⭐ El comentario más relevante para NUESTRO proyecto**, en
 `WebEmpresa/src/pages/home.tsx:12-14`:
-> *"JSON-LD **Organization** (**no LocalBusiness: no inventamos dirección ni
+
+> _"JSON-LD **Organization** (**no LocalBusiness: no inventamos dirección ni
 > teléfono**). Se escapa `<` para que un cierre de `</script>` en los datos no pueda
-> romper el documento (serialización segura, aunque hoy los datos sean estáticos)."*
+> romper el documento (serialización segura, aunque hoy los datos sean estáticos)."_
 
 Implementado con `.replace(/</g, '\\u003c')` (`home.tsx:21`).
 
@@ -417,28 +425,28 @@ Confluence enlazada al ticket.
 `WebEmpresa/progress/audit_a11y_seo.md:16-48` declaró **3 bloqueantes** de contraste
 (SC 1.4.3). He comprobado que **los valores de token siguen idénticos en HEAD**:
 
-| ID | Token (HEAD) | Ratio auditoría | **Ratio recomputado por mí** | ¿Cumple 4.5:1? |
-|---|---|---|---|---|
-| B2 | `--color-accent: #7c5cbf` sobre `#12082a` (oscuro) — `_tokens.scss:93` | ≈3.8:1 (`:34`) | **3.78:1** | ❌ |
-| B1 | `--color-tag-ink: #7c5cbf` sobre tag-bg compuesto (oscuro) — `_tokens.scss:111` | ≈2.6:1 (`:23`) | **2.64:1** | ❌ |
-| B3 | `--color-text-faint` claro — `_tokens.scss:57` | ≈2.8:1 (`:42`) | **2.78:1** | ❌ |
-| B3 | `--color-text-faint` oscuro — `_tokens.scss:108` | ≈3.5:1 (`:42`) | **3.51:1** | ❌ |
-| — | `--color-accent: #1e7a4f` claro sobre `#f2f4ef` — `_tokens.scss:42` | ≈4.8:1 (`:35`) | **4.80:1** | ✅ (por poco) |
+| ID  | Token (HEAD)                                                                    | Ratio auditoría | **Ratio recomputado por mí** | ¿Cumple 4.5:1? |
+| --- | ------------------------------------------------------------------------------- | --------------- | ---------------------------- | -------------- |
+| B2  | `--color-accent: #7c5cbf` sobre `#12082a` (oscuro) — `_tokens.scss:93`          | ≈3.8:1 (`:34`)  | **3.78:1**                   | ❌             |
+| B1  | `--color-tag-ink: #7c5cbf` sobre tag-bg compuesto (oscuro) — `_tokens.scss:111` | ≈2.6:1 (`:23`)  | **2.64:1**                   | ❌             |
+| B3  | `--color-text-faint` claro — `_tokens.scss:57`                                  | ≈2.8:1 (`:42`)  | **2.78:1**                   | ❌             |
+| B3  | `--color-text-faint` oscuro — `_tokens.scss:108`                                | ≈3.5:1 (`:42`)  | **3.51:1**                   | ❌             |
+| —   | `--color-accent: #1e7a4f` claro sobre `#f2f4ef` — `_tokens.scss:42`             | ≈4.8:1 (`:35`)  | **4.80:1**                   | ✅ (por poco)  |
 
-*Método de mi recomputación: fórmula de luminancia relativa y ratio de contraste de
+_Método de mi recomputación: fórmula de luminancia relativa y ratio de contraste de
 WCAG 2.1, compositando los `rgba` sobre el fondo declarado. Mis cifras coinciden con la
-auditoría en las 5 medidas → **la auditoría es fiable**.*
+auditoría en las 5 medidas → **la auditoría es fiable**._
 
-**[HECHO] Requisito normativo oficial** (fuente: W3C, *Success Criterion 1.4.3 Contrast
-(Minimum)*, https://www.w3.org/TR/WCAG21/#contrast-minimum): nivel **AA**; texto normal
+**[HECHO] Requisito normativo oficial** (fuente: W3C, _Success Criterion 1.4.3 Contrast
+(Minimum)_, https://www.w3.org/TR/WCAG21/#contrast-minimum): nivel **AA**; texto normal
 **"at least 4.5:1"**; texto grande **"at least 3:1"**; "texto grande" = **≥18pt o ≥14pt
 en negrita**. Excepciones: texto incidental/decorativo y logotipos.
 
 **[HECHO]** Los usos afectados **no** caen en la excepción: la auditoría precisa que
 `.tag` es 11px/700 y `.exampleLabel` 9.5px/700 (`audit_a11y_seo.md:21-22`), y las
-`.eyebrow` 12px/600 *"no es 'texto grande'"* (`:36`) — todos por debajo del umbral de
-texto grande. Y distingue bien: el uso de `faint` en `ServiceMockup.module.scss:74` *"es
-decoración `aria-hidden`: no cuenta"* (`:43`).
+`.eyebrow` 12px/600 _"no es 'texto grande'"_ (`:36`) — todos por debajo del umbral de
+texto grande. Y distingue bien: el uso de `faint` en `ServiceMockup.module.scss:74` _"es
+decoración `aria-hidden`: no cuenta"_ (`:43`).
 
 **[HECHO]** `_tokens.scss` no se ha modificado desde `988795e` (2026-07-07)
 (`git log -- src/styles/_tokens.scss`), y un `grep -rn "contraste" progress/` solo
@@ -453,40 +461,41 @@ evaporaron. Las tres puertas (judge/mutación/tests) siguieron en verde **con la
 incumpliendo WCAG AA**.
 
 **[HECHO]** La propia auditoría avisó del riesgo de fiarse de la documentación
-(`audit_a11y_seo.md:45-48`): *"la checklist del design system (§8) afirma 'contraste AA
-validado en RF-MARCA-001'. Los valores calculados aquí lo contradicen"*.
+(`audit_a11y_seo.md:45-48`): _"la checklist del design system (§8) afirma 'contraste AA
+validado en RF-MARCA-001'. Los valores calculados aquí lo contradicen"_.
 **[INFERENCIA]** Lección: **la doc de marca puede mentir; recalcula los ratios tú mismo.**
 (Es exactamente lo que he hecho arriba.)
 
 **[HECHO] Mejoras SEO/a11y de esa auditoría — estado actual (verificado por mí):**
 
-| Ítem | Estado hoy | Evidencia |
-|---|---|---|
-| M1 `og:image` | ❌ **sigue faltando** | `grep -rn "og:image" src/ index.html` → 0 resultados |
-| M2 Twitter Card | ✅ resuelto (parcial) | `home.tsx:38` (`summary`; sin `twitter:title`) |
-| M3 canonical | ✅ resuelto | `home.tsx:31`, `aviso-legal.tsx:11` |
-| M5 sitemap.xml | ✅ resuelto | `public/sitemap.xml` |
-| M6 robots.txt | ✅ resuelto | `public/robots.txt` |
-| M7 JSON-LD | ✅ resuelto (Organization) | `home.tsx:15-21,39` |
-| M9 `theme-color` obsoleto | ✅ resuelto | `index.html:7-8` (`#F2F4EF`/`#12082A`) |
-| M12 target size ≥24px (WCAG 2.2) | **[DESCONOCIDO]** | no re-verificado en este estudio → §3 |
+| Ítem                             | Estado hoy                 | Evidencia                                            |
+| -------------------------------- | -------------------------- | ---------------------------------------------------- |
+| M1 `og:image`                    | ❌ **sigue faltando**      | `grep -rn "og:image" src/ index.html` → 0 resultados |
+| M2 Twitter Card                  | ✅ resuelto (parcial)      | `home.tsx:38` (`summary`; sin `twitter:title`)       |
+| M3 canonical                     | ✅ resuelto                | `home.tsx:31`, `aviso-legal.tsx:11`                  |
+| M5 sitemap.xml                   | ✅ resuelto                | `public/sitemap.xml`                                 |
+| M6 robots.txt                    | ✅ resuelto                | `public/robots.txt`                                  |
+| M7 JSON-LD                       | ✅ resuelto (Organization) | `home.tsx:15-21,39`                                  |
+| M9 `theme-color` obsoleto        | ✅ resuelto                | `index.html:7-8` (`#F2F4EF`/`#12082A`)               |
+| M12 target size ≥24px (WCAG 2.2) | **[DESCONOCIDO]**          | no re-verificado en este estudio → §3                |
 
 **[HECHO]** Del `a11y_seo_auditor` de #13 hay además dos hallazgos con doctrina útil
 (`audit_a11y_seo_fidelidad.md:26-33`): para un botón que **cicla 3 estados**, el nombre
-accesible dinámico basta; **NO** añadir `aria-pressed` (*"sería incorrecto: es booleano
-para toggles de 2 estados, no para un ciclo de 3"*) y `aria-live` es innecesario (YAGNI).
+accesible dinámico basta; **NO** añadir `aria-pressed` (_"sería incorrecto: es booleano
+para toggles de 2 estados, no para un ciclo de 3"_) y `aria-live` es innecesario (YAGNI).
 
 ### 2.7 SistemaDeMemoriaUncleBob — qué hay (spoiler: nada aún)
 
 **[HECHO] La carpeta `patterns/` está VACÍA de patrones.** `find patterns -type f`
 devuelve **exactamente un fichero**: `patterns/README.md`. El repo tiene 3 commits
-(`97dd7f8` *"feat: sistema de memoria organizacional del arnés SDD"*, `ec6e2b2`,
+(`97dd7f8` _"feat: sistema de memoria organizacional del arnés SDD"_, `ec6e2b2`,
 `9412921`). **No hay ni un solo patrón validado.**
 
 **[HECHO]** Y eso es **correcto por diseño**, según sus propias reglas
 (`SistemaDeMemoriaUncleBob/patterns/README.md:55-58`):
-> *"**Esta carpeta puede estar vacía**, y eso es correcto mientras no haya nada probado
-> de verdad. No se rellena con contenido de relleno para que 'se vea completa'."*
+
+> _"**Esta carpeta puede estar vacía**, y eso es correcto mientras no haya nada probado
+> de verdad. No se rellena con contenido de relleno para que 'se vea completa'."_
 
 **[HECHO] Estructura que impone** (`patterns/README.md:1-16`): un `.md` por patrón en
 `patterns/<categoria>/<slug>.md`, con **6 categorías cerradas**: `responsive/`,
@@ -499,21 +508,22 @@ literales** que el validador busca tal cual: `## El problema`, `## El patrón`,
 `**Origen:**`, `**Validado en:**`, `**Categoría:**`.
 
 **[HECHO] Reglas destacables** (`patterns/README.md:48-66`):
-- *"**`Origen` es obligatorio y verificable.** Un repo, un archivo, una fecha real. No
-  generalizaciones especulativas."*
-- *"**`Validado en` empieza con un solo repo y crece con el tiempo.** ...es la señal de
-  confianza del patrón, más fiable que cualquier afirmación en el texto."*
-- *"**Sin datos sensibles.** Nada de secretos, claves, datos personales ni **precios de
-  cliente**; el nombre del repo en `Origen` es el máximo nivel de identificación admitido."*
-- *"Un patrón sin límites documentados es sospechoso."* (`:41`)
-- *"prioriza los patrones de la categoría relevante... pero **no los apliques a ciegas**
-  — revisa 'Cuándo NO aplica' primero."* (`:64-66`)
+
+- _"**`Origen` es obligatorio y verificable.** Un repo, un archivo, una fecha real. No
+  generalizaciones especulativas."_
+- _"**`Validado en` empieza con un solo repo y crece con el tiempo.** ...es la señal de
+  confianza del patrón, más fiable que cualquier afirmación en el texto."_
+- _"**Sin datos sensibles.** Nada de secretos, claves, datos personales ni **precios de
+  cliente**; el nombre del repo en `Origen` es el máximo nivel de identificación admitido."_
+- _"Un patrón sin límites documentados es sospechoso."_ (`:41`)
+- _"prioriza los patrones de la categoría relevante... pero **no los apliques a ciegas**
+  — revisa 'Cuándo NO aplica' primero."_ (`:64-66`)
 
 **[HECHO]** El consumo es vía `scripts/sync-memoria.sh`, que clona
 `https://github.com/Cenit-Digital/SistemaDeMemoriaUncleBob.git` (`NailsLashStudioWeb/scripts/sync-memoria.sh:13`)
 a `.memoria-cache/patterns/`. **[HECHO]** El `CLAUDE.md` de este proyecto lo declara
-**no bloqueante**: *"si falla (sin red o sin acceso al repo privado), sigue sin memoria
-y déjalo anotado en `progress/current.md`"*.
+**no bloqueante**: _"si falla (sin red o sin acceso al repo privado), sigue sin memoria
+y déjalo anotado en `progress/current.md`"_.
 
 **Resumen [INFERENCIA]:** el paso 2bis **no nos va a dar nada** en este arranque, y no
 es un fallo: es un sistema recién creado esperando su primer depósito. **Somos nosotros
@@ -526,7 +536,7 @@ precios debe redactarse **sin precios reales** (regla de datos sensibles).
 ### 2.8 Diferencia de arnés: WebEmpresa vs. este proyecto
 
 **[HECHO]** WebEmpresa **no tiene** `harness.config.json` ni `bin/` (`ls` →
-*"No such file or directory"*). Sus comandos están **hardcodeados** en
+_"No such file or directory"_). Sus comandos están **hardcodeados** en
 `WebEmpresa/package.json:13-28` y `verify` es `bash ./init.sh` (`:27`).
 
 **[HECHO]** NailsLashStudioWeb sí trae el motor agnóstico: `bin/`, `harness.config.json`,
@@ -535,8 +545,8 @@ precios debe redactarse **sin precios reales** (regla de datos sensibles).
 `"project": "mi-proyecto"`, `"language": "generic"`, todos los `commands` vacíos
 (`install`/`lint`/`test`/`mutate`/`build`), `"mutation": { "threshold": 0.8, "targets": [] }`.
 
-**[HECHO]** El `CLAUDE.md` de este repo obliga a invocar por el motor: *"Se invocan
-siempre a través del motor agnóstico (no los hardcodees)"*, con `bin\harness.ps1` en
+**[HECHO]** El `CLAUDE.md` de este repo obliga a invocar por el motor: _"Se invocan
+siempre a través del motor agnóstico (no los hardcodees)"_, con `bin\harness.ps1` en
 Windows.
 
 **[INFERENCIA]** Hay un **desajuste de umbral que hay que decidir explícitamente**:
@@ -548,21 +558,21 @@ probada, no el default de la plantilla.
 
 ## 3. Lo que NO he podido verificar
 
-| # | Afirmación / hueco | Por qué no está verificado | Qué haría falta |
-|---|---|---|---|
-| 1 | Norma interna `RF-STACK-001`, `RF-CODE-001`, `RF-MARCA-001`, `RF-SISTEMA-001`, `GU-HARNESS-001`, `DE-002` | Se citan en `architecture.md:22`, `conventions.md:3`, `stryker.config.json:3`, `verification.md:24` pero **viven en Confluence**, fuera del repo. No he accedido. | Abrir el espacio de Confluence (hay MCP de Atlassian disponible) y leerlas antes de heredar reglas de marca/DoD. |
-| 2 | Los tickets Jira `WEB-2/4/5/6` | Referenciados en `feature_list.json` como criterio de aceptación; no accedidos. | Leer los criterios en Jira; determinan qué se considera `done`. |
-| 3 | **La regla "contact-form" del Firewall de Vercel existe** | `api/contact.ts:10-13` avisa de que si no existe, `checkRateLimit` es **no-op**. Es config de dashboard, fuera del repo. | Entrar al dashboard de Vercel y verificar la regla; luego probar 429 contra el endpoint desplegado con POSTs en bucle. **Bloqueante para publicar.** |
-| 4 | Que B1/B2/B3 de contraste sean "no arreglados" y no "riesgo aceptado" | Verifiqué que los tokens no cambiaron y que no hay registro de remediación, pero **la ausencia de registro no es una decisión documentada**. | Preguntar a Pablo si se aceptó el riesgo o se olvidó. |
-| 5 | Versiones **instaladas** reales (vs. rangos `^` del `package.json`) | Leí `package.json`, no `pnpm-lock.yaml` ni `node_modules`. `^` admite drift. | `pnpm list --depth 0` en el repo, o leer `pnpm-lock.yaml`. |
-| 6 | Que las versiones del stack sean las **actuales** en julio 2026 | No he consultado los changelogs oficiales de React/Vite/Vitest/Stryker. Prohibido usar memoria para versiones. | Consultar releases oficiales de cada proyecto antes de fijar versiones. |
-| 7 | Por qué `vite-react-ssg` está pineada a `0.9.0` exacta | Es la única dep sin `^`; no hay ADR que lo explique. | Buscar en el historial del PR o preguntar. |
-| 8 | El script anti-FOUC y su réplica `initialThemeAttribute` **no divergen** | Ambos se declaran espejo mutuo (`index.html:12-13`, `theme.ts:78-81`) pero **no vi ningún test que compare el literal del HTML con la función**. | Revisar los tests de `theme_selector`; si no existe, es un test a escribir. |
-| 9 | Estado de M12 (target size ≥24px, WCAG 2.2 SC 2.5.8) | Reportado en `audit_a11y_seo.md:82-87`; no re-verificado en HEAD. | Medir las áreas de nav de escritorio y del ✕ del drawer. |
-| 10 | Ratios de contraste **percibidos en pantalla** | Mis cálculos son sobre los valores declarados en `_tokens.scss`; no rendericé. Opacidades/superposiciones podrían alterar el resultado real. | Ejecutar axe/Lighthouse sobre `dist/` renderizado. |
-| 11 | Datos del negocio real (NAP: nombre/dirección/teléfono/horarios de Las Rozas), precios y servicios | **No están en ningún repo estudiado.** No los invento. | Pedírselos a Pablo / al salón; **imprescindible** para JSON-LD `NailSalon` (§4). |
-| 12 | Contenido de `docs/DESIGN_SYSTEM.md` y del handoff de diseño de NailsLash (`NailsLashStudioDiseño.zip`) | Fuera del alcance de esta pregunta (stack/proceso); no abiertos. | Otro investigador debería destilar el diseño. |
-| 13 | Que `pnpm verify`/`init.sh` de WebEmpresa siga verde hoy | No ejecuté nada en WebEmpresa (solo lectura). | `pnpm install && pnpm verify` allí, si hiciera falta. |
+| #   | Afirmación / hueco                                                                                        | Por qué no está verificado                                                                                                                                        | Qué haría falta                                                                                                                                      |
+| --- | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Norma interna `RF-STACK-001`, `RF-CODE-001`, `RF-MARCA-001`, `RF-SISTEMA-001`, `GU-HARNESS-001`, `DE-002` | Se citan en `architecture.md:22`, `conventions.md:3`, `stryker.config.json:3`, `verification.md:24` pero **viven en Confluence**, fuera del repo. No he accedido. | Abrir el espacio de Confluence (hay MCP de Atlassian disponible) y leerlas antes de heredar reglas de marca/DoD.                                     |
+| 2   | Los tickets Jira `WEB-2/4/5/6`                                                                            | Referenciados en `feature_list.json` como criterio de aceptación; no accedidos.                                                                                   | Leer los criterios en Jira; determinan qué se considera `done`.                                                                                      |
+| 3   | **La regla "contact-form" del Firewall de Vercel existe**                                                 | `api/contact.ts:10-13` avisa de que si no existe, `checkRateLimit` es **no-op**. Es config de dashboard, fuera del repo.                                          | Entrar al dashboard de Vercel y verificar la regla; luego probar 429 contra el endpoint desplegado con POSTs en bucle. **Bloqueante para publicar.** |
+| 4   | Que B1/B2/B3 de contraste sean "no arreglados" y no "riesgo aceptado"                                     | Verifiqué que los tokens no cambiaron y que no hay registro de remediación, pero **la ausencia de registro no es una decisión documentada**.                      | Preguntar a Pablo si se aceptó el riesgo o se olvidó.                                                                                                |
+| 5   | Versiones **instaladas** reales (vs. rangos `^` del `package.json`)                                       | Leí `package.json`, no `pnpm-lock.yaml` ni `node_modules`. `^` admite drift.                                                                                      | `pnpm list --depth 0` en el repo, o leer `pnpm-lock.yaml`.                                                                                           |
+| 6   | Que las versiones del stack sean las **actuales** en julio 2026                                           | No he consultado los changelogs oficiales de React/Vite/Vitest/Stryker. Prohibido usar memoria para versiones.                                                    | Consultar releases oficiales de cada proyecto antes de fijar versiones.                                                                              |
+| 7   | Por qué `vite-react-ssg` está pineada a `0.9.0` exacta                                                    | Es la única dep sin `^`; no hay ADR que lo explique.                                                                                                              | Buscar en el historial del PR o preguntar.                                                                                                           |
+| 8   | El script anti-FOUC y su réplica `initialThemeAttribute` **no divergen**                                  | Ambos se declaran espejo mutuo (`index.html:12-13`, `theme.ts:78-81`) pero **no vi ningún test que compare el literal del HTML con la función**.                  | Revisar los tests de `theme_selector`; si no existe, es un test a escribir.                                                                          |
+| 9   | Estado de M12 (target size ≥24px, WCAG 2.2 SC 2.5.8)                                                      | Reportado en `audit_a11y_seo.md:82-87`; no re-verificado en HEAD.                                                                                                 | Medir las áreas de nav de escritorio y del ✕ del drawer.                                                                                             |
+| 10  | Ratios de contraste **percibidos en pantalla**                                                            | Mis cálculos son sobre los valores declarados en `_tokens.scss`; no rendericé. Opacidades/superposiciones podrían alterar el resultado real.                      | Ejecutar axe/Lighthouse sobre `dist/` renderizado.                                                                                                   |
+| 11  | Datos del negocio real (NAP: nombre/dirección/teléfono/horarios de Las Rozas), precios y servicios        | **No están en ningún repo estudiado.** No los invento.                                                                                                            | Pedírselos a Pablo / al salón; **imprescindible** para JSON-LD `NailSalon` (§4).                                                                     |
+| 12  | Contenido de `docs/DESIGN_SYSTEM.md` y del handoff de diseño de NailsLash (`NailsLashStudioDiseño.zip`)   | Fuera del alcance de esta pregunta (stack/proceso); no abiertos.                                                                                                  | Otro investigador debería destilar el diseño.                                                                                                        |
+| 13  | Que `pnpm verify`/`init.sh` de WebEmpresa siga verde hoy                                                  | No ejecuté nada en WebEmpresa (solo lectura).                                                                                                                     | `pnpm install && pnpm verify` allí, si hiciera falta.                                                                                                |
 
 ---
 
@@ -618,7 +628,7 @@ probada, no el default de la plantilla.
 4. **Claves con prefijo `VITE_`** para nada secreto: se hornean en el bundle
    (`.env.example:6-8`).
 5. **Inventar datos del negocio.** Precedente explícito y ejemplar
-   (`home.tsx:12`): *"no LocalBusiness: **no inventamos dirección ni teléfono**"*.
+   (`home.tsx:12`): _"no LocalBusiness: **no inventamos dirección ni teléfono**"_.
 6. **Resolver por mi cuenta un conflicto entre fuentes de verdad.** Precedente de
    `paquetes` (`feature_list.json:114-119`): se señala y se eleva a decisión de producto.
 7. **Marcar `done` con una auditoría de a11y en rojo**, aunque las tres puertas estén
@@ -636,23 +646,23 @@ servicios: manicura, pestañas…), `contacto_seccion`, `contact_form`,
 **Nuevas, propias de un salón local [INFERENCIA]:**
 
 - **⭐ `seo_local` con JSON-LD `NailSalon`.** WebEmpresa se quedó en `Organization`
-  **por falta de datos**, y su propia auditoría marcó M7 como *"**Alto valor** para SEO
-  local"* (`audit_a11y_seo.md:66-67`). Nosotros **sí** somos un negocio local con sede
+  **por falta de datos**, y su propia auditoría marcó M7 como _"**Alto valor** para SEO
+  local"_ (`audit_a11y_seo.md:66-67`). Nosotros **sí** somos un negocio local con sede
   en Las Rozas → aquí sí procede.
   **[HECHO, fuente oficial]** El tipo existe y encaja: `https://schema.org/NailSalon`
-  — *"A nail salon"*, jerarquía `Thing > Organization > LocalBusiness >
-  HealthAndBeautyBusiness > NailSalon` (y `Thing > Place > LocalBusiness > …`), con
+  — _"A nail salon"_, jerarquía `Thing > Organization > LocalBusiness >
+HealthAndBeautyBusiness > NailSalon` (y `Thing > Place > LocalBusiness > …`), con
   propiedades `address`, `telephone`, `openingHoursSpecification`, `geo`, `priceRange`,
   `aggregateRating`.
   **Bloqueado por [DESCONOCIDO]:** los datos NAP reales del salón → §3 ítem 11. **No se
   escribe ni un campo sin dato verificado.**
   Copiar de `home.tsx:15-21` el patrón de **serialización segura** (`.replace(/</g,
-  '\\u003c')`).
+'\\u003c')`).
 - **`og:image`** — M1 sigue sin resolver en WebEmpresa (verificado: `grep` → 0
   resultados). Para un salón, la tarjeta al compartir en WhatsApp/Instagram es
   **negocio puro**, no cosmética.
-- **Horarios / reserva de cita.** WebEmpresa tenía "Sistema de citas" como *servicio que
-  vende*, no como funcionalidad propia. Si el salón quiere reservas online, es una
+- **Horarios / reserva de cita.** WebEmpresa tenía "Sistema de citas" como _servicio que
+  vende_, no como funcionalidad propia. Si el salón quiere reservas online, es una
   frontera de confianza **nueva** (datos personales → RGPD) sin precedente heredable.
   **[DESCONOCIDO]** si entra en alcance.
 - **Precios.** Precedente de `paquetes` (§2.4.5): WebEmpresa los omitió y **elevó la
@@ -662,6 +672,7 @@ servicios: manicura, pestañas…), `contacto_seccion`, `contact_form`,
   publicamos como patrón, no a la web.
 
 **Features de proceso [INFERENCIA]:**
+
 - **Sembrar `SistemaDeMemoriaUncleBob`** con los 4 patrones de §2.7 (hoy: 0 patrones).
   Requiere PR al repo privado + `bash scripts/validate-patterns.sh` en verde
   (`patterns/README.md:60-62`).

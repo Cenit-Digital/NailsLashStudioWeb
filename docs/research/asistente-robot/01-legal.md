@@ -63,7 +63,7 @@
 
 ## 1. Reglamento (UE) 2024/1689 (AI Act), artículo 50.1
 
-### 1.1 Texto literal de la obligación y de la excepción  **[V]**
+### 1.1 Texto literal de la obligación y de la excepción **[V]**
 
 Fuente: texto en español del Reglamento (UE) 2024/1689, DOUE L de 12-7-2024.
 <https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:32024R1689>
@@ -96,7 +96,7 @@ Fuente: texto en español del Reglamento (UE) 2024/1689, DOUE L de 12-7-2024.
   pymes se aplica la menor de las dos cifras (art. 99.6). El Ómnibus no modifica esos dos
   apartados; añade un 99.6 bis para las pequeñas empresas de mediana capitalización. **[V]**
 
-### 1.2 Fecha de aplicación (art. 113)  **[V]**
+### 1.2 Fecha de aplicación (art. 113) **[V]**
 
 - El art. 113 dice: «Será aplicable a partir del 2 de agosto de 2026.» El art. 50 no está en
   ninguna de las excepciones de fecha de las letras a) a c). Por tanto, **el 50.1 se aplica desde
@@ -135,7 +135,7 @@ Fuente: texto en español del Reglamento (UE) 2024/1689, DOUE L de 12-7-2024.
     del servidor.
 - **Estado a septiembre de 2026:** **adoptado, publicado en el DOUE y en vigor.** **[V]**
 
-### 1.4 Directrices y código de buenas prácticas de la Comisión sobre el art. 50  **[V]**
+### 1.4 Directrices y código de buenas prácticas de la Comisión sobre el art. 50 **[V]**
 
 - **Directrices sobre las obligaciones de transparencia del art. 50**, Anexo de C(2026) 5054
   final, Bruselas, 20.7.2026. El § 5 dice: «These Guidelines are non-binding.» [Estas Directrices
@@ -192,7 +192,7 @@ Fuente: texto en español del Reglamento (UE) 2024/1689, DOUE L de 12-7-2024.
 
 ## 2. ¿Es un «sistema de IA» un chatbot de reglas o de guion?
 
-### 2.1 La definición legal (art. 3.1)  **[V]**
+### 2.1 La definición legal (art. 3.1) **[V]**
 
 Fuente: el mismo enlace de EUR-Lex del § 1.1.
 
@@ -205,7 +205,7 @@ Fuente: el mismo enlace de EUR-Lex del § 1.1.
   - La definición «no debe incluir los sistemas basados en las normas definidas únicamente por
     personas físicas para ejecutar automáticamente operaciones».
 
-### 2.2 Directrices de la Comisión sobre la definición de sistema de IA  **[V]**
+### 2.2 Directrices de la Comisión sobre la definición de sistema de IA **[V]**
 
 - Página (publicada el 6-feb-2025):
   <https://digital-strategy.ec.europa.eu/en/library/commission-publishes-guidelines-ai-system-definition-facilitate-first-ai-acts-rules-application>
@@ -246,11 +246,11 @@ Fuente: el mismo enlace de EUR-Lex del § 1.1.
   answers» (§ 30.i) y en «basic data processing» (§ 46).
 - **[I]** Esta conclusión cambia si el guion incorpora cualquiera de estas piezas:
   - un clasificador de intenciones entrenado;
-  - *embeddings* o búsqueda semántica con un modelo;
+  - _embeddings_ o búsqueda semántica con un modelo;
   - una librería de NLU con modelo aprendido;
   - un motor de reglas que **infiera**, en lugar de solo ejecutar.
-  El § 62 exige analizar cada caso. Recomiendo **documentar la arquitectura del guion**: árbol
-  fijo, coincidencia literal y sin modelo.
+    El § 62 exige analizar cada caso. Recomiendo **documentar la arquitectura del guion**: árbol
+    fijo, coincidencia literal y sin modelo.
 - **[I]** Que el art. 50.1 no se aplique **no permite anunciarlo como «IA»**. Las Directrices
   (§ 50) recuerdan que la Directiva de prácticas comerciales desleales prohíbe las acciones
   engañosas sobre las características principales de un servicio. Llamar «IA» a un guion sería
@@ -287,7 +287,7 @@ puede editar el texto antes. **[I]**
   - «a) La identidad del responsable del tratamiento y de su representante, en su caso. b) La
     finalidad del tratamiento.»
   - «c) La posibilidad de ejercer los derechos establecidos en los artículos 15 a 22». **[V]**
-  <https://www.boe.es/buscar/act.php?id=BOE-A-2018-16673>
+    <https://www.boe.es/buscar/act.php?id=BOE-A-2018-16673>
 - **Minimización (art. 5.1.c RGPD).** Los datos deben ser «adecuados, pertinentes y limitados a lo
   necesario en relación con los fines para los que son tratados». **[V]**
   - **[I]** **No pedir el teléfono en el chat.** El mensaje de WhatsApp ya llega desde el número
@@ -389,7 +389,7 @@ puede editar el texto antes. **[I]**
 
 ## 4. WhatsApp: condiciones para proveedores de IA, uso por un negocio y antimonopolio
 
-### 4.1 Dónde están hoy las condiciones  **[V]**
+### 4.1 Dónde están hoy las condiciones **[V]**
 
 - `https://www.whatsapp.com/legal/business-solution-terms` responde con un **301** hacia
   **<https://www.facebook.com/legal/Meta-Terms-for-WhatsApp-Business-Platform>**, titulada
@@ -401,7 +401,7 @@ puede editar el texto antes. **[I]**
   similares). **[I]** No regulan el enlace `wa.me` que usa hoy la web, que solo abre un chat.
   Sí regularán la integración del servidor con WhatsApp.
 
-### 4.2 Cláusula 4.7 «AI Providers»: texto literal relevante (versión inglesa, que prevalece)  **[V]**
+### 4.2 Cláusula 4.7 «AI Providers»: texto literal relevante (versión inglesa, que prevalece) **[V]**
 
 - **Quién es «AI Provider».** «Providers and developers of artificial intelligence or machine
   learning technologies, including but not limited to large language models» [proveedores y
@@ -455,7 +455,7 @@ puede editar el texto antes. **[I]**
     [Puedes automatizar las respuestas dentro de la ventana de 24 h, pero debes ofrecer vías claras
     y directas para escalar el caso.] Cita como ejemplos el traspaso a un agente humano, el
     teléfono, el email, la web o la tienda.
-  - **Consentimiento y política de privacidad.** Hace falta *opt-in* para iniciar conversaciones, y
+  - **Consentimiento y política de privacidad.** Hace falta _opt-in_ para iniciar conversaciones, y
     el negocio es responsable de los avisos y consentimientos, «including maintaining a published
     privacy policy» [incluido mantener publicada una política de privacidad].
 - **Coste, para planificar.** La página oficial de precios (actualizada el 10-sep-2026) anuncia que
@@ -468,15 +468,15 @@ puede editar el texto antes. **[I]**
 **Comisión Europea, asunto AT.41034 «Exclusion of AI competitors from WhatsApp»**
 (<https://competition-cases.ec.europa.eu/cases/AT.41034>). **[V]**
 
-| Fecha | Hito | Fuente oficial |
-|---|---|---|
-| 04-12-2025 | Apertura del procedimiento. Cubre el EEE salvo Italia. | IP/25/2896 |
-| 09-02-2026 | Pliego de cargos sobre medidas cautelares. | IP/26/310 |
-| 02-03-2026 | Respuesta de Meta. | Registro del asunto |
-| 04-03-2026 | Meta revisa la política: readmite a los asistentes de terceros, pero de pago. | IP/26/805 |
-| 15-04-2026 | Pliego complementario. La investigación se amplía a **Italia**. | IP/26/805 |
-| 05-05-2026 | Audiencia. | Registro del asunto |
-| **09-06-2026** | **Decisión de medidas cautelares.** | IP/26/1276 |
+| Fecha          | Hito                                                                          | Fuente oficial      |
+| -------------- | ----------------------------------------------------------------------------- | ------------------- |
+| 04-12-2025     | Apertura del procedimiento. Cubre el EEE salvo Italia.                        | IP/25/2896          |
+| 09-02-2026     | Pliego de cargos sobre medidas cautelares.                                    | IP/26/310           |
+| 02-03-2026     | Respuesta de Meta.                                                            | Registro del asunto |
+| 04-03-2026     | Meta revisa la política: readmite a los asistentes de terceros, pero de pago. | IP/26/805           |
+| 15-04-2026     | Pliego complementario. La investigación se amplía a **Italia**.               | IP/26/805           |
+| 05-05-2026     | Audiencia.                                                                    | Registro del asunto |
+| **09-06-2026** | **Decisión de medidas cautelares.**                                           | IP/26/1276          |
 
 - **Qué ordena la decisión del 9-6-2026** (IP/26/1276):
   - Restablecer el acceso gratuito a la API de WhatsApp para los asistentes de IA de propósito
@@ -550,7 +550,7 @@ cliente, que la Comisión describe como uso permitido (§ 4.3).
 4. **Mostrar el texto final antes de enviar.** El usuario debe ver y poder editar el mensaje
    prellenado, y WhatsApp se lo muestra de nuevo en el campo de texto (§ 3.1).
 5. **Cero red y cero persistencia.**
-   - Nada de analítica, *fetch* ni `localStorage` en el chat. Estado en memoria.
+   - Nada de analítica, _fetch_ ni `localStorage` en el chat. Estado en memoria.
    - Si algún día hace falta recordar algo, usar `sessionStorage` y solo para la conversación en
      curso («entrada del usuario», exceptuada por el art. 22.2 LSSI según la AEPD).
 6. **Salidas directas siempre visibles:** teléfono y WhatsApp sin pasar por el guion. Es buena
@@ -597,7 +597,7 @@ cliente, que la Comisión describe como uso permitido (§ 4.3).
    - Usar la plataforma (API) con el bot **acotado** a los temas del salón, para seguir siendo uso
      «auxiliar» (cláusula 4.7).
    - Garantizar por contrato que los datos de la plataforma **no se usan para entrenar** modelos.
-   - Respetar el *opt-in* y la ventana de 24 h.
+   - Respetar el _opt-in_ y la ventana de 24 h.
    - Presupuestar los mensajes de servicio: se cobran desde el 1-10-2026, con 1 000 al mes
      gratis por número.
 7. **Revisar antes del lanzamiento**, porque todo esto cambia rápido:
@@ -611,42 +611,42 @@ cliente, que la Comisión describe como uso permitido (§ 4.3).
 
 ## 6. Fuentes (todas consultadas el 2026-09-27)
 
-| # | Fuente oficial | URL |
-|---|---|---|
-| 1 | Reglamento (UE) 2024/1689, texto ES (arts. 3.1, 3.3, 50, 99, 113; cons. 12 y 132) | <https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:32024R1689> |
-| 2 | Reglamento (UE) 2026/1744, Ómnibus digital sobre IA (ES y EN) | <https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:32026R1744> |
-| 3 | Propuesta COM(2025) 836 | <https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:52025PC0836> |
-| 4 | Versión consolidada del AI Act, 27-07-2026 | <https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng> |
-| 5 | Directrices del art. 50, C(2026) 5054, 20-7-2026 (PDF) | <https://ai-act-service-desk.ec.europa.eu/sites/default/files/2026-07/guidelines_on_the_implementation_of_the_transparency_obligations_for_certain_ai_systems_under_article_50_of_the_ai_act_bzptwqhk0ikg1dtlddap41psfy_131215.pdf> |
-| 6 | Página de las Directrices del art. 50 | <https://digital-strategy.ec.europa.eu/en/library/guidelines-transparency-obligations-providers-and-deployers-ai-systems> |
-| 7 | Código de buenas prácticas sobre contenido generado por IA | <https://digital-strategy.ec.europa.eu/en/policies/code-practice-ai-generated-content> |
-| 8 | Directrices sobre la definición de sistema de IA (página) | <https://digital-strategy.ec.europa.eu/en/library/commission-publishes-guidelines-ai-system-definition-facilitate-first-ai-acts-rules-application> |
-| 9 | Directrices sobre la definición, C(2025) 5053 (PDF EN) | <https://ec.europa.eu/newsroom/dae/redirection/document/112455> |
-| 10 | RGPD, texto ES (arts. 5, 6, 13, 28, 45) | <https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:32016R0679> |
-| 11 | LOPDGDD, art. 11 (BOE) | <https://www.boe.es/buscar/act.php?id=BOE-A-2018-16673> |
-| 12 | LSSI, art. 22.2 (BOE) | <https://www.boe.es/buscar/act.php?id=BOE-A-2002-13758> |
-| 13 | AEPD, Guía de cookies (mayo 2024) | <https://www.aepd.es/guias/guia-cookies.pdf> |
-| 14 | AEPD, infografía sobre chatbots con IA | <https://www.aepd.es/infografias/info-recomendaciones-chatbots-ia.pdf> |
-| 15 | AEPD, Adecuación al RGPD de tratamientos con IA (2020) | <https://www.aepd.es/guias/adecuacion-rgpd-ia.pdf> |
-| 16 | AEPD, IA agéntica (V1.2, feb-2026) y nota de prensa | <https://www.aepd.es/guias/orientaciones-ia-agentica.pdf> · <https://www.aepd.es/prensa-y-comunicacion/notas-de-prensa/la-agencia-publica-unas-orientaciones-sobre-inteligencia> |
-| 17 | AEPD, nota sobre la sentencia del DPF (3-9-2025) | <https://www.aepd.es/prensa-y-comunicacion/notas-de-prensa/aepd-valora-sentencia-tribunal-general-ue-que-confirma-marco-transferencias-datos-ue-eeuu> |
-| 18 | DO C/2025/6610, recurso C-703/25 P | <https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:C_202506610> |
-| 19 | InfoCuria, ficha de C-703/25 P | <https://curia.europa.eu/juris/liste.jsf?num=C-703/25&language=en> |
-| 20 | Comisión, página sobre transferencias UE-EE. UU. | <https://commission.europa.eu/law/law-topic/data-protection/international-dimension-data-protection/eu-us-data-transfers_en> |
-| 21 | Lista DPF (Dept. de Comercio de EE. UU.; fuera de la lista del encargo) | <https://www.dataprivacyframework.gov/list> |
-| 22 | Meta Terms for WhatsApp Business Platform (EN y ES), cl. 1.4, 4.7 y 7.2 | <https://www.facebook.com/legal/Meta-Terms-for-WhatsApp-Business-Platform> |
-| 23 | Meta for Developers, precios para proveedores de IA | <https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing/ai-providers> |
-| 24 | Meta for Developers, precios de la plataforma | <https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing> |
-| 25 | WhatsApp Business Messaging Policy | <https://whatsappbusiness.com/policy/> (redirige desde whatsapp.com/legal/business-policy) |
-| 26 | Ayuda de WhatsApp, «click to chat» | <https://faq.whatsapp.com/5913398998672934> |
-| 27 | Comisión, IP/25/2896 (4-12-2025) | <https://ec.europa.eu/commission/presscorner/detail/en/ip_25_2896> |
-| 28 | Comisión, IP/26/310 (9-2-2026) | <https://ec.europa.eu/commission/presscorner/detail/en/ip_26_310> |
-| 29 | Comisión, IP/26/805 (15-4-2026) | <https://ec.europa.eu/commission/presscorner/detail/en/ip_26_805> |
-| 30 | Comisión, IP/26/1276 (9-6-2026) | <https://ec.europa.eu/commission/presscorner/detail/en/ip_26_1276> |
-| 31 | Registro del asunto AT.41034 | <https://competition-cases.ec.europa.eu/cases/AT.41034> |
-| 32 | AGCM, A576, cautelares (24-12-2025) | <https://en.agcm.it/en/media/press-releases/2025/12/A576> |
+| #   | Fuente oficial                                                                    | URL                                                                                                                                                                                                                                 |
+| --- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Reglamento (UE) 2024/1689, texto ES (arts. 3.1, 3.3, 50, 99, 113; cons. 12 y 132) | <https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:32024R1689>                                                                                                                                                         |
+| 2   | Reglamento (UE) 2026/1744, Ómnibus digital sobre IA (ES y EN)                     | <https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:32026R1744>                                                                                                                                                         |
+| 3   | Propuesta COM(2025) 836                                                           | <https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:52025PC0836>                                                                                                                                                        |
+| 4   | Versión consolidada del AI Act, 27-07-2026                                        | <https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng>                                                                                                                                                                        |
+| 5   | Directrices del art. 50, C(2026) 5054, 20-7-2026 (PDF)                            | <https://ai-act-service-desk.ec.europa.eu/sites/default/files/2026-07/guidelines_on_the_implementation_of_the_transparency_obligations_for_certain_ai_systems_under_article_50_of_the_ai_act_bzptwqhk0ikg1dtlddap41psfy_131215.pdf> |
+| 6   | Página de las Directrices del art. 50                                             | <https://digital-strategy.ec.europa.eu/en/library/guidelines-transparency-obligations-providers-and-deployers-ai-systems>                                                                                                           |
+| 7   | Código de buenas prácticas sobre contenido generado por IA                        | <https://digital-strategy.ec.europa.eu/en/policies/code-practice-ai-generated-content>                                                                                                                                              |
+| 8   | Directrices sobre la definición de sistema de IA (página)                         | <https://digital-strategy.ec.europa.eu/en/library/commission-publishes-guidelines-ai-system-definition-facilitate-first-ai-acts-rules-application>                                                                                  |
+| 9   | Directrices sobre la definición, C(2025) 5053 (PDF EN)                            | <https://ec.europa.eu/newsroom/dae/redirection/document/112455>                                                                                                                                                                     |
+| 10  | RGPD, texto ES (arts. 5, 6, 13, 28, 45)                                           | <https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:32016R0679>                                                                                                                                                         |
+| 11  | LOPDGDD, art. 11 (BOE)                                                            | <https://www.boe.es/buscar/act.php?id=BOE-A-2018-16673>                                                                                                                                                                             |
+| 12  | LSSI, art. 22.2 (BOE)                                                             | <https://www.boe.es/buscar/act.php?id=BOE-A-2002-13758>                                                                                                                                                                             |
+| 13  | AEPD, Guía de cookies (mayo 2024)                                                 | <https://www.aepd.es/guias/guia-cookies.pdf>                                                                                                                                                                                        |
+| 14  | AEPD, infografía sobre chatbots con IA                                            | <https://www.aepd.es/infografias/info-recomendaciones-chatbots-ia.pdf>                                                                                                                                                              |
+| 15  | AEPD, Adecuación al RGPD de tratamientos con IA (2020)                            | <https://www.aepd.es/guias/adecuacion-rgpd-ia.pdf>                                                                                                                                                                                  |
+| 16  | AEPD, IA agéntica (V1.2, feb-2026) y nota de prensa                               | <https://www.aepd.es/guias/orientaciones-ia-agentica.pdf> · <https://www.aepd.es/prensa-y-comunicacion/notas-de-prensa/la-agencia-publica-unas-orientaciones-sobre-inteligencia>                                                    |
+| 17  | AEPD, nota sobre la sentencia del DPF (3-9-2025)                                  | <https://www.aepd.es/prensa-y-comunicacion/notas-de-prensa/aepd-valora-sentencia-tribunal-general-ue-que-confirma-marco-transferencias-datos-ue-eeuu>                                                                               |
+| 18  | DO C/2025/6610, recurso C-703/25 P                                                | <https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:C_202506610>                                                                                                                                                           |
+| 19  | InfoCuria, ficha de C-703/25 P                                                    | <https://curia.europa.eu/juris/liste.jsf?num=C-703/25&language=en>                                                                                                                                                                  |
+| 20  | Comisión, página sobre transferencias UE-EE. UU.                                  | <https://commission.europa.eu/law/law-topic/data-protection/international-dimension-data-protection/eu-us-data-transfers_en>                                                                                                        |
+| 21  | Lista DPF (Dept. de Comercio de EE. UU.; fuera de la lista del encargo)           | <https://www.dataprivacyframework.gov/list>                                                                                                                                                                                         |
+| 22  | Meta Terms for WhatsApp Business Platform (EN y ES), cl. 1.4, 4.7 y 7.2           | <https://www.facebook.com/legal/Meta-Terms-for-WhatsApp-Business-Platform>                                                                                                                                                          |
+| 23  | Meta for Developers, precios para proveedores de IA                               | <https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing/ai-providers>                                                                                                                                    |
+| 24  | Meta for Developers, precios de la plataforma                                     | <https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing>                                                                                                                                                 |
+| 25  | WhatsApp Business Messaging Policy                                                | <https://whatsappbusiness.com/policy/> (redirige desde whatsapp.com/legal/business-policy)                                                                                                                                          |
+| 26  | Ayuda de WhatsApp, «click to chat»                                                | <https://faq.whatsapp.com/5913398998672934>                                                                                                                                                                                         |
+| 27  | Comisión, IP/25/2896 (4-12-2025)                                                  | <https://ec.europa.eu/commission/presscorner/detail/en/ip_25_2896>                                                                                                                                                                  |
+| 28  | Comisión, IP/26/310 (9-2-2026)                                                    | <https://ec.europa.eu/commission/presscorner/detail/en/ip_26_310>                                                                                                                                                                   |
+| 29  | Comisión, IP/26/805 (15-4-2026)                                                   | <https://ec.europa.eu/commission/presscorner/detail/en/ip_26_805>                                                                                                                                                                   |
+| 30  | Comisión, IP/26/1276 (9-6-2026)                                                   | <https://ec.europa.eu/commission/presscorner/detail/en/ip_26_1276>                                                                                                                                                                  |
+| 31  | Registro del asunto AT.41034                                                      | <https://competition-cases.ec.europa.eu/cases/AT.41034>                                                                                                                                                                             |
+| 32  | AGCM, A576, cautelares (24-12-2025)                                               | <https://en.agcm.it/en/media/press-releases/2025/12/A576>                                                                                                                                                                           |
 
-**Notas de método.** EUR-Lex, el Press corner y InfoCuria no se dejan leer con un *fetch* simple
+**Notas de método.** EUR-Lex, el Press corner y InfoCuria no se dejan leer con un _fetch_ simple
 (devuelven un reto anti-bot o páginas vacías). Los leí con el navegador integrado y, para el Press
 corner, con su API pública de documentos. Los PDF se convirtieron a texto con `pdftotext` para
 citar de forma literal.

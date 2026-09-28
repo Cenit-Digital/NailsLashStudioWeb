@@ -7,6 +7,7 @@
 > Destino previsto: `progress/judge_nailbot_chat_compartido_delta.md`. El judge NO lo ha escrito: en esta ejecución no tiene herramienta de escritura y el operador prohíbe los ficheros de informe. Lo tiene que guardar el lead.
 
 ## Base de la revisión delta
+
 - **La revisión anterior de F-23 NO está en disco.** `progress/judge_nailbot_chat_compartido.md`, `progress/a11y_nailbot.md` y `progress/security_nailbot.md` no existen ni en el árbol ni en el historial de git (`git log --all`). Solo existe `progress/judge_nailbot_flotante.md` (F-24).
 - Por eso he reconstruido los bloqueantes de F-23 a partir del diario (`progress/tdd_nailbot_chat_compartido.md:59-65`) y, además, he hecho una revisión COMPLETA de los criterios del judge, para no depender solo de ese resumen.
 - Qué he ejecutado:
@@ -17,14 +18,16 @@
 - Qué NO he ejecutado, por orden del lead: build, Stryker y la suite completa.
 
 ## Bloqueantes anteriores (según el diario), uno a uno
-| # | Bloqueante | Estado | Evidencia |
-|---|---|---|---|
-| 1 | Una sola feature `in_progress` | RESUELTO | `feature_list.json`: in_progress=[23]; F-24 en `spec_ready` |
-| 2 | Diario con mapa @s → test | RESUELTO | `tdd_nailbot_chat_compartido.md:24-41`, comprobado test a test (abajo). La desviación TDD está declarada en `:3-22` |
-| 3 | Código no pedido: quitarlo o justificarlo | RESUELTO, pero la cura de seguridad trae B-N1 | Guarda `paso === 'dia'` quitada (`chat-nailbot-logica.ts:115-116`). `return estado` justificado y con test sin @s (`chat-nailbot-logica.test.ts:223-232`). `sinSurrogatesSueltos` justificado y con contraprueba (`:341-370`) |
-| 4 | Test de la clase global en reserva_chat @s24 | RESUELTO | `reserva.test.tsx:641` comprueba el atributo `class` == `['demo-btn','demo-btn--wa']` (contrato `reserva_chat.feature:642`) |
+
+| #   | Bloqueante                                   | Estado                                        | Evidencia                                                                                                                                                                                                                     |
+| --- | -------------------------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Una sola feature `in_progress`               | RESUELTO                                      | `feature_list.json`: in_progress=[23]; F-24 en `spec_ready`                                                                                                                                                                   |
+| 2   | Diario con mapa @s → test                    | RESUELTO                                      | `tdd_nailbot_chat_compartido.md:24-41`, comprobado test a test (abajo). La desviación TDD está declarada en `:3-22`                                                                                                           |
+| 3   | Código no pedido: quitarlo o justificarlo    | RESUELTO, pero la cura de seguridad trae B-N1 | Guarda `paso === 'dia'` quitada (`chat-nailbot-logica.ts:115-116`). `return estado` justificado y con test sin @s (`chat-nailbot-logica.test.ts:223-232`). `sinSurrogatesSueltos` justificado y con contraprueba (`:341-370`) |
+| 4   | Test de la clase global en reserva_chat @s24 | RESUELTO                                      | `reserva.test.tsx:641` comprueba el atributo `class` == `['demo-btn','demo-btn--wa']` (contrato `reserva_chat.feature:642`)                                                                                                   |
 
 Menores atendidos y verificados:
+
 - Leyenda sobre el DOM del horneado: `chat-nailbot.test.tsx:90-103`.
 - Foco que NO se mueve, con una prueba que muerde: `:425-438`.
 - `form action`: `:579`.
@@ -36,6 +39,7 @@ Menores atendidos y verificados:
 - `.claude/launch.json` ignorado (`.gitignore:54`, `git check-ignore` lo confirma).
 
 ## Cobertura de escenarios (@s ↔ test)
+
 - @s1: [x] `chat-nailbot.test.tsx:63-133` (7 tests con renderToString de `<Reserva/>` y de `<ChatNailbot/>`)
 - @s2: [x] `:136-155` (los 4 momentos)
 - @s3: [x] `:157-226` (5 filas, incluida la de «Lo antes posible»)
@@ -61,10 +65,12 @@ Menores atendidos y verificados:
   - Las del banner (`reserva_chat.feature:26-37`) casan con la fuente.
 
 ## Disciplina TDD
+
 - **¿Hay producción que ningún test pida?** NO. Las dos piezas que ningún escenario pide (`return estado` y `sinSurrogatesSueltos`) están declaradas en el diario y cubiertas por tests. El CSS extra (`overflow-wrap`, `min-width: 0`, `::placeholder`) no es mutable por declaración, y el par `--muted`/`--bg` existe en MATRIZ_DE_USO (`puerta-contraste.ts:209`).
 - **¿Hay evidencia de Rojo → Verde → Refactor?** NO. El código lo escribió el lead antes que los tests. Está declarado por escrito y lo compensan la revisión independiente y la mutación. Lo acepto como excepción declarada, con el mismo criterio que aplicó el judge de F-24.
 
 ## Calidad
+
 - **B-N1 (BLOQUEANTE, nuevo): el lookbehind rompe el envío con nombre en Safari/iOS anterior a 16.4.**
   - Dónde: `chat-nailbot-logica.ts:153-156`.
   - Qué hace el build: Vite 7 construye por defecto para `baseline-widely-available` (safari16), y esbuild convierte el literal en `new RegExp("…(?<!…)…","g")`. Lo he comprobado en `dist/assets/app-C99heFfv.js`, y es el único lookbehind de todo el bundle.
@@ -89,6 +95,7 @@ Menores atendidos y verificados:
   - Resto: `.gitignore` correcto. `Catalogo.tsx`, `PruebaColor.tsx` y los tests de equipo solo cambian de formato (comprobado con `git diff -w`).
 
 ## Checkpoints
+
 - C1: [x] ficheros base · [x] docs · [x] `bin/harness init`
   - Pasos 1-4 verificados por el judge: ficheros base, `feature_list` válido con una sola `in_progress` y typecheck y lint a 0.
   - Paso 5, la suite completa: medición del lead, 46/46 ficheros y 1475/1475 tests. No la he re-ejecutado por orden del lead; en lo acotado, 126/126.
@@ -100,6 +107,7 @@ Menores atendidos y verificados:
 - C7: [ ] pendiente del mutation_tester. El informe del lead da 100 %, pero `chat-nailbot-logica.ts` hay que volver a medirlo tras curar B-N1.
 
 ## Cambios requeridos
+
 1. **B-N1.** Quitar el lookbehind de `sinSurrogatesSueltos`: una sola expresión «par o surrogate suelto» con una función de reemplazo que conserve las coincidencias de longitud 2. Añadir una guarda de bytes con ancla positiva que prohíba `(?<` en `chat-nailbot-logica.ts` y volver a medir la mutación de ese fichero. Solo por decisión del humano cabe la alternativa: declarar `build.target` ≥ safari16.4 en `vite.config.ts` y documentarlo, asumiendo que así los Safari antiguos no llegan a parsear el bundle.
 2. Antes de `done`, guardar en disco los informes citados que faltan (o corregir las referencias en el diario y en `current.md`), además de este delta.
 3. Deseables: los menores de la lista.

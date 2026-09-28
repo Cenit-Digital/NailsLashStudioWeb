@@ -61,13 +61,13 @@ caching, tool use, límites de gasto y rate limits de la Console (`03` §4.2-§4
 
 ## 3. Decisiones que tendrá que tomar el salón (no las toma el código)
 
-| # | Decisión | Por qué importa | Fuente |
-|---|---|---|---|
-| S1 | **¿Mismo número en la app y en la API (Coexistence)?** | Disponible en España, pero solo vía Solution Partner / Tech Provider, y la app pierde funciones (difusión, temporales…) | `02` §4 |
-| S2 | **Proveedor/hosting del servidor** | Será encargado del tratamiento (contrato art. 28 RGPD) | `01` §3.2 |
-| S3 | **Modelo y presupuesto mensual** | Límite de gasto en la Console; orden de magnitud por conversación en `03` §4.1 | `03` §4.1, §4.5 |
-| S4 | **Presupuesto de WhatsApp** | Desde el 1-oct-2026 los mensajes de servicio se cobran (tramo gratuito mensual por número según `02` §3.4) y hace falta método de pago | `02` §3.4 |
-| S5 | **Residencia de datos** | La API directa de Claude no ofrece inferencia en la UE hoy | `03` §4.8 |
+| #   | Decisión                                               | Por qué importa                                                                                                                        | Fuente          |
+| --- | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| S1  | **¿Mismo número en la app y en la API (Coexistence)?** | Disponible en España, pero solo vía Solution Partner / Tech Provider, y la app pierde funciones (difusión, temporales…)                | `02` §4         |
+| S2  | **Proveedor/hosting del servidor**                     | Será encargado del tratamiento (contrato art. 28 RGPD)                                                                                 | `01` §3.2       |
+| S3  | **Modelo y presupuesto mensual**                       | Límite de gasto en la Console; orden de magnitud por conversación en `03` §4.1                                                         | `03` §4.1, §4.5 |
+| S4  | **Presupuesto de WhatsApp**                            | Desde el 1-oct-2026 los mensajes de servicio se cobran (tramo gratuito mensual por número según `02` §3.4) y hace falta método de pago | `02` §3.4       |
+| S5  | **Residencia de datos**                                | La API directa de Claude no ofrece inferencia en la UE hoy                                                                             | `03` §4.8       |
 
 ## 4. Puertas legales ANTES de encender la IA (bloqueantes)
 

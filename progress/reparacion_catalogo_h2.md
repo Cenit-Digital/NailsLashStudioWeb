@@ -34,7 +34,7 @@ ese texto a mano y quiere que siga sin verse.
   puede usarse `display:none`/`visibility:hidden` (sacarían el heading del árbol
   de accesibilidad y la puerta volvería a caer, esta vez sin síntoma visible).
 - `src/components/catalogo.module.scss` — nueva clase `.tituloOculto` con la
-  técnica *visually hidden* estándar (`position:absolute` + `clip`/`clip-path` +
+  técnica _visually hidden_ estándar (`position:absolute` + `clip`/`clip-path` +
   1×1px). Comentario explicando el porqué.
 - `src/lib/demo/catalogo-demo.ts` — renombrado el campo `titlebuttonfooter`
   (inglés pegado, viola la convención de español del repo) a **`textoBoton`**:
@@ -49,14 +49,14 @@ tipo de elemento, y el `<h2>` no es un `div`).
 
 Medido en un **árbol aislado** (`git worktree` en `HEAD` + SOLO mis tres ficheros
 del catálogo), porque el árbol de trabajo vivo lo está editando otra sesión en
-paralelo (ver más abajo). Es la única medición limpia de *mi* cambio:
+paralelo (ver más abajo). Es la única medición limpia de _mi_ cambio:
 
-| Comando | Resultado |
-| --- | --- |
-| `pnpm typecheck` | **exit 0** — `tsc --noEmit`, sin salida |
-| `pnpm lint` | **exit 0** — `eslint .`, sin salida |
-| `pnpm build` | **exit 0** — las 5 puertas OK |
-| `pnpm test` | **769 verdes / 0 rojos** (26 ficheros, 26 verdes) |
+| Comando          | Resultado                                         |
+| ---------------- | ------------------------------------------------- |
+| `pnpm typecheck` | **exit 0** — `tsc --noEmit`, sin salida           |
+| `pnpm lint`      | **exit 0** — `eslint .`, sin salida               |
+| `pnpm build`     | **exit 0** — las 5 puertas OK                     |
+| `pnpm test`      | **769 verdes / 0 rojos** (26 ficheros, 26 verdes) |
 
 Las 5 puertas del build, literal:
 

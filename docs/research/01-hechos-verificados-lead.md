@@ -13,10 +13,10 @@
 
 El salón **ya tiene web publicada**: <https://www.nailslashlasrozas.es/>
 
-- Es una *one-page* antigua: el sitemap declara `lastmod 2022-12-01` y solo 2
+- Es una _one-page_ antigua: el sitemap declara `lastmod 2022-12-01` y solo 2
   URLs (ambas la home).
-- Su propio texto declara que el negocio *"lleva más de 15 años ofreciéndote
-  los tratamientos de belleza más demandados"*.
+- Su propio texto declara que el negocio _"lleva más de 15 años ofreciéndote
+  los tratamientos de belleza más demandados"_.
 - Nadie nos había dicho que existía. Lo destapó la verificación adversarial.
 
 **Consecuencias que hay que meter en la spec:**
@@ -31,13 +31,13 @@ El salón **ya tiene web publicada**: <https://www.nailslashlasrozas.es/>
 
 ## 2. La web actual del cliente INCUMPLE la LSSI (verificado)
 
-| Comprobación | Resultado | Fuente |
-| --- | --- | --- |
-| Enlace "Aviso Legal" → `/es/aviso-legal` | **HTTP 404** | fetch 2026-07-15 |
-| Razón social en la web | **NO APARECE** | fetch de la home |
-| NIF/CIF en la web | **NO APARECE** | fetch de la home |
-| Email de contacto | **NO APARECE** | fetch de la home |
-| Responsable en la política de privacidad | **NO APARECE** — solo *"la persona a cargo del sitio web"* | fetch `/es/confidentiality_ws` |
+| Comprobación                             | Resultado                                                  | Fuente                         |
+| ---------------------------------------- | ---------------------------------------------------------- | ------------------------------ |
+| Enlace "Aviso Legal" → `/es/aviso-legal` | **HTTP 404**                                               | fetch 2026-07-15               |
+| Razón social en la web                   | **NO APARECE**                                             | fetch de la home               |
+| NIF/CIF en la web                        | **NO APARECE**                                             | fetch de la home               |
+| Email de contacto                        | **NO APARECE**                                             | fetch de la home               |
+| Responsable en la política de privacidad | **NO APARECE** — solo _"la persona a cargo del sitio web"_ | fetch `/es/confidentiality_ws` |
 
 → La web viva enlaza un aviso legal que **no existe** y su política de
 privacidad es una plantilla sin responsable identificado. Según
@@ -61,16 +61,16 @@ tenerlos (el aviso legal del propio titular) y **no existen**. Por tanto:
 
 ## 4. Ficha real del negocio (datos concordantes)
 
-| Campo | Valor verificado | Fuente |
-| --- | --- | --- |
-| Nombre | NAILS LASH STUDIO | `<title>` de la web oficial: *"Centro de estética en Las Rozas \| NAILS LASH STUDIO"* |
-| Dirección | **C.C. El Zoco, Av. de Atenas 75, Local 41, 28232 Las Rozas de Madrid** | web oficial; concuerda con Fresha y con el directorio del C.C. |
-| Teléfono | **625 22 33 66** (`tel:+34625223366`) | web oficial (texto + `href`), directorio `zocomonterozas.com`, Fresha |
-| Horario | **L–V 10:00–20:00 · Sábado 10:00–14:00** · domingo no listado | web oficial; concuerda con Treatwell |
-| Facebook | <https://www.facebook.com/nailslashstudiorozas/> | enlace en la web oficial |
-| Instagram | `@nailslash.studio_` | `<title>` del perfil |
-| Email | **NO EXISTE PÚBLICAMENTE** | ausente en la web oficial |
-| Coordenadas | 40.5179875, −3.9226688 | Fresha (no verificado por mí) |
+| Campo       | Valor verificado                                                        | Fuente                                                                                |
+| ----------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Nombre      | NAILS LASH STUDIO                                                       | `<title>` de la web oficial: _"Centro de estética en Las Rozas \| NAILS LASH STUDIO"_ |
+| Dirección   | **C.C. El Zoco, Av. de Atenas 75, Local 41, 28232 Las Rozas de Madrid** | web oficial; concuerda con Fresha y con el directorio del C.C.                        |
+| Teléfono    | **625 22 33 66** (`tel:+34625223366`)                                   | web oficial (texto + `href`), directorio `zocomonterozas.com`, Fresha                 |
+| Horario     | **L–V 10:00–20:00 · Sábado 10:00–14:00** · domingo no listado           | web oficial; concuerda con Treatwell                                                  |
+| Facebook    | <https://www.facebook.com/nailslashstudiorozas/>                        | enlace en la web oficial                                                              |
+| Instagram   | `@nailslash.studio_`                                                    | `<title>` del perfil                                                                  |
+| Email       | **NO EXISTE PÚBLICAMENTE**                                              | ausente en la web oficial                                                             |
+| Coordenadas | 40.5179875, −3.9226688                                                  | Fresha (no verificado por mí)                                                         |
 
 **Ojo con el `Local 41`**: el prototipo y la nota anterior decían solo
 "Av. de Atenas 75". La dirección completa lleva local y centro comercial.
@@ -83,12 +83,12 @@ Servicios que **el propio titular** declara en su web (literal):
 > Lifting de pestañas · Extensiones pelo a pelo · Tinte de pestañas ·
 > Diseño de cejas · Tinte de cejas · Laminado de cejas
 
-| | Prototipo (inventado) | Real (declarado por el titular) |
-| --- | --- | --- |
-| Categoría 1 | Uñas | **Uñas** ✓ |
-| Categoría 2 | **Facial** (limpieza, peeling, hidratante) | **Pestañas** (lifting, pelo a pelo, tinte) |
-| Categoría 3 | **Depilación** (piernas, ingles, axilas) | **Cejas** (diseño, tinte, laminado) |
-| Precios en la web | 18 servicios con precio | **NO APARECE ninguno** |
+|                   | Prototipo (inventado)                      | Real (declarado por el titular)            |
+| ----------------- | ------------------------------------------ | ------------------------------------------ |
+| Categoría 1       | Uñas                                       | **Uñas** ✓                                 |
+| Categoría 2       | **Facial** (limpieza, peeling, hidratante) | **Pestañas** (lifting, pelo a pelo, tinte) |
+| Categoría 3       | **Depilación** (piernas, ingles, axilas)   | **Cejas** (diseño, tinte, laminado)        |
+| Precios en la web | 18 servicios con precio                    | **NO APARECE ninguno**                     |
 
 → La estructura de 3 categorías del diseño **se puede conservar**, pero su
 contenido es **Uñas · Pestañas · Cejas**. La categoría "Facial" del prototipo
@@ -115,10 +115,10 @@ viable de las que no dependen del cliente.
 
 **Volumen de reseñas — NO son intercambiables:**
 
-| Plataforma | Nota | Nº opiniones | Estado |
-| --- | --- | --- | --- |
-| Treatwell | 4,9 | **1.231** | verificado en la ficha |
-| Google | 4,9 | **226** | leído con navegador real; el fetch plano cae en `consent.google.com` |
+| Plataforma | Nota | Nº opiniones | Estado                                                               |
+| ---------- | ---- | ------------ | -------------------------------------------------------------------- |
+| Treatwell  | 4,9  | **1.231**    | verificado en la ficha                                               |
+| Google     | 4,9  | **226**      | leído con navegador real; el fetch plano cae en `consent.google.com` |
 
 → Coinciden en nota (4,9) pero **no** en volumen. Si se muestra «4,9 · 1.231
 opiniones» hay que **decir de qué plataforma** y enlazarla, o el dato es
@@ -146,12 +146,12 @@ afirmación concreta que se vaya a usar.
 
 ## 8. Lo que sigue faltando y SOLO puede dar el cliente
 
-| Dato | Por qué es imprescindible | Bloquea |
-| --- | --- | --- |
-| Razón social / nombre del titular | LSSI art. 10.1 a) | aviso legal → **publicar** |
-| NIF / CIF | LSSI art. 10.1 a) | aviso legal → **publicar** |
-| Email de contacto | LSSI art. 10.1 f) (medio de contacto directo y efectivo) | aviso legal → **publicar** |
-| Precios vigentes | no los publica en su web; los de Treatwell hay que confirmarlos | sección de precios |
-| Fotos reales del equipo + consentimiento | LO 1/1982 y RGPD | sección equipo |
-| Ofertas vigentes reales | las 3 del prototipo son inventadas | sección ofertas |
-| ¿Migramos `nailslashlasrozas.es`? | dominio, 301, SEO | despliegue |
+| Dato                                     | Por qué es imprescindible                                       | Bloquea                    |
+| ---------------------------------------- | --------------------------------------------------------------- | -------------------------- |
+| Razón social / nombre del titular        | LSSI art. 10.1 a)                                               | aviso legal → **publicar** |
+| NIF / CIF                                | LSSI art. 10.1 a)                                               | aviso legal → **publicar** |
+| Email de contacto                        | LSSI art. 10.1 f) (medio de contacto directo y efectivo)        | aviso legal → **publicar** |
+| Precios vigentes                         | no los publica en su web; los de Treatwell hay que confirmarlos | sección de precios         |
+| Fotos reales del equipo + consentimiento | LO 1/1982 y RGPD                                                | sección equipo             |
+| Ofertas vigentes reales                  | las 3 del prototipo son inventadas                              | sección ofertas            |
+| ¿Migramos `nailslashlasrozas.es`?        | dominio, 301, SEO                                               | despliegue                 |

@@ -48,21 +48,21 @@
 
 - **@s1** → `@s1 la regla \`body\` declara font-family "'Manrope', system-ui, sans-serif"`.
 - **@s2** → `@s2 hay UNA sola regla que nombra h2 y/o h3, y su lista es {h2, h3} (conjunta, no dos
-  reglas)` + `@s2 esa regla conjunta declara font-family "'Gilda Display', serif"`.
+reglas)` + `@s2 esa regla conjunta declara font-family "'Gilda Display', serif"`.
 - **@s3** → `@s3 main.scss lo importa con @use 'tipografia'`.
 - **@s4** → `@s4 la regla del selector "%s" NOMBRA su propia font-family` (it.each: `body`, `h2, h3`).
 - **@s5** → `@s5 toda familia ENTRECOMILLADA … pertenece a la allowlist {Manrope, Gilda Display,
-  Great Vibes}` + `@s5 el ÚNICO identificador SIN comillas admitido es un genérico CSS` + `@s5 el
-  partial NO contiene ninguna directiva @import ni ningún bloque @font-face`.
+Great Vibes}` + `@s5 el ÚNICO identificador SIN comillas admitido es un genérico CSS` + `@s5 el
+partial NO contiene ninguna directiva @import ni ningún bloque @font-face`.
 - **@s6** → `@s6 la lista de selectores … contiene h2 y h3 y NO contiene h1` + `@s6 el partial no
-  declara ninguna regla que aplique a h1 ni a las clases del titular del hero` + `@s6 el partial NO
-  edita ni referencia hero.module.scss`.
+declara ninguna regla que aplique a h1 ni a las clases del titular del hero` + `@s6 el partial NO
+edita ni referencia hero.module.scss`.
 - **@s7** → `@s7 ninguna declaración font-family … lleva !important` + `@s7 el partial no usa
-  !important en ninguna parte` + `@s7 las reglas del partial usan solo selectores de TIPO … body por
-  herencia, h2/h3 (0,0,1)`.
+!important en ninguna parte` + `@s7 las reglas del partial usan solo selectores de TIPO … body por
+herencia, h2/h3 (0,0,1)`.
 - **@s8 / @s9** → `@verificacion-viva`. NO viven en este test ni en jsdom. Los cierra el LEAD con
   Chrome real/CDP sobre `dist/` (`font-family` computado del body y de un `<h2>`, `document.fonts.
-  check('16px Manrope')` / `check('24px Gilda Display')`, descarga same-origin del woff2 de Gilda
+check('16px Manrope')` / `check('24px Gilda Display')`, descarga same-origin del woff2 de Gilda
   Display, y regresión F-03/F-05/F-06/F-07). PROHIBIDO fingirlos con jsdom.
 
 Anti-tautología: los stacks (`'Manrope', system-ui, sans-serif`; `'Gilda Display', serif`), la
@@ -74,14 +74,14 @@ símbolo. El test NO lee los `.module.scss` de F-06/F-07 (ficheros `done` ajenos
 
 Batería determinista con backup/restore (todos ROJO y la suite vuelve a VERDE):
 
-| # | Sabotaje | Muerde |
-| - | -------- | ------ |
-| S1 | quitar `@use 'tipografia'` de `main.scss` | @s3 |
-| S2 | quitar `font-family` del `body` | @s1 y @s4 (body) |
-| S3 | familia no horneada (`'Playfair Display'`) | @s5 allowlist (+ @s2) |
-| S4 | identificador desnudo no genérico (`Georgia`) | @s5 desnudos (+ @s1) |
-| S5 | ampliar el selector a `h1, h2, h3` | @s6 (+ @s4) |
-| S6 | `!important` en el body | @s7 (+ @s5 desnudos) |
+| #   | Sabotaje                                      | Muerde                |
+| --- | --------------------------------------------- | --------------------- |
+| S1  | quitar `@use 'tipografia'` de `main.scss`     | @s3                   |
+| S2  | quitar `font-family` del `body`               | @s1 y @s4 (body)      |
+| S3  | familia no horneada (`'Playfair Display'`)    | @s5 allowlist (+ @s2) |
+| S4  | identificador desnudo no genérico (`Georgia`) | @s5 desnudos (+ @s1)  |
+| S5  | ampliar el selector a `h1, h2, h3`            | @s6 (+ @s4)           |
+| S6  | `!important` en el body                       | @s7 (+ @s5 desnudos)  |
 
 Balance: **TODOS mordieron**; suite restaurada a verde. Las mordidas colaterales confirman que las
 guardas se cruzan (S3 rompe también @s2, S6 rompe @s5).

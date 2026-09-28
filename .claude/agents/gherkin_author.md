@@ -37,9 +37,9 @@ No escribes código de producción. No escribes tests unitarios. No editas
 - ❌ NUNCA edites `src/` o los tests.
 - ❌ NUNCA marques `in_progress` ni `done`. Solo `spec_ready`.
 - ✅ Cada criterio del `acceptance` de `feature_list.json` y cada
-   comportamiento del `project-spec.md` DEBE quedar cubierto por al menos un
-   `Scenario`. Si algo no es expresable en Given/When/Then, vuelve al
-   `spec_partner`: la spec está incompleta.
+  comportamiento del `project-spec.md` DEBE quedar cubierto por al menos un
+  `Scenario`. Si algo no es expresable en Given/When/Then, vuelve al
+  `spec_partner`: la spec está incompleta.
 - ✅ Nada de pasos vagos ("el sistema funciona"). Cada paso es ejecutable.
 
 ## Comunicación

@@ -15,6 +15,7 @@
 ## RETIRO 1 — botón flotante de WhatsApp
 
 ### Cobertura / naturaleza del cambio
+
 No es una feature con `@s` vigentes: `features/boton_whatsapp_flotante.feature` nunca cruzó la
 puerta humana (su propio encabezado histórico: «Estado: PROPUESTA hasta la puerta humana», sin
 entrada en `feature_list.json`). Verificado: la id 13 (`solicitud_whatsapp`) sigue `"status":
@@ -22,6 +23,7 @@ entrada en `feature_list.json`). Verificado: la id 13 (`solicitud_whatsapp`) sig
 que este judge revisa es que el borrado sea completo y honesto.
 
 ### (a) Referencias rotas o huérfanas a `BotonWhatsApp`/`boton-whatsapp` en `src/`
+
 Grep propio sobre `src/**/*.{ts,tsx,scss}` (case-insensitive): cero imports, cero símbolos, cero
 ficheros huérfanos. `src/pages/home.tsx` ya no importa `BotonWhatsApp` (diff confirmado: solo se
 retira esa línea, nada más del fichero se toca). Los 3 tests huérfanos y el `.module.scss` están
@@ -29,6 +31,7 @@ borrados y no quedan referenciados por ningún import vivo.
 
 Sí quedan tres COMENTARIOS (prosa, no código; no rompen compilación ni tests) que citan artefactos ya
 borrados de esta rebanada:
+
 - `src/components/galeria.test.tsx:1120` — cita `boton-whatsapp-montaje.test.tsx` como el fichero que
   "también vigila" que la galería siga dentro de `<main>`. Ese fichero ya no existe.
 - `features/galeria_carrusel.feature:241` — mismo patrón, en la nota de @s2 de OTRO contrato: "Que la
@@ -42,22 +45,26 @@ Los dos primeros ya estaban reconocidos como deuda menor en `progress/tdd_boton_
 bloqueante: son comentarios/prosa, no imports ni aserciones.
 
 ### (b) Honestidad de la nota RETIRADA
+
 `features/boton_whatsapp_flotante.feature:1-6` es honesta y no borra el registro histórico: dice
 explícitamente que la propuesta "NUNCA cruzó la puerta humana", cita el motivo (Pablo eliminó el
 componente que la habría implementado, commit `479d541`) y conserva el contrato íntegro debajo del
 banner. No hay ninguna frase que finja que el botón sigue vigente.
 
 ### (c) `src/lib/demo/contacto-demo.ts` tras quitar la constante
+
 Coherente: queda un único export (`CONTACTO_WHATSAPP_TEXTO`), su docblock (líneas 1-5) no menciona ya
 `BOTON_WHATSAPP_FLOTANTE_TEXTO`, y no hay exports huérfanos ni referencias rotas al bloque borrado.
 
 ### Disciplina TDD
+
 - ¿Producción sin test que la pida? NO — es retirado puro (borrar código/tests/constantes muertas),
   no se añade producción nueva.
 - ¿Evidencia de Rojo→Verde→Refactor? No aplica (no es ciclo TDD: es limpieza mecánica declarada como
   tal en el propio diario, con verificación previa por grep de "cero consumidores" antes de borrar).
 
 ### Calidad
+
 - `src/pages/home.tsx`: un solo `import` retirado, nada más tocado — cambio mínimo y quirúrgico.
 - `src/lib/demo/contacto-demo.ts`: docblock y export coherentes tras el borrado (arriba).
 - Verificación cruzada del propio autor documentada en el diario (typecheck/lint/test acotados a
@@ -65,6 +72,7 @@ Coherente: queda un único export (`CONTACTO_WHATSAPP_TEXTO`), su docblock (lín
   tests).
 
 ### Hallazgos
+
 - **[Menor]** `src/components/galeria.test.tsx:1120` — comentario cita un fichero de test borrado
   (`boton-whatsapp-montaje.test.tsx`). No rompe nada; pulir el comentario si se vuelve a tocar ese
   bloque.
@@ -77,6 +85,7 @@ Ninguno de los tres hallazgos afecta comportamiento, tests ni cobertura: son pro
 Por eso el veredicto es **APPROVED** pese a los tres menores.
 
 ### Checkpoints (Retiro 1)
+
 - C1: [x] `bin/harness init` verde.
 - C2: [x] estado coherente — F-13 sigue `pending` intacta, no se tocó su `status`.
 - C3: [x] sin dependencias nuevas, sin código muerto residual en `src/` (grep limpio).
@@ -89,6 +98,7 @@ Por eso el veredicto es **APPROVED** pese a los tres menores.
 ## RETIRO 2 — controles del carrusel (ENMIENDA 4)
 
 ### Cobertura de escenarios (@s ↔ test), contrato AMENDADO
+
 Contraste hecho leyendo `features/galeria_carrusel.feature` (866 líneas) contra el Then/And EXACTO
 de cada escenario amendado y el/los `it(...)` reales en `galeria.test.tsx` / `resenas.test.tsx` (no
 contra el diario del `tdd_craftsman`, que solo se usó como mapa de arranque).
@@ -137,12 +147,14 @@ compartido + grupos de puntos con nombre propio), sin dejar un hueco de cobertur
 nunca fue el ÚNICO test del hecho que lo sustituye.
 
 ### Disciplina TDD
+
 - ¿Evidencia de Rojo→Verde→Refactor? SÍ — el diario documenta el punto de partida en rojo (30/90 y
   27/107 tests fallando por controles inexistentes, `progress/tdd_carrusel_enmienda4.md:16-20`) y el
   cierre en verde por fichero, escenario a escenario.
 - ¿Producción sin test que la pida? SÍ — un caso, y es serio. Ver hallazgo BLOQUEANTE abajo.
 
 ### Calidad
+
 - La retirada de `alternarRotacion`/`claveDeRotacion`/`etiquetaDeRotacion` es limpia, completa y
   simétrica en los dos componentes y en `galeria-logica.ts` (diff revisado línea por línea: imports,
   la función, el describe de test dedicado — todo fuera, nada a medias).
@@ -156,6 +168,7 @@ nunca fue el ÚNICO test del hecho que lo sustituye.
   afirme cumplimiento sin matizar.
 
 #### [BLOQUEANTE] arranqueExplicito es dead state que ningún test exige, y sobrevivió a la MISMA poda que sí se aplicó a alternarRotacion
+
 `Galeria.tsx:101,117,281` y `Resenas.tsx:82,96,251`: el estado `arranqueExplicito`
 (`useState(false)`) se sigue declarando, se sigue pasando a `debeRotar(...)`, y `entra()` lo sigue
 reseteando a `false`. Pero su ÚNICO setter con valor `true` vivía dentro de `alternarRotacion` — la
@@ -220,6 +233,7 @@ causa de muerte que el que sí se podó en esta misma sesión.
    corrige el hallazgo 1).
 
 ### Checkpoints
+
 - C1: [x] `bin/harness init` verde (verificado por este judge, no solo por el `craftsman_lead`).
 - C2: [x] una sola feature `in_progress` en `feature_list.json` (ninguna, de hecho: F-22/F-14 siguen
   `done`, coherente con que esto es una sincronización de cabos sueltos, no una feature nueva) ·
@@ -233,6 +247,7 @@ causa de muerte que el que sí se podó en esta misma sesión.
 - C7: no evaluado aquí (la mutación corre después de este veredicto, como marca el proceso).
 
 ### Cambios requeridos
+
 1. Retirar `arranqueExplicito` (el `useState`, su paso a `debeRotar` en ambos componentes, y el
    reseteo en `entra()`) de `Galeria.tsx` y `Resenas.tsx`, sustituyendo la llamada por
    `debeRotar({ pausadoPorElUsuario: pausado, raton, foco, arranqueExplicito: false })` o,
@@ -246,7 +261,6 @@ causa de muerte que el que sí se podó en esta misma sesión.
 3. (No bloqueante, para consolidar al cierre) Actualizar `feature_list.json` ids 22 y 14 para
    reflejar la ENMIENDA 4 — hallazgo 2, lo hace el `craftsman_lead`.
 
-
 ---
 
 ## Re-revisión delta (2026-07-24, tras remate)
@@ -259,6 +273,7 @@ causa de muerte que el que sí se podó en esta misma sesión.
 ### 1. Bloqueante (arranqueExplicito cableado muerto) — RESUELTO
 
 Grep propio de `arranqueExplicito`/`setArranqueExplicito` en TODO `src/`:
+
 - `src/components/Galeria.tsx:111,118` y `src/components/Resenas.tsx:90,97` — solo quedan: (a) un
   comentario explicando por qué se pasa `false`, y (b) el literal `arranqueExplicito: false` dentro
   de la llamada a `debeRotar`. CERO `useState`, CERO `setArranqueExplicito` en ninguno de los dos
@@ -286,6 +301,7 @@ retirado no quedó huérfano en ningún otro fichero (grep de `arranqueExplicito
 **Sobre la decisión de CONSERVAR debeRotar/EstadoDeRotacion.arranqueExplicito en
 galeria-logica.ts:** de acuerdo con el criterio del `tdd_craftsman`, verificado con criterio propio y
 no solo leído del diario:
+
 - `debeRotar` SÍ tiene un llamador real en producción: las dos únicas invocaciones vivas en todo
   `src/` son `Galeria.tsx:114` y `Resenas.tsx:93`, ambas dentro del render.
 - El parámetro `arranqueExplicito` SÍ está probado como una regla de negocio legítima de la función
@@ -310,6 +326,7 @@ componentes). Hallazgo 1 (BLOQUEANTE): RESUELTO.
 ### 2. Los 3 hallazgos MENORES de prosa (Retiro 1) — RESUELTOS
 
 Lectura directa, no solo el diario:
+
 - `src/components/galeria.test.tsx:1119-1128` — el `it('@s2 la galería sigue montada DENTRO de
   <main> en la home', ...)` ya no tiene ningún comentario que cite `boton-whatsapp-montaje.test.tsx`
   (fichero borrado). Confirmado.
@@ -323,6 +340,7 @@ Lectura directa, no solo el diario:
 ### 3. Verificación propia de bin/harness init
 
 Ejecutado por este judge (`bin/harness.ps1 init`), no delegado al diario del `tdd_craftsman`:
+
 - Entorno: OK (Node v22.15.0).
 - `pnpm typecheck`: 0 errores.
 - `pnpm lint` (`eslint .`): 0 errores.
@@ -341,6 +359,7 @@ rama de debeRotar tocada, ningún otro useState afectado, ningún comentario "MU
 huérfano.
 
 ### Checkpoints (actualizados)
+
 - C1: [x] `bin/harness init` verde, verificado por este judge de nuevo tras el remate.
 - C3: [x] ya NO hay código de producción sin uso real — el hallazgo 1 queda cerrado; arquitectura
   respetada (capa pura conserva su generalidad documentada, capa de componente queda sin cableado

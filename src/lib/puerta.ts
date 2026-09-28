@@ -60,8 +60,7 @@ const CODIGO_FALLO = 1
 
 /** Acusar, no gruñir: cada línea dice QUÉ lo disparó, DÓNDE está y con QUÉ valor. */
 function describirViolacion(violacion: Violacion): string {
-  const causa =
-    violacion.via === 'patron' ? `patrón "${violacion.patron}"` : 'flag esPlaceholder'
+  const causa = violacion.via === 'patron' ? `patrón "${violacion.patron}"` : 'flag esPlaceholder'
 
   return `${causa} en ${violacion.ubicacion}: "${violacion.valor}"`
 }
@@ -83,7 +82,9 @@ export function ejecutarPuerta(peticion: PeticionPuerta): ResultadoPuerta {
     if (!peticion.ficheros.existeDirectorio(DIRECTORIO_ARTEFACTO)) {
       return {
         codigoSalida: CODIGO_FALLO,
-        lineas: [`no había nada que inspeccionar: no existe el directorio "${DIRECTORIO_ARTEFACTO}"`],
+        lineas: [
+          `no había nada que inspeccionar: no existe el directorio "${DIRECTORIO_ARTEFACTO}"`,
+        ],
       }
     }
 
@@ -97,7 +98,9 @@ export function ejecutarPuerta(peticion: PeticionPuerta): ResultadoPuerta {
     if (!artefacto.some((fichero) => fichero.ubicacion === FICHERO_HTML_DE_ENTRADA)) {
       return {
         codigoSalida: CODIGO_FALLO,
-        lineas: [`no se inspeccionó "${FICHERO_HTML_DE_ENTRADA}": el artefacto no tiene HTML de entrada`],
+        lineas: [
+          `no se inspeccionó "${FICHERO_HTML_DE_ENTRADA}": el artefacto no tiene HTML de entrada`,
+        ],
       }
     }
 

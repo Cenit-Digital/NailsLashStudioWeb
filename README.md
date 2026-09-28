@@ -21,7 +21,7 @@ proyecto son los comandos de tu stack, declarados en un `harness.config.json`:
 ```json
 {
   "commands": {
-    "test":   "…tu comando de tests…",
+    "test": "…tu comando de tests…",
     "mutate": "…tu prueba de mutación…"
   },
   "mutation": { "threshold": 0.8 }
@@ -72,13 +72,13 @@ Una sola feature a la vez. Estado en disco (no en el chat): `project-spec.md`,
 
 ### Comandos del arnés
 
-| Comando                    | Qué hace                                            |
-| -------------------------- | --------------------------------------------------- |
-| `bin/harness init`         | Verifica entorno, ficheros base, feature_list, tests |
-| `bin/harness test`         | La suite de tests declarada                          |
-| `bin/harness mutate [t]`   | La prueba de mutación                                |
-| `bin/harness verify`       | init + mutación (puerta de cierre)                  |
-| `bin/harness status`       | Resumen de `feature_list.json`                      |
+| Comando                  | Qué hace                                             |
+| ------------------------ | ---------------------------------------------------- |
+| `bin/harness init`       | Verifica entorno, ficheros base, feature_list, tests |
+| `bin/harness test`       | La suite de tests declarada                          |
+| `bin/harness mutate [t]` | La prueba de mutación                                |
+| `bin/harness verify`     | init + mutación (puerta de cierre)                   |
+| `bin/harness status`     | Resumen de `feature_list.json`                       |
 
 (En Windows: `bin\harness.ps1 <comando>`.)
 
@@ -86,10 +86,10 @@ Una sola feature a la vez. Estado en disco (no en el chat): `project-spec.md`,
 
 Dos arneses completos, listos para inspeccionar o copiar como punto de partida:
 
-| Ejemplo                     | Stack                    | Tests | Mutación |
-| --------------------------- | ------------------------ | ----- | -------- |
-| `examples/python-notes-cli` | Python (stdlib)          | 47    | 100%     |
-| `examples/node-notes-cli`   | Node/JS (cero deps)      | 29    | 100%     |
+| Ejemplo                     | Stack               | Tests | Mutación |
+| --------------------------- | ------------------- | ----- | -------- |
+| `examples/python-notes-cli` | Python (stdlib)     | 47    | 100%     |
+| `examples/node-notes-cli`   | Node/JS (cero deps) | 29    | 100%     |
 
 Ambos demuestran el flujo Uncle Bob de punta a punta con un mutador propio sin
 dependencias. Para producción en TS, el adaptador Node usa Vitest + StrykerJS.

@@ -23,22 +23,22 @@
 
 ## Mapa @s → test (features/nailbot_chat_compartido.feature)
 
-| @s | Test(s) |
-|---|---|
-| @s1 | `chat-nailbot.test.tsx` · describe «@s1 horneado…» (7 tests sobre `renderToString(<Reserva/>)` y `<ChatNailbot/>`; la leyenda se comprueba sobre el DOM del horneado con `closest`) |
-| @s2 | `chat-nailbot.test.tsx` · «@s2 la leyenda se ve SIEMPRE» (4 momentos) |
-| @s3 | `chat-nailbot.test.tsx` · «@s3 el guion…» (5 filas, incluida «Lo antes posible → franja») |
-| @s4 | `chat-nailbot.test.tsx` · «@s4 “Un sábado” NO pregunta la franja» (6 burbujas exactas) + canario en `chat-nailbot-logica.test.ts` (precondición `HORARIO.sabado` cierra a las 14:00) |
-| @s5 | `chat-nailbot-logica.test.ts` · «@s5 la regla del sábado es PURA…» (4 rangos) + `fraseSabado` (guarda anclada) |
-| @s6 | `chat-nailbot.test.tsx` · «@s6 al terminar…» (con nombre por el sábado; sin nombre) |
-| @s7 | `chat-nailbot.test.tsx` · «@s7 el aviso de capa 1…» |
-| @s8 | `chat-nailbot.test.tsx` · «@s8 tras cada acción…» (7 filas + «al montar no se mueve» + «nombre vacío no mueve el foco») |
-| @s9 | `chat-nailbot.test.tsx` · «@s9 “Reservar otra cita”…» (+ el campo vuelve vacío) |
-| @s10 | `chat-nailbot.test.tsx` · «@s10 dos instancias…» |
-| @s11 | `chat-nailbot-logica.test.ts` · «@s11 responder es PURA…» (congelado, síncrono, determinista, nombre vacío, 300 caracteres, reinicio) |
-| @s12 | `chat-nailbot.test.tsx` · «@s12 guardas de FUENTE» (incluye «form action», como remite reserva_chat @s22) |
-| @s13 | `chat-nailbot-estilos.test.ts` (selectores, pares de la matriz escritos a mano, sin «en línea», sin animación) |
-| @s14 | `nailbot-arte.test.tsx` (SVG estático, sin ids ni subrecursos, pose final, paleta) |
+| @s   | Test(s)                                                                                                                                                                              |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| @s1  | `chat-nailbot.test.tsx` · describe «@s1 horneado…» (7 tests sobre `renderToString(<Reserva/>)` y `<ChatNailbot/>`; la leyenda se comprueba sobre el DOM del horneado con `closest`)  |
+| @s2  | `chat-nailbot.test.tsx` · «@s2 la leyenda se ve SIEMPRE» (4 momentos)                                                                                                                |
+| @s3  | `chat-nailbot.test.tsx` · «@s3 el guion…» (5 filas, incluida «Lo antes posible → franja»)                                                                                            |
+| @s4  | `chat-nailbot.test.tsx` · «@s4 “Un sábado” NO pregunta la franja» (6 burbujas exactas) + canario en `chat-nailbot-logica.test.ts` (precondición `HORARIO.sabado` cierra a las 14:00) |
+| @s5  | `chat-nailbot-logica.test.ts` · «@s5 la regla del sábado es PURA…» (4 rangos) + `fraseSabado` (guarda anclada)                                                                       |
+| @s6  | `chat-nailbot.test.tsx` · «@s6 al terminar…» (con nombre por el sábado; sin nombre)                                                                                                  |
+| @s7  | `chat-nailbot.test.tsx` · «@s7 el aviso de capa 1…»                                                                                                                                  |
+| @s8  | `chat-nailbot.test.tsx` · «@s8 tras cada acción…» (7 filas + «al montar no se mueve» + «nombre vacío no mueve el foco»)                                                              |
+| @s9  | `chat-nailbot.test.tsx` · «@s9 “Reservar otra cita”…» (+ el campo vuelve vacío)                                                                                                      |
+| @s10 | `chat-nailbot.test.tsx` · «@s10 dos instancias…»                                                                                                                                     |
+| @s11 | `chat-nailbot-logica.test.ts` · «@s11 responder es PURA…» (congelado, síncrono, determinista, nombre vacío, 300 caracteres, reinicio)                                                |
+| @s12 | `chat-nailbot.test.tsx` · «@s12 guardas de FUENTE» (incluye «form action», como remite reserva_chat @s22)                                                                            |
+| @s13 | `chat-nailbot-estilos.test.ts` (selectores, pares de la matriz escritos a mano, sin «en línea», sin animación)                                                                       |
+| @s14 | `nailbot-arte.test.tsx` (SVG estático, sin ids ni subrecursos, pose final, paleta)                                                                                                   |
 
 Enmienda de `reserva_chat.feature`: @s7, @s9, @s11, @s13, @s15, @s17, @s20, @s22, @s23 AJUSTADOS en
 `reserva.test.tsx`; @s8 y @s12 RETIRADOS (tests borrados, comentario con el motivo); @s24 gana el test

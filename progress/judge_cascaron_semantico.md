@@ -110,7 +110,7 @@ número mágico. Es **desviación declarada y aprobada en el contrato** (@s26), 
   defecto de esta feature (y no la arregla F-04: sería alcance inflado). La producción de `tools/`
   **sí** exige `.ts` (`--experimental-strip-types`) y la conserva.
 - **`docs/verification.md`:** la regla **falsa** de la extensión `.ts` **no está** como regla. Está
-  registrada como *corolario refutado* (`:127-134`) con la medición que la tumba y con la
+  registrada como _corolario refutado_ (`:127-134`) con la medición que la tumba y con la
   advertencia de que aplicarla habría roto el build. **Es la forma correcta de matar una regla
   falsa: dejando el cadáver a la vista.**
 
@@ -124,7 +124,7 @@ número mágico. Es **desviación declarada y aprobada en el contrato** (@s26), 
    (`ausenteOVacio → false`, «Survived» en el informe, **5 tests muertos** a mano). Se declara como
    **síntoma con procedimiento de verificación**, no como causa. Eso es exactamente lo que le
    faltaba a la regla del `.ts`.
-   - *Matiz que dejo, sin bloquear:* de las tres señales, el doc dice «basta una». La señal 2
+   - _Matiz que dejo, sin bloquear:_ de las tres señales, el doc dice «basta una». La señal 2
      aislada admite causa legítima (mejor atribución `perTest`, o un cambio en la suite): solo es
      anómala a **código y tests constantes**, que es lo que la tabla acota. Las señales 1 y 3 sí
      bastan solas. Sugerencia: escribir esa acotación junto al «basta una».
@@ -160,6 +160,6 @@ número mágico. Es **desviación declarada y aprobada en el contrato** (@s26), 
 ## Nota
 
 Esta feature hace lo que F-04 existía para hacer: **una puerta que ve lo que jsdom no puede ver**.
-El hallazgo de @s32 —que la primera puerta era *tan ciega como jsdom* y solo rompió por accidente—
+El hallazgo de @s32 —que la primera puerta era _tan ciega como jsdom_ y solo rompió por accidente—
 es el tipo de defecto que sobrevive a una suite entera en verde, y lo cazó el escenario que el
 contrato exigía **precisamente para eso**. El escenario se pagó a sí mismo. Aprobado.

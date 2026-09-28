@@ -22,27 +22,28 @@ del arte (`nailbot-flotante-estilos.test.ts`, @s12). La verificación real es en
 
 ## Mapa @s → test (features/nailbot_flotante.feature)
 
-| @s | Test(s) |
-|---|---|
-| @s1 | `nailbot-flotante.test.tsx` · «@s1 sin JavaScript no hay flotante» (home horneada + componente a solas) |
-| @s2 | `nailbot-flotante.test.tsx` · «@s2 tras hidratar…» (compareDocumentPosition con anclas; ids únicos con el panel ABIERTO; sin headings fuera del diálogo) |
-| @s3 | `nailbot-flotante.test.tsx` · «@s3 el lanzador…» |
-| @s4 | `nailbot-flotante.test.tsx` · «@s4 la pausa…» (2 filas + icono ❙❙/▶ + sin persistencia) |
-| @s5 | `nailbot-flotante.test.tsx` · «@s5 movimiento reducido…» (4 filas + foco fuera + sin matchMedia) |
-| @s6 | `nailbot-flotante-logica.test.ts` (bocadillo 5 filas, animación 7 filas + extremos, teclas 6 filas; `enfocar`/`focoDentro`) |
-| @s7 | `nailbot-flotante.test.tsx` · «@s7 el bocadillo aparece UNA vez…» (4 antecedentes) |
-| @s8 | `nailbot-flotante.test.tsx` · «@s8 el bocadillo se cierra…» (Esc ajeno, otra tecla, ×, Esc con el foco en la ×, abrir el panel, temporizador cancelado al desmontar) |
-| @s9 | `nailbot-flotante.test.tsx` · «@s9 pulsar el lanzador abre un <dialog> NATIVO…» |
-| @s10 | `nailbot-flotante.test.tsx` · «@s10 cerrar deja el panel CERRADO…» (botón y close() ajeno) |
-| @s11 | `nailbot-flotante.test.tsx` · «@s11 con el panel abierto, ← y →…» (6 filas) |
-| @s12 | `nailbot-flotante-estilos.test.ts` (13 keyframes dentro de no-preference, solo transform/opacity, longhands, duraciones, pausa que congela) |
-| @s13 | `nailbot-flotante-estilos.test.ts` (fijo, z-index 40, áreas seguras, 32 px, cierres ≥ 24 px, sin verde, animación ≤ 5 s en no-preference) |
-| @s14 | `nailbot-flotante-estilos.test.ts` (`--nailbot-lanzador` ≥ 44 px en escritorio y móvil; `scroll-padding-bottom`) |
-| @s15 | `nailbot-flotante-estilos.test.ts` (sin red/storage/analítica/«whatsapp», sin open controlado ni ids literales, montaje en home, doble protegido del setup) |
+| @s   | Test(s)                                                                                                                                                              |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| @s1  | `nailbot-flotante.test.tsx` · «@s1 sin JavaScript no hay flotante» (home horneada + componente a solas)                                                              |
+| @s2  | `nailbot-flotante.test.tsx` · «@s2 tras hidratar…» (compareDocumentPosition con anclas; ids únicos con el panel ABIERTO; sin headings fuera del diálogo)             |
+| @s3  | `nailbot-flotante.test.tsx` · «@s3 el lanzador…»                                                                                                                     |
+| @s4  | `nailbot-flotante.test.tsx` · «@s4 la pausa…» (2 filas + icono ❙❙/▶ + sin persistencia)                                                                              |
+| @s5  | `nailbot-flotante.test.tsx` · «@s5 movimiento reducido…» (4 filas + foco fuera + sin matchMedia)                                                                     |
+| @s6  | `nailbot-flotante-logica.test.ts` (bocadillo 5 filas, animación 7 filas + extremos, teclas 6 filas; `enfocar`/`focoDentro`)                                          |
+| @s7  | `nailbot-flotante.test.tsx` · «@s7 el bocadillo aparece UNA vez…» (4 antecedentes)                                                                                   |
+| @s8  | `nailbot-flotante.test.tsx` · «@s8 el bocadillo se cierra…» (Esc ajeno, otra tecla, ×, Esc con el foco en la ×, abrir el panel, temporizador cancelado al desmontar) |
+| @s9  | `nailbot-flotante.test.tsx` · «@s9 pulsar el lanzador abre un <dialog> NATIVO…»                                                                                      |
+| @s10 | `nailbot-flotante.test.tsx` · «@s10 cerrar deja el panel CERRADO…» (botón y close() ajeno)                                                                           |
+| @s11 | `nailbot-flotante.test.tsx` · «@s11 con el panel abierto, ← y →…» (6 filas)                                                                                          |
+| @s12 | `nailbot-flotante-estilos.test.ts` (13 keyframes dentro de no-preference, solo transform/opacity, longhands, duraciones, pausa que congela)                          |
+| @s13 | `nailbot-flotante-estilos.test.ts` (fijo, z-index 40, áreas seguras, 32 px, cierres ≥ 24 px, sin verde, animación ≤ 5 s en no-preference)                            |
+| @s14 | `nailbot-flotante-estilos.test.ts` (`--nailbot-lanzador` ≥ 44 px en escritorio y móvil; `scroll-padding-bottom`)                                                     |
+| @s15 | `nailbot-flotante-estilos.test.ts` (sin red/storage/analítica/«whatsapp», sin open controlado ni ids literales, montaje en home, doble protegido del setup)          |
 
 ## Ronda de correcciones tras la revisión (2026-09-28)
 
 judge F-24 (6 bloqueantes) y a11y (1 bloqueante) → atendidos:
+
 - La pausa congela (arriba). Icono de la pausa con test. Sin escrituras muertas: el bocadillo es ahora
   DERIVADO de tres hechos con estado (tiempo cumplido, panel abierto alguna vez, descartado) a través de
   la decisión pura `mostrarBocadillo`. Este diario. Una sola feature en `in_progress`. `bin/harness init`

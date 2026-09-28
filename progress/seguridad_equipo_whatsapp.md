@@ -9,12 +9,15 @@ Alcance revisado (SOLO lo nuevo, sin tocar el hero):
 ## Veredicto: SECURE (0 crítico / 0 alto)
 
 ## 🔴 Crítico
+
 Ninguno.
 
 ## 🟡 Alto
+
 Ninguno.
 
 ## 🟠 Medio
+
 Ninguno.
 
 ## 🔵 Bajo / informativo (defensa en profundidad, NO accionable ahora)
@@ -63,5 +66,6 @@ Ninguno.
   (art. 9 RGPD): solo selección de día/hora que nunca sale del navegador. OK.
 
 ## Nota de proceso
+
 No se editó ningún archivo de código ni test. No se abrió ni tocó nada de la
 zona prohibida del hero.

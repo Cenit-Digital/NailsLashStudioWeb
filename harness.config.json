@@ -2,10 +2,10 @@
   "$schema": "./harness.schema.json",
   "project": "nails-lash-studio-web",
   "language": "node",
-  "description": "Web del salón Nails & Lash Studio. Stack heredado de WebEmpresa (Vite + React + TypeScript + SCSS + pnpm + SSG vía vite-react-ssg). `lint` fusiona typecheck porque el schema no tiene ranura propia y el base lo trata como puerta obligatoria. `paths.tests` es `src` porque en este stack los tests conviven con el código (vitest.config.ts → include: src/**/*.{test,spec}.{ts,tsx}). `mutation.threshold` va en proporción 0-1 (Stryker usa porcentaje: thresholds.break 100).",
+  "description": "Web del salón Nails & Lash Studio. Stack heredado de WebEmpresa (Vite + React + TypeScript + SCSS + pnpm + SSG vía vite-react-ssg). `lint` fusiona typecheck porque el schema no tiene ranura propia y el base lo trata como puerta obligatoria; desde el 2026-09-28 fusiona también `format:check` (Prettier), por decisión del humano, para que la deuda de formato no vuelva a acumularse. `paths.tests` es `src` porque en este stack los tests conviven con el código (vitest.config.ts → include: src/**/*.{test,spec}.{ts,tsx}). `mutation.threshold` va en proporción 0-1 (Stryker usa porcentaje: thresholds.break 100).",
   "commands": {
     "install": "pnpm install",
-    "lint": "pnpm typecheck && pnpm lint",
+    "lint": "pnpm typecheck && pnpm lint && pnpm format:check",
     "test": "pnpm test",
     "mutate": "node tools/mutate.mjs {{target}}",
     "build": "pnpm build"

@@ -32,10 +32,10 @@ lo cubren los tests que leen el fichero (`hero-estilos.test.ts`, @s1..@s4/@s9) y
 > F-05: «100 %» con 152 timeouts). «Un `tests per mutant` desplomado inventa supervivientes.» «Una
 > medición con 0 tests corridos lee «sobrevive» donde no lo hay.» **Ninguna mordió aquí, y está medido.**
 
-| Fichero | Concurrencia | `# timeout` | tests/mutante | dry run (tests que cubren) | `# errors` | `# no cov` | ¿Vale? |
-| ------- | ------------ | ----------- | ------------- | -------------------------- | ---------- | ---------- | ------ |
-| `src/lib/partir-nombre.ts` | `--concurrency 1` | **0** | **2,77** | **22** | **0** | **0** | **sí** |
-| `src/components/Hero.tsx`  | `--concurrency 1` | **0** | **1,50** | **17** | **0** | **0** | **sí** |
+| Fichero                    | Concurrencia      | `# timeout` | tests/mutante | dry run (tests que cubren) | `# errors` | `# no cov` | ¿Vale? |
+| -------------------------- | ----------------- | ----------- | ------------- | -------------------------- | ---------- | ---------- | ------ |
+| `src/lib/partir-nombre.ts` | `--concurrency 1` | **0**       | **2,77**      | **22**                     | **0**      | **0**      | **sí** |
+| `src/components/Hero.tsx`  | `--concurrency 1` | **0**       | **1,50**      | **17**                     | **0**      | **0**      | **sí** |
 
 1. **`# timeout` = 0 en los DOS.** `partir-nombre.ts` es **código PURO sin un solo bucle** -> un
    timeout ahí sería contención pura y contaría como MUERTO inflando el score; **no hay ni uno**.
@@ -43,8 +43,8 @@ lo cubren los tests que leen el fichero (`hero-estilos.test.ts`, @s1..@s4/@s9) y
    -> el score se puede leer, no hay mentira de contención.
 2. **`tests/mutante` NO desplomado — genuino y coherente con el pool que cubre cada fichero.**
    - `partir-nombre.ts`: **2,77 sobre 22 tests** que lo cubren (el pool = 5 de `partir-nombre.test.ts`
-     + 15 de `hero.test.tsx` + 2 de `home.test.tsx`, que lo importan transitivamente vía `Hero`). 13
-     mutantes, media 2,77 = asesinos tempranos con bail-out; **no es el desplome-que-inventa-supervivientes**.
+     - 15 de `hero.test.tsx` + 2 de `home.test.tsx`, que lo importan transitivamente vía `Hero`). 13
+       mutantes, media 2,77 = asesinos tempranos con bail-out; **no es el desplome-que-inventa-supervivientes**.
    - `Hero.tsx`: **1,50 sobre 17 tests** (15 `hero.test.tsx` + 2 `home.test.tsx`). Con **solo 2
      mutantes** (JSX literal no se muta), 1,50 es lo esperado (ambos mueren pronto); es el mismo rango
      que los `.tsx` de 1-2 mutantes de F-06 (1,00). No hay desplome anómalo.
@@ -69,16 +69,17 @@ head-*/index.html` son ruido inofensivo, NO `# errors`) · `src/` **git-clean an
 
 ## 2. El score — ya con derecho a leerse
 
-| Fichero | `# timeout` | tests/mut | Total | Killed | **Survived** | **NoCov** | `# errors` | Score |
-| ------- | ----------- | --------- | ----- | ------ | ------------ | --------- | ---------- | ----- |
-| `src/lib/partir-nombre.ts` | **0** | 2,77 | **13** | 13 | **0** | **0** | 0 | **100,00 %** |
-| `src/components/Hero.tsx`  | **0** | 1,50 | **2**  | 2  | **0** | **0** | 0 | **100,00 %** |
-| **Feature** | **0** | — | **15** | **15** | **0** | **0** | 0 | **100,00 %** |
+| Fichero                    | `# timeout` | tests/mut | Total  | Killed | **Survived** | **NoCov** | `# errors` | Score        |
+| -------------------------- | ----------- | --------- | ------ | ------ | ------------ | --------- | ---------- | ------------ |
+| `src/lib/partir-nombre.ts` | **0**       | 2,77      | **13** | 13     | **0**        | **0**     | 0          | **100,00 %** |
+| `src/components/Hero.tsx`  | **0**       | 1,50      | **2**  | 2      | **0**        | **0**     | 0          | **100,00 %** |
+| **Feature**                | **0**       | —         | **15** | **15** | **0**        | **0**     | 0          | **100,00 %** |
 
 Stryker salió con **código 0** en los dos ficheros («Final mutation score of 100.00 is greater than
 or equal to break threshold 100»). **Ni un superviviente, ni un equivalente.** Nada que escalar.
 
 ### El mutante crítico previsto — MUERTO
+
 El `EqualityOperator` `corte < 0 -> corte <= 0` (guarda de `partir-nombre.ts:22`) está entre los 13
 mutantes y **murió**: en la traza de Stryker el escenario **@s16** («` Studio`», un NOMBRE que empieza
 por espacio, corte===0) figura como **`killed 1`** — mató EXACTAMENTE ese mutante y ningún otro test lo
@@ -86,6 +87,7 @@ tocaba. Confirma la predicción del contrato y la reproducción del `judge`: sin
 sobreviviría; con @s16, cae. **El mutante crítico DEBE morir -> murió.**
 
 ### Hero.tsx — 2 mutantes, ambos muertos
+
 JSX con atributos/estructura LITERALES: Stryker instrumentó **solo 2 mutantes** (el cuerpo de la
 función `Hero`, no los literales `<span>`/`<p>`/`className`), como avisaba la lección F-06. Los dos
 mueren con el pool de 17 tests (`hero.test.tsx` + `home.test.tsx` sobre el HTML de `renderToString`).
@@ -126,6 +128,7 @@ base `.heroMarca` (`'Great Vibes', cursive`) y `.heroStudio` (`'Manrope', sans-s
 `feature_list.json` líneas 19 y 21; nota §7-174: la tipografía «se asevera leyendo el .module.scss»).
 
 Verificado en ESTA ronda:
+
 - `stryker.config.json` → lista `mutate` (15 entradas explícitas, líneas 12-28): **0 entradas
   `*.module.scss`** y **0 ficheros de test**. `@s17` NO añade ningún fichero mutable nuevo. Los dos
   mutables de F-07 siguen siendo exactamente `src/lib/partir-nombre.ts` (línea 23) y
@@ -155,21 +158,21 @@ línea 51) → Stryker no lo copia; ambos dry-runs salieron **«Initial test run
 
 ### Salud del informe (se lee ANTES que el score)
 
-| Fichero | Concurrencia | dry-run | tests/mut | `# timeout` | `# errors` | `# no cov` | EXIT | ¿Vale? |
-| ------- | ------------ | ------- | --------- | ----------- | ---------- | ---------- | ---- | ------ |
-| `src/lib/partir-nombre.ts` | `--concurrency 1` | «Initial test run succeeded. Ran **22** tests» | **2,77** | **0** | **0** | **0** | **0** | **sí** |
-| `src/components/Hero.tsx`  | `--concurrency 1` | «Initial test run succeeded. Ran **17** tests» | **1,50** | **0** | **0** | **0** | **0** | **sí** |
+| Fichero                    | Concurrencia      | dry-run                                        | tests/mut | `# timeout` | `# errors` | `# no cov` | EXIT  | ¿Vale? |
+| -------------------------- | ----------------- | ---------------------------------------------- | --------- | ----------- | ---------- | ---------- | ----- | ------ |
+| `src/lib/partir-nombre.ts` | `--concurrency 1` | «Initial test run succeeded. Ran **22** tests» | **2,77**  | **0**       | **0**      | **0**      | **0** | **sí** |
+| `src/components/Hero.tsx`  | `--concurrency 1` | «Initial test run succeeded. Ran **17** tests» | **1,50**  | **0**       | **0**      | **0**      | **0** | **sí** |
 
 0 timeouts en los dos (ningún `Timeout` inflando el score como falso-muerto), 0 `# errors` (ningún
 mutante sin evaluar), dry-run > 0 y coherente con el baseline → el score se puede leer, no hay mentira.
 
 ### El score — ya con derecho a leerse
 
-| Fichero | Total | Killed | **Survived** | NoCov | Timeout | Errors | Score |
-| ------- | ----- | ------ | ------------ | ----- | ------- | ------ | ----- |
-| `src/lib/partir-nombre.ts` | **13** | 13 | **0** | 0 | 0 | 0 | **100,00 %** |
-| `src/components/Hero.tsx`  | **2**  | 2  | **0** | 0 | 0 | 0 | **100,00 %** |
-| **Feature (F-07)** | **15** | **15** | **0** | 0 | 0 | 0 | **100,00 %** |
+| Fichero                    | Total  | Killed | **Survived** | NoCov | Timeout | Errors | Score        |
+| -------------------------- | ------ | ------ | ------------ | ----- | ------- | ------ | ------------ |
+| `src/lib/partir-nombre.ts` | **13** | 13     | **0**        | 0     | 0       | 0      | **100,00 %** |
+| `src/components/Hero.tsx`  | **2**  | 2      | **0**        | 0     | 0       | 0      | **100,00 %** |
+| **Feature (F-07)**         | **15** | **15** | **0**        | 0     | 0       | 0      | **100,00 %** |
 
 Stryker salió con **código 0** en los dos («Final mutation score of 100.00 is greater than or equal
 to break threshold 100»). Cifras **idénticas** a la ronda de cierre previa (13 + 2 mutantes, 2,77 y

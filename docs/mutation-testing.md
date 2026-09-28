@@ -11,7 +11,7 @@ Una suite verde dice "el código no explota con estas entradas". **No** dice
 pasa siempre y no protege nada.
 
 La prueba de mutación lo mide al revés: introduce un defecto pequeño en el
-código (un *mutante*) y observa la suite.
+código (un _mutante_) y observa la suite.
 
 - Si **algún test falla** → el mutante está **muerto** (killed). Bien: la red
   atrapó el defecto.

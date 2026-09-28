@@ -69,21 +69,21 @@ parcial. En cualquier caso, la medida de HOY manda. Los 8, con su cierre:
    una expresión, no una plantilla.
 
 2-4. **124:30 `ConditionalExpression` (×2) + `EqualityOperator`** — el chip de DÍA todavía llevaba
-   `className={indice === diaIdx ? estilos.diaActivo : estilos.dia}`. Bajo `css:false` ambas ramas son
-   `undefined`: inmatable, EXACTAMENTE el mismo defecto que ya se había reparado para `.horaOpcion` en
-   la ronda de mutación anterior (`progress/mutation_equipo.md`, 177:32) — pero el chip de DÍA se había
-   quedado sin ese mismo tratamiento. **REDISEÑO** (mismo patrón, mirror de `.horaOpcion`): `className`
-   pasa a fijo (`estilos.dia`); el estado ELEGIDO se colorea desde `&[aria-pressed='true']` DENTRO de
-   `.dia` en `equipo.module.scss` (se funde con `.diaActivo`, que desaparece). `equipo-estilos.test.ts`
-   se actualiza a las dos aserciones que ya usaban ese patrón para `.horaOpcion`. **Se tocó
-   `equipo.module.scss`**, fuera de la lista literal del encargo: es la capa visual de la MISMA
-   sección, necesaria para no perder el color del día activo, y sigue el precedente exacto ya
-   aprobado. Se declara aquí para que el lead lo revise.
+`className={indice === diaIdx ? estilos.diaActivo : estilos.dia}`. Bajo `css:false` ambas ramas son
+`undefined`: inmatable, EXACTAMENTE el mismo defecto que ya se había reparado para `.horaOpcion` en
+la ronda de mutación anterior (`progress/mutation_equipo.md`, 177:32) — pero el chip de DÍA se había
+quedado sin ese mismo tratamiento. **REDISEÑO** (mismo patrón, mirror de `.horaOpcion`): `className`
+pasa a fijo (`estilos.dia`); el estado ELEGIDO se colorea desde `&[aria-pressed='true']` DENTRO de
+`.dia` en `equipo.module.scss` (se funde con `.diaActivo`, que desaparece). `equipo-estilos.test.ts`
+se actualiza a las dos aserciones que ya usaban ese patrón para `.horaOpcion`. **Se tocó
+`equipo.module.scss`**, fuera de la lista literal del encargo: es la capa visual de la MISMA
+sección, necesaria para no perder el color del día activo, y sigue el precedente exacto ya
+aprobado. Se declara aquí para que el lead lo revise.
 
 5. **119:16 `ConditionalExpression`** — `{dias.length === 0 && <span>Cargando días…</span>}` → `{true
-   && …}`. Ningún test comprobaba la ausencia del aviso una vez hidratado con los 6 días reales (solo
+&& …}`. Ningún test comprobaba la ausencia del aviso una vez hidratado con los 6 días reales (solo
    su presencia en SSR, @s9). **Test nuevo**: tras `renderEnJueves()`, `queryByText('Cargando
-   días…')` debe ser `null`. Verificado a mano: con `true &&` aplicado, el test cae ROJO (el aviso
+días…')` debe ser `null`. Verificado a mano: con `true &&` aplicado, el test cae ROJO (el aviso
    sigue mostrándose); revertido, VERDE.
 
 6. **135:14 `ConditionalExpression`** — `{diaSel !== null && (<div className={estilos.horas}>…)}` →
@@ -96,10 +96,10 @@ parcial. En cualquier caso, la medida de HOY manda. Los 8, con su cierre:
    el contenedor YA existe antes de elegir día → el conteo no crece → test ROJO; revertido, VERDE.
 
 7. **199:6 (tras reformatear, línea del array de deps) `ArrayDeclaration`** — `}, [])` → `},
-   ["Stryker was here"])`. **MUTANTE EQUIVALENTE, demostrado**: React compara las dependencias de
+["Stryker was here"])`. **MUTANTE EQUIVALENTE, demostrado**: React compara las dependencias de
    `useEffect` ELEMENTO A ELEMENTO con `Object.is`, nunca por referencia del array. Como el único
    elemento mutado es un STRING LITERAL constante, en CADA render la comparación (`'Stryker was
-   here' === 'Stryker was here'`) es siempre `true`, así que el efecto se ejecuta EXACTAMENTE una vez
+here' === 'Stryker was here'`) es siempre `true`, así que el efecto se ejecuta EXACTAMENTE una vez
    al montar, con `[]` y con `['Stryker was here']` por igual. `Equipo` no recibe props (no hay forma
    de forzar un remount con una key/prop distinta desde fuera) y cualquier remount real re-ejecutaría
    el efecto CON CUALQUIER array de deps, así que tampoco distingue. **Comprobado a mano**: con la
@@ -141,10 +141,10 @@ todos los cambios de `Equipo.tsx`):
 
 **`pnpm exec stryker run --mutate src/components/Equipo.tsx`** (antes → después):
 
-| Corrida                          | % score | # killed | # timeout | # survived |
-| --------------------------------- | ------: | -------: | --------: | ---------: |
+| Corrida                             | % score | # killed | # timeout | # survived |
+| ----------------------------------- | ------: | -------: | --------: | ---------: |
 | ANTES (medida real, no la del lead) |   88.41 |       60 |         1 |          8 |
-| DESPUÉS de las 8 correcciones      |  100.00 |       63 |         1 |          0 |
+| DESPUÉS de las 8 correcciones       |  100.00 |       63 |         1 |          0 |
 
 Total de mutantes de `Equipo.tsx` bajó de 69 a 64: 1 excluido genuinamente (deps del `useEffect`,
 justificado arriba), y el resto se redujo porque el REDISEÑO de `key`/`className` del día ELIMINÓ los

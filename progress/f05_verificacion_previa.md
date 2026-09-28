@@ -10,8 +10,8 @@
 >
 > **Resultado: 0 refutadas de raíz, 8 de 8 con algo tumbado (`resiste: false` en las ocho).**
 > **Ninguna decisión de F-05 cae. Lo que cae son los PORQUÉS, y uno de ellos es la
-> `puerta_legal` entera.** El patrón de F-04, otra vez y más fuerte: *la decisión es correcta,
-> el porqué escrito es falso.*
+> `puerta_legal` entera.** El patrón de F-04, otra vez y más fuerte: _la decisión es correcta,
+> el porqué escrito es falso._
 
 ---
 
@@ -39,8 +39,8 @@ de React; `schema.org` es el `@context` del JSON-LD de **F-04**; `example.invali
 canónica (TLD reservado RFC 2606, deliberado).
 
 > 🔴 **CORREGIDO 2026-07-17 — este párrafo tenía un ERROR DE HECHO propio, cazado por la revisión
-> adversarial del contrato y remedido por el lead.** Decía: *«Facebook es un `<a href>` de
-> `site.ts`»*. **Es falso.** Medido:
+> adversarial del contrato y remedido por el lead.** Decía: _«Facebook es un `<a href>` de
+> `site.ts`»_. **Es falso.** Medido:
 >
 > ```
 > $ grep -rlo "facebook" dist/          →  dist/assets/app-BPAduMZD.js   (SOLO el bundle)
@@ -55,15 +55,15 @@ canónica (TLD reservado RFC 2606, deliberado).
 >
 > **La conclusión no cambia, se refuerza**: no es una petición, y `detectarOrigenesExternos` no
 > debe marcarlo. **Lo que cambia es el porqué** — y es, otra vez, el patrón que esta verificación
-> existe para cazar: *la decisión es correcta, el porqué escrito es falso*. Esta vez el porqué
+> existe para cazar: _la decisión es correcta, el porqué escrito es falso_. Esta vez el porqué
 > falso **era mío**.
 >
 > **Consecuencia para el contrato:** el escenario del `<a href>` a Facebook sigue siendo válido
 > **como contrato de futuro** (F-06 montará el pie con ese enlace y entonces sí será un `<a>`),
 > pero **NO describe el `dist/` de hoy** y no puede presentarse como tal.
 
-`feature_list.json` §5 exige literalmente: *«El build falla si el artefacto contiene **CUALQUIER**
-origen externo»* con *«allowlist vacía»*. **Escrito así, la puerta no se puede satisfacer jamás:
+`feature_list.json` §5 exige literalmente: _«El build falla si el artefacto contiene **CUALQUIER**
+origen externo»_ con _«allowlist vacía»_. **Escrito así, la puerta no se puede satisfacer jamás:
 no se puede borrar `http://www.w3.org/2000/svg` del bundle de React.** Y rompería **F-04, que
 está `done`**.
 
@@ -85,16 +85,16 @@ los `<link>` en **external resource link** frente a **hyperlink**. Literal (§4.
 
 Las cuatro preguntas que deciden F-05, con cita y todas dando **NO**:
 
-| Construcción | ¿Pide? | Fuente primaria |
-| --- | --- | --- |
-| `<link rel=canonical href=…>` | **NO** | §4.6.8.4: «This keyword creates **a hyperlink**». Tabla normativa: `canonical — Effect on link: Hyperlink` |
-| `<a href="https://facebook.com/x">` | **NO** antes del clic | Solo se piden al *follow the hyperlink* — acción del usuario |
-| `xmlns="http://www.w3.org/2000/svg"` | **NO** | *Namespaces in XML* §3: «**It is not a goal that it be directly usable for retrieval** of a schema» |
-| `"https://react.dev/errors/"` en un `.js` | **NO** | Un literal de cadena no es construcción de fetch. Medido: `react/cjs/react.react-server.production.js:14` lo concatena en un mensaje de error |
+| Construcción                              | ¿Pide?                | Fuente primaria                                                                                                                               |
+| ----------------------------------------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<link rel=canonical href=…>`             | **NO**                | §4.6.8.4: «This keyword creates **a hyperlink**». Tabla normativa: `canonical — Effect on link: Hyperlink`                                    |
+| `<a href="https://facebook.com/x">`       | **NO** antes del clic | Solo se piden al _follow the hyperlink_ — acción del usuario                                                                                  |
+| `xmlns="http://www.w3.org/2000/svg"`      | **NO**                | _Namespaces in XML_ §3: «**It is not a goal that it be directly usable for retrieval** of a schema»                                           |
+| `"https://react.dev/errors/"` en un `.js` | **NO**                | Un literal de cadena no es construcción de fetch. Medido: `react/cjs/react.react-server.production.js:14` lo concatena en un mensaje de error |
 
 ### 🔴 El refutador encontró un FALSO NEGATIVO en la regla propuesta
 
-El verificador dedujo *«`rel=alternate` es Hyperlink, luego no detectar»* **de la fila-resumen de
+El verificador dedujo _«`rel=alternate` es Hyperlink, luego no detectar»_ **de la fila-resumen de
 la tabla**. La letra que la desarrolla lo contradice. §4.6.8.1:
 
 > «If the element is a link element and the rel attribute **also contains the keyword
@@ -106,7 +106,7 @@ Y §4.6.8.23: «stylesheet […] **creates an external resource link**».
 → **`<link rel="alternate stylesheet" href="https://cdn.tercero.com/x.css">` SÍ SE PIDE.** La
 regla del verificador habría dejado pasar **una petición real a un tercero**. Y era su propia
 trampa nº1 («rel es lo que decide»), sin aplicar hasta el final: se quedó en el valor, no llegó a
-las *keywords*.
+las _keywords_.
 
 > **REGLA que F-05 escribe por esto:** la clasificación se hace sobre el **conjunto tokenizado**
 > de `rel` (tokens separados por espacio, ASCII case-insensitive), **nunca sobre la cadena
@@ -114,12 +114,12 @@ las *keywords*.
 > keyword desarrolla su significado, **manda la sección**.
 
 Segundo hallazgo del refutador, con letra normativa: `<link rel=stylesheet **disabled**>` **NO se
-pide** — §4.6.8.23, *linked resource fetch setup steps*: «If el's disabled attribute is set, then
+pide** — §4.6.8.23, _linked resource fetch setup steps_: «If el's disabled attribute is set, then
 return false». Marcarlo sería **falso positivo sostenido por spec**.
 
 ### Los dos ejes que la spec NO decide → **criterio de proyecto, y se declara**
 
-1. **`preconnect` / `dns-prefetch`**: son *external resource* pero **no descargan recurso** —
+1. **`preconnect` / `dns-prefetch`**: son _external resource_ pero **no descargan recurso** —
    abren TCP/TLS o resuelven DNS. Si el eje de F-05 es «contacto con origen externo sin acción
    del usuario», **cuentan**; si es «petición HTTP de un recurso», no. **Hay que elegir uno y no
    mezclarlos.**
@@ -149,13 +149,13 @@ Un `<script type="application/ld+json">` **el navegador ni lo parsea**. `schema.
 
 ### 🔴 Dos fallos graves del verificador
 
-1. **CITA INEXISTENTE.** Presentó como literal de la spec JSON-LD 1.1 API: *«Set context document
-   to the RemoteDocument obtained by dereferencing context using the LoadDocumentCallback.»*
+1. **CITA INEXISTENTE.** Presentó como literal de la spec JSON-LD 1.1 API: _«Set context document
+   to the RemoteDocument obtained by dereferencing context using the LoadDocumentCallback.»_
    **Esa frase no existe.** El texto real (paso 5.2.5) empieza con **«Otherwise,»** — es la rama
    **else** de 5.2.4. Al borrar el «Otherwise» y recapitalizar, **convirtió una rama condicional
    en un mandato incondicional**, que era justo su tesis. Parafraseo vendido como cita.
-2. **CAUSA FALSA, medida.** Dijo que `schema.org` viaja en el bundle *«porque el componente
-   re-renderiza en hidratación»*. **Falso y la hidratación es irrelevante**: `home.tsx:3` importa
+2. **CAUSA FALSA, medida.** Dijo que `schema.org` viaja en el bundle _«porque el componente
+   re-renderiza en hidratación»_. **Falso y la hidratación es irrelevante**: `home.tsx:3` importa
    `construirJsonLd` de `../lib/seo` con un import **estático**, así que Rollup mete el módulo en
    el grafo de cliente e inlinea la constante (`const Wi="https://schema.org"`). **Estaría ahí
    aunque no hubiera hidratación jamás.** Es un hecho del grafo de imports, no del ciclo de vida
@@ -172,11 +172,11 @@ Context Processing Algorithm. **Medido: este repo no carga ninguna.**
 
 **Medido sobre el prototipo (`Opcion-1-Rosa.dc.html`), no heredado:**
 
-| Familia | Uso real | Pesos |
-| --- | --- | --- |
-| **Manrope** | cuerpo, botones, nav | 400, 500, 600, 700 |
-| **Gilda Display** | todos los `h2`/`h3`, precios | 400 |
-| **Great Vibes** | el «Nails Lash» del hero | 400 |
+| Familia           | Uso real                     | Pesos              |
+| ----------------- | ---------------------------- | ------------------ |
+| **Manrope**       | cuerpo, botones, nav         | 400, 500, 600, 700 |
+| **Gilda Display** | todos los `h2`/`h3`, precios | 400                |
+| **Great Vibes**   | el «Nails Lash» del hero     | 400                |
 
 `font-weight: 300` → **0 ocurrencias**. El prototipo pide `Manrope:wght@300;400;500;600;700` y
 **el 300 no se usa jamás**. La afirmación heredada es **CIERTA, y ahora medida**.
@@ -206,7 +206,7 @@ autohospedar: «to use, study, copy, merge, embed, modify, redistribute»):
   `'Manrope'`, **la fuente no carga y cae al fallback sin ningún error**. Es el fallo silencioso
   más caro de la lista.
 - **Cada `@font-face` emite `woff2` Y `woff`**: `url(…woff2) format('woff2'), url(…woff)
-  format('woff')`. **Vite emite los dos** → 12 ficheros en `dist` para 6 usados. Coste de `dist`,
+format('woff')`. **Vite emite los dos** → 12 ficheros en `dist` para 6 usados. Coste de `dist`,
   no de red.
 - **`latin-400.css` NO tiene `unicode-range`** → ese `@font-face` **aplica a TODO el rango**. Si
   aparece un carácter fuera del subset latin, el navegador **no cae a la siguiente fuente**: pinta
@@ -266,7 +266,7 @@ el «nunca externo», y ningún grep del CSS lo anticipa.**
 
 ## 5. A5 — Fashion ID · **el ap. 85 afirma Y LUEGO limita**
 
-El verificador escribió que *«el 85 NO es refuerzo: es precisamente el que LIMITA»*. **Falso de
+El verificador escribió que _«el 85 NO es refuerzo: es precisamente el que LIMITA»_. **Falso de
 hecho**, y el refutador lo cazó citando el XHTML oficial de CELLAR: el ap. 85 es la **respuesta
 dispositiva** a la segunda cuestión y su **primera frase afirma** el estatus:
 
@@ -302,9 +302,9 @@ enunciaba, cometido al revés.
 Es el hallazgo más grave de la sesión. `feature_list.json` §5 dice:
 
 > `"puerta_legal": "RGPD (evita el análisis de corresponsabilidad de Fashion ID) + art. 22.2 LSSI
-> (sin cookies → sin banner)"`
+(sin cookies → sin banner)"`
 
-y la descripción: *«elimina banner, CMP y política de cookies **de un plumazo**»*.
+y la descripción: _«elimina banner, CMP y política de cookies **de un plumazo**»_.
 
 ### (a) La cita de la AEPD: **CONFIRMADA**
 
@@ -326,7 +326,7 @@ el `.woff2` devuelve **`Cache-Control: public, max-age=31536000`**.
 ¿Se activa el 22.2 por ese cacheo? **NO_VERIFICABLE, y en los DOS sentidos:**
 
 - **A favor:** CEPD, Directrices 2/2023 v2.0, párr. 50 («does constitute storage, at the very
-  least through the caching mechanism») — pero dicho de *tracking pixels*, y sobre el art. 5(3)
+  least through the caching mechanism») — pero dicho de _tracking pixels_, y sobre el art. 5(3)
   ePD, cuya letra es **disyuntiva** («storage **or** the gaining of access»).
 - **En contra:** la transposición española y **la propia AEPD** lo formulan en **conjuntivo y con
   finalidad** — Guía §1 pág. 8: «tecnologías similares utilizadas … **para almacenar y recuperar
@@ -335,14 +335,14 @@ el `.woff2` devuelve **`Cache-Control: public, max-age=31536000`**.
   datos del terminal.**
 - **No hay pronunciamiento de AEPD ni CEPD sobre CDNs de fuentes.**
 
-**Lo único que se sostiene sin inferencia:** *el art. 22.2 **no obliga a poner banner por cargar
-una fuente*** — o porque no entra en su ámbito, o porque entraría en la excepción del párrafo 3.º.
+**Lo único que se sostiene sin inferencia:** _el art. 22.2 **no obliga a poner banner por cargar
+una fuente**_ — o porque no entra en su ámbito, o porque entraría en la excepción del párrafo 3.º.
 **En ninguna rama justifica F-05.**
 
 ### (c) El eje RGPD: **NO_VERIFICABLE HOY EN FUENTE PRIMARIA**
 
-El verificador declaró que el motivo válido era Fashion ID y que *«no depende de ninguna
-inferencia discutible»*. **Su propio scratchpad prueba que nunca pudo abrir la sentencia**:
+El verificador declaró que el motivo válido era Fashion ID y que _«no depende de ninguna
+inferencia discutible»_. **Su propio scratchpad prueba que nunca pudo abrir la sentencia**:
 `c40-17-es.html` = **0 bytes**; cuatro ficheros de curia de **exactamente 130.226 bytes** (el
 mismo shell SPA, con `count('Fashion ID') == 0`).
 
@@ -384,7 +384,7 @@ instalados → **salida vacía**; el mapa `replacements` de `method-expression-m
 del encargo solo se mutan: `endsWith`⇄`startsWith`, `every`⇄`some`, `filter`→(eliminado),
 `toLowerCase`⇄`toUpperCase`.
 
-> El criterio *«Mutar la comparación de origen o el predicado de allowlist rompe un test»* es
+> El criterio _«Mutar la comparación de origen o el predicado de allowlist rompe un test»_ es
 > **INMEDIBLE tal cual**: nombra «el predicado» sin decir **qué mutador** lo ataca. → **A-23**.
 
 **Y el propio verificador fabricó un número**: dijo «19 mutadores». Medido por el refutador: el
@@ -399,11 +399,11 @@ Stryker.NET/Stryker4s, no de StrykerJS**.
 
 Sobre la forma `origenes.filter(o => !allowlist.includes(o))` con `allowlist = []`:
 
-| Mutante | ¿Equivalente con `[]`? | Cómo se mata |
-| --- | --- | --- |
-| **FilterRemoval** (`.filter(p)` → `origenes`) | **SÍ** | allowlist **no vacía** que tape un origen **realmente presente** |
-| **ArrayDeclaration** (`[]` → `["Stryker was here"]`) | **SÍ** | que **no haya literal `[]`** en el fichero mutado |
-| **BooleanLiteral** (quitar el `!`) | **NO** — devuelve `[]` en vez de la lista | cualquier test con ≥1 origen detectado |
+| Mutante                                              | ¿Equivalente con `[]`?                    | Cómo se mata                                                     |
+| ---------------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------- |
+| **FilterRemoval** (`.filter(p)` → `origenes`)        | **SÍ**                                    | allowlist **no vacía** que tape un origen **realmente presente** |
+| **ArrayDeclaration** (`[]` → `["Stryker was here"]`) | **SÍ**                                    | que **no haya literal `[]`** en el fichero mutado                |
+| **BooleanLiteral** (quitar el `!`)                   | **NO** — devuelve `[]` en vez de la lista | cualquier test con ≥1 origen detectado                           |
 
 🔴 **`ArrayDeclaration` sobre `[]` es CONTRAINTUITIVO**: sobre array **no vacío quita** elementos;
 sobre array **vacío lo RELLENA** con `["Stryker was here"]`. Quien asuma que `[]`→`[]` (no-op, sin
@@ -426,8 +426,8 @@ mutante) **se equivoca: el mutante existe siempre**.
   vacía que tape un origen presente). **Son dos cosas independientes; el verificador las soldó en
   una cadena causal falsa.**
 - **«INALCANZABLE» era demasiado fuerte**: medido, `ArrayDeclaration` **muere** con un fixture cuyo
-  origen sea el token literal `Stryker was here`. Redacción honesta: *«con default `= []` el 100 %
-  solo se alcanza con un fixture grotesco»*.
+  origen sea el token literal `Stryker was here`. Redacción honesta: _«con default `= []` el 100 %
+  solo se alcanza con un fixture grotesco»_.
 - **«Exactamente dos equivalentes» es una PREDICCIÓN, no una medición**: el fichero de F-05 **no
   existe** (`grep -rln "allowlist|detectarOrigenes" src/` → nada). Otra implementación tendrá otro
   conjunto.
@@ -474,8 +474,8 @@ puerto**, y **el doble del test lo honra** (lanza donde el real lanza).
 
 Otro matiz: «los `tools/` no llevan tests» es falso como enunciado general —
 `src/lib/diferidos.test.ts:89-96` **sí** testea `tools/puerta-placeholders.ts` leyéndolo con
-`readFileSync`. La forma correcta: *no llevan **fichero de test propio** ni entran en `mutate`;
-cuando una **decisión** vive en el humilde, se ancla desde un test que lee el fichero*.
+`readFileSync`. La forma correcta: _no llevan **fichero de test propio** ni entran en `mutate`;
+cuando una **decisión** vive en el humilde, se ancla desde un test que lee el fichero_.
 
 ### 🔴 F-05 es la PRIMERA feature que mete binarios en `dist/` → activa la deuda de F-01
 
@@ -494,7 +494,7 @@ las tres puertas: **las tres pasan, exit 0.** Y el `.woff2` va comprimido con Br
 URL de la licencia OFL **no aparece como literal** (0 URLs visibles al decodificar utf8).
 
 > **Conclusión honesta:** el falso positivo es **potencial, no determinista**, y **no se ha
-> observado un fallo real**. Pero *«0 violaciones»* **no significa que el hueco esté cerrado**: los
+> observado un fallo real**. Pero _«0 violaciones»_ **no significa que el hueco esté cerrado**: los
 > ficheros que entren en `dist/` tras el pipeline de Vite **no son byte a byte** los de
 > `node_modules`.
 >
@@ -512,12 +512,12 @@ ocurrir**.
 
 ## 9. Las preguntas abiertas que van a la puerta humana
 
-| # | Qué | Por qué no lo decido yo |
-| --- | --- | --- |
-| **A-23** | El criterio *«el build falla si el artefacto contiene CUALQUIER origen externo»* es **insatisfacible** (10 orígenes medidos hoy, ninguno una petición) y *«mutar el predicado de allowlist»* pide **un mutante que no existe**. Propuesta: reescribirlos como *«ninguna PETICIÓN AUTOMÁTICA a un origen externo»* y nombrar mutadores reales. | **Cambia los criterios de aceptación.** Es la puerta humana. |
-| **A-24** | La **`puerta_legal` es una atribución normativa falsa** y la descripción promete «elimina banner, CMP y política de cookies de un plumazo». Propuesta: sustituir por **criterio de proyecto** + Fashion ID marcado `[I]` y **no re-verificado hoy**. | Toca el contrato **y** `feature_list.json`. |
-| **A-27** | F-05 es la primera feature que mete binarios en `dist/` → **activa la deuda declarada de F-01** (medido: 0 violaciones hoy, 50.100 secuencias candidatas). ¿Se deja declarada, o se abre escenario en `puerta_placeholders.feature` (feature **`done`**)? | **Reabrir una feature cerrada** es decisión del humano. |
-| **A-28** | `latin-400.css` **no tiene `unicode-range`** → un nombre con `Ł`/`ř`/`ğ` daría **tofu silencioso**. ¿Se añade `latin-ext` (+6 woff2) o se acepta? | Decisión de **producto** (¿qué nombres de clienta se esperan?). |
+| #        | Qué                                                                                                                                                                                                                                                                                                                                           | Por qué no lo decido yo                                         |
+| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| **A-23** | El criterio _«el build falla si el artefacto contiene CUALQUIER origen externo»_ es **insatisfacible** (10 orígenes medidos hoy, ninguno una petición) y _«mutar el predicado de allowlist»_ pide **un mutante que no existe**. Propuesta: reescribirlos como _«ninguna PETICIÓN AUTOMÁTICA a un origen externo»_ y nombrar mutadores reales. | **Cambia los criterios de aceptación.** Es la puerta humana.    |
+| **A-24** | La **`puerta_legal` es una atribución normativa falsa** y la descripción promete «elimina banner, CMP y política de cookies de un plumazo». Propuesta: sustituir por **criterio de proyecto** + Fashion ID marcado `[I]` y **no re-verificado hoy**.                                                                                          | Toca el contrato **y** `feature_list.json`.                     |
+| **A-27** | F-05 es la primera feature que mete binarios en `dist/` → **activa la deuda declarada de F-01** (medido: 0 violaciones hoy, 50.100 secuencias candidatas). ¿Se deja declarada, o se abre escenario en `puerta_placeholders.feature` (feature **`done`**)?                                                                                     | **Reabrir una feature cerrada** es decisión del humano.         |
+| **A-28** | `latin-400.css` **no tiene `unicode-range`** → un nombre con `Ł`/`ř`/`ğ` daría **tofu silencioso**. ¿Se añade `latin-ext` (+6 woff2) o se acepta?                                                                                                                                                                                             | Decisión de **producto** (¿qué nombres de clienta se esperan?). |
 
 **Decididos por mí y declarados en el contrato** (criterio de proyecto, no norma): `preconnect` y
 `dns-prefetch` **cuentan** como origen externo (contactan al tercero → el tercero recibe la IP, que

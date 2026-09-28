@@ -18,22 +18,22 @@
 
 ## Ciclos Rojo → Verde → Refactor (un test a la vez)
 
-| # | @s | ROJO (test que falla) | VERDE (mínimo) | REFACTOR |
-| - | -- | --------------------- | -------------- | -------- |
-| 1 | @s1 | reloj falso a domingo 03:00, `estaAbierto(lunes 10:30)` → import falla | `estaAbierto = () => true` (constante, se generaliza en @s2) | — |
-| 2 | @s2 | outline L-V semiabierto (09:59/10:00/19:59/20:00/20:01/00:00) rompe la constante | `abiertoEn`+`horaDePared` (Intl Europe/Madrid, hourCycle h23)+`parsearFranjas`+`aMinutos`+`HORARIO_SEMANAL` derivado de `HORARIO` (F-02); comparadores `>=`/`<` | nombres/constantes |
-| 3 | @s3 | sábado 10:00–14:00 + domingo cerrado | la derivación uniforme ya produce S=`[{600,840}]`, D=`[]` (ejercita datos que @s2 no toca) | — |
-| 4 | @s4 | DST CET/CEST misma hora de pared | ya lo resuelve `Intl` (sin offset fijo); ancla anti-regresión | — |
-| 5 | @s5 | `abiertoEn(…, excepciones)` con 3er arg → arity error | añadida la rama de excepciones (consultadas PRIMERO) + `fecha` a `horaDePared`; `EXCEPCIONES = []` para `estaAbierto` | — |
-| 6 | @s6 | excepción abre un domingo cerrado | ya lo cubre la rama (franjas no vacías, semiabiertas) | — |
-| 7 | @s7 | `aMinutos` outline (13:59→839) | ya implementado en @s2 | — |
-| 8 | @s8 | `parsearFranjas` outline (`'cerrado'`→`[]`) | ya implementado en @s2 | — |
-| 9 | @s9 | `HORARIO_SEMANAL` 7 días | ya derivado en @s2 | — |
-| 10 | @s10 | `EXCEPCIONES` vacía + festivo daría abierto | `EXCEPCIONES = []` (honesto, no inventa festivos) | — |
-| 11 | @s11 | `horarioParaUI` 3 filas → undefined | `horarioParaUI`+`franjaParaUI`+`deMinutos`+`dosDigitos`; copy «Cerrado», separador «–» | franja de UNA franja (evita el separador `join` no testeado) |
-| 12 | @s13 | `openingHoursSpecification` → undefined | builder schema.org: `GRUPOS_SCHEMA` (L-V agrupado, S, D omitido), `@type` inglés | — |
-| 13 | @s12 | badge en el `dist/` real (build-based) → pasa con ancla positiva + sin badge | (característico: la DEMO no hornea badge) | regex tolerante a `data-rh` de Helmet |
-| 14 | @s14 | JSON-LD horneado sin `openingHoursSpecification` | compone en `home.tsx` (spread + clave), SIN tocar `construirJsonLd` | — |
+| #   | @s   | ROJO (test que falla)                                                            | VERDE (mínimo)                                                                                                                                                  | REFACTOR                                                     |
+| --- | ---- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| 1   | @s1  | reloj falso a domingo 03:00, `estaAbierto(lunes 10:30)` → import falla           | `estaAbierto = () => true` (constante, se generaliza en @s2)                                                                                                    | —                                                            |
+| 2   | @s2  | outline L-V semiabierto (09:59/10:00/19:59/20:00/20:01/00:00) rompe la constante | `abiertoEn`+`horaDePared` (Intl Europe/Madrid, hourCycle h23)+`parsearFranjas`+`aMinutos`+`HORARIO_SEMANAL` derivado de `HORARIO` (F-02); comparadores `>=`/`<` | nombres/constantes                                           |
+| 3   | @s3  | sábado 10:00–14:00 + domingo cerrado                                             | la derivación uniforme ya produce S=`[{600,840}]`, D=`[]` (ejercita datos que @s2 no toca)                                                                      | —                                                            |
+| 4   | @s4  | DST CET/CEST misma hora de pared                                                 | ya lo resuelve `Intl` (sin offset fijo); ancla anti-regresión                                                                                                   | —                                                            |
+| 5   | @s5  | `abiertoEn(…, excepciones)` con 3er arg → arity error                            | añadida la rama de excepciones (consultadas PRIMERO) + `fecha` a `horaDePared`; `EXCEPCIONES = []` para `estaAbierto`                                           | —                                                            |
+| 6   | @s6  | excepción abre un domingo cerrado                                                | ya lo cubre la rama (franjas no vacías, semiabiertas)                                                                                                           | —                                                            |
+| 7   | @s7  | `aMinutos` outline (13:59→839)                                                   | ya implementado en @s2                                                                                                                                          | —                                                            |
+| 8   | @s8  | `parsearFranjas` outline (`'cerrado'`→`[]`)                                      | ya implementado en @s2                                                                                                                                          | —                                                            |
+| 9   | @s9  | `HORARIO_SEMANAL` 7 días                                                         | ya derivado en @s2                                                                                                                                              | —                                                            |
+| 10  | @s10 | `EXCEPCIONES` vacía + festivo daría abierto                                      | `EXCEPCIONES = []` (honesto, no inventa festivos)                                                                                                               | —                                                            |
+| 11  | @s11 | `horarioParaUI` 3 filas → undefined                                              | `horarioParaUI`+`franjaParaUI`+`deMinutos`+`dosDigitos`; copy «Cerrado», separador «–»                                                                          | franja de UNA franja (evita el separador `join` no testeado) |
+| 12  | @s13 | `openingHoursSpecification` → undefined                                          | builder schema.org: `GRUPOS_SCHEMA` (L-V agrupado, S, D omitido), `@type` inglés                                                                                | —                                                            |
+| 13  | @s12 | badge en el `dist/` real (build-based) → pasa con ancla positiva + sin badge     | (característico: la DEMO no hornea badge)                                                                                                                       | regex tolerante a `data-rh` de Helmet                        |
+| 14  | @s14 | JSON-LD horneado sin `openingHoursSpecification`                                 | compone en `home.tsx` (spread + clave), SIN tocar `construirJsonLd`                                                                                             | —                                                            |
 
 **REFACTOR global (barra verde):** `horaDePared` pasó de `.find(...)?.value ?? ''` (con fallback
 INALCANZABLE → superviviente StringLiteral) a `Object.fromEntries(...map([type,value]))` sin fallo muerto.

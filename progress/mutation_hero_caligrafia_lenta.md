@@ -5,18 +5,19 @@ el ÚNICO sobreviviente es el equivalente genuino ANTICIPADO por el diario del t
 misma familia ya verificada DOS veces en este repo — documentado SIN excluir: la exclusión es
 decisión del lead, como manda el precedente `mutation_galeria_carrusel.md`)
 **Score:** detectados/total:
-  - `src/components/hero-logica.ts` (NUEVO) → 16/16 = **100.00 %** (exit 0)
-  - `src/components/Hero.tsx` → 34/35 = **97.14 %** (1 sobreviviente, exit 1)
-**Comandos:** `bin/harness mutate src/components/hero-logica.ts` y después
-`bin/harness mutate src/components/Hero.tsx` (SECUENCIAL, sin `--testFiles`, como manda
-stryker.config.json)
-**Runner:** StrykerJS 9.6.x · `vitest.stryker.config.ts` (horneados FUERA de la mutación por
-diseño; corren en `pnpm test`/`verify`) · hero-logica.ts Done in 13 s · Hero.tsx Done in 24 s ·
-`thresholds.break = 100`
-**Precondiciones:** `bin/harness init` VERDE inmediatamente antes (1361/1361 tests, 42 ficheros).
-⚠️ No existe `progress/judge_hero_caligrafia_lenta.md`: esta es la PRIMERA medición, ordenada por
-el lead (el `judge_hero_caligrafia.md` en disco es del contrato viejo 2026-07-20). Mismo caso que
-la primera medición de galería: la puerta del judge sigue pendiente en cualquier caso.
+
+- `src/components/hero-logica.ts` (NUEVO) → 16/16 = **100.00 %** (exit 0)
+- `src/components/Hero.tsx` → 34/35 = **97.14 %** (1 sobreviviente, exit 1)
+  **Comandos:** `bin/harness mutate src/components/hero-logica.ts` y después
+  `bin/harness mutate src/components/Hero.tsx` (SECUENCIAL, sin `--testFiles`, como manda
+  stryker.config.json)
+  **Runner:** StrykerJS 9.6.x · `vitest.stryker.config.ts` (horneados FUERA de la mutación por
+  diseño; corren en `pnpm test`/`verify`) · hero-logica.ts Done in 13 s · Hero.tsx Done in 24 s ·
+  `thresholds.break = 100`
+  **Precondiciones:** `bin/harness init` VERDE inmediatamente antes (1361/1361 tests, 42 ficheros).
+  ⚠️ No existe `progress/judge_hero_caligrafia_lenta.md`: esta es la PRIMERA medición, ordenada por
+  el lead (el `judge_hero_caligrafia.md` en disco es del contrato viejo 2026-07-20). Mismo caso que
+  la primera medición de galería: la puerta del judge sigue pendiente en cualquier caso.
 
 ## Tabla (clear-text de Stryker)
 
@@ -42,9 +43,9 @@ la primera medición de galería: la puerta del judge sigue pendiente en cualqui
 
 ### EQUIVALENTE genuino — documentado, NO excluido (decisión del lead)
 
-- **src/components/Hero.tsx:92:6**  `ArrayDeclaration`
-  - original: `}, [])`  (deps del efecto de LECTURA de `matchMedia`, Hero.tsx:84-92)
-  - mutado:   `}, ["Stryker was here"])`
+- **src/components/Hero.tsx:92:6** `ArrayDeclaration`
+  - original: `}, [])` (deps del efecto de LECTURA de `matchMedia`, Hero.tsx:84-92)
+  - mutado: `}, ["Stryker was here"])`
   - Estado Stryker: `Survived`, `static: false`, **54 tests completados** sobre él (cobertura
     perTest real: lo ejercitó toda la banda de hero + home; ningún assert puede distinguirlo).
   - Por qué es equivalente: React compara las deps elemento a elemento con `Object.is` entre

@@ -25,8 +25,14 @@
       "properties": {
         "install": { "type": "string", "description": "Instala dependencias (opcional)." },
         "lint": { "type": "string", "description": "Linter/formato. Vacío para omitir." },
-        "test": { "type": "string", "description": "Ejecuta la suite de tests. Debe salir con código 0 si todo pasa." },
-        "mutate": { "type": "string", "description": "Prueba de mutación. Debe salir != 0 si no supera el umbral." },
+        "test": {
+          "type": "string",
+          "description": "Ejecuta la suite de tests. Debe salir con código 0 si todo pasa."
+        },
+        "mutate": {
+          "type": "string",
+          "description": "Prueba de mutación. Debe salir != 0 si no supera el umbral."
+        },
         "build": { "type": "string", "description": "Build de producción (opcional)." }
       }
     },

@@ -3,6 +3,7 @@
 **Veredicto:** APPROVED (con observaciones menores; no bloquean la puerta de mutación)
 
 ## Cobertura de escenarios (@s ↔ test)
+
 - @s1: [x] `equipo.test.tsx` describe('@s1 …') — 1 <section> aria-labelledby, 7 <article>, h2/eyebrow/intro literales.
 - @s2: [x] describe('@s2 …') verifica el ancla `equipo-titulo` (parte de la feature). El 7º enlace de la nav y las 5 puertas los cablea otro agente: VERIFICADO por el juez → MenuNavegacion.tsx:50 `<a href="#equipo-titulo">Equipo</a>` (entre Ofertas y Reserva) + `pnpm build` exit 0 con las 5 puertas verdes (incl. anclas vivas).
 - @s3: [x] describe('@s3 …') — siete <h3> en orden Lucía…Sara.
@@ -31,16 +32,19 @@
 - Núcleo mutable por valor: indiceCircular(3,3)=0 / (-1,3)=2; franjasDe('Saturday')=[10,11:30,13] y ≠16/17:30/19; franjasDe('Sunday')=[].
 
 ## Disciplina TDD
+
 - ¿Producción sin test que la pida? Prácticamente NO. Todo el JSX/estado se corresponde con escenarios cubiertos. Excepciones decorativas menores (el círculo "✓" de confirmación y los glifos ★/←/→ aria-hidden) no tienen aserción propia; son adorno aria-hidden dentro de estados sí testeados.
 - ¿Evidencia de Rojo→Verde→Refactor? SÍ. `progress/tdd_equipo.md` documenta el ROJO real de `equipo-estilos.test.ts` (bloque `.diaActivo` standalone vs. encabezado agrupado) y su corrección a VERDE, más el núcleo mutable cubierto por valor.
 
 ## Calidad
+
 - `Equipo.tsx`: funciones puras `diasOfrecidos` / `franjasDe` / `indiceCircular` bien extraídas, reloj INYECTADO (L55), reutiliza `HORARIO_SEMANAL`/`aMinutos` de F-10 (fuente única, no reimplementa). Nombres reveladores, constantes arriba, docblock citando la feature.
 - Estado en atributo CONSULTABLE: `aria-pressed` en chips de día/hora, `disabled` en el botón de reserva. El estado no-habilitado es `<button disabled>` (spec §12/aviso 9), no un `<div>`.
 - `equipo-demo.ts`: sigue la plantilla de datos demo (interface readonly + const + LEYENDA), datos FUERA del JSX. Sin "Facial"/"Depilación".
 - SCSS fiel a `spec_visual_equipo.md`: `demo-seccion--plain`, foto 4/3 + accent-soft, rellenos/textos en `--accent-dark`, bordes de control en `--border-interactive`, estrellas `--accent-2`. Sin `--accent` a pelo bajo blanco.
 
 ## Checkpoints
+
 - C1 [x] arnés completo (`bin/harness init` exit 0).
 - C2 [x] estado coherente (una feature en curso).
 - C3 [x] arquitectura respetada (5 ficheros previstos; sin deps nuevas).
@@ -50,9 +54,11 @@
 - C7 [ ] mutación: la corre el `mutation_tester` DESPUÉS de esta aprobación.
 
 ## Observaciones menores (no bloquean; para el `mutation_tester` y el pulido)
+
 1. `Equipo.tsx:160,177` el `className` condicional (`… ? estilos.diaActivo : estilos.dia`) DUPLICA la condición del `aria-pressed`. Con `css:false` ambas ramas son `undefined` en test, así que ese ternario podría dejar un mutante SUPERVIVIENTE en Stryker. El estado sí está en `aria-pressed` (matable), luego @s24 se cumple; que la puerta C7 vigile ese ternario.
 2. `.circulo` (el "✓" de confirmación) no tiene test de bytes en `equipo-estilos.test.ts` ni aserción de comportamiento; es decorativo aria-hidden dentro de @s17.
 3. 3 warnings `react-refresh/only-export-components` en `Equipo.tsx` por co-localizar las funciones puras; intencional (alcance de 5 ficheros, Stryker debe morderlas) y el gate es `warn`, no error.
 
 ## Cambios requeridos
+
 Ninguno bloqueante. Se aprueba para pasar a la puerta de mutación.

@@ -23,27 +23,31 @@ Comandos: `init`, `test`, `mutate [target]`, `verify`, `status`, `help`.
 {
   "$schema": "./harness.schema.json",
   "project": "mi-proyecto",
-  "language": "python",          // etiqueta informativa
-  "standalone": true,             // false = hereda el arnés raíz (para examples/)
+  "language": "python", // etiqueta informativa
+  "standalone": true, // false = hereda el arnés raíz (para examples/)
   "commands": {
-    "install": "…",               // opcional
-    "lint":    "…",               // vacío = se omite
-    "test":    "…",               // sale 0 si todo pasa
-    "mutate":  "…",               // sale != 0 si no supera el umbral
-    "build":   "…"                // opcional
+    "install": "…", // opcional
+    "lint": "…", // vacío = se omite
+    "test": "…", // sale 0 si todo pasa
+    "mutate": "…", // sale != 0 si no supera el umbral
+    "build": "…", // opcional
   },
-  "paths": {                       // por si tu layout difiere de los defaults
-    "src": "src", "tests": "tests", "features": "features",
-    "progress": "progress", "spec": "project-spec.md",
-    "feature_list": "feature_list.json"
+  "paths": {
+    // por si tu layout difiere de los defaults
+    "src": "src",
+    "tests": "tests",
+    "features": "features",
+    "progress": "progress",
+    "spec": "project-spec.md",
+    "feature_list": "feature_list.json",
   },
   "mutation": { "threshold": 0.8, "targets": ["src/…"] },
   "rules": {
     "one_feature_at_a_time": true,
     "require_approved_spec_to_implement": true,
     "require_tests_to_close": true,
-    "require_mutation_to_close": true
-  }
+    "require_mutation_to_close": true,
+  },
 }
 ```
 

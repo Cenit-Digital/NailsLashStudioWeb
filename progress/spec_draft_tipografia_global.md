@@ -25,10 +25,10 @@ Una única capa GLOBAL, en un partial nuevo `src/styles/_tipografia.scss`,
 enganchado con `@use 'tipografia'` desde `src/styles/main.scss`. Dos reglas y
 nada más:
 
-| Selector  | `font-family`                          | Fuente MEDIDA (main.tsx:21-22)         |
-| --------- | -------------------------------------- | -------------------------------------- |
-| `body`    | `'Manrope', system-ui, sans-serif`     | Manrope = cuerpo, botones, nav         |
-| `h2, h3`  | `'Gilda Display', serif`               | Gilda Display 400 = h2/h3 (y precios)  |
+| Selector | `font-family`                      | Fuente MEDIDA (main.tsx:21-22)        |
+| -------- | ---------------------------------- | ------------------------------------- |
+| `body`   | `'Manrope', system-ui, sans-serif` | Manrope = cuerpo, botones, nav        |
+| `h2, h3` | `'Gilda Display', serif`           | Gilda Display 400 = h2/h3 (y precios) |
 
 - `body` fija el **suelo heredable** del documento (idéntico al stack del
   eyebrow y de la cabecera, para coherencia literal).
@@ -212,7 +212,7 @@ tocan ficheros `done`. No es un bug; se deja anotado.
 ### D-4 (menor) — ¿fallback rico o genérico? → **RECOMIENDO genérico**
 
 - `body`: `'Manrope', system-ui, sans-serif`; `h2, h3`: `'Gilda Display',
-  serif`. Coherente con la casa (`.heroMarca` usa `'Great Vibes', cursive`, un
+serif`. Coherente con la casa (`.heroMarca` usa `'Great Vibes', cursive`, un
   solo genérico). **Alternativa descartada**: stack serif rico
   (`'Gilda Display', Georgia, 'Times New Roman', serif`) — más robusto ante el
   FOUT, pero rompe la coherencia establecida y no aporta en un prototipo demo.

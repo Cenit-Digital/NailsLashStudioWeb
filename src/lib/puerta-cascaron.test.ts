@@ -137,8 +137,16 @@ describe('inspeccionarSitio → title, description y canónica (@s13)', () => {
   it.each([
     ['no hay ningún <title>', { title: null }, 'title ausente o vacío'],
     ['el <title> está presente pero vacío', { title: '' }, 'title ausente o vacío'],
-    ['no hay ninguna <meta name="description">', { description: null }, 'description ausente o vacía'],
-    ['la <meta name="description"> tiene content=""', { description: '' }, 'description ausente o vacía'],
+    [
+      'no hay ninguna <meta name="description">',
+      { description: null },
+      'description ausente o vacía',
+    ],
+    [
+      'la <meta name="description"> tiene content=""',
+      { description: '' },
+      'description ausente o vacía',
+    ],
     ['no hay ningún <link rel="canonical">', { canonica: null }, 'canónica ausente'],
   ])('@s13 %s → 1 violación por la regla "%s"', (_situacion, desperfecto, regla) => {
     expect(inspeccionarSitio([paginaCompleta('/', desperfecto)], ['/'])).toEqual([
@@ -248,11 +256,14 @@ describe('inspeccionarSitio → la cuenta de h1 (@s16)', () => {
     { cuantosH1: 0, cuantas: 1, frontera: 'ausente' },
     { cuantosH1: 1, cuantas: 0, frontera: 'el único caso que pasa' },
     { cuantosH1: 2, cuantas: 1, frontera: 'más de uno' },
-  ])('@s16 con $cuantosH1 h1 hay exactamente $cuantas violación(es) ($frontera)', ({ cuantosH1, cuantas }) => {
-    expect(
-      violacionesPorRegla([paginaCompleta('/', { cuantosH1 })], ['/'], 'h1 ausente o más de uno'),
-    ).toHaveLength(cuantas)
-  })
+  ])(
+    '@s16 con $cuantosH1 h1 hay exactamente $cuantas violación(es) ($frontera)',
+    ({ cuantosH1, cuantas }) => {
+      expect(
+        violacionesPorRegla([paginaCompleta('/', { cuantosH1 })], ['/'], 'h1 ausente o más de uno'),
+      ).toHaveLength(cuantas)
+    },
+  )
 })
 
 /**
@@ -442,11 +453,16 @@ function jsonLdModificado(estropear: (nodo: Record<string, never>) => void): str
 describe('inspeccionarSitio → name, address y geo (@s21)', () => {
   it.each([
     ['no hay campo name', (n: Record<string, never>) => delete n.name, 'JSON-LD sin name'],
-    ['name es la cadena vacía', (n: Record<string, never>) => (n.name = '' as never), 'JSON-LD sin name'],
+    [
+      'name es la cadena vacía',
+      (n: Record<string, never>) => (n.name = '' as never),
+      'JSON-LD sin name',
+    ],
     ['no hay campo address', (n: Record<string, never>) => delete n.address, 'JSON-LD sin address'],
     [
       'address es el Text "AV.ATENAS 75 LOCAL 41 C.C.ZOCO MONTE ROZAS"',
-      (n: Record<string, never>) => (n.address = 'AV.ATENAS 75 LOCAL 41 C.C.ZOCO MONTE ROZAS' as never),
+      (n: Record<string, never>) =>
+        (n.address = 'AV.ATENAS 75 LOCAL 41 C.C.ZOCO MONTE ROZAS' as never),
       'address no es PostalAddress',
     ],
     [
@@ -508,7 +524,10 @@ function jsonLdConGrafo(...nodosExtra: readonly unknown[]): string {
  * REFUTABLE CON UNA FUENTE OFICIAL Y HUNDIRÍA LA CREDIBILIDAD DEL CONTRATO ENTERO.
  */
 describe('inspeccionarSitio → reseñas prohibidas a CUALQUIER profundidad (@s22)', () => {
-  const conAggregateRating = { '@type': 'Service', aggregateRating: { ratingValue: 4.9, reviewCount: 1231 } }
+  const conAggregateRating = {
+    '@type': 'Service',
+    aggregateRating: { ratingValue: 4.9, reviewCount: 1231 },
+  }
 
   // 🔴 LAS FILAS ANIDADAS SON LA RAZÓN DE SER DE ESTE ESCENARIO: `aggregateRating` puede
   // REAPARECER DENTRO DE UN `Service`/`Offer` DEL `@graph` → RECORRIDO RECURSIVO, NUNCA
@@ -517,7 +536,10 @@ describe('inspeccionarSitio → reseñas prohibidas a CUALQUIER profundidad (@s2
   it.each([
     [
       'el nodo raíz tiene aggregateRating { ratingValue: 4.9, reviewCount: 1231 }',
-      () => jsonLdModificado((n) => (n.aggregateRating = { ratingValue: 4.9, reviewCount: 1231 } as never)),
+      () =>
+        jsonLdModificado(
+          (n) => (n.aggregateRating = { ratingValue: 4.9, reviewCount: 1231 } as never),
+        ),
       'aggregateRating',
     ],
     [
@@ -527,7 +549,11 @@ describe('inspeccionarSitio → reseñas prohibidas a CUALQUIER profundidad (@s2
     ],
     [
       'el @graph contiene un Service con un Offer anidado que tiene aggregateRating',
-      () => jsonLdConGrafo({ '@type': 'Service', offers: { '@type': 'Offer', aggregateRating: { ratingValue: 4.9 } } }),
+      () =>
+        jsonLdConGrafo({
+          '@type': 'Service',
+          offers: { '@type': 'Offer', aggregateRating: { ratingValue: 4.9 } },
+        }),
       'aggregateRating',
     ],
     [
@@ -550,17 +576,20 @@ describe('inspeccionarSitio → reseñas prohibidas a CUALQUIER profundidad (@s2
       () => jsonLdModificado((n) => (n.reviewCount = 1231 as never)),
       'reviewCount',
     ],
-  ])('@s22 %s → al menos 1 violación que declara la ruta del nodo', (_situacion, construir, clave) => {
-    const violaciones = violacionesPorRegla(
-      [paginaCompleta('/', { jsonLd: construir() })],
-      ['/'],
-      'reseñas prohibidas en el JSON-LD',
-    ) as { ruta: string; valor: string }[]
+  ])(
+    '@s22 %s → al menos 1 violación que declara la ruta del nodo',
+    (_situacion, construir, clave) => {
+      const violaciones = violacionesPorRegla(
+        [paginaCompleta('/', { jsonLd: construir() })],
+        ['/'],
+        'reseñas prohibidas en el JSON-LD',
+      ) as { ruta: string; valor: string }[]
 
-    expect(violaciones.length).toBeGreaterThanOrEqual(1)
-    expect(violaciones[0].ruta).toBe('/')
-    expect(violaciones[0].valor).toContain(clave)
-  })
+      expect(violaciones.length).toBeGreaterThanOrEqual(1)
+      expect(violaciones[0].ruta).toBe('/')
+      expect(violaciones[0].valor).toContain(clave)
+    },
+  )
 
   // La RUTA DEL NODO dentro del JSON-LD: sin ella el informe no dice DÓNDE está la reseña, y a
   // las 3 de la mañana nadie la busca a mano en un @graph anidado.
@@ -568,7 +597,10 @@ describe('inspeccionarSitio → reseñas prohibidas a CUALQUIER profundidad (@s2
     const violaciones = violacionesPorRegla(
       [
         paginaCompleta('/', {
-          jsonLd: jsonLdConGrafo({ '@type': 'Service', offers: { '@type': 'Offer', aggregateRating: { ratingValue: 4.9 } } }),
+          jsonLd: jsonLdConGrafo({
+            '@type': 'Service',
+            offers: { '@type': 'Offer', aggregateRating: { ratingValue: 4.9 } },
+          }),
         }),
       ],
       ['/'],
@@ -583,7 +615,11 @@ describe('inspeccionarSitio → reseñas prohibidas a CUALQUIER profundidad (@s2
   it('@s22 la comparación de la clave prohibida es INSENSIBLE A LA CAJA', () => {
     expect(
       violacionesPorRegla(
-        [paginaCompleta('/', { jsonLd: jsonLdModificado((n) => (n.AggregateRating = { ratingValue: 4.9 } as never)) })],
+        [
+          paginaCompleta('/', {
+            jsonLd: jsonLdModificado((n) => (n.AggregateRating = { ratingValue: 4.9 } as never)),
+          }),
+        ],
         ['/'],
         'reseñas prohibidas en el JSON-LD',
       ).length,
@@ -618,7 +654,10 @@ describe('inspeccionarSitio → el horario, la regla que hereda F-10 (@s35)', ()
     // que I-7 existe para prohibir. Divergen en silencio.
     [
       'hay openingHours Y openingHoursSpecification a la vez (LA MEZCLA: dos fuentes de verdad)',
-      { openingHours: 'Mo-Fr 10:00-20:00', openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification' }] },
+      {
+        openingHours: 'Mo-Fr 10:00-20:00',
+        openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification' }],
+      },
       1,
     ],
   ])('@s35 %s → %i violación(es)', (_situacion, horario, cuantas) => {
@@ -657,12 +696,15 @@ describe('inspeccionarSitio → la puerta ANTI-404 (@s23, @s24)', () => {
     ['/aviso-legal', 'ES LITERALMENTE EL BUG DEL CLIENTE: hoy su /es/aviso-legal da 404 [V]'],
     ['/servicios', 'ruta no prerenderizada: el enlace apunta a la nada'],
     ['/Aviso-Legal', 'no existe: la resolución de rutas del artefacto no es un juego de cajas'],
-  ])('@s23 un enlace a "%s" sin fichero en dist/ → 1 violación que declara el href (%s)', (href) => {
-    // El artefacto contiene ÚNICAMENTE dist/index.html → la única ruta que existe es "/".
-    expect(inspeccionarSitio([paginaCompleta('/', { enlaces: ['/', href] })], ['/'])).toEqual([
-      { ruta: '/', regla: 'href interno sin fichero en dist/', valor: href },
-    ])
-  })
+  ])(
+    '@s23 un enlace a "%s" sin fichero en dist/ → 1 violación que declara el href (%s)',
+    (href) => {
+      // El artefacto contiene ÚNICAMENTE dist/index.html → la única ruta que existe es "/".
+      expect(inspeccionarSitio([paginaCompleta('/', { enlaces: ['/', href] })], ['/'])).toEqual([
+        { ruta: '/', regla: 'href interno sin fichero en dist/', valor: href },
+      ])
+    },
+  )
 
   /**
    * La aseveración del NEGATIVO, y no es decorativa: SIN ELLA, LA PUERTA ANTI-404 NACE ROTA O
@@ -674,7 +716,10 @@ describe('inspeccionarSitio → la puerta ANTI-404 (@s23, @s24)', () => {
    */
   it.each([
     ['/', 'la home EXISTE: dist/index.html'],
-    ['https://www.facebook.com/nailslashstudiorozas/', 'externo: fuera del artefacto (dato real, F-02)'],
+    [
+      'https://www.facebook.com/nailslashstudiorozas/',
+      'externo: fuera del artefacto (dato real, F-02)',
+    ],
     ['tel:+34625223366', 'no es una ruta'],
     ['mailto:info@example.invalid', 'no es una ruta'],
     ['#servicios', 'ancla dentro de la misma página'],
@@ -706,14 +751,20 @@ describe('inspeccionarSitio → la puerta ANTI-404 bajo una base declarada (@s36
       '/NailsLashStudioWeb/Servicios',
       'el prefijo coincide; el resto "/Servicios" no es una ruta lógica — la resolución sigue sin ser un juego de cajas',
     ],
-  ])('@s36 con base declarada, un href con su prefijo pero sin ruta lógica tras él sigue siendo violación: "%s" (%s)', (href) => {
-    expect(inspeccionarSitio([paginaCompleta('/', { enlaces: ['/', href] })], ['/'], BASE)).toEqual([
-      { ruta: '/', regla: 'href interno sin fichero en dist/', valor: href },
-    ])
-  })
+  ])(
+    '@s36 con base declarada, un href con su prefijo pero sin ruta lógica tras él sigue siendo violación: "%s" (%s)',
+    (href) => {
+      expect(
+        inspeccionarSitio([paginaCompleta('/', { enlaces: ['/', href] })], ['/'], BASE),
+      ).toEqual([{ ruta: '/', regla: 'href interno sin fichero en dist/', valor: href }])
+    },
+  )
 
   it.each([
-    ['/NailsLashStudioWeb/', 'el prefijo coincide y el resto (vacío) es la ruta lógica "/", que EXISTE'],
+    [
+      '/NailsLashStudioWeb/',
+      'el prefijo coincide y el resto (vacío) es la ruta lógica "/", que EXISTE',
+    ],
     [
       '/otra-cosa',
       'NO tiene el prefijo de la base declarada: fuera del ámbito de esta puerta (puede ser un sitio distinto en la raíz del origen)',
@@ -815,22 +866,29 @@ function ficheroDe(ubicacion: string, opciones: OpcionesDeFixture = {}): Fichero
 describe('ejecutarPuertaDelCascaron → la guarda de las rutas esperadas (@s26)', () => {
   it.each([
     ['el directorio dist/ no existe', artefactoInexistente, ['/', '/servicios']],
-    ['dist/ existe pero no contiene ningún fichero HTML', () => artefactoCon(), ['/', '/servicios']],
+    [
+      'dist/ existe pero no contiene ningún fichero HTML',
+      () => artefactoCon(),
+      ['/', '/servicios'],
+    ],
     [
       'dist/ contiene index.html pero no contiene servicios/index.html',
       () => artefactoCon(ficheroDe('dist/index.html')),
       ['/', '/servicios'],
     ],
-  ])('@s26 %s → exit != 0 y la salida declara la ruta que no encontró', (_situacion, construir, rutasEsperadas) => {
-    const resultado = ejecutarPuertaDelCascaron({
-      artefacto: construir(),
-      rutasEsperadas,
-    })
+  ])(
+    '@s26 %s → exit != 0 y la salida declara la ruta que no encontró',
+    (_situacion, construir, rutasEsperadas) => {
+      const resultado = ejecutarPuertaDelCascaron({
+        artefacto: construir(),
+        rutasEsperadas,
+      })
 
-    expect(resultado.codigoSalida).not.toBe(0)
-    expect(resultado.lineas.join('\n')).toContain('/servicios')
-    expect(resultado.lineas.length).toBeGreaterThan(0)
-  })
+      expect(resultado.codigoSalida).not.toBe(0)
+      expect(resultado.lineas.join('\n')).toContain('/servicios')
+      expect(resultado.lineas.length).toBeGreaterThan(0)
+    },
+  )
 })
 
 /**
@@ -975,12 +1033,17 @@ describe('la puerta está enganchada al build de PRODUCCIÓN, y NO al de desarro
     const build = scripts().build
 
     expect(build).toContain('tools/puerta-cascaron.ts')
-    expect(build.indexOf('vite-react-ssg build')).toBeLessThan(build.indexOf('tools/puerta-cascaron.ts'))
+    expect(build.indexOf('vite-react-ssg build')).toBeLessThan(
+      build.indexOf('tools/puerta-cascaron.ts'),
+    )
   })
 
-  it.each([['dev'], ['dev:ssr']])('@s31 el script "%s" NO invoca la puerta del cascarón', (guion) => {
-    expect(scripts()[guion]).not.toContain('puerta-cascaron')
-  })
+  it.each([['dev'], ['dev:ssr']])(
+    '@s31 el script "%s" NO invoca la puerta del cascarón',
+    (guion) => {
+      expect(scripts()[guion]).not.toContain('puerta-cascaron')
+    },
+  )
 })
 
 /**
@@ -1235,7 +1298,10 @@ describe('los huecos que destapó la mutación', () => {
    */
   it('@s15 un lang DUPLICADO con los dos valores correctos SIGUE siendo violación', () => {
     expect(
-      inspeccionarSitio([paginaCompleta('/', { elementoHtml: '<html lang="es" lang="es">' })], ['/']),
+      inspeccionarSitio(
+        [paginaCompleta('/', { elementoHtml: '<html lang="es" lang="es">' })],
+        ['/'],
+      ),
     ).toEqual([{ ruta: '/', regla: 'lang ausente, duplicado o distinto de es', valor: 'es, es' }])
   })
 
@@ -1325,12 +1391,18 @@ describe('el informe acusa el VALOR encontrado, no solo la regla', () => {
   it.each([
     [
       'geo distinto de la constante',
-      () => jsonLdModificado((n) => ((n.geo as unknown as Record<string, number>).latitude = 40.5179876)),
+      () =>
+        jsonLdModificado(
+          (n) => ((n.geo as unknown as Record<string, number>).latitude = 40.5179876),
+        ),
       '40.5179876, -3.9226688',
     ],
     [
       'address no es PostalAddress',
-      () => jsonLdModificado((n) => (n.address = 'AV.ATENAS 75 LOCAL 41 C.C.ZOCO MONTE ROZAS' as never)),
+      () =>
+        jsonLdModificado(
+          (n) => (n.address = 'AV.ATENAS 75 LOCAL 41 C.C.ZOCO MONTE ROZAS' as never),
+        ),
       'AV.ATENAS 75 LOCAL 41 C.C.ZOCO MONTE ROZAS',
     ],
     ['JSON-LD sin name', () => jsonLdModificado((n) => (n.name = 42 as never)), '42'],
@@ -1342,7 +1414,10 @@ describe('el informe acusa el VALOR encontrado, no solo la regla', () => {
   })
 
   it('la violación del JSON-LD no parseable acusa EL CRUDO que no pudo parsear', () => {
-    const violaciones = inspeccionarSitio([paginaCompleta('/', { jsonLd: '{ esto no es json' })], ['/'])
+    const violaciones = inspeccionarSitio(
+      [paginaCompleta('/', { jsonLd: '{ esto no es json' })],
+      ['/'],
+    )
 
     expect(violaciones[0].regla).toBe('JSON-LD no parseable')
     expect(violaciones[0].valor).toBe('{ esto no es json')
@@ -1384,7 +1459,11 @@ describe('el informe acusa el VALOR encontrado, no solo la regla', () => {
 
   it('la violación del horario acusa la clave Y la ruta del nodo', () => {
     const violaciones = inspeccionarSitio(
-      [paginaCompleta('/', { jsonLd: jsonLdModificado((n) => (n.openingHours = 'Mo-Fr' as never)) })],
+      [
+        paginaCompleta('/', {
+          jsonLd: jsonLdModificado((n) => (n.openingHours = 'Mo-Fr' as never)),
+        }),
+      ],
       ['/'],
     )
 
@@ -1482,16 +1561,18 @@ describe('el valor de cada violación está anclado', () => {
         [paginaCompleta('/', { secciones: '<section><div class="titulo">S</div></section>' })],
         ['/'],
       ),
-    ).toEqual([
-      { ruta: '/', regla: 'section sin aria-labelledby a un heading real', valor: '' },
-    ])
+    ).toEqual([{ ruta: '/', regla: 'section sin aria-labelledby a un heading real', valor: '' }])
   })
 
   // Un `aria-labelledby=""` es «sin atributo» a efectos de la regla: no identifica a nadie.
   it('una section con aria-labelledby vacío también es violación', () => {
     expect(
       inspeccionarSitio(
-        [paginaCompleta('/', { secciones: '<section aria-labelledby=""><h2 id="x">S</h2></section>' })],
+        [
+          paginaCompleta('/', {
+            secciones: '<section aria-labelledby=""><h2 id="x">S</h2></section>',
+          }),
+        ],
         ['/'],
       ),
     ).toHaveLength(1)
@@ -1532,17 +1613,18 @@ describe('los huecos del recorrido y de las guardas', () => {
   })
 
   // El flag `i` de los landmarks: el HTML no es sensible a la caja y `<MAIN>` es un main.
-  it.each([['<MAIN>x</MAIN>', 'main'], ['<NAV>x</NAV>', 'nav'], ['<FOOTER>x</FOOTER>', 'footer']])(
-    'el landmark %s cuenta aunque venga en mayúsculas',
-    (etiqueta, landmark) => {
-      const html = htmlCrudo({ landmarks: ['main', 'nav', 'footer'] }).replace(
-        new RegExp(`<${landmark}[^>]*>`, 'i'),
-        etiqueta.split('>')[0] + '>',
-      )
+  it.each([
+    ['<MAIN>x</MAIN>', 'main'],
+    ['<NAV>x</NAV>', 'nav'],
+    ['<FOOTER>x</FOOTER>', 'footer'],
+  ])('el landmark %s cuenta aunque venga en mayúsculas', (etiqueta, landmark) => {
+    const html = htmlCrudo({ landmarks: ['main', 'nav', 'footer'] }).replace(
+      new RegExp(`<${landmark}[^>]*>`, 'i'),
+      etiqueta.split('>')[0] + '>',
+    )
 
-      expect(inspeccionarSitio([{ ruta: '/', html }], ['/'])).toEqual([])
-    },
-  )
+    expect(inspeccionarSitio([{ ruta: '/', html }], ['/'])).toEqual([])
+  })
 
   /**
    * EL ESPACIADO ALREDEDOR DEL `=` ES OPCIONAL EN HTML (`rel="x"` ≡ `rel = "x"`). Los extractores
@@ -1552,7 +1634,9 @@ describe('los huecos del recorrido y de las guardas', () => {
    */
   it('canonicaDeLaPagina tolera el espaciado alrededor del = en rel y en href', () => {
     expect(
-      canonicaDeLaPagina(cabezaDe('<head><link rel = "canonical" href = "https://example.invalid/"></head>')),
+      canonicaDeLaPagina(
+        cabezaDe('<head><link rel = "canonical" href = "https://example.invalid/"></head>'),
+      ),
     ).toBe('https://example.invalid/')
   })
 
@@ -1571,7 +1655,11 @@ describe('los huecos del recorrido y de las guardas', () => {
   it('la section tolera el espaciado alrededor del = en aria-labelledby', () => {
     expect(
       inspeccionarSitio(
-        [paginaCompleta('/', { secciones: '<section aria-labelledby = "x"><h2 id="x">S</h2></section>' })],
+        [
+          paginaCompleta('/', {
+            secciones: '<section aria-labelledby = "x"><h2 id="x">S</h2></section>',
+          }),
+        ],
         ['/'],
       ),
     ).toEqual([])
@@ -1605,13 +1693,19 @@ describe('los últimos huecos de los extractores', () => {
    */
   it('descripcionDe no revienta con metas que no tienen atributo name (el charset del index real)', () => {
     expect(
-      descripcionDe(cabezaDe('<head><meta charset="UTF-8"><meta name="description" content="x"></head>')),
+      descripcionDe(
+        cabezaDe('<head><meta charset="UTF-8"><meta name="description" content="x"></head>'),
+      ),
     ).toBe('x')
   })
 
   it('canonicaDeLaPagina no revienta con links que no tienen atributo rel', () => {
     expect(
-      canonicaDeLaPagina(cabezaDe('<head><link href="/a.css"><link rel="canonical" href="https://example.invalid/"></head>')),
+      canonicaDeLaPagina(
+        cabezaDe(
+          '<head><link href="/a.css"><link rel="canonical" href="https://example.invalid/"></head>',
+        ),
+      ),
     ).toBe('https://example.invalid/')
   })
 
@@ -1621,9 +1715,9 @@ describe('los últimos huecos de los extractores', () => {
    * y se podía romper sin que nada se enterara. El orden de los atributos no lo fija nadie.
    */
   it('leerJsonLd casa el script con atributos DESPUÉS del type', () => {
-    expect(leerJsonLd('<script type="application/ld+json" data-x="1">{"a":1}</script>').estado).toBe(
-      'leido',
-    )
+    expect(
+      leerJsonLd('<script type="application/ld+json" data-x="1">{"a":1}</script>').estado,
+    ).toBe('leido')
   })
 
   /**

@@ -10,13 +10,14 @@ pnpm build exit 0 (5 puertas), pnpm test 943/943.
 ## A) Fidelidad al diseno (#reserva)
 
 Comparado caracter a caracter contra Opcion-1-Rosa.dc.html L251-253:
+
 - eyebrow "Reserva rapida" -- VERBATIM (Reserva.tsx:97).
 - h2 "Prefieres reservar por chat?" -- VERBATIM, id reserva-titulo intacto (Reserva.tsx:98-100).
 - parrafo "Elige servicio, dia y franja horaria con nuestro asistente y te confirmamos la hora exacta por WhatsApp." -- VERBATIM (Reserva.tsx:101-104).
 - Enlaces "WhatsApp" / "Llamar al estudio", en ese orden -- VERBATIM (L255-256 del prototipo).
-El telefono falso 34600123456 / +34600123456 del prototipo NO se copia: ambos href derivan de
-TELEFONO.legible (F-02) via waHref/telHref. Confirmado por grep: cero apariciones de 600123456 en
-Reserva.tsx, reserva-logica.ts, lib/demo/reserva-demo.ts.
+  El telefono falso 34600123456 / +34600123456 del prototipo NO se copia: ambos href derivan de
+  TELEFONO.legible (F-02) via waHref/telHref. Confirmado por grep: cero apariciones de 600123456 en
+  Reserva.tsx, reserva-logica.ts, lib/demo/reserva-demo.ts.
 
 ## B) Alcance
 
@@ -24,12 +25,14 @@ git diff --stat toca exactamente: features/reserva_chat.feature, features/equipo
 src/components/Reserva.tsx, Equipo.tsx, equipo-logica.ts, equipo.module.scss, equipo.test.tsx,
 equipo-estilos.test.ts, reserva.module.scss, mas los nuevos reserva-logica.ts, reserva.test.tsx,
 lib/demo/reserva-demo.ts. Confirmado con git status:
+
 - src/pages/home.tsx y src/components/Galeria.tsx NO aparecen en el diff (galeria intacta).
 - stryker.config.json y vitest.config.ts NO tocados en esta sesion.
 
 ## C) Trazabilidad @s <-> test
 
 ### reserva_chat.feature (22 escenarios, todos en src/components/reserva.test.tsx salvo lo dicho)
+
 - @s1 [x] 3 tests (section/h2, eyebrow+parrafo, sin h1/sin copy viejo)
 - @s2 [x] 3 tests (2 links exactos, texto=nombre accesible, sin target=_blank)
 - @s3 [x] href WA contiene E.164 sin "+" y texto urlencoded a mano; NO asevera host (A-10 respetado)
@@ -44,6 +47,7 @@ lib/demo/reserva-demo.ts. Confirmado con git status:
 Ningun @s queda sin test concreto.
 
 ### equipo_reservas.feature, ampliacion @s26-@s31 (equipo.test.tsx / equipo-estilos.test.ts)
+
 - @s26 [x] 7 tests (uno por profesional, monograma unico + una sola letra)
 - @s27 [x] 4 filas por valor (inicialDe), incluida "angela"->"A con tilde" y "lucia"->"L"
 - @s28 [x] caso vacio: no lanza, devuelve cadena vacia, no "undefined"/"U"

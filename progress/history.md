@@ -19,12 +19,12 @@
   documentación oficial, autonomía total, preguntar cualquier duda real.
 - **Investigación (documentación oficial de GitHub, verificada 2026-07-25) encontró tres bloqueos
   reales que no eran míos para decidir**: (1) el repo era privado y la organización estaba en plan
-  Free — GitHub Pages exige repo público en Free, cita literal: *"If the account that owns the
-  repository uses GitHub Free... the repository must be public"*; con Team el código puede seguir
+  Free — GitHub Pages exige repo público en Free, cita literal: _"If the account that owns the
+  repository uses GitHub Free... the repository must be public"_; con Team el código puede seguir
   privado, pero el SITIO publicado sigue siendo público igualmente (acceso restringido de verdad
   exige Enterprise Cloud); (2) el proyecto declara por escrito que "sin razón social ni NIF válido
   en fuente pública, la web no se puede publicar" (F-16 sigue `blocked`); (3) `ORIGEN_CANONICA =
-  'https://example.invalid'` (`src/lib/seo.ts:238`) es un placeholder deliberado, "decisión del
+'https://example.invalid'` (`src/lib/seo.ts:238`) es un placeholder deliberado, "decisión del
   CLIENTE". Tres preguntas vía `AskUserQuestion`; respuestas de Pablo: repo público (acepta exponer
   el historial); pipeline listo con **aprobación manual suya por despliegue** (regla de protección
   del entorno `github-pages`); dominio "de momento no hay... esto será temporal, hasta que el
@@ -105,8 +105,8 @@
 - **Retiro 2 — controles del carrusel, ENMIENDA 4** (el delicado: reabre un hueco legal en dos
   features `done` y mutadas al 100%). El `craftsman_lead` preguntó explícitamente a Pablo si
   restaurar al menos el botón de pausa, citando el propio contrato («SC 2.2.2 Pause, Stop, Hide,
-  Nivel A, BLOQUEANTE»). Respuesta literal de Pablo: *"No lo soluciones para que todo pase, con los
-  cambios que yo he hecho, que para eso los he hecho yo a mano, gracias, ultrathink."* — decisión
+  Nivel A, BLOQUEANTE»). Respuesta literal de Pablo: _"No lo soluciones para que todo pase, con los
+  cambios que yo he hecho, que para eso los he hecho yo a mano, gracias, ultrathink."_ — decisión
   INFORMADA de conservar su edición y aceptar el hueco. Pipeline completo:
   - `gherkin_author`: ENMIENDA 4 en `features/galeria_carrusel.feature` (y `resenas_agregado_enlace.feature`
     por herencia). RETIRADOS @s8/@s11/@s16/@s24 (cuerpo histórico intacto, tags nunca reutilizados);
@@ -191,7 +191,6 @@
   EN VIVO 50/50) — esta entrada quedó desactualizada tras ese cierre. `stryker.config.json` YA
   contiene `carrusel-logica.ts` (confirmado por inspección directa el 2026-07-24).]
 
-
 ## 2026-07-17 — feature `5 — cero_terceros` · **CERRADA `done`**
 
 **Resultado: 43/43 escenarios · 576 tests · judge APROBADO · mutación 100 % en los dos ficheros
@@ -204,8 +203,8 @@ los 6 imports `@fontsource/<familia>/latin-<peso>.css`.
 ### La feature en una frase
 
 **«Cero terceros» no es «cero orígenes externos en el texto del artefacto»: es cero PETICIONES
-AUTOMÁTICAS.** La distinción la da el HTML Living Standard (*external resource link* vs
-*hyperlink*) y **es la feature entera**.
+AUTOMÁTICAS.** La distinción la da el HTML Living Standard (_external resource link_ vs
+_hyperlink_) y **es la feature entera**.
 
 ### Fases
 
@@ -224,14 +223,14 @@ AUTOMÁTICAS.** La distinción la da el HTML Living Standard (*external resource
 ### 🔴 Lo que esta feature enseña, y no estaba en ninguna otra
 
 1. **Un criterio de aceptación puede ser INSATISFACIBLE, y nadie lo nota hasta que se mide.**
-   *«El build falla si el artefacto contiene CUALQUIER origen externo»* era imposible: `dist/` ya
+   _«El build falla si el artefacto contiene CUALQUIER origen externo»_ era imposible: `dist/` ya
    traía **10 orígenes externos y ninguno era una petición** (4 namespaces XML de React,
    `react.dev/errors`, `fb.me`, el `@context` de F-04, la canónica). **Cumplirlo habría roto F-04,
    que estaba `done`.** → A-23.
 2. **La `puerta_legal` era una ATRIBUCIÓN NORMATIVA FALSA**, y llevaba ahí desde el troceado.
    El art. 22.2 LSSI **no dice «cookies»**: dice «almacenamiento **Y recuperación**». **MEDIDO:**
-   gstatic **no** manda `Set-Cookie` pero **sí** `Cache-Control: max-age=31536000` → *«no almacena
-   nada»* es **falso**. Y **Fashion ID no se pudo abrir** (EUR-Lex: 202 + challenge AWS-WAF).
+   gstatic **no** manda `Set-Cookie` pero **sí** `Cache-Control: max-age=31536000` → _«no almacena
+   nada»_ es **falso**. Y **Fashion ID no se pudo abrir** (EUR-Lex: 202 + challenge AWS-WAF).
    → **La justificación correcta es CRITERIO DE PROYECTO y no cuelga de ninguna cita.** La
    decisión de autoalojar **no cambió**; cambió su fundamento. F-11 arrastraba lo mismo: corregida.
 3. **«No copiar del base» mordió por TERCERA vez.** El diseño usa **Manrope + Gilda Display +
@@ -241,7 +240,7 @@ AUTOMÁTICAS.** La distinción la da el HTML Living Standard (*external resource
    **«100 %, 0 survived» con 152/183 en TIMEOUT**, en código **sin un solo bucle**. A
    `--concurrency 1`: **152 → 0 y aparecieron 9 supervivientes reales.**
 5. 🔴 **LA LECCIÓN NUEVA — UNA MEDICIÓN ROTA NO ES UN RESULTADO, y siempre apunta a «aquí no hay
-   nada que hacer».** Pasó **CUATRO veces en un día**, y las cuatro se cazaron *solo* porque el
+   nada que hacer».** Pasó **CUATRO veces en un día**, y las cuatro se cazaron _solo_ porque el
    número era **imposible por construcción**:
    - La tanda #1 de Stryker: 152 timeouts en código sin bucles.
    - Un sabotaje del `judge` con error de sintaxis que imprimía «0 red».
@@ -250,8 +249,8 @@ AUTOMÁTICAS.** La distinción la da el HTML Living Standard (*external resource
      «0 fallos» como «sobrevive».
    - La sonda del `judge` en el delta: falló **uniformemente** en los 6 casos, que se habría leído
      como «indistinguible = decorado». **La cazó porque tenía controles SIN mutante.**
-   > **Regla que se queda:** *una medición que coincide con tu hipótesis en TODOS los casos es más
-   > probable que esté rota a que sea cierta.* **Y: comprueba cuántos tests corrieron de verdad.**
+   > **Regla que se queda:** _una medición que coincide con tu hipótesis en TODOS los casos es más
+   > probable que esté rota a que sea cierta._ **Y: comprueba cuántos tests corrieron de verdad.**
 6. **El diff textual de Stryker MIENTE sobre la precedencia.** `a && b && c && d` parsea
    `((a&&b)&&c)&&d`; el mutante `LogicalOperator` se **imprime** `a || b && …` pero **es**
    `(a || b) && …`. **Copiar el diff literal da un mutante MÁS FUERTE que mata 5 tests** y
@@ -264,7 +263,7 @@ AUTOMÁTICAS.** La distinción la da el HTML Living Standard (*external resource
 9. **Vite 7 NO exime a las fuentes del inlining** (4096 B): hoy salva el tamaño (6.192 B) — **suerte,
    no garantía**. Y **`base` reescribe todos los `url()` a un origen externo**: es la vía nº1 y
    **ningún grep del CSS la anticipa** → la puerta asevera **la config**, no solo la salida.
-10. 🔴 **LA PRUEBA DE MUTACIÓN ENCONTRÓ UN HUECO EN LA *SPEC*, NO EN LOS TESTS.** Los 10
+10. 🔴 **LA PRUEBA DE MUTACIÓN ENCONTRÓ UN HUECO EN LA _SPEC_, NO EN LOS TESTS.** Los 10
     supervivientes eran **guardas defensivas CORRECTAS que ningún escenario ejercitaba**.
     **Producción quedó byte a byte idéntica mientras el contrato crecía de 40 a 43.**
     Y el `:58`: **un comentario que prometía tolerar `src = "x"` sin que ningún test lo fijara.**
@@ -285,8 +284,8 @@ AUTOMÁTICAS.** La distinción la da el HTML Living Standard (*external resource
 - **`latin-ext`** (A-28): un nombre con `Ł`/`ř`/`ğ` daría **tofu silencioso**. Entrará con su
   escenario el día que exista un nombre real que lo exija.
 - **Ley 3**: el craftsman la rompió 3 veces en la ronda 1 y lo **declaró**; el `judge` lo aprobó
-  tras probarlo por sabotaje, pero lo registró como **deuda GRAVE**: *«el sabotaje es un remedio a
-  posteriori, no una licencia»*.
+  tras probarlo por sabotaje, pero lo registró como **deuda GRAVE**: _«el sabotaje es un remedio a
+  posteriori, no una licencia»_.
 - **`prettier --check .` falla en 86 ficheros y ya fallaba antes de F-05.** Deuda preexistente;
   `format:check` **no** es puerta del arnés (`lint` = `typecheck + eslint`).
 - **Los 2 menores del `judge`**, no bloqueantes.
@@ -304,8 +303,8 @@ ficheros (`puerta-anclas.ts` 149 + `Cabecera.tsx` + `MenuNavegacion.tsx` + `Pie.
 
 **El entregable central no fue la nav, sino una PUERTA DE ANCLAS VIVAS** que no existía: la anti-404
 de F-04 **excluye las anclas por diseño** (`RUTA_INTERNA = /^\/(?!\/)/`), así que una nav con 7
-anclas muertas pasaba las cuatro puertas en verde. Ahora *«todo `href="#id"` de la nav resuelve a un
-`id` presente Y cada sección navegable está enlazada (igualdad de conjuntos)»*, sobre el HTML crudo
+anclas muertas pasaba las cuatro puertas en verde. Ahora _«todo `href="#id"` de la nav resuelve a un
+`id` presente Y cada sección navegable está enlazada (igualdad de conjuntos)»_, sobre el HTML crudo
 de `dist/`, fallando cerrada para **los dos** extractores.
 
 ### Fases
@@ -329,12 +328,12 @@ de `dist/`, fallando cerrada para **los dos** extractores.
 1. **«No copiar del base» mordió por CUARTA vez.** El breakpoint **`767` era herencia muerta de
    WebEmpresa** (0 ocurrencias en `src/`); el diseño no tiene ni una `@media`. El breakpoint real
    **medido en Chrome** es 793–806px → 820px con margen.
-2. **La trampa gemela de WCAG, por TERCERA vez.** La `puerta_legal` (*«SC 2.4.11 foco no
-   oscurecido»*) rozaba el AAA: el listón AA es *«not entirely hidden»*; *«no part hidden»* es el
+2. **La trampa gemela de WCAG, por TERCERA vez.** La `puerta_legal` (_«SC 2.4.11 foco no
+   oscurecido»_) rozaba el AAA: el listón AA es _«not entirely hidden»_; _«no part hidden»_ es el
    2.4.12, que es AAA. **Cero umbrales numéricos**: los 66/70/80px no son WCAG.
-3. **Tres criterios de aceptación no se podían destilar tal cual** (A-23 redux): @1 *«TODAS las
-   secciones, no 7 de 11»* insatisfacible (hoy 2 secciones, ids en los `<h2>`); @2 *«scroll-margin no
-   actúa al tabular»* **falso** (el scroll al Tab es UA-defined); @4 *«se deriva de la altura real»*
+3. **Tres criterios de aceptación no se podían destilar tal cual** (A-23 redux): @1 _«TODAS las
+   secciones, no 7 de 11»_ insatisfacible (hoy 2 secciones, ids en los `<h2>`); @2 _«scroll-margin no
+   actúa al tabular»_ **falso** (el scroll al Tab es UA-defined); @4 _«se deriva de la altura real»_
    **insostenible bajo SSG** (en CSS puro no hay forma de leer la altura de un elemento).
 4. 🔴 **Un `className={cond?'a':'b'}` en TSX es INMATABLE** bajo la regla anti-clase-CSS del repo
    (5 mutantes, solo mueren con `toHaveClass`, prohibido). **La salida medida: el estado va en un
@@ -352,8 +351,8 @@ de `dist/`, fallando cerrada para **los dos** extractores.
    vez**: un comentario que prometía tolerar `href = "#x"` con espacios sin que ningún test lo fijara.
 8. 🔴 **UN «MUTANTE EQUIVALENTE» SE ELIMINA POR REFACTOR, NO SIEMPRE SE EXCLUYE — pero el refactor
    ingenuo RE-INTRODUCE el equivalente.** La forma orientativa del lead (`referencia !== undefined &&
-   headings.has(...)`) habría vuelto a ser equivalente: `true && headings.has(...)` = `headings.has(
-   undefined)` = siempre false (la trampa del `undefined` redundante). La forma correcta: **un guard
+headings.has(...)`) habría vuelto a ser equivalente: `true && headings.has(...)` = `headings.has(
+undefined)` = siempre false (la trampa del `undefined` redundante). La forma correcta: **un guard
    que protege un THROW real** (`coincidencia[1]` sobre `null` revienta), así **debilitar el guard
    LANZA** y un test lo mata. El proyecto mantiene **0 exclusiones** desde F-03.
 9. **La mutación sobre TSX es territorio nuevo y benigno**: los mismos 6 mutadores de cualquier
@@ -394,7 +393,7 @@ de `dist/`, fallando cerrada para **los dos** extractores.
   - **mutation_tester (2.ª ronda):** 100 % — `partir-nombre.ts` (13/13), `Hero.tsx` (2/2), 0
     supervivientes; `@s17` es SCSS → no-mutable (declarado, no fingido).
   - **RE-VERIFICACIÓN EN VIVO con Chrome (extensión del humano + CDP headless):** `document.fonts.check
-    ('142px Great Vibes')` = **true** (era `false`); titular computa `'Great Vibes', cursive` /
+('142px Great Vibes')` = **true** (era `false`); titular computa `'Great Vibes', cursive` /
     `'Manrope', sans-serif`; Great Vibes 400 `loaded`; **LCP 136-216 ms** (`lcp_inH1: false`);
     reduced-motion sin movimiento; reflow 320 sin desborde; **0 peticiones a terceros** (F-05 intacto);
     consola limpia. Ver `progress/verificacion_viva_hero_marca.md`.
@@ -419,6 +418,7 @@ escenarios. La **revisión adversarial (5 lentes) cazó 2 BLOQUEANTES antes de e
 2026-07-18. `feature_list.json`: F-09/F-10/F-12 → spec_ready; añadida #21 tipografia_global.
 
 ### feature `tipografia_global` (id 21, NUEVA) → **`done`**
+
 - Nace de la deuda de F-07 (el `body` global no fijaba `font-family` → Times New Roman).
 - **TDD @s1–@s7** (leen el SCSS): partial nuevo `src/styles/_tipografia.scss` (`body` Manrope; `h2, h3`
   Gilda Display, regla conjunta, selector de tipo que no toca el `h1` del hero) + `@use 'tipografia'` en
@@ -430,6 +430,7 @@ escenarios. La **revisión adversarial (5 lentes) cazó 2 BLOQUEANTES antes de e
   **0 terceros**. Resultado: `done`. Cierra la deuda #2 de F-07.
 
 ### F-10 `horario` · F-09 `catalogo_servicios` · F-12 `contacto`
+
 - Contratos aprobados y abiertos (✅). Se implementan uno a uno tras tipografía (orden: horario →
   contacto → catálogo). Estado al escribir esto: `spec_ready`.
 
@@ -571,8 +572,8 @@ escenarios. La **revisión adversarial (5 lentes) cazó 2 BLOQUEANTES antes de e
      imágenes de `Opcion-1-Rosa` son placeholders grises con el literal «IMAGEN TEMPORAL» (por eso la
      puerta 2 prohíbe `ph-woman` Y ese literal). No había ninguna foto que reutilizar.
      🔴 **Por qué fotos de TRABAJOS y no retratos** (decisión con base legal, no estética): la
-     licencia OFICIAL de Pexels (leída hoy, `https://www.pexels.com/license/`) dice *«Don't imply
-     endorsement of your product by people or brands on the imagery»*. Una cara de banco en una
+     licencia OFICIAL de Pexels (leída hoy, `https://www.pexels.com/license/`) dice _«Don't imply
+     endorsement of your product by people or brands on the imagery»_. Una cara de banco en una
      tarjeta que dice «Lucía · Especialista en uñas» implica que esa persona trabaja aquí → va contra
      la licencia Y contra LO 1/1982. Con fotos de trabajo **el bloqueo de F-18 «para publicar» por
      imagen de terceros DECAE** (siguen bloqueando los nombres/reseñas de ejemplo, con su leyenda).
@@ -601,14 +602,14 @@ escenarios. La **revisión adversarial (5 lentes) cazó 2 BLOQUEANTES antes de e
     **pintadas 348×261 (4:3 exacto)**, 7 tarjetas, sección de 2637 px, todo `opacity:1`/`visible`.
     El **chat se condujo de punta a punta** (Uñas → Entre semana → Por la mañana → «Marta») y el CTA
     resultante es `wa.me/34625223366?text=Hola, quiero reservar: Uñas · Entre semana · Por la mañana.
-    Me llamo Marta…` — los 4 datos y el número REAL. ⚠️ **El capturador de pantalla de Chrome devolvía
+Me llamo Marta…` — los 4 datos y el número REAL. ⚠️ **El capturador de pantalla de Chrome devolvía
     fotogramas EN BLANCO** (y una vez timeout de CDP): NO era la página —se descartó midiendo el DOM—.
     Si alguien repite la verificación, que no confunda el bug del capturador con un fallo de la web.
   - 🟡 **Deuda viva:** (a) el chat sigue SIN decir en pantalla que es una demostración —ahora entrega
     la solicitud de verdad, así que el riesgo baja, pero la leyenda sigue sin escenario—; (b)
     `Galeria.tsx` tiene 7 tests pero NO está en `mutate`; (c) `features/galeria_carrusel.feature` @s24
     (galería ANTES de «Reserva rápida») quedó obsoleto al dejarla donde está; (d) `features/
-    contacto.feature` @s11/@s12 reservan «Cómo llegar» a F-11 pero el botón YA existe en
+contacto.feature` @s11/@s12 reservan «Cómo llegar» a F-11 pero el botón YA existe en
     `Contacto.tsx`, sin test, desde antes de esta sesión; (e) los huecos de foto del CATÁLOGO siguen
     vacíos (Pablo no los marcó) y el catálogo sigue anunciando «Servicio facial» con precios, que el
     salón NO ofrece (deuda `progress/deuda_precios_catalogo.md`, Pablo pidió no tocarla).
@@ -690,7 +691,7 @@ escenarios. La **revisión adversarial (5 lentes) cazó 2 BLOQUEANTES antes de e
   cadencia migró a `carrusel-logica.ts` (compartida, sin segunda copia).
 - 🔴 **El bloqueante que cazó el judge del lote** (y el a11y en paralelo): la desambiguación del
   teclado entre los DOS carruseles era de mentira — dos listeners independientes con la distancia
-  fabricada a 0; con foco en la galería y reseñas visible, una tecla movía AMBOS. Remate: 
+  fabricada a 0; con foco en la galería y reseñas visible, una tecla movía AMBOS. Remate:
   **coordinador compartido** en `carrusel-logica.ts` (registro de candidatas con medidas REALES
   del IO, arbitraje único, el foco excluye, limpieza al desmontar) → delta re-APROBADO y el caso
   verificado EN VIVO (sonda: `teclado-desambigua` y `teclado-foco-excluye`, verdes).
@@ -745,7 +746,7 @@ escenarios. La **revisión adversarial (5 lentes) cazó 2 BLOQUEANTES antes de e
   Iteración 2 del banco (2026-07-24): Pablo pidió probar 15 s; vivido en tiempo real por el lead
   (a 15 s ≈1,7 s/letra la pluma se ve escribir con claridad Y la mayoría de visitantes ve la firma
   completarse — el punto dulce frente al 30, más ceremonial pero cuyo final pocos veían). Enmienda 4
-  + micro-ciclo con sabotaje del espejo, mutación 100 %/100 %, 15 000 ms exactos en el build real.
+  - micro-ciclo con sabotaje del espejo, mutación 100 %/100 %, 15 000 ms exactos en el build real.
 - **Incidente de herramienta, declarado**: el WebSocket nativo de Node (undici) contra el CDP
   murió repetidas veces en corridas largas con muchas capturas; el remedio fue trocear la sonda en
   sesiones cortas (mini-sonda para los 4 checks finales) y hacer ATÓMICOS los pares espera+acción

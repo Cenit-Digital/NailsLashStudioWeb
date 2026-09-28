@@ -38,11 +38,11 @@
 
 Treatwell no tiene un único documento. Aplican tres, y hay que leerlos juntos:
 
-| Documento | URL | Última actualización | A quién obliga |
-|---|---|---|---|
-| Términos y condiciones del Sitio web | https://www.treatwell.es/info/terminos-y-condiciones/ | Abril 2024 `[VERIFICADO]` | A cualquier visitante de treatwell.es (nosotros incluidos) |
-| Política de Contenido Generado por el Usuario (CGU) | https://www.treatwell.es/info/politica-contenido-generado-usuario/ | `[NO VERIFICADO]` | Al cliente que escribe la reseña |
-| Términos Comerciales Treatwell/Empresa Asociada | https://www.treatwell.es/info/terminos-y-condiciones-para-profesionales/ | Abril 2024 `[VERIFICADO]` | **Al salón** |
+| Documento                                           | URL                                                                      | Última actualización      | A quién obliga                                             |
+| --------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------- | ---------------------------------------------------------- |
+| Términos y condiciones del Sitio web                | https://www.treatwell.es/info/terminos-y-condiciones/                    | Abril 2024 `[VERIFICADO]` | A cualquier visitante de treatwell.es (nosotros incluidos) |
+| Política de Contenido Generado por el Usuario (CGU) | https://www.treatwell.es/info/politica-contenido-generado-usuario/       | `[NO VERIFICADO]`         | Al cliente que escribe la reseña                           |
+| Términos Comerciales Treatwell/Empresa Asociada     | https://www.treatwell.es/info/terminos-y-condiciones-para-profesionales/ | Abril 2024 `[VERIFICADO]` | **Al salón**                                               |
 
 **Entidad legal:** «Treatwell Spain s.l. (CIF B-87237293, domicilio: Magallanes 3, 28015 planta 10 - Madrid)».
 Fuente: https://www.treatwell.es/info/terminos-y-condiciones/ `[VERIFICADO]`
@@ -71,7 +71,7 @@ Fuente: https://www.treatwell.es/info/terminos-y-condiciones-para-profesionales/
 
 > «le concedemos una licencia personal, no exclusiva, intransferible y totalmente revocable para utilizar el Software»
 
-`[VERIFICADO]`. Nótese: **«intransferible»** y **«totalmente revocable»**, y su objeto es *el Software*, no el contenido ni las reseñas.
+`[VERIFICADO]`. Nótese: **«intransferible»** y **«totalmente revocable»**, y su objeto es _el Software_, no el contenido ni las reseñas.
 
 ---
 
@@ -99,7 +99,7 @@ He buscado en los tres documentos una cláusula que permita a salones o terceros
 
 > «Tenga en cuenta que cualquier CGU que usted remita a nuestro Sitio web será considerado no confidencial y sin derechos de propiedad.»
 
-`[VERIFICADO]`. ⚠️ **Cuidado con malinterpretar esto como "es de dominio público".** No lo es. Es una cláusula de descargo frente a reclamaciones de confidencialidad del *autor* hacia *Treatwell*; no crea derechos a favor de terceros. `[INFERENCIA]`
+`[VERIFICADO]`. ⚠️ **Cuidado con malinterpretar esto como "es de dominio público".** No lo es. Es una cláusula de descargo frente a reclamaciones de confidencialidad del _autor_ hacia _Treatwell_; no crea derechos a favor de terceros. `[INFERENCIA]`
 
 ---
 
@@ -147,7 +147,7 @@ Fuente: https://www.boe.es/buscar/act.php?id=BOE-A-1996-8930 `[VERIFICADO]`
 
 **Matiz honesto a favor:** una reseña muy corta y banal («Muy bien, repetiré») probablemente **carece de originalidad** y por tanto no sería obra protegida por el art. 10. `[INFERENCIA]`. Pero esto **no desbloquea nada**, porque: (a) el candado contractual 4.2 sigue aplicando con independencia de la PI; (b) el candado RGPD sigue aplicando sobre el nombre; (c) determinar caso por caso si cada reseña alcanza el umbral de originalidad es un análisis jurídico que no podemos hacer a escala. No es una vía practicable.
 
-**Sobre la nota media / número de reseñas:** los datos numéricos aislados no son obra protegida `[INFERENCIA]`, pero (a) la cláusula 9.1 del contrato de socio atribuye a Treatwell «todos los derechos» sobre el contenido, (b) podría existir un derecho *sui generis* de base de datos (arts. 133 y ss. TRLPI — **`[NO VERIFICADO]`**, no he leído el texto), y (c) Google prohíbe expresamente agregar valoraciones de otras webs (§6). **No mostramos la nota de Treatwell.**
+**Sobre la nota media / número de reseñas:** los datos numéricos aislados no son obra protegida `[INFERENCIA]`, pero (a) la cláusula 9.1 del contrato de socio atribuye a Treatwell «todos los derechos» sobre el contenido, (b) podría existir un derecho _sui generis_ de base de datos (arts. 133 y ss. TRLPI — **`[NO VERIFICADO]`**, no he leído el texto), y (c) Google prohíbe expresamente agregar valoraciones de otras webs (§6). **No mostramos la nota de Treatwell.**
 
 ---
 
@@ -161,16 +161,16 @@ Fuente: https://www.boe.es/buscar/act.php?id=BOE-A-1996-8930 `[VERIFICADO]`
 
 Fuente: https://www.treatwell.es/info/politica-de-privacidad/ `[VERIFICADO]`
 
-⚠️ **Esto es una advertencia de riesgo al usuario, NO una autorización a terceros para tratar esos datos.** Que Treatwell avise al cliente de que terceros *pueden* recoger sus datos no legitima que nosotros lo hagamos. `[INFERENCIA]`
+⚠️ **Esto es una advertencia de riesgo al usuario, NO una autorización a terceros para tratar esos datos.** Que Treatwell avise al cliente de que terceros _pueden_ recoger sus datos no legitima que nosotros lo hagamos. `[INFERENCIA]`
 
 **Análisis de base jurídica (art. 6.1 RGPD) para republicar nombre + reseña:**
 
-| Base | ¿Sirve? | Razonamiento |
-|---|---|---|
-| 6.1.a Consentimiento | ❌ hoy no | El cliente consintió publicar en *Treatwell*, no en *nuestra* web. El consentimiento debe ser específico e informado para cada finalidad. `[INFERENCIA]` |
-| 6.1.b Contrato | ❌ | Republicar un testimonio no es necesario para ejecutar el contrato de servicio de manicura. `[INFERENCIA]` |
-| 6.1.f Interés legítimo | ❌ (falla el test) | Nuestro interés (marketing) es real, pero **falla la expectativa razonable**: el cliente no espera que su nombre aparezca en la web comercial del salón. Además el tratamiento no es *necesario* — existe alternativa menos invasiva evidente: pedírselo. `[INFERENCIA]` |
-| 6.1.a Consentimiento **recabado por nosotros** | ✅ | Es la vía. Explícito, informado, granular, revocable. `[INFERENCIA]` |
+| Base                                           | ¿Sirve?            | Razonamiento                                                                                                                                                                                                                                                             |
+| ---------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 6.1.a Consentimiento                           | ❌ hoy no          | El cliente consintió publicar en _Treatwell_, no en _nuestra_ web. El consentimiento debe ser específico e informado para cada finalidad. `[INFERENCIA]`                                                                                                                 |
+| 6.1.b Contrato                                 | ❌                 | Republicar un testimonio no es necesario para ejecutar el contrato de servicio de manicura. `[INFERENCIA]`                                                                                                                                                               |
+| 6.1.f Interés legítimo                         | ❌ (falla el test) | Nuestro interés (marketing) es real, pero **falla la expectativa razonable**: el cliente no espera que su nombre aparezca en la web comercial del salón. Además el tratamiento no es _necesario_ — existe alternativa menos invasiva evidente: pedírselo. `[INFERENCIA]` |
+| 6.1.a Consentimiento **recabado por nosotros** | ✅                 | Es la vía. Explícito, informado, granular, revocable. `[INFERENCIA]`                                                                                                                                                                                                     |
 
 **Restricción adicional del contrato de socio sobre datos de clientes** — texto literal:
 
@@ -202,6 +202,7 @@ Texto literal sobre el widget:
 Fuente: https://www.treatwell.es/info/terminos-y-condiciones-para-profesionales/ `[VERIFICADO]`
 
 **Sobre la API:** existen referencias a «Treatwell APIs» en agregadores de terceros (apitracker.io) y una integración con software de gestión de salones (Salonized), pero:
+
 - La integración de Salonized es de **sincronización de agenda/reservas**, y su propia documentación indica que está disponible solo en Países Bajos, Bélgica, Alemania, Suiza y Reino Unido — **no España**. `[VERIFICADO]` vía https://help.salonized.com/en/articles/6287754-what-is-the-treatwell-integration
 - **No he encontrado documentación oficial de Treatwell de una API pública de reseñas.** `[NO VERIFICADO]` — ausencia de evidencia, no evidencia de ausencia. Requiere preguntar al gestor de cuenta.
 
@@ -253,19 +254,19 @@ Fuente: https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:02005L002
 
 ## 3. Lo que NO he podido verificar
 
-| # | Afirmación / hueco | Por qué importa | Qué haría falta para verificarlo |
-|---|---|---|---|
-| 1 | **Si el salón tiene efectivamente contrato de socio con Treatwell y qué versión aceptó** | Todo el candado contractual (§2.2) depende de esto. Si no hay contrato, aplican solo los candados de PI y RGPD (que ya bastan para bloquear, pero el análisis cambia) | Preguntar al cliente/dueña; localizar el contrato firmado y su fecha; comparar con la versión de abril 2024 |
-| 2 | **Fecha de última actualización de la Política de CGU (ES)** | Las cláusulas citadas podrían haber cambiado | Revisar el pie del documento en treatwell.es; guardar copia sellada con fecha |
-| 3 | **Discrepancia de denominación social:** «Treatwell Spain s.l.» vs «Treatwell S.L.» vs «Treatwell Spain s.l.u.» | Determinar la entidad correcta si hay que dirigir un requerimiento o solicitud formal | Consulta al Registro Mercantil por CIF B-87237293; o vía https://www.treatwell.es/info/consultas-legales/ |
-| 4 | **Si existe alguna API/widget/badge oficial de reseñas de Treatwell no documentado públicamente** | Si existiera, sería la vía legítima y cambiaría la recomendación | Preguntar por escrito al gestor de cuenta de Treatwell o a https://www.treatwell.es/info/consultas-legales/. Conservar la respuesta |
-| 5 | **Si Treatwell concedería una sublicencia escrita para republicar reseñas** | La cláusula 2.1 CGU incluye «derecho absoluto de sublicencia» → es jurídicamente posible | Solicitud formal por escrito a Treatwell. `[INFERENCIA]`: improbable que la concedan, va contra su modelo, pero el coste de preguntar es cero |
-| 6 | **Si enlazar desde nuestra web al perfil público de Treatwell está permitido** | Es la alternativa de mínimo riesgo que propongo en §5 | Releer T&C del sitio en busca de cláusula de enlaces/framing; consultar a Treatwell. `[INFERENCIA]`: el enlace de texto simple no reproduce obra y es práctica estándar, pero **no lo he verificado en los T&C** |
-| 7 | **Texto del derecho *sui generis* de base de datos (arts. 133 y ss. TRLPI)** | Afectaría a extraer conjuntos de datos (notas, número de reseñas) aunque no sean obra | Leer el texto consolidado en BOE-A-1996-8930 |
-| 8 | **Si la política de privacidad de Treatwell impone obligaciones al salón como corresponsable sobre datos de reseñas** | Podría añadir obligaciones nuestras | Lectura completa del DPA de socios de Treatwell (mencionado en la política de privacidad) |
-| 9 | **Contenido íntegro de las «Directrices de reseñas» / Review Guidelines en versión española** | Solo he verificado la versión británica (https://www.treatwell.co.uk/info/community-guidelines/) | Localizar equivalente en treatwell.es |
-| 10 | **Validación por abogado español colegiado** | Este informe es investigación documental, no dictamen | Revisión por abogado de PI/protección de datos antes de publicar la web |
-| 11 | **Cifras concretas del salón** (nº de reseñas, nota media en Treatwell) | No las he consultado ni las necesito — no vamos a usarlas | N/A — deliberadamente fuera de alcance |
+| #   | Afirmación / hueco                                                                                                    | Por qué importa                                                                                                                                                       | Qué haría falta para verificarlo                                                                                                                                                                                 |
+| --- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Si el salón tiene efectivamente contrato de socio con Treatwell y qué versión aceptó**                              | Todo el candado contractual (§2.2) depende de esto. Si no hay contrato, aplican solo los candados de PI y RGPD (que ya bastan para bloquear, pero el análisis cambia) | Preguntar al cliente/dueña; localizar el contrato firmado y su fecha; comparar con la versión de abril 2024                                                                                                      |
+| 2   | **Fecha de última actualización de la Política de CGU (ES)**                                                          | Las cláusulas citadas podrían haber cambiado                                                                                                                          | Revisar el pie del documento en treatwell.es; guardar copia sellada con fecha                                                                                                                                    |
+| 3   | **Discrepancia de denominación social:** «Treatwell Spain s.l.» vs «Treatwell S.L.» vs «Treatwell Spain s.l.u.»       | Determinar la entidad correcta si hay que dirigir un requerimiento o solicitud formal                                                                                 | Consulta al Registro Mercantil por CIF B-87237293; o vía https://www.treatwell.es/info/consultas-legales/                                                                                                        |
+| 4   | **Si existe alguna API/widget/badge oficial de reseñas de Treatwell no documentado públicamente**                     | Si existiera, sería la vía legítima y cambiaría la recomendación                                                                                                      | Preguntar por escrito al gestor de cuenta de Treatwell o a https://www.treatwell.es/info/consultas-legales/. Conservar la respuesta                                                                              |
+| 5   | **Si Treatwell concedería una sublicencia escrita para republicar reseñas**                                           | La cláusula 2.1 CGU incluye «derecho absoluto de sublicencia» → es jurídicamente posible                                                                              | Solicitud formal por escrito a Treatwell. `[INFERENCIA]`: improbable que la concedan, va contra su modelo, pero el coste de preguntar es cero                                                                    |
+| 6   | **Si enlazar desde nuestra web al perfil público de Treatwell está permitido**                                        | Es la alternativa de mínimo riesgo que propongo en §5                                                                                                                 | Releer T&C del sitio en busca de cláusula de enlaces/framing; consultar a Treatwell. `[INFERENCIA]`: el enlace de texto simple no reproduce obra y es práctica estándar, pero **no lo he verificado en los T&C** |
+| 7   | **Texto del derecho _sui generis_ de base de datos (arts. 133 y ss. TRLPI)**                                          | Afectaría a extraer conjuntos de datos (notas, número de reseñas) aunque no sean obra                                                                                 | Leer el texto consolidado en BOE-A-1996-8930                                                                                                                                                                     |
+| 8   | **Si la política de privacidad de Treatwell impone obligaciones al salón como corresponsable sobre datos de reseñas** | Podría añadir obligaciones nuestras                                                                                                                                   | Lectura completa del DPA de socios de Treatwell (mencionado en la política de privacidad)                                                                                                                        |
+| 9   | **Contenido íntegro de las «Directrices de reseñas» / Review Guidelines en versión española**                         | Solo he verificado la versión británica (https://www.treatwell.co.uk/info/community-guidelines/)                                                                      | Localizar equivalente en treatwell.es                                                                                                                                                                            |
+| 10  | **Validación por abogado español colegiado**                                                                          | Este informe es investigación documental, no dictamen                                                                                                                 | Revisión por abogado de PI/protección de datos antes de publicar la web                                                                                                                                          |
+| 11  | **Cifras concretas del salón** (nº de reseñas, nota media en Treatwell)                                               | No las he consultado ni las necesito — no vamos a usarlas                                                                                                             | N/A — deliberadamente fuera de alcance                                                                                                                                                                           |
 
 ---
 
@@ -273,18 +274,18 @@ Fuente: https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:02005L002
 
 ### 4.1 Qué PROHÍBE (reglas duras — bloqueantes)
 
-| ❌ Prohibido | Fundamento |
-|---|---|
-| Copiar/pegar texto de reseñas de Treatwell en la web | Contrato socio 4.2 + 9.1; art. 17 TRLPI |
-| Publicar el nombre del reseñador de Treatwell | RGPD art. 6 (sin base jurídica) |
-| Scraping o automatización de extracción de treatwell.es | T&C del sitio, punto de «screen scraping» |
-| Usar scrapers de terceros (Apify u otros) sobre Treatwell | Ídem — «utilizar o instar a otros a utilizar» |
-| Capturas de pantalla de reseñas de Treatwell | Reproducción de obra (art. 17 TRLPI) + marca + RGPD |
-| Mostrar la nota media / nº de reseñas de Treatwell | Contrato socio 9.1; política de Google (§6) |
-| Marcar con `aggregateRating`/`Review` de schema.org | Política de Google — inelegible y prohibido agregar de otras webs |
-| Publicar testimonios inventados o de ejemplo | Art. 27.8 LCD — práctica desleal en cualquier circunstancia |
-| Presentar una selección curada de positivos como "opinión de nuestros clientes" | Art. 27.8 LCD — «distorsionar reseñas» |
-| Escribir a clientes de Treatwell sin consentimiento expreso para pedir testimonio | Contrato socio — comunicaciones solo con consentimiento expreso |
+| ❌ Prohibido                                                                      | Fundamento                                                        |
+| --------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Copiar/pegar texto de reseñas de Treatwell en la web                              | Contrato socio 4.2 + 9.1; art. 17 TRLPI                           |
+| Publicar el nombre del reseñador de Treatwell                                     | RGPD art. 6 (sin base jurídica)                                   |
+| Scraping o automatización de extracción de treatwell.es                           | T&C del sitio, punto de «screen scraping»                         |
+| Usar scrapers de terceros (Apify u otros) sobre Treatwell                         | Ídem — «utilizar o instar a otros a utilizar»                     |
+| Capturas de pantalla de reseñas de Treatwell                                      | Reproducción de obra (art. 17 TRLPI) + marca + RGPD               |
+| Mostrar la nota media / nº de reseñas de Treatwell                                | Contrato socio 9.1; política de Google (§6)                       |
+| Marcar con `aggregateRating`/`Review` de schema.org                               | Política de Google — inelegible y prohibido agregar de otras webs |
+| Publicar testimonios inventados o de ejemplo                                      | Art. 27.8 LCD — práctica desleal en cualquier circunstancia       |
+| Presentar una selección curada de positivos como "opinión de nuestros clientes"   | Art. 27.8 LCD — «distorsionar reseñas»                            |
+| Escribir a clientes de Treatwell sin consentimiento expreso para pedir testimonio | Contrato socio — comunicaciones solo con consentimiento expreso   |
 
 ### 4.2 Qué EXIGE (si implementamos testimonios propios)
 
@@ -298,15 +299,15 @@ Fuente: https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:02005L002
 
 ### 4.3 Features que implica
 
-| Feature | Descripción | Prioridad |
-|---|---|---|
-| `testimonios-propios` | Modelo de datos de testimonio: `id`, `nombre_mostrado`, `texto`, `servicio`, `fecha_servicio`, `fecha_consentimiento`, `prueba_consentimiento`, `publicado`, `fecha_retirada` | Alta |
-| `consentimiento-testimonio` | Flujo de captación con texto de consentimiento explícito, informado, granular y revocable. **Captación presencial en salón o canal propio** — nunca sobre la base de Treatwell | Alta |
-| `retirada-testimonio` | Despublicación inmediata a petición del cliente (art. 17 RGPD). Idealmente sin redeploy | Alta |
-| `guard-testimonios-fixture` | **Puerta de build**: el build de producción falla si hay testimonios de ejemplo/fixture en el array publicado. Previene el riesgo del art. 27.8 LCD | Alta |
-| `aviso-autenticidad-resenas` | Bloque visible que declara el origen y la verificación de los testimonios (art. 7.6 Directiva) | Media |
-| `enlace-perfil-treatwell` | Enlace de texto simple al perfil público, sin copiar contenido. **Sujeto a verificar hueco #6** | Baja |
-| `politica-privacidad` | Debe cubrir la finalidad «publicación de testimonios» | Alta (ya necesaria por otros motivos) |
+| Feature                      | Descripción                                                                                                                                                                    | Prioridad                             |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------- |
+| `testimonios-propios`        | Modelo de datos de testimonio: `id`, `nombre_mostrado`, `texto`, `servicio`, `fecha_servicio`, `fecha_consentimiento`, `prueba_consentimiento`, `publicado`, `fecha_retirada`  | Alta                                  |
+| `consentimiento-testimonio`  | Flujo de captación con texto de consentimiento explícito, informado, granular y revocable. **Captación presencial en salón o canal propio** — nunca sobre la base de Treatwell | Alta                                  |
+| `retirada-testimonio`        | Despublicación inmediata a petición del cliente (art. 17 RGPD). Idealmente sin redeploy                                                                                        | Alta                                  |
+| `guard-testimonios-fixture`  | **Puerta de build**: el build de producción falla si hay testimonios de ejemplo/fixture en el array publicado. Previene el riesgo del art. 27.8 LCD                            | Alta                                  |
+| `aviso-autenticidad-resenas` | Bloque visible que declara el origen y la verificación de los testimonios (art. 7.6 Directiva)                                                                                 | Media                                 |
+| `enlace-perfil-treatwell`    | Enlace de texto simple al perfil público, sin copiar contenido. **Sujeto a verificar hueco #6**                                                                                | Baja                                  |
+| `politica-privacidad`        | Debe cubrir la finalidad «publicación de testimonios»                                                                                                                          | Alta (ya necesaria por otros motivos) |
 
 ### 4.4 Decisión sobre schema.org — importante y contraintuitiva `[VERIFICADO]`
 
@@ -330,14 +331,14 @@ Fuente: https://developers.google.com/search/docs/appearance/structured-data/rev
 
 ## 5. Alternativas legítimas, ordenadas por riesgo
 
-| Opción | Riesgo | Valoración |
-|---|---|---|
-| **A. Testimonios propios con consentimiento** | Bajo | ✅ **Recomendada.** Contenido nuestro, control total, sin dependencia de Treatwell. La licencia del cliente a Treatwell es **no exclusiva** → el cliente conserva derechos y puede autorizarnos por separado `[INFERENCIA]` |
-| **B. Enlace de texto al perfil de Treatwell** | Bajo-medio | ✅ Complementaria. No reproduce contenido. **Sujeta al hueco #6** |
-| **C. Pedir sublicencia escrita a Treatwell** | Bajo (si la conceden) | 🟡 Coste cero preguntar. `[INFERENCIA]`: improbable que la concedan |
-| **D. Potenciar Google Business Profile** | Bajo | ✅ Vía correcta para estrellas en buscador. Requiere informe propio |
-| **E. Republicar reseñas de Treatwell** | **Alto** | ❌ **Descartada.** Incumplimiento contractual + PI + RGPD |
-| **F. Scraping** | **Muy alto** | ❌ **Descartada.** Prohibición expresa en T&C |
+| Opción                                        | Riesgo                | Valoración                                                                                                                                                                                                                  |
+| --------------------------------------------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **A. Testimonios propios con consentimiento** | Bajo                  | ✅ **Recomendada.** Contenido nuestro, control total, sin dependencia de Treatwell. La licencia del cliente a Treatwell es **no exclusiva** → el cliente conserva derechos y puede autorizarnos por separado `[INFERENCIA]` |
+| **B. Enlace de texto al perfil de Treatwell** | Bajo-medio            | ✅ Complementaria. No reproduce contenido. **Sujeta al hueco #6**                                                                                                                                                           |
+| **C. Pedir sublicencia escrita a Treatwell**  | Bajo (si la conceden) | 🟡 Coste cero preguntar. `[INFERENCIA]`: improbable que la concedan                                                                                                                                                         |
+| **D. Potenciar Google Business Profile**      | Bajo                  | ✅ Vía correcta para estrellas en buscador. Requiere informe propio                                                                                                                                                         |
+| **E. Republicar reseñas de Treatwell**        | **Alto**              | ❌ **Descartada.** Incumplimiento contractual + PI + RGPD                                                                                                                                                                   |
+| **F. Scraping**                               | **Muy alto**          | ❌ **Descartada.** Prohibición expresa en T&C                                                                                                                                                                               |
 
 **Nota sobre la opción A y el candado del §2.6:** la captación de testimonios debe hacerse **en el salón** (presencialmente, QR en mostrador, o sobre clientes propios que no vinieron por Treatwell). **No** enviando comunicaciones a la base de clientes de Treatwell sin consentimiento expreso de marketing. Este matiz es fácil de pasar por alto y es la trampa más probable de este diseño. `[INFERENCIA]`
 
@@ -346,6 +347,7 @@ Fuente: https://developers.google.com/search/docs/appearance/structured-data/rev
 ## 6. Fuentes consultadas
 
 **Treatwell (oficiales):**
+
 - https://www.treatwell.es/info/terminos-y-condiciones/ — T&C del sitio (abril 2024)
 - https://www.treatwell.es/info/politica-contenido-generado-usuario/ — Política de CGU (ES)
 - https://www.treatwell.es/info/terminos-y-condiciones-para-profesionales/ — Términos Comerciales Socio (abril 2024)
@@ -355,15 +357,18 @@ Fuente: https://developers.google.com/search/docs/appearance/structured-data/rev
 - https://www.treatwell.es/info/consultas-legales/ — Canal de consultas legales (no consultado aún)
 
 **Normativa (oficiales):**
+
 - https://www.boe.es/buscar/act.php?id=BOE-A-1996-8930 — TRLPI (RDLeg 1/1996) — arts. 5, 10, 17, 32.1
 - https://www.boe.es/buscar/act.php?id=BOE-A-1991-628 — Ley 3/1991 Competencia Desleal — art. 27.7 y 27.8
 - https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=CELEX:02005L0029-20220528 — Directiva 2005/29/CE consolidada — Anexo I 23 ter/quater, art. 7.6
 - https://boe.es/buscar/act.php?id=BOE-A-2021-17910 — RDL 24/2021 (transposición Omnibus)
 
 **Plataforma:**
+
 - https://developers.google.com/search/docs/appearance/structured-data/review-snippet — Política de review snippets
 
 **Terceros (contexto, no normativos):**
+
 - https://help.salonized.com/en/articles/6287754-what-is-the-treatwell-integration — integración Treatwell/Salonized (no disponible en España)
 
 ---

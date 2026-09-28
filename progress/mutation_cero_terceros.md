@@ -19,10 +19,10 @@ contrato**, no con excusas.
 > miente al revés» (§77). **Un 100 % NO se reporta hasta que estas dos columnas están sanas** — mi
 > propia tanda #1 dio «100 %, 0 survived» **y era FALSA**.
 
-| Tanda de cierre | Concurrencia | `# timeout` | tests/mutante | dry run | `# errors` | `# no cov` | ¿Vale? |
-| --------------- | ------------ | ----------- | ------------- | ------- | ---------- | ---------- | ------ |
-| `terceros.ts` | `--concurrency 1` | **0** ✅ | **10,02** ✅ | **126** | 0 | 0 | ✅ **sí** |
-| `puerta-terceros.ts` | `--concurrency 1 --timeoutMS 60000` | **0** ✅ | **7,34** ✅ | **44** | 0 | 0 | ✅ **sí** |
+| Tanda de cierre      | Concurrencia                        | `# timeout` | tests/mutante | dry run | `# errors` | `# no cov` | ¿Vale?    |
+| -------------------- | ----------------------------------- | ----------- | ------------- | ------- | ---------- | ---------- | --------- |
+| `terceros.ts`        | `--concurrency 1`                   | **0** ✅    | **10,02** ✅  | **126** | 0          | 0          | ✅ **sí** |
+| `puerta-terceros.ts` | `--concurrency 1 --timeoutMS 60000` | **0** ✅    | **7,34** ✅   | **44**  | 0          | 0          | ✅ **sí** |
 
 **Las tres columnas de salud, contra sus precedentes medidos:**
 
@@ -30,17 +30,17 @@ contrato**, no con excusas.
    es **imposible por construcción** y sería ruido de contención contado como MUERTO. La tanda #1
    traía **152/183** y tapaba 9 supervivientes reales. **Aquí no hay ni uno.**
 2. **tests/mutante 10,02 y 7,34** — clavados en los de la tanda honesta (**10,85** y **7,24**) y
-   lejísimos del envenenado (**1,59**; el de F-04, **1,35**). *El leve descenso 10,85 → 10,02 es
+   lejísimos del envenenado (**1,59**; el de F-04, **1,35**). _El leve descenso 10,85 → 10,02 es
    coherente y esperado: con `perTest` + bail, un mutante **muerto** corta al primer rojo y ejecuta
    MENOS tests que uno que sobrevive. Convertir 9 supervivientes en muertos **baja** la media. Sube
-   el score y baja el promedio: las dos cosas apuntan al mismo sitio.*
+   el score y baja el promedio: las dos cosas apuntan al mismo sitio._
 3. 🔴 **El dry run CORROBORA al `tdd_craftsman` sin creerle nada.** Es la comprobación de «cuántos
    tests corrieron **de verdad**» que exige la regla nº 6:
 
-| Fichero mutado | Dry run ANTES | Dry run AHORA | Cuadra con |
-| -------------- | ------------- | ------------- | ---------- |
-| `src/lib/terceros.ts` | 118 (75+43) | **126** | `terceros.test.ts` (**82**) + `puerta-terceros.test.ts` (**44**) ✓ |
-| `src/lib/puerta-terceros.ts` | 43 | **44** | `puerta-terceros.test.ts` (**44**) ✓ — `terceros.test.ts` NO lo importa |
+| Fichero mutado               | Dry run ANTES | Dry run AHORA | Cuadra con                                                              |
+| ---------------------------- | ------------- | ------------- | ----------------------------------------------------------------------- |
+| `src/lib/terceros.ts`        | 118 (75+43)   | **126**       | `terceros.test.ts` (**82**) + `puerta-terceros.test.ts` (**44**) ✓      |
+| `src/lib/puerta-terceros.ts` | 43            | **44**        | `puerta-terceros.test.ts` (**44**) ✓ — `terceros.test.ts` NO lo importa |
 
 **118 + 8 tests nuevos = 126**, y **43 + 1 (`@s43`) = 44**. Cuadra **a la unidad** con los «576 tests
 (568 → +8)» del `tdd_craftsman`, **medido por Stryker, no contado por él**. Los tests nuevos existen
@@ -60,11 +60,11 @@ pnpm exec stryker run --mutate src/lib/puerta-terceros.ts --concurrency 1 --time
 
 ## 2. Informe por fichero — el score, ya con derecho a leerse
 
-| Fichero | `# timeout` | tests/mutante | Total | Killed | **Survived** | Score |
-| ------- | ----------- | ------------- | ----- | ------ | ------------ | ----- |
-| `src/lib/terceros.ts` | **0** | 10,02 | **183** | **183** | **0** | **100,00 %** |
-| `src/lib/puerta-terceros.ts` | **0** | 7,34 | **110** | **110** | **0** | **100,00 %** |
-| **Feature** | **0** | — | **293** | **293** | **0** | **100,00 %** |
+| Fichero                      | `# timeout` | tests/mutante | Total   | Killed  | **Survived** | Score        |
+| ---------------------------- | ----------- | ------------- | ------- | ------- | ------------ | ------------ |
+| `src/lib/terceros.ts`        | **0**       | 10,02         | **183** | **183** | **0**        | **100,00 %** |
+| `src/lib/puerta-terceros.ts` | **0**       | 7,34          | **110** | **110** | **0**        | **100,00 %** |
+| **Feature**                  | **0**       | —             | **293** | **293** | **0**        | **100,00 %** |
 
 **Los totales de mutantes NO se han movido** (183 y 110, idénticos a la tanda de la escalada): la
 ronda 2 **no añadió ni quitó producción**, solo tests. Es la firma de «0 líneas de producción
@@ -77,18 +77,18 @@ tocadas», **medida**, no declarada. Stryker sale con **código 0** en las dos y
 **Los 10 mutantes que escalé están MUERTOS**, los 3 verificados abajo **por sabotaje manual propio**
 y los 10 por Stryker (0 survived sobre el mismo total de 183/110).
 
-| # | Mutante | Estado | Test que lo mata |
-| - | ------- | ------ | ---------------- |
-| 1 | `terceros.ts:257` `ConditionalExpression` `(rel && href)` → `true` | ✅ **MUERTO** | @s41 filas 1 y 2 |
-| 2 | `terceros.ts:257` `ConditionalExpression` `rel !== undefined` → `true` | ✅ **MUERTO** | @s41 fila 1 |
-| 3 | `terceros.ts:257` `LogicalOperator` `(rel \|\| href) && …` | ✅ **MUERTO** 🔬 | @s41 filas 1 y 2 (**2 rojos, verificado**) |
-| 4 | `terceros.ts:258` `ConditionalExpression` `href !== undefined` → `true` | ✅ **MUERTO** | @s41 fila 2 (`<base>` al tercero) |
-| 5 | `terceros.ts:240` `ConditionalExpression` `if (href !== undefined)` → `if (true)` | ✅ **MUERTO** | @s42 |
-| 6 | `terceros.ts:241` `OptionalChaining` `URL.parse(…)?.href` | ✅ **MUERTO** | @s9 fila 4 |
-| 7 | `terceros.ts:278` `ConditionalExpression` `nombre === ATRIBUTO_SRCSET ? …` → `true ? …` | ✅ **MUERTO** | @s1 fila `a b.png` |
-| 8 | `terceros.ts:299` `ConditionalExpression` `url === null \|\| …` → `false \|\| …` | ✅ **MUERTO** | @s41 fila 3 |
-| 9 | `terceros.ts:58` `Regex` de `\s*=\s*` a `\S*=\s*` | ✅ **MUERTO** 🔬 | @s1 fila `src = "…"` (**1 rojo, verificado**) |
-| 10 | `puerta-terceros.ts:159` `ConditionalExpression` `if (tipo === TIPO_CSS)` → `if (true)` | ✅ **MUERTO** 🔬 | @s43 (**1 rojo, verificado**) |
+| #   | Mutante                                                                                 | Estado           | Test que lo mata                              |
+| --- | --------------------------------------------------------------------------------------- | ---------------- | --------------------------------------------- |
+| 1   | `terceros.ts:257` `ConditionalExpression` `(rel && href)` → `true`                      | ✅ **MUERTO**    | @s41 filas 1 y 2                              |
+| 2   | `terceros.ts:257` `ConditionalExpression` `rel !== undefined` → `true`                  | ✅ **MUERTO**    | @s41 fila 1                                   |
+| 3   | `terceros.ts:257` `LogicalOperator` `(rel \|\| href) && …`                              | ✅ **MUERTO** 🔬 | @s41 filas 1 y 2 (**2 rojos, verificado**)    |
+| 4   | `terceros.ts:258` `ConditionalExpression` `href !== undefined` → `true`                 | ✅ **MUERTO**    | @s41 fila 2 (`<base>` al tercero)             |
+| 5   | `terceros.ts:240` `ConditionalExpression` `if (href !== undefined)` → `if (true)`       | ✅ **MUERTO**    | @s42                                          |
+| 6   | `terceros.ts:241` `OptionalChaining` `URL.parse(…)?.href`                               | ✅ **MUERTO**    | @s9 fila 4                                    |
+| 7   | `terceros.ts:278` `ConditionalExpression` `nombre === ATRIBUTO_SRCSET ? …` → `true ? …` | ✅ **MUERTO**    | @s1 fila `a b.png`                            |
+| 8   | `terceros.ts:299` `ConditionalExpression` `url === null \|\| …` → `false \|\| …`        | ✅ **MUERTO**    | @s41 fila 3                                   |
+| 9   | `terceros.ts:58` `Regex` de `\s*=\s*` a `\S*=\s*`                                       | ✅ **MUERTO** 🔬 | @s1 fila `src = "…"` (**1 rojo, verificado**) |
+| 10  | `puerta-terceros.ts:159` `ConditionalExpression` `if (tipo === TIPO_CSS)` → `if (true)` | ✅ **MUERTO** 🔬 | @s43 (**1 rojo, verificado**)                 |
 
 🔬 = **re-verificado a mano por este agente en la tanda de cierre** (no heredado del `tdd_craftsman`).
 
@@ -100,11 +100,11 @@ Se eligieron los 3 mutantes donde el método ya mordió: el de la **precedencia*
 invertidas** y el de la **puerta**. Mutante aplicado al fichero real → suite → **fichero restaurado
 siempre** (`finally`) → `git status` limpio.
 
-| Sabotaje | `ejecutados` | Rojos | Veredicto |
-| -------- | ------------ | ----- | --------- |
-| #9 `:58` `Regex` (construido con `String.fromCharCode(92)`, **sin barras en heredoc**) | **82** | **1** | ✅ **MUERTO** |
-| #10 `puerta:159` `if (true)` | **44** | **1** | ✅ **MUERTO** |
-| #3 `:257` `LogicalOperator` **PARENTIZADO** | **82** | **2** | ✅ **MUERTO** |
+| Sabotaje                                                                               | `ejecutados` | Rojos | Veredicto     |
+| -------------------------------------------------------------------------------------- | ------------ | ----- | ------------- |
+| #9 `:58` `Regex` (construido con `String.fromCharCode(92)`, **sin barras en heredoc**) | **82**       | **1** | ✅ **MUERTO** |
+| #10 `puerta:159` `if (true)`                                                           | **44**       | **1** | ✅ **MUERTO** |
+| #3 `:257` `LogicalOperator` **PARENTIZADO**                                            | **82**       | **2** | ✅ **MUERTO** |
 
 **Los tres rojos son EL TEST QUE SE DISEÑÓ PARA CADA UNO**, no daño colateral. El #3 lo dice con
 nombre y apellidos:
@@ -148,13 +148,14 @@ ROJO: @s41 <base href="https://cdn.tercero.com/"><link rel="stylesheet"> … (LA
    leen ANTES.** Sin esa regla, F-05 habría cerrado con 10 agujeros y nadie se habría enterado.
 2. **La mutación encontró CONTRATO DE MENOS, no código de más.** Los 10 supervivientes eran **guardas
    defensivas correctas que ningún escenario ejercitaba**. El humano amplió el contrato (+3
-   escenarios) y **la producción se quedó tal cual**. *La prueba de mutación no solo valida tests:
-   **encuentra huecos en la especificación**.*
+   escenarios) y **la producción se quedó tal cual**. _La prueba de mutación no solo valida tests:
+   **encuentra huecos en la especificación**._
 3. **El `:58` es el que más enseña**: un **comentario que prometía** («el espaciado alrededor del `=`
    es OPCIONAL… el extractor lo tolera») **sin ninguna puerta que lo sostuviera**. Hoy `@s1` lo fija
    y el mutante muere. **Una promesa en un comentario no es un contrato hasta que un test la muerde.**
 
 ---
+
 ---
 
 # HISTÓRICO — la tanda de la ESCALADA (2026-07-17, superada por la de cierre)
@@ -179,11 +180,11 @@ A-23 (humano, 2026-07-17) eligió la opción **SIN supervivientes preaprobados**
 
 ### 🔴 La primera tanda de `terceros.ts` dio «100 %, 0 supervivientes» Y ERA FALSO
 
-| Tanda | Concurrencia | `# timeout` | tests/mutante | Score | ¿Vale? |
-| ----- | ------------ | ----------- | ------------- | ----- | ------ |
-| `terceros.ts` #1 | por defecto (harness) | **152 / 183** | **1,59** | **100,00 %** ❌ | **NO — DESCARTADA** |
-| `terceros.ts` #2 | `--concurrency 1` | **0** | **10,85** | **95,08 %** | ✅ sí |
-| `puerta-terceros.ts` #1 | `--concurrency 1 --timeoutMS 60000` | **0** | **7,24** | **99,09 %** | ✅ sí |
+| Tanda                   | Concurrencia                        | `# timeout`   | tests/mutante | Score           | ¿Vale?              |
+| ----------------------- | ----------------------------------- | ------------- | ------------- | --------------- | ------------------- |
+| `terceros.ts` #1        | por defecto (harness)               | **152 / 183** | **1,59**      | **100,00 %** ❌ | **NO — DESCARTADA** |
+| `terceros.ts` #2        | `--concurrency 1`                   | **0**         | **10,85**     | **95,08 %**     | ✅ sí               |
+| `puerta-terceros.ts` #1 | `--concurrency 1 --timeoutMS 60000` | **0**         | **7,24**      | **99,09 %**     | ✅ sí               |
 
 **El calco exacto de F-01 y F-03**: `terceros.ts` es **código puro, sin un solo bucle que pueda
 colgarse** → 152 timeouts son **imposibles por construcción**; son ruido de contención, y cada uno
@@ -196,10 +197,10 @@ se aplicó. Reproducido lo de F-03 al pie de la letra: **timeouts 152 → 0 ⇒ 
 El dry run de `terceros.ts` corre **118 tests**, no los 568 de la suite. **No es la mentira de §77.**
 Stryker acota a los **tests relacionados por el grafo de dependencias** con el fichero mutado [V]:
 
-| Fichero mutado | Dry run | Cuadra con |
-| -------------- | ------- | ---------- |
-| `src/lib/terceros.ts` | **118** | `terceros.test.ts` (75) + `puerta-terceros.test.ts` (43) = **118** ✓ |
-| `src/lib/puerta-terceros.ts` | **43** | `puerta-terceros.test.ts` (**43**) ✓ — `terceros.test.ts` NO lo importa |
+| Fichero mutado               | Dry run | Cuadra con                                                              |
+| ---------------------------- | ------- | ----------------------------------------------------------------------- |
+| `src/lib/terceros.ts`        | **118** | `terceros.test.ts` (75) + `puerta-terceros.test.ts` (43) = **118** ✓    |
+| `src/lib/puerta-terceros.ts` | **43**  | `puerta-terceros.test.ts` (**43**) ✓ — `terceros.test.ts` NO lo importa |
 
 Las dos cuentan **exactas**, y la segunda tanda **confirma la explicación de forma independiente**.
 `tests/mutante` **10,85** y **7,24** están en el rango sano del precedente F-04 (`seo.ts` **10,04**,
@@ -217,11 +218,11 @@ pnpm exec stryker run --mutate src/lib/puerta-terceros.ts --concurrency 1 --time
 
 ## 2. Informe por fichero
 
-| Fichero | `# timeout` | tests/mutante | Total | Killed | **Survived** | Score |
-| ------- | ----------- | ------------- | ----- | ------ | ------------ | ----- |
-| `src/lib/terceros.ts` | **0** | 10,85 | 183 | 174 | **9** | **95,08 %** |
-| `src/lib/puerta-terceros.ts` | **0** | 7,24 | 110 | 109 | **1** | **99,09 %** |
-| **Feature** | **0** | — | **293** | **283** | **10** | **96,59 %** |
+| Fichero                      | `# timeout` | tests/mutante | Total   | Killed  | **Survived** | Score       |
+| ---------------------------- | ----------- | ------------- | ------- | ------- | ------------ | ----------- |
+| `src/lib/terceros.ts`        | **0**       | 10,85         | 183     | 174     | **9**        | **95,08 %** |
+| `src/lib/puerta-terceros.ts` | **0**       | 7,24          | 110     | 109     | **1**        | **99,09 %** |
+| **Feature**                  | **0**       | —             | **293** | **283** | **10**       | **96,59 %** |
 
 Ambos por debajo de **100 %**. Stryker sale con código 1 en las dos tandas honestas.
 
@@ -242,10 +243,10 @@ Cada mutante aplicado a mano al fichero, `pnpm test` completo (**568 tests**), f
    `rel !== undefined || href !== undefined &&…`, pero el mutante real es
    **`(rel !== undefined || href !== undefined) && …`**. Copiar el diff **literal** da otro mutante,
    más fuerte: sin paréntesis `&&` liga más que `||`, y ese sí **mata 5 tests**. Reproducido con
-   paréntesis: **SOBREVIVE**. *Un sabotaje mal parentizado habría «desmentido» un superviviente real.*
+   paréntesis: **SOBREVIVE**. _Un sabotaje mal parentizado habría «desmentido» un superviviente real._
 2. **El heredoc se come las barras invertidas**: el primer intento de sabotear el regex buscaba
    `s*` en vez de `\s*` → «patrón no encontrado». Se rehízo sin barras literales
-   (`String.fromCharCode(92)`). *Un «NO_APLICA» no es un «no sobrevive».*
+   (`String.fromCharCode(92)`). _Un «NO_APLICA» no es un «no sobrevive»._
 
 ---
 
@@ -266,7 +267,7 @@ Cada mutante aplicado a mano al fichero, `pnpm test` completo (**568 tests**), f
 2. **`<base href="https://cdn.tercero.com/">` + `<link rel="stylesheet">` SIN `href`** → debe dar
    **0 orígenes**. Con el mutante se hace `yield undefined`, que resuelve contra la base del tercero
    → **`https://cdn.tercero.com/undefined`: un FALSO POSITIVO inventado**. Mata `href!==undefined → true`.
-   *Con la base propia NO se distingue* (ambos caen del lado propio): **la fila tiene que llevar
+   _Con la base propia NO se distingue_ (ambos caen del lado propio): **la fila tiene que llevar
    `<base>` a un tercero.**
 
 ### Grupo B — `baseDelDocumento` (2 mutantes)
@@ -276,7 +277,7 @@ Cada mutante aplicado a mano al fichero, `pnpm test` completo (**568 tests**), f
   y una URL relativa → debe detectar **1 origen** (el primer `<base href>` válido gana, §4.6.5).
   Con el mutante, el `<base>` sin href devuelve `…/undefined` **y corta el bucle**: el `<base>` del
   tercero **no se consulta jamás** y la petición al tercero **se vuelve invisible**.
-  *Un `<base>` sin href a secas NO lo mata: `…/undefined` y `…/` son ambos host propio.*
+  _Un `<base>` sin href a secas NO lo mata: `…/undefined` y `…/` son ambos host propio._
 - **`terceros.ts:241:16`** `OptionalChaining` — `URL.parse(href, RAIZ_PROPIA)?.href` → `.href`
   **Falta:** **`<base href="http://[">`** (URL **inválida**, `URL.parse` → `null`) → debe caer con
   gracia en `RAIZ_PROPIA` y **no lanzar**. Con el mutante: `null.href` → **TypeError**.
@@ -334,14 +335,14 @@ Cada mutante aplicado a mano al fichero, `pnpm test` completo (**568 tests**), f
 
 ## 7. Qué pedirle al `tdd_craftsman` (6 tests rojos matan los 10)
 
-| # | Test que falta | Mata |
-| - | -------------- | ---- |
-| 1 | `<link href="…">` **sin `rel`** → 0 orígenes, sin lanzar | 3 de `:257` |
-| 2 | `<base href>` a tercero + `<link rel="stylesheet">` **sin `href`** → 0 orígenes | `:258` |
-| 3 | `<base>` sin href **seguido de** `<base href>` a tercero → 1 origen | `:240` |
-| 4 | URL **inválida** (`http://[`) en `<base href>` **y** en `<img src>` → sin lanzar | `:241`, `:299` |
-| 5 | `<img src = "…">` con **espacios en el `=`**, y `<img src>` con **espacio en la URL** | `:58`, `:278` |
-| 6 | recurso `html` con `@font-face` inline → **no** cuenta como par | `puerta:159` |
+| #   | Test que falta                                                                        | Mata           |
+| --- | ------------------------------------------------------------------------------------- | -------------- |
+| 1   | `<link href="…">` **sin `rel`** → 0 orígenes, sin lanzar                              | 3 de `:257`    |
+| 2   | `<base href>` a tercero + `<link rel="stylesheet">` **sin `href`** → 0 orígenes       | `:258`         |
+| 3   | `<base>` sin href **seguido de** `<base href>` a tercero → 1 origen                   | `:240`         |
+| 4   | URL **inválida** (`http://[`) en `<base href>` **y** en `<img src>` → sin lanzar      | `:241`, `:299` |
+| 5   | `<img src = "…">` con **espacios en el `=`**, y `<img src>` con **espacio en la URL** | `:58`, `:278`  |
+| 6   | recurso `html` con `@font-face` inline → **no** cuenta como par                       | `puerta:159`   |
 
 **Patrón de los 10, y merece leerse junto:** salvo el `:58`, **todos son guardas defensivas contra
 entradas que NINGÚN escenario mete** (`rel`/`href` ausentes, URL que no parsea, `@font-face` en un

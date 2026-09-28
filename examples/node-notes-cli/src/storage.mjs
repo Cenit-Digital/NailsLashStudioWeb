@@ -1,18 +1,18 @@
 // Persistencia atómica de notas en un archivo JSON. Cero dependencias.
-import { existsSync, readFileSync, writeFileSync, renameSync, unlinkSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
-import { randomUUID } from 'node:crypto';
+import { existsSync, readFileSync, writeFileSync, renameSync, unlinkSync } from 'node:fs'
+import { dirname, join, resolve } from 'node:path'
+import { randomUUID } from 'node:crypto'
 
-let defaultPath = '.notes.json';
+let defaultPath = '.notes.json'
 
 /** Ruta por defecto del almacén (mutable, para poder aislar en tests). */
 export function getDefaultPath() {
-  return defaultPath;
+  return defaultPath
 }
 
 /** Cambia la ruta por defecto (los tests la apuntan a un directorio temporal). */
 export function setDefaultPath(path) {
-  defaultPath = path;
+  defaultPath = path
 }
 
 /**
@@ -22,9 +22,9 @@ export function setDefaultPath(path) {
  */
 export function load(path = defaultPath) {
   if (!existsSync(path)) {
-    return [];
+    return []
   }
-  return JSON.parse(readFileSync(path, 'utf8'));
+  return JSON.parse(readFileSync(path, 'utf8'))
 }
 
 /**
@@ -34,15 +34,15 @@ export function load(path = defaultPath) {
  * @param {string} [path]
  */
 export function save(notes, path = defaultPath) {
-  const directory = dirname(resolve(path));
-  const tmp = join(directory, `.notes_${randomUUID()}.tmp`);
+  const directory = dirname(resolve(path))
+  const tmp = join(directory, `.notes_${randomUUID()}.tmp`)
   try {
-    writeFileSync(tmp, JSON.stringify(notes, null, 2), 'utf8');
-    renameSync(tmp, path);
+    writeFileSync(tmp, JSON.stringify(notes, null, 2), 'utf8')
+    renameSync(tmp, path)
   } catch (err) {
     if (existsSync(tmp)) {
-      unlinkSync(tmp);
+      unlinkSync(tmp)
     }
-    throw err;
+    throw err
   }
 }

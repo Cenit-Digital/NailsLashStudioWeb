@@ -17,7 +17,8 @@ export const FAQ_DEMO: readonly PreguntaDemo[] = [
   },
   {
     pregunta: '¿Qué horario tenéis?',
-    respuesta: 'De lunes a viernes de 10:00 a 20:00 y los sábados de 10:00 a 14:00. Domingos cerrado.',
+    respuesta:
+      'De lunes a viernes de 10:00 a 20:00 y los sábados de 10:00 a 14:00. Domingos cerrado.',
   },
   {
     pregunta: '¿Qué servicios ofrecéis?',

@@ -1,19 +1,20 @@
 # Mutación — LOTE v3+reseñas (feature 22 `galeria_carrusel` v3 + feature 14 `resenas_agregado_enlace`)
 
 **Veredicto:** ESCALADO (FAIL: 2 de 6 ficheros bajo el umbral 100 %; **5 supervivientes MATABLES**
-+ **2 equivalentes por construcción VERIFICADOS y documentados SIN excluir** — la exclusión o el
-refactor son decisión del lead)
-**Score:** detectados/puntuados, en el orden del encargo:
+
+- **2 equivalentes por construcción VERIFICADOS y documentados SIN excluir** — la exclusión o el
+  refactor son decisión del lead)
+  **Score:** detectados/puntuados, en el orden del encargo:
   - `src/components/carrusel-logica.ts` → 41/41 = **100.00 %** (exit 0)
   - `src/components/galeria-logica.ts` → 60/60 = **100.00 %** (exit 0)
   - `src/components/Galeria.tsx` → 138/139 = **99.28 %** (exit 1, 1 superviviente)
   - `src/components/Resenas.tsx` → 123/129 = **95.35 %** (exit 1, 6 supervivientes)
   - `src/components/resenas-logica.ts` → 30/30 = **100.00 %** (29 killed + 1 timeout, exit 0)
   - `src/lib/resenas-agregado.ts` → 4/4 = **100.00 %** (exit 0)
-**Comandos:** `bin/harness mutate <fichero>`, los SEIS SECUENCIALES en el orden de arriba, sin
-`--testFiles` (prohibido por stryker.config.json).
-**Runner:** StrykerJS 9.6.1 · `vitest.stryker.config.ts` · `thresholds.break = 100` ·
-`coverageAnalysis: perTest`.
+    **Comandos:** `bin/harness mutate <fichero>`, los SEIS SECUENCIALES en el orden de arriba, sin
+    `--testFiles` (prohibido por stryker.config.json).
+    **Runner:** StrykerJS 9.6.1 · `vitest.stryker.config.ts` · `thresholds.break = 100` ·
+    `coverageAnalysis: perTest`.
 
 ## Precondiciones (estado REAL al medir, 2026-07-23)
 
@@ -28,14 +29,14 @@ refactor son decisión del lead)
 
 ## Tabla (clear-text de Stryker, corrida por corrida)
 
-| # | File                | % score | instrumentados | puntuados | # killed | # timeout | # survived | # no cov | # errors | # ignored | exit |
-|---|---------------------|--------:|---------------:|----------:|---------:|----------:|-----------:|---------:|---------:|----------:|-----:|
-| 1 | carrusel-logica.ts  |  100.00 |             41 |        41 |       41 |         0 |          0 |        0 |        0 |         0 |    0 |
-| 2 | galeria-logica.ts   |  100.00 |             60 |        60 |       60 |         0 |          0 |        0 |        0 |         0 |    0 |
-| 3 | Galeria.tsx         |   99.28 |            142 |       139 |      138 |         0 |          1 |        0 |        0 |         3 |    1 |
-| 4 | Resenas.tsx         |   95.35 |            132 |       129 |      123 |         0 |          6 |        0 |        0 |         3 |    1 |
-| 5 | resenas-logica.ts   |  100.00 |             30 |        30 |       29 |         1 |          0 |        0 |        0 |         0 |    0 |
-| 6 | resenas-agregado.ts |  100.00 |              4 |         4 |        4 |         0 |          0 |        0 |        0 |         0 |    0 |
+| #   | File                | % score | instrumentados | puntuados | # killed | # timeout | # survived | # no cov | # errors | # ignored | exit |
+| --- | ------------------- | ------: | -------------: | --------: | -------: | --------: | ---------: | -------: | -------: | --------: | ---: |
+| 1   | carrusel-logica.ts  |  100.00 |             41 |        41 |       41 |         0 |          0 |        0 |        0 |         0 |    0 |
+| 2   | galeria-logica.ts   |  100.00 |             60 |        60 |       60 |         0 |          0 |        0 |        0 |         0 |    0 |
+| 3   | Galeria.tsx         |   99.28 |            142 |       139 |      138 |         0 |          1 |        0 |        0 |         3 |    1 |
+| 4   | Resenas.tsx         |   95.35 |            132 |       129 |      123 |         0 |          6 |        0 |        0 |         3 |    1 |
+| 5   | resenas-logica.ts   |  100.00 |             30 |        30 |       29 |         1 |          0 |        0 |        0 |         0 |    0 |
+| 6   | resenas-agregado.ts |  100.00 |              4 |         4 |        4 |         0 |          0 |        0 |        0 |         0 |    0 |
 
 - Dry-runs verdes: 186 tests (Galeria.tsx) · 96 (Resenas.tsx) · 244 (galeria-logica) · 107
   (resenas-logica) · 98 (resenas-agregado). 0 errores y 0 sin-cobertura en las seis corridas.
@@ -76,7 +77,7 @@ COMPLETA carácter a carácter.
 
 - **src/components/Galeria.tsx:257:9** `ConditionalExpression`
   - original: `raiz.current !== null && typeof IntersectionObserver === 'function'`
-  - mutado:   `true && typeof IntersectionObserver === 'function'`
+  - mutado: `true && typeof IntersectionObserver === 'function'`
   - OJO: el mutante sustituye SOLO el operando IZQUIERDO (el diff del clear-text lo prueba); la
     guarda del `typeof` SIGUE en pie, así que en jsdom (sin IO) ambas versiones dan `false` y nada
     revienta. La diferencia solo sería observable si el efecto corriera con `raiz.current === null`

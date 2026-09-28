@@ -9,14 +9,16 @@ Comando: `node tools/mutate.mjs src/components/BotonWhatsApp.tsx`
 Runner: Stryker 9.6.1 + `@stryker-mutator/vitest-runner`, `vitest.stryker.config.ts`.
 
 ## Nota de precondición
+
 `progress/judge_boton_whatsapp.md` está en **CHANGES_REQUESTED** (bloqueante @s4
 sin test), no en APPROVED. El protocolo pide `judge` aprobado ANTES de mutar;
 esta RONDA 1 se corre por directiva expresa del `craftsman_lead` (medir, no cerrar).
 Queda anotado: la feature NO puede cerrarse con este veredicto.
 
 ## Qué pasó (medición)
+
 - Stryker encontró el fichero e **instrumentó 3 mutantes** ("Instrumented 1
-  source file(s) with 3 mutant(s)"). Son mutantes de *string literal* del render
+  source file(s) with 3 mutant(s)"). Son mutantes de _string literal_ del render
   estático (className / id / aria-label / atributos del `<svg>`), no de lógica:
   la feature es NO-MUTABLE por declaración (@s11, `<a>` estático sin predicados).
 - El **initial test run (dry-run)** FALLÓ y Stryker abortó con
@@ -24,6 +26,7 @@ Queda anotado: la feature NO puede cerrarse con este veredicto.
   Ningún mutante llegó a correrse ⇒ no hay killed/survived ⇒ **no hay score**.
 
 ### Causa raíz (incompatibilidad arnés↔instrumentación, NO un mutante vivo)
+
 El test que rompe es de la propia suite de la feature:
 
     boton-whatsapp.test.tsx  @s11  "el .tsx no contiene «if (», ni ternario «?», ni «&&», ni «||»"
@@ -40,15 +43,18 @@ cierta sintaxis es, por construcción, incompatible con que Stryker instrumente
 ese mismo fichero.
 
 ## Mutantes (3) — disposición
-| # | Estado | Detalle |
-|---|--------|---------|
+
+| #    | Estado      | Detalle                                                                                                                           |
+| ---- | ----------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | 1..3 | NO EVALUADO | 3 mutantes de string-literal instrumentados; la corrida abortó en el dry-run antes de ejecutarlos. Killed/Survived = desconocido. |
 
 No hay mutantes SUPERVIVIENTES confirmados (ninguno se llegó a correr) y tampoco
 KILLED confirmados. No se puede certificar el 100%.
 
 ## Esto NO lo arreglo yo (mido, no edito). Para el `craftsman_lead` / `tdd_craftsman`:
+
 Dos vías legítimas (decisión del lead), documentadas para no ser trampa:
+
 1. **Excluir `src/components/BotonWhatsApp.tsx` de la lista `mutate` de
    `stryker.config.json`.** La feature está DECLARADA NO-MUTABLE (@s11: `<a>`
    estático, sin lógica; los 3 mutantes son de string y su comportamiento lo
@@ -70,6 +76,7 @@ dry-run. No se declara PASS por debajo del umbral (regla dura).
 (docs/mutation-testing.md, fichero declarado NO-MUTABLE con justificación).
 
 ### Por qué es legítimo (no es relajar la red)
+
 1. **El componente es un `<a>` ESTÁTICO sin lógica.** No hay predicados,
    ramas ni operadores que medir. `@s11` lo ENFORCE leyendo los bytes del
    `.tsx` y prohibiendo `if (` / `&&` / `||` / `?`: si alguien introdujese una
@@ -89,6 +96,7 @@ corrida no arrancaba, y el fichero no tiene lógica mutable. La red de la featur
 la sostienen los tests de comportamiento, no la mutación de un render estático.
 
 ### Contrapartida (la red mutable no se afloja)
+
 En la misma corrección se EXTRAJO la lógica pura de Equipo a
 `src/components/equipo-logica.ts` (para eliminar 4 warnings react-refresh). Ese
 módulo —que alberga `diasOfrecidos`, `franjasOfrecibles`, `franjasDe`,
@@ -97,6 +105,7 @@ commit. `Equipo.tsx` se MANTIENE en la lista. Balance: sale un render estático
 sin lógica, entra el núcleo mutable que antes vivía dentro de `Equipo.tsx`.
 
 ## Ruido colateral (no bloqueante, ajeno a la feature)
+
 Warning de `DisableTypeChecksPreprocessor` al parsear
 `.experimentos-tmp/head-mayusculas/index.html` (HTML mal formado). No afecta a la
 mutación de este fichero; es higiene del repo (candidato a `mutator.excludedMutations`/ignore).

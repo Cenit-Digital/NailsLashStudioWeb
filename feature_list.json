@@ -5,13 +5,7 @@
     "one_feature_at_a_time": true,
     "require_tests_to_close": true,
     "require_approved_spec_to_implement": true,
-    "valid_status": [
-      "pending",
-      "spec_ready",
-      "in_progress",
-      "done",
-      "blocked"
-    ],
+    "valid_status": ["pending", "spec_ready", "in_progress", "done", "blocked"],
     "sdd_required_when": "feature has \"sdd\": true",
     "mutation_threshold": 1,
     "notas": [
@@ -67,9 +61,7 @@
         "Mutar la normalización E.164 (quitar +, ceros o espacios) rompe un test"
       ],
       "puerta_legal": "TRLGDCU art. 20.1.a) + 60.2.b) (identidad y teléfono en la oferta comercial)",
-      "depends_on": [
-        "puerta_placeholders"
-      ],
+      "depends_on": ["puerta_placeholders"],
       "mutable": true,
       "sdd": true,
       "status": "done"
@@ -108,10 +100,7 @@
         "Mutar la composicion del title o de la canonica rompe un test"
       ],
       "puerta_legal": "SEPARAR SIEMPRE LOS TRES EJES: letra de la norma ≠ técnica suficiente ≠ criterio de proyecto. Y schema.org ≠ Google. Reescrita 2026-07-16 con progress/f04_verificacion_previa.md: 5 justificaciones de la redacción anterior eran FALSAS. || WCAG 2.2 SC 3.1.1 (A): exige que el idioma sea DETERMINABLE POR CÓDIGO, no dice 'lang'; en HTML se satisface con lang en <html> (H57, técnica suficiente). Que un lang incorrecto falle es [I], no cita. || SC 1.3.1 (A): NO exige 'un solo h1' ni landmarks — ninguna frase sobre el número de h1 existe en toda la norma [V]; H101/ARIA11/ARIA20 son técnicas suficientes en OR. 'Un h1' y los landmarks son CRITERIO DE PROYECTO (buenas reglas, se testean igual; lo prohibido es la atribución normativa). Lo que SÍ es 1.3.1: una relación comunicada visualmente debe existir en el código (título de sección → heading real + section aria-labelledby, no un div con font-size). || SC 2.4.2 (A): el listón es 'describe topic or purpose'; CERO requisito de unicidad [V]. La COMPOSICIÓN del title es criterio de PROYECTO/SEO, NUNCA WCAG (A-22). || SC 2.4.7 (AA): foco visible; G165 y C45 son ambas suficientes. CERO requisito de contraste o grosor: el 3:1/2px es SC 2.4.13, y es AAA. PROHIBIDO atribuir cualquier umbral a 2.4.7 (trampa gemela del 1.4.11 de F-03). || SC 2.4.11 (AA, nuevo en 2.2): HUECO detectado — su Understanding nombra literalmente los sticky headers (técnica C43, scroll-padding). ¿F-04 o F-06? → A-18. || LSSI art. 10.1 [VERSIÓN NO DECLARADA [NV]: el art. 10 tiene 4 versiones; verificar en act.php sin pinear fecha y NUNCA ordenando los bloques de la API del BOE por fecha_vigencia, que los ordena por PUBLICACIÓN]: exige acceso 'permanente, fácil, directa y gratuita' (los cuatro adverbios son literales [V]). '(aparece en todas las páginas)' NO ESTÁ EN LA LEY: escaneo del estatuto entero (395.867 car.) → 'pie de página'=0, 'todas las páginas'=0, 'cada página'=0 [V]; y el art. 10.2 admite 'su página O sitio de Internet' [V]. DECISIÓN DEL PROYECTO: enlace en el pie de todas las páginas como MEDIO de cumplimiento → SUFICIENTE, NO NECESARIO. 'Permanente' es TEMPORAL, no espacial: se asevera contra el DESTINO (puerta anti-404), no contra la presencia del enlace — es exactamente el fallo del cliente (enlace en el pie, destino 404). El CONTENIDO y las rutas legales son F-16 (A-17). La calificación sancionadora NO es plana: depende de 'significativo' (art. 38.3.b), concepto indeterminado [V]. || Google Search Central (elegibilidad de rich result, NO validez): exige name (Text) y address (PostalAddress). schema.org NO obliga a NINGUNA propiedad — un JSON-LD con solo @type es válido [V]. PROHIBIDA la palabra 'obligatorio' sin sujeto explícito: todo 'obligatorio' se lee 'obligatorio PARA <schema.org|Google>'. Exigir PostalAddress (schema.org admite Text) es decisión de proyecto MÁS ESTRICTA que el vocabulario. || Google Technical guidelines: 'Don't aggregate reviews or ratings from other websites' bajo 'Warning: ... Google may take manual action' → PROHIBICIÓN [V]. NO escribir 'Google prohíbe aggregateRating self-serving': eso es INELEGIBILIDAD, no prohibición, y la FAQ oficial lo refuta ('No, you don't need to remove them'). Tres capas independientes: (a) prohibición Google, (b) inelegibilidad Google, (c) Treatwell cl. 4.2.2 = FALTA DE TÍTULO (no hay licencia; escribirlo como prohibición expresa sería inventar). (a) y (c) sostienen la decisión POR SEPARADO. || NO APLICA AQUÍ TRLGDCU art. 60.4 (castellano): su ámbito es la información PRECONTRACTUAL del art. 60.2 → F-09/F-16, NO el JSON-LD [I: se deduce de 'facilitada al consumidor', no es letra expresa], y NO se satisface con html lang=es (eso es SC 3.1.1, obligación distinta). El 60.4 omitía además 'de forma gratuita', que sí está en la norma [V]. || NIF/CIF: PROHIBIDO completar, corregir, inferir o derivar. El vatID '10656940' del JSON-LD del cliente NO es válido (8 dígitos sin letra: ni CIF por Orden EHA/451/2008 art. 2, ni NIF por RD 1065/2007 art. 19.1 [V]) y es verosímilmente un DNI truncado = dato personal. La letra del DNI es DETERMINISTA (mod 23): calcularla sería INVENTAR UN NIF. Un identificador que no cumple el formato legal se RECHAZA y bloquea la publicación; NO se repara.",
-      "depends_on": [
-        "datos_negocio_fuente_unica",
-        "tokens_paleta_contraste"
-      ],
+      "depends_on": ["datos_negocio_fuente_unica", "tokens_paleta_contraste"],
       "mutable": true,
       "sdd": true,
       "status": "done",
@@ -151,9 +140,7 @@
         "Mutar el predicado de la puerta de anclas o el breakpoint (820px, leido del SCSS y anclado contra el literal a mano) rompe al menos un test. Los .tsx nuevos se anaden a mutate de stryker.config.json Y a coverage.include de vitest.config.ts (son dos listas). El pie NO emite enlaces legales (romperia la anti-404; es de F-16)"
       ],
       "puerta_legal": "WCAG SC 2.4.11 Focus Not Obscured (Minimum), nivel AA, liston literal «not entirely hidden» (corregido en la puerta 2026-07-17, B-1: la redaccion anterior «foco no oscurecido» rozaba el 2.4.12, que es AAA). C43 (scroll-padding) es tecnica SUFICIENTE, no impuesta por la norma. El 2.4.11 NO tiene umbral numerico: los px del scroll-padding son criterio de proyecto, no WCAG. Ver progress/f06_verificacion_previa.md §1.",
-      "depends_on": [
-        "cascaron_semantico"
-      ],
+      "depends_on": ["cascaron_semantico"],
       "mutable": true,
       "sdd": true,
       "status": "done",
@@ -175,10 +162,7 @@
         "La tipografia de marca del titular (anadido en la puerta 2026-07-18 tras la verificacion EN VIVO con Chrome, que cazo que el titular salia en la fuente por defecto): el <span> «Nails Lash» (.heroMarca) usa font-family Great Vibes (la letra manuscrita de marca, ya horneada por F-05, con fallback cursive); el <span> «Studio» (.heroStudio) usa Manrope (con fallback sans-serif). Es el diseno del prototipo Opcion-1-Rosa y la razon de partir el nombre en dos spans. Se asevera leyendo el .module.scss (Stryker no ve SCSS) y se RE-VERIFICA EN VIVO con Chrome (document.fonts.check(Great Vibes) y el font-family computado del titular). El LCP medido (40ms) aguanta Great Vibes en el camino critico."
       ],
       "puerta_legal": "WCAG SC 2.2.2 Pause Stop Hide (nivel A) para el indicador de movimiento: la LETRA exige un mecanismo de pausa/parada/ocultacion para movimiento que arranca automatico, dura >5s y va en paralelo; se cumple con DURACION TOTAL <=5s (tecnica suficiente). El paintReveal (<=1,2s tras C-3) NO lo dispara. || LCP <=2,5s p75 [V: web.dev/articles/lcp] es la norma de rendimiento, pero NO es puerta unitaria (jsdom no tiene layout/paint): se verifica EN VIVO con Chrome tras el TDD (C-2). || prefers-reduced-motion es CRITERIO DE PROYECTO, no obligacion WCAG A/AA (2.3.3 es AAA). Corregido en la puerta 2026-07-18; ver progress/f07_verificacion_previa.md.",
-      "depends_on": [
-        "tokens_paleta_contraste",
-        "cascaron_semantico"
-      ],
+      "depends_on": ["tokens_paleta_contraste", "cascaron_semantico"],
       "mutable": true,
       "sdd": true,
       "status": "done",
@@ -197,9 +181,7 @@
         "Un test lee el SCSS y asevera la regla de rejilla"
       ],
       "puerta_legal": "WCAG SC 1.4.10 Reflow",
-      "depends_on": [
-        "cascaron_semantico"
-      ],
+      "depends_on": ["cascaron_semantico"],
       "mutable": false,
       "nota_mutacion": "Nada que mutar: es CSS. Stryker no ve SCSS y src/styles/ no está en la lista mutate. No lleva mutate propio y se declara aquí en vez de fingir cobertura.",
       "sdd": true,
@@ -241,9 +223,7 @@
         "El modelo admite excepciones (festivos, cierre de agosto) sin tocar el copy",
         "Mutar los límites de las franjas o el comparador rompe un test"
       ],
-      "depends_on": [
-        "datos_negocio_fuente_unica"
-      ],
+      "depends_on": ["datos_negocio_fuente_unica"],
       "mutable": true,
       "bloqueada_para_publicar": "Las excepciones (festivos, agosto) no están verificadas con el salón.",
       "sdd": true,
@@ -262,9 +242,7 @@
         "La dirección menciona Planta 0, Local 41"
       ],
       "puerta_legal": "CRITERIO DE PROYECTO, heredado de F-05 (corregido 2026-07-17, A-24): sostiene el invariante «cero peticiones a terceros», asi que ningun tercero recibe la IP del visitante. NO se justifica por el art. 22.2 LSSI: ver la puerta_legal de F-05 y progress/f05_verificacion_previa.md §6 — que el 22.2 se active por un recurso de tercero es NO_VERIFICABLE en los dos sentidos, y «evita el banner» es una consecuencia PROBABLE, no una obligacion normativa que se pueda citar. Los Google Maps Platform ToS SI reconocen «Services that store and access Cookies on End Users devices» [V], lo que hace el analisis INNECESARIO en vez de resuelto.",
-      "depends_on": [
-        "cero_terceros"
-      ],
+      "depends_on": ["cero_terceros"],
       "mutable": true,
       "sdd": true,
       "status": "pending"
@@ -281,9 +259,7 @@
         "No aparece TikTok"
       ],
       "puerta_legal": "RD 193/2023 art. 14.1 (información accesible independientemente del canal)",
-      "depends_on": [
-        "datos_negocio_fuente_unica"
-      ],
+      "depends_on": ["datos_negocio_fuente_unica"],
       "mutable": true,
       "bloqueada_para_publicar": "El email (centroesteticarozas@gmail.com aparece solo en el JSON-LD de la web actual, nunca visible) hay que confirmarlo con el cliente.",
       "sdd": true,
@@ -332,9 +308,7 @@
         "Mutación 100% en Resenas.tsx, carrusel-logica.ts y resenas-agregado.ts"
       ],
       "puerta_legal": "art. 20.4 TRLGDCU",
-      "depends_on": [
-        "cascaron_semantico"
-      ],
+      "depends_on": ["cascaron_semantico"],
       "mutable": true,
       "bloqueada_para_publicar": "RESUELTA 2026-07-23: Pablo eligió Treatwell (4,9 · 1.239) como plataforma del agregado.",
       "sdd": true,
@@ -351,9 +325,7 @@
         "El acordeón es de apertura única y expone aria-expanded y aria-controls",
         "Mutar el toggle (s.faq===i?-1:i) rompe un test"
       ],
-      "depends_on": [
-        "cascaron_semantico"
-      ],
+      "depends_on": ["cascaron_semantico"],
       "mutable": true,
       "bloqueada_para_publicar": "'Formas de pago' y 'cancelación 24h' son compromisos contractuales de plantilla: los confirma el cliente o no se publican.",
       "sdd": true,
@@ -371,10 +343,7 @@
         "Completar la capa 1 del aviso de Nailbot (F-23, deuda A-23/HS-1): la identidad del responsable, los derechos y el enlace a la política, que hoy faltan porque esta página no existe"
       ],
       "puerta_legal": "LSSI art. 10.1 a) y f) · régimen sancionador art. 38.3.b) (infracción grave)",
-      "depends_on": [
-        "puerta_placeholders",
-        "cascaron_semantico"
-      ],
+      "depends_on": ["puerta_placeholders", "cascaron_semantico"],
       "mutable": true,
       "bloqueada_para_publicar": "Razón social, NIF/CIF, domicilio fiscal y email. Verificado que NO existen en ninguna fuente pública: el aviso legal del propio cliente es un 404.",
       "sdd": true,
@@ -391,9 +360,7 @@
         "El LCP no lleva loading=lazy y el resto sí",
         "Se sirve AVIF con fallback WebP y JPEG"
       ],
-      "depends_on": [
-        "puerta_placeholders"
-      ],
+      "depends_on": ["puerta_placeholders"],
       "mutable": true,
       "bloqueada_para_publicar": "Fotos reales en proporción exacta: equipo 4/3, categorías 4/5.",
       "sdd": true,
@@ -409,9 +376,7 @@
         "Ninguna foto generada por IA se presenta como una profesional real en producción"
       ],
       "puerta_legal": "LO 1/1982 art. 2.3 (derechos de imagen) · RGPD art. 7.3 (retirada del consentimiento) · LCD art. 5.1.g)",
-      "depends_on": [
-        "puerta_placeholders"
-      ],
+      "depends_on": ["puerta_placeholders"],
       "mutable": true,
       "bloqueada_para_publicar": "Fotos reales del equipo + consentimiento firmado de cada profesional. Las ph-woman*.png son placeholder de desarrollo bloqueado en producción (decisión 8).",
       "sdd": true,
@@ -429,9 +394,7 @@
         "La selección es única y expone aria-pressed"
       ],
       "puerta_legal": "WCAG SC 1.4.1 (el uso del color)",
-      "depends_on": [
-        "solicitud_whatsapp"
-      ],
+      "depends_on": ["solicitud_whatsapp"],
       "mutable": true,
       "bloqueada_para_publicar": "La carta de esmaltes real del salón.",
       "sdd": true,
@@ -442,13 +405,8 @@
       "name": "presupuesto_perf_ci",
       "title": "Presupuesto de rendimiento en CI (opcional)",
       "description": "Opcional. Lighthouse CI como puerta: LCP ≤2,5s y CLS ≤0,1 (p75), umbrales oficiales de web.dev. Los presupuestos por recurso propuestos por el investigador son inferencia suya, no cifras de fuente: no se adoptan sin decidirlos.",
-      "acceptance": [
-        "El CI falla si LCP p75 > 2,5s o CLS p75 > 0,1"
-      ],
-      "depends_on": [
-        "hero_marca",
-        "pipeline_imagenes"
-      ],
+      "acceptance": ["El CI falla si LCP p75 > 2,5s o CLS p75 > 0,1"],
+      "depends_on": ["hero_marca", "pipeline_imagenes"],
       "mutable": false,
       "nota_mutacion": "Es configuración de CI: no lleva mutate propio.",
       "sdd": false,
@@ -466,11 +424,7 @@
         "Verificación EN VIVO con Chrome tras el TDD: font-family computado del body resuelve a Manrope (document.fonts.check('16px Manrope')) y el de un <h2> a Gilda Display (document.fonts.check('24px Gilda Display')); el woff2 de Gilda Display se descarga de /assets sin esquema http(s)",
         "Regresión en vivo: el <h1> del hero sigue en Great Vibes/Manrope (F-07), cabecera/nav/pie siguen en Manrope (F-06), ningún color cambia (F-03) y no hay peticiones a googleapis/gstatic (F-05); pnpm build exit 0 con las CINCO puertas"
       ],
-      "depends_on": [
-        "cero_terceros",
-        "cascaron_semantico",
-        "hero_marca"
-      ],
+      "depends_on": ["cero_terceros", "cascaron_semantico", "hero_marca"],
       "mutable": false,
       "nota_mutacion": "Nada que mutar: es SCSS. Stryker no ve SCSS y src/styles/ no está en la lista mutate. No lleva mutate propio y se declara aquí en vez de fingir cobertura (igual que F-08).",
       "sdd": true,
@@ -491,11 +445,7 @@
         "Verificación EN VIVO con Chrome real: autoplay avanza y respeta la pausa, transforms 3D computados (rotateY/translate/scale) con domo ∩, salto del bucle sin barrido visible, reduced-motion arranca pausado",
         "pnpm build exit 0 con las CINCO puertas y suite completa sin regresión (base 956 → 1074+ tests)"
       ],
-      "depends_on": [
-        "tokens_paleta_contraste",
-        "cero_terceros",
-        "cascaron_semantico"
-      ],
+      "depends_on": ["tokens_paleta_contraste", "cero_terceros", "cascaron_semantico"],
       "mutable": true,
       "sdd": true,
       "status": "done",
@@ -536,9 +486,7 @@
         "Mutación al 100% sobre NailbotFlotante.tsx, NailbotArte.tsx y su lógica",
         "Verificación en vivo: modal nativo, foco inicial, Esc y vuelta del foco, F110, móvil 320 px, reduced-motion en frío y en caliente"
       ],
-      "depends_on": [
-        "nailbot_chat_compartido"
-      ],
+      "depends_on": ["nailbot_chat_compartido"],
       "mutable": true,
       "sdd": true,
       "status": "spec_ready",

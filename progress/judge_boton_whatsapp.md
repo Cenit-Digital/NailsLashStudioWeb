@@ -8,6 +8,7 @@ Suite: 883/883 verdes (full run), 37/37 de esta feature. tsc --noEmit exit 0, es
 (3 warnings ajenos en Equipo.tsx, ninguno en esta feature). NINGUN test rojo.
 
 ## Cobertura de escenarios (@s vs test)
+
 - @s1: [x] boton-whatsapp.test.tsx:30-51 - href horneado contiene 34625223366 y el text urlencoded,
   literales A MANO; sin 625 22 33 66 ni coma/espacio crudos. Host NO aseverado.
 - @s2: [x] boton-whatsapp.test.tsx:53-80 - bytes del .tsx: sin numero/host; con waHref e import de
@@ -40,6 +41,7 @@ Suite: 883/883 verdes (full run), 37/37 de esta feature. tsc --noEmit exit 0, es
 - @s14: [x] test.tsx:191-210 - mensaje generico FIJO; sin servicio/fecha/hora/profesional; sin form.
 
 ## Los 9 controles duros encargados
+
 1. Cada @sN tiene test -> NO: @s4 sin ningun test (bloqueante). @s5/@s6/@s12 con cobertura PARCIAL
    (falta build-exit-code y conteo global).
 2. href DERIVA de waHref, sin numero/host hardcodeado -> OK. BotonWhatsApp.tsx:23 usa
@@ -66,6 +68,7 @@ Suite: 883/883 verdes (full run), 37/37 de esta feature. tsc --noEmit exit 0, es
    que lo pinne (ver @s4).
 
 ## Disciplina TDD
+
 - Produccion sin test que la pida? NO. Componente a estatico; cada atributo lo exige un test
   (id/href @s1/@s12, aria-label @s3, svg @s3/@s6, .flotante posicion/foco @s7/@s9/@s10). El color via
   .demo-btn--wa global no se asevera por clase (css:false); el .module.scss sin color/background fuerza
@@ -75,6 +78,7 @@ Suite: 883/883 verdes (full run), 37/37 de esta feature. tsc --noEmit exit 0, es
   verde. Anclas positivas presentes (no verde por vacuidad).
 
 ## Calidad (lente de artesano)
+
 - BotonWhatsApp.tsx: funcion corta, un solo motivo de cambio, docblock que cita la feature, export
   nombrado, ID_BOTON_WHATSAPP como const arriba. Sin numeros magicos. Bien.
 - boton-whatsapp.module.scss: solo posicion/forma/foco; icono dimensionado en selector aparte para que
@@ -83,6 +87,7 @@ Suite: 883/883 verdes (full run), 37/37 de esta feature. tsc --noEmit exit 0, es
   18 escrito a mano.
 
 ## Checkpoints
+
 - C1 (arnes/init): [x] typecheck 0, lint 0 (warnings ajenos), 883 tests verdes.
 - C2 (estado coherente): [x] feature es rebanada de F-13, sin entrada propia en feature_list.json.
 - C3 (arquitectura): [x] componente encaja, sin dependencias nuevas.
@@ -92,6 +97,7 @@ Suite: 883/883 verdes (full run), 37/37 de esta feature. tsc --noEmit exit 0, es
 - C7 (mutacion): [ ] corre despues de la aprobacion; feature declarada NO-MUTABLE (@s11).
 
 ## Cambios requeridos
+
 1. (Bloqueante) @s4 sin ningun test. Anadir un test sobre el HTML prerenderizado de la home (patron
    home-horneado.test.ts / SSR de Home): (a) el documento contiene el cierre de main e id
    whatsapp-flotante; (b) el indice del enlace es MAYOR que el del cierre de main; (c) la seccion

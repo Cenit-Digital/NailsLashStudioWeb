@@ -37,7 +37,9 @@ function sistemaDeFicherosFalso(
   // Un directorio existe si cuelga algo de él o si se declara vacío a propósito: un
   // `dist/` vacío es un estado real del disco (@s21) y el doble tiene que saber decirlo.
   const existe = (directorio: string) =>
-    esRaiz(directorio) || directoriosVacios.includes(directorio) || contenidoDe(directorio).length > 0
+    esRaiz(directorio) ||
+    directoriosVacios.includes(directorio) ||
+    contenidoDe(directorio).length > 0
 
   return {
     existeDirectorio: existe,
@@ -172,7 +174,7 @@ describe('la puerta — lo que esquiva a cada vía por separado', () => {
   // El módulo de la puerta declara los 6 patrones como literales. Se escriben aquí A MANO
   // (anti-tautología): este doble es un retrato del módulo, no un import suyo.
   const moduloDeLaPuerta = [
-    "export const PATRONES_PROHIBIDOS = [",
+    'export const PATRONES_PROHIBIDOS = [',
     "  'IMAGEN TEMPORAL',",
     "  'Plantilla de demostración',",
     "  '600123456',",
@@ -226,8 +228,9 @@ describe('la puerta — lo que esquiva a cada vía por separado', () => {
       modo: 'produccion',
       registros: [],
       ficheros: sistemaDeFicherosFalso({
-        'project-spec.md': 'La dirección del prototipo era "Calle de la Belleza 24" y las '
-          + 'fotos IA son "ph-woman0.png". Ambos son placeholder y aquí se citan a propósito.',
+        'project-spec.md':
+          'La dirección del prototipo era "Calle de la Belleza 24" y las ' +
+          'fotos IA son "ph-woman0.png". Ambos son placeholder y aquí se citan a propósito.',
         'dist/index.html': '<h1>Nails Lash Studio</h1>',
       }),
     })

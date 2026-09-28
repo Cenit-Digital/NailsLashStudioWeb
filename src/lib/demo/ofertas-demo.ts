@@ -13,9 +13,27 @@ export interface OfertaDemo {
 }
 
 export const OFERTAS_DEMO: readonly OfertaDemo[] = [
-  { titulo: 'Pack Manos Perfectas', desc: 'Manicura semipermanente + diseño en dos uñas.', precio: '29 €', antes: '35 €', badge: '−17%' },
-  { titulo: 'Dúo Uñas + Pestañas', desc: 'Manicura + lifting de pestañas en una sola visita.', precio: '55 €', antes: '65 €', badge: 'Ahorra 10 €' },
-  { titulo: 'Cejas de diez', desc: 'Diseño + laminado de cejas con acabado natural.', precio: '35 €', antes: '42 €', badge: 'Solo este mes' },
+  {
+    titulo: 'Pack Manos Perfectas',
+    desc: 'Manicura semipermanente + diseño en dos uñas.',
+    precio: '29 €',
+    antes: '35 €',
+    badge: '−17%',
+  },
+  {
+    titulo: 'Dúo Uñas + Pestañas',
+    desc: 'Manicura + lifting de pestañas en una sola visita.',
+    precio: '55 €',
+    antes: '65 €',
+    badge: 'Ahorra 10 €',
+  },
+  {
+    titulo: 'Cejas de diez',
+    desc: 'Diseño + laminado de cejas con acabado natural.',
+    precio: '35 €',
+    antes: '42 €',
+    badge: 'Solo este mes',
+  },
 ]
 
 export const LEYENDA_OFERTAS = 'Ofertas de muestra · pendientes de confirmar con el salón'

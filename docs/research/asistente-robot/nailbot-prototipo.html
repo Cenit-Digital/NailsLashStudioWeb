@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nailbot — prototipo visual</title>
-<!--
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nailbot — prototipo visual</title>
+    <!--
   PROTOTIPO VISUAL (no es código de producción). Fuente de verdad del ARTE de Nailbot para que el
   tdd_craftsman lo porte a src/ por TDD. SVG inline + CSS @keyframes, sin librerías ni peticiones a
   terceros (puerta F-05). Colores de marca = tokens de src/styles/_tokens.scss; el rojo de labios y
@@ -13,257 +13,864 @@
   (reduced-motion / pausa / SSG) Nailbot se ve con las uñas YA pintadas y el pincel en el bote.
   Sin <defs>/ids: el SVG aparece varias veces en la página y los ids se duplicarían.
 -->
-<style>
-  :root {
-    --bg: #FDF4F7; --surface: #FFFFFF; --surface2: #FBE7EF; --accent-soft: #F7DDE8;
-    --text: #5E404A; --muted: #6F525A; --ink: #8E3355; --accent: #C05576; --accent-dark: #A23E5F;
-    --accent-2: #B3316E; --on-accent: #FFFFFF; --line: rgba(176, 70, 106, 0.16);
-    --border-interactive: #AB5F79;
-    /* Paleta PROPIA del robot (decorativa) */
-    --nb-carcasa: #FFFFFF; --nb-perfil: #E4B3C4; --nb-oro-rosa: #E7B09F; --nb-oro-rosa-osc: #C07F6E;
-    --nb-cara: #FBE7EF; --nb-ojo: #3A1D29; --nb-rojo: #D7263D; --nb-rojo-osc: #99102A;
-    --nb-colorete: #F2A0BA; --nb-una-base: #F1CFDB;
-  }
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: Manrope, system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 160vh; }
-  .demo { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
-  .demo h1 { font-family: 'Gilda Display', Georgia, serif; font-weight: 400; color: var(--ink); margin: 0 0 8px; }
-  .fila { display: flex; gap: 18px; flex-wrap: wrap; align-items: end; }
-  .fila figure { margin: 0; text-align: center; font-size: 12px; color: var(--muted); }
-  .fila svg { display: block; background: var(--surface); border-radius: 12px; }
-  .congelado .nb, .congelado .nb * { animation-play-state: paused !important; }
+    <style>
+      :root {
+        --bg: #fdf4f7;
+        --surface: #ffffff;
+        --surface2: #fbe7ef;
+        --accent-soft: #f7dde8;
+        --text: #5e404a;
+        --muted: #6f525a;
+        --ink: #8e3355;
+        --accent: #c05576;
+        --accent-dark: #a23e5f;
+        --accent-2: #b3316e;
+        --on-accent: #ffffff;
+        --line: rgba(176, 70, 106, 0.16);
+        --border-interactive: #ab5f79;
+        /* Paleta PROPIA del robot (decorativa) */
+        --nb-carcasa: #ffffff;
+        --nb-perfil: #e4b3c4;
+        --nb-oro-rosa: #e7b09f;
+        --nb-oro-rosa-osc: #c07f6e;
+        --nb-cara: #fbe7ef;
+        --nb-ojo: #3a1d29;
+        --nb-rojo: #d7263d;
+        --nb-rojo-osc: #99102a;
+        --nb-colorete: #f2a0ba;
+        --nb-una-base: #f1cfdb;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: Manrope, system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 160vh;
+      }
+      .demo {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 24px 16px;
+      }
+      .demo h1 {
+        font-family: 'Gilda Display', Georgia, serif;
+        font-weight: 400;
+        color: var(--ink);
+        margin: 0 0 8px;
+      }
+      .fila {
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+        align-items: end;
+      }
+      .fila figure {
+        margin: 0;
+        text-align: center;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .fila svg {
+        display: block;
+        background: var(--surface);
+        border-radius: 12px;
+      }
+      .congelado .nb,
+      .congelado .nb * {
+        animation-play-state: paused !important;
+      }
 
-  /* ───────────── LANZADOR FLOTANTE ───────────── */
-  .lanzador {
-    position: fixed; right: max(20px, env(safe-area-inset-right)); bottom: max(20px, env(safe-area-inset-bottom));
-    display: flex; align-items: flex-end; gap: 10px; z-index: 50;
-  }
-  .robot-btn {
-    position: relative; width: 104px; height: 104px; padding: 0; border: 0; border-radius: 50%;
-    background: radial-gradient(circle at 50% 38%, var(--surface) 0 55%, var(--surface2) 100%);
-    box-shadow: 0 10px 28px rgba(142, 51, 85, 0.22), 0 0 0 2px var(--surface), 0 0 0 4px var(--accent-soft);
-    cursor: pointer; overflow: visible;
-  }
-  .robot-btn:hover { box-shadow: 0 12px 32px rgba(142, 51, 85, 0.3), 0 0 0 2px var(--surface), 0 0 0 4px var(--accent); }
-  .robot-btn:focus-visible { outline: 3px solid var(--accent-dark); outline-offset: 4px; }
-  .robot-btn svg { position: absolute; left: -8%; top: -16%; width: 116%; height: 116%; }
-  .pausa {
-    position: absolute; top: -4px; left: -4px; width: 30px; height: 30px; border-radius: 50%;
-    border: 1.5px solid var(--border-interactive); background: var(--surface); color: var(--accent-dark);
-    display: grid; place-items: center; cursor: pointer; padding: 0; z-index: 2;
-  }
-  .pausa:focus-visible { outline: 3px solid var(--accent-dark); outline-offset: 2px; }
-  .pausa svg { width: 12px; height: 12px; }
-  .envoltorio { position: relative; }
-  .bocadillo {
-    position: relative; max-width: 200px; margin-bottom: 40px; padding: 10px 34px 10px 14px;
-    background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 16px 16px 4px 16px;
-    box-shadow: 0 8px 22px rgba(142, 51, 85, 0.16); font-size: 14px; line-height: 1.35;
-  }
-  .bocadillo strong { color: var(--ink); font-weight: 700; }
-  .bocadillo .cerrar {
-    position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border: 0; border-radius: 50%;
-    background: transparent; color: var(--muted); cursor: pointer; font-size: 16px; line-height: 1;
-  }
-  .bocadillo .cerrar:focus-visible { outline: 2px solid var(--accent-dark); }
+      /* ───────────── LANZADOR FLOTANTE ───────────── */
+      .lanzador {
+        position: fixed;
+        right: max(20px, env(safe-area-inset-right));
+        bottom: max(20px, env(safe-area-inset-bottom));
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+        z-index: 50;
+      }
+      .robot-btn {
+        position: relative;
+        width: 104px;
+        height: 104px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: radial-gradient(circle at 50% 38%, var(--surface) 0 55%, var(--surface2) 100%);
+        box-shadow:
+          0 10px 28px rgba(142, 51, 85, 0.22),
+          0 0 0 2px var(--surface),
+          0 0 0 4px var(--accent-soft);
+        cursor: pointer;
+        overflow: visible;
+      }
+      .robot-btn:hover {
+        box-shadow:
+          0 12px 32px rgba(142, 51, 85, 0.3),
+          0 0 0 2px var(--surface),
+          0 0 0 4px var(--accent);
+      }
+      .robot-btn:focus-visible {
+        outline: 3px solid var(--accent-dark);
+        outline-offset: 4px;
+      }
+      .robot-btn svg {
+        position: absolute;
+        left: -8%;
+        top: -16%;
+        width: 116%;
+        height: 116%;
+      }
+      .pausa {
+        position: absolute;
+        top: -4px;
+        left: -4px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1.5px solid var(--border-interactive);
+        background: var(--surface);
+        color: var(--accent-dark);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        padding: 0;
+        z-index: 2;
+      }
+      .pausa:focus-visible {
+        outline: 3px solid var(--accent-dark);
+        outline-offset: 2px;
+      }
+      .pausa svg {
+        width: 12px;
+        height: 12px;
+      }
+      .envoltorio {
+        position: relative;
+      }
+      .bocadillo {
+        position: relative;
+        max-width: 200px;
+        margin-bottom: 40px;
+        padding: 10px 34px 10px 14px;
+        background: var(--surface);
+        color: var(--text);
+        border: 1px solid var(--line);
+        border-radius: 16px 16px 4px 16px;
+        box-shadow: 0 8px 22px rgba(142, 51, 85, 0.16);
+        font-size: 14px;
+        line-height: 1.35;
+      }
+      .bocadillo strong {
+        color: var(--ink);
+        font-weight: 700;
+      }
+      .bocadillo .cerrar {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 24px;
+        height: 24px;
+        border: 0;
+        border-radius: 50%;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+      }
+      .bocadillo .cerrar:focus-visible {
+        outline: 2px solid var(--accent-dark);
+      }
 
-  /* ───────────── ARTE + ANIMACIÓN ───────────── */
-  .nb * { transform-box: fill-box; }
-  .nb-flota   { transform-origin: center; animation: nb-flotar 3.2s ease-in-out infinite; }
-  .nb-corazon { transform-origin: center; animation: nb-latir 1.6s ease-in-out infinite; }
-  .nb-ojos    { transform-origin: center; animation: nb-parpadeo 4.6s ease-in-out infinite; }
-  .nb-labios  { transform-origin: center; animation: nb-soplar 7s ease-in-out infinite; }
-  .nb-mano-uñas { transform-origin: 50% 100%; animation: nb-lucir 7s ease-in-out infinite; }
-  .nb-mano-pincel { animation: nb-pintar 7s ease-in-out infinite; }
-  .nb-esmalte { animation: 7s ease-in-out infinite; }
-  .nb-esmalte-1 { animation-name: nb-una-1; }
-  .nb-esmalte-2 { animation-name: nb-una-2; }
-  .nb-esmalte-3 { animation-name: nb-una-3; }
-  .nb-esmalte-4 { animation-name: nb-una-4; }
-  .nb-soplido { opacity: 0; animation: nb-soplo 7s ease-out infinite; }
-  .nb-brillo  { opacity: 0; transform-origin: center; animation: nb-destello 7s ease-in-out infinite; }
-  .nb-brillo-b { animation-name: nb-destello-b; }
+      /* ───────────── ARTE + ANIMACIÓN ───────────── */
+      .nb * {
+        transform-box: fill-box;
+      }
+      .nb-flota {
+        transform-origin: center;
+        animation: nb-flotar 3.2s ease-in-out infinite;
+      }
+      .nb-corazon {
+        transform-origin: center;
+        animation: nb-latir 1.6s ease-in-out infinite;
+      }
+      .nb-ojos {
+        transform-origin: center;
+        animation: nb-parpadeo 4.6s ease-in-out infinite;
+      }
+      .nb-labios {
+        transform-origin: center;
+        animation: nb-soplar 7s ease-in-out infinite;
+      }
+      .nb-mano-uñas {
+        transform-origin: 50% 100%;
+        animation: nb-lucir 7s ease-in-out infinite;
+      }
+      .nb-mano-pincel {
+        animation: nb-pintar 7s ease-in-out infinite;
+      }
+      .nb-esmalte {
+        animation: 7s ease-in-out infinite;
+      }
+      .nb-esmalte-1 {
+        animation-name: nb-una-1;
+      }
+      .nb-esmalte-2 {
+        animation-name: nb-una-2;
+      }
+      .nb-esmalte-3 {
+        animation-name: nb-una-3;
+      }
+      .nb-esmalte-4 {
+        animation-name: nb-una-4;
+      }
+      .nb-soplido {
+        opacity: 0;
+        animation: nb-soplo 7s ease-out infinite;
+      }
+      .nb-brillo {
+        opacity: 0;
+        transform-origin: center;
+        animation: nb-destello 7s ease-in-out infinite;
+      }
+      .nb-brillo-b {
+        animation-name: nb-destello-b;
+      }
 
-  @keyframes nb-flotar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2.5px); } }
-  @keyframes nb-latir { 0%, 100% { transform: scale(1); } 20% { transform: scale(1.2); } 40% { transform: scale(1); } }
-  @keyframes nb-parpadeo { 0%, 44%, 50%, 100% { transform: scaleY(1); } 47% { transform: scaleY(0.08); } }
-  /* El pincel: sale del bote (reposo) → barre las 4 uñas con toques → vuelve al bote. */
-  @keyframes nb-pintar {
-    0%, 4%   { transform: translate(0, 0) rotate(0deg); }
-    11%      { transform: translate(-60.7px, -17.5px) rotate(-10deg); }
-    15%      { transform: translate(-60.7px, -15px) rotate(-10deg); }
-    20%      { transform: translate(-55.7px, -19.9px) rotate(-8deg); }
-    25%      { transform: translate(-55.7px, -17.4px) rotate(-8deg); }
-    30%      { transform: translate(-50.7px, -19.3px) rotate(-6deg); }
-    35%      { transform: translate(-50.7px, -16.8px) rotate(-6deg); }
-    40%      { transform: translate(-45.7px, -16.9px) rotate(-4deg); }
-    45%      { transform: translate(-45.7px, -14.4px) rotate(-4deg); }
-    54%, 100% { transform: translate(0, 0) rotate(0deg); }
-  }
-  /* Cada uña se pinta cuando el pincel la toca. BASE (fuera del keyframe) = pintada. */
-  @keyframes nb-una-1 { 0%, 13% { opacity: 0; } 16%, 94% { opacity: 1; } 99%, 100% { opacity: 0; } }
-  @keyframes nb-una-2 { 0%, 23% { opacity: 0; } 26%, 94% { opacity: 1; } 99%, 100% { opacity: 0; } }
-  @keyframes nb-una-3 { 0%, 33% { opacity: 0; } 36%, 94% { opacity: 1; } 99%, 100% { opacity: 0; } }
-  @keyframes nb-una-4 { 0%, 43% { opacity: 0; } 46%, 94% { opacity: 1; } 99%, 100% { opacity: 0; } }
-  /* Tras pintar, levanta la mano para lucirla y sopla para secarla. */
-  @keyframes nb-lucir { 0%, 54%, 90%, 100% { transform: translateY(0) rotate(0deg); } 60%, 84% { transform: translateY(-3px) rotate(-6deg); } }
-  @keyframes nb-soplar { 0%, 58%, 76%, 100% { transform: scale(1, 1); } 62%, 72% { transform: scale(0.6, 1.2); } }
-  @keyframes nb-soplo { 0%, 61% { opacity: 0; transform: translate(0, 0); } 65% { opacity: 0.95; } 75% { opacity: 0; transform: translate(-4px, 4px); } 100% { opacity: 0; } }
-  @keyframes nb-destello { 0%, 76% { opacity: 0; transform: scale(0.2) rotate(0deg); } 81% { opacity: 1; transform: scale(1) rotate(45deg); } 88%, 100% { opacity: 0; transform: scale(0.2) rotate(90deg); } }
-  @keyframes nb-destello-b { 0%, 79% { opacity: 0; transform: scale(0.2) rotate(0deg); } 84% { opacity: 1; transform: scale(1) rotate(45deg); } 91%, 100% { opacity: 0; transform: scale(0.2) rotate(90deg); } }
+      @keyframes nb-flotar {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-2.5px);
+        }
+      }
+      @keyframes nb-latir {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        20% {
+          transform: scale(1.2);
+        }
+        40% {
+          transform: scale(1);
+        }
+      }
+      @keyframes nb-parpadeo {
+        0%,
+        44%,
+        50%,
+        100% {
+          transform: scaleY(1);
+        }
+        47% {
+          transform: scaleY(0.08);
+        }
+      }
+      /* El pincel: sale del bote (reposo) → barre las 4 uñas con toques → vuelve al bote. */
+      @keyframes nb-pintar {
+        0%,
+        4% {
+          transform: translate(0, 0) rotate(0deg);
+        }
+        11% {
+          transform: translate(-60.7px, -17.5px) rotate(-10deg);
+        }
+        15% {
+          transform: translate(-60.7px, -15px) rotate(-10deg);
+        }
+        20% {
+          transform: translate(-55.7px, -19.9px) rotate(-8deg);
+        }
+        25% {
+          transform: translate(-55.7px, -17.4px) rotate(-8deg);
+        }
+        30% {
+          transform: translate(-50.7px, -19.3px) rotate(-6deg);
+        }
+        35% {
+          transform: translate(-50.7px, -16.8px) rotate(-6deg);
+        }
+        40% {
+          transform: translate(-45.7px, -16.9px) rotate(-4deg);
+        }
+        45% {
+          transform: translate(-45.7px, -14.4px) rotate(-4deg);
+        }
+        54%,
+        100% {
+          transform: translate(0, 0) rotate(0deg);
+        }
+      }
+      /* Cada uña se pinta cuando el pincel la toca. BASE (fuera del keyframe) = pintada. */
+      @keyframes nb-una-1 {
+        0%,
+        13% {
+          opacity: 0;
+        }
+        16%,
+        94% {
+          opacity: 1;
+        }
+        99%,
+        100% {
+          opacity: 0;
+        }
+      }
+      @keyframes nb-una-2 {
+        0%,
+        23% {
+          opacity: 0;
+        }
+        26%,
+        94% {
+          opacity: 1;
+        }
+        99%,
+        100% {
+          opacity: 0;
+        }
+      }
+      @keyframes nb-una-3 {
+        0%,
+        33% {
+          opacity: 0;
+        }
+        36%,
+        94% {
+          opacity: 1;
+        }
+        99%,
+        100% {
+          opacity: 0;
+        }
+      }
+      @keyframes nb-una-4 {
+        0%,
+        43% {
+          opacity: 0;
+        }
+        46%,
+        94% {
+          opacity: 1;
+        }
+        99%,
+        100% {
+          opacity: 0;
+        }
+      }
+      /* Tras pintar, levanta la mano para lucirla y sopla para secarla. */
+      @keyframes nb-lucir {
+        0%,
+        54%,
+        90%,
+        100% {
+          transform: translateY(0) rotate(0deg);
+        }
+        60%,
+        84% {
+          transform: translateY(-3px) rotate(-6deg);
+        }
+      }
+      @keyframes nb-soplar {
+        0%,
+        58%,
+        76%,
+        100% {
+          transform: scale(1, 1);
+        }
+        62%,
+        72% {
+          transform: scale(0.6, 1.2);
+        }
+      }
+      @keyframes nb-soplo {
+        0%,
+        61% {
+          opacity: 0;
+          transform: translate(0, 0);
+        }
+        65% {
+          opacity: 0.95;
+        }
+        75% {
+          opacity: 0;
+          transform: translate(-4px, 4px);
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+      @keyframes nb-destello {
+        0%,
+        76% {
+          opacity: 0;
+          transform: scale(0.2) rotate(0deg);
+        }
+        81% {
+          opacity: 1;
+          transform: scale(1) rotate(45deg);
+        }
+        88%,
+        100% {
+          opacity: 0;
+          transform: scale(0.2) rotate(90deg);
+        }
+      }
+      @keyframes nb-destello-b {
+        0%,
+        79% {
+          opacity: 0;
+          transform: scale(0.2) rotate(0deg);
+        }
+        84% {
+          opacity: 1;
+          transform: scale(1) rotate(45deg);
+        }
+        91%,
+        100% {
+          opacity: 0;
+          transform: scale(0.2) rotate(90deg);
+        }
+      }
 
-  /* Pausa (control SC 2.2.2) y reduced-motion: se detiene en su sitio / se queda en la BASE visible. */
-  .nb[data-pausado='true'], .nb[data-pausado='true'] * { animation-play-state: paused !important; }
-  @media (prefers-reduced-motion: reduce) { .nb, .nb * { animation: none !important; } }
+      /* Pausa (control SC 2.2.2) y reduced-motion: se detiene en su sitio / se queda en la BASE visible. */
+      .nb[data-pausado='true'],
+      .nb[data-pausado='true'] * {
+        animation-play-state: paused !important;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .nb,
+        .nb * {
+          animation: none !important;
+        }
+      }
 
-  @media (max-width: 600px) {
-    .robot-btn { width: 76px; height: 76px; }
-    .bocadillo { max-width: 150px; font-size: 13px; margin-bottom: 28px; }
-    .pausa { width: 26px; height: 26px; }
-  }
-</style>
-</head>
-<body>
-<div class="demo">
-  <h1>Nailbot · prototipo visual</h1>
-  <p>Arte a 360 px (animado) y fotogramas congelados del ciclo de 7 s. El lanzador real, abajo a la derecha (bajo 600 px de ancho, tamaño móvil).</p>
-  <div class="fila">
-    <figure><svg data-hueco width="360" height="360"></svg><figcaption>360 px, animado</figcaption></figure>
-    <figure><svg data-hueco width="96" height="96"></svg><figcaption>96 px</figcaption></figure>
-    <figure><svg data-hueco width="64" height="64"></svg><figcaption>64 px</figcaption></figure>
-  </div>
-  <h2 style="font-size:16px;color:var(--ink)">Fotogramas (congelados)</h2>
-  <div class="fila">
-    <figure class="congelado" data-t="0.1"><svg data-hueco width="180" height="180"></svg><figcaption>t=0,1 s · reposo</figcaption></figure>
-    <figure class="congelado" data-t="0.85"><svg data-hueco width="180" height="180"></svg><figcaption>t=0,85 s · 1.ª uña</figcaption></figure>
-    <figure class="congelado" data-t="2.3"><svg data-hueco width="180" height="180"></svg><figcaption>t=2,3 s · 3.ª uña</figcaption></figure>
-    <figure class="congelado" data-t="4.6"><svg data-hueco width="180" height="180"></svg><figcaption>t=4,6 s · sopla</figcaption></figure>
-    <figure class="congelado" data-t="5.75"><svg data-hueco width="180" height="180"></svg><figcaption>t=5,75 s · destellos</figcaption></figure>
-    <figure class="congelado" data-t="3.29"><svg data-hueco width="180" height="180"></svg><figcaption>t=3,29 s · parpadeo</figcaption></figure>
-  </div>
-</div>
+      @media (max-width: 600px) {
+        .robot-btn {
+          width: 76px;
+          height: 76px;
+        }
+        .bocadillo {
+          max-width: 150px;
+          font-size: 13px;
+          margin-bottom: 28px;
+        }
+        .pausa {
+          width: 26px;
+          height: 26px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="demo">
+      <h1>Nailbot · prototipo visual</h1>
+      <p>
+        Arte a 360 px (animado) y fotogramas congelados del ciclo de 7 s. El lanzador real, abajo a
+        la derecha (bajo 600 px de ancho, tamaño móvil).
+      </p>
+      <div class="fila">
+        <figure>
+          <svg data-hueco width="360" height="360"></svg>
+          <figcaption>360 px, animado</figcaption>
+        </figure>
+        <figure>
+          <svg data-hueco width="96" height="96"></svg>
+          <figcaption>96 px</figcaption>
+        </figure>
+        <figure>
+          <svg data-hueco width="64" height="64"></svg>
+          <figcaption>64 px</figcaption>
+        </figure>
+      </div>
+      <h2 style="font-size: 16px; color: var(--ink)">Fotogramas (congelados)</h2>
+      <div class="fila">
+        <figure class="congelado" data-t="0.1">
+          <svg data-hueco width="180" height="180"></svg>
+          <figcaption>t=0,1 s · reposo</figcaption>
+        </figure>
+        <figure class="congelado" data-t="0.85">
+          <svg data-hueco width="180" height="180"></svg>
+          <figcaption>t=0,85 s · 1.ª uña</figcaption>
+        </figure>
+        <figure class="congelado" data-t="2.3">
+          <svg data-hueco width="180" height="180"></svg>
+          <figcaption>t=2,3 s · 3.ª uña</figcaption>
+        </figure>
+        <figure class="congelado" data-t="4.6">
+          <svg data-hueco width="180" height="180"></svg>
+          <figcaption>t=4,6 s · sopla</figcaption>
+        </figure>
+        <figure class="congelado" data-t="5.75">
+          <svg data-hueco width="180" height="180"></svg>
+          <figcaption>t=5,75 s · destellos</figcaption>
+        </figure>
+        <figure class="congelado" data-t="3.29">
+          <svg data-hueco width="180" height="180"></svg>
+          <figcaption>t=3,29 s · parpadeo</figcaption>
+        </figure>
+      </div>
+    </div>
 
-<template id="arte">
-  <svg class="nb" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
-    <g class="nb-flota">
-      <!-- Antena con corazón -->
-      <path d="M60 20 L60 11" stroke="var(--nb-oro-rosa-osc)" stroke-width="2.4" stroke-linecap="round" fill="none"/>
-      <path class="nb-corazon" d="M60 12 C 57.5 10 54.6 8 54.6 5.2 C 54.6 3.4 56 2.1 57.6 2.1 C 58.7 2.1 59.5 2.7 60 3.6 C 60.5 2.7 61.3 2.1 62.4 2.1 C 64 2.1 65.4 3.4 65.4 5.2 C 65.4 8 62.5 10 60 12 Z" fill="var(--accent-2)"/>
-      <!-- Cuerpo (detrás de la cabeza) -->
-      <rect x="53.5" y="64" width="13" height="7" rx="2" fill="var(--nb-oro-rosa)"/>
-      <rect x="41" y="69" width="38" height="33" rx="14" fill="var(--nb-carcasa)" stroke="var(--nb-perfil)" stroke-width="2"/>
-      <path d="M70 91.5 C 68.9 90.6 67.6 89.7 67.6 88.4 C 67.6 87.6 68.2 87 69 87 C 69.5 87 69.8 87.3 70 87.7 C 70.2 87.3 70.5 87 71 87 C 71.8 87 72.4 87.6 72.4 88.4 C 72.4 89.7 71.1 90.6 70 91.5 Z" fill="var(--accent)"/>
-      <!-- Orejas (tornillos oro rosa) -->
-      <circle cx="27.5" cy="42" r="5.2" fill="var(--nb-oro-rosa)" stroke="var(--nb-oro-rosa-osc)" stroke-width="1.2"/>
-      <circle cx="92.5" cy="42" r="5.2" fill="var(--nb-oro-rosa)" stroke="var(--nb-oro-rosa-osc)" stroke-width="1.2"/>
-      <!-- Cabeza -->
-      <rect x="29" y="18" width="62" height="49" rx="22.5" fill="var(--nb-carcasa)" stroke="var(--nb-perfil)" stroke-width="2"/>
-      <rect x="36.2" y="25.2" width="47.6" height="35.6" rx="16" fill="var(--nb-cara)"/>
-      <!-- Ojos con pestañas largas y raya (grupo que parpadea) -->
-      <g class="nb-ojos">
-        <ellipse cx="50" cy="41" rx="4.1" ry="5" fill="var(--nb-ojo)"/>
-        <ellipse cx="70" cy="41" rx="4.1" ry="5" fill="var(--nb-ojo)"/>
-        <circle cx="51.4" cy="39.2" r="1.35" fill="#fff"/>
-        <circle cx="71.4" cy="39.2" r="1.35" fill="#fff"/>
-        <g stroke="var(--nb-ojo)" stroke-width="1.5" stroke-linecap="round" fill="none">
-          <path d="M45.4 39.6 Q 46.8 35.4 50.2 35.6 Q 53.2 35.9 54.4 38.4"/>
-          <path d="M46 38.2 Q 43.4 36.8 41.4 33.4"/>
-          <path d="M47.6 36.6 Q 45.8 33.8 45.3 29.9"/>
-          <path d="M49.9 35.8 Q 49.4 32.6 50.4 29.2"/>
-          <path d="M74.6 39.6 Q 73.2 35.4 69.8 35.6 Q 66.8 35.9 65.6 38.4"/>
-          <path d="M74 38.2 Q 76.6 36.8 78.6 33.4"/>
-          <path d="M72.4 36.6 Q 74.2 33.8 74.7 29.9"/>
-          <path d="M70.1 35.8 Q 70.6 32.6 69.6 29.2"/>
+    <template id="arte">
+      <svg class="nb" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+        <g class="nb-flota">
+          <!-- Antena con corazón -->
+          <path
+            d="M60 20 L60 11"
+            stroke="var(--nb-oro-rosa-osc)"
+            stroke-width="2.4"
+            stroke-linecap="round"
+            fill="none"
+          />
+          <path
+            class="nb-corazon"
+            d="M60 12 C 57.5 10 54.6 8 54.6 5.2 C 54.6 3.4 56 2.1 57.6 2.1 C 58.7 2.1 59.5 2.7 60 3.6 C 60.5 2.7 61.3 2.1 62.4 2.1 C 64 2.1 65.4 3.4 65.4 5.2 C 65.4 8 62.5 10 60 12 Z"
+            fill="var(--accent-2)"
+          />
+          <!-- Cuerpo (detrás de la cabeza) -->
+          <rect x="53.5" y="64" width="13" height="7" rx="2" fill="var(--nb-oro-rosa)" />
+          <rect
+            x="41"
+            y="69"
+            width="38"
+            height="33"
+            rx="14"
+            fill="var(--nb-carcasa)"
+            stroke="var(--nb-perfil)"
+            stroke-width="2"
+          />
+          <path
+            d="M70 91.5 C 68.9 90.6 67.6 89.7 67.6 88.4 C 67.6 87.6 68.2 87 69 87 C 69.5 87 69.8 87.3 70 87.7 C 70.2 87.3 70.5 87 71 87 C 71.8 87 72.4 87.6 72.4 88.4 C 72.4 89.7 71.1 90.6 70 91.5 Z"
+            fill="var(--accent)"
+          />
+          <!-- Orejas (tornillos oro rosa) -->
+          <circle
+            cx="27.5"
+            cy="42"
+            r="5.2"
+            fill="var(--nb-oro-rosa)"
+            stroke="var(--nb-oro-rosa-osc)"
+            stroke-width="1.2"
+          />
+          <circle
+            cx="92.5"
+            cy="42"
+            r="5.2"
+            fill="var(--nb-oro-rosa)"
+            stroke="var(--nb-oro-rosa-osc)"
+            stroke-width="1.2"
+          />
+          <!-- Cabeza -->
+          <rect
+            x="29"
+            y="18"
+            width="62"
+            height="49"
+            rx="22.5"
+            fill="var(--nb-carcasa)"
+            stroke="var(--nb-perfil)"
+            stroke-width="2"
+          />
+          <rect x="36.2" y="25.2" width="47.6" height="35.6" rx="16" fill="var(--nb-cara)" />
+          <!-- Ojos con pestañas largas y raya (grupo que parpadea) -->
+          <g class="nb-ojos">
+            <ellipse cx="50" cy="41" rx="4.1" ry="5" fill="var(--nb-ojo)" />
+            <ellipse cx="70" cy="41" rx="4.1" ry="5" fill="var(--nb-ojo)" />
+            <circle cx="51.4" cy="39.2" r="1.35" fill="#fff" />
+            <circle cx="71.4" cy="39.2" r="1.35" fill="#fff" />
+            <g stroke="var(--nb-ojo)" stroke-width="1.5" stroke-linecap="round" fill="none">
+              <path d="M45.4 39.6 Q 46.8 35.4 50.2 35.6 Q 53.2 35.9 54.4 38.4" />
+              <path d="M46 38.2 Q 43.4 36.8 41.4 33.4" />
+              <path d="M47.6 36.6 Q 45.8 33.8 45.3 29.9" />
+              <path d="M49.9 35.8 Q 49.4 32.6 50.4 29.2" />
+              <path d="M74.6 39.6 Q 73.2 35.4 69.8 35.6 Q 66.8 35.9 65.6 38.4" />
+              <path d="M74 38.2 Q 76.6 36.8 78.6 33.4" />
+              <path d="M72.4 36.6 Q 74.2 33.8 74.7 29.9" />
+              <path d="M70.1 35.8 Q 70.6 32.6 69.6 29.2" />
+            </g>
+          </g>
+          <!-- Colorete -->
+          <circle cx="42.8" cy="50.5" r="3.6" fill="var(--nb-colorete)" opacity="0.75" />
+          <circle cx="77.2" cy="50.5" r="3.6" fill="var(--nb-colorete)" opacity="0.75" />
+          <!-- Morros rojos, marcados y pintados (con brillo) -->
+          <g class="nb-labios">
+            <path
+              d="M51.2 52.6 C 53.6 49.4 57 48.8 60 51 C 63 48.8 66.4 49.4 68.8 52.6 C 65.4 53.9 54.6 53.9 51.2 52.6 Z"
+              fill="var(--nb-rojo)"
+              stroke="var(--nb-rojo-osc)"
+              stroke-width="0.9"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M51.2 52.6 C 54.6 54.2 65.4 54.2 68.8 52.6 C 67.2 58 52.8 58 51.2 52.6 Z"
+              fill="var(--nb-rojo)"
+              stroke="var(--nb-rojo-osc)"
+              stroke-width="0.9"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M52.3 52.7 C 55.8 53.6 64.2 53.6 67.7 52.7"
+              stroke="var(--nb-rojo-osc)"
+              stroke-width="0.8"
+              fill="none"
+              stroke-linecap="round"
+            />
+            <ellipse cx="63.2" cy="55.3" rx="2.2" ry="0.9" fill="#fff" opacity="0.75" />
+            <ellipse cx="56" cy="51" rx="1.2" ry="0.55" fill="#fff" opacity="0.6" />
+          </g>
+          <!-- Bote de esmalte (rojo, con brillo), apoyado abajo a la derecha -->
+          <rect
+            x="93"
+            y="95"
+            width="15"
+            height="16"
+            rx="3.8"
+            fill="var(--nb-rojo)"
+            stroke="var(--nb-rojo-osc)"
+            stroke-width="1"
+          />
+          <rect x="96.8" y="91" width="7.4" height="5" rx="1" fill="var(--nb-rojo-osc)" />
+          <rect x="95.3" y="97.8" width="2.4" height="8.5" rx="1.2" fill="#fff" opacity="0.55" />
+          <!-- Mano de las uñas: levantada delante del cuerpo, dedos arriba (pose 💅), pulsera oro rosa -->
+          <g class="nb-mano-uñas">
+            <rect
+              x="38.6"
+              y="99.5"
+              width="16"
+              height="5.2"
+              rx="2.6"
+              fill="var(--nb-oro-rosa)"
+              stroke="var(--nb-oro-rosa-osc)"
+              stroke-width="1"
+            />
+            <rect
+              x="37.4"
+              y="80"
+              width="4.8"
+              height="13"
+              rx="2.4"
+              fill="var(--nb-carcasa)"
+              stroke="var(--nb-perfil)"
+              stroke-width="1.3"
+            />
+            <rect
+              x="42.4"
+              y="77.6"
+              width="4.8"
+              height="15"
+              rx="2.4"
+              fill="var(--nb-carcasa)"
+              stroke="var(--nb-perfil)"
+              stroke-width="1.3"
+            />
+            <rect
+              x="47.4"
+              y="78.2"
+              width="4.8"
+              height="14.4"
+              rx="2.4"
+              fill="var(--nb-carcasa)"
+              stroke="var(--nb-perfil)"
+              stroke-width="1.3"
+            />
+            <rect
+              x="52.4"
+              y="80.6"
+              width="4.8"
+              height="12"
+              rx="2.4"
+              fill="var(--nb-carcasa)"
+              stroke="var(--nb-perfil)"
+              stroke-width="1.3"
+            />
+            <rect
+              x="33.4"
+              y="89"
+              width="7.4"
+              height="4.6"
+              rx="2.3"
+              transform="rotate(-40 37.1 91.3)"
+              fill="var(--nb-carcasa)"
+              stroke="var(--nb-perfil)"
+              stroke-width="1.3"
+            />
+            <path
+              d="M36.4 90 H58.2 V95.5 C 58.2 99.2 55.4 101.2 51.8 101.2 H42.8 C 39.2 101.2 36.4 99.2 36.4 95.5 Z"
+              fill="var(--nb-carcasa)"
+              stroke="var(--nb-perfil)"
+              stroke-width="1.3"
+              stroke-linejoin="round"
+            />
+            <!-- Uñas ALMENDRA largas: base sin pintar + esmalte encima (BASE = pintada) -->
+            <path
+              d="M37.9 82.6 V79.4 C 37.9 76.4 39.8 74.4 39.8 74.4 C 39.8 74.4 41.7 76.4 41.7 79.4 V82.6 Z"
+              fill="var(--nb-una-base)"
+            />
+            <path
+              d="M42.9 80.2 V77 C 42.9 74 44.8 72 44.8 72 C 44.8 72 46.7 74 46.7 77 V80.2 Z"
+              fill="var(--nb-una-base)"
+            />
+            <path
+              d="M47.9 80.8 V77.6 C 47.9 74.6 49.8 72.6 49.8 72.6 C 49.8 72.6 51.7 74.6 51.7 77.6 V80.8 Z"
+              fill="var(--nb-una-base)"
+            />
+            <path
+              d="M52.9 83.2 V80 C 52.9 77 54.8 75 54.8 75 C 54.8 75 56.7 77 56.7 80 V83.2 Z"
+              fill="var(--nb-una-base)"
+            />
+            <path
+              class="nb-esmalte nb-esmalte-1"
+              d="M37.9 82.6 V79.4 C 37.9 76.4 39.8 74.4 39.8 74.4 C 39.8 74.4 41.7 76.4 41.7 79.4 V82.6 Z"
+              fill="var(--nb-rojo)"
+            />
+            <path
+              class="nb-esmalte nb-esmalte-2"
+              d="M42.9 80.2 V77 C 42.9 74 44.8 72 44.8 72 C 44.8 72 46.7 74 46.7 77 V80.2 Z"
+              fill="var(--nb-rojo)"
+            />
+            <path
+              class="nb-esmalte nb-esmalte-3"
+              d="M47.9 80.8 V77.6 C 47.9 74.6 49.8 72.6 49.8 72.6 C 49.8 72.6 51.7 74.6 51.7 77.6 V80.8 Z"
+              fill="var(--nb-rojo)"
+            />
+            <path
+              class="nb-esmalte nb-esmalte-4"
+              d="M52.9 83.2 V80 C 52.9 77 54.8 75 54.8 75 C 54.8 75 56.7 77 56.7 80 V83.2 Z"
+              fill="var(--nb-rojo)"
+            />
+          </g>
+          <!-- Soplidos (de los morros hacia las uñas) -->
+          <g
+            class="nb-soplido"
+            stroke="var(--accent)"
+            stroke-width="1.2"
+            stroke-linecap="round"
+            fill="none"
+            opacity="0"
+          >
+            <path d="M52 60.5 Q 49.5 63 49 66.5" />
+            <path d="M55 61.5 Q 53.6 64.5 54 68" />
+          </g>
+          <!-- Destellos de «uñas perfectas» -->
+          <path
+            class="nb-brillo"
+            d="M33 69 l1.3 2.8 2.8 1.3 -2.8 1.3 -1.3 2.8 -1.3 -2.8 -2.8 -1.3 2.8 -1.3 Z"
+            fill="var(--accent)"
+          />
+          <path
+            class="nb-brillo nb-brillo-b"
+            d="M59.5 70.5 l1 2.1 2.1 1 -2.1 1 -1 2.1 -1 -2.1 -2.1 -1 2.1 -1 Z"
+            fill="var(--nb-oro-rosa-osc)"
+          />
+          <!-- Mano del pincel (bola con pulgar y pulsera) — reposo: con la punta del pincel metida en el bote -->
+          <g class="nb-mano-pincel">
+            <rect
+              x="98.4"
+              y="74.6"
+              width="4.2"
+              height="10.5"
+              rx="1.6"
+              fill="var(--nb-oro-rosa)"
+              stroke="var(--nb-oro-rosa-osc)"
+              stroke-width="0.9"
+            />
+            <rect x="99.6" y="85" width="1.8" height="6.2" rx="0.9" fill="var(--nb-oro-rosa-osc)" />
+            <path
+              d="M99.3 90.8 L101.7 90.8 L101.1 94.8 Q 100.5 96 99.9 94.8 Z"
+              fill="var(--nb-rojo)"
+            />
+            <rect
+              x="103.6"
+              y="70.4"
+              width="4.6"
+              height="10.4"
+              rx="2.3"
+              fill="var(--nb-oro-rosa)"
+              stroke="var(--nb-oro-rosa-osc)"
+              stroke-width="1"
+            />
+            <circle
+              cx="100.6"
+              cy="75.6"
+              r="5.6"
+              fill="var(--nb-carcasa)"
+              stroke="var(--nb-perfil)"
+              stroke-width="1.3"
+            />
+            <circle
+              cx="96.4"
+              cy="78.6"
+              r="2.3"
+              fill="var(--nb-carcasa)"
+              stroke="var(--nb-perfil)"
+              stroke-width="1.2"
+            />
+          </g>
         </g>
-      </g>
-      <!-- Colorete -->
-      <circle cx="42.8" cy="50.5" r="3.6" fill="var(--nb-colorete)" opacity="0.75"/>
-      <circle cx="77.2" cy="50.5" r="3.6" fill="var(--nb-colorete)" opacity="0.75"/>
-      <!-- Morros rojos, marcados y pintados (con brillo) -->
-      <g class="nb-labios">
-        <path d="M51.2 52.6 C 53.6 49.4 57 48.8 60 51 C 63 48.8 66.4 49.4 68.8 52.6 C 65.4 53.9 54.6 53.9 51.2 52.6 Z" fill="var(--nb-rojo)" stroke="var(--nb-rojo-osc)" stroke-width="0.9" stroke-linejoin="round"/>
-        <path d="M51.2 52.6 C 54.6 54.2 65.4 54.2 68.8 52.6 C 67.2 58 52.8 58 51.2 52.6 Z" fill="var(--nb-rojo)" stroke="var(--nb-rojo-osc)" stroke-width="0.9" stroke-linejoin="round"/>
-        <path d="M52.3 52.7 C 55.8 53.6 64.2 53.6 67.7 52.7" stroke="var(--nb-rojo-osc)" stroke-width="0.8" fill="none" stroke-linecap="round"/>
-        <ellipse cx="63.2" cy="55.3" rx="2.2" ry="0.9" fill="#fff" opacity="0.75"/>
-        <ellipse cx="56" cy="51" rx="1.2" ry="0.55" fill="#fff" opacity="0.6"/>
-      </g>
-      <!-- Bote de esmalte (rojo, con brillo), apoyado abajo a la derecha -->
-      <rect x="93" y="95" width="15" height="16" rx="3.8" fill="var(--nb-rojo)" stroke="var(--nb-rojo-osc)" stroke-width="1"/>
-      <rect x="96.8" y="91" width="7.4" height="5" rx="1" fill="var(--nb-rojo-osc)"/>
-      <rect x="95.3" y="97.8" width="2.4" height="8.5" rx="1.2" fill="#fff" opacity="0.55"/>
-      <!-- Mano de las uñas: levantada delante del cuerpo, dedos arriba (pose 💅), pulsera oro rosa -->
-      <g class="nb-mano-uñas">
-        <rect x="38.6" y="99.5" width="16" height="5.2" rx="2.6" fill="var(--nb-oro-rosa)" stroke="var(--nb-oro-rosa-osc)" stroke-width="1"/>
-        <rect x="37.4" y="80" width="4.8" height="13" rx="2.4" fill="var(--nb-carcasa)" stroke="var(--nb-perfil)" stroke-width="1.3"/>
-        <rect x="42.4" y="77.6" width="4.8" height="15" rx="2.4" fill="var(--nb-carcasa)" stroke="var(--nb-perfil)" stroke-width="1.3"/>
-        <rect x="47.4" y="78.2" width="4.8" height="14.4" rx="2.4" fill="var(--nb-carcasa)" stroke="var(--nb-perfil)" stroke-width="1.3"/>
-        <rect x="52.4" y="80.6" width="4.8" height="12" rx="2.4" fill="var(--nb-carcasa)" stroke="var(--nb-perfil)" stroke-width="1.3"/>
-        <rect x="33.4" y="89" width="7.4" height="4.6" rx="2.3" transform="rotate(-40 37.1 91.3)" fill="var(--nb-carcasa)" stroke="var(--nb-perfil)" stroke-width="1.3"/>
-        <path d="M36.4 90 H58.2 V95.5 C 58.2 99.2 55.4 101.2 51.8 101.2 H42.8 C 39.2 101.2 36.4 99.2 36.4 95.5 Z" fill="var(--nb-carcasa)" stroke="var(--nb-perfil)" stroke-width="1.3" stroke-linejoin="round"/>
-        <!-- Uñas ALMENDRA largas: base sin pintar + esmalte encima (BASE = pintada) -->
-        <path d="M37.9 82.6 V79.4 C 37.9 76.4 39.8 74.4 39.8 74.4 C 39.8 74.4 41.7 76.4 41.7 79.4 V82.6 Z" fill="var(--nb-una-base)"/>
-        <path d="M42.9 80.2 V77 C 42.9 74 44.8 72 44.8 72 C 44.8 72 46.7 74 46.7 77 V80.2 Z" fill="var(--nb-una-base)"/>
-        <path d="M47.9 80.8 V77.6 C 47.9 74.6 49.8 72.6 49.8 72.6 C 49.8 72.6 51.7 74.6 51.7 77.6 V80.8 Z" fill="var(--nb-una-base)"/>
-        <path d="M52.9 83.2 V80 C 52.9 77 54.8 75 54.8 75 C 54.8 75 56.7 77 56.7 80 V83.2 Z" fill="var(--nb-una-base)"/>
-        <path class="nb-esmalte nb-esmalte-1" d="M37.9 82.6 V79.4 C 37.9 76.4 39.8 74.4 39.8 74.4 C 39.8 74.4 41.7 76.4 41.7 79.4 V82.6 Z" fill="var(--nb-rojo)"/>
-        <path class="nb-esmalte nb-esmalte-2" d="M42.9 80.2 V77 C 42.9 74 44.8 72 44.8 72 C 44.8 72 46.7 74 46.7 77 V80.2 Z" fill="var(--nb-rojo)"/>
-        <path class="nb-esmalte nb-esmalte-3" d="M47.9 80.8 V77.6 C 47.9 74.6 49.8 72.6 49.8 72.6 C 49.8 72.6 51.7 74.6 51.7 77.6 V80.8 Z" fill="var(--nb-rojo)"/>
-        <path class="nb-esmalte nb-esmalte-4" d="M52.9 83.2 V80 C 52.9 77 54.8 75 54.8 75 C 54.8 75 56.7 77 56.7 80 V83.2 Z" fill="var(--nb-rojo)"/>
-      </g>
-      <!-- Soplidos (de los morros hacia las uñas) -->
-      <g class="nb-soplido" stroke="var(--accent)" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0">
-        <path d="M52 60.5 Q 49.5 63 49 66.5"/>
-        <path d="M55 61.5 Q 53.6 64.5 54 68"/>
-      </g>
-      <!-- Destellos de «uñas perfectas» -->
-      <path class="nb-brillo" d="M33 69 l1.3 2.8 2.8 1.3 -2.8 1.3 -1.3 2.8 -1.3 -2.8 -2.8 -1.3 2.8 -1.3 Z" fill="var(--accent)"/>
-      <path class="nb-brillo nb-brillo-b" d="M59.5 70.5 l1 2.1 2.1 1 -2.1 1 -1 2.1 -1 -2.1 -2.1 -1 2.1 -1 Z" fill="var(--nb-oro-rosa-osc)"/>
-      <!-- Mano del pincel (bola con pulgar y pulsera) — reposo: con la punta del pincel metida en el bote -->
-      <g class="nb-mano-pincel">
-        <rect x="98.4" y="74.6" width="4.2" height="10.5" rx="1.6" fill="var(--nb-oro-rosa)" stroke="var(--nb-oro-rosa-osc)" stroke-width="0.9"/>
-        <rect x="99.6" y="85" width="1.8" height="6.2" rx="0.9" fill="var(--nb-oro-rosa-osc)"/>
-        <path d="M99.3 90.8 L101.7 90.8 L101.1 94.8 Q 100.5 96 99.9 94.8 Z" fill="var(--nb-rojo)"/>
-        <rect x="103.6" y="70.4" width="4.6" height="10.4" rx="2.3" fill="var(--nb-oro-rosa)" stroke="var(--nb-oro-rosa-osc)" stroke-width="1"/>
-        <circle cx="100.6" cy="75.6" r="5.6" fill="var(--nb-carcasa)" stroke="var(--nb-perfil)" stroke-width="1.3"/>
-        <circle cx="96.4" cy="78.6" r="2.3" fill="var(--nb-carcasa)" stroke="var(--nb-perfil)" stroke-width="1.2"/>
-      </g>
-    </g>
-  </svg>
-</template>
+      </svg>
+    </template>
 
-<div class="lanzador">
-  <div class="bocadillo" id="bocadillo">
-    <strong>¿Te pinto una cita?</strong> 💅 Soy Nailbot, te ayudo a reservar.
-    <button class="cerrar" type="button" aria-label="Cerrar mensaje de Nailbot">×</button>
-  </div>
-  <div class="envoltorio">
-    <button class="pausa" type="button" aria-label="Pausar la animación de Nailbot" aria-pressed="false" id="pausa">
-      <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><rect x="2" y="1.5" width="2.8" height="9" rx="1" fill="currentColor"/><rect x="7.2" y="1.5" width="2.8" height="9" rx="1" fill="currentColor"/></svg>
-    </button>
-    <button class="robot-btn" type="button" aria-label="Abrir el chat de Nailbot para reservar cita" id="robot"></button>
-  </div>
-</div>
+    <div class="lanzador">
+      <div class="bocadillo" id="bocadillo">
+        <strong>¿Te pinto una cita?</strong> 💅 Soy Nailbot, te ayudo a reservar.
+        <button class="cerrar" type="button" aria-label="Cerrar mensaje de Nailbot">×</button>
+      </div>
+      <div class="envoltorio">
+        <button
+          class="pausa"
+          type="button"
+          aria-label="Pausar la animación de Nailbot"
+          aria-pressed="false"
+          id="pausa"
+        >
+          <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+            <rect x="2" y="1.5" width="2.8" height="9" rx="1" fill="currentColor" />
+            <rect x="7.2" y="1.5" width="2.8" height="9" rx="1" fill="currentColor" />
+          </svg>
+        </button>
+        <button
+          class="robot-btn"
+          type="button"
+          aria-label="Abrir el chat de Nailbot para reservar cita"
+          id="robot"
+        ></button>
+      </div>
+    </div>
 
-<script>
-  const arte = document.getElementById('arte').content.firstElementChild
-  for (const hueco of document.querySelectorAll('svg[data-hueco]')) {
-    const svg = arte.cloneNode(true)
-    svg.setAttribute('width', hueco.getAttribute('width'))
-    svg.setAttribute('height', hueco.getAttribute('height'))
-    hueco.replaceWith(svg)
-  }
-  for (const fig of document.querySelectorAll('.congelado')) {
-    const t = Number(fig.dataset.t)
-    for (const el of [fig.querySelector('.nb'), ...fig.querySelectorAll('.nb *')]) el.style.animationDelay = `-${t}s`
-  }
-  document.getElementById('robot').appendChild(arte.cloneNode(true))
-  const pausa = document.getElementById('pausa')
-  pausa.addEventListener('click', () => {
-    const pausado = pausa.getAttribute('aria-pressed') !== 'true'
-    pausa.setAttribute('aria-pressed', String(pausado))
-    document.querySelectorAll('.lanzador .nb').forEach((n) => n.setAttribute('data-pausado', String(pausado)))
-  })
-  document.querySelector('.bocadillo .cerrar').addEventListener('click', () => document.getElementById('bocadillo').remove())
-</script>
-</body>
+    <script>
+      const arte = document.getElementById('arte').content.firstElementChild
+      for (const hueco of document.querySelectorAll('svg[data-hueco]')) {
+        const svg = arte.cloneNode(true)
+        svg.setAttribute('width', hueco.getAttribute('width'))
+        svg.setAttribute('height', hueco.getAttribute('height'))
+        hueco.replaceWith(svg)
+      }
+      for (const fig of document.querySelectorAll('.congelado')) {
+        const t = Number(fig.dataset.t)
+        for (const el of [fig.querySelector('.nb'), ...fig.querySelectorAll('.nb *')])
+          el.style.animationDelay = `-${t}s`
+      }
+      document.getElementById('robot').appendChild(arte.cloneNode(true))
+      const pausa = document.getElementById('pausa')
+      pausa.addEventListener('click', () => {
+        const pausado = pausa.getAttribute('aria-pressed') !== 'true'
+        pausa.setAttribute('aria-pressed', String(pausado))
+        document
+          .querySelectorAll('.lanzador .nb')
+          .forEach((n) => n.setAttribute('data-pausado', String(pausado)))
+      })
+      document
+        .querySelector('.bocadillo .cerrar')
+        .addEventListener('click', () => document.getElementById('bocadillo').remove())
+    </script>
+  </body>
 </html>

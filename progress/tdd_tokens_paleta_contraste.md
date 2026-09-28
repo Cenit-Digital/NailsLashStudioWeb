@@ -14,13 +14,13 @@ higiene: +3 de la deuda 2).
 
 **Mutación (toda a `--concurrency 1`, la única medición honesta — ver Hallazgo 2):**
 
-| Fichero | Score | Muertos | Supervivientes | Timeouts |
-| ------- | ----- | ------- | -------------- | -------- |
-| `src/lib/contraste.ts` | **100,00 %** | 53 | **0** | 0 |
-| `src/lib/puerta-contraste.ts` | **100,00 %** | 232 | **0** | 0 |
-| `src/lib/placeholders.ts` (F-01) | sin regresión (100 % de F-01 vigente) | — | — | — |
-| `src/lib/puerta.ts` (F-01) | sin regresión (100 % de F-01 vigente) | — | — | — |
-| `src/lib/site.ts` (F-02) | sin regresión (100 % de F-02 vigente) | — | — | — |
+| Fichero                          | Score                                 | Muertos | Supervivientes | Timeouts |
+| -------------------------------- | ------------------------------------- | ------- | -------------- | -------- |
+| `src/lib/contraste.ts`           | **100,00 %**                          | 53      | **0**          | 0        |
+| `src/lib/puerta-contraste.ts`    | **100,00 %**                          | 232     | **0**          | 0        |
+| `src/lib/placeholders.ts` (F-01) | sin regresión (100 % de F-01 vigente) | —       | —              | —        |
+| `src/lib/puerta.ts` (F-01)       | sin regresión (100 % de F-01 vigente) | —       | —              | —        |
+| `src/lib/site.ts` (F-02)         | sin regresión (100 % de F-02 vigente) | —       | —              | —        |
 
 **0 mutantes excluidos** (F-01 necesitó 1). Los dos equivalentes que aparecieron se
 eliminaron cambiando el DISEÑO, no excluyéndolos — ver Hallazgo 4.
@@ -51,37 +51,37 @@ mensaje del lead.
 
 ## Arquitectura (la de F-01, sin inventar otra)
 
-| Capa | Fichero | Qué hace |
-| ---- | ------- | -------- |
-| PURA | `src/lib/contraste.ts` | G17: `hexARgb`, `canalLineal`, `luminancia`, `ratio`, `componer`. No lee ficheros ni decide exit codes. |
-| PUERTA | `src/lib/puerta-contraste.ts` | Lee el SCSS, recorre la matriz de uso, decide el código de salida. |
-| HUMILDE | `tools/puerta-contraste.ts` | Solo cablea `node:fs`/`node:process`. Sin tests ni mutación (no decide nada). |
-| DATOS | `src/styles/_tokens.scss` | El `:root` REAL con los 7 cambios. T-1: **no** copiado de WebEmpresa. |
+| Capa    | Fichero                       | Qué hace                                                                                                |
+| ------- | ----------------------------- | ------------------------------------------------------------------------------------------------------- |
+| PURA    | `src/lib/contraste.ts`        | G17: `hexARgb`, `canalLineal`, `luminancia`, `ratio`, `componer`. No lee ficheros ni decide exit codes. |
+| PUERTA  | `src/lib/puerta-contraste.ts` | Lee el SCSS, recorre la matriz de uso, decide el código de salida.                                      |
+| HUMILDE | `tools/puerta-contraste.ts`   | Solo cablea `node:fs`/`node:process`. Sin tests ni mutación (no decide nada).                           |
+| DATOS   | `src/styles/_tokens.scss`     | El `:root` REAL con los 7 cambios. T-1: **no** copiado de WebEmpresa.                                   |
 
 Enganchada a `pnpm build`, **no** a `dev` (D-8, como F-01).
 
 ## Trazabilidad @s → test
 
-| `@s` | Test |
-| ---- | ---- |
-| @s1 | `contraste.test.ts` → `@s1 convierte "%s" a tres enteros 0-255` (4 filas) |
-| @s2 | `@s2 expande la forma corta "%s"` (3 filas) |
-| @s3 | `@s3 es insensible a mayúsculas/minúsculas` |
-| @s4 | `@s4 lanza ante el hex malformado "%s"` (**6 filas**, la última añadida por mutación con aprobación humana) |
-| @s5 | `@s5 canalLineal(%i) es exactamente %i` (2 filas) |
-| @s6 | `@s6 en el punto de corte 0.04045 usa la rama LINEAL` + `@s6 … rama de POTENCIA` |
-| @s7 | `@s7 la luminancia de %s es exactamente %s` (5 filas, primarios cromáticos) |
-| @s8 | `@s8 el ratio blanco/negro es exactamente 21` + `@s8 … es igual … también exactamente 21` |
-| @s9 | `@s9 %s` (4 filas: α=1, α=0, `--line` α=.16, `color-mix` α=.88) |
-| @s10 | `puerta-contraste.test.ts` → `@s10 el token %s vale exactamente %s` (6 filas) + 3 tests de parser (espaciado, multi-token, comentado) |
-| @s11 | `@s11 "%s" sobre "%s" … pasa` (16 filas) + no-violación + puerta limpia exit 0 + auditabilidad + ruta vigilada |
-| @s12 | `@s12 emite exactamente 1 violación …` + `… exit != 0` + `… enganchada al build, y NO al dev` + `… determinista` |
-| @s13 | `@s13 ningún par … declara #C05576 como primer plano` + `… usa --accent-dark` + `… sigue existiendo como relleno` |
+| `@s` | Test                                                                                                                                                                                                                                                                                                          |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| @s1  | `contraste.test.ts` → `@s1 convierte "%s" a tres enteros 0-255` (4 filas)                                                                                                                                                                                                                                     |
+| @s2  | `@s2 expande la forma corta "%s"` (3 filas)                                                                                                                                                                                                                                                                   |
+| @s3  | `@s3 es insensible a mayúsculas/minúsculas`                                                                                                                                                                                                                                                                   |
+| @s4  | `@s4 lanza ante el hex malformado "%s"` (**6 filas**, la última añadida por mutación con aprobación humana)                                                                                                                                                                                                   |
+| @s5  | `@s5 canalLineal(%i) es exactamente %i` (2 filas)                                                                                                                                                                                                                                                             |
+| @s6  | `@s6 en el punto de corte 0.04045 usa la rama LINEAL` + `@s6 … rama de POTENCIA`                                                                                                                                                                                                                              |
+| @s7  | `@s7 la luminancia de %s es exactamente %s` (5 filas, primarios cromáticos)                                                                                                                                                                                                                                   |
+| @s8  | `@s8 el ratio blanco/negro es exactamente 21` + `@s8 … es igual … también exactamente 21`                                                                                                                                                                                                                     |
+| @s9  | `@s9 %s` (4 filas: α=1, α=0, `--line` α=.16, `color-mix` α=.88)                                                                                                                                                                                                                                               |
+| @s10 | `puerta-contraste.test.ts` → `@s10 el token %s vale exactamente %s` (6 filas) + 3 tests de parser (espaciado, multi-token, comentado)                                                                                                                                                                         |
+| @s11 | `@s11 "%s" sobre "%s" … pasa` (16 filas) + no-violación + puerta limpia exit 0 + auditabilidad + ruta vigilada                                                                                                                                                                                                |
+| @s12 | `@s12 emite exactamente 1 violación …` + `… exit != 0` + `… enganchada al build, y NO al dev` + `… determinista`                                                                                                                                                                                              |
+| @s13 | `@s13 ningún par … declara #C05576 como primer plano` + `… usa --accent-dark` + `… sigue existiendo como relleno`                                                                                                                                                                                             |
 | @s14 | `@s14 con %s el código de salida es distinto de 0` (2 filas; la 2ª **inerte** — ver post-cierre) + `@s14 la salida declara que no se evaluó el mínimo` + (post-cierre) `@s14 el mínimo … es exactamente 18` + `@s14 con un par MENOS del mínimo exigido …` + `@s14 la matriz real satisface el mínimo real …` |
-| @s15 | 5 tests: fichero ilegible (ENOENT), token no declarado, hex malformado, `--header-bg` irreconocible, `--header-bg` ausente |
-| @s16 | matriz declara «Studio» + umbral 4.5 no 3.0 + fixture 4.19 → violación + corregido 5.98 pasa |
-| @s17 | 2 filas centrales (negro puro) + 10 filas de margen + matriz vigila nav Y logo + 4 filas de espaciado de `color-mix` |
-| @s18 | `@s18 bajar la cabecera al 82 % … violación con 4.22 y umbral 4.5` |
+| @s15 | 5 tests: fichero ilegible (ENOENT), token no declarado, hex malformado, `--header-bg` irreconocible, `--header-bg` ausente                                                                                                                                                                                    |
+| @s16 | matriz declara «Studio» + umbral 4.5 no 3.0 + fixture 4.19 → violación + corregido 5.98 pasa                                                                                                                                                                                                                  |
+| @s17 | 2 filas centrales (negro puro) + 10 filas de margen + matriz vigila nav Y logo + 4 filas de espaciado de `color-mix`                                                                                                                                                                                          |
+| @s18 | `@s18 bajar la cabecera al 82 % … violación con 4.22 y umbral 4.5`                                                                                                                                                                                                                                            |
 
 ## Las trampas del encargo: todas confirmadas por cálculo ANTES de escribir el test
 
@@ -117,7 +117,7 @@ se MIENTE un informe verde, y las tres me pasaron a mí en esta feature.**
 2. **Un 19 % puede ser culpa de los TESTS, no del código.**
    `puerta-contraste.ts` midió **19,25 % con 189 supervivientes** y el código estaba bien. Yo
    calculaba `evaluarMatriz(...)`, `extraerTokens(...)`, `readFileSync(...)` y `MATRIZ_DE_USO
-   .find(...)` en el **cuerpo del `describe`**, o sea en **tiempo de recolección**. Stryker
+.find(...)` en el **cuerpo del `describe`**, o sea en **tiempo de recolección**. Stryker
    activa el mutante **POR TEST**: lo que ya se ejecutó al recolectar **no se vuelve a ejecutar**
    con el mutante activo → sobrevive intacto. Y el caso peor: un mutante que rompía la matriz
    hacía fallar la **recolección del fichero** → **0 tests corrían** → Stryker no veía ningún
@@ -159,7 +159,7 @@ Primera medición: **19,25 %, 189 supervivientes**. Causa: yo calculaba `evaluar
 `extraerTokens(...)` y `readFileSync(...)` en el **cuerpo del `describe`**, o sea en tiempo de
 **recolección**. Stryker activa el mutante **por test**: lo que ya se ejecutó al recolectar no
 se vuelve a ejecutar con el mutante activo → **sobrevive intacto**. Peor: un mutante que rompía
-la matriz hacía fallar la *recolección* del fichero → **0 tests corrían** → Stryker no veía
+la matriz hacía fallar la _recolección_ del fichero → **0 tests corrían** → Stryker no veía
 ningún test fallido → **lo contaba como superviviente**.
 Con helpers perezosos (`scssReal()`, `tokensReales()`, `evaluacionesReales()`, `parStudio()`):
 **19,25 % → 65,69 % → 90,75 % → 98,68 % → 100 %**. Regla escrita en la cabecera del fichero de
@@ -281,11 +281,11 @@ modificado es `src/lib/puerta-contraste.test.ts` (+47 líneas, 3 tests).
 El hallazgo decía «bajarlo a 1 no pondría rojo nada». **Lo verifiqué sabotéandolo**, que es la
 única forma honesta de probar un ancla sobre producción que ya existe:
 
-| paso | producción | suite |
-| ---- | ---------- | ----- |
-| 1. sabotaje, sin tests nuevos | `MINIMO_DE_PARES = 1` | **183/183 VERDE** ← el hueco, confirmado |
-| 2. con los 3 tests nuevos | `MINIMO_DE_PARES = 1` | **1 failed** (`expected 1 to be 18`) |
-| 3. restaurado | `MINIMO_DE_PARES = 18` | **186/186 VERDE** |
+| paso                          | producción             | suite                                    |
+| ----------------------------- | ---------------------- | ---------------------------------------- |
+| 1. sabotaje, sin tests nuevos | `MINIMO_DE_PARES = 1`  | **183/183 VERDE** ← el hueco, confirmado |
+| 2. con los 3 tests nuevos     | `MINIMO_DE_PARES = 1`  | **1 failed** (`expected 1 to be 18`)     |
+| 3. restaurado                 | `MINIMO_DE_PARES = 18` | **186/186 VERDE**                        |
 
 El paso 1 es el hallazgo del `judge` reproducido: la guarda anti-vacuidad del build real se
 podía **desactivar en silencio** con todo en verde. Es la misma clase de fallo que F-03 existe
@@ -301,7 +301,7 @@ decide una guarda y que ningún test fija»).
    anclaba `RUTA_DE_LOS_TOKENS` en `@s11`. Coge las **dos direcciones**: bajarlo (guarda muerta)
    y subirlo a 19 (guarda insatisfacible).
 2. **`@s14 con un par MENOS del mínimo exigido la puerta falla, aunque ningún par viole su
-   umbral`** — la frontera, con el mínimo REAL de producción. Es el verde por vacuidad literal:
+umbral`** — la frontera, con el mínimo REAL de producción. Es el verde por vacuidad literal:
    0 fallos sobre pocos pares no es estar protegido. Se recorta a `MINIMO_DE_PARES - 1`, **no** a
    `length - 1`, para que **añadir** un par a la matriz no lo ponga rojo sin motivo.
 3. **`@s14 la matriz real satisface el mínimo real: la puerta de producción sale con código 0`** —
@@ -309,7 +309,7 @@ decide una guarda y que ningún test fija»).
 
 **El reparto símbolo/literal es deliberado:** el test 1 fija el **VALOR** (literal); los tests 2 y
 3 fijan el **COMPORTAMIENTO** de `length < minimo` (símbolo). Verificado en vivo: bajo el sabotaje
-`18 → 1` los tests 2 y 3 **siguen verdes** —usan el símbolo, así que *siguen al mutante*— y solo
+`18 → 1` los tests 2 y 3 **siguen verdes** —usan el símbolo, así que _siguen al mutante_— y solo
 el test 1 se pone rojo. Es la razón exacta por la que el ancla va contra el literal, comprobada en
 el propio repo en vez de citada.
 
@@ -325,7 +325,7 @@ fichero al 100 % de mutación puede tener una guarda muerta: el score no cubre e
 ### Lo que NO hice, y por qué
 
 - **No anclé que el humilde pase `MINIMO_DE_PARES`** (el `judge` lo apunta de pasada). El humilde
-  es *humble object* sin decisiones, sin tests y fuera de mutación **por diseño ya aprobado en
+  es _humble object_ sin decisiones, sin tests y fuera de mutación **por diseño ya aprobado en
   F-01**. Aseverar sobre su texto fuente sería testear lo que no decide. Precedente respetado: se
   ancla la CONSTANTE (como `RUTA_DE_LOS_TOKENS`), y del cableado responde el humilde.
   **Residual conocido y aceptado:** si alguien editara `tools/puerta-contraste.ts` para pasar
@@ -340,9 +340,9 @@ contra el SCSS real → `✓ los 18 pares en uso cumplen su umbral WCAG 2.2 AA`,
 **Mutación de `src/lib/puerta-contraste.ts`** (`--mutate src/lib/puerta-contraste.ts
 --concurrency 1 --timeoutMS 60000`, sin nada compitiendo por la CPU):
 
-| Score | Muertos | Supervivientes | **Timeouts** | No cov | Errores |
-| ----- | ------- | -------------- | ------------ | ------ | ------- |
-| **100,00 %** | 232 | **0** | **0** | 0 | 0 |
+| Score        | Muertos | Supervivientes | **Timeouts** | No cov | Errores |
+| ------------ | ------- | -------------- | ------------ | ------ | ------- |
+| **100,00 %** | 232     | **0**          | **0**        | 0      | 0       |
 
 **`# timeout` leído ANTES que el score** (regla del arnés, `docs/verification.md`): es 0, así que
 el score vale. No se re-midió la tanda completa: `contraste.ts` no se ha tocado y
@@ -354,23 +354,23 @@ cambio es **añadir** tests, y más tests solo pueden matar más mutantes, nunca
 **La fila es inerte: confirmado.** Las dos filas pasan `matriz: []`, y con matriz vacía la guarda
 del mínimo cortocircuita **antes** de que `leerScss` influya. Medido con la producción real:
 
-| caso | matriz | SCSS | exit | línea emitida |
-| ---- | ------ | ---- | ---- | ------------- |
-| A (fila 1) | vacía | real | 1 | `no se evaluó el mínimo de pares exigido: 0 de 16` |
-| B (fila 2) | vacía | `body { color: red; }` | 1 | **idéntica a A** ← la fila 2 es la fila 1 con otro nombre |
-| **C (la fila que pide el encargo)** | **REAL** | `body { color: red; }` | 1 | `la puerta … no pudo completar el análisis: el token "--muted" … no está declarado en el :root` |
+| caso                                | matriz   | SCSS                   | exit | línea emitida                                                                                   |
+| ----------------------------------- | -------- | ---------------------- | ---- | ----------------------------------------------------------------------------------------------- |
+| A (fila 1)                          | vacía    | real                   | 1    | `no se evaluó el mínimo de pares exigido: 0 de 16`                                              |
+| B (fila 2)                          | vacía    | `body { color: red; }` | 1    | **idéntica a A** ← la fila 2 es la fila 1 con otro nombre                                       |
+| **C (la fila que pide el encargo)** | **REAL** | `body { color: red; }` | 1    | `la puerta … no pudo completar el análisis: el token "--muted" … no está declarado en el :root` |
 
 **Y aquí para el trabajo: el caso C sale por la rama de `@s15`, no por la de `@s14`.**
 
 ### La contradicción del contrato, en concreto
 
-`@s14` dice: *«Given una matriz de uso vacía, **o un regex del SCSS que no casa ningún token**»* →
-*«And la salida declara **que no se evaluó el mínimo de pares exigido**»*. Leído en Gherkin
+`@s14` dice: _«Given una matriz de uso vacía, **o un regex del SCSS que no casa ningún token**»_ →
+_«And la salida declara **que no se evaluó el mínimo de pares exigido**»_. Leído en Gherkin
 estricto, los tres `Then` valen para los **dos** `Given`.
 
 **Ese `Then` es INSATISFACIBLE para el segundo `Given` con matriz no vacía**, y no por un
-descuido del código: porque **`@s15` manda lo contrario**. `@s15` declara *«un token de la matriz
-de uso no está declarado en el :root»* → *«la salida declara la causa»*, y `valorDelToken` LANZA
+descuido del código: porque **`@s15` manda lo contrario**. `@s15` declara _«un token de la matriz
+de uso no está declarado en el :root»_ → _«la salida declara la causa»_, y `valorDelToken` LANZA
 antes de llegar a la guarda del mínimo. Un SCSS que no casa ningún token **es** un token no
 declarado. Los dos escenarios **se solapan sobre la misma entrada y exigen mensajes distintos**.
 

@@ -20,13 +20,13 @@ Base sólida de los mandos: `color-mix(in srgb, var(--surface) 78%, transparent)
 blur(8px)` NO cuenta: promedia, no garantiza nada. Composición alfa en sRGB:
 `C_eff = 0.78·255 + 0.22·C_under` por canal. Luminancias WCAG y ratios reales:
 
-| Píxel debajo | Base efectiva | Glifo `--accent-dark #A23E5F` | Borde `--border-interactive #AB5F79` |
-|---|---|---|---|
-| `#FFFFFF` (el que pide el encargo) | `#FFFFFF` | **6,19:1** ✔ | **4,52:1** ✔ |
-| `--bg #FDF4F7` | `#FFFDFD` | **6,11:1** ✔ | **4,46:1** ✔ |
-| Rojo clásico `#C0392B` (foto «Manicura clásica en rojo») | `#F1D3D0` | **4,41:1** ✔ | **3,22:1** ✔ |
-| Sombra granate `#7A1F1F` | `#E2CECE` | **4,12:1** ✔ | **3,00:1** ✔ (justo) |
-| Negro absoluto `#000000` (suelo teórico) | `#C7C7C7` | **3,66:1** ✔ | **2,67:1** ✘ |
+| Píxel debajo                                             | Base efectiva | Glifo `--accent-dark #A23E5F` | Borde `--border-interactive #AB5F79` |
+| -------------------------------------------------------- | ------------- | ----------------------------- | ------------------------------------ |
+| `#FFFFFF` (el que pide el encargo)                       | `#FFFFFF`     | **6,19:1** ✔                  | **4,52:1** ✔                         |
+| `--bg #FDF4F7`                                           | `#FFFDFD`     | **6,11:1** ✔                  | **4,46:1** ✔                         |
+| Rojo clásico `#C0392B` (foto «Manicura clásica en rojo») | `#F1D3D0`     | **4,41:1** ✔                  | **3,22:1** ✔                         |
+| Sombra granate `#7A1F1F`                                 | `#E2CECE`     | **4,12:1** ✔                  | **3,00:1** ✔ (justo)                 |
+| Negro absoluto `#000000` (suelo teórico)                 | `#C7C7C7`     | **3,66:1** ✔                  | **2,67:1** ✘                         |
 
 - OJO a la trampa del enunciado: para un glifo OSCURO el peor caso NO es el píxel más claro (blanco
   da el MÁXIMO contraste, 6,19) sino el más oscuro. El suelo absoluto del compuesto al 78 % es
@@ -47,6 +47,7 @@ blur(8px)` NO cuenta: promedia, no garantiza nada. Composición alfa en sRGB:
 ## Eje 2 — SC 2.2.2 con cadencia de 2 s — **APTO** (🔵 aviso UX en reseñas, atribución honesta)
 
 El mecanismo de control está ÍNTEGRO en los DOS carruseles:
+
 - Botón ⏸/▶ PRIMERO en el DOM y en el tab-order, persistente, sin `aria-pressed`
   (`Galeria.tsx:350-357`, `Resenas.tsx:329-337`); «Parar» es definitivo — `debeRotar` da precedencia
   absoluta a `pausadoPorElUsuario`, y el anti-regresión de @s20 está cableado: en pausa,
@@ -93,14 +94,14 @@ El mecanismo de control está ÍNTEGRO en los DOS carruseles:
 
 Tarjeta central (`.lamina` sobre `--surface2 #FBE7EF`, opacidad 1 a distancia 0):
 
-| Elemento | Par | Ratio | Umbral | ✔ |
-|---|---|---|---|---|
-| Cita (15 px) | `--text #5E404A` / `#FBE7EF` | **7,70:1** | 4,5:1 | ✔ |
-| Autora (16 px, 600) | `--ink #8E3355` / `#FBE7EF` | **6,45:1** | 4,5:1 | ✔ |
-| Servicio (13 px) y nota «N de 5» (14 px) | `--accent-dark #A23E5F` / `#FBE7EF` | **5,24:1** | 4,5:1 | ✔ |
-| Línea del agregado (15 px) | `--muted #6F525A` / `--bg #FDF4F7` | **6,42:1** | 4,5:1 | ✔ |
-| Enlace Treatwell | `--accent-dark` / `--bg` | **5,74:1** | 4,5:1 | ✔ |
-| Leyenda de honestidad (13 px) | `--muted` / `--bg` | **6,42:1** | 4,5:1 | ✔ |
+| Elemento                                 | Par                                 | Ratio      | Umbral | ✔   |
+| ---------------------------------------- | ----------------------------------- | ---------- | ------ | --- |
+| Cita (15 px)                             | `--text #5E404A` / `#FBE7EF`        | **7,70:1** | 4,5:1  | ✔   |
+| Autora (16 px, 600)                      | `--ink #8E3355` / `#FBE7EF`         | **6,45:1** | 4,5:1  | ✔   |
+| Servicio (13 px) y nota «N de 5» (14 px) | `--accent-dark #A23E5F` / `#FBE7EF` | **5,24:1** | 4,5:1  | ✔   |
+| Línea del agregado (15 px)               | `--muted #6F525A` / `--bg #FDF4F7`  | **6,42:1** | 4,5:1  | ✔   |
+| Enlace Treatwell                         | `--accent-dark` / `--bg`            | **5,74:1** | 4,5:1  | ✔   |
+| Leyenda de honestidad (13 px)            | `--muted` / `--bg`                  | **6,42:1** | 4,5:1  | ✔   |
 
 - Todos los pares son tokens YA auditados por la puerta de contraste; ningún color nuevo. Las
   estrellas ★ van en `--accent-dark` y son `aria-hidden` con el número en texto al lado: su
@@ -165,14 +166,14 @@ Tarjeta central (`.lamina` sobre `--surface2 #FBE7EF`, opacidad 1 a distancia 0)
 
 ## Resumen
 
-| Eje | Veredicto |
-|---|---|
-| 1 · SC 1.4.11 cristal (peor caso calculado) | **APTO** · 🟡 borde 2,67:1 bajo píxel casi negro (glifo aguanta 3,66:1 siempre; fix: surface 85 %) |
-| 2 · SC 2.2.2 con 2 s | **APTO** · 🔵 2 s sobre texto es hostil al lector táctil (decisión de cliente, no WCAG) |
-| 3 · Teclado global @s21..@s23 | **APTO** · 🟡 doble-atención posible: el desempate de @s22 es inalcanzable en el cableado |
-| 4 · Contraste del texto de Reseñas | **APTO** (todos ≥ 5,24:1) · 🔵 laterales apagadas bajo 4,5 (defensa anotada) + guardia del subrayado |
-| 5 · Árbol APG del segundo carrusel | **APTO** |
-| 6 · SEO | **APTO** (sin aggregateRating; nofollow NO necesario; leyenda desactiva los ejemplos) |
+| Eje                                         | Veredicto                                                                                            |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| 1 · SC 1.4.11 cristal (peor caso calculado) | **APTO** · 🟡 borde 2,67:1 bajo píxel casi negro (glifo aguanta 3,66:1 siempre; fix: surface 85 %)   |
+| 2 · SC 2.2.2 con 2 s                        | **APTO** · 🔵 2 s sobre texto es hostil al lector táctil (decisión de cliente, no WCAG)              |
+| 3 · Teclado global @s21..@s23               | **APTO** · 🟡 doble-atención posible: el desempate de @s22 es inalcanzable en el cableado            |
+| 4 · Contraste del texto de Reseñas          | **APTO** (todos ≥ 5,24:1) · 🔵 laterales apagadas bajo 4,5 (defensa anotada) + guardia del subrayado |
+| 5 · Árbol APG del segundo carrusel          | **APTO**                                                                                             |
+| 6 · SEO                                     | **APTO** (sin aggregateRating; nofollow NO necesario; leyenda desactiva los ejemplos)                |
 
 **APTO CON AVISOS**: 0 bloqueantes AA. Los dos 🟡 (borde del cristal sobre fondos oscuros; decisión
 de teclado no compartida entre carruseles) tienen corrección de una línea cada uno y conviene

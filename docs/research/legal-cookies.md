@@ -2,7 +2,7 @@
 
 - **Área:** Legal ES/UE — cookies y art. 22.2 LSSI
 - **Fecha del informe:** 2026-07-15
-- **Fuente normativa principal:** AEPD, *Guía sobre el uso de las cookies*, **versión MAYO 2024** (verificada descargando el PDF el 2026-07-15).
+- **Fuente normativa principal:** AEPD, _Guía sobre el uso de las cookies_, **versión MAYO 2024** (verificada descargando el PDF el 2026-07-15).
 - **Estado:** las afirmaciones marcadas `[V]` están verificadas contra fuente oficial citada; `[I]` son inferencias mías; `[?]` es desconocido / no verificado.
 
 ---
@@ -19,10 +19,10 @@ Dos caminos independientes llevan a la misma conclusión:
 **Lo que sí recomendamos hacer** (y es barato):
 
 - **No poner banner.** Un banner cuando no hay cookies no es "por si acaso": es ruido que daña UX y CLS, y **sugiere al usuario que le estamos rastreando cuando no es cierto**. La AEPD no lo exige. `[I]`
-- **Sí poner una frase de transparencia** en la política de privacidad. La AEPD lo *recomienda* expresamente incluso para cookies excluidas del art. 22.2, y da un ejemplo literal de redacción (§4.3). `[V]`
+- **Sí poner una frase de transparencia** en la política de privacidad. La AEPD lo _recomienda_ expresamente incluso para cookies excluidas del art. 22.2, y da un ejemplo literal de redacción (§4.3). `[V]`
 - **Tratar "cero cookies" como un invariante testeable, no como una intención.** Es la decisión de diseño de mayor apalancamiento del informe: si se sostiene, desaparecen banner, CMP, política de cookies y toda una clase de riesgo. Ver §7.
 
-**El punto crítico y contraintuitivo: Google Maps.** Incrustar un iframe de Google Maps **rompe el "sin cookies de terceros"** y, con la redacción actual de los términos de Google, **arrastra la obligación de consentimiento previo**, es decir, **obliga a poner el banner que estamos evitando** (ver §6). La recomendación es **no incrustar Maps por defecto**: usar imagen estática o enlace externo, o *click-to-load*. Esta es la única decisión de producto de este informe que cambia el resultado por sí sola.
+**El punto crítico y contraintuitivo: Google Maps.** Incrustar un iframe de Google Maps **rompe el "sin cookies de terceros"** y, con la redacción actual de los términos de Google, **arrastra la obligación de consentimiento previo**, es decir, **obliga a poner el banner que estamos evitando** (ver §6). La recomendación es **no incrustar Maps por defecto**: usar imagen estática o enlace externo, o _click-to-load_. Esta es la única decisión de producto de este informe que cambia el resultado por sí sola.
 
 **Aviso de alcance:** este informe cubre **cookies**. La web tendrá otras obligaciones (aviso legal LSSI art. 10, política de privacidad del formulario de contacto) que **no** se resuelven aquí y que dependen de datos que solo puede aportar el cliente (razón social, CIF), ya listados como riesgo abierto en `progress/current.md:128-129`.
 
@@ -30,11 +30,11 @@ Dos caminos independientes llevan a la misma conclusión:
 
 ## 2. Fuente vigente y su fecha (verificación)
 
-| Dato | Valor | Cómo se ha verificado |
-| --- | --- | --- |
-| Documento | Guía sobre el uso de las cookies | AEPD |
-| **Versión** | **MAYO 2024** | Portada del PDF: `"MAYO 2024"` / `"Guía actualizada en mayo 2024"` |
-| URL oficial | <https://www.aepd.es/guias/guia-cookies.pdf> | Descargado el 2026-07-15 |
+| Dato        | Valor                                        | Cómo se ha verificado                                              |
+| ----------- | -------------------------------------------- | ------------------------------------------------------------------ |
+| Documento   | Guía sobre el uso de las cookies             | AEPD                                                               |
+| **Versión** | **MAYO 2024**                                | Portada del PDF: `"MAYO 2024"` / `"Guía actualizada en mayo 2024"` |
+| URL oficial | <https://www.aepd.es/guias/guia-cookies.pdf> | Descargado el 2026-07-15                                           |
 
 `[V]` La versión de mayo de 2024 es la que la AEPD sirve **hoy** en su URL canónica de guías. Verificado descargando el PDF en la fecha de este informe y leyendo la portada, no por búsqueda indirecta.
 
@@ -60,8 +60,8 @@ Fuente oficial: **BOE, Ley 34/2002, texto consolidado**, <https://www.boe.es/bus
 
 Tres precisiones que importan al proyecto:
 
-- `[V]` **La norma es neutra respecto a la tecnología.** No dice "cookies": dice *dispositivos de almacenamiento y recuperación de datos*. La Guía lo confirma: "La LSSI resulta aplicable a las cookies entendidas en el sentido señalado al comienzo de esta guía, esto es, como **cualquier tipo de dispositivo de almacenamiento y recuperación de datos** que se utilice en el equipo terminal de un usuario" (Guía, §2.1, pág. 11).
-- `[V]` La Guía extiende expresamente el ámbito a "*local shared objects o flash cookies, web beacons o bugs, etc.*" y **al fingerprinting**: "La citada norma también resulta de aplicación al empleo de técnicas de fingerprinting" (Guía, §1, pág. 8).
+- `[V]` **La norma es neutra respecto a la tecnología.** No dice "cookies": dice _dispositivos de almacenamiento y recuperación de datos_. La Guía lo confirma: "La LSSI resulta aplicable a las cookies entendidas en el sentido señalado al comienzo de esta guía, esto es, como **cualquier tipo de dispositivo de almacenamiento y recuperación de datos** que se utilice en el equipo terminal de un usuario" (Guía, §2.1, pág. 11).
+- `[V]` La Guía extiende expresamente el ámbito a "_local shared objects o flash cookies, web beacons o bugs, etc._" y **al fingerprinting**: "La citada norma también resulta de aplicación al empleo de técnicas de fingerprinting" (Guía, §1, pág. 8).
 - `[I]` **`localStorage` y `sessionStorage` están cubiertos** por esa definición neutra, aunque **la Guía no los nombra literalmente**. Es una inferencia, pero de bajo riesgo: son inequívocamente "dispositivos de almacenamiento y recuperación de datos en el equipo terminal". **Consecuencia práctica para el proyecto en §7.**
 - `[V]` La remisión a la LO 15/1999 debe entenderse hecha hoy al **RGPD y a la LOPDGDD** (Guía, §1, pág. 9).
 
@@ -74,6 +74,7 @@ Tres precisiones que importan al proyecto:
 `[V]` Guía AEPD (§1 "Alcance de las normas", págs. 9-10), literal:
 
 > "quedan exceptuadas del cumplimiento de las obligaciones establecidas en el artículo 22.2 de la LSSI las cookies utilizadas para alguna de las siguientes finalidades:
+>
 > - Permitir únicamente la comunicación entre el equipo del usuario y la red.
 > - Estrictamente prestar un servicio expresamente solicitado por el usuario."
 
@@ -87,7 +88,7 @@ Tres precisiones que importan al proyecto:
 - Cookies de sesión de reproductor multimedia
 - Cookies de sesión para equilibrar la carga
 - **Cookies de personalización de la interfaz de usuario**
-- Determinadas cookies de complemento (plug-in) para intercambiar contenidos sociales (nota 14 de la Guía: "*La excepción sólo se aplica para usuarios que han decidido mantener la sesión abierta*")
+- Determinadas cookies de complemento (plug-in) para intercambiar contenidos sociales (nota 14 de la Guía: "_La excepción sólo se aplica para usuarios que han decidido mantener la sesión abierta_")
 
 ### 4.3 Respuesta literal a la pregunta del banner
 
@@ -111,7 +112,7 @@ Y en §1 (pág. 10):
 
 ### 4.5 Cookies polivalentes (relevante si algún día se añade algo)
 
-`[V]` Guía, §1 (pág. 10): "una misma cookie puede tener más de una finalidad (cookies polivalentes), por lo que existe la posibilidad de que una cookie quede exceptuada [...] para una o varias de sus finalidades y no para otras". La AEPD cita al GT29: esto debería "*incitar a los propietarios de sitios web a utilizar una cookie diferente para cada finalidad*".
+`[V]` Guía, §1 (pág. 10): "una misma cookie puede tener más de una finalidad (cookies polivalentes), por lo que existe la posibilidad de que una cookie quede exceptuada [...] para una o varias de sus finalidades y no para otras". La AEPD cita al GT29: esto debería "_incitar a los propietarios de sitios web a utilizar una cookie diferente para cada finalidad_".
 
 `[V]` Las cookies técnicas dejan de estar exentas si se reutilizan para fines no exentos: "si estas cookies se utilizan también para finalidades no exentas (por ejemplo, para fines publicitarios comportamentales), quedarán sujetas a dichas obligaciones" (Guía, §2.1.2.a, pág. 11).
 
@@ -121,11 +122,11 @@ Y en §1 (pág. 10):
 
 Este es el error conceptual más caro de este dominio, y conviene dejarlo fijado porque condiciona §6:
 
-| | **Art. 22.2 LSSI** | **RGPD** |
-| --- | --- | --- |
-| Qué regula | **Almacenar o acceder** a datos en el equipo terminal | **Tratar datos personales** |
-| Se activa con | Cookies, localStorage, fingerprinting… | Cualquier dato personal, **incluida la IP** |
-| ¿Depende de que haya dato personal? | **No** | Sí |
+|                                     | **Art. 22.2 LSSI**                                    | **RGPD**                                    |
+| ----------------------------------- | ----------------------------------------------------- | ------------------------------------------- |
+| Qué regula                          | **Almacenar o acceder** a datos en el equipo terminal | **Tratar datos personales**                 |
+| Se activa con                       | Cookies, localStorage, fingerprinting…                | Cualquier dato personal, **incluida la IP** |
+| ¿Depende de que haya dato personal? | **No**                                                | Sí                                          |
 
 `[V]` La Guía es explícita en que ambos planos son distintos y acumulativos: "cuando la utilización de una cookie conlleve el tratamiento de datos personales, los responsables de tal tratamiento deberán asegurarse del cumplimiento de las **exigencias adicionales** establecidas por la normativa sobre protección de datos personales" (Guía, §1, pág. 9).
 
@@ -155,7 +156,7 @@ Este es el error conceptual más caro de este dominio, y conviene dejarlo fijado
 
 ### 6.2 Lo que dice Google (fuente oficial del propio tercero)
 
-`[V]` **Google Maps Platform Terms of Service** (<https://cloud.google.com/maps-platform/terms/>, **"Last modified June 23, 2026"**, consultado 2026-07-15), cláusula *End User Requirements → End User Privacy*, literal:
+`[V]` **Google Maps Platform Terms of Service** (<https://cloud.google.com/maps-platform/terms/>, **"Last modified June 23, 2026"**, consultado 2026-07-15), cláusula _End User Requirements → End User Privacy_, literal:
 
 > "Customer's use of the Services in the Customer Application will comply with applicable privacy laws, **including laws regarding Services that store and access Cookies on End Users' devices**. Customer will comply with the then-current Consent Policy at <https://www.google.com/about/company/user-consent-policy/>, if applicable."
 
@@ -179,13 +180,13 @@ Hice una petición `curl` al endpoint del iframe clásico (`https://www.google.c
 
 `[I]` Ordenadas de menor a mayor riesgo:
 
-| Opción | Efecto | Banner |
-| --- | --- | --- |
-| **A. Imagen estática del mapa (self-hosted) + enlace "Cómo llegar" que abre Google Maps en pestaña nueva** | Ningún recurso de terceros se carga desde nuestra web. La IP se transmite a Google **solo** si el usuario **decide** pulsar. | **No** |
-| **B. *Click-to-load*: placeholder local; el iframe se inyecta solo tras pulsar** | Nada de terceros hasta un acto libre e inequívoco del usuario. | Discutible `[?]` |
-| **C. Iframe de Maps cargado directamente** | Terceros en cada visita, sin elección. | **Sí** `[I]` |
+| Opción                                                                                                     | Efecto                                                                                                                       | Banner           |
+| ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| **A. Imagen estática del mapa (self-hosted) + enlace "Cómo llegar" que abre Google Maps en pestaña nueva** | Ningún recurso de terceros se carga desde nuestra web. La IP se transmite a Google **solo** si el usuario **decide** pulsar. | **No**           |
+| **B. _Click-to-load_: placeholder local; el iframe se inyecta solo tras pulsar**                           | Nada de terceros hasta un acto libre e inequívoco del usuario.                                                               | Discutible `[?]` |
+| **C. Iframe de Maps cargado directamente**                                                                 | Terceros en cada visita, sin elección.                                                                                       | **Sí** `[I]`     |
 
-**Recomiendo A.** Razones: (i) mantiene el invariante "cero terceros" del §7 intacto y verificable; (ii) hace innecesarios banner y CMP; (iii) es **más rápida** (un iframe de Maps es pesado); (iv) para un salón local, el valor real de un mapa incrustado es bajo — lo que el usuario quiere es *cómo llegar*, y un enlace lo resuelve mejor desde el móvil, abriendo la app nativa con navegación.
+**Recomiendo A.** Razones: (i) mantiene el invariante "cero terceros" del §7 intacto y verificable; (ii) hace innecesarios banner y CMP; (iii) es **más rápida** (un iframe de Maps es pesado); (iv) para un salón local, el valor real de un mapa incrustado es bajo — lo que el usuario quiere es _cómo llegar_, y un enlace lo resuelve mejor desde el móvil, abriendo la app nativa con navegación.
 
 `[?]` Sobre **B**: es la práctica habitual del sector y es defendible (el usuario solicita expresamente el contenido), pero **no he encontrado un pronunciamiento oficial de la AEPD que valide el patrón click-to-load** como consentimiento válido para este caso. **No lo presento como verificado.** Si el cliente exige mapa embebido, B es el mal menor, pero exige análisis específico antes de publicar.
 
@@ -199,13 +200,13 @@ Hice una petición `curl` al endpoint del iframe clásico (`https://www.google.c
 
 ### 7.1 Qué EXIGE
 
-| # | Exigencia | Fuente |
-| --- | --- | --- |
-| E1 | Si en algún momento se usa **una sola** cookie/almacenamiento no exceptuado → banner conforme (aceptar y rechazar **al mismo nivel**, mismo formato destacado) + política de cookies + gestión del consentimiento. | Guía §4.1 (pág. 31) `[V]`; nota de prensa AEPD 11/07/2023 `[V]` |
-| E2 | Frase genérica de transparencia sobre cookies en la política de privacidad (**recomendado**, no obligatorio). | Guía §1 (pág. 10) `[V]` |
-| E3 | Si se incrusta Maps/iframe de terceros → asegurar información y **mecanismo de consentimiento**; responsabilidad **no desplazable** por contrato. | Guía §4.2 (págs. 31-33) `[V]` |
-| E4 | Si se incrusta cualquier módulo de terceros → somos **corresponsables** de recogida y transmisión (aunque no de las fases ulteriores). | TJUE C-40/17 `[V]`; Guía §4.2 pág. 33 `[V]` |
-| E5 | Si se usa Maps Platform → cumplir la **EU User Consent Policy** de Google (obligación contractual, adicional a la legal). | Google Maps Platform ToS, 23/06/2026 `[V]` |
+| #   | Exigencia                                                                                                                                                                                                          | Fuente                                                          |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| E1  | Si en algún momento se usa **una sola** cookie/almacenamiento no exceptuado → banner conforme (aceptar y rechazar **al mismo nivel**, mismo formato destacado) + política de cookies + gestión del consentimiento. | Guía §4.1 (pág. 31) `[V]`; nota de prensa AEPD 11/07/2023 `[V]` |
+| E2  | Frase genérica de transparencia sobre cookies en la política de privacidad (**recomendado**, no obligatorio).                                                                                                      | Guía §1 (pág. 10) `[V]`                                         |
+| E3  | Si se incrusta Maps/iframe de terceros → asegurar información y **mecanismo de consentimiento**; responsabilidad **no desplazable** por contrato.                                                                  | Guía §4.2 (págs. 31-33) `[V]`                                   |
+| E4  | Si se incrusta cualquier módulo de terceros → somos **corresponsables** de recogida y transmisión (aunque no de las fases ulteriores).                                                                             | TJUE C-40/17 `[V]`; Guía §4.2 pág. 33 `[V]`                     |
+| E5  | Si se usa Maps Platform → cumplir la **EU User Consent Policy** de Google (obligación contractual, adicional a la legal).                                                                                          | Google Maps Platform ToS, 23/06/2026 `[V]`                      |
 
 ### 7.2 Qué PROHÍBE / desaconseja
 
@@ -266,30 +267,30 @@ La decisión de mayor apalancamiento del informe. Encaja exactamente con el patr
 
 ## 8. Lo que NO he podido verificar
 
-| # | Afirmación no verificada | Por qué importa | Qué haría falta |
-| --- | --- | --- | --- |
-| NV1 | **Si el iframe de Google Maps fija cookies o escribe almacenamiento local en la práctica**, y cuáles. | Determina si Maps obliga a banner (§6). Mi test `curl` **no es concluyente**. | Cargar una página con el iframe en **navegador real** (DevTools → Application → Cookies/Storage + panel Network), desde IP española y perfil limpio. Reproducible con `claude-in-chrome` o Playwright. |
-| NV2 | Si existe una versión de la Guía AEPD **posterior a mayo 2024**. | Todo el informe se apoya en esa versión. | Reverificar <https://www.aepd.es/guias/guia-cookies.pdf> (portada) antes de publicar la web. Mitigado: verificado el 2026-07-15. |
-| NV3 | Motivo/alcance exacto de la revisión de **mayo 2024** frente a la de julio 2023. | Podría haber matices no capturados. | Diff entre el PDF de julio 2023 (URL legacy) y el de mayo 2024. |
-| NV4 | Si la AEPD acepta el patrón **click-to-load** como consentimiento válido (§6.4 opción B). | Es la alternativa si el cliente exige mapa embebido. | Buscar resoluciones sancionadoras de la AEPD o pronunciamiento del CEPD. **No lo he hecho.** |
-| NV5 | Si los **términos de Google Maps Platform** aplican al iframe simple "compartir → insertar mapa" (sin API key) o solo a Maps Platform con clave. | Cambia la fuerza del argumento de §6.2 para el caso concreto del iframe. | Analizar los ToS de Google Maps/Google generales frente a los de Maps Platform. |
-| NV6 | Estado del **Reglamento ePrivacy** (sustituto de la Directiva 2002/58). | Cambiaría el marco a medio plazo. | Consultar el registro legislativo de la UE. **No verificado: no afirmo nada al respecto.** |
-| NV7 | Si el sitio final usará **Maps, analítica o widgets**. | Es la variable que decide banner sí/no. | **Decisión del humano** en `project-spec.md`. `feature_list.json` sigue siendo la plantilla (`"ejemplo_feature"`), así que aún no hay nada comprometido. |
-| NV8 | Si algún producto de analítica concreto cumple los criterios de exención de §7.5. | Solo relevante si se quiere analítica. | Análisis del producto contra los 4 criterios de la guía de medición de audiencia. |
-| NV9 | Obligaciones de **aviso legal (LSSI art. 10)** y política de privacidad del formulario. | Fuera del alcance de este informe (cookies). | Investigación aparte. Depende de razón social/CIF, ya listados como pendientes en `progress/current.md:128-129`. |
+| #   | Afirmación no verificada                                                                                                                         | Por qué importa                                                               | Qué haría falta                                                                                                                                                                                        |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| NV1 | **Si el iframe de Google Maps fija cookies o escribe almacenamiento local en la práctica**, y cuáles.                                            | Determina si Maps obliga a banner (§6). Mi test `curl` **no es concluyente**. | Cargar una página con el iframe en **navegador real** (DevTools → Application → Cookies/Storage + panel Network), desde IP española y perfil limpio. Reproducible con `claude-in-chrome` o Playwright. |
+| NV2 | Si existe una versión de la Guía AEPD **posterior a mayo 2024**.                                                                                 | Todo el informe se apoya en esa versión.                                      | Reverificar <https://www.aepd.es/guias/guia-cookies.pdf> (portada) antes de publicar la web. Mitigado: verificado el 2026-07-15.                                                                       |
+| NV3 | Motivo/alcance exacto de la revisión de **mayo 2024** frente a la de julio 2023.                                                                 | Podría haber matices no capturados.                                           | Diff entre el PDF de julio 2023 (URL legacy) y el de mayo 2024.                                                                                                                                        |
+| NV4 | Si la AEPD acepta el patrón **click-to-load** como consentimiento válido (§6.4 opción B).                                                        | Es la alternativa si el cliente exige mapa embebido.                          | Buscar resoluciones sancionadoras de la AEPD o pronunciamiento del CEPD. **No lo he hecho.**                                                                                                           |
+| NV5 | Si los **términos de Google Maps Platform** aplican al iframe simple "compartir → insertar mapa" (sin API key) o solo a Maps Platform con clave. | Cambia la fuerza del argumento de §6.2 para el caso concreto del iframe.      | Analizar los ToS de Google Maps/Google generales frente a los de Maps Platform.                                                                                                                        |
+| NV6 | Estado del **Reglamento ePrivacy** (sustituto de la Directiva 2002/58).                                                                          | Cambiaría el marco a medio plazo.                                             | Consultar el registro legislativo de la UE. **No verificado: no afirmo nada al respecto.**                                                                                                             |
+| NV7 | Si el sitio final usará **Maps, analítica o widgets**.                                                                                           | Es la variable que decide banner sí/no.                                       | **Decisión del humano** en `project-spec.md`. `feature_list.json` sigue siendo la plantilla (`"ejemplo_feature"`), así que aún no hay nada comprometido.                                               |
+| NV8 | Si algún producto de analítica concreto cumple los criterios de exención de §7.5.                                                                | Solo relevante si se quiere analítica.                                        | Análisis del producto contra los 4 criterios de la guía de medición de audiencia.                                                                                                                      |
+| NV9 | Obligaciones de **aviso legal (LSSI art. 10)** y política de privacidad del formulario.                                                          | Fuera del alcance de este informe (cookies).                                  | Investigación aparte. Depende de razón social/CIF, ya listados como pendientes en `progress/current.md:128-129`.                                                                                       |
 
 ---
 
 ## 9. Fuentes
 
-| Fuente | URL | Fecha/versión verificada |
-| --- | --- | --- |
-| AEPD — Guía sobre el uso de las cookies | <https://www.aepd.es/guias/guia-cookies.pdf> | **MAYO 2024** (descargada 2026-07-15) |
-| AEPD — Guía uso de cookies para herramientas de medición de audiencia | <https://www.aepd.es/guias/guia-cookies-analiticas-externas.pdf> | **v. enero de 2024** |
-| AEPD — Nota de prensa (adaptación a Directrices 03/2022 CEPD) | <https://www.aepd.es/prensa-y-comunicacion/notas-de-prensa/aepd-actualiza-guia-cookies-para-adaptarla-a-nuevas-directrices-cepd> | 11/07/2023 |
-| BOE — Ley 34/2002 (LSSI), texto consolidado (arts. 22, 38, 39) | <https://www.boe.es/buscar/act.php?id=BOE-A-2002-13758> | Art. 22 modificado por Ley 9/2014 (vigor 11/05/2014) |
-| TJUE — C-40/17 (Fashion ID) | <https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX%3A62017CJ0040> | Sentencia de 29/07/2019 |
-| GT29 — Dictamen 4/2012 (exención de consentimiento) | <https://ec.europa.eu/justice/article-29/documentation/opinion-recommendation/files/2012/wp194_en.pdf> | WP194 |
-| Google — Maps Platform Terms of Service | <https://cloud.google.com/maps-platform/terms/> | "Last modified **June 23, 2026**" (consultado 2026-07-15) |
-| Google — EU User Consent Policy | <https://www.google.com/about/company/user-consent-policy/> | Sin fecha de vigencia declarada `[?]` |
-| CEPD — Report of the Cookie Banner Taskforce | Citado en la **nota 10 de la Guía AEPD** (dominio `edpb.europa.eu`). **No reproduzco la URL**: el salto de línea del PDF la parte y no la he verificado abriéndola. | **No consultado directamente** `[?]` |
+| Fuente                                                                | URL                                                                                                                                                                 | Fecha/versión verificada                                  |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| AEPD — Guía sobre el uso de las cookies                               | <https://www.aepd.es/guias/guia-cookies.pdf>                                                                                                                        | **MAYO 2024** (descargada 2026-07-15)                     |
+| AEPD — Guía uso de cookies para herramientas de medición de audiencia | <https://www.aepd.es/guias/guia-cookies-analiticas-externas.pdf>                                                                                                    | **v. enero de 2024**                                      |
+| AEPD — Nota de prensa (adaptación a Directrices 03/2022 CEPD)         | <https://www.aepd.es/prensa-y-comunicacion/notas-de-prensa/aepd-actualiza-guia-cookies-para-adaptarla-a-nuevas-directrices-cepd>                                    | 11/07/2023                                                |
+| BOE — Ley 34/2002 (LSSI), texto consolidado (arts. 22, 38, 39)        | <https://www.boe.es/buscar/act.php?id=BOE-A-2002-13758>                                                                                                             | Art. 22 modificado por Ley 9/2014 (vigor 11/05/2014)      |
+| TJUE — C-40/17 (Fashion ID)                                           | <https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX%3A62017CJ0040>                                                                                           | Sentencia de 29/07/2019                                   |
+| GT29 — Dictamen 4/2012 (exención de consentimiento)                   | <https://ec.europa.eu/justice/article-29/documentation/opinion-recommendation/files/2012/wp194_en.pdf>                                                              | WP194                                                     |
+| Google — Maps Platform Terms of Service                               | <https://cloud.google.com/maps-platform/terms/>                                                                                                                     | "Last modified **June 23, 2026**" (consultado 2026-07-15) |
+| Google — EU User Consent Policy                                       | <https://www.google.com/about/company/user-consent-policy/>                                                                                                         | Sin fecha de vigencia declarada `[?]`                     |
+| CEPD — Report of the Cookie Banner Taskforce                          | Citado en la **nota 10 de la Guía AEPD** (dominio `edpb.europa.eu`). **No reproduzco la URL**: el salto de línea del PDF la parte y no la he verificado abriéndola. | **No consultado directamente** `[?]`                      |

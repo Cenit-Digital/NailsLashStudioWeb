@@ -49,7 +49,9 @@ function fontFace(familia: string, peso: number, url: string): string {
 /** Un CSS que declara EXACTAMENTE los pares que se le pidan, todos con url(/assets/…woff2). */
 function cssDePares(pares: readonly ParDeFuente[]): string {
   return pares
-    .map(([familia, peso]) => fontFace(familia, peso, `/assets/${familia}-${String(peso)}-Bx.woff2`))
+    .map(([familia, peso]) =>
+      fontFace(familia, peso, `/assets/${familia}-${String(peso)}-Bx.woff2`),
+    )
     .join('')
 }
 
@@ -96,8 +98,16 @@ interface OpcionesDePeticion {
  */
 function peticion(opciones: OpcionesDePeticion = {}): PeticionPuertaTerceros {
   const recursos = opciones.recursos ?? [
-    { ubicacion: 'dist/assets/index-DiwrgTda.css', tipo: 'css', contenido: cssDeLasSeisFuentes('/assets/manrope-latin-400-normal-BGsTXAXT.woff2') },
-    { ubicacion: 'dist/index.html', tipo: 'html', contenido: '<html lang="es"><body><h1>Nails Lash Studio</h1></body></html>' },
+    {
+      ubicacion: 'dist/assets/index-DiwrgTda.css',
+      tipo: 'css',
+      contenido: cssDeLasSeisFuentes('/assets/manrope-latin-400-normal-BGsTXAXT.woff2'),
+    },
+    {
+      ubicacion: 'dist/index.html',
+      tipo: 'html',
+      contenido: '<html lang="es"><body><h1>Nails Lash Studio</h1></body></html>',
+    },
   ]
 
   return {
@@ -184,16 +194,15 @@ describe('la puerta asevera la config base de vite.config.ts, ADEMÁS de la sali
     expect(resultado.lineas).toEqual([])
   })
 
-  it.each([
-    ['/'],
-    ['/subcarpeta/'],
-    ['/NailsLashStudioWeb/'],
-  ])('@s27 base "%s" es una ruta same-origin root-absoluta: no emite ninguna violación por base', (base) => {
-    const resultado = ejecutarPuertaDeTerceros(peticion({ config: configConBase(base) }))
+  it.each([['/'], ['/subcarpeta/'], ['/NailsLashStudioWeb/']])(
+    '@s27 base "%s" es una ruta same-origin root-absoluta: no emite ninguna violación por base',
+    (base) => {
+      const resultado = ejecutarPuertaDeTerceros(peticion({ config: configConBase(base) }))
 
-    expect(resultado.codigoSalida).toBe(0)
-    expect(resultado.lineas).toEqual([])
-  })
+      expect(resultado.codigoSalida).toBe(0)
+      expect(resultado.lineas).toEqual([])
+    },
+  )
 
   it.each([
     ['https://cdn.evil.example/x/'],
@@ -456,7 +465,9 @@ describe('la puerta falla cerrada si la lectura de vite.config.ts LANZA (@s33)',
     expect(resultado.codigoSalida).not.toBe(0)
     expect(resultado.lineas).toHaveLength(1)
     expect(resultado.lineas[0]).toContain('la puerta de terceros no pudo completar la inspección')
-    expect(resultado.lineas[0]).toContain("ENOENT: no such file or directory, open 'vite.config.ts'")
+    expect(resultado.lineas[0]).toContain(
+      "ENOENT: no such file or directory, open 'vite.config.ts'",
+    )
   })
 })
 
@@ -505,7 +516,6 @@ describe('el humilde SOLO lee .html y .css — ni binarios, ni el JS del bundle 
     expect(resultado.lineas).toEqual([])
   })
 })
-
 
 /**
  * EL CAMINO FELIZ. SIN ÉL, UNA PUERTA QUE ROMPIERA SIEMPRE PASARÍA TODOS LOS ESCENARIOS NEGATIVOS.
@@ -571,9 +581,12 @@ describe('el build de desarrollo NO invoca la puerta de terceros (@s36)', () => 
     )
   })
 
-  it.each([['dev'], ['dev:ssr']])('@s36 el script "%s" NO invoca la puerta de terceros', (guion) => {
-    expect(scripts()[guion]).not.toContain('puerta-terceros')
-  })
+  it.each([['dev'], ['dev:ssr']])(
+    '@s36 el script "%s" NO invoca la puerta de terceros',
+    (guion) => {
+      expect(scripts()[guion]).not.toContain('puerta-terceros')
+    },
+  )
 })
 
 /**
@@ -655,7 +668,6 @@ describe('el nombre de familia se compara DESTOKENIZADO y SIN COMILLAS, como sal
     expect(resultado.lineas).toEqual([])
   })
 })
-
 
 /* ---------------------------------------------------------------------------
  * LAS DOS CONSTANTES DE PRODUCCIÓN — LO QUE NINGÚN ESCENARIO ASEVERABA.

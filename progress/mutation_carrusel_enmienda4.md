@@ -15,10 +15,10 @@
 ## Score por fichero
 
 | Fichero                            | % score | puntuados | killed | timeout | survived | no cov | errors |
-| ----------------------------------- | ------: | --------: | -----: | ------: | -------: | -----: | -----: |
-| `src/components/galeria-logica.ts` |  100.00 |        54 |     50 |       4 |      0   |      0 |      0 |
-| `src/components/Galeria.tsx`       |   92.98 |       114 |    101 |       5 |      8   |      0 |      0 |
-| `src/components/Resenas.tsx`       |   92.31 |       104 |     96 |       0 |      8   |      0 |      0 |
+| ---------------------------------- | ------: | --------: | -----: | ------: | -------: | -----: | -----: |
+| `src/components/galeria-logica.ts` |  100.00 |        54 |     50 |       4 |        0 |      0 |      0 |
+| `src/components/Galeria.tsx`       |   92.98 |       114 |    101 |       5 |        8 |      0 |      0 |
+| `src/components/Resenas.tsx`       |   92.31 |       104 |     96 |       0 |        8 |      0 |      0 |
 
 Nota: en la tabla de arriba, `galeria-logica.ts` cierra con **0 supervivientes**; `Galeria.tsx` y
 `Resenas.tsx` cierran cada uno con **8 supervivientes** (16 en total).
@@ -65,8 +65,7 @@ sin parar, pero tras una vuelta completa **vuelve a caer en el mismo indice** qu
 movido -- la asercion `expect(centrada(container)).toBe(0)` (o `.toBe(1)` tras un desplazamiento
 manual previo) es CIERTA en los dos mundos y no distingue "pausado" de "dio una vuelta entera". El
 propio fichero demuestra que el equipo YA conocia este riesgo y lo evito en otro escenario vecino: el
-test `@s10 el PUNTERO para... REANUDA sola al salir` usa a proposito `avanzar(8000)` (NO multiplo de
-12000) con el comentario explicito "La media del Given: sin esta comprobacion el Then pasaria aunque
+test `@s10 el PUNTERO para... REANUDA sola al salir` usa a proposito `avanzar(8000)` (NO multiplo de 12000) con el comentario explicito "La media del Given: sin esta comprobacion el Then pasaria aunque
 la pausa no existiera." -- exactamente el problema que aqui SI ocurre, sin ese resguardo, en `@s12`.
 
 No son mutantes equivalentes: cambian comportamiento observable real (el carrusel gira cuando deberia
@@ -90,13 +89,13 @@ una asercion sobre el argumento exacto pasado a `matchMedia` (hoy el stub no lo 
 - **Galeria.tsx:136:20** `BooleanLiteral` -- `setPausado(true)` -> `setPausado(false)` (dentro del `if` de arranque).
   Falta para las tres de arriba: una comprobacion del arranque pausado a un `avanzar(N)` que NO sea
   multiplo de `TOTAL x MILISEGUNDOS_POR_FOTO` (12000 = 6x2000); hoy `@s12 a los 12000 ms sigue
-  centrada la PRIMERA...` no distingue "arranco pausado" de "dio una vuelta entera sin parar".
+centrada la PRIMERA...` no distingue "arranco pausado" de "dio una vuelta entera sin parar".
 - **Galeria.tsx:142:71** `BlockStatement` -- vacia el cuerpo entero de `alCambiarLaPreferencia`.
 - **Galeria.tsx:143:13** `ConditionalExpression` -- `if (cambio.matches) {` -> `if (false) {`.
 - **Galeria.tsx:143:29** `BlockStatement` -- `if (cambio.matches) { setPausado(true) }` -> `if (cambio.matches) {}`.
 - **Galeria.tsx:144:22** `BooleanLiteral` -- `setPausado(true)` -> `setPausado(false)` (dentro del listener `change`).
   Falta para las cuatro de arriba: mismo problema, en `@s12 activar la preferencia con la pagina
-  abierta pausa la rotacion EN CURSO` -- arranca sin preferencia, avanza 2000 ms (activo=1), dispara el
+abierta pausa la rotacion EN CURSO` -- arranca sin preferencia, avanza 2000 ms (activo=1), dispara el
   `change`, y comprueba con `avanzar(12000)` que sigue en 1: si el `change` NO pausara nada, 6 ticks
   mas devolverian el indice a 1 igualmente (vuelta completa desde 1). Un `avanzar` intermedio
   (p. ej. 2000 u 8000 antes de completar la vuelta) romperia la coincidencia.
@@ -158,20 +157,20 @@ completo del ciclo en `progress/tdd_carrusel_enmienda4.md` seccion "Remate — m
 Dos cambios, por fichero (`galeria.test.tsx` y `resenas.test.tsx`, mismo patron en los dos):
 
 1. **`StringLiteral` (84:38 / 68:38)**: el stub de `matchMedia` en el describe de `@s12`/`@s8 (@s12
-   de galeria)` pasa de funcion suelta a `vi.fn(...)` (variable `matchMedia`, devuelta por
+de galeria)` pasa de funcion suelta a `vi.fn(...)` (variable `matchMedia`, devuelta por
    `stubDeMatchMedia`). Test nuevo `'@s12 window.matchMedia se consulta con la media query EXACTA de
-   movimiento reducido'` / `'@s8 window.matchMedia se consulta con la media query EXACTA de
-   movimiento reducido'`: `expect(matchMedia).toHaveBeenCalledWith('(prefers-reduced-motion:
-   reduce)')` (literal escrito a mano, nunca importado de produccion -- anti-tautologia).
+movimiento reducido'` / `'@s8 window.matchMedia se consulta con la media query EXACTA de
+movimiento reducido'`: `expect(matchMedia).toHaveBeenCalledWith('(prefers-reduced-motion:
+reduce)')` (literal escrito a mano, nunca importado de produccion -- anti-tautologia).
 2. **Los 7 mutantes de `if`/`BlockStatement`/`BooleanLiteral`** (arranque + listener `change`):
    ampliados los DOS tests que antes saltaban directo a `avanzar(12000)` (una vuelta completa,
    6×2000 ms) con un checkpoint intermedio a un tiempo NO multiplo del ciclo (mismo patron que
    `@s10`, `avanzar(8000)`):
    - `'@s12 a los 12000 ms sigue centrada la PRIMERA...'` / `'@s8 a los 12000 ms sigue centrado el
-     PRIMERO...'`: `avanzar(2000)` + `expect(centrada(...)).toBe(0)` ANTES de completar los 12000 ms
+PRIMERO...'`: `avanzar(2000)` + `expect(centrada(...)).toBe(0)` ANTES de completar los 12000 ms
      totales. Mata 135:11, 135:32, 136:20 (Galeria) / 111:11, 111:32, 112:20 (Resenas).
    - `'@s12 activar la preferencia con la pagina abierta pausa la rotacion EN CURSO'` / `'@s8 activar
-     la preferencia con la pagina abierta pausa la rotacion EN CURSO'`: tras disparar el `change` a
+la preferencia con la pagina abierta pausa la rotacion EN CURSO'`: tras disparar el `change` a
      `matches: true`, `avanzar(8000)` + `expect(centrada(...)).toBe(1)` ANTES de completar el resto
      hasta 12000 ms. Mata 142:71, 143:13, 143:29, 144:22 (Galeria) / 117:71, 118:13, 118:29, 119:22
      (Resenas).
@@ -180,7 +179,7 @@ Dos cambios, por fichero (`galeria.test.tsx` y `resenas.test.tsx`, mismo patron 
 mismo comando, `galeria-logica.ts` fuera de esta corrida por ya estar 100% limpio):
 
 | Fichero                      | % score | puntuados | killed | timeout | survived |
-| ----------------------------- | ------: | --------: | -----: | ------: | -------: |
+| ---------------------------- | ------: | --------: | -----: | ------: | -------: |
 | `src/components/Galeria.tsx` |  100.00 |       114 |     96 |      18 |        0 |
 | `src/components/Resenas.tsx` |  100.00 |       104 |    104 |       0 |        0 |
 

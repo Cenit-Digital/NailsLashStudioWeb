@@ -15,8 +15,10 @@ Feature aislada: boton-whatsapp-montaje.test.tsx + boton-whatsapp.test.tsx +
 boton-whatsapp-estilos.test.ts -> 40/40 verde.
 
 ## 1) @s4 — bloqueante de v1: RESUELTO
+
 Test real y determinista NUEVO: src/pages/boton-whatsapp-montaje.test.tsx
 (describe('@s4 ...'), 3 it, lineas 49-71):
+
 - ANCLA POSITIVA PRIMERO (53-54): el prerender de <Home/> SI contiene "</main>" y
   'id="whatsapp-flotante"' -> la comparacion de indices no se hace contra -1.
 - ORDEN (62): indexOf(id) > indexOf("</main>") -> el boton vive FUERA del landmark
@@ -36,6 +38,7 @@ Test real y determinista NUEVO: src/pages/boton-whatsapp-montaje.test.tsx
 - El HOST no se menciona (A-10 respetado).
 
 ## 2) Exclusion de BotonWhatsApp.tsx de la mutacion: LEGITIMA (no es trampa)
+
 - Confirmado en stryker.config.json:12-32: src/components/BotonWhatsApp.tsx NO esta en `mutate`.
 - Es un <a> ESTATICO sin predicados. @s11 (boton-whatsapp.test.tsx:139-153) lo ENFORCE
   leyendo los bytes del .tsx y prohibiendo `if (` / `?` / `&&` / `||`: si alguien mete una
@@ -53,6 +56,7 @@ Test real y determinista NUEVO: src/pages/boton-whatsapp-montaje.test.tsx
   y cobertura. La exclusion esta documentada y es coherente con «mutable:false por escrito».
 
 ## 3) Contrato del enlace: OK
+
 - Sin hardcodear numero/host: BotonWhatsApp.tsx:23 waHref(TELEFONO.legible,
   BOTON_WHATSAPP_FLOTANTE_TEXTO). @s2 prueba sobre bytes que la fuente NO contiene el numero
   (625 22 33 66 / 34625223366 / +34625223366) ni el host (wa.me / api.whatsapp.com /
@@ -67,15 +71,16 @@ Test real y determinista NUEVO: src/pages/boton-whatsapp-montaje.test.tsx
   @s4 lo pinea.
 
 ## Cobertura de escenarios (@s <-> test) — 14/14
-- @s1:  [x] boton-whatsapp.test.tsx:30-51
-- @s2:  [x] boton-whatsapp.test.tsx:53-80
-- @s3:  [x] boton-whatsapp.test.tsx:82-97
-- @s4:  [x] boton-whatsapp-montaje.test.tsx:49-71  <- corregido (bloqueante de v1)
-- @s5:  [x] boton-whatsapp.test.tsx:99-110 + boton-whatsapp-estilos.test.ts (exit-code -> fase build)
-- @s6:  [x] boton-whatsapp.test.tsx:112-137 + boton-whatsapp-estilos.test.ts (exit-code -> fase build)
-- @s7:  [x] boton-whatsapp-estilos.test.ts
-- @s8:  [x] boton-whatsapp-estilos.test.ts (PROXY declarado; F110 = verificacion manual)
-- @s9:  [x] boton-whatsapp-estilos.test.ts
+
+- @s1: [x] boton-whatsapp.test.tsx:30-51
+- @s2: [x] boton-whatsapp.test.tsx:53-80
+- @s3: [x] boton-whatsapp.test.tsx:82-97
+- @s4: [x] boton-whatsapp-montaje.test.tsx:49-71 <- corregido (bloqueante de v1)
+- @s5: [x] boton-whatsapp.test.tsx:99-110 + boton-whatsapp-estilos.test.ts (exit-code -> fase build)
+- @s6: [x] boton-whatsapp.test.tsx:112-137 + boton-whatsapp-estilos.test.ts (exit-code -> fase build)
+- @s7: [x] boton-whatsapp-estilos.test.ts
+- @s8: [x] boton-whatsapp-estilos.test.ts (PROXY declarado; F110 = verificacion manual)
+- @s9: [x] boton-whatsapp-estilos.test.ts
 - @s10: [x] boton-whatsapp-estilos.test.ts
 - @s11: [x] boton-whatsapp.test.tsx:139-153
 - @s12: [x] boton-whatsapp.test.tsx:155-170 (conteo GLOBAL en dist/ -> fase build)
@@ -85,10 +90,12 @@ Test real y determinista NUEVO: src/pages/boton-whatsapp-montaje.test.tsx
 Todos los @s tienen >=1 test. Ya no hay escenario sin cobertura (regla dura satisfecha).
 
 ## Disciplina TDD
+
 - Produccion sin test que la pida? NO. <a> estatico; cada atributo lo exige un test.
 - Rojo->Verde->Refactor? SI. tdd_boton_whatsapp.md:66-71 y correccion_puertas.md:54-62.
 
 ## Calidad
+
 - BotonWhatsApp.tsx: funcion corta, un solo motivo de cambio, docblock que cita la feature,
   export nombrado, ID_BOTON_WHATSAPP como const. Sin numeros magicos.
 - boton-whatsapp-montaje.test.tsx: helper seccionContacto con fallback '' que hace CAER la
@@ -97,6 +104,7 @@ Todos los @s tienen >=1 test. Ya no hay escenario sin cobertura (regla dura sati
   directiva del lead (tdd_boton_whatsapp.md:6-23). Divergencia ya aceptada en v1, no bloqueante.
 
 ## Checkpoints
+
 - C1 (arnes/init): [x] tsc 0, eslint 0, 889/889 verde.
 - C2 (estado): [x] rebanada de F-13, sin entrada propia en feature_list.json (@s14).
 - C3 (arquitectura): [x] href deriva de F-02; sin dependencias nuevas.
@@ -106,12 +114,14 @@ Todos los @s tienen >=1 test. Ya no hay escenario sin cobertura (regla dura sati
 - C7 (mutacion): [ ] corre DESPUES de esta aprobacion; NO-MUTABLE (@s11); exclusion justificada.
 
 ## Pendientes NO bloqueantes (fase build + puerta humana antes de PUBLICAR)
+
 1. Capa autoritativa de BYTES de dist/ (home-horneado): exit-code 0 de las 5 puertas
    (@s5/@s6) y conteo GLOBAL == 1 (@s12). Hoy cubiertos por SSR/in-process.
 2. Verificaciones manuales del contrato (no son tests): tab-through SC 2.4.11/F110, apertura
    real en Android/iOS/WhatsApp Web (host wa.me, A-10), JS deshabilitado y 320px.
 
 ## Conclusion
+
 El unico bloqueante de v1 (@s4) esta resuelto con un test real, determinista y anti-vacuidad.
 La exclusion de mutacion es legitima y compensada. Sin hardcodeo de numero/host, sin asercion
 del host, icono SVG inline, aria-label correcto, montado fuera de #contacto. Suite verde

@@ -89,7 +89,14 @@ const ATRIBUTO_HREF = 'href'
  * `canonical` y `alternate` (a secas) NO están aquí a propósito: crean un HIPERENLACE, y un
  * hiperenlace no pide nada hasta que la usuaria decide ir (@s10, @s11, @s12).
  */
-const KEYWORDS_DE_PETICION = ['stylesheet', 'icon', 'preload', 'modulepreload', 'prefetch', 'manifest']
+const KEYWORDS_DE_PETICION = [
+  'stylesheet',
+  'icon',
+  'preload',
+  'modulepreload',
+  'prefetch',
+  'manifest',
+]
 
 /**
  * 🔴 CRITERIO DE PROYECTO, NO LETRA — Y LA SEPARACIÓN ESTÁ EN EL CÓDIGO A PROPÓSITO.

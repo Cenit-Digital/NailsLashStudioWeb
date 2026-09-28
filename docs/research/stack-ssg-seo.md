@@ -30,8 +30,8 @@ El patrón exacto es:
 4. **JSON-LD schema.org**: solo `Organization`, inline en la home
    (`src/pages/home.tsx:15-21`), con escapado de `<` como defensa ante inyección.
    **Deliberadamente NO usan `LocalBusiness`** con este comentario literal
-   (`src/pages/home.tsx:12`): *"JSON-LD Organization (no LocalBusiness: no inventamos
-   dirección ni teléfono)"*.
+   (`src/pages/home.tsx:12`): _"JSON-LD Organization (no LocalBusiness: no inventamos
+   dirección ni teléfono)"_.
 5. **Vercel sin `vercel.json`**: **no existe** ese archivo en el repo (búsqueda
    exhaustiva: 0 resultados). Se apoya en la autodetección del preset Vite. Las funciones
    viven en `api/*.ts` con el formato **`export default { fetch }`**, que es exactamente
@@ -59,6 +59,7 @@ que hoy NO tenemos**—; (b) el sitemap manual es un riesgo que conviene automat
 ```json
 "vite-react-ssg": "0.9.0",
 ```
+
 > Fuente: `package.json:62`. Nótese que el resto de devDependencies usan `^` — la fijación
 > exacta aquí es deliberada. **[INFERENCIA]** El motivo no está documentado en el repo;
 > probablemente por la sensibilidad del prerender a cambios de patch. No lo he verificado.
@@ -69,13 +70,13 @@ que hoy NO tenemos**—; (b) el sitemap manual es un riesgo que conviene automat
 **[HECHO]** Estado en el registro oficial npm (consulta a `https://registry.npmjs.org/vite-react-ssg`
 el 2026-07-15):
 
-| Versión | Fecha de publicación |
-| --- | --- |
-| 0.8.9 | 2025-09-08 |
-| **0.9.0** (la que usa WebEmpresa) | **2026-02-05** |
-| 0.9.1-beta.1 | 2026-02-13 |
-| 0.9.1 | 2026-07-08 |
-| **0.9.2** (`dist-tags.latest`) | **2026-07-15** |
+| Versión                           | Fecha de publicación |
+| --------------------------------- | -------------------- |
+| 0.8.9                             | 2025-09-08           |
+| **0.9.0** (la que usa WebEmpresa) | **2026-02-05**       |
+| 0.9.1-beta.1                      | 2026-02-13           |
+| 0.9.1                             | 2026-07-08           |
+| **0.9.2** (`dist-tags.latest`)    | **2026-07-15**       |
 
 **[HECHO]** Dependencias de la 0.9.0 según el registro npm:
 `react-helmet-async ^1.3.0`, `jsdom ^24.1.3`, `p-queue ^9.1.0`, `fs-extra ^11.3.3`,
@@ -107,6 +108,7 @@ import './styles/main.scss'
 
 export const createRoot = ViteReactSSG({ routes })
 ```
+
 > Fuente: `src/main.tsx:9-13`. Las fuentes `@fontsource` se importan arriba
 > (`src/main.tsx:1-8`) y los estilos globales en `src/main.tsx:11`.
 
@@ -116,11 +118,11 @@ export const createRoot = ViteReactSSG({ routes })
 import { ViteReactSSG } from 'vite-react-ssg'
 import routes from './App.tsx'
 
-export const createRoot = ViteReactSSG(
-  { routes },
-  ({ router, routes, isClient, initialState }) => { /* do something. */ },
-)
+export const createRoot = ViteReactSSG({ routes }, ({ router, routes, isClient, initialState }) => {
+  /* do something. */
+})
 ```
+
 > Fuente: README oficial (https://github.com/Daydreamer-riri/vite-react-ssg).
 > WebEmpresa **omite el segundo argumento** (el callback de setup), que es opcional.
 
@@ -144,6 +146,7 @@ export const routes: RouteRecord[] = [
   },
 ]
 ```
+
 > Fuente: `src/App.tsx:1-16`.
 
 Detalles del patrón, con su justificación oficial:
@@ -151,6 +154,7 @@ Detalles del patrón, con su justificación oficial:
 - **`RouteRecord`** extiende el `RouteObject` de react-router con `lazy`, `entry` y
   `getStaticPaths`. Fuente: README oficial.
 - **El campo `entry`** — cita textual del README oficial:
+
   > "You are not required to use this field. It is only necessary when 'prehydration style
   > loss' occurs. It should be the path from root to the target file."
 
@@ -158,6 +162,7 @@ Detalles del patrón, con su justificación oficial:
   sea opcional. **[INFERENCIA]** Lo hacen preventivamente contra la pérdida de estilos
   antes de la hidratación (el proyecto usa SCSS Modules por componente, justo el escenario
   del "prehydration style loss"). El repo no documenta el motivo explícitamente.
+
 - **`Component:`** (no `element:`) y rutas **estáticas, sin `lazy`, sin `getStaticPaths`**:
   al no haber rutas dinámicas (`:param`), no hace falta `getStaticPaths` ni
   `includedRoutes`/`includeAllRoutes`.
@@ -178,28 +183,32 @@ export default defineConfig({
   },
 })
 ```
+
 > Fuente: `vite.config.ts:1-14`.
 
 **[HECHO]** Contraste con los valores por defecto documentados en el README oficial
 (`ViteReactSSGOptions`):
 
-| Opción | Default oficial | WebEmpresa | Efecto |
-| --- | --- | --- | --- |
-| `script` | `'sync'` | `'async'` | El JS no bloquea el parseo del HTML. |
-| `entry` | `'src/main.ts'` | `'src/main.tsx'` | Necesario: el entry es `.tsx`, no `.ts`. |
-| `dirStyle` | `'flat'` | `'nested'` | `/foo/index.html` en vez de `/foo.html` → **URLs limpias sin `.html` ni rewrites**. |
-| `formatting` | `'none'` | `'none'` | Igual al default (redundante pero explícito). |
+| Opción       | Default oficial | WebEmpresa       | Efecto                                                                              |
+| ------------ | --------------- | ---------------- | ----------------------------------------------------------------------------------- |
+| `script`     | `'sync'`        | `'async'`        | El JS no bloquea el parseo del HTML.                                                |
+| `entry`      | `'src/main.ts'` | `'src/main.tsx'` | Necesario: el entry es `.tsx`, no `.ts`.                                            |
+| `dirStyle`   | `'flat'`        | `'nested'`       | `/foo/index.html` en vez de `/foo.html` → **URLs limpias sin `.html` ni rewrites**. |
+| `formatting` | `'none'`        | `'none'`         | Igual al default (redundante pero explícito).                                       |
 
 **[HECHO] El build es `vite-react-ssg build`**, no `vite build`:
+
 ```json
 "dev": "vite",
 "dev:ssr": "vite-react-ssg dev",
 "build": "vite-react-ssg build",
 ```
+
 > Fuente: `package.json:14-16`. **Ojo**: `pnpm dev` arranca Vite normal (SPA, sin
 > prerender); `pnpm dev:ssr` es el modo que ejercita el SSG.
 
 **[HECHO] Prueba del prerenderizado real** — archivos presentes en `dist/`:
+
 - `dist/index.html` (ruta `/`)
 - `dist/aviso-legal/index.html` (ruta `/aviso-legal`)
 
@@ -213,15 +222,16 @@ necesita ningún rewrite SPA en Vercel** (ver §2.6).
 `react-helmet` ni `react-helmet-async` en ningún punto de `src/`.
 
 Uso oficial documentado (README):
+
 ```tsx
 import { Head } from 'vite-react-ssg'
-<Head>
+;<Head>
   <title>My Title</title>
   <meta property="og:description" content="Description" />
 </Head>
 ```
 
-**[HECHO]** El README oficial describe `<Head/>` como *"a wrapper around React Helmet"* y
+**[HECHO]** El README oficial describe `<Head/>` como _"a wrapper around React Helmet"_ y
 enlaza al `react-helmet` original (`github.com/nfl/react-helmet`).
 **[HECHO] Pero eso es impreciso**: la dependencia real de la 0.9.0 es
 **`react-helmet-async ^1.3.0`** (registro npm), y el HTML generado lleva los atributos
@@ -232,6 +242,7 @@ prácticos: es react-helmet-async, que es SSR-safe (el original no lo es).
 **Patrón de dos niveles** (verificado):
 
 **Nivel 1 — Layout (defaults comunes)**, `src/components/Layout.tsx:16-23`:
+
 ```tsx
 <Head>
   <html lang="es" />
@@ -242,9 +253,11 @@ prácticos: es react-helmet-async, que es SSR-safe (el original no lo es).
   <meta property="og:url" content={SITE.url} />
 </Head>
 ```
+
 > Nótese `<html lang="es" />` dentro de `<Head>`: así se fija el atributo `lang` del `<html>`.
 
 **Nivel 2 — Página (sobrescribe)**, `src/pages/home.tsx:28-40`:
+
 ```tsx
 <Head>
   <title>{title}</title>
@@ -266,16 +279,19 @@ Y la página interior, más escueta (`src/pages/aviso-legal.tsx:8-13`): `title`,
 la semántica de sobrescritura de Helmet (el componente más profundo gana).
 
 **[HECHO] Fuente única de la verdad del sitio** — `src/lib/site.ts:1-7`:
+
 ```ts
 export const SITE = {
   name: 'Cénit Digital',
   tagline: 'Soluciones digitales para pymes',
-  description: 'Estudio digital para pymes del noroeste de Madrid: webs rápidas, SEO y automatizaciones con IA.',
+  description:
+    'Estudio digital para pymes del noroeste de Madrid: webs rápidas, SEO y automatizaciones con IA.',
   url: 'https://www.cenitdigital.es',
 } as const
 ```
 
 **[HECHO] Lógica de títulos aislada y testeada** — `src/lib/seo.ts:9-24`:
+
 ```ts
 export function buildPageTitle(pageTitle?: string): string {
   if (!pageTitle) return SITE.name
@@ -285,23 +301,32 @@ export function buildHomeTitle(): string {
   return `${SITE.name} — ${SITE.tagline}`
 }
 ```
+
 Con la decisión de diseño documentada en el propio comentario (`src/lib/seo.ts:16-21`):
-*"Título de la home: `<sitio> — <tagline>`. Orden inverso al de las páginas interiores (el
-nombre va primero) para que la marca encabece el resultado de búsqueda de la portada."*
+_"Título de la home: `<sitio> — <tagline>`. Orden inverso al de las páginas interiores (el
+nombre va primero) para que la marca encabece el resultado de búsqueda de la portada."_
 
 **[HECHO]** Y con tests unitarios que cubren los casos borde, incluido `''` (cadena vacía →
 solo el nombre): `src/lib/seo.test.ts:6-17`. Esto es la aplicación de la regla de
-arquitectura *"la lógica con valor de negocio vive en `lib/` para poder testearla y mutarla
-sin renderizar"* (`docs/architecture.md:44-46`).
+arquitectura _"la lógica con valor de negocio vive en `lib/` para poder testearla y mutarla
+sin renderizar"_ (`docs/architecture.md:44-46`).
 
 **[HECHO] Resultado real prerenderizado** en `dist/index.html` (extracto literal del `<head>`):
+
 ```html
 <title data-rh="true">Cénit Digital — Soluciones digitales para pymes</title>
-<meta data-rh="true" name="description" content="Estudio digital para pymes del noroeste de Madrid: …">
-<meta data-rh="true" property="og:url" content="https://www.cenitdigital.es/">
-<link data-rh="true" rel="canonical" href="https://www.cenitdigital.es/">
-<script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"Organization",…}</script>
+<meta
+  data-rh="true"
+  name="description"
+  content="Estudio digital para pymes del noroeste de Madrid: …"
+/>
+<meta data-rh="true" property="og:url" content="https://www.cenitdigital.es/" />
+<link data-rh="true" rel="canonical" href="https://www.cenitdigital.es/" />
+<script data-rh="true" type="application/ld+json">
+  {"@context":"https://schema.org","@type":"Organization",…}
+</script>
 ```
+
 → **[HECHO]** El SEO y el JSON-LD **viajan en el HTML estático**, no dependen de JS.
 Esto es lo que hace que el patrón sirva para SEO real.
 
@@ -323,12 +348,13 @@ const ORGANIZATION_LD = JSON.stringify({
 ```
 
 Tres decisiones que **debemos copiar tal cual**:
+
 1. **`JSON.stringify` sobre un objeto**, nunca un string JSON escrito a mano → imposible
    generar JSON inválido.
 2. **`.replace(/</g, '\\u003c')`** → un `</script>` dentro de un dato no puede romper el
    documento (XSS por ruptura de contexto). Defensa en profundidad.
-3. **`Organization` y no `LocalBusiness`**, con el motivo escrito en el código: *"no
-   inventamos dirección ni teléfono"*. **[HECHO]** Es exactamente la misma disciplina
+3. **`Organization` y no `LocalBusiness`**, con el motivo escrito en el código: _"no
+   inventamos dirección ni teléfono"_. **[HECHO]** Es exactamente la misma disciplina
    antiinvención que rige nuestro proyecto.
 
 **[HECHO]** No hay `BreadcrumbList`, ni `WebSite`/`SearchAction`, ni `FAQPage`, ni `Service`.
@@ -340,6 +366,7 @@ Tres decisiones que **debemos copiar tal cual**:
 `onFinished` en `vite.config.ts`, que es donde vite-react-ssg permitiría generarlos).
 
 `public/robots.txt` (contenido íntegro):
+
 ```
 User-agent: *
 Allow: /
@@ -348,6 +375,7 @@ Sitemap: https://www.cenitdigital.es/sitemap.xml
 ```
 
 `public/sitemap.xml` (contenido íntegro):
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -365,6 +393,7 @@ Sitemap: https://www.cenitdigital.es/sitemap.xml
 ```
 
 **[HECHO]** Observaciones objetivas:
+
 - El namespace `http://www.sitemaps.org/schemas/sitemap/0.9` es el correcto del protocolo.
 - **No hay `<lastmod>`** en ninguna URL.
 - Las URLs están **hardcodeadas**, duplicando `SITE.url` (`src/lib/site.ts:6`) → dos fuentes
@@ -391,21 +420,23 @@ verificar** la configuración real del proyecto en el dashboard de Vercel (§3).
 > "If your Vite app is configured to deploy as a Single Page Application (SPA), deep linking
 > won't work out of the box. To enable deep linking in SPA Vite apps, create a `vercel.json`
 > file at the root of your project, and add the following code: `{"rewrites": [{"source":
-> "/(.*)", "destination": "/index.html"}]}`"
+"/(.*)", "destination": "/index.html"}]}`"
 
 Y remata:
+
 > "**Deploying your app in Multi-Page App mode is recommended for production builds**."
 
 **[INFERENCIA] — y es un punto crítico para nosotros**: con `dirStyle: 'nested'` el build
 produce un HTML por ruta (`dist/aviso-legal/index.html`), es decir, un **Multi-Page App**
 de facto. El rewrite SPA no solo es innecesario: **sería activamente dañino**, porque
-serviría `index.html` (la home) para *todas* las rutas y **anularía el prerender por página**
+serviría `index.html` (la home) para _todas_ las rutas y **anularía el prerender por página**
 —el HTML de `/aviso-legal` nunca llegaría al buscador—. Por tanto, la **ausencia** de
 `vercel.json` no es un olvido: es coherente con el diseño SSG.
-*(Esto es razonamiento mío a partir de dos hechos verificados —el output real de `dist/` y
-la doc de Vercel—; el repo no lo documenta explícitamente en ningún sitio.)*
+_(Esto es razonamiento mío a partir de dos hechos verificados —el output real de `dist/` y
+la doc de Vercel—; el repo no lo documenta explícitamente en ningún sitio.)_
 
 **[HECHO] Formato de las funciones serverless** — `api/contact.ts:36-37`:
+
 ```ts
 export default {
   async fetch(request: Request): Promise<Response> {
@@ -414,32 +445,37 @@ export default {
 Esto coincide **exactamente** con el formato oficialmente documentado por Vercel para
 proyectos sin framework. Cita literal de https://vercel.com/docs/functions/quickstart
 (bloque etiquetado `filename="api/hello.ts" framework=other`):
+
 ```ts
 export default {
   async fetch(request: Request) {
-    const response = await fetch('https://api.vercel.app/products');
-    const products = await response.json();
-    return Response.json(products);
+    const response = await fetch('https://api.vercel.app/products')
+    const products = await response.json()
+    return Response.json(products)
   },
-};
+}
 ```
-> La misma doc añade: *"While using `fetch` is the recommended way to create a Vercel
-> Function, you can still use HTTP methods like `GET` and `POST`."*
+
+> La misma doc añade: _"While using `fetch` is the recommended way to create a Vercel
+> Function, you can still use HTTP methods like `GET` and `POST`."_
 
 **[HECHO] El endpoint se consume desde el cliente** con `fetch('/api/contact', …)`
 (`src/lib/contact.ts:42`) — ruta relativa, mismo origen.
 
 **[HECHO] `api/` queda FUERA del typecheck del arnés.** `tsconfig.json:22`:
+
 ```json
 "include": ["src", "vite.config.ts", "vitest.config.ts", "vitest.setup.ts"]
 ```
-El propio código lo reconoce (`api/contact.ts:15-16`): *"NOTA: este archivo NO forma parte
+
+El propio código lo reconoce (`api/contact.ts:15-16`): _"NOTA: este archivo NO forma parte
 del build SSG ni del typecheck del arnés (tsconfig solo incluye `src/`); Vercel lo compila
-y sirve por separado."*
+y sirve por separado."_
 **[INFERENCIA]** Es un agujero real de calidad: el código con acceso a claves y a la
 frontera de confianza es justo el que ningún gate verifica. Ver §4.
 
 **[HECHO] Endurecimiento del endpoint** (`api/contact.ts`), útil como checklist a replicar:
+
 - Rechaza no-POST → 405 (`api/contact.ts:38-40`).
 - **Rate limit por IP** con `checkRateLimit('contact-form', { request })` de
   `@vercel/firewall` → 429 (`api/contact.ts:43-46`).
@@ -451,31 +487,33 @@ frontera de confianza es justo el que ningún gate verifica. Ver §4.
 - Si falta `RESEND_API_KEY` → 500 controlado, sin filtrar detalles (`api/contact.ts:82-85`).
 
 **[HECHO] El rate limit exige configuración manual en el dashboard.** `README.md:128-131`:
-*"Rate limiting: en el dashboard de Vercel → Firewall → nueva regla con Rate limit ID
+_"Rate limiting: en el dashboard de Vercel → Firewall → nueva regla con Rate limit ID
 `contact-form` (el que consume `checkRateLimit` en `api/contact.ts`). Sin esa regla,
-`checkRateLimit` es un no-op seguro (no limita, pero no rompe)."*
+`checkRateLimit` es un no-op seguro (no limita, pero no rompe)."_
 → **[INFERENCIA]** Riesgo operativo: el código "funciona" sin la regla, pero **sin
 protección**. Es un fallo silencioso: nada en el build avisa.
 
-**[HECHO] Las funciones NO corren en `pnpm dev`.** `README.md:133-134`: *"En local,
+**[HECHO] Las funciones NO corren en `pnpm dev`.** `README.md:133-134`: _"En local,
 `pnpm dev` no ejecuta las funciones de `/api` (usa `vercel dev` para probarlas); los tests
-cubren el comportamiento del formulario mockeando el envío."*
+cubren el comportamiento del formulario mockeando el envío."_
 
-**[HECHO] Gestión de secretos** — regla `RF-STACK-001` (`.env.example:3-8`): *"NINGUNA clave
-real se sube al repositorio"*; solo las variables con prefijo `VITE_` llegan al cliente. Las
+**[HECHO] Gestión de secretos** — regla `RF-STACK-001` (`.env.example:3-8`): _"NINGUNA clave
+real se sube al repositorio"_; solo las variables con prefijo `VITE_` llegan al cliente. Las
 privadas (`RESEND_API_KEY`, `CONTACT_TO`, `RESEND_FROM`) viven en las env vars de Vercel.
 
 ### 2.7 Hidratación: el patrón `ClientOnly`
 
 **[HECHO]** Todo lo que depende del navegador se envuelve en `<ClientOnly>` de
 `vite-react-ssg`, con la sintaxis **render-prop** (`src/components/HeaderNav.tsx:21,34`):
+
 ```tsx
 <ClientOnly>{() => <ThemeToggle />}</ClientOnly>
 ```
-> Motivo documentado en `src/components/HeaderNav.tsx:13`: *"envuelto en `ClientOnly` para
-> no renderizar en el prerender SSG"*. Y en `docs/architecture.md:57-59`: *"La interactividad
+
+> Motivo documentado en `src/components/HeaderNav.tsx:13`: _"envuelto en `ClientOnly` para
+> no renderizar en el prerender SSG"_. Y en `docs/architecture.md:57-59`: _"La interactividad
 > que depende del navegador (p. ej. el conmutador de tema) se envuelve en `<ClientOnly>`
-> para evitar desajustes de hidratación."*
+> para evitar desajustes de hidratación."_
 
 **[HECHO]** El tema se aplica **antes del primer pintado** con un script inline en
 `index.html:10-28` que lee `localStorage['cenit-theme']` y cae a
@@ -492,18 +530,18 @@ drawer sobre la cabecera`.
 
 ## 3. Lo que NO he podido verificar
 
-| # | Afirmación / dato | Por qué no está verificado | Qué haría falta para verificarlo |
-| --- | --- | --- | --- |
-| 1 | La configuración real del proyecto en **Vercel** (framework preset, build command, output dir, `cleanUrls`, dominio) | No hay `vercel.json` en el repo; esa config vive **solo en el dashboard**, al que no tengo acceso | Acceso al dashboard de Vercel del proyecto, o `vercel project inspect` / `vercel pull` autenticado |
-| 2 | Que **cenitdigital.es esté realmente desplegado** con este patrón y que el HTML servido en producción coincida con `dist/` | No he hecho ninguna petición al dominio real | `curl -s https://www.cenitdigital.es/aviso-legal` y comprobar que devuelve HTML prerenderizado con 200 (no un rewrite a la home) |
-| 3 | Si existe la **regla de Firewall `contact-form`** en Vercel | Es config de dashboard; el código es un no-op seguro sin ella (`README.md:130-131`) | Revisar Vercel → Firewall → Rate limiting del proyecto |
-| 4 | Si `dist/` está **actualizado** respecto al código fuente actual | `dist/` está en el árbol de trabajo pero es un artefacto de build de fecha desconocida; no he ejecutado `pnpm build` | Ejecutar `pnpm install && pnpm build` en WebEmpresa y volver a comparar el HTML |
-| 5 | Qué cambia entre **0.9.0 → 0.9.1 → 0.9.2** de vite-react-ssg y si romperían este patrón | No he leído el CHANGELOG ni los diffs de esas versiones | Leer `https://github.com/Daydreamer-riri/vite-react-ssg/releases` y el CHANGELOG.md del repo |
-| 6 | El motivo de **fijar `0.9.0` exacto** (sin `^`) | No está documentado en el repo (ni en `package.json`, ni en `docs/`, ni en el historial que he revisado) | Preguntar al responsable del stack o buscar en Confluence (`RF-STACK-001`, `DE-002`) |
-| 7 | Postura oficial actual de Google sobre **`changefreq`/`priority`** y sobre `<lastmod>` | No lo he consultado; no afirmo nada al respecto | Leer la doc oficial de Google Search Central sobre sitemaps |
-| 8 | Los **datos del negocio real** de NailsLashStudio (nombre legal, NIF, dirección exacta en Las Rozas, teléfono, horarios, dominio) | **No están en ninguna fuente que yo haya visto.** Son de otra área de investigación | Aportación directa del cliente/propietario, documentada por escrito |
-| 9 | El **vocabulario schema.org exacto** para un salón de uñas/pestañas (`BeautySalon` vs `NailSalon` vs `HealthAndBeautyBusiness`, propiedades obligatorias) | No he consultado schema.org en esta investigación — está fuera del alcance de mi pregunta y merece verificación propia | Consultar `https://schema.org/BeautySalon` y la doc de Google sobre datos estructurados de negocios locales |
-| 10 | Si el proyecto NailsLashStudioWeb debe usar **RR v6 + vite-react-ssg** o **RR v7 con SSG nativo** | Es una decisión de arquitectura, no un hecho verificable. La doc oficial recomienda RR v7 nativo *si ya usas v7*; el stack de empresa está en v6 | Decisión humana explícita (`craftsman_lead` + norma de empresa `RF-STACK-001`) |
+| #   | Afirmación / dato                                                                                                                                         | Por qué no está verificado                                                                                                                       | Qué haría falta para verificarlo                                                                                                 |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | La configuración real del proyecto en **Vercel** (framework preset, build command, output dir, `cleanUrls`, dominio)                                      | No hay `vercel.json` en el repo; esa config vive **solo en el dashboard**, al que no tengo acceso                                                | Acceso al dashboard de Vercel del proyecto, o `vercel project inspect` / `vercel pull` autenticado                               |
+| 2   | Que **cenitdigital.es esté realmente desplegado** con este patrón y que el HTML servido en producción coincida con `dist/`                                | No he hecho ninguna petición al dominio real                                                                                                     | `curl -s https://www.cenitdigital.es/aviso-legal` y comprobar que devuelve HTML prerenderizado con 200 (no un rewrite a la home) |
+| 3   | Si existe la **regla de Firewall `contact-form`** en Vercel                                                                                               | Es config de dashboard; el código es un no-op seguro sin ella (`README.md:130-131`)                                                              | Revisar Vercel → Firewall → Rate limiting del proyecto                                                                           |
+| 4   | Si `dist/` está **actualizado** respecto al código fuente actual                                                                                          | `dist/` está en el árbol de trabajo pero es un artefacto de build de fecha desconocida; no he ejecutado `pnpm build`                             | Ejecutar `pnpm install && pnpm build` en WebEmpresa y volver a comparar el HTML                                                  |
+| 5   | Qué cambia entre **0.9.0 → 0.9.1 → 0.9.2** de vite-react-ssg y si romperían este patrón                                                                   | No he leído el CHANGELOG ni los diffs de esas versiones                                                                                          | Leer `https://github.com/Daydreamer-riri/vite-react-ssg/releases` y el CHANGELOG.md del repo                                     |
+| 6   | El motivo de **fijar `0.9.0` exacto** (sin `^`)                                                                                                           | No está documentado en el repo (ni en `package.json`, ni en `docs/`, ni en el historial que he revisado)                                         | Preguntar al responsable del stack o buscar en Confluence (`RF-STACK-001`, `DE-002`)                                             |
+| 7   | Postura oficial actual de Google sobre **`changefreq`/`priority`** y sobre `<lastmod>`                                                                    | No lo he consultado; no afirmo nada al respecto                                                                                                  | Leer la doc oficial de Google Search Central sobre sitemaps                                                                      |
+| 8   | Los **datos del negocio real** de NailsLashStudio (nombre legal, NIF, dirección exacta en Las Rozas, teléfono, horarios, dominio)                         | **No están en ninguna fuente que yo haya visto.** Son de otra área de investigación                                                              | Aportación directa del cliente/propietario, documentada por escrito                                                              |
+| 9   | El **vocabulario schema.org exacto** para un salón de uñas/pestañas (`BeautySalon` vs `NailSalon` vs `HealthAndBeautyBusiness`, propiedades obligatorias) | No he consultado schema.org en esta investigación — está fuera del alcance de mi pregunta y merece verificación propia                           | Consultar `https://schema.org/BeautySalon` y la doc de Google sobre datos estructurados de negocios locales                      |
+| 10  | Si el proyecto NailsLashStudioWeb debe usar **RR v6 + vite-react-ssg** o **RR v7 con SSG nativo**                                                         | Es una decisión de arquitectura, no un hecho verificable. La doc oficial recomienda RR v7 nativo _si ya usas v7_; el stack de empresa está en v6 | Decisión humana explícita (`craftsman_lead` + norma de empresa `RF-STACK-001`)                                                   |
 
 ---
 
@@ -540,7 +578,7 @@ drawer sobre la cabecera`.
    caer: aparece en la doc de Vercel y en mil tutoriales, pero aplica a SPAs, **no a nuestro caso**.
 2. **NO inventar datos del negocio en el JSON-LD ni en el `<head>`.** WebEmpresa se
    autolimitó a `Organization` con el motivo escrito en el código (`src/pages/home.tsx:12`):
-   *"no inventamos dirección ni teléfono"*. Nosotros tenemos la **misma regla dura** y
+   _"no inventamos dirección ni teléfono"_. Nosotros tenemos la **misma regla dura** y
    **[DESCONOCIDO] #8**: hoy no tenemos NI dirección, NI teléfono, NI horarios, NI dominio
    verificados del salón.
 3. **NO usar `pnpm dev` como prueba de que el SSG funciona**: `dev` es Vite plano (SPA). El

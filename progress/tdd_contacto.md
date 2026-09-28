@@ -5,10 +5,12 @@
 > el 2026-07-18, LOTE A). Baseline anclado: **729 tests** verdes.
 
 ## Puerta verificada antes de empezar
+
 - `features/contacto.feature` cabecera: «✅✅ APROBADO POR LA PUERTA HUMANA EL 2026-07-18 (LOTE A)».
 - `feature_list.json` §12 (`contacto`): `status: "in_progress"` + `puerta_humana` (lote A). CUADRAN → adelante.
 
 ## Diseño (mínimo, homogéneo con el repo)
+
 - **Núcleo mutable ÚNICO:** `instagramHref(handle)` en `src/lib/site.ts` — derivación pura HERMANA de
   `telHref`/`waHref`. EXTIENDE site.ts (no reabre F-02: `telHref`/`waHref`/NAP intactos).
 - **Render:** se extrae `src/components/Contacto.tsx` (+ `contacto.module.scss`) del stub `#contacto`
@@ -39,6 +41,7 @@
 Diseño: se EXTRAE `src/components/Contacto.tsx` (+ `contacto.module.scss`) del stub `#contacto` de
 `home.tsx`, homogéneo con el repo (Hero/Pie/Cabecera son componentes con `.module.scss` co-locado; F-07
 ya extrajo `<Hero/>` del `<h1>` stub). Dos capas de test, como el repo:
+
 - `src/components/contacto.test.tsx` — `renderToString(<Contacto/>)` in-process: da COBERTURA DE MUTACIÓN
   a los literales de `Contacto.tsx` (id, «Contacto», separadores de la dirección, textos de enlace).
 - `src/pages/contacto-horneado.test.ts` — build-based, AUTORITATIVO sobre los BYTES de `dist/` (readFileSync,
@@ -64,23 +67,23 @@ ya extrajo `<Hero/>` del `<h1>` stub). Dos capas de test, como el repo:
 
 ## Trazabilidad @s → test (cada escenario cubierto por ≥1 test concreto)
 
-| @s | test(s) |
-| -- | ------- |
-| @s1 | `site.test.ts` «@s1 …» (URL exacta · no la alternativa · host/sin-@/cierra «/») |
-| @s2 | `site.test.ts` «@s2 el caso "%s" LANZA …» (it.each: '', '@', '@nails lash') |
-| @s3 | `site.test.ts` «@s3 "nailslash.studio_" (sin "@") LANZA …» |
-| @s4 | `contacto-horneado.test.ts` «@s4 …» (dist, autoritativo) + `contacto.test.tsx` «@s4 …» (in-process) |
-| @s5 | `contacto-horneado.test.ts` «@s5 …» + `contacto.test.tsx` «@s5 …» |
-| @s6 | `contacto-estilos.test.ts` «@s6 …» (2: @media que trata .telefono · sin atribución WCAG) |
-| @s7 | `contacto-horneado.test.ts` «@s7 …» (ancla positiva marca + sin «tiktok» en TODO el doc) |
-| @s8 | `contacto-horneado.test.ts` «@s8 …» (ancla positiva + sin email + sin mailto: en TODO el doc) |
-| @s9 | `contacto-horneado.test.ts` «@s9 …» (ancla positiva h2+tel · Facebook NO en #contacto, SÍ en el pie) |
-| @s10 | `contacto-horneado.test.ts` «@s10 …» (1 sección + 1 id + nav enlaza + exit 0) + `contacto.test.tsx` «@s10 …» |
-| @s11 | `contacto-horneado.test.ts` «@s11 …» (ancla positiva tel+dir+IG · sin wa.me/api.whatsapp.com) |
+| @s   | test(s)                                                                                                               |
+| ---- | --------------------------------------------------------------------------------------------------------------------- |
+| @s1  | `site.test.ts` «@s1 …» (URL exacta · no la alternativa · host/sin-@/cierra «/»)                                       |
+| @s2  | `site.test.ts` «@s2 el caso "%s" LANZA …» (it.each: '', '@', '@nails lash')                                           |
+| @s3  | `site.test.ts` «@s3 "nailslash.studio_" (sin "@") LANZA …»                                                            |
+| @s4  | `contacto-horneado.test.ts` «@s4 …» (dist, autoritativo) + `contacto.test.tsx` «@s4 …» (in-process)                   |
+| @s5  | `contacto-horneado.test.ts` «@s5 …» + `contacto.test.tsx` «@s5 …»                                                     |
+| @s6  | `contacto-estilos.test.ts` «@s6 …» (2: @media que trata .telefono · sin atribución WCAG)                              |
+| @s7  | `contacto-horneado.test.ts` «@s7 …» (ancla positiva marca + sin «tiktok» en TODO el doc)                              |
+| @s8  | `contacto-horneado.test.ts` «@s8 …» (ancla positiva + sin email + sin mailto: en TODO el doc)                         |
+| @s9  | `contacto-horneado.test.ts` «@s9 …» (ancla positiva h2+tel · Facebook NO en #contacto, SÍ en el pie)                  |
+| @s10 | `contacto-horneado.test.ts` «@s10 …» (1 sección + 1 id + nav enlaza + exit 0) + `contacto.test.tsx` «@s10 …»          |
+| @s11 | `contacto-horneado.test.ts` «@s11 …» (ancla positiva tel+dir+IG · sin wa.me/api.whatsapp.com)                         |
 | @s12 | `contacto-horneado.test.ts` «@s12 …» (dir texto · sin iframe/«Cómo llegar»/«Planta 0») + `contacto.test.tsx` «@s12 …» |
-| @s13 | cubierto por @s1/@s2/@s3 (`site.test.ts`); lo MIDE el `mutation_tester`. `site.ts` + `Contacto.tsx` en `mutate` |
-| @s14 | `contacto-horneado.test.ts` «@s14 …» + `contacto.test.tsx` «@s14 …» (texto=handle · href=URL · cuerpo común) |
-| @s15 | `contacto-fuente.test.ts` «@s15 …» (.tsx sin «instagram.com» · site.ts con el host) |
+| @s13 | cubierto por @s1/@s2/@s3 (`site.test.ts`); lo MIDE el `mutation_tester`. `site.ts` + `Contacto.tsx` en `mutate`       |
+| @s14 | `contacto-horneado.test.ts` «@s14 …» + `contacto.test.tsx` «@s14 …» (texto=handle · href=URL · cuerpo común)          |
+| @s15 | `contacto-fuente.test.ts` «@s15 …» (.tsx sin «instagram.com» · site.ts con el host)                                   |
 
 ## Sabotajes (docs/verification.md) — cada test MUERDE, todos revertidos
 
@@ -135,22 +138,22 @@ ya extrajo `<Hero/>` del `<h1>` stub). Dos capas de test, como el repo:
 
 ### Los 6 tests nuevos → los 8 mutantes que matan
 
-| Mutante (informe) | Test nuevo | Fichero |
-|---|---|---|
-| `site.ts:125:21` (mensaje «empezar por "@"» vaciado) | `@s3 el handle sin "@" lanza un error que nombra la regla: «empezar por "@"»` — patrón F-02 (`toThrow`, site.test.ts:219) | `site.test.ts` |
-| `site.ts:133:21` (mensaje «no es válido» vaciado) | `@s2 el handle inválido lanza un error que nombra el problema: «no es válido»` (con `'@'` y `'@nails lash'`) | `site.test.ts` |
-| `Contacto.tsx:35:26` (`horario.map(() => undefined)`) | `cada fila empareja sus días con su franja: L-V 10:00–20:00, Sábado 10:00–14:00 y Domingo Cerrado` — literales A MANO, con el guion LARGO «–» (U+2013) de `horarioParaUI`, emparejando día↔franja por regex sobre el `renderToString` | `contacto.test.tsx` |
-| `Contacto.tsx:20:19` (`MAPS_HREF` vaciado, mutante ESTÁTICO) | `el href es EXACTAMENTE el formato oficial Maps URLs ?api=1&query=lat%2Clng` — URL A MANO desde las coordenadas [V]; OJO MEDIDO: React escapa el `&` del atributo como `&amp;` | `contacto.test.tsx` |
-| `Contacto.tsx:26:19` (`demo-seccion …` vaciado) y `:27:23` (`demo-contenedor …`) | `la <section> lleva demo-seccion y la rejilla demo-contenedor` — se lee el atributo `class` del horneado (patrón `equipo.test.tsx:128-138`; sin `toHaveClass`, clases GLOBALES estáticas, no condicionales) | `contacto.test.tsx` |
-| `Contacto.tsx:64:26` (`demo-btn demo-btn--wa …`) y `:77:24` (`demo-btn demo-btn--solido …`) | `el CTA de WhatsApp viste demo-btn demo-btn--wa y «Cómo llegar» demo-btn demo-btn--solido` — regex ancladas al TEXTO de cada enlace | `contacto.test.tsx` |
+| Mutante (informe)                                                                           | Test nuevo                                                                                                                                                                                                                            | Fichero             |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| `site.ts:125:21` (mensaje «empezar por "@"» vaciado)                                        | `@s3 el handle sin "@" lanza un error que nombra la regla: «empezar por "@"»` — patrón F-02 (`toThrow`, site.test.ts:219)                                                                                                             | `site.test.ts`      |
+| `site.ts:133:21` (mensaje «no es válido» vaciado)                                           | `@s2 el handle inválido lanza un error que nombra el problema: «no es válido»` (con `'@'` y `'@nails lash'`)                                                                                                                          | `site.test.ts`      |
+| `Contacto.tsx:35:26` (`horario.map(() => undefined)`)                                       | `cada fila empareja sus días con su franja: L-V 10:00–20:00, Sábado 10:00–14:00 y Domingo Cerrado` — literales A MANO, con el guion LARGO «–» (U+2013) de `horarioParaUI`, emparejando día↔franja por regex sobre el `renderToString` | `contacto.test.tsx` |
+| `Contacto.tsx:20:19` (`MAPS_HREF` vaciado, mutante ESTÁTICO)                                | `el href es EXACTAMENTE el formato oficial Maps URLs ?api=1&query=lat%2Clng` — URL A MANO desde las coordenadas [V]; OJO MEDIDO: React escapa el `&` del atributo como `&amp;`                                                        | `contacto.test.tsx` |
+| `Contacto.tsx:26:19` (`demo-seccion …` vaciado) y `:27:23` (`demo-contenedor …`)            | `la <section> lleva demo-seccion y la rejilla demo-contenedor` — se lee el atributo `class` del horneado (patrón `equipo.test.tsx:128-138`; sin `toHaveClass`, clases GLOBALES estáticas, no condicionales)                           | `contacto.test.tsx` |
+| `Contacto.tsx:64:26` (`demo-btn demo-btn--wa …`) y `:77:24` (`demo-btn demo-btn--solido …`) | `el CTA de WhatsApp viste demo-btn demo-btn--wa y «Cómo llegar» demo-btn demo-btn--solido` — regex ancladas al TEXTO de cada enlace                                                                                                   | `contacto.test.tsx` |
 
 ### Sabotaje (obligatorio): los mutantes replicados A MANO
 
 1. `site.ts`: los DOS mensajes → `new Error('')` ⇒ **2 rojos** (exactamente los 2 tests nuevos).
    Restaurado con `git checkout -- src/lib/site.ts` (estaba limpio antes).
 2. `Contacto.tsx`: los 4 mutantes aplicados A LA VEZ (`map(() => undefined)`, `MAPS_HREF = \` \``,
-   `className={\`\`}` en la sección y en el CTA) ⇒ **4 rojos** (los 4 tests nuevos, cada uno cazó
-   el suyo). Restaurado con `git checkout -- src/components/Contacto.tsx`.
+`className={\`\`}`en la sección y en el CTA) ⇒ **4 rojos** (los 4 tests nuevos, cada uno cazó
+el suyo). Restaurado con`git checkout -- src/components/Contacto.tsx`.
 
 ### Estado
 

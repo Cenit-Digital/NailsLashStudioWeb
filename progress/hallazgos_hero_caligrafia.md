@@ -7,15 +7,15 @@
 ## 1. El recorte lateral — CAUSA ÚNICA, MEDIDA
 
 `src/components/hero.module.scss:51` → `.heroMarca { clip-path: inset(0 0 0 0) }`.
-`inset()` recorta **al border-box**. Los *swashes* de Great Vibes se salen de la caja de avance:
+`inset()` recorta **al border-box**. Los _swashes_ de Great Vibes se salen de la caja de avance:
 
-| medición | fuente | valor |
-|---|---|---|
-| caja de `.heroMarca` a 1440 px | `getBoundingClientRect` | 428,21 px |
-| borde izq. de la tinta | `TextMetrics.actualBoundingBoxLeft` | **−4,00 px** (fuera) |
-| borde der. de la tinta | `TextMetrics.actualBoundingBoxRight` | **439,28 px** (11,06 fuera) |
-| desbordamiento en em (medido a 1000 px) | `measureText` | izq **0,0156 em** · der **0,0703 em** |
-| desbordamiento según el fichero de fuente | opentype.js sobre el `.woff` | der **0,071 em** ✅ coincide |
+| medición                                  | fuente                               | valor                                 |
+| ----------------------------------------- | ------------------------------------ | ------------------------------------- |
+| caja de `.heroMarca` a 1440 px            | `getBoundingClientRect`              | 428,21 px                             |
+| borde izq. de la tinta                    | `TextMetrics.actualBoundingBoxLeft`  | **−4,00 px** (fuera)                  |
+| borde der. de la tinta                    | `TextMetrics.actualBoundingBoxRight` | **439,28 px** (11,06 fuera)           |
+| desbordamiento en em (medido a 1000 px)   | `measureText`                        | izq **0,0156 em** · der **0,0703 em** |
+| desbordamiento según el fichero de fuente | opentype.js sobre el `.woff`         | der **0,071 em** ✅ coincide          |
 
 La sesión anterior arregló el eje Y con `padding-top/bottom`; **nadie tocó el eje X**. El
 `overflow: hidden` de `.demo-hero` (`_demo.scss:108`) es un segundo recortador latente, pero a los
@@ -43,14 +43,14 @@ letras hoy no es la punta: es el culo del bote.
 
 ### Lo que se descartó, con la medición que lo descarta
 
-- **Enmascarar el texto HTML con `mask-image: url(#id)`**: *funciona* (probado: el texto se revela
+- **Enmascarar el texto HTML con `mask-image: url(#id)`**: _funciona_ (probado: el texto se revela
   siguiendo la curva y se re-evalúa al animar `stroke-dashoffset`), pero obliga a
   `maskContentUnits="objectBoundingBox"` para ser responsive, y ahí **el trazo se deforma con la
   relación de aspecto de la caja** (4,3 × 1,8 em): un trazo de 0,45 em de alto sale de **1,07 em de
   ancho** → revela una letra entera por delante y vuelve a parecer un barrido. **Descartado por
   medición, no por gusto.**
   Riesgo adicional confirmado en spec: si el navegador soporta `mask-image` pero **no resuelve**
-  `url(#id)`, la spec obliga a tratarlo como *transparent black* → **elemento invisible**, no
+  `url(#id)`, la spec obliga a tratarlo como _transparent black_ → **elemento invisible**, no
   visible. <https://drafts.fxtf.org/css-masking-1/>
 - **GSAP / Anime.js**: **ninguna de las dos resuelve el problema real.** Ni GSAP ni Anime.js generan
   la línea central de unas letras: exigen que tú les entregues el `<path>` ya hecho, porque las
@@ -65,13 +65,13 @@ justo lo que la vía HTML no podía dar:
 
 1. `<mask>` con la línea central trazada gruesa + `stroke-dashoffset` animado por CSS → la tinta
    aparece **siguiendo el trazo**. Verificado en vivo: la máscara honra el `stroke` (a diferencia de
-   `<clipPath>`, que por spec usa *"raw geometry … exclusive of … stroke"*).
+   `<clipPath>`, que por spec usa _"raw geometry … exclusive of … stroke"_).
 2. El aplicador es un `<image>` movido por **CSS `offset-path`** sobre **el mismo path**.
    Verificado en vivo: opera en **unidades del viewBox** (desviación medida 0,1 u) → escala con el
    titular responsive.
 3. **Sincronía exacta por construcción**: `pathLength="100"` + `stroke-dasharray="100"` +
    `stroke-dashoffset: 100→0` (unidades de usuario) contra `offset-distance: 0%→100%`. Ambas son
-   lineales en **longitud de arco** y comparten *document timeline* con idénticos
+   lineales en **longitud de arco** y comparten _document timeline_ con idénticos
    duration/delay/easing. ⚠️ Trampa evitada: los **porcentajes** en `stroke-dasharray` NO usan esa
    métrica (se resuelven contra la diagonal del viewport) — por eso van en unidades absolutas.
 4. **El recorte deja de existir por construcción**: el `viewBox` se calcula del bbox real de la
@@ -92,7 +92,7 @@ holgura y sigue siendo **~3× más estrecha que una letra** (≈350 ‰) → rev
 - **LCP**: un `<svg>` inline **no es candidato a LCP** (sí lo son `<img src=…svg>` y un `<image>`
   dentro del SVG) — <https://web.dev/articles/lcp>. Sustituir el titular por SVG inline mueve el
   candidato LCP a otro elemento de la página; conviene medirlo.
-- **Duración 4,5 s**: pedida explícitamente por Pablo. **No** infringe WCAG 2.2.2 (exige *más de*
+- **Duración 4,5 s**: pedida explícitamente por Pablo. **No** infringe WCAG 2.2.2 (exige _más de_
   cinco segundos) ni 2.3.3 (es AAA y solo cubre animación disparada por interacción). Obliga a
   subir el tope de `@s4`, hoy en 2,5 s → hay que reescribir el contrato, no saltárselo.
 - **El aplicador**: hay que recortarlo a cerdas+varilla y voltearlo para que la punta mire hacia
@@ -123,7 +123,7 @@ La línea central se está derivando **de los glifos reales**, no a mano. Rig mo
 6. ⏳ **SIGUIENTE**: recorrido euleriano por continuación más recta sobre los 132 arcos, agrupado
    por las 5 plumadas → remuestreo → suavizado → ajuste a Béziers → emitir `d` con
    `pathLength="100"`.
-6. Puertas de calidad previstas (objetivas, automatizables): % de puntos muestreados del trazo que
+7. Puertas de calidad previstas (objetivas, automatizables): % de puntos muestreados del trazo que
    caen DENTRO de la tinta, y % de tinta cubierta por la máscara en t=1.
 
 **Nada de esto se ha llevado todavía a `src/`.** El árbol de trabajo sigue limpio.

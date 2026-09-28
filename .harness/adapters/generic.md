@@ -12,14 +12,14 @@ cualquier stack no cubierto por un adaptador específico:
 
 ## Ejemplos de comandos por stack
 
-| Stack   | test                     | mutación (herramienta)                        |
-| ------- | ------------------------ | --------------------------------------------- |
-| Go      | `go test ./...`          | [gremlins](https://github.com/go-gremlins/gremlins) / go-mutesting |
-| Rust    | `cargo test`             | [cargo-mutants](https://github.com/sourcefrog/cargo-mutants) |
-| Java    | `mvn test`               | [PIT](https://pitest.org/)                    |
-| C#/.NET | `dotnet test`            | [Stryker.NET](https://stryker-mutator.io/)    |
-| PHP     | `phpunit`                | [Infection](https://infection.github.io/)     |
-| Ruby    | `rspec`                  | [mutant](https://github.com/mbj/mutant)       |
+| Stack   | test            | mutación (herramienta)                                             |
+| ------- | --------------- | ------------------------------------------------------------------ |
+| Go      | `go test ./...` | [gremlins](https://github.com/go-gremlins/gremlins) / go-mutesting |
+| Rust    | `cargo test`    | [cargo-mutants](https://github.com/sourcefrog/cargo-mutants)       |
+| Java    | `mvn test`      | [PIT](https://pitest.org/)                                         |
+| C#/.NET | `dotnet test`   | [Stryker.NET](https://stryker-mutator.io/)                         |
+| PHP     | `phpunit`       | [Infection](https://infection.github.io/)                          |
+| Ruby    | `rspec`         | [mutant](https://github.com/mbj/mutant)                            |
 
 ## Si tu stack no tiene mutador maduro
 

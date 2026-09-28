@@ -228,7 +228,9 @@ function inspeccionarArtefacto(peticion: PeticionPuertaAnclas): ResultadoPuertaA
   if (!seInspeccionoAlgunAncla) {
     return {
       codigoSalida: CODIGO_FALLO,
-      lineas: ['no se inspeccionó ningún ancla de la nav: el extractor de anclas no encontró ninguna'],
+      lineas: [
+        'no se inspeccionó ningún ancla de la nav: el extractor de anclas no encontró ninguna',
+      ],
     }
   }
 

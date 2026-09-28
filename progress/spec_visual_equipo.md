@@ -6,21 +6,21 @@
 
 ## 1. `<section id="equipo">` (L162)
 
-| Prop | Diseño | Repo |
-| --- | --- | --- |
-| padding | `94px 0` | `.demo-seccion` da 92px — diferencia sub-perceptible, **ceder a la utilidad** |
-| scroll-margin-top | `66px` | ya se aplica globalmente por la cabecera sticky — **comprobar antes de duplicar** |
-| background | ninguno (hereda `--bg`) | usar `.demo-seccion--plain` (`.demo-seccion` añade un `border-top` que el diseño NO tiene aquí) |
+| Prop              | Diseño                  | Repo                                                                                            |
+| ----------------- | ----------------------- | ----------------------------------------------------------------------------------------------- |
+| padding           | `94px 0`                | `.demo-seccion` da 92px — diferencia sub-perceptible, **ceder a la utilidad**                   |
+| scroll-margin-top | `66px`                  | ya se aplica globalmente por la cabecera sticky — **comprobar antes de duplicar**               |
+| background        | ninguno (hereda `--bg`) | usar `.demo-seccion--plain` (`.demo-seccion` añade un `border-top` que el diseño NO tiene aquí) |
 
 ## 2. Contenedor y encabezado (L163-168)
 
-| Elemento | Prop | Diseño | Repo |
-| --- | --- | --- | --- |
-| contenedor | max-width / padding | `1220px` / `0 40px` | `.demo-contenedor` = 1200px — ceder |
-| encabezado | text-align / max-width / margin | `center` / `680px` / `0 auto 46px` | `.demo-encabezado--centro` = 620px / 38px — ceder |
-| eyebrow | text-transform / letter-spacing / font-size / color / margin | `uppercase` / `.28em` / `12px` / `var(--accent)` / `0 0 14px` | `.demo-eyebrow` (usa `--accent-dark`, **correcto AA**) |
-| `<h2>` | family / weight / size / line-height / margin / color | `'Gilda Display',serif` / `400` / `clamp(30px,4.4vw,50px)` / `1.04` / `0 0 14px` / `var(--ink)` | `.demo-titulo` = `clamp(1.875rem,4vw,2.875rem)`, lh 1.06 — ceder |
-| intro | color / line-height / margin / font-size | `var(--text)` / `1.65` / `0` / `17px` | `.demo-intro` — **coincide exacto** |
+| Elemento   | Prop                                                         | Diseño                                                                                          | Repo                                                             |
+| ---------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| contenedor | max-width / padding                                          | `1220px` / `0 40px`                                                                             | `.demo-contenedor` = 1200px — ceder                              |
+| encabezado | text-align / max-width / margin                              | `center` / `680px` / `0 auto 46px`                                                              | `.demo-encabezado--centro` = 620px / 38px — ceder                |
+| eyebrow    | text-transform / letter-spacing / font-size / color / margin | `uppercase` / `.28em` / `12px` / `var(--accent)` / `0 0 14px`                                   | `.demo-eyebrow` (usa `--accent-dark`, **correcto AA**)           |
+| `<h2>`     | family / weight / size / line-height / margin / color        | `'Gilda Display',serif` / `400` / `clamp(30px,4.4vw,50px)` / `1.04` / `0 0 14px` / `var(--ink)` | `.demo-titulo` = `clamp(1.875rem,4vw,2.875rem)`, lh 1.06 — ceder |
+| intro      | color / line-height / margin / font-size                     | `var(--text)` / `1.65` / `0` / `17px`                                                           | `.demo-intro` — **coincide exacto**                              |
 
 Textos literales del diseño: eyebrow `Equipo`, h2 `Nuestro equipo de profesionales`,
 intro `Elige a tu especialista, mira sus reseñas y reserva tu día y hora en segundos.`
@@ -41,13 +41,13 @@ En el repo, patrón de `ofertas.module.scss/.rejilla`: usar `minmax(min(320px,10
 
 ## 5-7. Foto, cuerpo, nombre y rol (L172-180)
 
-| Prop | Valor |
-| --- | --- |
-| foto | `aspect-ratio:4/3` · `background:var(--accent-soft)` |
-| cuerpo | `padding:22px 22px 24px` · `display:flex` · `flex-direction:column` · `gap:16px` |
+| Prop            | Valor                                                                                  |
+| --------------- | -------------------------------------------------------------------------------------- |
+| foto            | `aspect-ratio:4/3` · `background:var(--accent-soft)`                                   |
+| cuerpo          | `padding:22px 22px 24px` · `display:flex` · `flex-direction:column` · `gap:16px`       |
 | fila del nombre | `display:flex` · `align-items:baseline` · `justify-content:space-between` · `gap:10px` |
-| `<h3>` nombre | `'Gilda Display',serif` · `400` · `23px` · `margin:0` · `color:var(--ink)` |
-| rol | `color:var(--muted)` · `13px` |
+| `<h3>` nombre   | `'Gilda Display',serif` · `400` · `23px` · `margin:0` · `color:var(--ink)`             |
+| rol             | `color:var(--muted)` · `13px`                                                          |
 
 ## 8. Chips de especialidad (L181-184)
 
@@ -68,14 +68,14 @@ Fila: `display:flex` · `gap:7px` · `flex-wrap:wrap`.
 Comunes: `display:flex` · `flex-direction:column` · `align-items:center` · `min-width:44px`
 · `padding:7px 8px` · `border-radius:12px` · `cursor:pointer` · `font-family:'Manrope',sans-serif`.
 
-| | Activo | Inactivo |
-| --- | --- | --- |
-| border | `1px solid var(--accent)` | `1px solid var(--line)` |
-| background | `var(--accent)` | `var(--bg)` |
-| color | `var(--on-accent)` | `var(--text)` |
-| hover | — | `border-color:var(--accent)` |
+|                 | Activo                                       | Inactivo                                            |
+| --------------- | -------------------------------------------- | --------------------------------------------------- |
+| border          | `1px solid var(--accent)`                    | `1px solid var(--line)`                             |
+| background      | `var(--accent)`                              | `var(--bg)`                                         |
+| color           | `var(--on-accent)`                           | `var(--text)`                                       |
+| hover           | —                                            | `border-color:var(--accent)`                        |
 | span día-semana | `10px` · uppercase · `.04em` · `opacity:.85` | `10px` · uppercase · `.04em` · `color:var(--muted)` |
-| span número | `16px` · `700` | `16px` · `700` |
+| span número     | `16px` · `700`                               | `16px` · `700`                                      |
 
 **`.dia` / `.diaActivo` / `.diaDow` / `.diaNum` de `reserva.module.scss` son EXACTAMENTE esta spec**,
 ya con la corrección AA aplicada (`--accent-dark` + `--border-interactive`). **Reutilizar íntegramente**
@@ -123,18 +123,18 @@ Flechas `←` / `→`: `30px × 30px` · `border-radius:50%` · `border:1px soli
 
 ## Mapeo de variables diseño → repo
 
-| Var | Diseño (L28) | Repo `_tokens.scss` | ¿Coincide? |
-| --- | --- | --- | --- |
-| `--bg` | `#FDF4F7` | `#FDF4F7` | sí |
-| `--surface` | `#FFFFFF` | `#FFFFFF` | sí |
-| `--accent-soft` | `#F7DDE8` | `#F7DDE8` | sí |
-| `--text` | `#5E404A` | `#5E404A` | sí |
-| `--line` | `rgba(176,70,106,.16)` | igual | sí (solo decorativo) |
-| `--on-accent` | `#FFFFFF` | `#FFFFFF` | sí |
-| `--accent` | `#C05576` | `#C05576` | mismo hex, **uso restringido** |
-| `--muted` | `#9C7F89` | `#6F525A` | **NO** — el repo lo oscurece por AA |
-| `--ink` | `#B0466A` | `#8E3355` | **NO** — el repo lo oscurece por AA |
-| `--accent-2` | `#E38AAE` | `#B3316E` | **NO** — cambio grande (afecta a las estrellas) |
+| Var             | Diseño (L28)           | Repo `_tokens.scss` | ¿Coincide?                                      |
+| --------------- | ---------------------- | ------------------- | ----------------------------------------------- |
+| `--bg`          | `#FDF4F7`              | `#FDF4F7`           | sí                                              |
+| `--surface`     | `#FFFFFF`              | `#FFFFFF`           | sí                                              |
+| `--accent-soft` | `#F7DDE8`              | `#F7DDE8`           | sí                                              |
+| `--text`        | `#5E404A`              | `#5E404A`           | sí                                              |
+| `--line`        | `rgba(176,70,106,.16)` | igual               | sí (solo decorativo)                            |
+| `--on-accent`   | `#FFFFFF`              | `#FFFFFF`           | sí                                              |
+| `--accent`      | `#C05576`              | `#C05576`           | mismo hex, **uso restringido**                  |
+| `--muted`       | `#9C7F89`              | `#6F525A`           | **NO** — el repo lo oscurece por AA             |
+| `--ink`         | `#B0466A`              | `#8E3355`           | **NO** — el repo lo oscurece por AA             |
+| `--accent-2`    | `#E38AAE`              | `#B3316E`           | **NO** — cambio grande (afecta a las estrellas) |
 
 ## Avisos
 

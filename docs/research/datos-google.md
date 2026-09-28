@@ -32,11 +32,11 @@ propietario fechadas el 6 jun 2026 y respuestas del propietario a reseñas).
    legal**: sin ese dato no se puede redactar un aviso legal conforme a LSSI-CE. Hay que
    pedírselo al cliente.
 4. **El canal de reserva real es Treatwell**, no Fresha. La propia Fresha declara en su página
-   que el negocio *"is not currently affiliated with or partnered with Fresha"*. No enlazar Fresha.
+   que el negocio _"is not currently affiliated with or partnered with Fresha"_. No enlazar Fresha.
 
 **Restricción técnica dura:** la documentación oficial de Google prohíbe marcar con datos
-estructurados valoraciones traídas de otros sitios (*"Don't aggregate reviews or ratings from
-other websites"*). El "4,9" se puede **mostrar como texto**, pero **no** emitirse como
+estructurados valoraciones traídas de otros sitios (_"Don't aggregate reviews or ratings from
+other websites"_). El "4,9" se puede **mostrar como texto**, pero **no** emitirse como
 `aggregateRating`. Ver §5.
 
 ---
@@ -46,35 +46,35 @@ other websites"*). El "4,9" se puede **mostrar como texto**, pero **no** emitirs
 **Fuente única de esta tabla:** ficha de Google Maps del negocio, leída el 15/07/2026 en
 `https://www.google.com/maps/place/Nails+Lash+Studio/@40.5179875,-3.9226688,17z/data=!3m1!4b1!4m6!3m5!1s0xd419da0d11b02b3:0x71ef6da9667ea235!8m2!3d40.5179875!4d-3.9226688!16s%2Fg%2F11sz2y68zd`
 
-| Campo | Valor exacto en Google | Confianza |
-| --- | --- | --- |
-| **Nombre exacto** | `Nails Lash Studio` | Verificado |
-| **Categoría** | `Centro de estética` | Verificado |
-| **Dirección** | `C.C. El Zoco, Av. de Atenas, 75, Loc 41, 28232 Las Rozas de Madrid, Madrid` | Verificado |
-| **Ubicación interior** | `Piso 0 · Centro Comercial Zoco Monterozas` | Verificado |
-| **Teléfono (público)** | `625 22 33 66` (enlace `tel:625223366`) | Verificado |
-| **Horario L–V** | `De 10:00 a 20:00` | Verificado |
-| **Horario Sábado** | `De 10:00 a 14:00` | Verificado |
-| **Domingo** | `Cerrado` | Verificado |
-| **Nota media** | `4,9` | Verificado |
-| **Nº de reseñas** | `226 reseñas` | Verificado |
-| **Sitio web declarado** | `https://www.instagram.com/nailslash.studio_/reels/` (Google lo etiqueta `Sitio web: instagram.com`) | Verificado |
-| **Enlace "Servicios" / "Reservar en línea"** | `https://www.treatwell.es/establecimiento/nails-lash-studio/` | Verificado |
-| **Plus Code** | `G39G+5W Las Rozas de Madrid` | Verificado |
-| **Coordenadas** | `40.5179875, -3.9226688` | Verificado |
-| **CID (hex : decimal)** | `0x71ef6da9667ea235` : `8209901220056179253` | Verificado (hex leído de la URL; decimal calculado) |
-| **Feature ID / mid** | `/g/11sz2y68zd` | Verificado |
-| **Atributo declarado** | `Se identifica como de propietarias mujeres` | Verificado |
+| Campo                                        | Valor exacto en Google                                                                               | Confianza                                           |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| **Nombre exacto**                            | `Nails Lash Studio`                                                                                  | Verificado                                          |
+| **Categoría**                                | `Centro de estética`                                                                                 | Verificado                                          |
+| **Dirección**                                | `C.C. El Zoco, Av. de Atenas, 75, Loc 41, 28232 Las Rozas de Madrid, Madrid`                         | Verificado                                          |
+| **Ubicación interior**                       | `Piso 0 · Centro Comercial Zoco Monterozas`                                                          | Verificado                                          |
+| **Teléfono (público)**                       | `625 22 33 66` (enlace `tel:625223366`)                                                              | Verificado                                          |
+| **Horario L–V**                              | `De 10:00 a 20:00`                                                                                   | Verificado                                          |
+| **Horario Sábado**                           | `De 10:00 a 14:00`                                                                                   | Verificado                                          |
+| **Domingo**                                  | `Cerrado`                                                                                            | Verificado                                          |
+| **Nota media**                               | `4,9`                                                                                                | Verificado                                          |
+| **Nº de reseñas**                            | `226 reseñas`                                                                                        | Verificado                                          |
+| **Sitio web declarado**                      | `https://www.instagram.com/nailslash.studio_/reels/` (Google lo etiqueta `Sitio web: instagram.com`) | Verificado                                          |
+| **Enlace "Servicios" / "Reservar en línea"** | `https://www.treatwell.es/establecimiento/nails-lash-studio/`                                        | Verificado                                          |
+| **Plus Code**                                | `G39G+5W Las Rozas de Madrid`                                                                        | Verificado                                          |
+| **Coordenadas**                              | `40.5179875, -3.9226688`                                                                             | Verificado                                          |
+| **CID (hex : decimal)**                      | `0x71ef6da9667ea235` : `8209901220056179253`                                                         | Verificado (hex leído de la URL; decimal calculado) |
+| **Feature ID / mid**                         | `/g/11sz2y68zd`                                                                                      | Verificado                                          |
+| **Atributo declarado**                       | `Se identifica como de propietarias mujeres`                                                         | Verificado                                          |
 
 ### 2.1 Desglose de reseñas (Google) — cuadra internamente
 
 | Estrellas | Reseñas |
-| --- | --- |
-| 5 ★ | 217 |
-| 4 ★ | 1 |
-| 3 ★ | 3 |
-| 2 ★ | 1 |
-| 1 ★ | 4 |
+| --------- | ------- |
+| 5 ★       | 217     |
+| 4 ★       | 1       |
+| 3 ★       | 3       |
+| 2 ★       | 1       |
+| 1 ★       | 4       |
 | **Total** | **226** |
 
 **Comprobación propia (inferencia aritmética, no dato de Google):** 217+1+3+1+4 = 226 ✔ y la
@@ -96,20 +96,21 @@ Solo el cliente puede confirmar quién tiene el acceso.
 ## 3. Contraste con Treatwell y otras fuentes
 
 ### 3.1 Treatwell — verificado
+
 Fuente: `https://www.treatwell.es/establecimiento/nails-lash-studio/` (leída 15/07/2026).
 
-| Campo | Valor en Treatwell |
-| --- | --- |
-| Nombre | `Nails Lash Studio` |
-| Dirección | `Av. de Atenas, 75, 28232 Las Rozas de Madrid, Madrid, España` (**sin** local ni C.C.) |
-| Nota media | `4,9` |
-| Nº de opiniones | `1231 opiniones` |
-| Horario | L–V `10:00–20:00`, Sáb `10:00–14:00`, Dom `Cerrado` (idéntico a Google) |
-| Teléfono | **No lo publica** |
-| Equipo listado | Lady, Johana, Sandra, Katerine, Irene, Camila, Zaira |
-| Marcas declaradas | `Neonail y Indigo Nails` |
-| Transporte | `A un paseo a pie de la estación de tren Pinar de Las Rozas` |
-| Pie legal | `© 2026 Treatwell Spain S.L` |
+| Campo             | Valor en Treatwell                                                                     |
+| ----------------- | -------------------------------------------------------------------------------------- |
+| Nombre            | `Nails Lash Studio`                                                                    |
+| Dirección         | `Av. de Atenas, 75, 28232 Las Rozas de Madrid, Madrid, España` (**sin** local ni C.C.) |
+| Nota media        | `4,9`                                                                                  |
+| Nº de opiniones   | `1231 opiniones`                                                                       |
+| Horario           | L–V `10:00–20:00`, Sáb `10:00–14:00`, Dom `Cerrado` (idéntico a Google)                |
+| Teléfono          | **No lo publica**                                                                      |
+| Equipo listado    | Lady, Johana, Sandra, Katerine, Irene, Camila, Zaira                                   |
+| Marcas declaradas | `Neonail y Indigo Nails`                                                               |
+| Transporte        | `A un paseo a pie de la estación de tren Pinar de Las Rozas`                           |
+| Pie legal         | `© 2026 Treatwell Spain S.L`                                                           |
 
 **Dominio antiguo:** `https://www.uala.es/nails-lash-studio_avenida-de-atenas-75-28232-las-rozas-de-madrid`
 responde **301 Moved Permanently** → `https://www.treatwell.es/establecimiento/nails-lash-studio`.
@@ -125,6 +126,7 @@ Limar y esmaltar tradicional manos 15 €.
 en la web sin confirmación del cliente (ver §4).
 
 ### 3.2 Web actual del salón — verificado
+
 Fuente: `https://www.nailslashlasrozas.es/`
 
 - Nombre en la web: `NAILS LASH STUDIO`.
@@ -135,14 +137,16 @@ Fuente: `https://www.nailslashlasrozas.es/`
 - Enlace social presente: Facebook `https://www.facebook.com/nailslashstudiorozas/`.
 - **No** publica CIF ni razón social.
 - `https://www.nailslashlasrozas.es/es/aviso-legal` → **HTTP 404** (el enlace del pie apunta a
-  esa ruta pero no resuelve). *Hecho verificado; su interpretación legal queda en §5.*
+  esa ruta pero no resuelve). _Hecho verificado; su interpretación legal queda en §5._
 - Afirmación de marketing en la web: el centro lleva `más de 15 años` ofreciendo tratamientos.
   **No contrastable** con fuente independiente → tratar como claim del cliente, no como hecho.
 
 ### 3.3 Fresha — listado NO afiliado (verificado)
+
 Fuente: `https://www.fresha.com/lvp/nails-lash-studio-avenida-de-atenas-las-rozas-de-madrid-Evk6GW`
 
 Texto literal de la propia Fresha en la ficha:
+
 > "This page uses publicly available information to help people discover this venue. The business
 > is not currently affiliated with or partnered with Fresha, get in touch with us to update the information."
 
@@ -150,6 +154,7 @@ Dirección y horario coinciden con Google. **No muestra nota media ni reseñas.*
 generado por agregación, no un canal del negocio.
 
 ### 3.4 Directorio del centro comercial — datos divergentes
+
 Fuente: `https://zocomonterozas.com/comercios/nailslash-studio/`
 
 - Nombre: `Nailslash Studio` (grafía distinta).
@@ -162,10 +167,10 @@ Fuente: `https://zocomonterozas.com/comercios/nailslash-studio/`
 
 ### 3.5 Instagram — dos handles en circulación
 
-| Handle | Origen | Estado |
-| --- | --- | --- |
-| `@nailslash.studio_` | **Declarado en el GBP** como sitio web | **Existe.** Título de la página: `𝑵𝒂𝒊𝒍𝒔𝑳𝒂𝒔𝒉 𝒔𝒕𝒖𝒅𝒊𝒐 (@nailslash.studio_) • Fotos y vídeos de Instagram` |
-| `@nail_lash_studio_` | Directorio Zoco MonteRozas | **NO VERIFICADO.** La URL responde, pero el título sale sin nombre de perfil: `(@nail_lash_studio_) • Fotos y vídeos de Instagram`. No he podido confirmar que sea del salón ni que esté activo. |
+| Handle               | Origen                                 | Estado                                                                                                                                                                                           |
+| -------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `@nailslash.studio_` | **Declarado en el GBP** como sitio web | **Existe.** Título de la página: `𝑵𝒂𝒊𝒍𝒔𝑳𝒂𝒔𝒉 𝒔𝒕𝒖𝒅𝒊𝒐 (@nailslash.studio_) • Fotos y vídeos de Instagram`                                                                                           |
+| `@nail_lash_studio_` | Directorio Zoco MonteRozas             | **NO VERIFICADO.** La URL responde, pero el título sale sin nombre de perfil: `(@nail_lash_studio_) • Fotos y vídeos de Instagram`. No he podido confirmar que sea del salón ni que esté activo. |
 
 Instagram exige login para el contenido del perfil: **no he podido verificar** biografía,
 seguidores ni enlace de reservas de ninguno de los dos. El handle a usar es
@@ -174,16 +179,16 @@ pendiente de confirmación del cliente.
 
 ### 3.6 Tabla de discrepancias
 
-| # | Campo | Google (canónico) | Otra fuente | Lectura |
-| --- | --- | --- | --- | --- |
-| 1 | Nº reseñas | `226` | Treatwell `1231` | **No es contradicción**: plataformas distintas. Prohibido sumar o promediar. |
-| 2 | Nota media | `4,9` | Treatwell `4,9` | Coinciden. Refuerza el claim de calidad. |
-| 3 | Sitio web declarado | Instagram | Existe `nailslashlasrozas.es` no enlazada | **Acción**: actualizar GBP al publicar. |
-| 4 | Dirección | Incluye `C.C. El Zoco` + `Loc 41` | Treatwell solo `Av. de Atenas, 75` | Usar la de Google (más completa). |
-| 5 | Horario | L–V 10–20 / S 10–14 | Zoco `L–S 08:00–22:00` | Zoco = horario del centro comercial (inferencia). Ignorar. |
-| 6 | Instagram | `@nailslash.studio_` | Zoco `@nail_lash_studio_` | Confirmar con cliente. |
-| 7 | Canal de reserva | Treatwell | Fresha (no afiliado) | Enlazar solo Treatwell. |
-| 8 | Grafía del nombre | `Nails Lash Studio` | `NAILS LASH STUDIO` (web), `Nailslash Studio` (Zoco), `NailsLash studio` (IG), `NAIL LASH STUDIO` (Wonderbox) | Estandarizar en `Nails Lash Studio`. |
+| #   | Campo               | Google (canónico)                 | Otra fuente                                                                                                   | Lectura                                                                      |
+| --- | ------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| 1   | Nº reseñas          | `226`                             | Treatwell `1231`                                                                                              | **No es contradicción**: plataformas distintas. Prohibido sumar o promediar. |
+| 2   | Nota media          | `4,9`                             | Treatwell `4,9`                                                                                               | Coinciden. Refuerza el claim de calidad.                                     |
+| 3   | Sitio web declarado | Instagram                         | Existe `nailslashlasrozas.es` no enlazada                                                                     | **Acción**: actualizar GBP al publicar.                                      |
+| 4   | Dirección           | Incluye `C.C. El Zoco` + `Loc 41` | Treatwell solo `Av. de Atenas, 75`                                                                            | Usar la de Google (más completa).                                            |
+| 5   | Horario             | L–V 10–20 / S 10–14               | Zoco `L–S 08:00–22:00`                                                                                        | Zoco = horario del centro comercial (inferencia). Ignorar.                   |
+| 6   | Instagram           | `@nailslash.studio_`              | Zoco `@nail_lash_studio_`                                                                                     | Confirmar con cliente.                                                       |
+| 7   | Canal de reserva    | Treatwell                         | Fresha (no afiliado)                                                                                          | Enlazar solo Treatwell.                                                      |
+| 8   | Grafía del nombre   | `Nails Lash Studio`               | `NAILS LASH STUDIO` (web), `Nailslash Studio` (Zoco), `NailsLash studio` (IG), `NAIL LASH STUDIO` (Wonderbox) | Estandarizar en `Nails Lash Studio`.                                         |
 
 **Nota sobre una inconsistencia interna de Treatwell:** su filtro por popularidad muestra
 `980 / 27 / 6 / 0 / 1` (suma **1014**), que no cuadra con las `1231 opiniones` anunciadas.
@@ -191,6 +196,7 @@ pendiente de confirmación del cliente.
 motivo más para **no** usar la cifra de Treatwell como dato duro en la web.
 
 ### 3.7 Ojo: otro salón en la misma dirección
+
 `Acosta Nails Las Rozas` figura en `Avenida de Atenas 75, Local 1` (Fresha) y en Google con
 `4,4 · 154 reseñas`. **Es un negocio distinto** en el mismo centro comercial. No confundir fichas
 ni reseñas. El `Local 41` es lo que desambigua.
@@ -199,21 +205,21 @@ ni reseñas. El `Local 41` es lo que desambigua.
 
 ## 4. Lo que NO he podido verificar
 
-| # | Dato ausente | Por qué importa | Qué haría falta |
-| --- | --- | --- | --- |
-| 1 | **Razón social y CIF/NIF** | **Bloqueante legal.** Sin ellos no hay aviso legal válido (LSSI-CE art. 10). | Preguntar al cliente. Alternativa: nota simple / consulta al Registro Mercantil. |
-| 2 | **Domicilio social** (si difiere del local) | Aviso legal. | Cliente / Registro. |
-| 3 | **Email de contacto** | LSSI-CE exige medio de contacto directo; ninguna fuente publica email. | Cliente. |
-| 4 | **Titularidad y acceso al GBP** | Sin acceso no se puede cambiar el campo "sitio web" ni sale el SEO local. | Cliente. Verificable en `business.google.com`. |
-| 5 | **Control del dominio `nailslashlasrozas.es`** | Decide si migramos, redirigimos 301 o usamos dominio nuevo. Lo creó Proximedia/topclic.es. | Cliente + WHOIS `.es` (NIC.es). |
-| 6 | **Continuidad de Treatwell** | Define si la web enlaza reservas o integra otro sistema. | Cliente. |
-| 7 | **Tarifa oficial del salón** | Los precios de §3.1 son de Treatwell; publicarlos sin confirmar es riesgo de precio incorrecto. | Cliente (lista de precios oficial). |
-| 8 | **Instagram correcto y su bio/enlace** | Login wall. | Cliente. |
-| 9 | **Datos de la página de Facebook** | La respuesta vino truncada; no pude leer horario/valoración. | Nueva lectura con navegador autenticado / cliente. |
-| 10 | **Festivos y cierres vacacionales** | El horario semanal no cubre agosto/festivos. | Cliente. |
-| 11 | **Nº real de empleadas y sus nombres/roles** | Treatwell lista 7 (Zaira sin datos); no es plantilla oficial. | Cliente. |
-| 12 | **"Más de 15 años"** | Claim de marketing de la web; sin fuente independiente. | Cliente / fecha de constitución en Registro. |
-| 13 | **Si el salón quiere mostrar el "4,9"** | Decisión de negocio + implicaciones de §5. | Cliente. |
+| #   | Dato ausente                                   | Por qué importa                                                                                 | Qué haría falta                                                                  |
+| --- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| 1   | **Razón social y CIF/NIF**                     | **Bloqueante legal.** Sin ellos no hay aviso legal válido (LSSI-CE art. 10).                    | Preguntar al cliente. Alternativa: nota simple / consulta al Registro Mercantil. |
+| 2   | **Domicilio social** (si difiere del local)    | Aviso legal.                                                                                    | Cliente / Registro.                                                              |
+| 3   | **Email de contacto**                          | LSSI-CE exige medio de contacto directo; ninguna fuente publica email.                          | Cliente.                                                                         |
+| 4   | **Titularidad y acceso al GBP**                | Sin acceso no se puede cambiar el campo "sitio web" ni sale el SEO local.                       | Cliente. Verificable en `business.google.com`.                                   |
+| 5   | **Control del dominio `nailslashlasrozas.es`** | Decide si migramos, redirigimos 301 o usamos dominio nuevo. Lo creó Proximedia/topclic.es.      | Cliente + WHOIS `.es` (NIC.es).                                                  |
+| 6   | **Continuidad de Treatwell**                   | Define si la web enlaza reservas o integra otro sistema.                                        | Cliente.                                                                         |
+| 7   | **Tarifa oficial del salón**                   | Los precios de §3.1 son de Treatwell; publicarlos sin confirmar es riesgo de precio incorrecto. | Cliente (lista de precios oficial).                                              |
+| 8   | **Instagram correcto y su bio/enlace**         | Login wall.                                                                                     | Cliente.                                                                         |
+| 9   | **Datos de la página de Facebook**             | La respuesta vino truncada; no pude leer horario/valoración.                                    | Nueva lectura con navegador autenticado / cliente.                               |
+| 10  | **Festivos y cierres vacacionales**            | El horario semanal no cubre agosto/festivos.                                                    | Cliente.                                                                         |
+| 11  | **Nº real de empleadas y sus nombres/roles**   | Treatwell lista 7 (Zaira sin datos); no es plantilla oficial.                                   | Cliente.                                                                         |
+| 12  | **"Más de 15 años"**                           | Claim de marketing de la web; sin fuente independiente.                                         | Cliente / fecha de constitución en Registro.                                     |
+| 13  | **Si el salón quiere mostrar el "4,9"**        | Decisión de negocio + implicaciones de §5.                                                      | Cliente.                                                                         |
 
 ---
 
@@ -240,10 +246,10 @@ ni reseñas. El `Local 41` es lo que desambigua.
 ### 5.2 Lo que PROHÍBE
 
 - ❌ **Emitir `aggregateRating` con el 4,9 de Google o de Treatwell.** Documentación oficial de
-  Google (Review snippet): *"Don't aggregate reviews or ratings from other websites."* Además,
-  *"If the entity that's being reviewed controls the reviews about itself, their pages that use
+  Google (Review snippet): _"Don't aggregate reviews or ratings from other websites."_ Además,
+  _"If the entity that's being reviewed controls the reviews about itself, their pages that use
   `LocalBusiness` or any other type of `Organization` structured data are ineligible for star
-  review feature"*, y *"Ratings must be sourced directly from users"*.
+  review feature"_, y _"Ratings must be sourced directly from users"_.
   → El `LocalBusiness`/`BeautySalon` se marca **sin** `aggregateRating`. Mostrar "4,9 en Google"
   como **texto visible con atribución y enlace** es otra cosa y sí es viable.
 - ❌ **Mezclar las dos notas** ("4,9 sobre 1457 reseñas" sería falso).
@@ -257,18 +263,18 @@ ni reseñas. El `Local 41` es lo que desambigua.
 
 ### 5.3 Features que implica
 
-| Feature candidata | Datos que consume | Estado del dato |
-| --- | --- | --- |
-| `datos_negocio` (fuente única NAP + horario) | §2 | ✅ Verificado |
-| `schema_local_business` (sin `aggregateRating`) | §2 + geo | ✅ Verificado |
-| `bloque_horario` (con excepciones/festivos) | §2 + §4.10 | ⚠️ Parcial |
-| `cta_reserva_treatwell` | §3.1 | ✅ Verificado |
-| `contacto_telefono` (`tel:`) | §2 | ✅ Verificado |
-| `mapa_como_llegar` (planta 0, local 41) | §2 | ✅ Verificado |
-| `prueba_social_google` (texto "4,9 · 226 reseñas" + enlace) | §2 | ✅ Verificado (dato) / ⚠️ decisión de negocio |
-| `aviso_legal` | §4.1–4.3 | ❌ **Bloqueado** |
-| `enlaces_sociales` | §3.5 | ⚠️ Handle a confirmar |
-| `tarifas` | §3.1 | ⚠️ A confirmar con cliente |
+| Feature candidata                                           | Datos que consume | Estado del dato                               |
+| ----------------------------------------------------------- | ----------------- | --------------------------------------------- |
+| `datos_negocio` (fuente única NAP + horario)                | §2                | ✅ Verificado                                 |
+| `schema_local_business` (sin `aggregateRating`)             | §2 + geo          | ✅ Verificado                                 |
+| `bloque_horario` (con excepciones/festivos)                 | §2 + §4.10        | ⚠️ Parcial                                    |
+| `cta_reserva_treatwell`                                     | §3.1              | ✅ Verificado                                 |
+| `contacto_telefono` (`tel:`)                                | §2                | ✅ Verificado                                 |
+| `mapa_como_llegar` (planta 0, local 41)                     | §2                | ✅ Verificado                                 |
+| `prueba_social_google` (texto "4,9 · 226 reseñas" + enlace) | §2                | ✅ Verificado (dato) / ⚠️ decisión de negocio |
+| `aviso_legal`                                               | §4.1–4.3          | ❌ **Bloqueado**                              |
+| `enlaces_sociales`                                          | §3.5              | ⚠️ Handle a confirmar                         |
+| `tarifas`                                                   | §3.1              | ⚠️ A confirmar con cliente                    |
 
 ### 5.4 Acciones inmediatas recomendadas
 
@@ -284,18 +290,18 @@ ni reseñas. El `Local 41` es lo que desambigua.
 
 ## 6. Fuentes consultadas
 
-| Fuente | URL | Uso |
-| --- | --- | --- |
-| Google Maps / GBP | `https://www.google.com/maps/place/Nails+Lash+Studio/@40.5179875,-3.9226688,17z/data=!4m6!3m5!1s0xd419da0d11b02b3:0x71ef6da9667ea235!8m2!3d40.5179875!4d-3.9226688!16s%2Fg%2F11sz2y68zd` | Ficha canónica (§2) |
-| Treatwell | `https://www.treatwell.es/establecimiento/nails-lash-studio/` | Contraste, precios, equipo (§3.1) |
-| Uala (301 → Treatwell) | `https://www.uala.es/nails-lash-studio_avenida-de-atenas-75-28232-las-rozas-de-madrid` | Dominio heredado (§3.1) |
-| Web actual del salón | `https://www.nailslashlasrozas.es/` | Autoría Proximedia, 404 aviso legal (§3.2) |
-| Fresha | `https://www.fresha.com/lvp/nails-lash-studio-avenida-de-atenas-las-rozas-de-madrid-Evk6GW` | Declaración de no afiliación (§3.3) |
-| Zoco MonteRozas | `https://zocomonterozas.com/comercios/nailslash-studio/` | Horario divergente, IG alternativo (§3.4) |
-| Instagram | `https://www.instagram.com/nailslash.studio_/` y `https://www.instagram.com/nail_lash_studio_/` | Handles (§3.5) |
-| Facebook | `https://www.facebook.com/nailslashstudiorozas/` | Enlazada desde la web; **contenido no leído** |
-| Google Search Central — Review snippet | `https://developers.google.com/search/docs/appearance/structured-data/review-snippet` | Prohibición de agregar ratings de terceros (§5.2) |
-| Google Maps — aviso de reseñas | `https://support.google.com/local-guides?p=maps_policies` | "Las reseñas no se verifican" (§2.2) |
+| Fuente                                 | URL                                                                                                                                                                                      | Uso                                               |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| Google Maps / GBP                      | `https://www.google.com/maps/place/Nails+Lash+Studio/@40.5179875,-3.9226688,17z/data=!4m6!3m5!1s0xd419da0d11b02b3:0x71ef6da9667ea235!8m2!3d40.5179875!4d-3.9226688!16s%2Fg%2F11sz2y68zd` | Ficha canónica (§2)                               |
+| Treatwell                              | `https://www.treatwell.es/establecimiento/nails-lash-studio/`                                                                                                                            | Contraste, precios, equipo (§3.1)                 |
+| Uala (301 → Treatwell)                 | `https://www.uala.es/nails-lash-studio_avenida-de-atenas-75-28232-las-rozas-de-madrid`                                                                                                   | Dominio heredado (§3.1)                           |
+| Web actual del salón                   | `https://www.nailslashlasrozas.es/`                                                                                                                                                      | Autoría Proximedia, 404 aviso legal (§3.2)        |
+| Fresha                                 | `https://www.fresha.com/lvp/nails-lash-studio-avenida-de-atenas-las-rozas-de-madrid-Evk6GW`                                                                                              | Declaración de no afiliación (§3.3)               |
+| Zoco MonteRozas                        | `https://zocomonterozas.com/comercios/nailslash-studio/`                                                                                                                                 | Horario divergente, IG alternativo (§3.4)         |
+| Instagram                              | `https://www.instagram.com/nailslash.studio_/` y `https://www.instagram.com/nail_lash_studio_/`                                                                                          | Handles (§3.5)                                    |
+| Facebook                               | `https://www.facebook.com/nailslashstudiorozas/`                                                                                                                                         | Enlazada desde la web; **contenido no leído**     |
+| Google Search Central — Review snippet | `https://developers.google.com/search/docs/appearance/structured-data/review-snippet`                                                                                                    | Prohibición de agregar ratings de terceros (§5.2) |
+| Google Maps — aviso de reseñas         | `https://support.google.com/local-guides?p=maps_policies`                                                                                                                                | "Las reseñas no se verifican" (§2.2)              |
 
 ---
 

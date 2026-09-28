@@ -27,7 +27,8 @@ export const CATALOGO_DEMO: readonly CategoriaDemo[] = [
     eyebrow: 'Servicio de Uñas',
     textoBoton: 'Reservar Uñas',
     titulo: 'Manos y pies de Revista',
-    intro: 'Manicura, pedicura, esculpido y nail art con producto premium y un acabado impecable que dura semanas.',
+    intro:
+      'Manicura, pedicura, esculpido y nail art con producto premium y un acabado impecable que dura semanas.',
     servicios: [
       { nombre: 'Manicura semipermanente', precio: '15 €' },
       { nombre: 'Manicura rusa completa', precio: '25 €' },
@@ -42,7 +43,8 @@ export const CATALOGO_DEMO: readonly CategoriaDemo[] = [
     eyebrow: 'Servicio Facial',
     textoBoton: 'Reservar Facial',
     titulo: 'Tu piel, radiante',
-    intro: 'Tratamientos de limpieza, hidratación y luminosidad, más pestañas y cejas, adaptados a tu tipo de piel.',
+    intro:
+      'Tratamientos de limpieza, hidratación y luminosidad, más pestañas y cejas, adaptados a tu tipo de piel.',
     servicios: [
       { nombre: 'Limpieza facial profunda', precio: '35 €' },
       { nombre: 'Tratamiento hidratante', precio: '42 €' },
@@ -57,7 +59,8 @@ export const CATALOGO_DEMO: readonly CategoriaDemo[] = [
     eyebrow: 'Servicio de Depilación',
     textoBoton: 'Reservar Depilación',
     titulo: 'Piel suave y cuidada',
-    intro: 'Depilación con cera tibia en un entorno higiénico y respetuoso, para una piel suave más tiempo.',
+    intro:
+      'Depilación con cera tibia en un entorno higiénico y respetuoso, para una piel suave más tiempo.',
     servicios: [
       { nombre: 'Cejas', precio: '12 €' },
       { nombre: 'Labio superior', precio: '18 €' },
@@ -70,4 +73,5 @@ export const CATALOGO_DEMO: readonly CategoriaDemo[] = [
 ]
 
 /** Leyenda visible obligatoria (F-09 Q-B): los precios son de muestra y llevan IVA incluido. */
-export const LEYENDA_PRECIOS = 'Precios de muestra · IVA incluido · pendientes de confirmar con el salón'
+export const LEYENDA_PRECIOS =
+  'Precios de muestra · IVA incluido · pendientes de confirmar con el salón'

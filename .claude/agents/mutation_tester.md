@@ -54,7 +54,8 @@ Bloque en `progress/mutation_<name>.md`:
 **Score:** killed/total = N% (umbral: M%)
 
 ## Mutantes sobrevivientes (si los hay)
-- src/cli.py:42  `len(notes)` → `len(notes) - 1`
+
+- src/cli.py:42 `len(notes)` → `len(notes) - 1`
   Falta: un test que distinga el conteo exacto (no solo > 0).
 ```
 
@@ -63,7 +64,9 @@ Tu respuesta en chat es **una sola línea**:
 ```
 PASS -> progress/mutation_<name>.md (score N%)
 ```
+
 o
+
 ```
 FAIL -> progress/mutation_<name>.md (score N%, K sobrevivientes)
 ```
@@ -72,6 +75,6 @@ FAIL -> progress/mutation_<name>.md (score N%, K sobrevivientes)
 
 - ❌ Nunca declares PASS por debajo del umbral.
 - ❌ Nunca edites `src/` ni los tests para forzar el PASS. Reportas.
-- ✅ Si un mutante sobreviviente es un *equivalente* genuino (no cambia el
-   comportamiento observable), documéntalo y exclúyelo con justificación
-   explícita en `progress/mutation_<name>.md`. No abuses de esta vía.
+- ✅ Si un mutante sobreviviente es un _equivalente_ genuino (no cambia el
+  comportamiento observable), documéntalo y exclúyelo con justificación
+  explícita en `progress/mutation_<name>.md`. No abuses de esta vía.
