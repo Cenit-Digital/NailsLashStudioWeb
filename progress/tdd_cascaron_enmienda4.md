@@ -309,3 +309,163 @@ vitest, en modo test y en producción). 1535 = 1507 + 4 (@s42) + 4 (@s43) + 20 (
     `MODE: 'production'` también) sería una enmienda del humano con su propio escenario.
 - `progress/tdd_cascaron_enmienda3.md` aparecía modificado al empezar la sesión. No era mío: lo commiteó el
   lead en `36920d7`.
+
+## Ampliación @s45 (mismo día): el MODO de Vite de esos builds también es producción
+
+> Contrato: `features/cascaron_semantico.feature` (línea AMPLIACIÓN del banner ENMIENDA 4 y escenario
+> @s45, `:1891`, 7 filas) y `project-spec.md` §Feature 4 → «Enmienda 4» → «Ampliación». Contrato del lead
+> en `c24870e`, sobre el `89a30b5` de @s42-@s44. Cierra lo «Observado» de arriba: con `MODE=test` heredado
+> de Vitest, el modo de Vite seguía siendo `test`. No he cambiado el contrato: se cumple tal cual.
+
+### Estado: VERDE
+
+| Fichero                                 | Cambio                                                                                                                                                                                                                                                                                             |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/pages/home-horneado.test.ts`       | `let salidaDelBuild`: el `beforeAll` CONSERVA la salida estándar del `execSync('pnpm build')` que ya existía (si falla, la de `error.stdout`). `MODE: 'production'` junto a `NODE_ENV`. `trasCadaModoDelLog()` y 3 tests de @s45. Cabecera                                                         |
+| `src/pages/contacto-horneado.test.ts`   | Lo mismo en su `beforeAll`. `trasCadaModoDelLog()` y 3 tests de @s45, escritos aquí (el fichero no importa `src/` ni otro test). Cabecera                                                                                                                                                          |
+| `src/lib/trampas-del-horneado.test.tsx` | El helper `construirExperimento` conserva la salida de SU `execSync` de build en `Experimento.salidaDelBuild` (separada de `salida`, que es la de la PUERTA). `MODE: 'production'` junto a `NODE_ENV`. 3 `it.each` × 5 filas. `FILAS_DE_S44` pasa a llamarse `FILAS_DE_LOS_EXPERIMENTOS`. Cabecera |
+| `progress/current.md`                   | Nota de arranque y resultado                                                                                                                                                                                                                                                                       |
+
+Sin build nuevo: se captura la salida de los mismos `execSync` que ya lanzaban los tres ficheros. No he
+tocado nada de producción, ni `vite.config.ts`, `package.json`, las configs de Vitest y Stryker,
+`feature_list.json`, el `.feature` o la spec (comprobado con `git diff --quiet HEAD -- …` → exit 0). No he
+hecho commit.
+
+### Trazabilidad @s45 (una fila del `Examples:` por lanzamiento)
+
+- **Fila `src/pages/home-horneado.test.ts` / "pnpm build":**
+  - 1er `Then` (ancla, «building client environment for» ≥ 1) → `src/pages/home-horneado.test.ts:401`.
+  - 2º `Then` (cada aparición seguida de « production») → `src/pages/home-horneado.test.ts:405`.
+  - 3er `Then` (0 «building client environment for test») → `src/pages/home-horneado.test.ts:410`.
+  - Captura → `:26` y `:34-44`. Corrección → `:37`.
+- **Fila `src/pages/contacto-horneado.test.ts` / "pnpm build":**
+  - 1er `Then` → `src/pages/contacto-horneado.test.ts:291`.
+  - 2º `Then` → `src/pages/contacto-horneado.test.ts:295`.
+  - 3er `Then` → `src/pages/contacto-horneado.test.ts:300`.
+  - Captura → `:31` y `:40-50`. Corrección → `:43`.
+- **Las 5 filas de `src/lib/trampas-del-horneado.test.tsx`** («del experimento "react19-nativa" … "head-correcto"»):
+  - cada `it.each(FILAS_DE_LOS_EXPERIMENTOS)` recorre las 5, escritas a mano en `:412`.
+  - 1er `Then` → `src/lib/trampas-del-horneado.test.tsx:469`.
+  - 2º `Then` → `src/lib/trampas-del-horneado.test.tsx:478`.
+  - 3er `Then` → `src/lib/trampas-del-horneado.test.tsx:488`.
+  - Captura en el helper → `:194`. Corrección → `:197`.
+
+**Las líneas de @s42-@s44 del mapa de arriba se desplazan** con esta ampliación (mismos tests, sin
+cambios):
+
+- @s42 → `src/pages/home-horneado.test.ts:365, 369, 378, 382`.
+- @s43 → `src/pages/contacto-horneado.test.ts:254, 258, 268, 272`.
+- @s44 → `src/lib/trampas-del-horneado.test.tsx:421, 428, 440, 447`, con su medición en `:203-204`.
+
+### Ciclos Rojo → Verde → Refactor
+
+Orden en cada fichero: ancla → 2º `Then` → 3er `Then` → la línea del `env`. Las dos comprobaciones se
+vieron ROJAS con el lanzamiento de hoy (`NODE_ENV=production` y `MODE=test` heredado) antes de añadir
+`MODE`. Es la misma desviación declarada en la Decisión 1 de arriba, por el mismo motivo: una sola línea
+las pone verdes a la vez, y el lead pidió «ROJO primero con el env actual».
+
+**Home.**
+
+1. Ancla (`:401`). ROJO: `ReferenceError: salidaDelBuild is not defined` (`:380`), porque la salida no se
+   capturaba. VERDE: conservar la salida del `execSync` existente (23/23). El ancla ya está en verde con
+   el lanzamiento de hoy, como dice el contrato.
+2. 2º `Then` (`:405`). ROJO:
+
+   ```
+   AssertionError: expected [ ' test...\ntr' ] to deeply equal []
+    ❯ src/pages/home-horneado.test.ts:399:72
+   ```
+
+3. 3er `Then` (`:410`). ROJO, todavía sin `MODE`:
+
+   ```
+   AssertionError: expected [ ' test...\ntr' ] to deeply equal []
+    ❯ src/pages/home-horneado.test.ts:399:72
+   AssertionError: expected 1 to be +0 // Object.is equality
+    ❯ src/pages/home-horneado.test.ts:403:82
+         Tests  2 failed | 23 passed (25)
+   ```
+
+4. VERDE: `MODE: 'production'` en el `env` → 25/25.
+
+**Contacto.** Los mismos cuatro pasos:
+
+1. ROJO del ancla: `ReferenceError: salidaDelBuild is not defined` (`:282`). VERDE con la captura (22/22).
+2. ROJO del 2º `Then`: `expected [ ' test...\ntr' ] to deeply equal []` (`:295`).
+3. ROJO de los dos: `… to deeply equal []` (`:295`) y `expected 1 to be +0` (`:299`), 2 failed | 22 passed.
+4. VERDE con `MODE` → 24/24.
+
+**Trampas.**
+
+1. ROJO ×5 del ancla: `TypeError: Cannot read properties of undefined (reading 'split')` (`:468`). El
+   experimento no traía la salida del build. VERDE: `Experimento.salidaDelBuild` desde el `execSync` del
+   helper (35/35).
+2. ROJO ×5 del 2º `Then`: `expected [ ' test...\ntr' ] to deeply equal []` (`:480`).
+3. ROJO ×10, todavía sin `MODE`:
+
+   ```
+   AssertionError: expected [ ' test...\ntr' ] to deeply equal []   (×5)
+    ❯ src/lib/trampas-del-horneado.test.tsx:480:74
+   AssertionError: expected 1 to be +0 // Object.is equality        (×5)
+    ❯ src/lib/trampas-del-horneado.test.tsx:489:84
+         Tests  10 failed | 35 passed (45)
+   ```
+
+4. VERDE con `MODE` → 45/45, incluidas las 10 de @s32/@s33 y las 20 de @s44. Los bundles no cambian:
+   `app-D946Yd8C.js` (83 684 B) y `app-BYpc6tA3.js` (95 213 B) ×4, los mismos hashes que con solo
+   `NODE_ENV`. Lo que cambia es el modo, no el JS.
+
+**Sabotajes (en el test o en el lanzamiento, restaurando desde copia tras cada uno):**
+
+| Sabotaje                                                      | Resultado                                                                                                             |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| home: salida capturada vaciada (`… .toString() && ''`)        | cae SOLO el ancla: `expected 0 to be greater than or equal to 1`. Las otras dos pasarían en vacío: el ancla lo impide |
+| contacto: el mismo                                            | ídem, `expected 0 to be greater than or equal to 1`                                                                   |
+| trampas: leer `experimento(nombre).salida` (la de la PUERTA)  | ROJO ×5 en el ancla, `expected 0 to be greater than or equal to 1`: el contrato dice «si se confunden, el ancla cae»  |
+| home: `MODE: 'test'` explícito                                | caen el 2º y el 3er `Then` (`[ ' test...\ntr' ]` y `expected 1 to be +0`)                                             |
+| home: `pnpm build && exit 1` (el build falla DESPUÉS de Vite) | cae SOLO @s14 (`expected 1 to be +0`). @s45 sigue verde: la rama `catch` conserva el log de `error.stdout`            |
+
+**REFACTOR (en verde tras cada paso):**
+
+1. En home, el ancla pasó de `apariciones(…, /building client environment for/g)` a
+   `trasCadaModoDelLog().length`. Así el ancla y el 2º `Then` comparten la MISMA extracción sobre la MISMA
+   cadena (el patrón de @s41), y desaparece una línea que prettier partía de forma ilegible. Contacto y
+   trampas nacieron ya así.
+2. `FILAS_DE_S44` → `FILAS_DE_LOS_EXPERIMENTOS`, porque la usan @s44 y @s45. Su comentario prohíbe
+   `experimentos.keys()`.
+3. Cabeceras de los tres ficheros. Una variable local en el ancla de trampas por el mismo motivo de
+   prettier. `prettier --write` no cambió nada más.
+
+### Decisiones
+
+1. **«Tal cual, sin filtrar».** Se busca en la cadena cruda de `execSync(…).toString()`. «Seguida de» se
+   comprueba con los 11 caracteres que siguen INMEDIATAMENTE a cada aparición (`' production'.length`),
+   sin quitar escapes ANSI ni espacios. El log capturado sale sin color (el ROJO lo muestra: `' test...\ntr'`).
+   El contrato midió que con color forzado la frase sigue contigua.
+2. **La salida del error, en home y contacto.** El contrato dice «si el build falla, la que trae el
+   error». Ningún test la fuerza sin romper el build, así que la demostré con el sabotaje `&& exit 1` de
+   la tabla. Solo la salida ESTÁNDAR (`stdout`), porque así lo fija el `Given`.
+3. **Trampas no lleva `catch` en el build.** Si el build de un experimento lanza, el `beforeAll` entero
+   cae, como antes («que esto no lance es parte de la aserción»). Falla cerrada.
+4. **La negativa cuenta con el mismo `apariciones` que @s42-@s44.** El literal «building client
+   environment for test» está escrito a mano, y los tres literales no se derivan de `process.env`, de
+   `import.meta.env` ni de la config de Vite.
+
+### NO-MUTABLE, declarado
+
+Lo que cambia sigue siendo el LANZAMIENTO de tres tests build-based y sus aserciones: no hay fichero
+mutable nuevo ni se toca `stryker.config.json`. `vitest.stryker.config.ts` sigue excluyéndolos:
+`pnpm exec vitest list --filesOnly --config vitest.stryker.config.ts` → 44 ficheros, ninguno
+`*-horneado`. Su defensa son los ROJOS de arriba y el `judge`.
+
+### Resultados de la verificación final (@s45)
+
+- `pnpm typecheck` → exit 0. `pnpm lint` → exit 0. `pnpm exec prettier --check` sobre los tres ficheros de
+  test, `progress/current.md` y este diario → exit 0. Los tres se lanzaron por separado, con su `$?`
+  real y sin tuberías.
+- `bin/harness init` → **exit 0**: lint OK, **47/47 ficheros y 1556/1556 tests** (1535 + 3 + 3 + 15),
+  84,1 s en total (vitest 72,52 s). Con una corrida por lado frente a los 90,0 s de @s42-@s44, **no es
+  más caro**. Trampas aislado: 16,40 s (antes 16,65 s).
+- `pnpm build` directo (12:57:33, sin otra suite en marcha) → **exit 0**, con las 5 puertas en ✓, «building
+  client environment for production». `dist/` queda en producción: `app-CWmDYxle.js`, 164 751 B, 0
+  `jsxDEV` y 0 `fileName:`.

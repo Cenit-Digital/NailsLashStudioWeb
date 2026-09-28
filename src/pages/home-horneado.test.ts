@@ -5,12 +5,13 @@ import { resolve } from 'node:path'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 /**
- * F-10 @s12 y @s14, F-14 @s6 y F-04 @s39-@s42 (ENMIENDAS 2, 3 y 4 de `cascaron_semantico.feature`)
+ * F-10 @s12 y @s14, F-14 @s6 y F-04 @s39-@s42 y @s45 (ENMIENDAS 2, 3 y 4 de `cascaron_semantico.feature`)
  * — sobre el HTML CRUDO del artefacto de PRODUCCIÓN (en @s41, también el CSS de `dist/assets/`; en @s42,
  * el `app-*.js` al que apunta el HTML), leído por BYTES (readFileSync, sin ejecutar JavaScript — I-8,
  * NUNCA jsdom). «Verde ≠ funciona»: para las features de UI se verifica con `pnpm build` + fetch del HTML
- * crudo (feature_list.json §rules.notas). @s39-@s42 REUTILIZAN el build de este `beforeAll`: el contrato
- * prohíbe un build nuevo solo para ellos. @s42 demuestra que ese build es de PRODUCCIÓN.
+ * crudo (feature_list.json §rules.notas). @s39-@s42 y @s45 REUTILIZAN el build de este `beforeAll`: el
+ * contrato prohíbe un build nuevo solo para ellos. Que ese build es de PRODUCCIÓN lo demuestran @s42 (por
+ * los bytes del bundle) y @s45 (por el modo que escribe el propio log de Vite).
  *
  * 🔴 ESTE FICHERO NO IMPORTA NADA DE `src/lib/` NI DE `src/pages/`, Y ES DELIBERADO (patrón de
  * `trampas-del-horneado.test.tsx`): corre el BUILD REAL (lento) en `beforeAll`. Si importara
@@ -22,15 +23,24 @@ const RUTA_DIST = resolve('dist/index.html')
 
 let html = ''
 let codigoSalida = 0
+let salidaDelBuild = ''
 
 beforeAll(() => {
   // El `pnpm build` REAL con las CINCO puertas. @s14 exige exit 0 «con todas las puertas»: se captura
   // el código de salida (execSync lanza en fallo con `.status`). @s42: `NODE_ENV=production` explícito
   // en el SUBPROCESO (el resto se hereda); si heredara el `test` de Vitest, React saldría en DESARROLLO.
+  // @s45: y `MODE=production`, porque Vitest exporta también `MODE=test` y vite-react-ssg lo lee ANTES que
+  // `NODE_ENV`. Se CONSERVA su salida estándar (el log de Vite), y si falla, la que trae el error.
   try {
-    execSync('pnpm build', { stdio: 'pipe', env: { ...process.env, NODE_ENV: 'production' } })
+    salidaDelBuild = execSync('pnpm build', {
+      stdio: 'pipe',
+      env: { ...process.env, NODE_ENV: 'production', MODE: 'production' },
+    }).toString()
   } catch (error: unknown) {
-    codigoSalida = (error as { status: number }).status
+    const fallo = error as { status: number; stdout: Buffer }
+
+    codigoSalida = fallo.status
+    salidaDelBuild = fallo.stdout.toString()
   }
 
   html = readFileSync(RUTA_DIST, 'utf8')
@@ -372,5 +382,32 @@ describe('@s42 (F-04) el build que lanza home-horneado es de producción: su bun
   it('@s42 esos mismos bytes contienen exactamente 0 apariciones de "fileName:" seguido de una comilla (", \' o `)', () => {
     // Las tres comillas: hoy son todas `fileName:"/…"`, y un cambio de minificador no la deja en vacío.
     expect(apariciones(bundleDeLaApp(), /fileName:["'`]/g)).toBe(0)
+  })
+})
+
+/**
+ * @s45 — lo que sigue INMEDIATAMENTE a cada aparición de «building client environment for» en la salida
+ * capturada del build, tal cual (sin filtrar ni normalizar), con el largo de « production». Es la MISMA
+ * extracción para el ancla (cuántas hay) y para el 2º `Then` (qué sigue a cada una).
+ */
+function trasCadaModoDelLog(): readonly string[] {
+  return salidaDelBuild
+    .split('building client environment for')
+    .slice(1)
+    .map((resto) => resto.slice(0, ' production'.length))
+}
+
+describe('@s45 (F-04) el build "pnpm build" que lanza home-horneado corre en modo de Vite "production", según su propio log', () => {
+  it('@s45 ANCLA POSITIVA: la salida estándar capturada del build contiene al menos 1 vez "building client environment for"', () => {
+    expect(trasCadaModoDelLog().length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('@s45 cada una de esas apariciones va seguida, tras un espacio, del literal "production"', () => {
+    // Se listan las que NO siguen con « production», para que un fallo diga QUÉ modo trae el log.
+    expect(trasCadaModoDelLog().filter((tras) => tras !== ' production')).toEqual([])
+  })
+
+  it('@s45 esa misma salida contiene exactamente 0 veces "building client environment for test"', () => {
+    expect(apariciones(salidaDelBuild, /building client environment for test/g)).toBe(0)
   })
 })

@@ -11,7 +11,8 @@ import { beforeAll, describe, expect, it } from 'vitest'
  * features de UI se verifica con `pnpm build` + el HTML crudo (feature_list.json §rules.notas). Esta es
  * la capa AUTORITATIVA del contrato: @s4, @s5, @s7, @s8, @s9, @s10, @s11, @s12, @s14. Y F-04 @s43
  * (ENMIENDA 4 de `cascaron_semantico.feature`): el `app-*.js` al que apunta ese mismo HTML demuestra, por
- * bytes, que el build de este `beforeAll` es de PRODUCCIÓN.
+ * bytes, que el build de este `beforeAll` es de PRODUCCIÓN; y F-04 @s45, su ampliación: lo demuestra
+ * también el modo que escribe el propio log de Vite de ese build.
  *
  * 🔴 ESTE FICHERO NO IMPORTA NADA DE `src/`, Y ES DELIBERADO (patrón de `home-horneado.test.ts`): corre
  * el BUILD REAL (lento) en `beforeAll`. Si importara `site.ts`/`Contacto.tsx`, Stryker lo contaría como
@@ -27,16 +28,25 @@ const MARCA = 'Nails Lash Studio'
 
 let html = ''
 let codigoSalida = 0
+let salidaDelBuild = ''
 
 beforeAll(() => {
   // El `pnpm build` REAL con las CINCO puertas. Se captura el código de salida (execSync lanza en
   // fallo con `.status`): @s10 exige exit 0 «con todas las puertas», en especial la de ANCLAS de F-06.
   // F-04 @s43: `NODE_ENV=production` explícito en el SUBPROCESO (el resto se hereda); si heredara el
-  // `test` de Vitest, React saldría en DESARROLLO.
+  // `test` de Vitest, React saldría en DESARROLLO. F-04 @s45: y `MODE=production`, porque Vitest exporta
+  // también `MODE=test` y vite-react-ssg lo lee ANTES que `NODE_ENV`. Se CONSERVA su salida estándar (el
+  // log de Vite), y si falla, la que trae el error.
   try {
-    execSync('pnpm build', { stdio: 'pipe', env: { ...process.env, NODE_ENV: 'production' } })
+    salidaDelBuild = execSync('pnpm build', {
+      stdio: 'pipe',
+      env: { ...process.env, NODE_ENV: 'production', MODE: 'production' },
+    }).toString()
   } catch (error: unknown) {
-    codigoSalida = (error as { status: number }).status
+    const fallo = error as { status: number; stdout: Buffer }
+
+    codigoSalida = fallo.status
+    salidaDelBuild = fallo.stdout.toString()
   }
 
   html = readFileSync(RUTA_DIST, 'utf8')
@@ -262,5 +272,32 @@ describe('@s43 (F-04) el build que lanza contacto-horneado es de producción: su
   it('@s43 esos mismos bytes contienen exactamente 0 apariciones de "fileName:" seguido de una comilla (", \' o `)', () => {
     // Las tres comillas: hoy son todas `fileName:"/…"`, y un cambio de minificador no la deja en vacío.
     expect(apariciones(bundleDeLaApp(), /fileName:["'`]/g)).toBe(0)
+  })
+})
+
+/**
+ * @s45 — lo que sigue INMEDIATAMENTE a cada aparición de «building client environment for» en la salida
+ * capturada del build, tal cual (sin filtrar ni normalizar), con el largo de « production». Es la MISMA
+ * extracción para el ancla (cuántas hay) y para el 2º `Then` (qué sigue a cada una).
+ */
+function trasCadaModoDelLog(): readonly string[] {
+  return salidaDelBuild
+    .split('building client environment for')
+    .slice(1)
+    .map((resto) => resto.slice(0, ' production'.length))
+}
+
+describe('@s45 (F-04) el build "pnpm build" que lanza contacto-horneado corre en modo de Vite "production", según su propio log', () => {
+  it('@s45 ANCLA POSITIVA: la salida estándar capturada del build contiene al menos 1 vez "building client environment for"', () => {
+    expect(trasCadaModoDelLog().length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('@s45 cada una de esas apariciones va seguida, tras un espacio, del literal "production"', () => {
+    // Se listan las que NO siguen con « production», para que un fallo diga QUÉ modo trae el log.
+    expect(trasCadaModoDelLog().filter((tras) => tras !== ' production')).toEqual([])
+  })
+
+  it('@s45 esa misma salida contiene exactamente 0 veces "building client environment for test"', () => {
+    expect(apariciones(salidaDelBuild, /building client environment for test/g)).toBe(0)
   })
 })

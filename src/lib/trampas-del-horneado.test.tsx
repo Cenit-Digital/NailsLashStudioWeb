@@ -6,8 +6,9 @@ import { beforeAll, describe, expect, it } from 'vitest'
 
 /**
  * F-04 @s32 y @s33 — LAS DOS TRAMPAS QUE ANCLAN EL PORQUÉ. Sin ellas, alguien las revierte.
- * F-04 @s44 (ENMIENDA 4) — cada build de experimento es de PRODUCCIÓN, demostrado por los bytes del
- * `app-*.js` que carga su HTML (medidos en `construirExperimento`, por el que pasa todo build).
+ * F-04 @s44 y @s45 (ENMIENDA 4) — cada build de experimento es de PRODUCCIÓN, demostrado por los bytes
+ * del `app-*.js` que carga su HTML (@s44) y por el modo que escribe el propio log de Vite (@s45): los dos
+ * se miden en `construirExperimento`, por el que pasa todo build.
  *
  * 🔴🔴 ESTE FICHERO NO IMPORTA NADA DE `src/lib/`, Y ES DELIBERADO. Corre BUILDS SSG REALES
  * (lentos) y ejecuta la puerta COMO SUBPROCESO. Si importara la puerta, Stryker lo contaría como
@@ -167,6 +168,8 @@ interface Experimento {
   /** @s44 — medidos por el helper sobre el `dist/` que ESE build acaba de dejar. */
   readonly modulosDeLaApp: readonly string[]
   readonly bundleDeLaApp: string
+  /** @s45 — la salida estándar del BUILD (el log de Vite). No confundir con `salida`, la de la PUERTA. */
+  readonly salidaDelBuild: string
 }
 
 const experimentos = new Map<string, Experimento>()
@@ -186,12 +189,13 @@ function construirExperimento(nombre: string, indexHtml: string, home: string): 
   // justo que NO SE QUEJA. Que esto no lance es parte de la aserción.
   // Una sola cadena de comando (sin array de argumentos con shell: evita el aviso DEP0190 de Node).
   // @s44: `NODE_ENV=production` explícito en el SUBPROCESO (el resto se hereda); si heredara el `test`
-  // de Vitest, React saldría en DESARROLLO.
-  execSync('pnpm exec vite-react-ssg build', {
+  // de Vitest, React saldría en DESARROLLO. @s45: y `MODE=production`, porque Vitest exporta también
+  // `MODE=test` y vite-react-ssg lo lee ANTES que `NODE_ENV`. Se CONSERVA su salida estándar (el log).
+  const salidaDelBuild = execSync('pnpm exec vite-react-ssg build', {
     cwd: dir,
     stdio: 'pipe',
-    env: { ...process.env, NODE_ENV: 'production' },
-  })
+    env: { ...process.env, NODE_ENV: 'production', MODE: 'production' },
+  }).toString()
 
   const html = readFileSync(resolve(dir, 'dist/index.html'), 'utf8')
   // @s44: la medición del bundle va AQUÍ, sobre los bytes que ESTE build acaba de dejar; así ningún
@@ -220,7 +224,7 @@ function construirExperimento(nombre: string, indexHtml: string, home: string): 
     salida = `${fallo.stdout.toString()}${fallo.stderr.toString()}`
   }
 
-  return { html, salida, codigoSalida, modulosDeLaApp: modulos, bundleDeLaApp }
+  return { html, salida, codigoSalida, modulosDeLaApp: modulos, bundleDeLaApp, salidaDelBuild }
 }
 
 beforeAll(() => {
@@ -401,11 +405,11 @@ function apariciones(texto: string, patron: RegExp): number {
 }
 
 /**
- * F-04 @s44 (ENMIENDA 4) — las 5 filas del `Examples:`, ESCRITAS A MANO por su nombre. NUNCA
- * `experimentos.keys()`: esa colección podría estar vacía (verde por vacío). Si una fila no se construyó
- * o no se midió, `experimento(nombre)` o su medición no existen y el `it` cae en ROJO.
+ * F-04 @s44 y @s45 (ENMIENDA 4) — las 5 filas de sus `Examples:`, ESCRITAS A MANO por su nombre.
+ * NUNCA `experimentos.keys()`: esa colección podría estar vacía (verde por vacío). Si una fila no se
+ * construyó o no se midió, `experimento(nombre)` o su medición no existen y el `it` cae en ROJO.
  */
-const FILAS_DE_S44 = [
+const FILAS_DE_LOS_EXPERIMENTOS = [
   'react19-nativa',
   'head-espacio',
   'head-mayusculas',
@@ -414,14 +418,14 @@ const FILAS_DE_S44 = [
 ] as const
 
 describe('@s44 (F-04) cada build de experimento de trampas-del-horneado es de producción', () => {
-  it.each(FILAS_DE_S44)(
+  it.each(FILAS_DE_LOS_EXPERIMENTOS)(
     '@s44 ANCLA POSITIVA: en "%s" hay exactamente 1 <script type="module"> cuyo src empieza por "/assets/app-" y termina en ".js"',
     (nombre) => {
       expect(experimento(nombre).modulosDeLaApp).toHaveLength(1)
     },
   )
 
-  it.each(FILAS_DE_S44)(
+  it.each(FILAS_DE_LOS_EXPERIMENTOS)(
     '@s44 ANCLA POSITIVA: en "%s" ese fichero existe, pesa más de 0 bytes y contiene "Av. de Atenas 75, Local 41"',
     (nombre) => {
       // El literal es de la app MÍNIMA (0 veces en el bundle de la real), escrito A MANO: no se lee de
@@ -433,18 +437,60 @@ describe('@s44 (F-04) cada build de experimento de trampas-del-horneado es de pr
     },
   )
 
-  it.each(FILAS_DE_S44)(
+  it.each(FILAS_DE_LOS_EXPERIMENTOS)(
     '@s44 en "%s" esos mismos bytes contienen exactamente 0 apariciones de "jsxDEV"',
     (nombre) => {
       expect(apariciones(experimento(nombre).bundleDeLaApp, /jsxDEV/g)).toBe(0)
     },
   )
 
-  it.each(FILAS_DE_S44)(
+  it.each(FILAS_DE_LOS_EXPERIMENTOS)(
     '@s44 en "%s" esos mismos bytes contienen exactamente 0 apariciones de "fileName:" seguido de una comilla (", \' o `)',
     (nombre) => {
       // Las tres comillas: hoy son todas `fileName:"/…"`, y un cambio de minificador no la deja en vacío.
       expect(apariciones(experimento(nombre).bundleDeLaApp, /fileName:["'`]/g)).toBe(0)
+    },
+  )
+})
+
+/**
+ * @s45 — lo que sigue INMEDIATAMENTE a cada aparición de «building client environment for» en la salida
+ * del BUILD de un experimento (nunca la de la puerta), tal cual (sin filtrar ni normalizar), con el largo
+ * de « production». Es la MISMA extracción para el ancla (cuántas hay) y para el 2º `Then`.
+ */
+function trasCadaModoDelLog(salidaDelBuild: string): readonly string[] {
+  return salidaDelBuild
+    .split('building client environment for')
+    .slice(1)
+    .map((resto) => resto.slice(0, ' production'.length))
+}
+
+describe('@s45 (F-04) el build de cada experimento de trampas-del-horneado corre en modo de Vite "production", según su propio log', () => {
+  it.each(FILAS_DE_LOS_EXPERIMENTOS)(
+    '@s45 ANCLA POSITIVA: la salida estándar capturada del build del experimento "%s" contiene al menos 1 vez "building client environment for"',
+    (nombre) => {
+      const trasCadaAparicion = trasCadaModoDelLog(experimento(nombre).salidaDelBuild)
+
+      expect(trasCadaAparicion.length).toBeGreaterThanOrEqual(1)
+    },
+  )
+
+  it.each(FILAS_DE_LOS_EXPERIMENTOS)(
+    '@s45 en "%s" cada una de esas apariciones va seguida, tras un espacio, del literal "production"',
+    (nombre) => {
+      // Se listan las que NO siguen con « production», para que un fallo diga QUÉ modo trae el log.
+      const trasCadaAparicion = trasCadaModoDelLog(experimento(nombre).salidaDelBuild)
+
+      expect(trasCadaAparicion.filter((tras) => tras !== ' production')).toEqual([])
+    },
+  )
+
+  it.each(FILAS_DE_LOS_EXPERIMENTOS)(
+    '@s45 en "%s" esa misma salida contiene exactamente 0 veces "building client environment for test"',
+    (nombre) => {
+      const { salidaDelBuild } = experimento(nombre)
+
+      expect(apariciones(salidaDelBuild, /building client environment for test/g)).toBe(0)
     },
   )
 })
