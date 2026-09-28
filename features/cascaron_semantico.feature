@@ -1874,8 +1874,10 @@ Feature: Cáscara semántica horneada, JSON-LD escrito de cero y la puerta que m
   #     heredado: el log dice «for test»), con el ancla ya en VERDE. @s42-@s44 siguen en VERDE.
   #
   # NO SATISFACEN @s45 (ni su porqué):
-  #   - borrar, silenciar o no capturar el log (`logLevel: 'silent'`, un `customLogger`, `stdio: 'ignore'`
-  #     o `'inherit'`): la negativa pasaría en vacío, y el ancla lo impide (1er `Then` en ROJO);
+  #   - borrar, silenciar o no capturar el log (un `customLogger`, `stdio: 'ignore'` o `'inherit'`, o
+  #     redirigir la salida): la negativa pasaría en vacío, y el ancla lo impide (1er `Then` en ROJO).
+  #     `logLevel: 'silent'` NO sirve de ejemplo: en vite-react-ssg 0.9.0 solo silencia la línea del SSR,
+  #     porque el build del cliente usa su propio `customLogger` (judge, progress/judge_cascaron_enmienda4.md);
   #   - fijar `mode: 'production'` en `vite.config.ts`: MEDIDO, en la app que lo lee el log SÍ pasa a «for
   #     production» aun con `MODE=test`, pero los 5 experimentos NO leen el `vite.config.ts` del repo
   #     (escriben el suyo) y seguirían «for test»; además la decisión es el entorno del SUBPROCESO, y esa
