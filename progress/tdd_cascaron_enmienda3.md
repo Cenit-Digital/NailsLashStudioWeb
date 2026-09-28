@@ -191,7 +191,13 @@ cada una:
   - **6 `<link rel="preload" as="font">`, las 6 hacia `.woff2`, 0 hacia `.woff`**;
   - 0 `<link rel="preload" as="image">`.
   - El CSS **conserva** 6 `@font-face` con 6 `format("woff2")` y 6 `format("woff")`: el respaldo sigue.
-  - `dist/` queda construido en producción.
+  - **`dist/` NO queda en producción, y no por mí.** A las 10:55:58, después de mi build y mientras yo
+    solo ejecutaba prettier, otro proceso (otro agente o el lead, con un `*-horneado` en paralelo)
+    reescribió `dist/` con un build de vitest (`app-C6U4pjd1.js`, `NODE_ENV=test`). No lo he
+    reconstruido para no pisarle el `dist/` compartido a mitad de su test. Sobre ESE artefacto, @s41
+    también se cumple: 6 precargas `as="font"`, 6 hacia `.woff2`, 0 hacia `.woff`, y 6
+    `format("woff")` en el CSS. Quien necesite el artefacto de producción (la sonda en vivo, p. ej.)
+    tiene que lanzar `pnpm build` directo.
 - Mutación, `pnpm exec stryker run --mutate src/lib/horneado.ts` → **100 %**: 23 muertos, 0 timeouts,
   0 supervivientes, 0 sin cobertura, 17 tests en el dry run y 11 s. No hubo timeouts, así que no hizo
   falta re-medir con `--concurrency 1`. Mutantes:
@@ -210,8 +216,8 @@ cada una:
 ## Observado, fuera del alcance (para el lead)
 
 - **Los builds de vitest siguen heredando `NODE_ENV=test`** (el punto 4 del judge de la ENMIENDA 2). Lo
-  que mira @s41 (el HTML y el CSS) no depende del modo. Tras `bin/harness init` rehíce `dist/` con
-  `pnpm build` directo. Lo resuelve la ENMIENDA 4, que no he tocado.
+  que mira @s41 (el HTML y el CSS) no depende del modo: lo he medido sobre los dos artefactos, el de
+  producción y el de vitest. Lo resuelve la ENMIENDA 4, que no he tocado.
 - **Manrope 500** se sigue precargando (su `.woff2`). El contrato lo deja fuera de alcance: es de F-05.
 - **Las 6 precargas `.woff2` siguen con `type="font/woff2"` y `crossorigin=""`.** Es correcto, y el
   contrato ni lo exige ni lo prohíbe.

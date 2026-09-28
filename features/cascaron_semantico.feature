@@ -162,6 +162,12 @@
 # bytes de `dist/` es build-based (`*-horneado.test.*`, excluido de Stryker): demuestra que el cableado
 # llega al artefacto real, no sustituye a la mutación de la lógica.
 #
+# LÍMITE DECLARADO (judge, progress/judge_cascaron_enmienda3.md, recomendación 2): «termina en `.woff`» es
+# literal. Una precarga hacia `/x.woff?v=1` o con espacios alrededor del `href` la descargaría el
+# navegador y NO la retirarían ni la función ni el test: fallaría ABIERTO en los dos lados. Hoy no ocurre
+# (Vite pone el hash en el nombre del fichero, sin query, y `jsdom.serialize()` no añade espacios); si
+# algún día cambia, el criterio se amplía con su propio escenario.
+#
 # FUERA DE ALCANCE (anotado, NO decidido): Manrope 500 se precarga y se declara, pero tras recorrer la
 # home entera a 1280 px `document.fonts` lo deja `unloaded`; no se ha auditado si alguna regla lo usa en
 # otro estado o ancho. Es la lista de F-05 y la decide F-05.
