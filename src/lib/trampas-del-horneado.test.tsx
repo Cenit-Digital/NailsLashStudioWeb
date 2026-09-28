@@ -6,6 +6,9 @@ import { beforeAll, describe, expect, it } from 'vitest'
 
 /**
  * F-04 @s32 y @s33 — LAS DOS TRAMPAS QUE ANCLAN EL PORQUÉ. Sin ellas, alguien las revierte.
+ * F-04 @s44 y @s45 (ENMIENDA 4) — cada build de experimento es de PRODUCCIÓN, demostrado por los bytes
+ * del `app-*.js` que carga su HTML (@s44) y por el modo que escribe el propio log de Vite (@s45): los dos
+ * se miden en `construirExperimento`, por el que pasa todo build.
  *
  * 🔴🔴 ESTE FICHERO NO IMPORTA NADA DE `src/lib/`, Y ES DELIBERADO. Corre BUILDS SSG REALES
  * (lentos) y ejecuta la puerta COMO SUBPROCESO. Si importara la puerta, Stryker lo contaría como
@@ -111,10 +114,62 @@ const indexHtmlCon = (head: string): string => `<!doctype html>
 </html>
 `
 
+/**
+ * F-04 @s44 (ENMIENDA 4) — LA EXTRACCIÓN DE `<script>` DEL HTML CRUDO, escrita A MANO aquí (este fichero
+ * no importa `src/lib/` ni otro test) con el MISMO criterio que la de @s39 en `home-horneado`: NOMBRES de
+ * atributo en minúsculas, nunca subcadenas de la etiqueta; valores entre comillas dobles, simples o sin
+ * comillas; un atributo sin valor vale ''; ante un nombre repetido gana el PRIMERO.
+ */
+const ATRIBUTO = /([^\s"'<>/=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g
+
+type Atributos = ReadonlyMap<string, string>
+
+function atributosDe(texto: string): Atributos {
+  const atributos = new Map<string, string>()
+
+  for (const [, nombre, dobles, simples, sinComillas] of texto.matchAll(ATRIBUTO)) {
+    const clave = nombre.toLowerCase()
+
+    if (!atributos.has(clave)) {
+      atributos.set(clave, dobles ?? simples ?? sinComillas ?? '')
+    }
+  }
+
+  return atributos
+}
+
+/** El prefijo con el que el HTML crudo apunta a `dist/assets/`: el `vite.config.ts` mínimo no declara `base`. */
+const PREFIJO_DE_ASSETS = '/assets/'
+
+/** @s44 — los `src` de los `<script type="module">` de la app: `/assets/app-….js`. */
+function modulosDeLaApp(html: string): readonly string[] {
+  return [...html.matchAll(/<script(?=[\s/>])([^>]*)>/gi)]
+    .map((encontrado) => atributosDe(encontrado[1]))
+    .filter((script) => script.get('type')?.toLowerCase() === 'module')
+    .map((script) => script.get('src') ?? '')
+    .filter((src) => src.startsWith(`${PREFIJO_DE_ASSETS}app-`) && src.endsWith('.js'))
+}
+
+/**
+ * @s44 — los bytes del fichero al que apunta el módulo de la app: se quita el prefijo y se lee bajo el
+ * `dist/assets/` del experimento `dir`. NUNCA por glob. Si no hubiera módulo o fichero, lanza DENTRO del
+ * `beforeAll`: el fichero entero cae (falla cerrada, igual que si lanzara el build), nunca en verde.
+ */
+function leerBundleDeLaApp(dir: string, modulos: readonly string[]): string {
+  const [src = ''] = modulos
+
+  return readFileSync(resolve(dir, 'dist/assets', src.slice(PREFIJO_DE_ASSETS.length)), 'utf8')
+}
+
 interface Experimento {
   readonly html: string
   readonly salida: string
   readonly codigoSalida: number
+  /** @s44 — medidos por el helper sobre el `dist/` que ESE build acaba de dejar. */
+  readonly modulosDeLaApp: readonly string[]
+  readonly bundleDeLaApp: string
+  /** @s45 — la salida estándar del BUILD (el log de Vite). No confundir con `salida`, la de la PUERTA. */
+  readonly salidaDelBuild: string
 }
 
 const experimentos = new Map<string, Experimento>()
@@ -133,9 +188,20 @@ function construirExperimento(nombre: string, indexHtml: string, home: string): 
   // El build SSG REAL. Si vite-react-ssg lanzara por sí mismo, @s33 sobraría: su 1er `Then` es
   // justo que NO SE QUEJA. Que esto no lance es parte de la aserción.
   // Una sola cadena de comando (sin array de argumentos con shell: evita el aviso DEP0190 de Node).
-  execSync('pnpm exec vite-react-ssg build', { cwd: dir, stdio: 'pipe' })
+  // @s44: `NODE_ENV=production` explícito en el SUBPROCESO (el resto se hereda); si heredara el `test`
+  // de Vitest, React saldría en DESARROLLO. @s45: y `MODE=production`, porque Vitest exporta también
+  // `MODE=test` y vite-react-ssg lo lee ANTES que `NODE_ENV`. Se CONSERVA su salida estándar (el log).
+  const salidaDelBuild = execSync('pnpm exec vite-react-ssg build', {
+    cwd: dir,
+    stdio: 'pipe',
+    env: { ...process.env, NODE_ENV: 'production', MODE: 'production' },
+  }).toString()
 
   const html = readFileSync(resolve(dir, 'dist/index.html'), 'utf8')
+  // @s44: la medición del bundle va AQUÍ, sobre los bytes que ESTE build acaba de dejar; así ningún
+  // experimento, tampoco uno nuevo, se escapa de ella.
+  const modulos = modulosDeLaApp(html)
+  const bundleDeLaApp = leerBundleDeLaApp(dir, modulos)
 
   // LA PUERTA, COMO SUBPROCESO: `cwd` en el experimento, así su `dist` relativo es el de aquí.
   let salida = ''
@@ -158,7 +224,7 @@ function construirExperimento(nombre: string, indexHtml: string, home: string): 
     salida = `${fallo.stdout.toString()}${fallo.stderr.toString()}`
   }
 
-  return { html, salida, codigoSalida }
+  return { html, salida, codigoSalida, modulosDeLaApp: modulos, bundleDeLaApp, salidaDelBuild }
 }
 
 beforeAll(() => {
@@ -331,4 +397,100 @@ describe('@s33 pinchar el literal <head> rompe la inyección EN SILENCIO, y la p
     expect(html).toMatch(/name="description"/i)
     expect(codigoSalida).toBe(0)
   })
+})
+
+/** @s44 — cuántas veces casa `patron` (con `g`: sin él, `matchAll` lanza) en `texto`. */
+function apariciones(texto: string, patron: RegExp): number {
+  return [...texto.matchAll(patron)].length
+}
+
+/**
+ * F-04 @s44 y @s45 (ENMIENDA 4) — las 5 filas de sus `Examples:`, ESCRITAS A MANO por su nombre.
+ * NUNCA `experimentos.keys()`: esa colección podría estar vacía (verde por vacío). Si una fila no se
+ * construyó o no se midió, `experimento(nombre)` o su medición no existen y el `it` cae en ROJO.
+ */
+const FILAS_DE_LOS_EXPERIMENTOS = [
+  'react19-nativa',
+  'head-espacio',
+  'head-mayusculas',
+  'head-atributo',
+  'head-correcto',
+] as const
+
+describe('@s44 (F-04) cada build de experimento de trampas-del-horneado es de producción', () => {
+  it.each(FILAS_DE_LOS_EXPERIMENTOS)(
+    '@s44 ANCLA POSITIVA: en "%s" hay exactamente 1 <script type="module"> cuyo src empieza por "/assets/app-" y termina en ".js"',
+    (nombre) => {
+      expect(experimento(nombre).modulosDeLaApp).toHaveLength(1)
+    },
+  )
+
+  it.each(FILAS_DE_LOS_EXPERIMENTOS)(
+    '@s44 ANCLA POSITIVA: en "%s" ese fichero existe, pesa más de 0 bytes y contiene "Av. de Atenas 75, Local 41"',
+    (nombre) => {
+      // El literal es de la app MÍNIMA (0 veces en el bundle de la real), escrito A MANO: no se lee de
+      // `HOME_CON_HEAD` ni de `HOME_CON_METADATA_NATIVA`. Se CUENTA para no volcar el bundle al fallar.
+      const { bundleDeLaApp } = experimento(nombre)
+
+      expect(bundleDeLaApp.length).toBeGreaterThan(0)
+      expect(apariciones(bundleDeLaApp, /Av\. de Atenas 75, Local 41/g)).toBeGreaterThanOrEqual(1)
+    },
+  )
+
+  it.each(FILAS_DE_LOS_EXPERIMENTOS)(
+    '@s44 en "%s" esos mismos bytes contienen exactamente 0 apariciones de "jsxDEV"',
+    (nombre) => {
+      expect(apariciones(experimento(nombre).bundleDeLaApp, /jsxDEV/g)).toBe(0)
+    },
+  )
+
+  it.each(FILAS_DE_LOS_EXPERIMENTOS)(
+    '@s44 en "%s" esos mismos bytes contienen exactamente 0 apariciones de "fileName:" seguido de una comilla (", \' o `)',
+    (nombre) => {
+      // Las tres comillas: hoy son todas `fileName:"/…"`, y un cambio de minificador no la deja en vacío.
+      expect(apariciones(experimento(nombre).bundleDeLaApp, /fileName:["'`]/g)).toBe(0)
+    },
+  )
+})
+
+/**
+ * @s45 — lo que sigue INMEDIATAMENTE a cada aparición de «building client environment for» en la salida
+ * del BUILD de un experimento (nunca la de la puerta), tal cual (sin filtrar ni normalizar), con el largo
+ * de « production». Es la MISMA extracción para el ancla (cuántas hay) y para el 2º `Then`.
+ */
+function trasCadaModoDelLog(salidaDelBuild: string): readonly string[] {
+  return salidaDelBuild
+    .split('building client environment for')
+    .slice(1)
+    .map((resto) => resto.slice(0, ' production'.length))
+}
+
+describe('@s45 (F-04) el build de cada experimento de trampas-del-horneado corre en modo de Vite "production", según su propio log', () => {
+  it.each(FILAS_DE_LOS_EXPERIMENTOS)(
+    '@s45 ANCLA POSITIVA: la salida estándar capturada del build del experimento "%s" contiene al menos 1 vez "building client environment for"',
+    (nombre) => {
+      const trasCadaAparicion = trasCadaModoDelLog(experimento(nombre).salidaDelBuild)
+
+      expect(trasCadaAparicion.length).toBeGreaterThanOrEqual(1)
+    },
+  )
+
+  it.each(FILAS_DE_LOS_EXPERIMENTOS)(
+    '@s45 en "%s" cada una de esas apariciones va seguida, tras un espacio, del literal "production"',
+    (nombre) => {
+      // Se listan las que NO siguen con « production», para que un fallo diga QUÉ modo trae el log.
+      const trasCadaAparicion = trasCadaModoDelLog(experimento(nombre).salidaDelBuild)
+
+      expect(trasCadaAparicion.filter((tras) => tras !== ' production')).toEqual([])
+    },
+  )
+
+  it.each(FILAS_DE_LOS_EXPERIMENTOS)(
+    '@s45 en "%s" esa misma salida contiene exactamente 0 veces "building client environment for test"',
+    (nombre) => {
+      const { salidaDelBuild } = experimento(nombre)
+
+      expect(apariciones(salidaDelBuild, /building client environment for test/g)).toBe(0)
+    },
+  )
 })

@@ -170,7 +170,8 @@ Rango: `package.json:40-64`. [VERIFICADO]
 ```ts
 plugins: [react()],            // :7  — @vitejs/plugin-react-swc
 ssgOptions: {                  // :8-13
-  script: 'async',             // :9
+  script: 'async',             // :9  ← RETIRADO en este repo el 2026-09-28 (F-04 ENMIENDA 2,
+                               //       progress/hallazgo_hidratacion_ssg.md): carrera de hidratación
   entry: 'src/main.tsx',       // :10
   dirStyle: 'nested',          // :11
   formatting: 'none',          // :12

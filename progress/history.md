@@ -13,6 +13,53 @@
 - Resultado: done.
 -->
 
+## 2026-09-27/28 — Nailbot (F-23 `nailbot_chat_compartido` + F-24 `nailbot_flotante`) · **CERRADAS `done`** + F-04 ENMIENDAS 2-4
+
+- **Encargo de Pablo (27-09)**: robot flotante que se pinta las uñas, con pestañas largas y morros rojos, que
+  abre un chat de reserva hacia WhatsApp, sin servidor todavía. Hubo 8 decisiones por AskUserQuestion y
+  un prototipo del arte aprobado; el brief está en `progress/nailbot_diseno.md` y la investigación
+  oficial en `docs/research/asistente-robot/`.
+- **Vía rápida (27-09, `302ddb4`)**: se publicó antes del TDD por petición expresa del humano. La
+  desviación (el código se escribió antes que los tests) quedó declarada en
+  `progress/tdd_nailbot_*.md`.
+- **Pipeline (28-09)**:
+  - Contratos: F-23 con 14 escenarios y F-24 con 15, más la enmienda de `reserva_chat.feature`.
+  - Revisión independiente (judge ×2, a11y y seguridad) → deltas → cierre APPROVED en las dos. Por el
+    camino se cazaron:
+    - la pausa que no congelaba en un navegador real (el shorthand de animation);
+    - un lookbehind que rompía el envío con nombre en Safari/iOS anterior a 16.4;
+    - un test que pasaba en vacío (los surrogates).
+  - Mutación de cierre: 341/341 = 100 %, sin timeouts.
+- **Verificación EN VIVO** (Chromium 141, `progress/verificacion_viva_nailbot.md`): 88 comprobaciones, de
+  las que 87 dan OK y 1 es un caso previsto por el contrato, decidido y aceptado: el foco inicial cae en
+  el hilo desbordado al reabrir, por los «keyboard focusable scrollers» de Chrome. Lo medido:
+  - F110 a 320, 390 y 1280 px sin ningún foco totalmente tapado;
+  - reduced-motion en frío y en caliente;
+  - 320 px con un nombre de 300 caracteres;
+  - consola limpia y cero terceros.
+- **Lo que destapó la verificación: la home se quedaba EN BLANCO.** Con el
+  `<script type="module" async>` heredado del stack, React lanzaba el #418 en 1-6 de cada 20 cargas en
+  frío, un defecto preexistente (`progress/hallazgo_hidratacion_ssg.md`). Se corrigió como **F-04
+  ENMIENDA 2** y la sonda da 0/60. A la vez se retiraron 13 precargas de foto que no se reutilizaban.
+- **Encargos añadidos por Pablo en la sesión, cada uno por el pipeline completo** (Gherkin → TDD → judge
+  → mutación):
+  - **ENMIENDA 3**: solo se precargan los `.woff2` (124 440 bytes menos por visita).
+  - **ENMIENDA 4**: los tests que construyen el sitio lo hacen en modo producción, con `NODE_ENV` y
+    `MODE`. Su artefacto es idéntico por sha256 al que se publica.
+  - **PR aparte de formato**: [Cenit-Digital/NailsLashStudioWeb#14](https://github.com/Cenit-Digital/NailsLashStudioWeb/pull/14),
+    con Prettier en 191 ficheros y `format:check` en la puerta de lint.
+- **Resultado**:
+  - F-23 y F-24 `done`; F-04 sigue `done` con las enmiendas 2-4 registradas en su `cierre`.
+  - `bin/harness init` da 47/47 ficheros y 1556/1556 tests; `pnpm build` pasa las 5 puertas.
+  - PR del cierre: [Cenit-Digital/NailsLashStudioWeb#13](https://github.com/Cenit-Digital/NailsLashStudioWeb/pull/13).
+- **Pendiente para el humano**:
+  - Probar en un móvil real: lector de pantalla, abrir el enlace en WhatsApp, gesto atrás de Android y
+    área segura de iOS.
+  - Aprobar el despliegue a Pages que espera en el entorno `github-pages` (y, cuando se fusione #13, el
+    siguiente).
+  - Los 3 workflows de `.github/workflows/` quedan fuera de Prettier: esta sesión no tiene permiso
+    `workflow`.
+
 ## 2026-07-25 — Despliegue en GitHub Pages (push a `main`): infraestructura + subruta `/NailsLashStudioWeb/` · CERRADA
 
 - **Encargo de Pablo**: desplegar el sitio en GitHub Pages en cada push a `main`, investigación en
