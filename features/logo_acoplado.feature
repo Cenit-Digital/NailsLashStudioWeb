@@ -206,10 +206,10 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
     And el atributo class del <a>, de los dos <span>, del <svg> y del <text> es la MISMA cadena que tenían recién montados en «texto» (precedente F-06 @s15)
 
     Examples:
-      | estado                 | preparación                                                                                          | data-logo  | data-vuelo |
-      | «texto», recién montada | ninguna entrega del observador                                                                       | texto      | no         |
-      | «caligrafia» sin vuelo | una entrega INICIAL con «STUDIO» ya arriba (bottom 12.5): la carga desplazada                        | caligrafia | no         |
-      | «caligrafia» con vuelo | una entrega inicial con «STUDIO» a la vista (bottom 400) y otra con «STUDIO» en la frontera (73.2)   | caligrafia | si         |
+      | estado                  | preparación                                                                                        | data-logo  | data-vuelo |
+      | «texto», recién montada | ninguna entrega del observador                                                                     | texto      | no         |
+      | «caligrafia» sin vuelo  | una entrega INICIAL con «STUDIO» ya arriba (bottom 12.5): la carga desplazada                      | caligrafia | no         |
+      | «caligrafia» con vuelo  | una entrega inicial con «STUDIO» a la vista (bottom 400) y otra con «STUDIO» en la frontera (73.2) | caligrafia | si         |
 
     # El nombre EXACTO muerde por los dos lados: si una representación visible perdiera su aria-hidden, el
     # nombre pasaría a "Nails Lash Studio Nails Lash Studio…" y la consulta exacta no encontraría nada.
@@ -385,10 +385,10 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
     And console.error no se ha llamado y ni el montaje ni el desmontaje lanzan ninguna excepción
 
     Examples:
-      | situación                                                                                                            | observador                                                                                      |
+      | situación                                                                                                              | observador                                                                                                           |
       | window.IntersectionObserver AUSENTE (jsdom 25 tal cual, o un navegador antiguo) y un documento CON los dos data-acople | document.querySelector NO se ha llamado con ningún selector que contenga "data-acople": el efecto sale sin hacer nada |
-      | IntersectionObserver sustituido y un documento SIN [data-acople="disparo"] (una página sin hero, p. ej. las legales)  | el constructor de IntersectionObserver NO se ha llamado, ni observe                              |
-      | IntersectionObserver sustituido y un documento con [data-acople="disparo"] pero SIN [data-acople="origen"]            | el constructor se ha llamado EXACTAMENTE una vez: sin origen hay acople sin vuelo (@s12), no degradación |
+      | IntersectionObserver sustituido y un documento SIN [data-acople="disparo"] (una página sin hero, p. ej. las legales)   | el constructor de IntersectionObserver NO se ha llamado, ni observe                                                  |
+      | IntersectionObserver sustituido y un documento con [data-acople="disparo"] pero SIN [data-acople="origen"]             | el constructor se ha llamado EXACTAMENTE una vez: sin origen hay acople sin vuelo (@s12), no degradación             |
 
     # Una sola guarda (LA-C10): `typeof IntersectionObserver !== 'function'` → el efecto sale sin hacer nada
     # (precedente galeria.test.tsx @s23). La tercera fila es el contraste: el origen solo decide el vuelo.
