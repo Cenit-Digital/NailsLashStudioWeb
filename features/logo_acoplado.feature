@@ -540,7 +540,7 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
   @s22
   Scenario: El hero sigue su ceremonia sin enterarse del acople, y el vuelo no crea nodos ni toca el rótulo: vuela el propio <svg> del logo (LA-C8, LA-16, LA-2)
     Given <Cabecera /> y <Hero /> montados juntos en jsdom con render(), window.matchMedia sustituido SIN preferencia de movimiento reducido (la caligrafía del hero en marcha: data-firma="corriendo" y el botón "Completar la firma" presente), IntersectionObserver sustituido, la geometría de referencia aplicada a los data-acople REALES del hero y el número de elementos del documento anotado
-    When el observador entrega una entrada inicial con «STUDIO» en bottom 400 y, después, otra en 73.2
+    When el observador entrega una entrada inicial con «STUDIO» en bottom 400 y, después, otra en 73
     Then el <a> tiene data-logo="caligrafia" y data-vuelo="si" (ANCLA POSITIVA: hubo acople con vuelo)
     And el hero sigue con data-firma="corriendo" y el botón "Completar la firma" sigue existiendo
     And el documento tiene el MISMO número de elementos que antes del acople, EXACTAMENTE dos <svg> con viewBox="-80 -840 4120 1200" (el rótulo y el logo) y EXACTAMENTE un elemento con id "tinta-marca" y uno con id "trazo-marca"
