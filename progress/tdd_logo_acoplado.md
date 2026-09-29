@@ -110,3 +110,33 @@ Comando de cada ciclo: `pnpm exec vitest run <fichero>` (un fichero, segundos). 
 - REFACTOR: el estado pasa a `{ logo, variables?: CSSProperties }`; `style={acople.variables}` y
   `data-vuelo` se derivan del mismo campo. Un `style={variables === null ? undefined : …}` habría
   fabricado un mutante equivalente (`style={null}` y `style={undefined}` pintan igual). → 45/45, tsc limpio.
+
+### @s11 — valores FLIP exactos con señuelo (ciclo 11)
+
+- ROJO: «en UNA sola entrega… 325px / -75px / 4» → falla («expected '0px' to be '325px'»: el fake-it
+  de @s10). El segundo test (solo el `<a>` lleva style) pasa a la primera: guarda.
+- VERDE: `ref` al `<svg>` del logo; x = origen.left − destino.left, y = origen.top − destino.top,
+  escala = origen.width / destino.width. → 47/47.
+- **Sabotajes medidos:** medir el `<a>` (señuelo) → «expected '341px' to be '325px'»; escala por el alto
+  → «expected '2.5' to be '4'». Restaurado.
+
+### @s12 — sin FLIP válido, acople sin vuelo y sin errores (ciclo 12)
+
+- ROJO: 3 filas → 3 fallan («TypeError: Cannot read properties of null (reading
+  'getBoundingClientRect')» sin origen; vuelo con escala 0 o ∞ con anchos 0).
+- VERDE: guardas de origen ausente y de `width <= 0`.
+- REFACTOR (en el mismo paso, en verde): el cálculo del vuelo sale del callback a `vueloHacia(destino,
+primeraObservacion)` a nivel de módulo. → 50/50, tsc limpio.
+
+### @s13 — ni matchMedia, ni animate, ni scroll/resize (ciclo 13)
+
+- Pasa a la primera (guarda). **Sabotajes medidos:** decidir el vuelo con `matchMedia` → rojos
+  (@s3/@s6…, jsdom no trae matchMedia); `window.addEventListener('scroll', …)` → 1 rojo (@s13).
+  Restaurado. → 37/37.
+
+### @s14 — degradación (ciclo 14)
+
+- ROJO: 3 filas → la fila «sin disparo» falla (el constructor se llamaba: `observe(null)`); las filas
+  «sin IntersectionObserver» y «sin origen» ya pasaban por las guardas de @s3 y @s12.
+- VERDE: `if (disparo === null) return` antes de construir el observador. → 54/54.
+- **Sabotaje medido** (buscar el disparo ANTES de la guarda `typeof`): 1 rojo (@s14 fila 1). Restaurado.
