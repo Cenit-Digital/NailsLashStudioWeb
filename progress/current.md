@@ -29,7 +29,7 @@
 ### Fases
 
 - [x] spec_partner → `project-spec.md` §F-25 (LA-1..LA-16) y §F-27 (CF-1..CF-7), commit edcc631; revisada por el lead
-- [ ] gherkin_author ×2 en paralelo (uno por feature, ficheros distintos) — en curso
+- [x] gherkin_author ×2: `logo_acoplado.feature` (34 escenarios, D-1..D-8 decididas por el lead; ENMIENDA D-1 en la spec) y `catalogo_fotos.feature` (26) → ambas `spec_ready`
       → `features/logo_acoplado.feature`, `features/catalogo_fotos.feature`
 - [ ] ⏸ puerta humana sobre los `.feature`
 - [ ] F-25: tdd_craftsman → judge → mutation_tester
