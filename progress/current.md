@@ -19,6 +19,12 @@
   `src/assets/servicios/` sin importar aún (commit 3dd425b).
 - El primer `spec_partner` se detuvo al interrumpir el humano la sesión sin escribir nada; se
   relanzó con las fotos y sus medidas.
+- El segundo `spec_partner` murió también por una interrupción (20 min de lectura, 0 bytes escritos).
+  Rescatado de su transcripción: 3 comprobaciones pendientes (mutabilidad de `Catalogo.tsx`, tests
+  que lean `cabecera.module.scss`, reutilizar `partirNombre`). Tercer `spec_partner` lanzado con
+  alcance recortado (F-25 + F-27) y ESCRITURA INCREMENTAL a disco para sobrevivir a interrupciones.
+- Workflows de GitHub Actions de la rama revisados: Harness CI y Guardián de rutas sensibles en
+  verde en los 5 commits del PR, ninguno encolado ni colgado.
 
 ### Fases
 
