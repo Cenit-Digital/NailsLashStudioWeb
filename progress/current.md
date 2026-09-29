@@ -28,8 +28,9 @@
 
 ### Fases
 
-- [ ] spec_partner → `project-spec.md` §F-25/§F-27 (en curso; F-26 retirada del encargo)
-- [ ] gherkin_author → `features/logo_acoplado.feature`, `features/catalogo_fotos.feature`
+- [x] spec_partner → `project-spec.md` §F-25 (LA-1..LA-16) y §F-27 (CF-1..CF-7), commit edcc631; revisada por el lead
+- [ ] gherkin_author ×2 en paralelo (uno por feature, ficheros distintos) — en curso
+      → `features/logo_acoplado.feature`, `features/catalogo_fotos.feature`
 - [ ] ⏸ puerta humana sobre los `.feature`
 - [ ] F-25: tdd_craftsman → judge → mutation_tester
 - [x] ~~F-26 `hero_foto`~~ — DESCARTADA por Pablo el 2026-09-29 («no quiero imagen»); en `no_se_construyen`
