@@ -734,3 +734,25 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
     And el <svg> del logo computa pointer-events "none", y el clic navega al destino del enlace de la nav, no a "/NailsLashStudioWeb/" (caso límite 20)
     And document.fonts.check('33px "Great Vibes"') es true y la fuente se sirve desde el propio sitio: ninguna petición a otro origen (F-05, F-21)
     And la firma en Great Vibes a ≈ 33 px de em se lee con sus trazos finos a 320 y a 1280 px (criterio de proyecto: juicio del lead con captura, A-6)
+
+  # ---------------------------------------------------------------------------------------------
+  # AÑADIDO TRAS LAS DECISIONES DEL LEAD (2026-09-29). Va al final para que la numeración siga estable.
+  # ---------------------------------------------------------------------------------------------
+
+  @s34
+  Scenario Outline: Si una entrega del observador trae VARIAS entradas, decide la ÚLTIMA; y «primera observación» es la primera ENTREGA, no la primera entrada (D-4)
+    Given la cabecera montada con IntersectionObserver sustituido y la geometría de referencia (cada entrada con rootBounds.top 73 y el origen con borde inferior 42)
+    And <antecedente>
+    When el observador entrega, en UNA sola llamada al callback, las entradas de «STUDIO» con boundingClientRect.bottom <entradas>, en ese orden
+    Then el <a> tiene data-logo="<data-logo>" y data-vuelo="<data-vuelo>"
+    And disconnect se ha llamado <desconexiones>
+
+    Examples:
+      | antecedente                                              | entradas         | data-logo  | data-vuelo | desconexiones       | por qué                                                                                   |
+      | una entrega inicial con «STUDIO» a la vista (bottom 400) | 400 y luego 73   | caligrafia | si         | EXACTAMENTE una vez | la última está sobre la línea: acopla, y vuela porque no es la primera entrega            |
+      | una entrega inicial con «STUDIO» a la vista (bottom 400) | 73 y luego 400   | texto      | no         | ninguna vez         | la última vuelve a verse: decide ella, no «alguna de ellas»                               |
+      | ninguno: es la entrega INICIAL                           | 400 y luego 12.5 | caligrafia | no         | EXACTAMENTE una vez | carga desplazada: dos entradas en la PRIMERA entrega siguen siendo la primera observación |
+
+    # La fila 2 mata la implementación que aplica la transición monótona a cada entrada en orden: la de 73
+    # acoplaría y la de 400 ya no podría deshacerlo (P2). La fila 3 mata la que cuenta entradas en vez de
+    # entregas: la segunda entrada de la entrega inicial NO es un cruce que «haya visto subir».
