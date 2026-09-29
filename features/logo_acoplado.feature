@@ -386,7 +386,7 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
 
     Examples:
       | situación                                                                                                            | observador                                                                                      |
-      | window.IntersectionObserver AUSENTE (jsdom 25 tal cual, o un navegador antiguo) y un documento CON los dos data-acople | no hay ningún observador que construir                                                          |
+      | window.IntersectionObserver AUSENTE (jsdom 25 tal cual, o un navegador antiguo) y un documento CON los dos data-acople | document.querySelector NO se ha llamado con ningún selector que contenga "data-acople": el efecto sale sin hacer nada |
       | IntersectionObserver sustituido y un documento SIN [data-acople="disparo"] (una página sin hero, p. ej. las legales)  | el constructor de IntersectionObserver NO se ha llamado, ni observe                              |
       | IntersectionObserver sustituido y un documento con [data-acople="disparo"] pero SIN [data-acople="origen"]            | el constructor se ha llamado EXACTAMENTE una vez: sin origen hay acople sin vuelo (@s12), no degradación |
 
