@@ -3471,3 +3471,474 @@ texto, de sobra para 3:1): sin fila nueva y vigilado. Decide el lead.
   panel usa el `ChatNailbot` idéntico al de `#reserva`.
 - **HS-17 → el anillo del lanzador pasa a `--accent-dark`** (par ya vigilado, sin fila nueva); el disco
   sigue blanco. Verificación visual en vivo.
+
+### Feature 25: `logo_acoplado` — «Nails Lash» sube del hero y se queda de logo: dos estados en atributos, un vuelo FLIP que vive en la hoja y la marca accesible intacta
+
+> Feature `#25` de `feature_list.json` (`pending`, `sdd`). Encargo literal de Pablo, decisiones P1–P3 y
+> cambio de alcance en `progress/brief_foto_logo_catalogo.md` (§1, §2 y §5); cálculos en su sección «Notas
+> del spec_partner». **Firmes (Pablo, 2026-09-29), no se reabren:** P2 (una vez acoplada, la caligrafía
+> **se queda** toda la visita, aunque se vuelva arriba) y P3 (el logo acoplado es **solo «Nails Lash»**,
+> sin «STUDIO»). Todo lo demás, marcado **LA-n**, es **propuesta del spec_partner, a ratificar en la
+> puerta**.
+
+#### Propósito
+
+Que la firma caligráfica del hero, al dejar de verse «STUDIO» bajo la cabecera, **suba con un vuelo suave
+hasta la esquina superior izquierda y se quede como logo**, sin mover la cabecera, sin tocar el nombre
+accesible del enlace y sin depender de JavaScript para que la página sea correcta.
+
+#### Qué ve y qué oye la persona
+
+| Momento                                              | Qué ve en la esquina superior izquierda                                                                                                                                 | Árbol de accesibilidad del enlace       |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| HTML horneado, sin JS (para siempre)                 | «nails lash studio» en Gilda Display (estado `texto`), como hoy                                                                                                         | enlace «Nails Lash Studio» → `BASE_URL` |
+| Tras hidratar, arriba del todo                       | Lo mismo. Nada se mueve                                                                                                                                                 | igual                                   |
+| Hace scroll y «STUDIO» queda entero bajo la cabecera | «Nails Lash» sale del rótulo del hero, **sube encogiéndose** hasta el hueco del logo en 0,9 s, de translúcido (0,35) a opaco; «nails lash studio» se desvanece en 0,4 s | igual (lo que vuela es `aria-hidden`)   |
+| Tras aterrizar                                       | «Nails Lash» en Great Vibes, quieto (estado `caligrafia`)                                                                                                               | igual                                   |
+| Vuelve arriba del todo                               | **Sigue** «Nails Lash» (P2). El rótulo del hero, en su sitio                                                                                                            | igual                                   |
+| Recarga arriba del todo                              | «nails lash studio» de nuevo: el estado no se guarda                                                                                                                    | igual                                   |
+| Recarga ya desplazada, o salto lejano                | «Nails Lash» **al instante, sin vuelo** (no hay nada que haya visto subir)                                                                                              | igual                                   |
+| `prefers-reduced-motion: reduce`                     | Cambio **instantáneo** de «nails lash studio» a «Nails Lash», sin vuelo ni fundido                                                                                      | igual                                   |
+| Móvil a 320 px                                       | Lo mismo; la cabecera **no cambia de alto ni de ancho** entre estados (sin CLS)                                                                                         | igual                                   |
+
+#### Contrato
+
+**LA-C1 · La estructura del enlace (horneada, SSR).** La marca de la cabecera deja de ser `<a>{NOMBRE}</a>` y
+pasa a ser un componente nuevo, `src/components/LogoAcoplado.tsx`, que `Cabecera.tsx` monta en el mismo
+sitio. Forma observable:
+
+```html
+<a href="{BASE_URL}" class="…marca" data-logo="texto" data-vuelo="no">
+  <span class="…soloLectores">Nails Lash Studio</span>
+  <!-- nombre accesible -->
+  <span class="…logoTexto" aria-hidden="true">Nails Lash Studio</span>
+  <!-- Gilda, minúsculas por CSS -->
+  <svg class="…logoCaligrafia" viewBox="{VISTA_MARCA}" aria-hidden="true" focusable="false">
+    <text x="0" y="0" font-size="1000" class="…">Nails Lash</text>
+    <!-- partirNombre(NOMBRE).marca -->
+  </svg>
+</a>
+```
+
+- **Nombre accesible = EXACTAMENTE «Nails Lash Studio» en los dos estados**, y sale del `<span>` solo para
+  lectores (técnica `clip`/1 px de la WAI, la misma del `<h1>` del hero). Las dos representaciones visibles
+  son `aria-hidden`. El `href` sigue siendo `import.meta.env.BASE_URL` (ENMIENDA 1 a F-05/F-04).
+- El `<text>` sale de **`partirNombre(NOMBRE).marca`** y el `viewBox` de **`VISTA_MARCA`**
+  (`src/lib/trazo-marca.ts`): la misma fuente que el rótulo del hero, **nunca** un literal «Nails Lash» en
+  producción (I-7). El test sí escribe «Nails Lash» **a mano** (anti-tautología).
+- **Cero `id` dentro del logo.** Sin `<mask>`, sin trazo y sin aplicador: los ids `tinta-marca` y
+  `trazo-marca` son del hero y deben seguir siendo únicos en el documento (duplicarlos haría ambiguo
+  `url(#…)` y rompería la máscara del rótulo). El logo muestra siempre la **firma completa**.
+- `className` **constante** en todos los nodos. Ningún `className` condicional (F-06 @s15: medido inmatable).
+
+**LA-C2 · El estado vive en DOS atributos consultables del `<a>`.**
+
+| Atributo     | Valores              | Horneado | Transición única                                                                 |
+| ------------ | -------------------- | -------- | -------------------------------------------------------------------------------- |
+| `data-logo`  | `texto`/`caligrafia` | `texto`  | `texto` → `caligrafia`, **una vez por carga** y nunca de vuelta (P2)             |
+| `data-vuelo` | `no`/`si`            | `no`     | `no` → `si` **solo** en el mismo commit que el acople y solo si el vuelo procede |
+
+Tres custom properties en el `style` del `<a>` —`--vuelo-x`, `--vuelo-y` (en `px`) y `--vuelo-escala` (sin
+unidad)— existen **solo** cuando `data-vuelo="si"`, y llegan **en el mismo render** que los dos atributos:
+así el primer fotograma pintado de la caligrafía ya está en el punto de salida y no hay destello en la
+esquina. En el horneado **no** hay `style`, ni `--vuelo-*`, ni `animation` inline.
+
+**LA-C3 · Qué pinta la hoja en cada estado** (`src/components/logo-acoplado.module.scss`, nuevo; las reglas
+de `.marca` salen de `cabecera.module.scss`).
+
+- **El hueco es estable por construcción:** `.marca` es `display: inline-grid` y **las dos representaciones
+  ocupan la misma celda** (`grid-area: 1 / 1`). La caja del enlace mide el máximo de las dos **en los dos
+  estados y desde el primer pintado**: cambiar de estado no mueve nada (cero CLS). La representación inactiva
+  se oculta con `visibility: hidden`, que **no** altera el layout.
+- **La base es el estado horneado** (I-4 leído con cuidado): sin atributo o con `texto`, se ve «nails lash
+  studio» y la caligrafía está `visibility: hidden`. **Solo** `[data-logo='caligrafia']` invierte las dos
+  visibilidades. Ninguna regla depende de `[data-logo='texto']`: si el atributo faltara, se vería la marca.
+  La caligrafía oculta en la base **no** es contenido pendiente de JS (el patrón que I-4 prohíbe): es la
+  representación alternativa, `aria-hidden`, de una marca que ya se ve.
+- **Dimensiones declaradas en la hoja, no por la fuente:** el `<svg>` mide **2,5 rem de alto** (40 px) y su
+  ancho sale de la relación del `viewBox`, 4120 : 1200 → **≈ 8,583 rem** (≈ 137 px). **Tope duro: ≤ 2,75 rem**
+  (44 px, el `min-height` del botón hamburguesa, que ya fija la fila en móvil). Así la cabecera nunca pasa de
+  los **76 px** que F-06 @s11 deriva de esta cabecera **sin leer su hoja** (`_base.scss:36`): un logo más
+  alto haría mentir al `scroll-padding-top` en silencio.
+- **Color y tipo:** `fill: var(--ink)` y `font-family: 'Great Vibes', cursive`, **sin `opacity`** en la
+  base. `pointer-events: none` en el `<svg>`: durante el vuelo, escalado, pasa por encima de la nav, y un
+  clic ahí no debe caer en el enlace de la marca (el `<a>` sigue siendo clicable por su propia caja).
+- **El vuelo, en la hoja** (LA-1): `transform-origin: 0 0` en el `<svg>` y
+
+  ```scss
+  .marca[data-vuelo='si'] .logoCaligrafia {
+    animation: acoplar 0.9s cubic-bezier(0.45, 0, 0.25, 1);
+  }
+  .marca[data-vuelo='si'] .logoTexto {
+    animation: soltar 0.4s linear;
+  }
+  @keyframes acoplar {
+    from {
+      transform: translate(var(--vuelo-x), var(--vuelo-y)) scale(var(--vuelo-escala));
+      opacity: 0.35;
+    }
+  }
+  @keyframes soltar {
+    from {
+      opacity: 1;
+      visibility: visible;
+    }
+    to {
+      opacity: 0;
+      visibility: visible;
+    }
+  }
+  ```
+
+  El `to` de `acoplar` es la base (`transform: none`, `opacity: 1`): el estado translúcido y desplazado vive
+  **solo** en el `from` del keyframe (I-4). `soltar` fuerza `visibility: visible` mientras dura porque la base
+  de `caligrafia` ya oculta el texto; al acabar, vuelve a la base (oculto). Sin `fill-mode`, sin
+  `will-change`, sin `animation` inline.
+
+- **Reduced-motion, en la hoja** (C-4): dentro de `@media (prefers-reduced-motion: reduce)`, `animation: none`
+  para `.marca[data-vuelo='si'] .logoCaligrafia` y `.marca[data-vuelo='si'] .logoTexto`, **repitiendo el
+  selector completo** (un `@media` no suma especificidad; con el selector corto perdería contra la regla
+  del vuelo — misma trampa que documenta `hero.module.scss`). Si la preferencia se activa **a mitad de
+  vuelo**, la hoja la aplica en caliente y el logo salta a su sitio: correcto sin JS.
+
+**LA-C4 · El disparo (exacto).** «STUDIO deja de verse» = **la caja del `span.heroStudio` queda entera por
+encima del borde inferior de la cabecera sticky**: `bordeInferiorStudio <= bordeInferiorCabecera`, ambos
+en coordenadas de viewport, medidos en el instante de la observación.
+
+- **«Ya pasó por arriba» ≠ «aún no ha llegado».** `isIntersecting === false` es cierto en los dos casos
+  (encima del cristal, o por debajo del viewport en una ventana muy baja), así que **no** decide: decide la
+  geometría. Por debajo, `bordeInferiorStudio > bordeInferiorCabecera` → sigue `texto`.
+- **Frontera `<=`:** con el borde exactamente en la línea quedan 0 px visibles, y eso ya es «no se ve».
+- Decide **la caja**, no la tinta ni la opacidad: durante la ceremonia de 15 s «STUDIO» está en
+  `opacity: 0` y su caja ya ocupa su sitio; el disparo es el mismo.
+- **Transporte:** un `IntersectionObserver` sobre el disparo, raíz = viewport, `threshold: 0` y `rootMargin`
+  superior = **−alto de la cabecera, redondeado hacia arriba** (`Math.ceil`: un borde fraccionario nunca
+  deja 1 px de «STUDIO» asomando cuando dispara). El `rootMargin` hace que el navegador avise justo al
+  cruzar esa línea, y el callback aplica la decisión pura con el borde de la cabecera **medido en ese
+  momento**.
+
+**LA-C5 · Monótono (P2).** Una vez `caligrafia`, el observador se **desconecta** y el estado no vuelve. La
+función de transición es monótona por sí misma (desde `caligrafia` siempre devuelve `caligrafia`), así que
+la monotonía no depende solo de desconectar. **Sin persistencia**: ni `sessionStorage` ni `localStorage`
+(I-2 y la línea de N-4); «la visita» es la vida del documento, y recargar arriba vuelve a `texto`.
+
+**LA-C6 · ¿Vuelo o cambio instantáneo?** Al acoplar, vuela **solo si** se cumplen las tres:
+
+1. **no** es la primera observación (el `IntersectionObserver` entrega siempre una entrada inicial al
+   `observe()`: si en esa entrada «STUDIO» ya está arriba, es una **carga ya desplazada** → sin vuelo);
+2. el rótulo del hero (el origen) está **a menos de un alto de viewport por encima del borde superior**:
+   `bordeInferiorOrigen > −altoViewport`. Cubre la restauración de scroll tardía y los saltos lejanos sin
+   scroll suave, donde el logo «caería» desde miles de píxeles;
+3. existen el origen y una transformación FLIP válida (LA-C7).
+
+La preferencia de movimiento **no** entra en esta decisión: la resuelve la hoja (LA-C3). El componente **no
+usa `matchMedia` ni `Element.animate`**.
+
+**LA-C7 · La transformación FLIP.** _First_ = la caja del `<svg>` del rótulo del hero en el instante del
+disparo; _Last_ = la caja del `<svg>` del logo (`visibility: hidden` no altera su layout, así que se mide
+bien antes del cambio). Con `transform-origin: 0 0`:
+
+- `x = origen.left − destino.left`, `y = origen.top − destino.top`, `escala = origen.width / destino.width`.
+- **Escala uniforme**: los dos `<svg>` comparten `VISTA_MARCA`, así que la misma escala casa el ancho y el
+  alto. Se usa el ancho (la dimensión mayor, la más precisa).
+- **Nula** si `destino.width <= 0` u `origen.width <= 0` (caja sin layout): no hay vuelo, solo acople.
+- Orden de magnitud [I, a medir en vivo]: en escritorio el rótulo mide ≈ 552 × 161 px → escala ≈ 4,0; a
+  320 px mide ≈ 194 × 57 px → escala ≈ 1,4.
+- La cabecera es sticky desde `y = 0`, así que el destino no se mueve durante el vuelo: **si la persona sigue
+  haciendo scroll (en cualquier sentido), el vuelo no se altera**. El `<svg>` vuela dentro del contexto de
+  apilamiento de la cabecera (`z-index: 50`): pasa **por encima** del cristal, nítido, no detrás.
+
+**LA-C8 · Si la caligrafía del hero aún se escribe.** El logo muestra la **firma completa** (no hereda
+máscara). El hero **sigue** su ceremonia sin enterarse: F-25 no toca `data-firma`, ni el control «Completar
+la firma», ni el reloj de 15 s. Efecto visual: durante 0,9 s la firma completa a 0,35 pasa sobre un rótulo a
+medio escribir que ya está bajo el cristal — aceptado.
+
+**LA-C9 · Comunicación hero → cabecera (la cabecera vive fuera de `<main>`).** Dos **atributos estáticos**
+en `Hero.tsx`: `data-acople="origen"` en el `<svg>` del rótulo y `data-acople="disparo"` en
+`span.heroStudio`. `LogoAcoplado` los busca con `document.querySelector` **dentro del efecto** (nunca en el
+render). Sin disparo (una página sin hero, p. ej. las legales de F-16) → no se crea observador y la marca es
+`texto` para siempre. Sin origen → acople sin vuelo. Los tests aseveran los dos atributos sobre el
+`renderToString(<Hero />)` con el literal **escrito a mano** (Stryker no muta atributos JSX literales, E1.d).
+
+**LA-C10 · Guardas de jsdom.** jsdom 25 no trae `IntersectionObserver`, `matchMedia` ni `Element.animate`.
+Con LA-1 solo hace falta **una** guarda: `typeof IntersectionObserver !== 'function'` → el efecto sale sin
+hacer nada y la marca queda `texto`, sin errores (precedente `galeria.test.tsx` @s23). Los tests del acople
+**stubean** el observador (precedente `stubDeIntersectionObserver` de `galeria.test.tsx`: captura callback y
+opciones, `observe`/`disconnect` espiados) y entregan entradas con **geometría real, no ceros**, y fijan
+`getBoundingClientRect` de la cabecera, el origen y el logo. `getBoundingClientRect` en jsdom devuelve ceros:
+**prohibido** decidir el acople fuera del callback del observador (con ceros, `0 <= 0` acoplaría en todos
+los tests).
+
+**LA-C11 · Lógica pura, al 100 % de mutación.** `src/components/logo-acoplado-logica.ts` (patrón
+`*-logica.ts` del repo), sin DOM:
+
+| Función                                                                   | Contrato                                                                                       |
+| ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `estadoTrasObservar(actual, bordeInferiorDisparo, bordeInferiorCabecera)` | `caligrafia` si `actual` ya lo es; si no, `caligrafia` ⇔ `disparo <= cabecera`; si no, `texto` |
+| `debeVolar({ primeraObservacion, bordeInferiorOrigen, altoViewport })`    | `!primeraObservacion && bordeInferiorOrigen > −altoViewport`                                   |
+| `transformacionFlip(origen, destino)`                                     | `{ x, y, escala }` de LA-C7, o `null` si algún ancho es `<= 0`                                 |
+| `variablesDeVuelo(flip)`                                                  | `{ '--vuelo-x': '<x>px', '--vuelo-y': '<y>px', '--vuelo-escala': '<escala>' }`                 |
+| `margenDeRaiz(altoCabecera)`                                              | `'-<ceil(alto)>px 0px 0px 0px'` (73,2 → `'-74px 0px 0px 0px'`, distinto de `Math.round`)       |
+
+Fronteras que el TDD debe fijar para matar los mutantes de igualdad: disparo **igual** a la cabecera →
+`caligrafia`, y medio píxel por debajo → `texto`; origen **igual** a `−altoViewport` → sin vuelo, y 1 px por
+encima → vuelo; ancho de destino `0` → `null`. Geometría asimétrica y distinta de cero en todos los ejemplos
+(hallazgo del judge de la galería). `LogoAcoplado.tsx` y `logo-acoplado-logica.ts` **entran en `mutate`**
+de `stryker.config.json` al 100 %; el `[]` de dependencias del efecto de montaje es el mutante equivalente ya
+ratificado tres veces en el repo (`Hero.tsx`, `Galeria.tsx`, `Equipo.tsx`) y se documenta igual.
+
+**LA-C12 · Contraste.** El logo caligráfico en reposo es `--ink` sobre `--header-bg` (88 %) con el peor
+_under_ posible, negro puro: **5,38** (recalculado: 5,3809), ≥ 4,5 como texto normal. **Ya lo vigila** la fila
+A-15 «logo sobre la cabecera translúcida» de `MATRIZ_DE_USO`: una fila se define por el par de colores, no
+por la tipografía. **Sin fila nueva y `MINIMO_DE_PARES` sigue en 18.** El eslabón que falta —que el logo
+nuevo use de verdad `--ink`— lo pone un **test que lee los bytes** de `logo-acoplado.module.scss`: `fill:
+var(--ink)`, sin `opacity` en la base y nunca `--accent`/`#C05576` (4,05 < 4,5). El 0,35 del vuelo (≈ 1,70:1)
+existe solo dentro del keyframe de 0,9 s, en un nodo `aria-hidden`, con el nombre intacto en el `<span>` solo
+para lectores **[I: WCAG no evalúa fotogramas intermedios de una transición]**. No nos apoyamos en la
+exención de logotipos de SC 1.4.3: **A-4 sigue abierta**. Legibilidad de Great Vibes a ≈ 33 px de em (trazos
+finos): criterio de proyecto, se mira en vivo.
+
+**LA-C13 · Sin JS, reduced-motion y móvil.** Sin JS: `texto` para siempre, la caligrafía viaja en los bytes
+pero oculta, la nav horneada intacta. Reduced-motion: LA-C3 (la hoja). Móvil a 320 px: ancho útil 320 − 2 ×
+24 = 272 px; el hueco del logo ≈ máx(«nails lash studio» ≈ 180 px **[I, a medir]**, 137 px) + hueco 16 px +
+hamburguesa 44 px cabe sin envolver. **Alto de la cabecera idéntico en los dos estados y ≤ 76 px**, medido
+en vivo a 320/360/375/390/414/768/1280 (I-8).
+
+#### Casos límite
+
+1. **Carga arriba del todo** → `texto`; nada se mueve hasta que «STUDIO» cruza.
+2. **Recarga a mitad de página** → la primera observación ya ve «STUDIO» arriba → `caligrafia` sin vuelo.
+   Desde el HTML horneado hasta el primer callback se ve «nails lash studio» un instante: es inherente al SSG
+   (el horneado pinta antes de que llegue el JS) y **no** es CLS (misma celda).
+3. **El navegador restaura el scroll DESPUÉS de la primera observación** → la segunda entrada es un cruce:
+   si el rótulo queda a más de un viewport por encima, sin vuelo (LA-C6.2); si queda más cerca, vuela al
+   cargar **[I: aceptable, parece una bienvenida]**.
+4. **Clic en un enlace de la nav** (scroll suave de `_demo.scss` bajo `no-preference`) → cruza a mitad del
+   scroll, con el rótulo aún cerca → vuela mientras la página baja.
+5. **Salto lejano instantáneo** → sin vuelo por LA-C6.2.
+6. **Scroll rápido** → el observador avisa por fotograma; el rótulo está a menos de un viewport → vuela desde
+   justo encima del borde.
+7. **Vuelve arriba** → se queda (P2); el observador ya está desconectado.
+8. **Scroll durante el vuelo**, en cualquier sentido → el vuelo sigue igual (LA-C7).
+9. **Reduced-motion activado a mitad del vuelo** → la hoja lo corta en caliente y el logo queda en su sitio.
+10. **Sin `IntersectionObserver`** (jsdom, navegador antiguo) → `texto` para siempre, sin errores.
+11. **Página sin hero** → `texto` para siempre. **Hero sin origen** → acople sin vuelo.
+12. **Caja del origen o del logo con ancho 0** → acople sin vuelo.
+13. **Menú móvil abierto al cruzar** → la cabecera es más alta que al crear el observador; el aviso llega al
+    cruzar la línea de la cabecera **cerrada** y la decisión usa el borde medido en ese momento. Si «STUDIO»
+    se esconde antes bajo el menú abierto, el disparo espera a esa línea: el menú ya tapa el hero.
+14. **Caligrafía del hero a medias** → LA-C8.
+15. **Great Vibes aún sin cargar** → el `<text>` pinta con la cursiva de reserva un instante; el hueco no
+    cambia (dimensiones declaradas en la hoja).
+16. **Zoom 200–400 % o reflow a 320 px CSS** → como móvil.
+17. **Página restaurada desde bfcache** → conserva el estado con el que se fue.
+18. **Clic en el logo** → navega a `BASE_URL`, recarga arriba → `texto`.
+19. **Frontera exacta** (borde de «STUDIO» sobre la línea) → acopla (LA-C4).
+20. **El `<svg>` escalado pasa sobre la nav durante el vuelo** → `pointer-events: none` (LA-C3); y como el
+    origen está dentro del ancho del viewport, el vuelo no crea desbordamiento horizontal.
+
+#### Decisiones (propuestas del spec_partner, a ratificar en la puerta)
+
+| #         | Propuesta                                                                                                         | Alternativas descartadas                                                                                                                    | Motivo                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| --------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **LA-1**  | **El vuelo es un `@keyframes` de la hoja**, con el punto de salida en tres custom properties que calcula JS       | (a) WAAPI (`element.animate`), la que proponía el brief; (b) View Transitions API; (c) animaciones ligadas al scroll (`animation-timeline`) | Es el patrón del repo (F-07 @s5: la animación vive en la hoja): reduced-motion lo resuelve un `@media` **sin JS** y se prueba **leyendo el SCSS**. (a) obligaría a decidir reduce con `matchMedia` y a guardar `animate`, y dejaría la duración como literal de TS. (b) es un _morph_ de un elemento que desaparece, y aquí el rótulo **se queda**; además congela instantáneas mientras se hace scroll. (c) es reversible con el scroll: contradice P2 y el «que se aprecie» |
+| **LA-2**  | **Vuela el propio `<svg>` del logo** (FLIP invertido): nace en su sitio final y se anima desde la caja del rótulo | (a) clonar el `<svg>` del hero en un fantasma `position: fixed`; (b) mover el rótulo del hero hasta la cabecera                             | Sin nodos nuevos, sin limpieza y sin DOM fuera de React. (a) duplica los ids `tinta-marca`/`trazo-marca` y deja un nodo huérfano si algo falla a mitad. (b) vacía el hero, cuando el rótulo debe seguir ahí al volver arriba (P2)                                                                                                                                                                                                                                             |
+| **LA-3**  | **Dos atributos**: `data-logo` (qué se ve) y `data-vuelo` (cómo llegó)                                            | (a) un solo atributo con tres valores; (b) `className` condicional                                                                          | Son dos hechos distintos y cada uno se consulta solo. (a) mezcla «qué» y «cómo» y obliga a la hoja a repetir el estado visible en dos valores. (b) está medido inmatable (F-06 @s15)                                                                                                                                                                                                                                                                                          |
+| **LA-4**  | **Las dos representaciones horneadas, en la misma celda de rejilla**                                              | (a) `<svg>` solo en cliente; (b) hueco de tamaño fijo en px                                                                                 | Cero CLS por construcción y sin números mágicos. (a) cambia la caja del enlace al hidratar, justo el salto que prohíbe el encargo (mismo mal que I-5). (b) ata el hueco a medidas de una fuente que puede cambiar (A-6)                                                                                                                                                                                                                                                       |
+| **LA-5**  | **Nombre desde un `<span>` solo para lectores**; las dos representaciones visibles, `aria-hidden`                 | (a) `aria-label` en el `<a>`; (b) el texto en Gilda sin `aria-hidden`, oculto con `opacity: 0` en `caligrafia`                              | Es la técnica del `<h1>` del hero, así que no se introduce otra. (a) sustituye el contenido y algunos traductores automáticos no traducen atributos. (b) haría depender el nombre de una decisión CSS que jsdom no ve (`css: false`): un cambio futuro a `visibility: hidden` vaciaría el nombre en el navegador con toda la suite verde                                                                                                                                      |
+| **LA-6**  | **`IntersectionObserver` con `rootMargin` = −alto de la cabecera**, más la decisión geométrica pura               | (a) escuchar `scroll` con `requestAnimationFrame`; (b) observador sin `rootMargin`                                                          | Sin trabajo en el hilo principal en cada scroll. (a) mide en cada fotograma para un evento que ocurre una vez. (b) avisa cuando «STUDIO» sale del **viewport**, un alto de cabecera tarde: bajo el cristal del 88 % con blur, «STUDIO» ya no se ve                                                                                                                                                                                                                            |
+| **LA-7**  | **Frontera `<=`**                                                                                                 | `<`                                                                                                                                         | Con 0 px visibles, «STUDIO» ya no se ve                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| **LA-8**  | **Atributos `data-acople` en `Hero.tsx`** y `querySelector` en el efecto                                          | (a) subir el estado a `home.tsx`, con _refs_ y _props_; (b) un contexto de React                                                            | Mínimo cambio en `Hero.tsx` (dos atributos, estructura del `<h1>` intacta) y degradación natural sin hero. (a) cambia las firmas de `Hero`/`Cabecera` y pone la lógica en `pages/`, fuera de `mutate`, y los tests arrastrarían `Head`/`HelmetProvider`. (b) es maquinaria para un solo booleano                                                                                                                                                                              |
+| **LA-9**  | **Carga desplazada = acople sin vuelo**, más la regla de «a menos de un viewport»                                 | (a) volar siempre; (b) guardar el estado en `sessionStorage`                                                                                | No hay nada que la persona haya visto subir. (a) haría caer el logo desde miles de píxeles. (b) es persistencia sin necesidad (I-2, N-4) y contradice «recargar arriba vuelve a `texto`»                                                                                                                                                                                                                                                                                      |
+| **LA-10** | **0,9 s con `cubic-bezier(0.45, 0, 0.25, 1)`, opacidad 0,35 → 1; el texto sale en 0,4 s lineal**                  | (a) 0,6 s; (b) ≥ 1,2 s; (c) una curva nueva de tipo _ease-out_                                                                              | Es la curva con la que ya aparece «STUDIO»: el sitio se mueve con una sola voz. (a) no «se aprecia», y Pablo pidió el foco en esta animación. (b) el scroll sigue y el logo llega tarde. (c) frena de golpe al aterrizar. 0,9 s < 5 s: fuera de SC 2.2.2                                                                                                                                                                                                                      |
+| **LA-11** | **Reduced-motion = cambio instantáneo**, sin fundido                                                              | un fundido corto de opacidad                                                                                                                | C-4 del repo (sin movimiento residual) y el brief. Un fundido no es desplazamiento, pero sería el único caso del repo que anima bajo `reduce`                                                                                                                                                                                                                                                                                                                                 |
+| **LA-12** | **Contraste con la fila A-15 existente**, más un test de bytes que ata el `fill` a `--ink`                        | (a) una fila nueva «logo caligráfico»; (b) confiar en la exención de logotipos (A-4)                                                        | (a) repite la misma aritmética (mismo par de colores) y sube el mínimo a 19 sin añadir ningún modo de fallo; el riesgo real es que el logo **no** use `--ink`, y eso lo caza el test de bytes. (b) A-4 está abierta y no se adivina                                                                                                                                                                                                                                           |
+| **LA-13** | **Alto 2,5 rem, con tope de 2,75 rem**                                                                            | (a) igualar el ancho del logo de texto (≈ 52 px de alto); (b) el mismo alto de línea del texto (≈ 27 px)                                    | (a) haría crecer la cabecera y mentir al 76 px de F-06 @s11. (b) deja la em en ≈ 22 px: Great Vibes a ese tamaño pierde los trazos finos                                                                                                                                                                                                                                                                                                                                      |
+| **LA-14** | **Componente nuevo `LogoAcoplado.tsx`** con su `.module.scss`                                                     | meterlo en `Cabecera.tsx`                                                                                                                   | `Cabecera` es SSR puro de diez líneas y sus tests son `renderToString`; mezclarle efectos, observador y estado junta dos responsabilidades                                                                                                                                                                                                                                                                                                                                    |
+| **LA-15** | **`partirNombre(NOMBRE).marca` y `VISTA_MARCA`**                                                                  | un literal «Nails Lash»                                                                                                                     | Una sola fuente (I-7): si cambia el nombre, cambian el rótulo y el logo a la vez. Es lo que ya hace el hero                                                                                                                                                                                                                                                                                                                                                                   |
+| **LA-16** | **El hero sigue su ceremonia**, sin enterarse del acople                                                          | completar la firma del hero al acoplar                                                                                                      | Acoplaría hero y cabecera sin beneficio visible: al disparar, el rótulo ya está bajo el cristal                                                                                                                                                                                                                                                                                                                                                                               |
+
+#### Contratos existentes que se enmiendan (sin romper)
+
+- **F-06 `header_nav_footer`.** El `<a>` de la marca pasa a `<LogoAcoplado />`. Se mantienen: @s12 (el
+  horneado de `<Cabecera />` contiene «Nails Lash Studio» y la nav con `aria-label="Principal"`), @s16 (menú
+  horneado cerrado, con enlaces), @s15/@s27 (sin tocar) y **@s17, que lee los bytes de
+  `cabecera.module.scss`** (`@media (max-width: 820px)` y ningún `767px`): las reglas de `.marca` se mudan y
+  el `@media` se queda. **Igualdad de anclas:** el logo no lleva `href="#…"` ni `id`, así que no cambia los
+  conjuntos. @s11 (76 px): lo protege el tope de LA-13, con su propio test de bytes.
+- **F-07 `hero_marca`.** Sigue habiendo **un solo `<h1>`** (el logo no es un encabezado ni lo contiene), con
+  nombre «Nails Lash Studio», dos `<span>` y el espacio real: solo se añaden `data-acople="disparo"` al segundo
+  `<span>` y `data-acople="origen"` al `<svg>`, y las regex de `hero.test.tsx` (`</span>\s<span\b`) siguen
+  casando. `data-firma`, el control, la clase de «lista» y el reloj de 15 s, intactos. Ids únicos (LA-C1).
+- **F-03.** `MATRIZ_DE_USO` y `MINIMO_DE_PARES = 18` sin cambios; el 88 % de `--header-bg`, intacto.
+- **F-04/F-05/F-21.** Un solo `<h1>` y ningún `aria-labelledby` nuevo. **Cero terceros**: ninguna petición
+  nueva; Great Vibes ya está autohospedada y en la allowlist de familias de F-21. A-6 («¿sobrevive Great
+  Vibes?») **pesa más**: la fuente pasa a estar también en la cabecera de toda la visita.
+- **`stryker.config.json`:** se añaden `src/components/LogoAcoplado.tsx` y
+  `src/components/logo-acoplado-logica.ts` (y, si el repo lo exige, a `coverage.include`).
+
+#### Comprobaciones pendientes del predecesor (resultado)
+
+- **(2) ¿Algún test lee los bytes de `cabecera.module.scss`?** **Sí**: `cabecera.test.tsx` @s17
+  (`readFileSync`, regex del `@media (max-width: 820px)` y ausencia de `767px`). Además
+  `src/styles/_base.scss:36` y `scroll-padding-cabecera.test.ts` **derivan a mano** los 76 px de esa hoja
+  (padding + 44 px) **sin leerla**: por eso LA-13 pone el tope y su test. No hay más lectores **[V: grep de
+  `module.scss` en `src/**/*.test.ts`]**.
+- **(3) ¿El logo reutiliza `partirNombre(NOMBRE).marca`?** **Sí** (LA-15). El rótulo del hero ya lo hace
+  (`Hero.tsx:104`) y comparte `VISTA_MARCA`, que es lo que hace exacta la escala uniforme del FLIP.
+- **(1) `Catalogo.tsx` y la mutación** → resuelto en F-27.
+
+#### Verificación en vivo (I-8: `pnpm build` → servir → navegador real)
+
+HTML crudo de `dist/` con `data-logo="texto"`, `data-vuelo="no"`, las dos representaciones y sin `style`;
+disparo justo al quedar «STUDIO» bajo el borde de la cabecera; vuelo visible, de translúcido a opaco;
+sigue la caligrafía al volver arriba; recarga a mitad sin vuelo; `reduce` (emulado con CDP) sin vuelo;
+alto de la cabecera igual en los dos estados y ≤ 76 px, y CLS 0 a 320/360/375/390/414/768/1280; nombre
+accesible del enlace «Nails Lash Studio» en el árbol de accesibilidad de Chrome, en los dos estados.
+
+### Feature 26: `hero_foto` — DESCARTADA
+
+> **DESCARTADA por Pablo el 2026-09-29, antes de la puerta humana: la cabecera y el hero se quedan como
+> están** (degradado rosa, cristal al 88 %). Registrada en `feature_list.json` → `no_se_construyen` y en la
+> decisión **FL-4**. Todo el análisis de `progress/brief_foto_logo_catalogo.md` §3.2 (velo, contraste sobre
+> foto, nav sobre foto, LCP) y las medidas de la foto 939835 de `progress/fotos_seleccion.md` quedan **sin
+> efecto**, solo como registro. No se especifica.
+
+### Feature 27: `catalogo_fotos` — la foto de cada servicio en el hueco rosa: `<img>` horneada, `alt` que describe lo que se ve, y una leyenda que dice de dónde salen
+
+> Feature `#27` de `feature_list.json` (`pending`, `sdd`). Encargo literal de Pablo (punto 2 de
+> `progress/brief_foto_logo_catalogo.md` §1). **Firme (P1):** fotos de **Pexels** elegidas por el equipo, ya
+> seleccionadas, sin rostro identificable y recortadas a 800 × 1000 en `src/assets/servicios/`
+> (`progress/fotos_seleccion.md`). Todo lo demás, marcado **CF-n**, es **propuesta del spec_partner, a
+> ratificar en la puerta**.
+
+#### Propósito
+
+Que cada categoría del catálogo enseñe **una foto claramente relacionada con ese servicio** en lugar del
+hueco rosa, **sin fingir que es trabajo del salón**, sin salto de maquetación y sin una sola petición a
+terceros.
+
+#### Qué ve y qué oye la persona
+
+| Categoría (`clave`) | Fichero (`src/assets/servicios/`)    | Qué muestra                                                 | `alt` propuesto (CF-1)                                     |
+| ------------------- | ------------------------------------ | ----------------------------------------------------------- | ---------------------------------------------------------- |
+| `unas`              | `servicio-unas-manicura-nude.jpg`    | Manos con manicura nude y anillos dorados sobre pelo blanco | «Manos con manicura en tono nude y anillos dorados»        |
+| `facial`            | `servicio-facial-pestanas.jpg`       | Primer plano de pestañas largas sobre un párpado cerrado    | «Primer plano de pestañas largas sobre un párpado cerrado» |
+| `depilacion`        | `servicio-depilacion-piel-suave.jpg` | Una mano extendiendo crema sobre una pierna de piel suave   | «Mano extendiendo crema sobre una pierna de piel suave»    |
+
+Bajo el catálogo, además de la leyenda de precios de hoy, una segunda leyenda (CF-4):
+**«Fotos de banco de imágenes, ilustrativas del servicio · las fotos reales del salón se añaden antes de
+publicar»**. Sin JS se ve exactamente lo mismo: las fotos viajan horneadas.
+
+#### Contrato
+
+**CF-C1 · Datos** (`src/lib/demo/catalogo-demo.ts`, I-7). `CategoriaDemo` gana dos campos **obligatorios**:
+`foto: string` (la URL que devuelve el `import` estático del `.jpg`, como `equipo-demo.ts`) y `alt: string`.
+Los tres `import` viven en el fichero de datos, no en el componente. Nueva constante exportada
+`LEYENDA_FOTOS` con el literal de arriba. `LEYENDA_PRECIOS` **no cambia ni un byte** (su contrato es de F-09,
+Q-B). Cambiar una foto (p. ej., la de Depilación) es cambiar un fichero y un `alt` en datos, sin tocar la
+mecánica.
+
+**CF-C2 · Render** (`src/components/Catalogo.tsx`). El `<div className={estilos.foto} aria-hidden="true" />`
+de cada categoría se sustituye por
+
+```tsx
+<img
+  className={estilos.foto}
+  src={categoria.foto}
+  alt={categoria.alt}
+  width={ANCHO_FOTO}
+  height={ALTO_FOTO}
+  loading="lazy"
+/>
+```
+
+con `ANCHO_FOTO = 800` y `ALTO_FOTO = 1000`: las medidas **reales** de los ficheros, que además coinciden con
+el hueco 4:5 (precedente `Equipo.tsx`, 800 × 600). Mismo sitio en el DOM (después de la carta): el orden visual
+y el de lectura no cambian. Tras las leyendas de precios, un `<p>` con `LEYENDA_FOTOS`, **exactamente una
+vez**. La sección, su `<h2 id="servicios-titulo">` oculto, los `<h3>` y el CTA quedan intactos.
+
+**CF-C3 · Hoja** (`src/components/catalogo.module.scss`, `.foto`). `display: block; width: 100%; height: auto;
+aspect-ratio: 4 / 5; object-fit: cover;` conservando `border-radius: 22px` y el borde `--line`. El degradado
+rosa se queda como `background` del propio `<img>`: es lo que se ve mientras carga, o si la imagen falla. Sale
+el `min-height: 260px`, que con `aspect-ratio` solo podía deformar la caja en una columna estrecha (a 320 px
+la columna mide 272 px → 340 px de alto: nunca mordía). `object-position` por defecto (centro): los recortes
+ya están centrados en el sujeto. Un test **lee los bytes** de la hoja y asevera `object-fit: cover` y
+`aspect-ratio: 4 / 5` en `.foto` (Stryker no ve SCSS).
+
+**CF-C4 · Horneado y cero terceros.** Las tres `<img>` con `src`, `alt`, `width`, `height` y `loading` viajan
+en el HTML de `dist/` (`renderToString` en el test; los bytes de `dist/index.html` en la verificación). Los
+`.jpg` los empaqueta Vite en `dist/assets/` con huella y bajo `BASE_URL`: ningún `src` con esquema `http(s)`,
+así que la puerta de F-05 sigue verde por construcción. Los ficheros no llevan EXIF (los optimizó el lead).
+Pexels no exige atribución en la página **[I: licencia Pexels, como en equipo y galería]**; los IDs y autores
+quedan en `progress/fotos_seleccion.md`.
+
+**CF-C5 · Honestidad.** La leyenda declara el origen de las fotos, como las de equipo y galería. El `alt`
+describe **lo que se ve**, nunca «nuestro trabajo» ni «resultado del salón», nunca identifica a una persona y
+no empieza por «Foto de…». **Depilación:** Pexels no dio ninguna foto de depilación **con cera** sin cara
+identificable, y la elegida enseña «piel suave», que es la promesa de la tarjeta («para una piel suave más
+tiempo»). Su `alt` **no** afirma cera ni depilación: dice lo que muestra. Nótese además que las categorías
+«Facial» y «Depilación» son las de la demo actual y **A-2 sigue abierta**: F-27 pone fotos a las categorías que
+hay, no las ratifica.
+
+**CF-C6 · Qué es mutable** (comprobación (1) del predecesor, resuelta).
+
+- **`Catalogo.tsx` puede llegar al 100 % y entra en `mutate`.** Sus tres `className` en _template literal_
+  (`demo-seccion ${…}`, `demo-card ${…}`, `demo-btn demo-btn--solido ${…}`) generan mutantes que los vacían.
+  Mueren como ya mueren en `Equipo.tsx`, `Contacto.tsx` y `Reserva.tsx`: se lee el atributo `class` del
+  `renderToString` y se asevera la parte **global** (`demo-seccion`, `demo-card`, `demo-btn`), que es
+  observable con `css: false` (el trozo del módulo sale `undefined`). Precedentes: `equipo.test.tsx:134`,
+  `contacto.test.tsx:110` y `reserva.test.tsx:80`. Los demás (el literal `servicios-titulo` y las dos
+  funciones flecha del `.map`) mueren con el `id`/`aria-labelledby` escritos a mano y con el recuento de
+  `<h3>`, filas e `<img>`. **Hoy `Catalogo.tsx` no tiene ni un test**: F-27 crea `catalogo.test.tsx`.
+- **Lo nuevo de F-27 no crea mutantes** —atributos JSX literales (E1.d) y literales numéricos (A-14:
+  Stryker 9.6 no los sustituye)—, pero **los tests los aseveran igual**: Stryker no los protege, así que lo
+  hace el test (`width="800"`, `height="1000"`, `loading="lazy"`, `alt` exactos escritos a mano).
+- **No hay `*-logica.ts`.** No hay lógica: una función que devolviera `categoria.foto` sería producción que
+  ningún test rojo pide (Ley 1). `catalogo-demo.ts` es **dato**, fuera de `mutate` (como `equipo-demo.ts`).
+
+#### Casos límite
+
+1. **La imagen falla al cargar** → el `alt` se pinta dentro del hueco, sobre el degradado rosa, y el hueco
+   conserva el 4:5 (atributos `width`/`height` + `aspect-ratio`).
+2. **320 px** → una columna (`minmax(min(300px, 100%), 1fr)` de F-08): foto de 272 × 340 px, sin desbordar.
+3. **Sin JS** → idéntico: nada depende de la hidratación.
+4. **CTA «Ver servicios» → `#servicios-titulo`** con _lazy_ → las imágenes cargan al acercarse, pero su caja
+   ya está reservada: el ancla aterriza donde debe y nada empuja el contenido (CLS 0).
+5. **Pantalla grande** → si la foto de Uñas cae dentro del primer viewport, `loading="lazy"` podría retrasar el
+   LCP. Se mide en vivo a 1280 × 800 y 1440 × 900; **si pasa, decide el lead** (CF-6), no el TDD.
+6. **Pantallas de densidad 2×** → en escritorio la columna mide ≈ 538 px y pediría ≈ 1076 px de fuente, pero
+   hay 800: algo blanda **[I]**. Aceptado para la demo: el `srcset` es de F-17 (bloqueada).
+7. **Categoría sin `foto` o sin `alt`** → no compila (campos obligatorios): no hay rama en tiempo de
+   ejecución que probar.
+8. **`alt` vacío o repetido por error** → los tests fijan los tres literales exactos y que son distintos.
+9. **Pablo cambia una foto** → fichero + `alt` en datos (CF-C1); los tests del `alt` se actualizan con él.
+10. **`prefers-reduced-motion`** → no aplica: nada se mueve.
+
+#### Decisiones (propuestas del spec_partner, a ratificar en la puerta)
+
+| #        | Propuesta                                                                | Alternativas descartadas                                                                     | Motivo                                                                                                                                                                                                                                                         |
+| -------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **CF-1** | **`alt` que describe lo fotografiado** (los tres textos de la tabla)     | (a) `alt=""`, decorativa; (b) repetir el título de la categoría («Servicio de Uñas»)         | Pablo quiere una foto «claramente relacionada» con el servicio: es contenido, y el precedente de equipo y galería describe el trabajo. (a) la esconde a quien no ve. (b) es redundante con el `<h3>` que el lector acaba de oír                                |
+| **CF-2** | **El `<img>` ES el hueco** (lleva la clase `.foto`)                      | (a) `<div class="foto"><img></div>`, como en `Equipo.tsx`; (b) `background-image` en CSS     | Un nodo menos y la caja 4:5 sigue siendo la misma. (a) no aporta nada aquí: no hay nada más dentro. (b) no tiene `alt`, no está en el árbol de accesibilidad, no tiene `loading` nativo y los tests no lo ven                                                  |
+| **CF-3** | **`foto` y `alt` en `catalogo-demo.ts`**                                 | (a) un mapa `clave → foto` en el componente; (b) derivar el nombre del fichero de la `clave` | I-7: retirar o cambiar una foto es cambiar un dato, no el JSX. (a) reparte los datos entre dos sitios. (b) es una convención mágica, y Vite solo empaqueta lo que se importa estáticamente                                                                     |
+| **CF-4** | **Leyenda propia, `LEYENDA_FOTOS`**, en un segundo `<p>`                 | (a) alargar `LEYENDA_PRECIOS`; (b) un `<figcaption>` «Foto de banco de imágenes» en cada una | Cada leyenda declara una cosa. (a) toca un literal cuyo contrato es de F-09 (Q-B). (b) lo repite tres veces y ensucia cada tarjeta. Mismo tono que la galería                                                                                                  |
+| **CF-5** | **`Catalogo.tsx` entra en `mutate` al 100 %**, con su primer test        | dejarlo fuera, como hoy                                                                      | Hoy no lo defiende ningún test. Cuesta unos seis mutantes, todos matables con el patrón del repo, y F-09 ya lo tenía previsto en `mutate`                                                                                                                      |
+| **CF-6** | **`loading="lazy"` en las tres**                                         | (a) `eager` en la primera; (b) `fetchpriority="high"` en la primera                          | En los tamaños medidos, el catálogo empieza debajo del hero **[I, a verificar en vivo]**, y es el precedente de equipo y galería. (a)/(b) solo si la verificación demuestra que la foto de Uñas está en el primer viewport, y entonces con un escenario propio |
+| **CF-7** | **Depilación: foto de «piel suave» y un `alt` que no afirma la técnica** | (a) seguir buscando una foto de cera; (b) dejar el hueco rosa solo en Depilación             | (a) no hay ninguna sin cara identificable (P1, `fotos_seleccion.md`). (b) una tarjeta de tres, rota. Pablo puede cambiarla sin tocar la mecánica                                                                                                               |
+
+#### Contratos existentes que se enmiendan (sin romper)
+
+- **Catálogo de la demo (inspira F-09).** `div.foto aria-hidden` → `<img>`; `LEYENDA_PRECIOS`, la sección
+  navegable `#servicios-titulo` (cascarón F-04, anclas F-06, CTA del hero) y los `<h3>`, intactos. El contrato
+  de F-09 (`catalogo_servicios.feature`, `spec_ready`) no se toca: F-27 no construye el catálogo real.
+- **F-05 `cero_terceros`:** sin hosts nuevos (CF-C4). **F-08:** la rejilla responsive, intacta.
+- **`stryker.config.json`:** se añade `src/components/Catalogo.tsx` (y, si el repo lo exige, a
+  `coverage.include`).
+
+#### Verificación en vivo (I-8)
+
+Bytes de `dist/index.html` con las tres `<img>` (`src` bajo `/NailsLashStudioWeb/assets/`, `alt`,
+`width="800"`, `height="1000"`, `loading="lazy"`) y la leyenda; ninguna petición fuera del origen; las tres
+fotos cubren su hueco sin deformarse a 320/360/375/390/414/768/1280; CLS 0; y la medida de CF-6 (¿está la foto
+de Uñas en el primer viewport a 1280 × 800 y 1440 × 900?).
