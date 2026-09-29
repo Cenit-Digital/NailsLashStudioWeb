@@ -173,3 +173,11 @@ sin cara).
   (mediana 0,70; píxel más oscuro 0,137). Abre un modelo de contraste alternativo al del negro
   puro: el peor under = el píxel más oscuro real de la foto, vigilado por un test que decodifica
   el JPEG commiteado.
+
+## 5. CAMBIO DE ALCANCE — 2026-09-29 (Pablo)
+
+«No quiero imagen» en la cabecera ni en el hero: **F-26 `hero_foto` queda DESCARTADA** antes de la
+puerta humana (registrada en `feature_list.json` → `no_se_construyen`). La cabecera y el hero se
+quedan como están (degradado rosa, cristal al 88 %). Todo lo de §3.2 (velo, contraste sobre foto,
+nav sobre foto, LCP) queda sin efecto. Siguen en pie **F-25 `logo_acoplado`** y **F-27
+`catalogo_fotos`**, sin cambios. Las fotos del hero se retiran de `src/assets/hero/`.

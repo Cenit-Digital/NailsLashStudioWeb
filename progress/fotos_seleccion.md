@@ -1,4 +1,8 @@
-# Selección de fotos — F-26 `hero_foto` y F-27 `catalogo_fotos` (2026-09-29)
+# Selección de fotos — F-27 `catalogo_fotos` (2026-09-29)
+
+> ⚠️ **2026-09-29, cambio de alcance:** Pablo descartó F-26 `hero_foto` («no quiero imagen» en la
+> cabecera ni en el hero). La foto 939835 y sus medidas quedan solo como registro; los ficheros de
+> `src/assets/hero/` se retiraron del repo.
 
 > La hace el `craftsman_lead` (precedente `progress/tdd_fotos_equipo_galeria.md`: el lead busca,
 > mira una a una y descarta rostros identificables; el `tdd_craftsman` solo las cablea). Decisión P1

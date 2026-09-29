@@ -22,9 +22,9 @@
 
 ### Fases
 
-- [ ] spec_partner → `project-spec.md` §F-25/§F-26/§F-27 (en curso)
-- [ ] gherkin_author → `features/logo_acoplado.feature`, `features/hero_foto.feature`, `features/catalogo_fotos.feature`
+- [ ] spec_partner → `project-spec.md` §F-25/§F-27 (en curso; F-26 retirada del encargo)
+- [ ] gherkin_author → `features/logo_acoplado.feature`, `features/catalogo_fotos.feature`
 - [ ] ⏸ puerta humana sobre los `.feature`
 - [ ] F-25: tdd_craftsman → judge → mutation_tester
-- [ ] F-26: (fotos) tdd_craftsman → judge → mutation_tester
+- [x] ~~F-26 `hero_foto`~~ — DESCARTADA por Pablo el 2026-09-29 («no quiero imagen»); en `no_se_construyen`
 - [ ] F-27: (fotos) tdd_craftsman → judge → mutation_tester

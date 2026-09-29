@@ -512,24 +512,6 @@
       "puerta_humana": "Decisiones de Pablo por AskUserQuestion el 2026-09-29: P2 «Se queda la caligrafía», P3 «Solo Nails Lash». Pendiente: aprobación de features/logo_acoplado.feature."
     },
     {
-      "id": 26,
-      "name": "hero_foto",
-      "title": "Foto de fondo bajo la cabecera y el hero, hasta la línea divisoria, sin perder AA",
-      "description": "Punto 1 del encargo de Pablo (2026-09-29). Opción B elegida por Pablo: una foto relacionada con el negocio (una mano con uñas bonitas) ocupa desde y=0 de la página —detrás de la cabecera sticky— hasta la línea divisoria que separa el hero del catálogo, con el nav de poco contraste/translúcido para que el foco sea la foto. Foto de Pexels (P1) alojada en el repo, decorativa (alt vacío), candidata a LCP. El texto del hero y la nav mantienen WCAG AA contra el peor under, vigilado por la puerta de contraste.",
-      "acceptance": [
-        "Escenarios de features/hero_foto.feature verdes por TDD",
-        "judge APROBADO",
-        "Puerta de contraste ampliada y verde",
-        "Mutación al 100% sobre lo mutable tocado",
-        "Verificación en vivo: foto de borde a borde bajo nav+hero, línea divisoria intacta, textos legibles, móvil 320 px"
-      ],
-      "depends_on": ["header_nav_footer", "hero_marca", "tokens_paleta_contraste", "cero_terceros"],
-      "mutable": true,
-      "sdd": true,
-      "status": "pending",
-      "puerta_humana": "Pablo eligió la opción B (foto bajo nav + header) y P1 (Pexels, selección autónoma) el 2026-09-29. BLOQUEO DE ENTORNO: la red del entorno cloud devuelve 403 a Pexels a 2026-09-29."
-    },
-    {
       "id": 27,
       "name": "catalogo_fotos",
       "title": "Fotos reales en las cards de Uñas, Facial y Depilación del catálogo",
@@ -567,6 +549,10 @@
     {
       "del_prototipo": "cat.slot",
       "motivo": "Campo muerto e incoherente (s1-depil vs s1-depilacion)."
+    },
+    {
+      "del_prototipo": "F-26 hero_foto — foto de fondo bajo la cabecera y el hero (encargo de Pablo, 2026-09-29)",
+      "motivo": "Descartada por Pablo el 2026-09-29, antes de la puerta humana: no quiere imagen de fondo en la cabecera ni en el hero, que se quedan como están (degradado rosa). Se conservan F-25 logo_acoplado y F-27 catalogo_fotos. El id 26 queda sin reutilizar para no renumerar referencias ya escritas."
     }
   ]
 }
