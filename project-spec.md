@@ -3616,10 +3616,20 @@ en coordenadas de viewport, medidos en el instante de la observación.
 - Decide **la caja**, no la tinta ni la opacidad: durante la ceremonia de 15 s «STUDIO» está en
   `opacity: 0` y su caja ya ocupa su sitio; el disparo es el mismo.
 - **Transporte:** un `IntersectionObserver` sobre el disparo, raíz = viewport, `threshold: 0` y `rootMargin`
-  superior = **−alto de la cabecera, redondeado hacia arriba** (`Math.ceil`: un borde fraccionario nunca
-  deja 1 px de «STUDIO» asomando cuando dispara). El `rootMargin` hace que el navegador avise justo al
-  cruzar esa línea, y el callback aplica la decisión pura con el borde de la cabecera **medido en ese
-  momento**.
+  superior = **−alto de la cabecera, redondeado hacia ABAJO** (`Math.floor`). El `rootMargin` hace que el
+  navegador avise justo al cruzar esa línea, y el callback aplica la decisión pura **contra la línea del
+  propio observador** (`entry.rootBounds.top`); solo si `rootBounds` es `null` cae al borde de la cabecera
+  medido en ese momento. Si varias entradas llegan en la misma entrega, **decide la última**.
+- **ENMIENDA D-1 (craftsman_lead, 2026-09-29, a propuesta del `gherkin_author`).** La primera redacción usaba
+  `Math.ceil` y decidía contra el borde medido por separado. Con cabecera de 73,2 px la línea del observador
+  quedaba en 74: el único aviso de salida podía llegar con el borde de «STUDIO» en (73,2; 74), la decisión
+  devolvía `texto` y, como «STUDIO» ya no intersecaba, **no volvía a avisar: el acople se perdía** con scroll
+  lento (Δ de 1-2 px por fotograma). Con `floor`, la línea queda en el borde de la cabecera o por encima, y al
+  decidir contra `rootBounds.top` aviso y decisión son coherentes **por construcción**. **D-2 queda resuelta con
+  lo mismo:** si la cabecera cambia de alto tras montar (redimensionar cruzando los 820 px, ≈ 74 ↔ 70 px), el
+  acople se adelanta o se retrasa unos 4 px como mucho, pero **nunca se pierde**; no se rehace el observador.
+  **D-3, aceptada como caso límite:** retirar `reduce` después de acoplar bajo `reduce` puede reproducir el
+  vuelo una vez (raro e inofensivo; solo como observación en vivo).
 
 **LA-C5 · Monótono (P2).** Una vez `caligrafia`, el observador se **desconecta** y el estado no vuelve. La
 función de transición es monótona por sí misma (desde `caligrafia` siempre devuelve `caligrafia`), así que
@@ -3676,13 +3686,13 @@ los tests).
 **LA-C11 · Lógica pura, al 100 % de mutación.** `src/components/logo-acoplado-logica.ts` (patrón
 `*-logica.ts` del repo), sin DOM:
 
-| Función                                                                   | Contrato                                                                                       |
-| ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `estadoTrasObservar(actual, bordeInferiorDisparo, bordeInferiorCabecera)` | `caligrafia` si `actual` ya lo es; si no, `caligrafia` ⇔ `disparo <= cabecera`; si no, `texto` |
-| `debeVolar({ primeraObservacion, bordeInferiorOrigen, altoViewport })`    | `!primeraObservacion && bordeInferiorOrigen > −altoViewport`                                   |
-| `transformacionFlip(origen, destino)`                                     | `{ x, y, escala }` de LA-C7, o `null` si algún ancho es `<= 0`                                 |
-| `variablesDeVuelo(flip)`                                                  | `{ '--vuelo-x': '<x>px', '--vuelo-y': '<y>px', '--vuelo-escala': '<escala>' }`                 |
-| `margenDeRaiz(altoCabecera)`                                              | `'-<ceil(alto)>px 0px 0px 0px'` (73,2 → `'-74px 0px 0px 0px'`, distinto de `Math.round`)       |
+| Función                                                                   | Contrato                                                                                                                                                                                                                            |
+| ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `estadoTrasObservar(actual, bordeInferiorDisparo, bordeInferiorCabecera)` | `caligrafia` si `actual` ya lo es; si no, `caligrafia` ⇔ `disparo <= cabecera`; si no, `texto`. El componente pasa como «cabecera» la línea del observador (`entry.rootBounds.top`) y, si es `null`, el borde medido (ENMIENDA D-1) |
+| `debeVolar({ primeraObservacion, bordeInferiorOrigen, altoViewport })`    | `!primeraObservacion && bordeInferiorOrigen > −altoViewport`                                                                                                                                                                        |
+| `transformacionFlip(origen, destino)`                                     | `{ x, y, escala }` de LA-C7, o `null` si algún ancho es `<= 0`                                                                                                                                                                      |
+| `variablesDeVuelo(flip)`                                                  | `{ '--vuelo-x': '<x>px', '--vuelo-y': '<y>px', '--vuelo-escala': '<escala>' }`                                                                                                                                                      |
+| `margenDeRaiz(altoCabecera)`                                              | `'-<floor(alto)>px 0px 0px 0px'` (73,7 → `'-73px 0px 0px 0px'`, distinto de `Math.round`; ENMIENDA D-1)                                                                                                                             |
 
 Fronteras que el TDD debe fijar para matar los mutantes de igualdad: disparo **igual** a la cabecera →
 `caligrafia`, y medio píxel por debajo → `texto`; origen **igual** a `−altoViewport` → sin vuelo, y 1 px por
