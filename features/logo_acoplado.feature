@@ -598,7 +598,7 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
     # «caligrafia» (P2): la monotonía no depende solo de desconectar. Nada se deriva en la carga del módulo.
 
   @s25
-  Scenario Outline: La geometría del vuelo es PURA y se muerde por valor —FLIP con escala por el ANCHO y nula si alguna caja no tiene ancho; variables con su unidad; margen redondeado hacia ARRIBA—
+  Scenario Outline: La geometría del vuelo es PURA y se muerde por valor —FLIP con escala por el ANCHO y nula si alguna caja no tiene ancho; variables con su unidad; margen redondeado hacia ABAJO (D-1 a)—
     Given la función "<función>" de "src/components/logo-acoplado-logica.ts"
     When se evalúa con <entrada>
     Then devuelve <salida>
