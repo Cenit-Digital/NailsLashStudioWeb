@@ -25,8 +25,9 @@
 #   LA-3  dos atributos: data-logo (qué se ve) y data-vuelo (cómo llegó) ......... @s1, @s3, @s10
 #   LA-4  las dos representaciones horneadas en la MISMA celda de rejilla (cero CLS) ... @s2, @s17, @s32
 #   LA-5  nombre desde un <span> solo para lectores; lo visible, aria-hidden ...... @s2, @s3, @s33
-#   LA-6  IntersectionObserver con rootMargin = −ceil(alto de la cabecera) ....... @s5, @s7, @s13 (⚠ D-1)
-#   LA-7  frontera `<=` .......................................................... @s6, @s24
+#   LA-6  IntersectionObserver con rootMargin = −FLOOR(alto de la cabecera), y la decisión contra la
+#         línea DEL PROPIO OBSERVADOR (rootBounds.top) [D-1 ACEPTADA por el lead] ... @s5, @s7, @s13, @s25, @s34
+#   LA-7  frontera `<=` .......................................................... @s6, @s7, @s24
 #   LA-8  atributos data-acople en Hero.tsx + querySelector DENTRO del efecto ....... @s1, @s14, @s21
 #   LA-9  carga desplazada = acople SIN vuelo; y la regla «a menos de un viewport» .... @s10, @s24
 #   LA-10 0,9 s · cubic-bezier(0.45, 0, 0.25, 1) · opacidad 0,35 → 1; el texto sale en 0,4 s linear . @s15
@@ -60,7 +61,12 @@
 # =============================================================================================
 #   · window.innerHeight = 812 (fijado a mano; NO el 768 por defecto de jsdom).
 #   · La cabecera (el <header> que contiene el enlace), por getBoundingClientRect:
-#       top 0 · bottom 73.2 · height 73.2  → rootMargin "-74px 0px 0px 0px" (ceil; Math.round daría 73).
+#       top 0 · bottom 73.6 · height 73.6  → rootMargin "-73px 0px 0px 0px" (Math.floor; Math.round y
+#       Math.ceil darían "-74px": 73,6 los distingue a los dos a la vez).
+#   · TODA entrada que entrega el doble del observador trae rootBounds con top 73 y bottom 812: la línea
+#     DEL PROPIO OBSERVADOR (el viewport recortado por el rootMargin), como la fabrica el navegador.
+#     La FRONTERA del disparo en la geometría de referencia es, por tanto, 73 (no el 73.6 de la cabecera).
+#     Solo @s7 entrega entradas con rootBounds null, para fijar la caída al borde medido.
 #   · El <svg> del LOGO (DESTINO del FLIP): left 40 · top 17 · width 137.5 · height 40.
 #   · El <a> del logo, como SEÑUELO (caza medir el nodo equivocado): left 24 · top 22.4 · width 181 ·
 #     height 28.8. Medirlo en vez del <svg> daría x 341 · y −80.4 · escala ≈ 3,04.
