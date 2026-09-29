@@ -222,7 +222,7 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
       | estado                  | preparación                                                                                        | data-logo  | data-vuelo |
       | «texto», recién montada | ninguna entrega del observador                                                                     | texto      | no         |
       | «caligrafia» sin vuelo  | una entrega INICIAL con «STUDIO» ya arriba (bottom 12.5): la carga desplazada                      | caligrafia | no         |
-      | «caligrafia» con vuelo  | una entrega inicial con «STUDIO» a la vista (bottom 400) y otra con «STUDIO» en la frontera (73.2) | caligrafia | si         |
+      | «caligrafia» con vuelo  | una entrega inicial con «STUDIO» a la vista (bottom 400) y otra con «STUDIO» en la frontera (73)   | caligrafia | si         |
 
     # El nombre EXACTO muerde por los dos lados: si una representación visible perdiera su aria-hidden, el
     # nombre pasaría a "Nails Lash Studio Nails Lash Studio…" y la consulta exacta no encontraría nada.
@@ -247,18 +247,18 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
   # ---------------------------------------------------------------------------------------------
 
   @s5
-  Scenario: Tras montar, UN observador vigila a «STUDIO» con la línea de la cabecera como margen —threshold 0, sin root, rootMargin "-74px 0px 0px 0px"— y hasta su primera entrega nada cambia
-    Given un documento con un elemento [data-acople="disparo"] y otro [data-acople="origen"] (el papel del hero), IntersectionObserver sustituido por un doble que captura el callback y las opciones y espía observe y disconnect, y la geometría de referencia (cabecera de 73.2 px de alto)
+  Scenario: Tras montar, UN observador vigila a «STUDIO» con la línea de la cabecera como margen —threshold 0, sin root, rootMargin "-73px 0px 0px 0px"— y hasta su primera entrega nada cambia
+    Given un documento con un elemento [data-acople="disparo"] y otro [data-acople="origen"] (el papel del hero), IntersectionObserver sustituido por un doble que captura el callback y las opciones y espía observe y disconnect, y la geometría de referencia (cabecera de 73.6 px de alto)
     When se monta <Cabecera /> con render() y corren sus efectos
-    Then el constructor de IntersectionObserver se ha llamado EXACTAMENTE una vez, y sus opciones son exactamente { threshold: 0, rootMargin: "-74px 0px 0px 0px" }, sin root: la raíz es el viewport
+    Then el constructor de IntersectionObserver se ha llamado EXACTAMENTE una vez, y sus opciones son exactamente { threshold: 0, rootMargin: "-73px 0px 0px 0px" }, sin root: la raíz es el viewport
     And observe se ha llamado EXACTAMENTE una vez, con el elemento [data-acople="disparo"] como argumento
-    And sin ninguna entrega del callback el <a> sigue en data-logo="texto" y data-vuelo="no", sin atributo style, aunque en jsdom «STUDIO» mida 0 y "0 <= 73.2" acoplaría (LA-C10)
+    And sin ninguna entrega del callback el <a> sigue en data-logo="texto" y data-vuelo="no", sin atributo style, aunque en jsdom «STUDIO» mida 0 y "0 <= 73" acoplaría (LA-C10)
     And al desmontar el componente sin haber acoplado, disconnect se ha llamado EXACTAMENTE una vez
-    # "-74px" = −ceil(73.2): Math.round daría "-73px" (LA-C11). ⚠ D-1: la spec elige ceil; ver la
-    # cabecera y la bitácora. Con el rootMargin el navegador avisa al cruzar la línea de la cabecera, y
-    # no un alto de cabecera tarde, cuando «STUDIO» ya sale del viewport bajo el cristal del 88 % con
-    # blur (LA-6 b). Desconectar al desmontar es la limpieza del efecto [derivado: la spec solo nombra
-    # la desconexión al acoplar; sin esta aserción el mutante que borra la limpieza sobrevive].
+    # "-73px" = −floor(73.6) (D-1 a): Math.round y Math.ceil darían "-74px", una línea POR DEBAJO del
+    # borde de la cabecera por la que asomaría «STUDIO» al avisar. Con el rootMargin el navegador avisa al
+    # cruzar la línea de la cabecera, y no un alto de cabecera tarde, cuando «STUDIO» ya sale del viewport
+    # bajo el cristal del 88 % con blur (LA-6 b). Desconectar al desmontar es la limpieza del efecto
+    # [derivado D-6, ratificado: sin esta aserción sobrevive el mutante que borra la limpieza].
 
   @s6
   Scenario Outline: El disparo lo decide la GEOMETRÍA de la entrada, no isIntersecting —«ya pasó por arriba» acopla, «aún no ha llegado» no— y la frontera es "<=" (LA-C4, LA-7)
