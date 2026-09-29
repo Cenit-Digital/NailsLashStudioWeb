@@ -81,11 +81,12 @@
 #   · jsdom + render + IntersectionObserver SUSTITUIDO (precedente `stubDeIntersectionObserver` de
 #     galeria.test.tsx: captura callback y opciones; observe/disconnect espiados). Las entregas se
 #     hacen A MANO dentro de act(), con geometría REAL y nunca ceros, y la cabecera, el origen y el
-#     <svg> del logo con getBoundingClientRect fijado ANTES del montaje: @s3, @s5-@s14, @s22, @s26.
+#     <svg> del logo con getBoundingClientRect fijado ANTES del montaje: @s3, @s5-@s14, @s22.
 #   · Funciones PURAS por valor: @s24, @s25 → logo-acoplado-logica.test.ts.
 #   · BYTES del SCSS (`cuerpoDelBloque`, ANCLA POSITIVA SIEMPRE primero; jsdom corre con `css: false` y
-#     no ejecuta animaciones): @s15-@s20 → logo-acoplado-estilos.test.ts.
-#   · BYTES de la fuente y de stryker.config.json: @s27.
+#     no ejecuta animaciones): @s15-@s20 → logo-acoplado-estilos.test.ts (@s20, en cabecera.test.tsx).
+#   · BYTES de la fuente y de stryker.config.json: @s26, @s27. La PUNTUACIÓN de @s27 la mide el
+#     mutation_tester, no un test.
 #   · SOLO EN NAVEGADOR REAL (Chrome + CDP sobre `dist/` servido, I-8): @s28-@s33, con el tag
 #     @verificacion-viva y el prefijo «[VERIFICACIÓN EN VIVO CON CHROME, NO jsdom]» (precedente
 #     tipografia_global @s8/@s9). NO son puerta unitaria: PROHIBIDO fingirlos con jsdom (jsdom no pinta,
@@ -104,9 +105,9 @@
 #      estado vive en `data-logo`/`data-vuelo`, nunca en un className condicional (F-06 @s15).
 #   ❌ PROHIBIDO decidir el acople fuera del callback del observador (LA-C10): en jsdom todo mide 0.
 #   ❌ PROHIBIDO `matchMedia`, `Element.animate`, escuchar "scroll"/"resize" y storage de cualquier tipo
-#      en el componente (@s9, @s13, @s27).
+#      en el componente (@s9, @s13, @s26).
 #   ❌ PROHIBIDO en ficheros de `mutate` guardas de FUENTE contra `if (`, `?`, `&&` o `||` (lección del
-#      botón retirado): las de @s27 solo vetan literales que Stryker nunca inyecta.
+#      botón retirado): las de @s26 solo vetan literales que Stryker nunca inyecta.
 #
 # =============================================================================================
 # MUTACIÓN (umbral 1.0) — @s27

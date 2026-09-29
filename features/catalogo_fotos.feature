@@ -130,7 +130,7 @@ Feature: catalogo_fotos — cada categoría del catálogo enseña en su hueco ro
   @s1
   Scenario Outline: Cada categoría muestra EXACTAMENTE UNA foto, con el alt exacto de la tabla
     Given el catálogo de servicios renderizado a HTML por SSR, sin ejecutar JavaScript ni hidratar
-    When se lee el bloque de la categoría "<clave>", el que empieza en el "<h3>" "<titulo>" y acaba antes del "<h3>" siguiente o de las leyendas
+    When se lee el bloque de la categoría "<clave>", el que empieza en su encabezado h3 "<titulo>" y acaba antes del encabezado h3 siguiente o de las leyendas
     Then ese bloque contiene EXACTAMENTE UNA "<img"
     And el atributo alt de esa "<img" es exactamente "<alt>"
 
