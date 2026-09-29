@@ -261,8 +261,8 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
     # [derivado D-6, ratificado: sin esta aserción sobrevive el mutante que borra la limpieza].
 
   @s6
-  Scenario Outline: El disparo lo decide la GEOMETRÍA de la entrada, no isIntersecting —«ya pasó por arriba» acopla, «aún no ha llegado» no— y la frontera es "<=" (LA-C4, LA-7)
-    Given la cabecera montada con IntersectionObserver sustituido, la geometría de referencia (borde inferior de la cabecera: 73.2) y una primera entrega ya hecha con «STUDIO» a la vista (bottom 400, isIntersecting true), que dejó data-logo="texto"
+  Scenario Outline: El disparo lo decide la GEOMETRÍA de la entrada contra la línea del observador, no isIntersecting —«ya pasó por arriba» acopla, «aún no ha llegado» no— y la frontera es "<=" (LA-C4, LA-7, D-1)
+    Given la cabecera montada con IntersectionObserver sustituido, la geometría de referencia (cada entrada trae rootBounds.top = 73, la línea del observador) y una primera entrega ya hecha con «STUDIO» a la vista (bottom 400, isIntersecting true), que dejó data-logo="texto"
     When el observador entrega una entrada de «STUDIO» con boundingClientRect.bottom = <bottom> e isIntersecting = <isIntersecting>
     Then el <a> tiene data-logo="<data-logo>"
     And disconnect se ha llamado <desconexiones>
@@ -271,15 +271,18 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
       | bottom | isIntersecting | data-logo  | desconexiones       | qué representa                                                                    |
       | 912    | false          | texto      | ninguna vez         | aún no ha llegado: por debajo del viewport, en una ventana muy baja               |
       | 400    | true           | texto      | ninguna vez         | «STUDIO» a la vista (caso límite 1)                                               |
-      | 73.7   | false          | texto      | ninguna vez         | medio píxel de «STUDIO» asomando bajo la cabecera                                 |
-      | 73.2   | false          | caligrafia | EXACTAMENTE una vez | frontera exacta: 0 px visibles ya es «no se ve» (caso límite 19)                  |
+      | 73.5   | true           | texto      | ninguna vez         | medio píxel por debajo de la línea del observador                                 |
+      | 73     | true           | caligrafia | EXACTAMENTE una vez | frontera exacta sobre la línea: 0 px por debajo ya es «no se ve» (caso límite 19) |
+      | 72.5   | false          | caligrafia | EXACTAMENTE una vez | el aviso de salida típico: medio píxel por encima de la línea                     |
       | 12.5   | false          | caligrafia | EXACTAMENTE una vez | ya pasó por arriba                                                                |
       | -640   | false          | caligrafia | EXACTAMENTE una vez | muy por encima: un scroll rápido que el observador ve un fotograma tarde (caso 6) |
 
     # isIntersecting === false en las filas 912 y 12.5: es cierto en los DOS sentidos, así que NO decide.
     # Decide la CAJA, no la tinta ni la opacidad: durante la ceremonia de 15 s «STUDIO» está en opacity 0
-    # con su caja ya en su sitio, y la entrada trae la misma caja. La fila 73.7 es, con el ceil de la
-    # spec, una entrada que el navegador SÍ puede entregar al cruzar la línea de 74 px: es el caso de D-1.
+    # con su caja ya en su sitio, y la entrada trae la misma caja. La fila 73 lleva isIntersecting true a
+    # propósito (tocar el borde de la raíz es intersecar para el navegador) y aun así acopla: tampoco ahí
+    # decide isIntersecting. D-1 (b): el navegador avisa la salida cuando bottom < rootBounds.top, así que
+    # todo aviso de salida cumple `<=` contra esa MISMA línea y el acople no se pierde (fila 72.5).
 
   @s7
   Scenario Outline: El borde de la cabecera se mide EN EL CALLBACK, no al crear el observador —con el menú móvil abierto la cabecera es más alta— (caso límite 13)
