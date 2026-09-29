@@ -493,6 +493,58 @@
       "status": "done",
       "puerta_humana": "Diseño aprobado por el humano en conversación el 2026-09-27: 8 decisiones por AskUserQuestion (panel de chat→WhatsApp, asistente compartido, bucle+pausa, bocadillo descartable, sin verde ni logo en el lanzador, nombre Nailbot, IA futura Claude, push directo a main) y el prototipo visual del arte («venga nos gusta, impleméntalo»). Autonomía explícita delegada para el resto («hazlo tú el 100% de forma autónoma», «dale ya impleméntalo», «ultracode»): mismo precedente que galeria_carrusel. El humano canceló la espera de la puerta sobre los .feature y pidió commit+push inmediato: se publicó una VÍA RÁPIDA (commit 302ddb4) ANTES del TDD formal; el TDD de esta feature trabaja por deltas contra el contrato y lo declara.",
       "cierre": "CERRADA 2026-09-28 (tras F-23, una feature a la vez). 15/15 escenarios de features/nailbot_flotante.feature. DESVIACIÓN TDD DECLARADA (vía rápida 302ddb4, código antes que tests): progress/tdd_nailbot_flotante.md. judge: 6 bloqueantes → delta CHANGES_REQUESTED (test de pointer-events) → cierre APPROVED (progress/judge_nailbot_flotante_cierre.md; el test demostrado que muerde con 6 hojas saboteadas). a11y PASS: el bloqueante SC 2.2.2 (la pausa no congelaba por el shorthand de animation) curado con longhands y guarda de bytes. Mutación 100 % (NailbotFlotante.tsx 97/97 + 2 equivalentes justificados, nailbot-flotante-logica.ts 62/62). VERIFICACIÓN EN VIVO completa (progress/verificacion_viva_nailbot.md, Chromium 141): dialog :modal, fondo inerte, top layer sobre la cabecera, foco inicial en el primer control, Esc y «Cerrar el chat» devuelven el foco al robot, conversación conservada al reabrir; la pausa CONGELA (13 piezas paused, fotogramas idénticos 1,2 s); reduced-motion en frío (sin pausa, pose final) y en caliente (al retirarlo no reanuda: pausa pulsada); ←/→ aislados de los carruseles; bocadillo a los ~4 s como descripción del lanzador, no región viva, Esc sin mover el foco; F110 a 320/390/1280 px en los dos sentidos: 0 controles totalmente tapados (sin relleno en .pie, HS-10 b); 320 px: panel a pantalla completa sin desborde; menú móvil apaisado por encima del robot; 0 errores/avisos de consola y 0 terceros. Caso previsto por el contrato, DECIDIDO: al REABRIR con el hilo desbordado, el foco inicial cae en el hilo (keyboard focusable scrollers de Chrome ≥130/132); se acepta (HS-12 prohíbe autofocus; orden del DOM; acceso por teclado al historial). DEUDA REGISTRADA (no bloqueante): el panel móvil usa width: 100vw (a11y MENOR-1: con barra de scroll clásica de Windows en ventanas ≤600 px mide 15 px de más; no reproducible en Chromium headless, que usa barras superpuestas; su cura choca con la guarda de @s13 «sin width: 100%» y requiere acotarla); sin guarda de bytes el .titulo en el flujo (judge cierre, menor 1); partir NailbotFlotante.tsx en hooks. PENDIENTE EN EL MÓVIL REAL DEL HUMANO: lector de pantalla, gesto atrás de Android, área segura de iOS y abrir el enlace en la app."
+    },
+    {
+      "id": 25,
+      "name": "logo_acoplado",
+      "title": "Logo caligráfico «Nails Lash» que sube desde el hero y se acopla en la cabecera cuando «STUDIO» deja de verse",
+      "description": "Punto 3 del encargo de Pablo (2026-09-29, progress/brief_foto_logo_catalogo.md). La marca de la cabecera tiene dos estados publicados en un atributo consultable: «texto» (el actual «nails lash studio» en Gilda, horneado) y «caligrafia» («Nails Lash» en Great Vibes, la tipografía del rótulo del hero, SIN «STUDIO» — P3). Al hacer scroll y dejar de verse «STUDIO» bajo la cabecera, un vuelo FLIP suave lleva «Nails Lash» del hero a la esquina superior izquierda pasando de translúcido a opaco. Monótono: una vez acoplado se queda aunque se vuelva arriba (P2). Sin vuelo bajo prefers-reduced-motion. Nombre accesible del enlace intacto y hueco estable (sin CLS).",
+      "acceptance": [
+        "Escenarios de features/logo_acoplado.feature verdes por TDD",
+        "judge APROBADO",
+        "Mutación al 100% sobre la lógica pura del acople",
+        "Verificación en vivo: disparo al ocultarse STUDIO, vuelo visible, se queda al volver arriba, reduce-motion sin vuelo, móvil 320 px sin CLS"
+      ],
+      "depends_on": ["header_nav_footer", "hero_marca"],
+      "mutable": true,
+      "sdd": true,
+      "status": "pending",
+      "puerta_humana": "Decisiones de Pablo por AskUserQuestion el 2026-09-29: P2 «Se queda la caligrafía», P3 «Solo Nails Lash». Pendiente: aprobación de features/logo_acoplado.feature."
+    },
+    {
+      "id": 26,
+      "name": "hero_foto",
+      "title": "Foto de fondo bajo la cabecera y el hero, hasta la línea divisoria, sin perder AA",
+      "description": "Punto 1 del encargo de Pablo (2026-09-29). Opción B elegida por Pablo: una foto relacionada con el negocio (una mano con uñas bonitas) ocupa desde y=0 de la página —detrás de la cabecera sticky— hasta la línea divisoria que separa el hero del catálogo, con el nav de poco contraste/translúcido para que el foco sea la foto. Foto de Pexels (P1) alojada en el repo, decorativa (alt vacío), candidata a LCP. El texto del hero y la nav mantienen WCAG AA contra el peor under, vigilado por la puerta de contraste.",
+      "acceptance": [
+        "Escenarios de features/hero_foto.feature verdes por TDD",
+        "judge APROBADO",
+        "Puerta de contraste ampliada y verde",
+        "Mutación al 100% sobre lo mutable tocado",
+        "Verificación en vivo: foto de borde a borde bajo nav+hero, línea divisoria intacta, textos legibles, móvil 320 px"
+      ],
+      "depends_on": ["header_nav_footer", "hero_marca", "tokens_paleta_contraste", "cero_terceros"],
+      "mutable": true,
+      "sdd": true,
+      "status": "pending",
+      "puerta_humana": "Pablo eligió la opción B (foto bajo nav + header) y P1 (Pexels, selección autónoma) el 2026-09-29. BLOQUEO DE ENTORNO: la red del entorno cloud devuelve 403 a Pexels a 2026-09-29."
+    },
+    {
+      "id": 27,
+      "name": "catalogo_fotos",
+      "title": "Fotos reales en las cards de Uñas, Facial y Depilación del catálogo",
+      "description": "Punto 2 del encargo de Pablo (2026-09-29). Sustituye el hueco rosa placeholder (div.foto aria-hidden 4:5) de cada categoría del catálogo por una foto de Pexels (P1) relacionada con ese servicio, sin rostro identificable, alojada en el repo, con alt útil, width/height, loading=lazy y object-fit cover. La leyenda declara que son fotos de banco de imágenes (precedente equipo/galería).",
+      "acceptance": [
+        "Escenarios de features/catalogo_fotos.feature verdes por TDD",
+        "judge APROBADO",
+        "Mutación al 100% sobre lo mutable tocado",
+        "Verificación en vivo: 3 fotos cubren su card sin deformarse, móvil 320 px"
+      ],
+      "depends_on": ["cero_terceros"],
+      "mutable": true,
+      "sdd": true,
+      "status": "pending",
+      "puerta_humana": "P1 (Pexels, selección autónoma) el 2026-09-29. BLOQUEO DE ENTORNO: la red del entorno cloud devuelve 403 a Pexels a 2026-09-29."
     }
   ],
   "no_se_construyen": [
