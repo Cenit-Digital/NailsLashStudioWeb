@@ -1,8 +1,12 @@
 import { act, render, screen } from '@testing-library/react'
 import { renderToString } from 'react-dom/server'
+import { HelmetProvider } from 'react-helmet-async'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { inspeccionarAnclas } from '../lib/puerta-anclas'
+import Home from '../pages/home'
 import { Cabecera } from './Cabecera'
+import { Hero } from './Hero'
 
 /**
  * F-25 — el logo acoplado. Contrato: features/logo_acoplado.feature.
@@ -721,4 +725,78 @@ describe('@s14 sin IntersectionObserver o sin «STUDIO» en la página, la marca
       expect(error).not.toHaveBeenCalled()
     })
   }
+})
+
+describe('@s22 el hero sigue su ceremonia sin enterarse del acople, y el vuelo no crea nodos ni toca el rótulo', () => {
+  it('@s22 con Cabecera y Hero REALES: acopla con vuelo, la firma del hero sigue «corriendo» con su control, y el documento no gana ni pierde nodos', () => {
+    // La caligrafía del hero en marcha: matchMedia SIN preferencia de movimiento reducido.
+    vi.stubGlobal('matchMedia', (consulta: string) => ({
+      matches: false,
+      media: consulta,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    }))
+    const io = stubDeIntersectionObserver()
+    fijarGeometria()
+    render(
+      <>
+        <Cabecera />
+        <Hero />
+      </>,
+    )
+    const rotulo = document.querySelector('[data-acople="origen"]') as SVGSVGElement
+
+    expect(rotulo, 'el hero real publica su origen').not.toBeNull()
+    expect(document.querySelector('[data-firma]')).toHaveAttribute('data-firma', 'corriendo')
+    const elementosAntes = document.querySelectorAll('*').length
+
+    io.entregar(entrada(400, true))
+    io.entregar(entrada(73, true))
+
+    const enlace = enlaceDeLaMarca()
+
+    expect(enlace).toHaveAttribute('data-logo', 'caligrafia')
+    expect(enlace).toHaveAttribute('data-vuelo', 'si')
+    expect(document.querySelector('[data-firma]')).toHaveAttribute('data-firma', 'corriendo')
+    expect(screen.getByRole('button', { name: 'Completar la firma' })).toBeInTheDocument()
+    expect(document.querySelectorAll('*')).toHaveLength(elementosAntes)
+    expect(document.querySelectorAll('svg[viewBox="-80 -840 4120 1200"]')).toHaveLength(2)
+    expect(document.querySelectorAll('[id="tinta-marca"]')).toHaveLength(1)
+    expect(document.querySelectorAll('[id="trazo-marca"]')).toHaveLength(1)
+    expect(rotulo.hasAttribute('style')).toBe(false)
+    expect(rotulo.hasAttribute('data-vuelo')).toBe(false)
+    expect((enlace.querySelector('svg') as SVGSVGElement).hasAttribute('mask')).toBe(false)
+  })
+})
+
+describe('@s23 en la home horneada sigue habiendo UN <h1>, el logo no es un encabezado, los ids del rótulo son únicos y las anclas no cambian', () => {
+  const home = renderToString(
+    <HelmetProvider>
+      <Home />
+    </HelmetProvider>,
+  )
+  const logo = fragmentoDelLogo(home)
+
+  it('@s23 ANCLAS: EXACTAMENTE un <h1 y EXACTAMENTE un <a> con data-logo', () => {
+    expect(home.split('<h1').length - 1).toBe(1)
+    expect(home.match(/<a\b[^>]*\sdata-logo=/g) ?? []).toHaveLength(1)
+  })
+
+  it('@s23 el <a> del logo no es ni contiene un encabezado', () => {
+    expect(logo).toContain('<svg')
+    for (const prohibido of ['<h1', '<h2', '<h3', '<h4', '<h5', '<h6', 'role="heading"']) {
+      expect(logo, prohibido).not.toContain(prohibido)
+    }
+  })
+
+  it('@s23 los ids del rótulo aparecen una vez cada uno y el logo no trae ningún id', () => {
+    expect(home.split('id="tinta-marca"').length - 1).toBe(1)
+    expect(home.split('id="trazo-marca"').length - 1).toBe(1)
+    expect(logo).not.toContain(' id=')
+  })
+
+  it('@s23 la puerta de anclas vivas sobre la ruta "/" da 0 violaciones y el logo no apunta a un #ancla', () => {
+    expect(inspeccionarAnclas([{ ruta: '/', html: home }])).toEqual([])
+    expect(aperturaDelLogo(home)).not.toContain('href="#')
+  })
 })

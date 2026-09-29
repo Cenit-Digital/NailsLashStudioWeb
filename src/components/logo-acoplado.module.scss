@@ -5,10 +5,73 @@
 // --vuelo-escala). Stryker no ve SCSS: lo aseveran los tests que la LEEN
 // (logo-acoplado-estilos.test.ts) y la puerta humana.
 
+// EL HUECO ES ESTABLE POR CONSTRUCCIÓN (LA-4): las dos representaciones ocupan la MISMA celda de una
+// rejilla, así que la caja del enlace mide el máximo de las dos en los dos estados y desde el primer
+// pintado. Cambiar de estado no mueve nada (cero CLS). La inactiva se oculta con `visibility`, que no
+// altera el layout; nunca con `display: none` ni sacándola del flujo.
+.marca {
+  display: inline-grid;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+// El nombre accesible «Nails Lash Studio» (LA-5): presente para lectores de pantalla y fuera de la
+// vista, con la técnica clip/1 px de la WAI que ya usa el <h1> del hero. Nunca `display: none` ni
+// `visibility: hidden`: vaciarían el nombre del enlace en el navegador con toda la suite verde.
+.soloLectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+// LA BASE ES EL ESTADO HORNEADO (I-4): sin JS, o sin atributo, se ve «nails lash studio» y la firma
+// viaja en los bytes pero oculta. Ninguna regla depende del valor horneado del atributo.
+//
+// Las minúsculas y el espaciado van AQUÍ y no en `.marca` (D-5): el <text> de la firma los heredaría,
+// saldría en minúsculas, espaciado 60 unidades por letra, y la «h» se saldría del viewBox.
+.logoTexto {
+  grid-area: 1 / 1;
+  font-family: 'Gilda Display', serif;
+  font-size: 1.1875rem; // 19px
+  line-height: 1.4;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+}
+
 // Vuela el PROPIO <svg> del logo (FLIP invertido, LA-2): nace en su sitio y se anima DESDE la caja
 // del rótulo del hero. Escala desde su esquina superior izquierda, la misma que miden x e y.
+//
+// El alto se DECLARA aquí (LA-13), no lo pone la fuente: 2,5 rem = 40 px, y el ancho sale de la
+// relación del viewBox (4120 : 1200 → ≈ 8,58 rem). Tope duro 2,75 rem (44 px, el min-height de la
+// hamburguesa): más alto haría crecer la cabecera por encima de los 76 px que `_base.scss` deriva
+// a mano para el scroll-padding-top.
+//
+// Tinta --ink sobre el cristal de la cabecera: el par ya lo vigila la fila A-15 de la matriz de
+// contraste (LA-12). Sin opacidad en la base. `pointer-events: none`: durante el vuelo, escalado,
+// pasa por encima de la nav, y un clic ahí no debe caer en la marca.
 .logoCaligrafia {
+  grid-area: 1 / 1;
+  height: 2.5rem;
+  visibility: hidden;
   transform-origin: 0 0;
+  fill: var(--ink);
+  font-family: 'Great Vibes', cursive;
+  pointer-events: none;
+}
+
+// SOLO «caligrafia» invierte las dos visibilidades.
+.marca[data-logo='caligrafia'] .logoCaligrafia {
+  visibility: visible;
+}
+
+.marca[data-logo='caligrafia'] .logoTexto {
+  visibility: hidden;
 }
 
 // 0,9 s con la curva con la que ya aparece «STUDIO» en el hero: el sitio se mueve con una sola voz.
@@ -41,5 +104,20 @@
   to {
     opacity: 0;
     visibility: visible;
+  }
+}
+
+// Quien pide menos movimiento ve el cambio INSTANTÁNEO, sin vuelo ni fundido (LA-11, C-4), y en
+// caliente: si la preferencia llega a mitad de vuelo, el logo salta a su sitio, sin JS. Los selectores
+// repiten el COMPLETO del vuelo a propósito: un @media no suma especificidad, con el corto perdería
+// contra la regla de arriba; a igual especificidad gana este, que va después (misma trampa que
+// documenta hero.module.scss).
+@media (prefers-reduced-motion: reduce) {
+  .marca[data-vuelo='si'] .logoCaligrafia {
+    animation: none;
+  }
+
+  .marca[data-vuelo='si'] .logoTexto {
+    animation: none;
   }
 }

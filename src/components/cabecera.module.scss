@@ -32,15 +32,8 @@
   }
 }
 
-.marca {
-  font-family: 'Gilda Display', serif;
-  font-size: 1.1875rem; // 19px
-  letter-spacing: 0.06em;
-  line-height: 1.4;
-  text-transform: lowercase;
-  text-decoration: none;
-  color: var(--ink);
-}
+// La marca (el enlace a la home) vive en `logo-acoplado.module.scss` desde F-25: sus reglas se
+// mudaron con ella (features/logo_acoplado.feature @s20).
 
 .nav {
   display: flex;

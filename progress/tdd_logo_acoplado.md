@@ -140,3 +140,94 @@ primeraObservacion)` a nivel de módulo. → 50/50, tsc limpio.
   «sin IntersectionObserver» y «sin origen» ya pasaban por las guardas de @s3 y @s12.
 - VERDE: `if (disparo === null) return` antes de construir el observador. → 54/54.
 - **Sabotaje medido** (buscar el disparo ANTES de la guarda `typeof`): 1 rojo (@s14 fila 1). Restaurado.
+
+### Punto de control tras @s14
+
+- `pnpm test` (suite completa) → **49 ficheros, 1599 tests, verde** (83 s).
+
+### @s15 — el vuelo en la hoja (ciclo 15)
+
+- Granularidad declarada: en los escenarios de BYTES, el ciclo es el escenario; sus `it` fallan juntos
+  porque el fichero se lee al cargar el módulo de test (ENOENT) — igual que las filas de un outline.
+- ROJO: `logo-acoplado-estilos.test.ts` (nuevo; ayudantes `cuerpoDelBloque`, `sinBloque`, `reglas` del
+  precedente nailbot-flotante-estilos, más `sinComentarios`, `declaraciones` y `bloqueBase`) → «ENOENT:
+  … logo-acoplado.module.scss».
+- VERDE: `logo-acoplado.module.scss` nuevo con SOLO lo de @s15: base `.logoCaligrafia { transform-origin:
+0 0 }`, las dos reglas `[data-vuelo='si']` y las dos `@keyframes`. → 7/7.
+- **Sabotajes medidos** (cada uno, 1-2 rojos; restaurado): 0.9s → 0.6s; `100%` en acoplar; `both` en
+  soltar; `animation` en un `.logoTexto` sin `[data-vuelo]`; `transform-origin: center`.
+
+### @s16 — reduced-motion instantáneo, selector completo y después (ciclo 16)
+
+- ROJO: 5 tests → 5 fallan (no hay `@media`).
+- VERDE: `@media (prefers-reduced-motion: reduce)` al final con los dos selectores COMPLETOS del vuelo
+  en `animation: none`. → 12/12.
+- **Sabotajes medidos** (restaurado): selector corto dentro del @media → 2 rojos; @media antes de las
+  reglas → 2 rojos; `transition` residual → 1 rojo.
+
+### @s17 — hueco estable, base = horneado, `.soloLectores` (ciclo 17)
+
+- ROJO: 8 tests → 7 fallan (sin `inline-grid`, `grid-area`, visibilidades, `.soloLectores`, cableado).
+  La guarda «ninguna regla de las representaciones saca la caja del flujo» ya pasaba con las reglas de
+  @s15/@s16.
+- **APOYO DERIVADO, declarado:** «LogoAcoplado.tsx importa la hoja y aplica .marca, .soloLectores,
+  .logoTexto y .logoCaligrafia a sus nodos; el `<text>` sin clase (D-8)». Lee la FUENTE. Motivo: bajo
+  `css: false` las clases del module son undefined y ningún render las ve; sin este test, el cableado
+  de `className` sería producción que ningún test pide (Ley 1) y podría perderse con la suite verde.
+  No asevera ESTADO por clase (lo prohíbe el `.feature`): solo qué clase CONSTANTE lleva cada etiqueta.
+- VERDE: `.marca { display: inline-grid }`; `.soloLectores` con la técnica clip/1 px COMPLETA del
+  `.heroMarca` (incluye `margin: -1px; padding: 0; border: 0`, que el test no enumera: el `.feature`
+  pide «la técnica del <h1> del hero»); `grid-area: 1 / 1` en las dos representaciones;
+  `visibility: hidden` en la base de la caligrafía; las dos reglas `[data-logo='caligrafia']`; y las
+  cuatro `className` en LogoAcoplado.tsx. → 63/63 (estilos + logo + derivación).
+- **Sabotajes medidos** (restaurado): `display: none` en vez de visibility → 2 rojos; una regla sobre
+  `data-logo='texto'` → 1; `.soloLectores` con `visibility: hidden` → 1; `.logoTexto` en otra celda
+  → 1; clases de los dos `<span>` intercambiadas en la fuente → 1 (el apoyo).
+
+### @s18 — 2,5 rem con tope de 2,75 rem (ciclo 18)
+
+- ROJO: 3 tests → 2 fallan (sin `height`). El de «sin width en px» ya pasaba (guarda).
+- VERDE: `height: 2.5rem` en la base de `.logoCaligrafia`. → 23/23.
+- **Sabotajes medidos** (restaurado): `height: 3rem` dentro de un @media → 1 rojo; `max-height: 44px`
+  → 1; `width: 137px` → 1.
+
+### @s19 — `--ink`, Great Vibes, `pointer-events`, sin opacity; D-5; matriz intacta (ciclo 19)
+
+- ROJO: 6 tests → 4 fallan (sin fill, pointer-events, `var(--ink)`, tipografía de `.logoTexto`). Pasaban
+  a la primera: «fuera de las @keyframes nadie declara opacity» (guarda) y «MINIMO_DE_PARES 18 y UNA
+  fila A-15» (ancla de regresión).
+- VERDE: `.logoCaligrafia` + `fill: var(--ink)`, `font-family: 'Great Vibes', cursive`,
+  `pointer-events: none`; `.logoTexto` + `font-family: 'Gilda Display', serif`,
+  `letter-spacing: 0.06em`, `text-transform: lowercase`. → 29/29.
+- **Sabotajes medidos** (restaurado): `opacity: 0.9` en `.marca` → 1 rojo; `fill: var(--accent)` → 2;
+  `letter-spacing` en `.marca` → 1; `MINIMO_DE_PARES = 19` en puerta-contraste.ts → 1.
+
+### @s20 — ENMIENDA F-06: la mudanza de `.marca` (ciclo 20)
+
+- ROJO: `cabecera.test.tsx` «@s20» (3 tests) → 2 fallan: `cabecera.module.scss` aún tiene el bloque
+  `.marca`, y la hoja del logo no tiene color/subrayado/cuerpo/interlineado. El del horneado de F-06
+  pasaba (regresión de @s12/@s16).
+- La mitad positiva de «las reglas se MUDAN» (derivada del título del escenario): `color: var(--ink)`,
+  `text-decoration: none`, `font-size: 1.1875rem` y `line-height: 1.4` deben estar en los bloques base
+  `.marca` o `.logoTexto` de la hoja nueva (las otras tres ya las fijó @s19/D-5).
+- VERDE: fuera el bloque `.marca` de `cabecera.module.scss` (queda un comentario de dónde vive ahora; el
+  `@media (max-width: 820px)` intacto); `.marca` + color y subrayado; `.logoTexto` + cuerpo e
+  interlineado. → cabecera + estilos + `src/styles`: 65/65.
+
+### @s21 — ENMIENDA F-07: dos `data-acople` en Hero.tsx (ciclo 21)
+
+- ROJO: `hero.test.tsx` «@s21» (2 tests) → 1 falla («expected +0 to be 2»); el de «h1 intacto, ids
+  únicos, firma en marcha» pasaba (regresión).
+- VERDE: `data-acople="origen"` en el `<svg>` del rótulo y `data-acople="disparo"` en el `<span>` de
+  «Studio». Nada más en Hero.tsx. → hero + hero-estilos + hero-logica + home: 111/111.
+
+### @s22 — el hero sigue su ceremonia; ningún nodo nuevo (ciclo 22)
+
+- Pasa a la primera con Cabecera y Hero REALES (matchMedia sin reduce): la implementación no toca el
+  hero. **Sabotajes medidos** (restaurado): clonar el rótulo (el fantasma de la alternativa (a) de LA-2)
+  → rojo; `data-vuelo` en el rótulo → rojo. → 41/41.
+
+### @s23 — la home horneada: un `<h1>`, ids únicos, anclas vivas (ciclo 23)
+
+- Pasa a la primera (4 tests, regresión). **Sabotajes medidos** (restaurado): `id` en el `<svg>` del
+  logo → 2 rojos (@s2 y @s23); `href="#inicio"` → rojos, entre ellos @s23 (anclas). → 45/45.

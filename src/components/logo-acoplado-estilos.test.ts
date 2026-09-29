@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs'
 
 import { describe, expect, it } from 'vitest'
 
+import { MATRIZ_DE_USO, MINIMO_DE_PARES } from '../lib/puerta-contraste'
+
 /**
  * F-25 — lo que ningún render ve, por BYTES (features/logo_acoplado.feature @s15-@s19; @s26 y @s27
  * sobre la fuente y stryker.config.json). jsdom corre con `css: false` y no anima: la hoja se LEE.
@@ -153,5 +155,223 @@ describe('@s15 el vuelo vive en la hoja: 0,9 s con la curva de «STUDIO», de 0,
         expect(declaracion).not.toMatch(/\b(forwards|backwards|both)\b/)
       }
     }
+  })
+})
+
+describe('@s16 con prefers-reduced-motion: reduce el cambio es INSTANTÁNEO: animation none sobre el selector COMPLETO del vuelo, y DESPUÉS de él', () => {
+  const reduce = cuerpoDelBloque(HOJA, REDUCE) ?? ''
+
+  it('@s16 ANCLA POSITIVA: EXACTAMENTE un @media (prefers-reduced-motion: reduce)', () => {
+    expect(BYTES.split(REDUCE).length - 1).toBe(1)
+  })
+
+  it('@s16 dentro, los dos selectores completos del vuelo declaran animation: none', () => {
+    expect(declaraciones(cuerpoDelBloque(reduce, `${VUELO_CALIGRAFIA} {`))).toContain(
+      'animation: none',
+    )
+    expect(declaraciones(cuerpoDelBloque(reduce, `${VUELO_TEXTO} {`))).toContain('animation: none')
+  })
+
+  it('@s16 dentro NO hay bloques con .logoCaligrafia o .logoTexto a secas (perderían por especificidad)', () => {
+    const selectores = reglas(reduce).map((regla) => regla.selector)
+
+    expect(selectores.length).toBeGreaterThanOrEqual(2)
+    expect(selectores).not.toContain('.logoCaligrafia')
+    expect(selectores).not.toContain('.logoTexto')
+  })
+
+  it('@s16 el @media empieza DESPUÉS de las dos reglas del vuelo: a igual especificidad gana el que va después', () => {
+    const inicio = HOJA.indexOf(REDUCE)
+
+    expect(inicio).toBeGreaterThan(HOJA.indexOf(`${VUELO_CALIGRAFIA} {`))
+    expect(inicio).toBeGreaterThan(HOJA.indexOf(`${VUELO_TEXTO} {`))
+    expect(HOJA.indexOf(`${VUELO_CALIGRAFIA} {`)).toBeGreaterThanOrEqual(0)
+    expect(HOJA.indexOf(`${VUELO_TEXTO} {`)).toBeGreaterThanOrEqual(0)
+  })
+
+  it('@s16 dentro no se declara opacity, ni transition, ni ninguna animation distinta de none: sin fundido residual', () => {
+    const todas = reglas(reduce).flatMap((regla) => declaraciones(regla.cuerpo))
+
+    expect(todas.length).toBeGreaterThanOrEqual(2)
+    for (const declaracion of todas) {
+      expect(declaracion).not.toMatch(/^(opacity|transition(-[a-z]+)?)\s*:/)
+      if (esAnimacion.test(declaracion)) {
+        expect(declaracion).toBe('animation: none')
+      }
+    }
+  })
+})
+
+describe('@s17 el hueco es estable por construcción —las dos representaciones en la MISMA celda— y la base es el estado horneado', () => {
+  const CALIGRAFIA_ACOPLADA = ".marca[data-logo='caligrafia'] .logoCaligrafia"
+  const TEXTO_ACOPLADO = ".marca[data-logo='caligrafia'] .logoTexto"
+
+  it('@s17 ANCLA POSITIVA: el bloque .marca declara display: inline-grid', () => {
+    expect(declaraciones(bloqueBase('.marca'))).toContain('display: inline-grid')
+  })
+
+  it('@s17 las dos representaciones ocupan la misma celda: grid-area: 1 / 1 en cada bloque base', () => {
+    expect(declaraciones(bloqueBase('.logoTexto'))).toContain('grid-area: 1 / 1')
+    expect(declaraciones(bloqueBase('.logoCaligrafia'))).toContain('grid-area: 1 / 1')
+  })
+
+  it('@s17 la base es el horneado: la caligrafía oculta con visibility y el texto sin declarar visibility', () => {
+    expect(declaraciones(bloqueBase('.logoCaligrafia'))).toContain('visibility: hidden')
+    expect(bloqueBase('.logoTexto')).not.toBeNull()
+    expect(bloqueBase('.logoTexto')).not.toMatch(/(^|[\s;])visibility\s*:/)
+  })
+
+  it('@s17 SOLO data-logo="caligrafia" invierte las dos visibilidades', () => {
+    expect(declaraciones(cuerpoDelBloque(HOJA, `${CALIGRAFIA_ACOPLADA} {`))).toContain(
+      'visibility: visible',
+    )
+    expect(declaraciones(cuerpoDelBloque(HOJA, `${TEXTO_ACOPLADO} {`))).toContain(
+      'visibility: hidden',
+    )
+  })
+
+  it('@s17 ninguna regla depende de data-logo «texto»: si el atributo faltara, se vería la marca', () => {
+    expect(BYTES).toContain('data-logo=')
+    expect(BYTES).not.toContain("data-logo='texto'")
+    expect(BYTES).not.toContain('data-logo="texto"')
+  })
+
+  it('@s17 ninguna regla de .logoTexto o .logoCaligrafia saca la caja del flujo: ni display none, ni absolute, ni fixed', () => {
+    const representaciones = reglas(HOJA).filter((regla) =>
+      /\.logo(Texto|Caligrafia)\b/.test(regla.selector),
+    )
+
+    expect(representaciones.length).toBeGreaterThanOrEqual(4)
+    for (const regla of representaciones) {
+      for (const prohibida of ['display: none', 'position: absolute', 'position: fixed']) {
+        expect(declaraciones(regla.cuerpo), `${regla.selector} · ${prohibida}`).not.toContain(
+          prohibida,
+        )
+      }
+    }
+  })
+
+  it('@s17 .soloLectores usa la técnica clip/1 px del <h1> del hero, sin display none ni visibility hidden', () => {
+    const soloLectores = declaraciones(bloqueBase('.soloLectores'))
+
+    for (const declaracion of [
+      'position: absolute',
+      'width: 1px',
+      'height: 1px',
+      'overflow: hidden',
+      'clip: rect(0, 0, 0, 0)',
+      'white-space: nowrap',
+    ]) {
+      expect(soloLectores, declaracion).toContain(declaracion)
+    }
+    expect(soloLectores).not.toContain('display: none')
+    expect(soloLectores).not.toContain('visibility: hidden')
+  })
+
+  /**
+   * APOYO (derivado de LA-C1, declarado en progress/tdd_logo_acoplado.md): bajo `css: false` las
+   * clases del module son undefined y ningún render las ve; sin esto, el <a> podría perder sus clases
+   * con toda la suite verde. Se lee la FUENTE: qué clase lleva cada etiqueta de la marca.
+   */
+  it('@s17 apoyo: LogoAcoplado.tsx importa la hoja y aplica .marca, .soloLectores, .logoTexto y .logoCaligrafia a sus nodos', () => {
+    const fuente = readFileSync('src/components/LogoAcoplado.tsx', 'utf8')
+    const etiqueta = (nombre: string): string[] =>
+      [...fuente.matchAll(new RegExp(`<${nombre}\\b[^>]*>`, 'g'))].map((m) => m[0])
+    const [lectores, visible] = etiqueta('span')
+
+    expect(fuente).toMatch(/import estilos from '\.\/logo-acoplado\.module\.scss'/)
+    expect(etiqueta('a')[0]).toContain('className={estilos.marca}')
+    expect(lectores).toContain('className={estilos.soloLectores}')
+    expect(lectores).not.toContain('aria-hidden')
+    expect(visible).toContain('className={estilos.logoTexto}')
+    expect(visible).toContain('aria-hidden="true"')
+    expect(etiqueta('svg')[0]).toContain('className={estilos.logoCaligrafia}')
+    // D-8: el <text> no lleva clase propia; hereda tinta y familia del <svg>.
+    expect(etiqueta('text')[0]).not.toContain('className')
+  })
+})
+
+describe('@s18 el logo caligráfico mide 2,5 rem de alto, con un tope DURO de 2,75 rem: la cabecera no pasa de 76 px', () => {
+  /** Todos los bloques cuyo selector contiene .logoCaligrafia, también los de dentro de un @media. */
+  const bloquesDeLaFirma = reglas(HOJA).filter((regla) =>
+    regla.selector.includes('.logoCaligrafia'),
+  )
+
+  it('@s18 ANCLA POSITIVA: el bloque base .logoCaligrafia declara height: 2.5rem', () => {
+    expect(declaraciones(bloqueBase('.logoCaligrafia'))).toContain('height: 2.5rem')
+  })
+
+  it('@s18 ningún bloque de la firma declara un alto que no esté en rem o que pase de 2.75rem', () => {
+    const altos = bloquesDeLaFirma.flatMap((regla) =>
+      declaraciones(regla.cuerpo).filter((d) => /^(min-|max-)?height\s*:/.test(d)),
+    )
+
+    expect(altos.length).toBeGreaterThanOrEqual(1)
+    for (const alto of altos) {
+      const valor = /^(?:min-|max-)?height\s*:\s*([\d.]+)rem$/.exec(alto)
+
+      expect(valor, `${alto}: solo rem`).not.toBeNull()
+      expect(Number(valor?.[1]), alto).toBeLessThanOrEqual(2.75)
+    }
+  })
+
+  it('@s18 ningún bloque de la firma declara un ancho en px: el ancho sale de la relación del viewBox', () => {
+    expect(bloquesDeLaFirma.length).toBeGreaterThanOrEqual(1)
+    for (const regla of bloquesDeLaFirma) {
+      for (const declaracion of declaraciones(regla.cuerpo)) {
+        expect(declaracion, regla.selector).not.toMatch(/^(min-|max-)?width\s*:.*px/)
+      }
+    }
+  })
+})
+
+describe('@s19 la firma se pinta en --ink con Great Vibes, sin opacity en la base, sin --accent y sin capturar clics; no hereda las minúsculas ni el espaciado', () => {
+  it('@s19 ANCLA POSITIVA: un bloque de .logoCaligrafia declara fill: var(--ink) y la familia Great Vibes', () => {
+    const firma = reglas(HOJA)
+      .filter((regla) => regla.selector.startsWith('.logoCaligrafia'))
+      .flatMap((regla) => declaraciones(regla.cuerpo))
+
+    expect(firma).toContain('fill: var(--ink)')
+    expect(firma).toContain("font-family: 'Great Vibes', cursive")
+  })
+
+  it('@s19 el bloque base .logoCaligrafia declara pointer-events: none (el <svg> escalado pasa sobre la nav)', () => {
+    expect(declaraciones(bloqueBase('.logoCaligrafia'))).toContain('pointer-events: none')
+  })
+
+  it('@s19 fuera de las @keyframes ningún bloque declara opacity', () => {
+    const fueraDeLosFotogramas = sinBloque(
+      sinBloque(HOJA, '@keyframes acoplar'),
+      '@keyframes soltar',
+    )
+
+    expect(HOJA).toContain('opacity')
+    expect(fueraDeLosFotogramas).not.toMatch(/(^|[\s;{])opacity\s*:/)
+  })
+
+  it('@s19 ni --accent ni #C05576 en la hoja (4,05 < 4,5)', () => {
+    expect(BYTES).toContain('var(--ink)')
+    expect(BYTES).not.toContain('var(--accent)')
+    expect(BYTES.toLowerCase()).not.toContain('#c05576')
+  })
+
+  it('@s19 D-5: .marca no declara text-transform ni letter-spacing; .logoTexto lleva Gilda, minúsculas y 0.06em', () => {
+    const marca = declaraciones(bloqueBase('.marca'))
+    const texto = declaraciones(bloqueBase('.logoTexto'))
+
+    expect(marca.length).toBeGreaterThanOrEqual(1)
+    expect(marca.filter((d) => /^(text-transform|letter-spacing)\s*:/.test(d))).toEqual([])
+    expect(texto).toContain("font-family: 'Gilda Display', serif")
+    expect(texto).toContain('text-transform: lowercase')
+    expect(texto).toContain('letter-spacing: 0.06em')
+  })
+
+  it('@s19 el contraste ya lo vigila la fila A-15: MINIMO_DE_PARES sigue en 18 y hay EXACTAMENTE una fila «logo sobre la cabecera translúcida»', () => {
+    const filasDelLogo = MATRIZ_DE_USO.filter((par) =>
+      par.uso.startsWith('logo sobre la cabecera translúcida'),
+    )
+
+    expect(MINIMO_DE_PARES).toBe(18)
+    expect(filasDelLogo).toHaveLength(1)
   })
 })

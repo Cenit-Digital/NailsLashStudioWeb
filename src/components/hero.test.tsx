@@ -925,3 +925,38 @@ describe('@s14 el control no roba clics fuera del área del rótulo', () => {
     expect(control.parentElement).toBe(escenaDe(container))
   })
 })
+
+/**
+ * @s21 (F-25, features/logo_acoplado.feature) — ENMIENDA a F-07: Hero.tsx solo gana DOS atributos
+ * estáticos para que el logo de la cabecera encuentre su disparo y su origen, y el <h1> sigue intacto.
+ * Stryker NO muta atributos JSX literales (E1.d): este test, con los literales A MANO, es su defensa.
+ */
+describe('@s21 ENMIENDA F-25: data-acople="origen" en el <svg> del rótulo y data-acople="disparo" en el <span> de «Studio»', () => {
+  it('@s21 el hero horneado trae EXACTAMENTE dos data-acople, cada uno en su etiqueta', () => {
+    const horneado = renderToString(<Hero />)
+
+    expect(horneado.split('data-acople=').length - 1).toBe(2)
+
+    const rotulo = /<svg\b[^>]*viewBox="-80 -840 4120 1200"[^>]*>/.exec(horneado)?.[0] ?? ''
+
+    expect(rotulo).toContain('data-acople="origen"')
+
+    const h1 = /<h1\b[^>]*>([\s\S]*?)<\/h1>/.exec(horneado)?.[1] ?? ''
+    const spans = [...h1.matchAll(/<span\b([^>]*)>([^<]*)<\/span>/g)]
+
+    expect(spans).toHaveLength(2)
+    expect(spans[1][1]).toContain('data-acople="disparo"')
+    expect(spans[1][2]).toBe('Studio')
+    expect(spans[0][1]).not.toContain('data-acople')
+  })
+
+  it('@s21 el <h1> sigue intacto: uno, con dos <span> y el espacio real; ids del rótulo únicos y la firma en marcha', () => {
+    const horneado = renderToString(<Hero />)
+
+    expect(horneado.split('<h1').length - 1).toBe(1)
+    expect(horneado).toMatch(/<\/span>\s<span\b/)
+    expect(horneado.split('id="tinta-marca"').length - 1).toBe(1)
+    expect(horneado.split('id="trazo-marca"').length - 1).toBe(1)
+    expect(horneado).toContain('data-firma="corriendo"')
+  })
+})

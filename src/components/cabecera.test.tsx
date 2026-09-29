@@ -177,3 +177,55 @@ describe('el pie emite Facebook y tel:, y NO enlaces legales ni una URL de Insta
     expect(horneado).toContain('@nailslash.studio_')
   })
 })
+
+/**
+ * @s20 (F-25, features/logo_acoplado.feature) — ENMIENDA a F-06: la marca pasa a `<LogoAcoplado />`
+ * y las reglas de `.marca` se MUDAN a `logo-acoplado.module.scss`. El `@media (max-width: 820px)` se
+ * queda (lo lee @s17 de arriba) y el horneado conserva lo que protegen @s12 y @s16. Literales A MANO.
+ */
+describe('@s20 ENMIENDA F-25: las reglas de .marca se MUDAN a la hoja del logo, el @media de 820 px se queda y el horneado de F-06 sigue', () => {
+  const CABECERA = readFileSync('src/components/cabecera.module.scss', 'utf8')
+  const LOGO = readFileSync('src/components/logo-acoplado.module.scss', 'utf8')
+
+  /** Las declaraciones del bloque de PRIMER NIVEL con ese selector exacto (bloques hoja). */
+  function declaracionesDe(hoja: string, selector: string): string[] {
+    const escapado = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const cuerpo = new RegExp(`(^|\\n)${escapado}\\s*\\{([^{}]*)\\}`).exec(hoja)?.[2] ?? ''
+
+    return cuerpo
+      .replace(/\/\/[^\n]*/g, '')
+      .split(';')
+      .map((declaracion) => declaracion.replace(/\s+/g, ' ').trim())
+      .filter((declaracion) => declaracion !== '')
+  }
+
+  it('@s20 ANCLAS: cabecera.module.scss conserva .cabecera y el @media de 820 px, sin 767px; y ya NO tiene ningún bloque .marca', () => {
+    expect(CABECERA).toContain('.cabecera')
+    expect(CABECERA).toMatch(/@media\s*\(\s*max-width:\s*820px\s*\)/)
+    expect(CABECERA).not.toContain('767px')
+    expect(CABECERA).not.toMatch(/\.marca\b[^{;]*\{/)
+  })
+
+  it('@s20 la mudanza: color, subrayado, cuerpo e interlineado de la marca viven ahora en .marca o .logoTexto de la hoja del logo', () => {
+    const mudadas = [...declaracionesDe(LOGO, '.marca'), ...declaracionesDe(LOGO, '.logoTexto')]
+
+    for (const declaracion of [
+      'color: var(--ink)',
+      'text-decoration: none',
+      'font-size: 1.1875rem',
+      'line-height: 1.4',
+    ]) {
+      expect(mudadas, declaracion).toContain(declaracion)
+    }
+  })
+
+  it('@s20 el horneado de la cabecera sigue con «Nails Lash Studio», la nav «Principal», el menú cerrado y sus enlaces', () => {
+    const horneado = renderToString(<Cabecera />)
+
+    expect(horneado).toContain('Nails Lash Studio')
+    expect(horneado).toMatch(/<nav\b[^>]*aria-label="Principal"/)
+    expect(horneado).toMatch(/<button\b[^>]*aria-expanded="false"/)
+    expect(horneado).toContain('href="#servicios-titulo"')
+    expect(horneado).toContain('href="#contacto-titulo"')
+  })
+})

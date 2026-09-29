@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { partirNombre } from '../lib/partir-nombre'
 import { NOMBRE } from '../lib/site'
 import { VISTA_MARCA } from '../lib/trazo-marca'
+import estilos from './logo-acoplado.module.scss'
 
 interface Acople {
   logo: 'texto' | 'caligrafia'
@@ -101,13 +102,22 @@ export function LogoAcoplado() {
     <a
       ref={enlace}
       href={import.meta.env.BASE_URL}
+      className={estilos.marca}
       data-logo={acople.logo}
       data-vuelo={acople.variables === undefined ? 'no' : 'si'}
       style={acople.variables}
     >
-      <span>{NOMBRE}</span>
-      <span aria-hidden="true">{NOMBRE}</span>
-      <svg ref={logo} viewBox={VISTA_MARCA} aria-hidden="true" focusable="false">
+      <span className={estilos.soloLectores}>{NOMBRE}</span>
+      <span className={estilos.logoTexto} aria-hidden="true">
+        {NOMBRE}
+      </span>
+      <svg
+        ref={logo}
+        className={estilos.logoCaligrafia}
+        viewBox={VISTA_MARCA}
+        aria-hidden="true"
+        focusable="false"
+      >
         <text x="0" y="0" fontSize="1000">
           {marca}
         </text>
