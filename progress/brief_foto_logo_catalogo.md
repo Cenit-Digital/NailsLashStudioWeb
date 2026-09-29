@@ -181,3 +181,45 @@ puerta humana (registrada en `feature_list.json` → `no_se_construyen`). La cab
 quedan como están (degradado rosa, cristal al 88 %). Todo lo de §3.2 (velo, contraste sobre foto,
 nav sobre foto, LCP) queda sin efecto. Siguen en pie **F-25 `logo_acoplado`** y **F-27
 `catalogo_fotos`**, sin cambios. Las fotos del hero se retiran de `src/assets/hero/`.
+
+## 6. Notas del spec_partner (2026-09-29) — cálculos de apoyo a `project-spec.md` §F-25/§F-27
+
+> No es contrato: la spec vive en `project-spec.md` (LA-n y CF-n, a ratificar en la puerta).
+
+**Contraste (WCAG G17, misma fórmula que `src/lib/contraste.ts`, sin cuantizar — A-16).**
+`--header-bg` sobre negro puro = 0,88 × `#FDF4F7` = rgb(222,64; 214,72; 217,36).
+
+| Par                                                 | Ratio  | Nota                                                    |
+| --------------------------------------------------- | ------ | ------------------------------------------------------- |
+| `--ink #8E3355` sobre cabecera 88 % / negro         | 5,3809 | = fila A-15 «logo»; cubre el logo caligráfico           |
+| `--muted #6F525A` sobre cabecera 88 % / negro       | 4,8915 | = fila A-15 «nav», intacta                              |
+| `--ink` a opacidad 0,35 sobre cabecera 88 % / negro | 1,695  | solo en el `from` del keyframe de 0,9 s (`aria-hidden`) |
+| `--ink` a opacidad 0,5 sobre cabecera 88 % / negro  | 2,182  | referencia                                              |
+
+**Geometría del rótulo y del logo** (`VISTA_MARCA = '-80 -840 4120 1200'` → relación 3,433 : 1; el
+`<svg>` mide 4,12 em × 1,2 em).
+
+| Caja                                 | em (px) | Ancho (px) | Alto (px) |
+| ------------------------------------ | ------- | ---------- | --------- |
+| Rótulo del hero, mínimo del `clamp`  | 47,2    | 194,5      | 56,6      |
+| Rótulo del hero, máximo del `clamp`  | 134     | 552,1      | 160,8     |
+| Logo caligráfico propuesto (2,5 rem) | 33,3    | 137,3      | 40        |
+
+Escala FLIP inicial ≈ 552,1 / 137,3 = 4,02 (escritorio) y 194,5 / 137,3 = 1,42 (a 320 px). Tope del
+logo: 2,75 rem = 44 px (el `min-height` de la hamburguesa). Cabecera: `padding-block` 0,9375 rem × 2 =
+30 px + fila ≤ 44 px = ≤ 74 px, dentro de los 76 px que F-06 @s11 deriva a mano en `_base.scss:36`.
+
+**Ancho a 320 px:** 320 − 2 × 24 (`padding-inline` móvil de `.cabecera`) = 272 px útiles; hueco del
+logo ≈ máx(«nails lash studio» en Gilda 19 px ≈ 180 px **[I, sin medir]**, 137 px) + 16 px de `gap` +
+44 px de hamburguesa ≈ 240 px → cabe sin envolver.
+
+**Catálogo:** `.demo-contenedor` 1200 − 2 × 40 = 1120 px; dos columnas con `gap` 44 px → ≈ 538 px por
+columna → foto ≈ 538 × 672 px (a 2× pediría ≈ 1076 px de fuente; hay 800). A 320 px: 320 − 2 × 24 =
+272 px → foto 272 × 340 px.
+
+**Comprobaciones hechas** (resultado en la spec): (1) `Catalogo.tsx` puede llegar al 100 %: sus
+_template literals_ mueren leyendo el `class` del `renderToString` y aseverando la parte global
+(`equipo.test.tsx:134`, `contacto.test.tsx:110`, `reserva.test.tsx:80`); hoy no tiene ningún test y no
+está en `mutate`. (2) `cabecera.test.tsx` @s17 lee los bytes de `cabecera.module.scss`; `_base.scss:36`
+y `scroll-padding-cabecera.test.ts` derivan de ella los 76 px **sin leerla**. (3) El hero usa
+`partirNombre(NOMBRE).marca` (`Hero.tsx:104`) y `VISTA_MARCA`; el logo debe reutilizar los dos.

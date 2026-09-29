@@ -3859,7 +3859,7 @@ de cada categoría se sustituye por
 
 con `ANCHO_FOTO = 800` y `ALTO_FOTO = 1000`: las medidas **reales** de los ficheros, que además coinciden con
 el hueco 4:5 (precedente `Equipo.tsx`, 800 × 600). Mismo sitio en el DOM (después de la carta): el orden visual
-y el de lectura no cambian. Tras las leyendas de precios, un `<p>` con `LEYENDA_FOTOS`, **exactamente una
+y el de lectura no cambian. Tras la leyenda de precios, un `<p>` con `LEYENDA_FOTOS`, **exactamente una
 vez**, justo después del de `LEYENDA_PRECIOS`. La sección, su `<h2 id="servicios-titulo">` oculto, los `<h3>` y el CTA quedan intactos.
 
 **CF-C3 · Hoja** (`src/components/catalogo.module.scss`, `.foto`). `display: block; width: 100%; height: auto;
