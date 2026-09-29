@@ -363,7 +363,7 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
   @s11
   Scenario: El punto de salida del vuelo son tres custom properties en el style del <a>, calculadas con la caja del RÓTULO (origen) y la del <svg> del LOGO (destino), y llegan en la MISMA entrega que los dos atributos (LA-C2, LA-C7)
     Given la cabecera montada con IntersectionObserver sustituido y la geometría de referencia —origen left 365 · top -58 · width 550 · height 100; <svg> del logo left 40 · top 17 · width 137.5 · height 40; el <a> como SEÑUELO left 24 · top 22.4 · width 181 · height 28.8— y una entrega inicial con «STUDIO» a la vista (bottom 400)
-    When el observador entrega, en UNA sola llamada al callback, una entrada con «STUDIO» en bottom 73.2
+    When el observador entrega, en UNA sola llamada al callback, una entrada con «STUDIO» en bottom 73
     Then tras esa misma llamada el <a> tiene data-logo="caligrafia" y data-vuelo="si", y su style declara EXACTAMENTE tres propiedades
     And style.getPropertyValue("--vuelo-x") es "325px", style.getPropertyValue("--vuelo-y") es "-75px" y style.getPropertyValue("--vuelo-escala") es "4"
     And ninguna otra etiqueta del documento ha recibido atributo style: ni el <svg> del logo, ni el <svg> del rótulo, ni «STUDIO»
@@ -377,7 +377,7 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
   @s12
   Scenario Outline: Sin una transformación FLIP válida el logo se acopla SIN vuelo y sin errores (LA-C6.3, LA-C7; casos límite 11 y 12)
     Given la cabecera montada con IntersectionObserver sustituido, la geometría de referencia salvo que <cambio>, console.error espiado y una entrega inicial con «STUDIO» a la vista (bottom 400)
-    When el observador entrega una entrada con «STUDIO» en bottom 73.2
+    When el observador entrega una entrada con «STUDIO» en bottom 73
     Then el <a> tiene data-logo="caligrafia" y data-vuelo="no", y NO lleva atributo style
     And disconnect se ha llamado EXACTAMENTE una vez y console.error no se ha llamado
 
