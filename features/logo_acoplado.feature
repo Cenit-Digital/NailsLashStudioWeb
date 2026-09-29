@@ -285,21 +285,32 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
     # todo aviso de salida cumple `<=` contra esa MISMA línea y el acople no se pierde (fila 72.5).
 
   @s7
-  Scenario Outline: El borde de la cabecera se mide EN EL CALLBACK, no al crear el observador —con el menú móvil abierto la cabecera es más alta— (caso límite 13)
-    Given la cabecera montada con IntersectionObserver sustituido, creado cuando la cabecera medía 73.2 px (rootMargin "-74px 0px 0px 0px"), y una primera entrega con «STUDIO» a la vista (bottom 400)
+  Scenario Outline: La línea de la decisión es la del PROPIO OBSERVADOR (rootBounds.top); solo si rootBounds es null cae al borde de la cabecera medido EN EL CALLBACK —y un cambio de alto de la cabecera no rehace el observador— (D-1 b, D-2; caso límite 13)
+    Given la cabecera montada con IntersectionObserver sustituido, creado cuando la cabecera medía 73.6 px (rootMargin "-73px 0px 0px 0px"), y una primera entrega con «STUDIO» a la vista (bottom 400, rootBounds.top 73)
     And la cabecera pasa a medir <borde de la cabecera> px de borde inferior antes de la siguiente entrega
-    When el observador entrega una entrada de «STUDIO» con boundingClientRect.bottom = 150 e isIntersecting false
+    When el observador entrega una entrada de «STUDIO» con boundingClientRect.bottom = <bottom>, isIntersecting <isIntersecting> y rootBounds <rootBounds>
     Then el <a> tiene data-logo="<data-logo>"
-    And el constructor de IntersectionObserver sigue con EXACTAMENTE una llamada: el observador no se rehace
+    And el constructor de IntersectionObserver sigue con EXACTAMENTE una llamada y observe con una: el observador no se rehace
 
     Examples:
-      | borde de la cabecera | data-logo  | por qué                                                        |
-      | 260                  | caligrafia | menú abierto: 150 <= 260, «STUDIO» ya está tapado por el menú  |
-      | 73.2                 | texto      | menú cerrado: 150 > 73.2, «STUDIO» todavía se ve               |
+      | rootBounds       | borde de la cabecera | bottom | isIntersecting | data-logo  | por qué                                                                                           |
+      | con top 73       | 260                  | 150    | true           | texto      | manda la línea del observador: 150 > 73, aunque el menú abierto (260) ya tape «STUDIO»            |
+      | con top 73       | 73.6                 | 73.4   | true           | texto      | manda la línea del observador (73), no el borde medido (73.6): aviso y decisión, la misma línea   |
+      | con top 73       | 73.6                 | 73     | true           | caligrafia | frontera exacta sobre la línea del observador                                                     |
+      | con top 73       | 70                   | 72     | true           | caligrafia | la cabecera ENCOGIÓ tras montar (D-2): el acople se adelanta ≤ 4 px, y no se pierde               |
+      | null             | 260                  | 150    | false          | caligrafia | sin rootBounds: el borde medido EN el callback, con el menú abierto: 150 <= 260                   |
+      | null             | 73.6                 | 150    | false          | texto      | sin rootBounds, con el menú cerrado: 150 > 73.6                                                   |
+      | null             | 73.6                 | 73.6   | false          | caligrafia | sin rootBounds: frontera exacta sobre el borde medido                                             |
 
-    # Con el menú abierto la cabecera es más alta que al crear el observador: el aviso llega al cruzar la
-    # línea de la cabecera CERRADA y la decisión usa el borde medido en ESE momento. Si «STUDIO» se esconde
-    # antes bajo el menú abierto, el disparo espera a esa línea: el menú ya tapa el hero.
+    # D-1 (b): el navegador avisa la salida cuando el borde de «STUDIO» queda por encima de rootBounds.top,
+    # su propia línea. Comparar contra ESA línea hace coherentes aviso y decisión por construcción: nunca
+    # llega un aviso de salida que la decisión rechace, y el acople no se pierde. rootBounds es null en
+    # casos raros (p. ej. un documento en un iframe de otro origen): entonces decide el borde de la
+    # cabecera medido en ese momento (la regla original de LA-C4). Caso límite 13, menú móvil abierto: el
+    # aviso llega al cruzar la línea de la cabecera CERRADA; si «STUDIO» se esconde antes bajo el menú, el
+    # disparo espera a esa línea, porque el menú ya tapa el hero (fila 1). D-2, caso límite ACEPTADO: si la
+    # cabecera cambia de alto tras montar, el disparo se adelanta o se retrasa ≈ 4 px como mucho y el
+    # observador no se rehace (fila 4).
 
   @s8
   Scenario: Monótono (P2) — acoplada, desconecta el observador y NINGUNA entrega posterior la devuelve a «texto», aunque «STUDIO» vuelva a verse
