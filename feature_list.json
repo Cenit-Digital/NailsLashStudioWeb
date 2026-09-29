@@ -508,8 +508,8 @@
       "depends_on": ["header_nav_footer", "hero_marca"],
       "mutable": true,
       "sdd": true,
-      "status": "spec_ready",
-      "puerta_humana": "Decisiones de Pablo por AskUserQuestion el 2026-09-29: P2 «Se queda la caligrafía», P3 «Solo Nails Lash». Pendiente: aprobación de features/logo_acoplado.feature."
+      "status": "in_progress",
+      "puerta_humana": "Decisiones de Pablo por AskUserQuestion el 2026-09-29: P2 «Se queda la caligrafía», P3 «Solo Nails Lash». PUERTA HUMANA APROBADA el 2026-09-29 (AskUserQuestion: «Aprobado, empieza»): features/logo_acoplado.feature, 34 escenarios, con las LA-1..LA-16 y la ENMIENDA D-1 del lead."
     },
     {
       "id": 27,
@@ -526,7 +526,7 @@
       "mutable": true,
       "sdd": true,
       "status": "spec_ready",
-      "puerta_humana": "P1 (Pexels, selección autónoma) el 2026-09-29. BLOQUEO DE ENTORNO: la red del entorno cloud devuelve 403 a Pexels a 2026-09-29."
+      "puerta_humana": "P1 (Pexels, selección autónoma) el 2026-09-29. PUERTA HUMANA APROBADA el 2026-09-29 (AskUserQuestion: «Aprobado, empieza»): features/catalogo_fotos.feature, 26 escenarios, con las CF-1..CF-7. Espera turno tras F-25 (una feature a la vez)."
     }
   ],
   "no_se_construyen": [
