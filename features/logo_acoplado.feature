@@ -618,14 +618,16 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
 
     Examples: margenDeRaiz(altoCabecera)
       | función      | entrada | salida              |
-      | margenDeRaiz | 73.2    | "-74px 0px 0px 0px" |
+      | margenDeRaiz | 73.6    | "-73px 0px 0px 0px" |
+      | margenDeRaiz | 73.2    | "-73px 0px 0px 0px" |
       | margenDeRaiz | 74      | "-74px 0px 0px 0px" |
-      | margenDeRaiz | 70.01   | "-71px 0px 0px 0px" |
+      | margenDeRaiz | 70.99   | "-70px 0px 0px 0px" |
 
     # La escala sale del ANCHO (la dimensión mayor, la más precisa); con alto 100 frente a 40 una escala por
     # el alto daría 2,5 y no 4. `variablesDeVuelo` no redondea: el navegador trabaja en fracciones de píxel.
-    # ⚠ D-1: `margenDeRaiz` lleva hoy el ceil de la spec (73,2 → "-74px…", distinto de Math.round). Si la
-    # puerta acepta D-1 (floor), las filas pasan a "-73px…", "-74px…" y "-70px…": cambia el valor, no la forma.
+    # `margenDeRaiz` usa Math.FLOOR (D-1 a, decisión del lead): la línea queda en el borde de la cabecera o
+    # por encima, nunca por debajo. 73,6 y 70,99 distinguen floor de Math.round (74, 71) y de Math.ceil
+    # (74, 71); 73,2 distingue floor de ceil; 74 fija que un entero no se toca.
 
   # ---------------------------------------------------------------------------------------------
   # FUENTE Y MUTACIÓN (LA-C11, I-7).
@@ -673,7 +675,8 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
   Scenario: [VERIFICACIÓN EN VIVO CON CHROME, NO jsdom] Al quedar «STUDIO» entero bajo el borde de la cabecera, «Nails Lash» sube encogiéndose desde el rótulo hasta la esquina en 0,9 s, de translúcido a opaco, mientras «nails lash studio» se desvanece
     Given el mismo dist/ servido en Chrome real a 1280 × 800 y a 320 × 640, sin preferencia de movimiento reducido y cargado arriba del todo
     When se hace scroll hacia abajo en pasos de 1 px, de 2 px y de 100 px (tres pasadas, recargando arriba entre ellas) hasta dejar «STUDIO» por encima del borde inferior de la cabecera
-    Then mientras asoma 1 px de «STUDIO» bajo la cabecera, el <a> sigue en data-logo="texto"; y en las TRES pasadas pasa a data-logo="caligrafia" con data-vuelo="si" en cuanto el borde inferior de «STUDIO» es <= el de la cabecera, sin tener que volver a bajar (D-1)
+    Then mientras asoma 1 px de «STUDIO» bajo la cabecera, el <a> sigue en data-logo="texto"; y en las TRES pasadas pasa a data-logo="caligrafia" con data-vuelo="si" en el primer fotograma en que el borde inferior de «STUDIO» queda en la línea del observador (−floor del alto de la cabecera) o por encima, sin tener que volver a bajar (D-1: el acople nunca se pierde)
+    And en ese fotograma ningún píxel de «STUDIO» asoma bajo la cabecera: la línea del observador está en su borde o, como mucho, 1 px por encima
     And en ese instante getAnimations() del <svg> del logo devuelve EXACTAMENTE una animación, "acoplar", de 900 ms con easing "cubic-bezier(0.45, 0, 0.25, 1)", y la del <span> «nails lash studio» EXACTAMENTE una, "soltar", de 400 ms "linear"
     And el primer fotograma pintado de la firma está sobre el rótulo del hero, no en la esquina (sin destello), con opacidad ≈ 0,35; al terminar queda en su sitio con opacidad 1 y transform "none"
     And si se sigue haciendo scroll durante el vuelo, en cualquier sentido, ni la trayectoria ni el destino cambian (caso límite 8), y la firma pasa POR ENCIMA del cristal de la cabecera, nítida
