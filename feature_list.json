@@ -517,7 +517,7 @@
       "title": "Fotos reales en las cards de Uñas, Facial y Depilación del catálogo",
       "description": "Punto 2 del encargo de Pablo (2026-09-29). Sustituye el hueco rosa placeholder (div.foto aria-hidden 4:5) de cada categoría del catálogo por una foto de Pexels (P1) relacionada con ese servicio, sin rostro identificable, alojada en el repo, con alt útil, width/height, loading=lazy y object-fit cover. La leyenda declara que son fotos de banco de imágenes (precedente equipo/galería).",
       "acceptance": [
-        "Escenarios de features/catalogo_fotos.feature verdes por TDD",
+        "Los 26 escenarios de features/catalogo_fotos.feature verdes por TDD (@s22-@s26 en vivo)",
         "judge APROBADO",
         "Mutación al 100% sobre lo mutable tocado",
         "Verificación en vivo: 3 fotos cubren su card sin deformarse, móvil 320 px"
@@ -525,7 +525,7 @@
       "depends_on": ["cero_terceros"],
       "mutable": true,
       "sdd": true,
-      "status": "pending",
+      "status": "spec_ready",
       "puerta_humana": "P1 (Pexels, selección autónoma) el 2026-09-29. BLOQUEO DE ENTORNO: la red del entorno cloud devuelve 403 a Pexels a 2026-09-29."
     }
   ],
