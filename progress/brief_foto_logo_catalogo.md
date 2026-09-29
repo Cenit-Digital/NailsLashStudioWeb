@@ -163,3 +163,13 @@ sin cara).
 1. **F-25 `logo_acoplado`** — no depende de fotos; se puede hacer ya.
 2. **F-26 `hero_foto`** — necesita la foto panorámica (Pexels desbloqueado).
 3. **F-27 `catalogo_fotos`** — necesita las 3 fotos verticales.
+
+## 4. Actualización 2026-09-29 (tarde)
+
+- Pablo abrió la red del entorno a «Completo»: `images.pexels.com` responde 200. `www.pexels.com`
+  sigue tras el desafío anti-bots de Cloudflare, pero las fotos se descargan del CDN oficial.
+- **Fotos elegidas y medidas por el lead:** `progress/fotos_seleccion.md` (hero 939835, Uñas
+  34373403, Facial 7479587, Depilación 5202459) con la luminancia REAL de la foto del hero
+  (mediana 0,70; píxel más oscuro 0,137). Abre un modelo de contraste alternativo al del negro
+  puro: el peor under = el píxel más oscuro real de la foto, vigilado por un test que decodifica
+  el JPEG commiteado.
