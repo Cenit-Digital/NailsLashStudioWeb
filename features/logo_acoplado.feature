@@ -314,7 +314,7 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
 
   @s8
   Scenario: Monótono (P2) — acoplada, desconecta el observador y NINGUNA entrega posterior la devuelve a «texto», aunque «STUDIO» vuelva a verse
-    Given la cabecera montada con IntersectionObserver sustituido, la geometría de referencia y el logo ya acoplado con vuelo (una entrega inicial con «STUDIO» en bottom 400 y otra en 73.2), con el atributo style del <a> anotado
+    Given la cabecera montada con IntersectionObserver sustituido, la geometría de referencia y el logo ya acoplado con vuelo (una entrega inicial con «STUDIO» en bottom 400 y otra en 73), con el atributo style del <a> anotado
     When el observador entrega otra entrada con «STUDIO» de nuevo a la vista (bottom 400, isIntersecting true), como al volver arriba del todo
     Then el <a> sigue en data-logo="caligrafia" y data-vuelo="si", con el MISMO atributo style que tenía
     And disconnect se ha llamado EXACTAMENTE una vez (al acoplar) y el constructor de IntersectionObserver EXACTAMENTE una vez
@@ -347,9 +347,9 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
 
     Examples:
       | antecedente                                              | borde del origen | bottom de STUDIO | data-vuelo | style del a                                                   | caso                                                                    |
-      | ninguno: es la entrega INICIAL                           | 42               | 73.2             | no         | NO lleva atributo style                                       | recarga ya desplazada, con el rótulo cerca: nada que haya visto subir   |
+      | ninguno: es la entrega INICIAL                           | 42               | 73               | no         | NO lleva atributo style                                       | recarga ya desplazada, con el rótulo cerca: nada que haya visto subir   |
       | ninguno: es la entrega INICIAL                           | -2400            | -2369            | no         | NO lleva atributo style                                       | carga directa en un ancla lejana (caso límite 2)                        |
-      | una entrega inicial con «STUDIO» a la vista (bottom 400) | 42               | 73.2             | si         | lleva "--vuelo-x", "--vuelo-y" y "--vuelo-escala" en su style | cruce por scroll o por un enlace de la nav (casos límite 4 y 6)         |
+      | una entrega inicial con «STUDIO» a la vista (bottom 400) | 42               | 73               | si         | lleva "--vuelo-x", "--vuelo-y" y "--vuelo-escala" en su style | cruce por scroll o por un enlace de la nav (casos límite 4 y 6)         |
       | una entrega inicial con «STUDIO» a la vista (bottom 400) | -811             | -780             | si         | lleva "--vuelo-x", "--vuelo-y" y "--vuelo-escala" en su style | 1 px más cerca que un viewport: vuela                                   |
       | una entrega inicial con «STUDIO» a la vista (bottom 400) | -812             | -781             | no         | NO lleva atributo style                                       | exactamente un viewport por encima: frontera, sin vuelo                 |
       | una entrega inicial con «STUDIO» a la vista (bottom 400) | -2400            | -2369            | no         | NO lleva atributo style                                       | salto lejano instantáneo o scroll restaurado tarde (casos límite 3 y 5) |
