@@ -390,7 +390,7 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
   @s13
   Scenario: El componente NO consulta la preferencia de movimiento, NO anima con JS y NO escucha el scroll: con «reduce» activo marca data-vuelo="si" igual, porque lo resuelve la hoja (LA-1, LA-C6, LA-6)
     Given window.matchMedia sustituido por un espía que responde matches=true, Element.prototype.animate definido como espía, window.addEventListener y document.addEventListener espiados, IntersectionObserver sustituido y la geometría de referencia
-    When se completa un acople con vuelo: montaje de <Cabecera />, entrega inicial con «STUDIO» en bottom 400 y entrega con «STUDIO» en 73.2
+    When se completa un acople con vuelo: montaje de <Cabecera />, entrega inicial con «STUDIO» en bottom 400 y entrega con «STUDIO» en 73
     Then el <a> tiene data-logo="caligrafia" y data-vuelo="si", con "--vuelo-x", "--vuelo-y" y "--vuelo-escala" en su style
     And matchMedia NO se ha llamado ninguna vez y animate NO se ha llamado ninguna vez
     And ni window.addEventListener ni document.addEventListener han recibido "scroll" ni "resize"
