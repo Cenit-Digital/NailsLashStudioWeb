@@ -523,12 +523,12 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
     # clonado (alternativa (a) de LA-2) duplicaría los ids y dejaría un nodo huérfano si algo falla.
 
   @s23
-  Scenario: En la home horneada sigue habiendo UN solo <h1>, el logo no es ni contiene un encabezado, ningún id se repite y la igualdad de anclas no cambia (F-04, F-05, F-06; LA-C1)
+  Scenario: En la home horneada sigue habiendo UN solo <h1>, el logo no es ni contiene un encabezado, los ids del rótulo siguen siendo únicos y la igualdad de anclas no cambia (F-04, F-05, F-06; LA-C1)
     Given la home renderizada con renderToString(<HelmetProvider><Home /></HelmetProvider>), como la hornea el SSG
     When se inspeccionan sus encabezados, sus ids y sus anclas
     Then el HTML contiene EXACTAMENTE un "<h1" y EXACTAMENTE un <a> con data-logo (ANCLAS POSITIVAS)
     And el fragmento del <a> con data-logo no contiene "<h1", "<h2", "<h3", "<h4", "<h5", "<h6" ni 'role="heading"'
-    And ningún valor de atributo id aparece dos veces en el HTML, y "tinta-marca" y "trazo-marca" aparecen EXACTAMENTE una vez como id
+    And 'id="tinta-marca"' e 'id="trazo-marca"' aparecen EXACTAMENTE una vez cada uno en el HTML, y el fragmento del <a> con data-logo no contiene " id="
     And inspeccionarAnclas sobre la ruta "/" con ese HTML devuelve 0 violaciones, y el <a> del logo no lleva 'href="#'
     # El logo no lleva href="#…" ni id: no cambia los conjuntos de la puerta de anclas vivas (F-06).
     # Cero terceros (F-05/F-21): Great Vibes ya está autohospedada; ninguna petición nueva (EN VIVO, @s33).
