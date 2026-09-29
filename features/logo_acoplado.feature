@@ -87,7 +87,7 @@
 #   · jsdom + render + IntersectionObserver SUSTITUIDO (precedente `stubDeIntersectionObserver` de
 #     galeria.test.tsx: captura callback y opciones; observe/disconnect espiados). Las entregas se
 #     hacen A MANO dentro de act(), con geometría REAL y nunca ceros, y la cabecera, el origen y el
-#     <svg> del logo con getBoundingClientRect fijado ANTES del montaje: @s3, @s5-@s14, @s22.
+#     <svg> del logo con getBoundingClientRect fijado ANTES del montaje: @s3, @s5-@s14, @s22, @s34.
 #   · Funciones PURAS por valor: @s24, @s25 → logo-acoplado-logica.test.ts.
 #   · BYTES del SCSS (`cuerpoDelBloque`, ANCLA POSITIVA SIEMPRE primero; jsdom corre con `css: false` y
 #     no ejecuta animaciones): @s15-@s20 → logo-acoplado-estilos.test.ts (@s20, en cabecera.test.tsx).
