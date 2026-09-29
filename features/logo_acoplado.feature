@@ -571,16 +571,16 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
     When se evalúa con <entrada>
     Then devuelve <salida>
 
-    Examples: estadoTrasObservar(actual, bordeInferiorDisparo, bordeInferiorCabecera)
-      | función            | entrada                  | salida       |
-      | estadoTrasObservar | "texto", 73.2, 73.2      | "caligrafia" |
-      | estadoTrasObservar | "texto", 73.7, 73.2      | "texto"      |
-      | estadoTrasObservar | "texto", 12.5, 73.2      | "caligrafia" |
-      | estadoTrasObservar | "texto", -640, 73.2      | "caligrafia" |
-      | estadoTrasObservar | "texto", 912, 73.2       | "texto"      |
-      | estadoTrasObservar | "texto", 150, 260        | "caligrafia" |
-      | estadoTrasObservar | "caligrafia", 912, 73.2  | "caligrafia" |
-      | estadoTrasObservar | "caligrafia", 73.7, 73.2 | "caligrafia" |
+    Examples: estadoTrasObservar(actual, bordeInferiorDisparo, lineaDeCorte) — lineaDeCorte = rootBounds.top, o el borde medido si es null
+      | función            | entrada                | salida       |
+      | estadoTrasObservar | "texto", 73, 73        | "caligrafia" |
+      | estadoTrasObservar | "texto", 73.5, 73      | "texto"      |
+      | estadoTrasObservar | "texto", 12.5, 73      | "caligrafia" |
+      | estadoTrasObservar | "texto", -640, 73      | "caligrafia" |
+      | estadoTrasObservar | "texto", 912, 73       | "texto"      |
+      | estadoTrasObservar | "texto", 150, 260      | "caligrafia" |
+      | estadoTrasObservar | "caligrafia", 912, 73  | "caligrafia" |
+      | estadoTrasObservar | "caligrafia", 73.5, 73 | "caligrafia" |
 
     Examples: debeVolar({ primeraObservacion, bordeInferiorOrigen, altoViewport })
       | función   | entrada            | salida |
@@ -591,7 +591,9 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
       | debeVolar | false, -2400, 812  | false  |
       | debeVolar | true, -2400, 812   | false  |
 
-    # Fronteras (LA-C11): disparo IGUAL a la cabecera → «caligrafia», medio píxel por debajo → «texto»;
+    # Qué línea se pasa (rootBounds.top o el borde medido) lo decide el componente y lo fija @s7; la
+    # función pura solo compara. Fronteras (LA-C11): disparo IGUAL a la línea → «caligrafia», medio píxel
+    # por debajo → «texto»;
     # origen IGUAL a −altoViewport → sin vuelo, 1 px por encima → vuelo. Desde «caligrafia» siempre
     # «caligrafia» (P2): la monotonía no depende solo de desconectar. Nada se deriva en la carga del módulo.
 
