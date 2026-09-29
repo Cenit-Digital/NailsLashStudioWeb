@@ -155,7 +155,8 @@
 # =============================================================================================
 # TRAZA — contrato, casos límite y decisiones → escenario
 # =============================================================================================
-#   LA-C1 → @s1, @s2, @s3, @s4, @s23 · LA-C2 → @s1, @s10, @s11 · LA-C3 → @s15-@s19 · LA-C4 → @s5, @s6, @s7
+#   LA-C1 → @s1, @s2, @s3, @s4, @s23 · LA-C2 → @s1, @s10, @s11 · LA-C3 → @s15-@s19
+#   LA-C4 (enmendada por D-1) → @s5, @s6, @s7, @s34 · D-2 → @s7 · D-3 → @s31 · D-4 → @s34 · D-5 → @s19, @s28
 #   LA-C5 → @s8, @s9 · LA-C6 → @s10, @s12, @s13 · LA-C7 → @s11, @s12, @s25 · LA-C8 → @s22 (+ @s29)
 #   LA-C9 → @s1, @s14, @s21 · LA-C10 → @s5, @s14 · LA-C11 → @s24, @s25, @s27 · LA-C12 → @s19 (+ @s33)
 #   LA-C13 → @s1, @s28, @s32 · Enmiendas: F-06 → @s20, @s23 · F-07 → @s21, @s22 · F-03 → @s19 ·
@@ -164,7 +165,7 @@
 #   6 → @s6, @s10 · 7 → @s8, @s30 · 8 → @s29 (EN VIVO) · 9 → @s16, @s31 · 10 → @s14 · 11 → @s12, @s14 ·
 #   12 → @s12 · 13 → @s7 · 14 → @s22, @s29 · 15 → @s18, @s32 · 16 → @s32 · 17 → @s30 · 18 → @s30 ·
 #   19 → @s6, @s24 · 20 → @s19, @s29, @s33.
-#   Acceptance de feature_list.json: «escenarios verdes por TDD» → @s1-@s26 · «mutación al 100 %» → @s27 ·
+#   Acceptance de feature_list.json: «escenarios verdes por TDD» → @s1-@s26 y @s34 · «mutación al 100 %» → @s27 ·
 #   «verificación en vivo: disparo, vuelo visible, se queda al volver arriba, reduce sin vuelo, 320 px
 #   sin CLS» → @s29, @s29, @s30, @s31, @s32 (+ @s28, @s33) · «judge APROBADO» → fuera de este fichero.
 # =============================================================================================
