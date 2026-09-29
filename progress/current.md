@@ -12,13 +12,17 @@
   sigue sin ella (paso no bloqueante).
 - **Features registradas** en `feature_list.json`: F-25 `logo_acoplado`, F-26 `hero_foto`,
   F-27 `catalogo_fotos` (todas `pending`, orden de TDD 25 → 26 → 27).
-- **Bloqueo de entorno:** el proxy de salida del entorno cloud devuelve 403 (política de red) a
-  `www.pexels.com`, `images.pexels.com`, `api.pexels.com` e `images.unsplash.com`. F-26/F-27 no
-  pueden cerrar sin fotos; F-25 no depende de ellas.
+- **Bloqueo de entorno (RESUELTO):** el proxy devolvía 403 a Pexels; Pablo subió el acceso a red
+  del entorno a «Completo» y `images.pexels.com` responde 200 (`www.pexels.com` sigue tras el
+  anti-bots de Cloudflare, sin importancia: las fotos salen del CDN).
+- **Fotos elegidas por el lead** (P1): `progress/fotos_seleccion.md`, ya en `src/assets/hero/` y
+  `src/assets/servicios/` sin importar aún (commit 3dd425b).
+- El primer `spec_partner` se detuvo al interrumpir el humano la sesión sin escribir nada; se
+  relanzó con las fotos y sus medidas.
 
 ### Fases
 
-- [ ] spec_partner → `project-spec.md` §F-25/§F-26/§F-27
+- [ ] spec_partner → `project-spec.md` §F-25/§F-26/§F-27 (en curso)
 - [ ] gherkin_author → `features/logo_acoplado.feature`, `features/hero_foto.feature`, `features/catalogo_fotos.feature`
 - [ ] ⏸ puerta humana sobre los `.feature`
 - [ ] F-25: tdd_craftsman → judge → mutation_tester
