@@ -50,7 +50,7 @@
 #   TOCA: Cabecera.tsx (monta <LogoAcoplado />) · cabecera.module.scss (las reglas de `.marca` se
 #         MUDAN a la hoja nueva; el `@media (max-width: 820px)` se queda) · Hero.tsx (SOLO dos
 #         atributos estáticos `data-acople`) · hero.test.tsx (aserciones nuevas de @s21) ·
-#         stryker.config.json (+2 en `mutate`).
+#         cabecera.test.tsx (@s20) · stryker.config.json (+2 en `mutate`).
 #   NO TOCA: data-firma, el control «Completar la firma» ni el reloj de 15 s del hero (LA-C8, LA-16);
 #         `MATRIZ_DE_USO` ni `MINIMO_DE_PARES` (LA-12); `_tokens.scss` ni el 88 % de `--header-bg`;
 #         `_base.scss` (el `scroll-padding-top: 6rem` y los 76 px que deriva a mano, F-06 @s11).
@@ -136,6 +136,25 @@
 #     La spec no lo trata. Queda en @s31 como observación en vivo, no como contrato.
 #   · D-4: si una sola entrega trae varias entradas del mismo disparo, la spec no dice cuál decide.
 #     Recomendación: la última. Hoy ningún escenario lo fija.
+#   · D-5 (DERIVADO, añadido aquí): las reglas de `.marca` que se mudan llevan `text-transform: lowercase`
+#     y `letter-spacing: 0.06em`. En `.marca` las HEREDARÍA el <text> de la firma (minúsculas, letras
+#     separadas y la «h» fuera del viewBox). @s19 las pone en `.logoTexto`; @s28 lo mira en vivo.
+#
+# =============================================================================================
+# TRAZA — contrato, casos límite y decisiones → escenario
+# =============================================================================================
+#   LA-C1 → @s1, @s2, @s3, @s4, @s23 · LA-C2 → @s1, @s10, @s11 · LA-C3 → @s15-@s19 · LA-C4 → @s5, @s6, @s7
+#   LA-C5 → @s8, @s9 · LA-C6 → @s10, @s12, @s13 · LA-C7 → @s11, @s12, @s25 · LA-C8 → @s22 (+ @s29)
+#   LA-C9 → @s1, @s14, @s21 · LA-C10 → @s5, @s14 · LA-C11 → @s24, @s25, @s27 · LA-C12 → @s19 (+ @s33)
+#   LA-C13 → @s1, @s28, @s32 · Enmiendas: F-06 → @s20, @s23 · F-07 → @s21, @s22 · F-03 → @s19 ·
+#   F-04/F-05/F-21 → @s23, @s33 · stryker → @s27.
+#   Casos límite: 1 → @s6, @s28 · 2 → @s10, @s30 · 3 → @s10 · 4 → @s10, @s29 · 5 → @s10, @s30 ·
+#   6 → @s6, @s10 · 7 → @s8, @s30 · 8 → @s29 (EN VIVO) · 9 → @s16, @s31 · 10 → @s14 · 11 → @s12, @s14 ·
+#   12 → @s12 · 13 → @s7 · 14 → @s22, @s29 · 15 → @s18, @s32 · 16 → @s32 · 17 → @s30 · 18 → @s30 ·
+#   19 → @s6, @s24 · 20 → @s19, @s29, @s33.
+#   Acceptance de feature_list.json: «escenarios verdes por TDD» → @s1-@s26 · «mutación al 100 %» → @s27 ·
+#   «verificación en vivo: disparo, vuelo visible, se queda al volver arriba, reduce sin vuelo, 320 px
+#   sin CLS» → @s29, @s29, @s30, @s31, @s32 (+ @s28, @s33) · «judge APROBADO» → fuera de este fichero.
 # =============================================================================================
 
 Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del hero, se encoge y se queda de logo en la esquina superior izquierda, sin mover la cabecera ni cambiar el nombre del enlace
@@ -359,7 +378,7 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
 
   @s14
   Scenario Outline: Sin IntersectionObserver o sin «STUDIO» en la página, la marca se queda en «texto» para siempre y sin errores
-    Given console.error espiado y <situación>
+    Given console.error y document.querySelector espiados, y <situación>
     When se monta <Cabecera /> con render(), corren sus efectos y después se desmonta
     Then mientras estuvo montada, el <a> estuvo en data-logo="texto" y data-vuelo="no", sin atributo style
     And <observador>
