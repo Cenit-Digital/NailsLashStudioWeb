@@ -700,7 +700,7 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
     When se hace scroll hasta que «STUDIO» queda bajo la cabecera
     Then el <a> pasa a data-logo="caligrafia" y data-vuelo="si", y en ese mismo fotograma getAnimations() del <svg> del logo y del <span> «nails lash studio» está vacío: «Nails Lash» aparece en su sitio, opaca, y «nails lash studio» desaparece sin fundido
     And con "no-preference", activar "reduce" a mitad de un vuelo lo corta en caliente: el logo queda en su sitio con transform "none" y opacidad 1 (caso límite 9)
-    And [OBSERVACIÓN D-3, NO contrato] con el logo acoplado bajo "reduce", se retira "reduce" y se anota en progress/ si el vuelo se reproduce desde el origen antiguo, para que decida el lead
+    And [OBSERVACIÓN D-3, caso límite ACEPTADO por el lead, NO contrato] con el logo acoplado bajo "reduce", se retira "reduce" y se anota en progress/ si el vuelo se reproduce UNA vez desde el origen antiguo (raro e inofensivo); su resultado no aprueba ni suspende este escenario
 
   @s32 @verificacion-viva
   Scenario Outline: [VERIFICACIÓN EN VIVO CON CHROME, NO jsdom] A <ancho> px la cabecera mide lo MISMO en los dos estados y no más de 76 px, la fila no envuelve y el acople no produce ningún desplazamiento de diseño
