@@ -77,7 +77,7 @@
 #     tomada del alto se pone roja (en el navegador las dos coinciden: comparten VISTA_MARCA).
 #   · [data-acople="disparo"] («STUDIO»): su borde inferior LO TRAE LA ENTRADA del observador
 #     (entry.boundingClientRect.bottom). Su getBoundingClientRect se deja en los CEROS de jsdom: con
-#     ceros, `0 <= 73.2` acoplaría siempre, así que decidir con otra medida que la de la entrada se pone
+#     ceros, `0 <= 73` acoplaría siempre, así que decidir con otra medida que la de la entrada se pone
 #     rojo en las filas que esperan «texto» (@s6).
 #
 # =============================================================================================
@@ -103,7 +103,7 @@
 # ANTI-TAUTOLOGÍA Y PROHIBICIONES
 # =============================================================================================
 #   ✅ Literales A MANO en los tests: "Nails Lash Studio", "Nails Lash", "-80 -840 4120 1200", "texto",
-#      "caligrafia", "no", "si", "-74px 0px 0px 0px", "325px", "-75px", "4", "0.9s",
+#      "caligrafia", "no", "si", "-73px 0px 0px 0px", "325px", "-75px", "4", "0.9s",
 #      "cubic-bezier(0.45, 0, 0.25, 1)", "0.35", "0.4s", "2.5rem", "2.75rem", "var(--ink)".
 #   ❌ PROHIBIDO importar de producción NOMBRE, partirNombre, VISTA_MARCA ni ninguna constante del logo
 #      como VALOR ESPERADO (sí se sustituyen con vi.mock en @s4, que es lo contrario: prueba que se USAN).
