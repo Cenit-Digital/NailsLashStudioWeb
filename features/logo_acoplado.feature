@@ -125,26 +125,32 @@
 #   `--testFiles`. El SCSS es NO-MUTABLE: lo cubren @s15-@s20 (su mutante es HUMANO; su defensa, la puerta).
 #
 # =============================================================================================
-# DUDAS PARA LA PUERTA (detalle en progress/gherkin_logo_acoplado.md)
+# DUDAS DE LA DESTILACIÓN → DECISIONES DEL craftsman_lead (2026-09-29; detalle en
+# progress/gherkin_logo_acoplado.md). El lead enmienda LA-C4/LA-C11 en project-spec.md; este fichero
+# ya refleja las decisiones.
 # =============================================================================================
-#   ⚠ D-1 (BLOQUEANTE, recomiendo volver al spec_partner): `Math.ceil` en el rootMargin pone la línea
-#     del observador (y = 74) POR DEBAJO del borde de la cabecera (73.2). El aviso llega cuando el
-#     borde de «STUDIO» cruza y = 74, así que puede llegar con ese borde en (73.2, 74): la decisión `<=`
-#     devuelve «texto» y el observador NO vuelve a avisar mientras «STUDIO» siga subiendo (ya no
-#     interseca): el acople se PIERDE hasta volver a bajar. Con scroll lento (1-2 px por fotograma) la
-#     probabilidad es alta (≈ 0,8 / Δ). `Math.floor` (o el alto sin redondear) pone la línea en el borde
-#     o por encima y garantiza que todo aviso de salida cumple `<=`. @s5 y @s25 llevan hoy el valor de la
-#     spec (ceil); si la puerta acepta D-1, sus filas cambian de valor, no de forma.
-#   ⚠ D-2: el rootMargin se fija al montar; si la cabecera ENCOGE después (cruzar 820 px al redimensionar:
-#     ≈ 74 px con hamburguesa, ≈ 70 px sin ella), la ventana de D-1 crece a ≈ 4 px.
-#   ⚠ D-3: con `reduce` activo al acoplar, `data-vuelo="si"` queda puesto. Si la persona RETIRA `reduce`
-#     después, la regla del vuelo vuelve a aplicar y el vuelo se reproduce desde el origen ANTIGUO.
-#     La spec no lo trata. Queda en @s31 como observación en vivo, no como contrato.
-#   · D-4: si una sola entrega trae varias entradas del mismo disparo, la spec no dice cuál decide.
-#     Recomendación: la última. Hoy ningún escenario lo fija.
-#   · D-5 (DERIVADO, añadido aquí): las reglas de `.marca` que se mudan llevan `text-transform: lowercase`
-#     y `letter-spacing: 0.06em`. En `.marca` las HEREDARÍA el <text> de la firma (minúsculas, letras
-#     separadas y la «h» fuera del viewBox). @s19 las pone en `.logoTexto`; @s28 lo mira en vivo.
+#   ✅ D-1 ACEPTADA y reforzada. El problema era que `Math.ceil` ponía la línea del observador POR DEBAJO
+#     del borde de la cabecera: el aviso podía llegar con «STUDIO» asomando, la decisión devolvía «texto»
+#     y el observador ya no volvía a avisar, así que el acople se PERDÍA con scroll lento. Queda así:
+#     (a) `margenDeRaiz` = "-<FLOOR(alto)>px 0px 0px 0px". La línea queda en el borde de la cabecera o
+#         por encima. Se elige floor y no el alto exacto porque el margen entero no depende de cómo
+#         redondee cada motor un rootMargin fraccionario (@s5, @s25).
+#     (b) La decisión compara el borde inferior de «STUDIO» con la línea DEL PROPIO OBSERVADOR,
+#         `entry.rootBounds.top`, y no con un alto medido aparte. Si `rootBounds` es null, usa el borde
+#         de la cabecera medido EN el callback (@s7). El aviso de salida llega cuando el borde ya está
+#         por encima de esa misma línea, así que aviso y decisión son coherentes por construcción y el
+#         acople nunca se pierde (@s6, @s7, EN VIVO @s29).
+#   ✅ D-2 RESUELTA por D-1(b), caso límite ACEPTADO. Si la cabecera cambia de alto tras montar (al cruzar
+#     820 px redimensionando: ≈ 74 px con hamburguesa y ≈ 70 px con la nav horizontal), el acople se
+#     adelanta o se retrasa ≈ 4 px como mucho, pero nunca se pierde. El observador NO se rehace (fila de @s7).
+#   ✅ D-3 ACEPTADA como caso límite documentado, NO contrato: si se acopla con «reduce» activo y la
+#     persona lo retira después, el vuelo puede reproducirse UNA vez desde el origen antiguo. Es raro e
+#     inofensivo. Solo queda como observación en @s31.
+#   ✅ D-4 FIJADA: si una entrega trae varias entradas, decide la ÚLTIMA; «primera observación» es la
+#     primera ENTREGA, no la primera entrada (@s34).
+#   ✅ D-5 RATIFICADA: las reglas `text-transform: lowercase` y `letter-spacing: 0.06em` van a
+#     `.logoTexto`; en `.marca` las heredaría el <text> de la firma (@s19; EN VIVO en @s28).
+#   ✅ D-6, D-7 y D-8 RATIFICADAS tal cual (derivados menores, alcance de @s23 y nombres fijados aquí).
 #
 # =============================================================================================
 # TRAZA — contrato, casos límite y decisiones → escenario
