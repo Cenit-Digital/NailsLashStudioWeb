@@ -575,12 +575,12 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
     Then devuelve <salida>
 
     Examples: transformacionFlip(origen, destino) — cajas { left, top, width, height }
-      | función            | entrada                                           | salida                        |
-      | transformacionFlip | { 365, -58, 550, 100 }, { 40, 17, 137.5, 40 }     | { x: 325, y: -75, escala: 4 } |
-      | transformacionFlip | { 60, -41, 206.25, 60 }, { 24, 16, 137.5, 40 }    | { x: 36, y: -57, escala: 1.5 } |
-      | transformacionFlip | { 365, -58, 550, 100 }, { 40, 17, 0, 40 }         | null                          |
-      | transformacionFlip | { 365, -58, 0, 100 }, { 40, 17, 137.5, 40 }       | null                          |
-      | transformacionFlip | { 365, -58, 550, 100 }, { 40, 17, -3, 40 }        | null                          |
+      | función            | entrada                                        | salida                         |
+      | transformacionFlip | { 365, -58, 550, 100 }, { 40, 17, 137.5, 40 }  | { x: 325, y: -75, escala: 4 }  |
+      | transformacionFlip | { 60, -41, 206.25, 60 }, { 24, 16, 137.5, 40 } | { x: 36, y: -57, escala: 1.5 } |
+      | transformacionFlip | { 365, -58, 550, 100 }, { 40, 17, 0, 40 }      | null                           |
+      | transformacionFlip | { 365, -58, 0, 100 }, { 40, 17, 137.5, 40 }    | null                           |
+      | transformacionFlip | { 365, -58, 550, 100 }, { 40, 17, -3, 40 }     | null                           |
 
     Examples: variablesDeVuelo(flip)
       | función          | entrada                            | salida                                                                     |
