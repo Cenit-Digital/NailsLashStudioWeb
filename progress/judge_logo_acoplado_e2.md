@@ -17,32 +17,32 @@ Todos los tests están en `src/components/cabecera.test.tsx`. Los literales van 
 
 - F-06 @s17
   - [x] Then «usa exactamente "920px"» y And «contra el literal a mano»: línea 141,
-    `toMatch(/@media\s*\(\s*max-width:\s*920px\s*\)/)`. El literal está en la regex y no se importa
-    ningún símbolo, porque no hay rama JS de viewport: `grep matchMedia|innerWidth` en `src/` solo da
-    las consultas de movimiento reducido.
+        `toMatch(/@media\s*\(\s*max-width:\s*920px\s*\)/)`. El literal está en la regex y no se importa
+        ningún símbolo, porque no hay rama JS de viewport: `grep matchMedia|innerWidth` en `src/` solo da
+        las consultas de movimiento reducido.
 - F-25 @s20
   - [x] Then «".cabecera" y "@media (max-width: 920px)", sin "767px"»: líneas 205-210.
   - [x] And «sin comentarios, NO "max-width: 820px"» (NUEVO): líneas 212-215, con
-    `sinComentarios(CABECERA)` y `/max-width\s*:\s*820px/`.
+        `sinComentarios(CABECERA)` y `/max-width\s*:\s*820px/`.
   - [x] Los Then de `.marca` y del horneado siguen iguales: líneas 217-238.
 - F-25 @s35 (retoques)
   - [x] «EXACTAMENTE un bloque "@media (max-width: 920px)"»: línea 340, con
-    `MEDIA_MENU = mediaDeAncho('920px')` (línea 257, literal a mano).
+        `MEDIA_MENU = mediaDeAncho('920px')` (línea 257, literal a mano).
   - [x] «el bloque de 920 sigue declarando … y NO contiene ".reservar"»: líneas 385-395.
 - F-25 @s42 (describe «F-25 E-2 @s42», líneas 629-688)
   - [x] Then 1, ANCLA POSITIVA primero, EXACTAMENTE un `@media (max-width: 920px)`: líneas 630-632.
   - [x] And 2, `.disparador` inline-flex, `.lista` none y `flex-direction: column`, y
-    `[aria-expanded='true'] + .lista` flex: líneas 634-644.
+        `[aria-expanded='true'] + .lista` flex: líneas 634-644.
   - [x] And 3, el bloque va DESPUÉS de las bases `.lista` y `.disparador` de primer nivel: líneas
-    646-658. Cada base tiene su ancla `not.toBeNull()`.
+        646-658. Cada base tiene su ancla `not.toBeNull()`.
   - [x] And 4, EXACTAMENTE un `@media (max-width: 430px)` y detrás del de 920: líneas 660-667.
   - [x] And 5, sin `max-width: 820px` (hoja sin comentarios), sin `921px` ni `767px` (bytes crudos, que
-    es más estricto): líneas 669-675.
+        es más estricto): líneas 669-675.
   - [x] And 6, contacto tiene EXACTAMENTE un `@media (max-width: 820px)` con `.telefono` inline-flex y
-    `min-height: 2.75rem`, y no contiene `920px` (sin comentarios, como pide el When): líneas 677-687.
+        `min-height: 2.75rem`, y no contiene `920px` (sin comentarios, como pide el When): líneas 677-687.
   - [x] And 7, los literales "920px", "820px", "430px", "921px" y "767px" van a mano: cada `it` de @s42
-    llama a `mediaDeAncho('…')` con su literal o lo escribe en la regex o la cadena. Ninguno usa
-    `MEDIA_MENU` ni `MEDIA_MOVIL`. `mediaDeAncho` (líneas 259-262) solo construye la forma de la regex.
+        llama a `mediaDeAncho('…')` con su literal o lo escribe en la regex o la cadena. Ninguno usa
+        `MEDIA_MENU` ni `MEDIA_MOVIL`. `mediaDeAncho` (líneas 259-262) solo construye la forma de la regex.
 - @s39 (filas 920/921) y @s43: [n/a en jsdom], `@verificacion-viva`, a cargo del lead. La bitácora TDD
   no los finge (tabla de trazabilidad, filas @s39/@s43).
 
@@ -151,5 +151,4 @@ Ninguno.
   `Co-Authored-By`/`Claude-Session`. Además, la bitácora (`progress/tdd_logo_acoplado.md:895`) dice «Sin
   commits», escrito antes de que el lead hiciera el commit.
 - **N-7** El cierre de E-2 queda pendiente de la verificación EN VIVO del lead: @s43, las filas 920/921 de
-  @s39 y el repaso de @s32/@s39 (E-2-C4), sobre un `dist/` reconstruido. El `dist/` anterior llevaba el
-  820.
+  @s39 y el repaso de @s32/@s39 (E-2-C4), sobre un `dist/` reconstruido. El `dist/` anterior llevaba el 820.
