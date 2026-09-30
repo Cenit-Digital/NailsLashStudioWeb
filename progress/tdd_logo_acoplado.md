@@ -401,7 +401,7 @@ Cubiertos por TDD en jsdom o por bytes: **28** (@s1-@s27 y @s34). En vivo, pendi
 
 ## Desviaciones y apoyos declarados
 
-1. **@s26, cláusula «trazo-marca» → A RATIFICAR por el lead** (detalle en el ciclo 26). El import de
+1. **@s26, cláusula «trazo-marca» → RATIFICADA por el lead el 2026-09-30** (enmienda escrita en `features/logo_acoplado.feature` @s26) (detalle en el ciclo 26). El import de
    `VISTA_MARCA` desde el módulo generado `src/lib/trazo-marca.ts` hace imposible la letra. El test quita
    ese especificador, y solo ese, y exige que aparezca exactamente una vez. Propongo enmendar esa
    línea del `.feature`. Si el lead la rechaza, la otra salida es un módulo que solo reexporte la

@@ -639,7 +639,12 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
     When se buscan en ellos los literales vigilados
     Then LogoAcoplado.tsx SÍ contiene "export function LogoAcoplado", "IntersectionObserver", "data-logo", "data-vuelo", "partirNombre" y "VISTA_MARCA", y logo-acoplado-logica.ts SÍ contiene "export function" (ANCLAS POSITIVAS, primero)
     And ninguno de los dos contiene "matchMedia", ".animate(", "requestAnimationFrame", "startViewTransition", "animation-timeline", "'scroll'", '"scroll"', "localStorage", "sessionStorage", "document.cookie", "fetch(" ni "XMLHttpRequest"
-    And ninguno de los dos contiene "Nails Lash", "-80 -840 4120 1200", "tinta-marca" ni "trazo-marca" (los comentarios también son bytes)
+    And ninguno de los dos contiene "Nails Lash", "-80 -840 4120 1200", "tinta-marca" ni "trazo-marca" (los comentarios también son bytes), salvo el especificador del import de VISTA_MARCA, from '../lib/trazo-marca', que LogoAcoplado.tsx trae EXACTAMENTE una vez
+    # ENMIENDA @s26 (craftsman_lead, 2026-09-30, a propuesta del tdd_craftsman): la redacción original
+    # era imposible junto a @s4/LA-15, que exigen importar VISTA_MARCA del módulo GENERADO
+    # src/lib/trazo-marca.ts (nadie la reexporta). La intención —que el logo no copie los ids del rótulo
+    # (LA-C1)— queda intacta: fuera de ese import, "trazo-marca" sigue siendo rojo, comentarios incluidos.
+    # Se descarta crear un módulo solo para reexportar la constante: sería un artefacto para esquivar la guarda.
     And LogoAcoplado.tsx NO contiene "aria-label", "animation" ni "dangerouslySetInnerHTML"
     # NINGUNA guarda veta `if (`, `?`, `&&` ni `||`: los dos ficheros están en `mutate` y Stryker los lee
     # instrumentados. Las de aquí solo vetan literales que Stryker nunca inyecta. La prueba de que se USA
