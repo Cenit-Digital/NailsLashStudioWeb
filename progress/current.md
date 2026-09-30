@@ -35,7 +35,7 @@
 - [x] F-25 tdd_craftsman: 28 escenarios en jsdom/bytes (@s1-@s27, @s34), suite 1671/1671 (fff8588). El
       contenedor se reinició a mitad (probablemente dos suites concurrentes): se relanzó desde la bitácora
       sin perder nada (de08858). Desviación @s26 ratificada y enmendada en el `.feature` (7aa8ba9).
-- [ ] F-25 judge (en curso) → mutation_tester → verificación en vivo del lead (@s28-@s33)
+- [x] F-25 judge → mutation_tester → verificación en vivo del lead → `done` (ver ENMIENDAS E-1 y E-2 abajo)
 - [x] ~~F-26 `hero_foto`~~ — DESCARTADA por Pablo el 2026-09-29 («no quiero imagen»); en `no_se_construyen`
 - [ ] F-27: (fotos) tdd_craftsman → judge → mutation_tester
 
@@ -60,6 +60,8 @@
 - [x] ⏸ puerta humana de E-2 APROBADA por Pablo el 2026-09-30 («Aprobado, prográmalo»)
 - [x] tdd_craftsman: VERDE, suite 1694/1694 (+1 negativa en @s20, +6 de @s42), typecheck/lint/format
       limpios, sabotajes (a)-(e) demostrados → 199ca7a (instantánea en verde)
-- [ ] judge (en curso) · `pnpm build` en verde con las 5 puertas; CSS horneado con un solo 920 (menú),
-      un 430 (E-1) y un 820 (tel: de contacto) · verificación en vivo completa @s28-@s43 (en curso)
-- [ ] F-25 `done`
+- [x] judge E-2 APPROVED, 0 bloqueantes y 7 notas; sabotajes reproducidos por el judge (2df3ae8/dd5a248)
+- [x] Verificación en vivo final 62/62 ✓ sobre una copia INMUTABLE de `dist/` (H-3: los hooks del arnés
+      rehacen `dist/` al editar y al parar) → `progress/verificacion_viva_logo_acoplado.md`
+- [x] **F-25 `done`** (2026-09-30)
+- [ ] F-27 `catalogo_fotos`: tdd_craftsman → judge → mutation_tester → en vivo

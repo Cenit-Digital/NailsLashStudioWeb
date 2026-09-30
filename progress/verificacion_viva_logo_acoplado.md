@@ -1,4 +1,4 @@
-# Verificación EN VIVO — F-25 `logo_acoplado` (+ ENMIENDA E-1) · 2026-09-30
+# Verificación EN VIVO — F-25 `logo_acoplado` (+ ENMIENDAS E-1 y E-2) · 2026-09-30
 
 > La hace el `craftsman_lead` (I-8: `pnpm build` → servir → navegador real). Cubre los escenarios
 > `@verificacion-viva` de `features/logo_acoplado.feature`: @s28-@s33 y, de la ENMIENDA E-1, @s39-@s41.
@@ -53,9 +53,57 @@
   producción servida, las dos versiones miden 158,3 px. Las conclusiones de E-1 no cambian: los 118 → 131 px
   de móvil dependen del alto del logo, no de su ancho.
 
-## Estado de F-25
+## Estado de F-25 tras la primera pasada (histórico)
 
 - @s28-@s33 y @s40-@s41: verificados en vivo.
-- @s39: cumple en móvil (E-1) y en escritorio, pero NO a 821 px por H-1, un defecto que ya existía antes y que
-  el logo agrava 13 px.
-- F-25 no se marca `done` hasta que el humano decida sobre H-1.
+- @s39: cumplía en móvil (E-1) y en escritorio, pero NO a 821 px por H-1. Pablo decidió la ENMIENDA E-2
+  («Menú hasta 920 px»), que se verifica abajo.
+
+## Re-verificación final tras la ENMIENDA E-2 · 2026-09-30
+
+### Montaje
+
+- **Artefacto:** `pnpm build` sobre `dd5a248` (E-2 en `199ca7a`), exit 0 y las 5 puertas en verde. En el CSS
+  horneado hay un solo `max-width:920px` (menú), un `max-width:430px` (E-1) y un `max-width:820px` (el `tel:` de
+  contacto, que no se mueve).
+- **Copia INMUTABLE:** `dist/` se copió al scratchpad y se sirvió con
+  `vite preview --outDir <copia> --port 4175`. Se guardó la huella MD5 de sus 33 ficheros y, al terminar, la
+  copia seguía **intacta**. La razón está en el hallazgo H-3.
+- **Script:** `vivo_f25.mjs todos` (el mismo de la primera pasada, más @s43 y las filas nuevas de @s39).
+  Resultado: **62 comprobaciones, 62 ✓ y 0 ✗**, más la observación D-3 de @s31, que sigue igual.
+
+### Resultados
+
+| @s   | Resultado | Lo medido                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ---- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| @s28 | ✓ (4)     | Igual que en la primera pasada: HTML crudo, hidratación sin avisos, firma entera, sin JS. En la consola sigue el `404` de `/favicon.ico` (H-2).                                                                                                                                                                                                                                                                                                 |
+| @s29 | ✓ (9)     | 1280 y 320 con pasos de 1, 2 y 100 px: acopla en el fotograma exacto, `acoplar` 900 ms y `soltar` 400 ms, primer fotograma sobre el rótulo con opacidad 0,35, sin desbordamiento. El ✗ de 320/100 px de una pasada intermedia se debía a H-3 (página cargada con `dist/` a medio reescribir): con la copia inmutable, `acopla: true`.                                                                                                           |
+| @s30 | ✓ (6)     | P2 (se queda al volver arriba), recarga arriba y a mitad, ancla sin vuelo, clic en el logo y bfcache.                                                                                                                                                                                                                                                                                                                                           |
+| @s31 | ✓ (2)     | `reduce` instantáneo y `reduce` en caliente. D-3, igual que antes.                                                                                                                                                                                                                                                                                                                                                                              |
+| @s32 | ✓ (14)    | 320/360/375/390/414/768/1280, con y sin Great Vibes: el mismo alto en los dos estados (75 px; 71 px a 1280), caja del `<a>` idéntica (158,3 × 40), CLS 0.                                                                                                                                                                                                                                                                                       |
+| @s33 | ✓ (3)     | Un solo `link` «Nails Lash Studio» en los dos estados, `pointer-events: none`, fuente propia y 0 peticiones a terceros.                                                                                                                                                                                                                                                                                                                         |
+| @s39 | ✓ (17)    | 320–430: 75 px sin «Reservar» (E-1). 431, 768, 820, **821, 860, 890, 907 y 920**: 75 px en UNA fila con «Menú» y «Reservar», y Tab de «Menú» a «Reservar». **921** y 1280: nav horizontal en una fila de 71 px, y Tab de «FAQ» a «Reservar». Todo igual sin JS. La franja 821–907, que antes iba en dos filas (126/123 px), queda en 75 px.                                                                                                     |
+| @s40 | ✓ (3)     | 320, 390 y 430: `scroll-padding-top` 96 px, y en los 7 saltos de ancla y en «Reservar cita» el título queda por debajo de la cabecera de 75 px.                                                                                                                                                                                                                                                                                                 |
+| @s41 | ✓ (2)     | 320 y 430: los tres caminos a la reserva (hero, «Reserva» del menú y Nailbot) y consola limpia en esos tres pasos. El ✗ de 320 de la primera pasada era el 404 del favicon en la primera carga. Aquí no apareció dentro de la ventana medida, porque depende de cuándo lo pide Chrome. H-2 sigue abierto.                                                                                                                                       |
+| @s43 | ✓ (2)     | **Barrido de 800 a 960 px, de 1 en 1 (161 anchos), recargando en cada ancho, con el logo en «texto» y, tras el vuelo, en «caligrafia».** Fuentes cargadas (`fonts.check` de Gilda true) y bloqueadas con `Network.setBlockedURLs` (false, ancla de que el bloqueo funcionó). En los dos casos: 800–920 px → 75 px, una fila, «Menú» visible y lista plegada; 921–960 px → 71 px, una fila, nav horizontal. 0 anchos malos y sin desbordamiento. |
+
+### Hallazgos
+
+- **H-1 · RESUELTO por la ENMIENDA E-2.** Ver @s39 y @s43.
+- **H-2 · `/favicon.ico` da 404.** Sigue abierto. Es previo a F-25 y queda como tarea aparte.
+- **H-3 · Los hooks del arnés reescriben `dist/` (entorno, no producto).** `.claude/settings.json` declara
+  un `PostToolUse` sobre `Edit|Write` que ejecuta `node .harness/harness.mjs test`, y un `Stop` que ejecuta
+  `node .harness/harness.mjs init`. Los dos corren la suite completa, y sus tests de horneado
+  (`home-horneado`, `contacto-horneado`, `trampas-del-horneado`) hacen un `pnpm build` REAL sobre `dist/`.
+  Cada edición y cada fin de turno rehace `dist/` mientras `vite preview` lo sirve. Dos pasadas intermedias
+  se ensuciaron así (`ERR_HTTP_RESPONSE_CODE_FAILURE` en @s39/@s40/@s41 y el acople perdido de @s29 a
+  320/100 px). Un vigilante sobre `dist/index.html` lo pilló en el acto: `claude` → hook `Stop` →
+  `harness.mjs init` → `pnpm test` → `vitest run` → `pnpm build` → `vite-react-ssg build`. **Remedio de la
+  verificación:** servir una copia inmutable de `dist/` con su huella MD5, en un puerto aparte. Esto
+  explica también, con mucha probabilidad, los reinicios del contenedor de la sesión: suites de los hooks
+  que coincidían con las de los subagentes.
+
+## Estado de F-25
+
+**F-25 cumple su verificación en vivo completa** (@s28-@s33, @s39-@s41 y @s43), con las ENMIENDAS E-1 y E-2.
+Con judge APPROVED (F-25, E-1 y E-2) y mutación al 100 %, pasa a `done`.
