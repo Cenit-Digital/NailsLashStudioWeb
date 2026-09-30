@@ -111,6 +111,10 @@
 #     tipografia_global @s8/@s9). NO son puerta unitaria: PROHIBIDO fingirlos con jsdom (jsdom no pinta,
 #     no hace layout, no anima y no trae IntersectionObserver). Los corre el LEAD tras el TDD y los
 #     anota en progress/. PROHIBIDO crear tests build-based para ellos.
+#   · ENMIENDA E-1: BYTES de cabecera.module.scss @s35 · renderToString @s36 · jsdom @s37 · BYTES de la
+#     fuente @s38 · EN VIVO (mismas reglas que @s28-@s33) @s39, @s40 y @s41. jsdom no aplica ningún
+#     `@media` ni hace layout: que «Reservar» se oculte hasta 430 px y se vea desde 431 px SOLO se
+#     prueba en Chrome (@s39).
 #
 # =============================================================================================
 # ANTI-TAUTOLOGÍA Y PROHIBICIONES
