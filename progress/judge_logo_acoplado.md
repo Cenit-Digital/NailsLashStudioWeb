@@ -221,3 +221,106 @@ Ningún `@s` jsdom/bytes queda sin test: 28/28. En vivo quedan 6 pendientes del 
 
 Recomendado en la misma ronda, no bloquea: N1 (contar commits con `<Profiler>` en @s11), y N2 y N3
 (corregir los porqués y los textos caducados). N4 va a la verificación en vivo del lead.
+
+## Revisión delta (cd6b692)
+
+**Veredicto final:** APPROVED. B1 queda cerrado y N1, N2 y N3 están aplicados. No entra producción
+nueva ni se debilita ningún test. El `mutation_tester` puede entrar.
+
+### Qué revisé
+
+- **Delta:** `git diff 1b5e34d..cd6b692`, con el árbol limpio antes y después (`git status --short` vacío).
+  Son 5 ficheros:
+  - `features/logo_acoplado.feature` (el paréntesis de `:110-112`, del lead);
+  - `progress/judge_logo_acoplado.md` (mi informe, ahora commiteado);
+  - `progress/tdd_logo_acoplado.md`;
+  - `src/components/logo-acoplado-estilos.test.ts`;
+  - `src/components/logo-acoplado.test.tsx`.
+- **Producción:** `git diff --stat 1b5e34d..cd6b692 -- src ':(exclude)src/**/*.test.*'` sale vacío.
+  `LogoAcoplado.tsx`, `logo-acoplado-logica.ts`, la hoja, `Hero.tsx` y `Cabecera.tsx` están intactos.
+  `src/__tmp_n2/`, el test temporal de N2, no existe.
+- **Qué ejecuté**, todo acotado y en serie:
+  - `pnpm exec vitest run` sobre los 4 ficheros de F-25 → **111/111 verde**, que son los 110 de antes más el `<Profiler>`;
+  - `prettier --check` y `eslint` sobre los 2 tests y la bitácora → limpios;
+  - `pnpm typecheck` → exit 0.
+- **Qué NO ejecuté:** por orden del lead, ni la suite completa, ni `bin/harness init`, ni `pnpm build`, ni
+  Stryker. Me apoyo en el verde del commit (1672/1672, typecheck, lint y format:check) y en mi
+  `bin/harness init` de la primera ronda (exit 0). El delta solo toca tests y docs, y lo he re-medido acotado.
+- **Sabotajes:** cada uno se restauró con `git checkout --`. Los scripts están en el scratchpad:
+  `sabotaje2.py`, `delta1.py`, `delta1b.py`, `delta2.py` y `delta2s.py`.
+
+### B1: cerrado
+
+- **Dónde:** `logo-acoplado-estilos.test.ts:432-445`. Los bytes vigilados ahora son:
+  - `COMPONENTE.replace(IMPORT_DE_LA_VISTA, '')`, que es el único especificador. Sigue anclado por
+    `split(...)).toHaveLength(2)` en `:433`;
+  - `LOGICA` ENTERA.
+- **Docblock:** el de `:389-394` ya dice «ENMIENDA @s26, ratificada por el lead… SOLO de LogoAcoplado.tsx».
+- **Sabotajes:** en la fuente actual, `logo-acoplado-estilos.test.ts` → **34/34 verde**.
+
+  | Sabotaje                                                                       | Antes (1b5e34d) | Ahora (cd6b692)                                                                       |
+  | ------------------------------------------------------------------------------ | --------------- | ------------------------------------------------------------------------------------- |
+  | P: `export { VISTA_MARCA } from '../lib/trazo-marca'` en la lógica             | VERDE (110/110) | **ROJO** 1/34: «logo-acoplado-logica.ts: trazo-marca: … not to contain 'trazo-marca'» |
+  | P3: comentario `// VISTA_MARCA vive en from '../lib/trazo-marca'` en la lógica | VERDE (34/34)   | **ROJO** 1/34, con el mismo mensaje                                                   |
+  | P4 (control): `// ver trazo-marca` en la lógica                                | rojo            | rojo (1)                                                                              |
+  | P2 (control): 2.º especificador en un comentario del componente                | rojo            | rojo (1)                                                                              |
+  | P5 (control): `// ver trazo-marca` en el componente, fuera del import          | —               | rojo (1)                                                                              |
+  | P6 (extra): `import "../lib/trazo-marca"` (comillas dobles) en la lógica       | —               | rojo (1)                                                                              |
+
+### N1: aplicado, y muerde
+
+- **Dónde:** `logo-acoplado.test.tsx:585-611`.
+  - Envuelve `<Cabecera />` en `<Profiler onRender>`, entrega 400 (no acopla, así que no hay commit) y
+    hace `mockClear`.
+  - Después entrega 73 y exige EXACTAMENTE un `onRender`.
+  - Lleva las anclas positivas (`data-vuelo="si"` y las 3 variables) ANTES de contar, así que «0 commits» no
+    puede pasar.
+- **Sabotajes** (fuente actual → 49/49 verde):
+
+  | Sabotaje                                                                                    | Resultado                                                                                           |
+  | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+  | S: la entrega pone solo `{ logo }` y un `useEffect` añade las variables (updater funcional) | **ROJO** 1/49, en el `it` nuevo de @s11: «expected "vi.fn()" to be called 1 times, but got 2 times» |
+  | S': lo mismo con un objeto literal (variante de `sabotaje_s.py`)                            | **ROJO** 1/49, con el mismo mensaje                                                                 |
+  | S2 (informativo): el segundo commit es síncrono, desde `useLayoutEffect`                    | **ROJO** 1/49                                                                                       |
+
+- **S2 es más estricto que el destello visible.** `useLayoutEffect` no pinta entre los dos commits. Aun
+  así, la letra de LA-C2 es «en el MISMO render», así que el rojo es correcto.
+
+### N2 y N3: aplicados
+
+- **N2.** El porqué ahora dice «cadenas con hash (`_marca_0a3d44`), no un literal estable». Está corregido en:
+  - `logo-acoplado.test.tsx:18-19`;
+  - `logo-acoplado-estilos.test.ts:272-277`;
+  - `progress/tdd_logo_acoplado.md:174-180` y `:414-417`;
+  - `features/logo_acoplado.feature:110-112`, que corrigió el lead.
+
+  Un `grep` de «son undefined», «es undefined» y «no existen)» sobre los ficheros de F-25 da **0** resultados.
+
+- **N3.** El `grep` de «A RATIFICAR», «Propongo enmendar» y «Si el lead la rechaza» en los tests y la
+  bitácora de F-25 da **0** resultados.
+  - El pendiente de `:425` está tachado como ratificado.
+  - La fila @s26 del mapa cita la enmienda y B1.
+  - El único «A RATIFICAR» que queda es el de `features/logo_acoplado.feature:21`. Es el
+    encabezado histórico de las propuestas del `spec_partner`, fuera del alcance de N3.
+
+### Que no se haya colado nada
+
+- **Producción nueva:** ninguna (ver el diff de producción, vacío).
+- **Tests debilitados:** ninguno.
+  - En `logo-acoplado-estilos.test.ts` el cambio ENDURECE @s26: la lógica ya no recibe la excepción.
+    Las otras 3 `it` de @s26 y el uso de `FUENTES` en `:412` no cambian.
+  - En `logo-acoplado.test.tsx` solo hay un comentario de cabecera (`:18-19`) y un `it` NUEVO.
+  - No hay `.only`, `.skip` ni aserciones borradas.
+
+### Checkpoints (actualizados)
+
+- C1-C5: [x], sin cambios respecto a la primera ronda.
+- C6 Contrato Gherkin: [x] ahora. La cláusula enmendada de @s26 muerde en los dos ficheros, cada uno
+  con su regla.
+- C7 Prueba de mutación: [ ] le toca al `mutation_tester`. Recuerda N6: el `[]` de `LogoAcoplado.tsx:122` va
+  SIN marcar, y su `// Stryker disable` y la justificación se documentan en `progress/mutation_logo_acoplado.md`.
+
+### Siguen abiertos (no bloquean)
+
+- N4 (alineación vertical del estado «texto») → lo mide el lead en vivo, en @s28/@s32.
+- N5 (`closest('header')!`) → queda como constancia.
