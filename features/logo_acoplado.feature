@@ -2,8 +2,8 @@
 # CONTRATO — F-25 `logo_acoplado`: «Nails Lash» sube del hero y se queda de logo en la cabecera.
 # Dos estados en ATRIBUTOS del <a> (`data-logo`, `data-vuelo`), un vuelo FLIP que vive en la HOJA
 # (`@keyframes` + tres custom properties; sin WAAPI) y la marca accesible «Nails Lash Studio» intacta.
-# Estado: @s1-@s34 APROBADOS por la puerta humana (Pablo, 2026-09-29); ENMIENDA E-1 (@s35-@s41) pendiente
-# de su puerta (decisión de Pablo 2026-09-30: «Una fila sin "Reservar"»). Entrada 25 de
+# Estado: @s1-@s34 APROBADOS por la puerta humana (Pablo, 2026-09-29); ENMIENDA E-1 (@s35-@s41) APROBADA
+# por su puerta el 2026-09-30 (decisión de Pablo: «Una fila sin "Reservar"»). Entrada 25 de
 # `feature_list.json`. DEPENDE de F-06 `header_nav_footer` y F-07 `hero_marca`, que se ENMIENDAN sin
 # romper (@s20-@s23). Implementación y revisiones: progress/tdd_logo_acoplado.md.
 # Bitácora de esta destilación y dudas para la puerta: progress/gherkin_logo_acoplado.md.
