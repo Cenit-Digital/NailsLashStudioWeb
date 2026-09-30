@@ -798,3 +798,149 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
     # La fila 2 mata la implementación que aplica la transición monótona a cada entrada en orden: la de 73
     # acoplaría y la de 400 ya no podría deshacerlo (P2). La fila 3 mata la que cuenta entradas en vez de
     # entregas: la segunda entrada de la entrega inicial NO es un cruce que «haya visto subir».
+
+  # =============================================================================================
+  # ENMIENDA E-1 — LA CABECERA EN MÓVIL, EN UNA SOLA FILA SIN «RESERVAR» (Pablo, 2026-09-30,
+  # AskUserQuestion: «Una fila sin "Reservar"»). Fuentes: project-spec.md §F-25 «ENMIENDA E-1» y
+  # progress/brief_foto_logo_catalogo.md §7. Va AL FINAL para que la numeración siga estable.
+  # Medido en vivo por el lead (barrido de 2 en 2 px): CON «Reservar», dos filas (131 px) de 320 a
+  # 392 px y una (75 px) desde 394 px; SIN él, una fila de 75 px de 320 a 440 px, en los dos estados
+  # del logo. El corte en 430 px (E-1-C2) es el ancho del iPhone Pro Max: cubre todos los móviles
+  # habituales con una sola regla y deja 36 px de margen sobre los 394 px medidos (como los 820 px de
+  # F-06 sobre la banda 793–806).
+  # =============================================================================================
+
+  @s35
+  Scenario: ENMIENDA E-1 — cabecera.module.scss gana EXACTAMENTE un @media (max-width: 430px), que solo oculta «Reservar» con display: none y va después de su regla base; el @media de 820 px de F-06 sigue intacto (E-1-C1, E-1-C2)
+    Given los bytes de "src/components/cabecera.module.scss"
+    When se leen sus bloques con cuerpoDelBloque, sobre la hoja sin comentarios
+    Then la hoja SÍ contiene ".cabecera", ".reservar", ".disparador" y EXACTAMENTE un bloque "@media (max-width: 820px)" (ANCLAS POSITIVAS: F-06 @s17)
+    And la hoja contiene EXACTAMENTE un bloque "@media (max-width: 430px)", y NO contiene "431px" ni "@media (min-width"
+    And ese "@media (max-width: 430px)" contiene EXACTAMENTE un bloque, de selector ".reservar" a secas, con una sola declaración: "display: none"
+    And ese "@media (max-width: 430px)" empieza en la hoja DESPUÉS del bloque base ".reservar" de primer nivel
+    And fuera de ese "@media (max-width: 430px)", ningún bloque cuyo selector contiene ".reservar" declara "display: none" ni "visibility: hidden"
+    And el bloque "@media (max-width: 820px)" sigue declarando ".disparador" con "display: inline-flex", ".lista" con "display: none" y ".disparador[aria-expanded='true'] + .lista" con "display: flex", y NO contiene ".reservar"
+    And la hoja sigue sin contener "767px"
+    # CSS PURO (E-1-C1, el patrón de F-06): el eje responsive lo decide el `@media` y el horneado es el
+    # mismo en cualquier ancho. La regla va en la MISMA hoja que el `.reservar` que usa MenuNavegacion.tsx
+    # porque, en otra hoja, CSS Modules le pondría otro hash y no alcanzaría al enlace. Especificidad: el
+    # `@media` no suma, así que la regla (0,1,0) empata con la base (0,1,0) y gana por ir DESPUÉS. Hoy
+    # la base no declara `display`, pero si un día declarara `display: inline-flex` y la regla fuera
+    # delante, la base la pisaría (es la trampa de @s16). Con un solo `max-width` y ningún
+    # `min-width: 431px` no hay hueco fraccionario entre dos rangos: a 430,5 px «Reservar» se ve, y con
+    # él la fila ya cabe desde 394 px. «EXACTAMENTE un bloque con una sola declaración» cierra la
+    # alternativa (a), encoger logo, botón y márgenes, que se descartó. Stryker no ve el SCSS: el
+    # mutante es HUMANO, y este test, con "430px" y "display: none" escritos A MANO, es su red. Los
+    # tests de F-06 @s17 y F-25 @s20, que leen esta hoja, siguen verdes sin tocar una línea.
+
+  @s36
+  Scenario: ENMIENDA E-1 — el enlace «Reservar» sigue horneado, dentro de la nav y FUERA de la lista del menú, con href="#reserva-titulo" y sin nada en el marcado que lo oculte; las anclas no cambian (E-1-C1)
+    Given la cabecera renderizada con renderToString(<Cabecera />), como la hornea el SSG
+    When se localiza en ese HTML el <a> cuyo texto es exactamente "Reservar"
+    Then existe EXACTAMENTE uno, dentro de la <nav> con aria-label="Principal" (ANCLA POSITIVA)
+    And su href es exactamente "#reserva-titulo"
+    And está DESPUÉS del </ul> de la lista con id="menu-navegacion" y ANTES del </nav>: no se ha mudado al menú
+    And su etiqueta de apertura NO contiene "hidden", "aria-hidden", "style=", "tabindex" ni "inert"
+    And el HTML de la cabecera contiene 'href="#reserva-titulo"' EXACTAMENTE dos veces: «Reserva» en la lista y «Reservar»
+    # renderToString no tiene viewport y, con E-1, el horneado tampoco lo necesita: el HTML es el mismo a
+    # 320 y a 1280 px. Por eso la puerta de anclas vivas (@s23: 0 violaciones) y los tests de F-06 que leen
+    # el horneado (@s12, @s16) no cambian. Que el enlace siga fuera de la <ul> cierra la alternativa (b),
+    # mover «Reservar» al menú, que duplicaría «Reserva». Ocultarlo en el marcado (hidden, aria-hidden)
+    # lo escondería también en escritorio u obligaría a decidir el ancho con JS.
+
+  @s37
+  Scenario: ENMIENDA E-1 — ningún JS decide el ancho: montada en jsdom con 320 px de viewport y un matchMedia que responde que sí a todo, la cabecera conserva «Reservar» y no consulta matchMedia ni escucha "resize" (E-1-C1)
+    Given window.innerWidth fijado a 320, window.matchMedia sustituido por un espía que responde matches=true a cualquier consulta, window.addEventListener espiado, e IntersectionObserver sustituido con la geometría de referencia
+    When se monta <Cabecera /> con render() y corren sus efectos
+    Then getAllByRole("link", { name: "Reservar" }) devuelve EXACTAMENTE un enlace, dentro de la navegación de nombre "Principal", con href exactamente "#reserva-titulo" (ANCLA POSITIVA)
+    And ese enlace no lleva los atributos hidden, aria-hidden, style, tabindex ni inert
+    And matchMedia NO se ha llamado ninguna vez
+    And window.addEventListener no ha recibido "resize" ni "orientationchange"
+    # Un `useIsMobile`, el patrón de memoria `red-css-para-rama-solo-js-en-ssg` que F-06 ya descartó, se
+    # pondría rojo aquí de tres maneras: quitando el enlace a 320 px, llamando a matchMedia o escuchando
+    # "resize". El nombre exacto "Reservar" no confunde el enlace con «Reserva» de la lista. En jsdom no
+    # hay ningún `@media` aplicado (`css: false`): que se OCULTE hasta 430 px se prueba en Chrome (@s39).
+
+  @s38
+  Scenario: ENMIENDA E-1 — guardas de FUENTE: MenuNavegacion.tsx sigue atando «Reservar» a la clase .reservar, y ni él ni Cabecera.tsx conocen el ancho de la pantalla
+    Given los bytes de "src/components/MenuNavegacion.tsx" y "src/components/Cabecera.tsx"
+    When se buscan en ellos los literales vigilados
+    Then MenuNavegacion.tsx SÍ contiene EXACTAMENTE una vez "estilos.reservar" y EXACTAMENTE dos veces 'href="#reserva-titulo"' (ANCLAS POSITIVAS, primero)
+    And ninguno de los dos contiene "useIsMobile", "matchMedia", "innerWidth", "outerWidth", "screen.width", "'resize'" ni '"resize"'
+    # La clase es el ÚNICO puente entre la hoja (@s35) y el enlace. Bajo `css: false` el className es una
+    # cadena con hash y no se asevera en el DOM (ANTI-TAUTOLOGÍA), así que el puente se ata aquí por bytes,
+    # y EN VIVO en @s39. Los dos ficheros están en `mutate`: NINGUNA guarda veta `if (`, `?`, `&&` ni `||`.
+    # Estos literales, Stryker no los inyecta nunca.
+
+  @s39 @verificacion-viva
+  Scenario Outline: [VERIFICACIÓN EN VIVO CON CHROME, NO jsdom] ENMIENDA E-1 — a <ancho> px, con el menú cerrado y en los dos estados del logo, la cabecera es UNA fila de no más de 76 px, y «Reservar» <se ve>
+    Given el dist/ de producción (pnpm build con las cinco puertas verdes) servido en Chrome real vía CDP, con el viewport a <ancho> × 800 px (Emulation.setDeviceMetricsOverride, deviceScaleFactor 1), cargado arriba del todo y con el menú cerrado; «Reservar» es nav[aria-label="Principal"] > a[href="#reserva-titulo"]
+    When se mide la cabecera en «texto» y, tras hacer scroll hasta el acople y esperar al final del vuelo, en «caligrafia»
+    Then en los dos estados el alto del <header> es <= 76 px, y es el MISMO en «texto» que en «caligrafia»
+    And en los dos estados, los centros verticales de las cajas visibles (ancho y alto > 0) del <a> del logo, del botón «Menú», de la lista de la nav y de «Reservar» difieren entre sí 1 px como mucho: una sola fila
+    And document.documentElement.scrollWidth no supera clientWidth, y ninguna de esas cajas visibles acaba más allá de window.innerWidth
+    And en los dos estados «Reservar» sigue en el DOM, computa display <display> y su getBoundingClientRect mide <caja>
+    And arriba del todo, en el árbol de accesibilidad (Accessibility.getFullAXTree) hay <nodos> nodos "link" con nombre exactamente "Reservar"
+    And arriba del todo, con el foco en <foco previo>, una pulsación de Tab deja el foco <tras el Tab>
+    And con JavaScript desactivado (Emulation.setScriptExecutionDisabled) y la página recargada arriba del todo, «Reservar» computa el MISMO display y el <header> mide el MISMO alto que con JavaScript
+
+    Examples:
+      | ancho | se ve    | display          | caja                                                   | nodos         | foco previo                 | tras el Tab        | qué representa                                                         |
+      | 320   | NO se ve | "none"           | 0 × 0                                                  | 0             | el botón «Menú»             | fuera del <header> | el mínimo del proyecto; también el zoom al 400 % (caso límite 16)      |
+      | 360   | NO se ve | "none"           | 0 × 0                                                  | 0             | el botón «Menú»             | fuera del <header> | un Android habitual                                                    |
+      | 375   | NO se ve | "none"           | 0 × 0                                                  | 0             | el botón «Menú»             | fuera del <header> | iPhone SE / mini                                                       |
+      | 392   | NO se ve | "none"           | 0 × 0                                                  | 0             | el botón «Menú»             | fuera del <header> | el último ancho que, con «Reservar», daba DOS filas (131 px, medido)   |
+      | 394   | NO se ve | "none"           | 0 × 0                                                  | 0             | el botón «Menú»             | fuera del <header> | el primero en que «Reservar» ya cabía: se oculta igual (E-1-C2)        |
+      | 414   | NO se ve | "none"           | 0 × 0                                                  | 0             | el botón «Menú»             | fuera del <header> | iPhone Plus / XR                                                       |
+      | 430   | NO se ve | "none"           | 0 × 0                                                  | 0             | el botón «Menú»             | fuera del <header> | FRONTERA: el último ancho sin «Reservar» (iPhone Pro Max)              |
+      | 431   | SÍ se ve | distinto de none | más de 0 × 0, con su borde derecho dentro del viewport | EXACTAMENTE 1 | el botón «Menú»             | en «Reservar»      | FRONTERA: el primer ancho con «Reservar», y en una sola fila           |
+      | 768   | SÍ se ve | distinto de none | más de 0 × 0, con su borde derecho dentro del viewport | EXACTAMENTE 1 | el botón «Menú»             | en «Reservar»      | tablet: sin cambios                                                    |
+      | 820   | SÍ se ve | distinto de none | más de 0 × 0, con su borde derecho dentro del viewport | EXACTAMENTE 1 | el botón «Menú»             | en «Reservar»      | el último ancho con «Menú» (F-06 @s17)                                 |
+      | 821   | SÍ se ve | distinto de none | más de 0 × 0, con su borde derecho dentro del viewport | EXACTAMENTE 1 | el enlace «FAQ» de la lista | en «Reservar»      | el primer ancho con la nav horizontal: la fila más apretada por encima |
+      | 1280  | SÍ se ve | distinto de none | más de 0 × 0, con su borde derecho dentro del viewport | EXACTAMENTE 1 | el enlace «FAQ» de la lista | en «Reservar»      | escritorio; también el zoom al 100 %                                   |
+
+    # «Fuera del <header>» = document.activeElement no es descendiente del <header>: con el menú cerrado,
+    # la lista está en display none y, hasta 430 px, «Reservar» también, así que el Tab salta al hero.
+    # `display: none` saca a «Reservar» del orden de tabulación y del árbol de accesibilidad en ese
+    # ancho. Es lo que decide E-1-C3: la reserva sigue a un toque por tres caminos (@s41). 392 y 394 son
+    # los anchos que midió el lead y se quedan como registro; 430 frente a 431 es la frontera del
+    # contrato. Los centros verticales, y no la altura sola, detectan que «Reservar» envuelva DENTRO de
+    # la nav (que es flex-wrap). La prueba sin JS demuestra que el eje lo decide la hoja, no la
+    # hidratación. Resultados, a progress/verificacion_viva_logo_acoplado.md.
+
+  @s40 @verificacion-viva
+  Scenario Outline: [VERIFICACIÓN EN VIVO CON CHROME, NO jsdom] ENMIENDA E-1 — a <ancho> px, con la cabecera en una fila, el scroll-padding-top de 96 px vuelve a cubrirla: tras cualquier salto a una sección, su título se ve entero, por debajo del borde de la cabecera (E-1-C3, F-06 @s11)
+    Given el mismo dist/ en Chrome real con el viewport a <ancho> × 640 px
+    When se carga, una a una, la URL con cada ancla de la nav ("#servicios-titulo", "#destacados-titulo", "#ofertas-titulo", "#equipo-titulo", "#reserva-titulo", "#contacto-titulo" y "#faq-titulo") y, además, desde arriba del todo se pulsa «Reservar cita» del hero; en cada salto se espera a document.fonts.ready y al final del scroll
+    Then getComputedStyle(document.documentElement).scrollPaddingTop es "96px" (ANCLA POSITIVA: el 6rem de F-06 @s11, sin tocar)
+    And en cada uno de los ocho saltos el alto del <header> es <= 76 px
+    And en cada uno de los ocho saltos, el borde superior (getBoundingClientRect().top) del elemento con el id del ancla es >= el borde inferior del <header>: ningún píxel del título queda tapado por la cabecera
+
+    Examples:
+      | ancho | qué representa                                                                    |
+      | 320   | antes de E-1: 131 px de cabecera y 35 px de título tapados en cada salto (E-1-C3) |
+      | 390   | antes de E-1, también dos filas                                                   |
+      | 430   | FRONTERA de E-1: el ancho más grande sin «Reservar»                               |
+
+    # 96 px de scroll-padding frente a 75 px de cabecera medidos: 21 px de holgura. Los títulos del final
+    # de la página (Contacto, FAQ) pueden no llegar arriba del todo y quedan más abajo, así que la
+    # desigualdad se cumple igual. Los píxeles son CRITERIO DE PROYECTO (técnica C43, elegida en F-06):
+    # NO se atribuye ningún número a SC 2.4.11 (B-1 de F-06).
+
+  @s41 @verificacion-viva
+  Scenario Outline: [VERIFICACIÓN EN VIVO CON CHROME, NO jsdom] ENMIENDA E-1 — a <ancho> px, sin «Reservar» en la cabecera, la reserva sigue a un toque por los tres caminos, que no se tocan: «Reservar cita» del hero, «Reserva» del menú y el lanzador de Nailbot (E-1-C3)
+    Given el mismo dist/ en Chrome real con el viewport a <ancho> × 640 px, cargado arriba del todo
+    When se recorre cada camino por separado, recargando arriba entre uno y otro: pulsar «Reservar cita» del hero; pulsar «Menú» y después «Reserva»; y pulsar el lanzador de Nailbot
+    Then el enlace «Reservar cita» del hero mide más de 0 × 0 y su href termina en "#reserva-titulo", y al pulsarlo location.hash es exactamente "#reserva-titulo"
+    And al pulsar «Menú», su aria-expanded pasa a "true", el enlace «Reserva» de la lista mide más de 0 × 0 con href exactamente "#reserva-titulo", y al pulsarlo location.hash es exactamente "#reserva-titulo"
+    And el botón de nombre accesible exactamente "Abrir el chat con Nailbot para reservar cita" mide más de 0 × 0, queda entero dentro del viewport y, al pulsarlo, el <dialog> de Nailbot tiene el atributo open
+    And en ninguno de los tres caminos la consola muestra un error
+
+    Examples:
+      | ancho | qué representa                                      |
+      | 320   | el mínimo del proyecto                              |
+      | 430   | FRONTERA de E-1: el ancho más grande sin «Reservar» |
+
+    # Es la justificación de E-1-C3 comprobada en el navegador: ocultar «Reservar» es aceptable porque
+    # la reserva sigue a un toque sin él. Si uno de los tres caminos falla, E-1 pierde su premisa y el
+    # lead lo lleva a la puerta, no lo arregla el TDD.
