@@ -64,4 +64,4 @@
 - [x] Verificación en vivo final 62/62 ✓ sobre una copia INMUTABLE de `dist/` (H-3: los hooks del arnés
       rehacen `dist/` al editar y al parar) → `progress/verificacion_viva_logo_acoplado.md`
 - [x] **F-25 `done`** (2026-09-30)
-- [ ] F-27 `catalogo_fotos`: tdd_craftsman → judge → mutation_tester → en vivo
+- [ ] F-27 `catalogo_fotos` → `in_progress` (2026-09-30): tdd_craftsman (en curso) → judge → mutation_tester → en vivo (@s22-@s26, lead)

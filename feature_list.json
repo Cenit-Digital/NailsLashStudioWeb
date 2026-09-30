@@ -526,7 +526,7 @@
       "depends_on": ["cero_terceros"],
       "mutable": true,
       "sdd": true,
-      "status": "spec_ready",
+      "status": "in_progress",
       "puerta_humana": "P1 (Pexels, selección autónoma) el 2026-09-29. PUERTA HUMANA APROBADA el 2026-09-29 (AskUserQuestion: «Aprobado, empieza»): features/catalogo_fotos.feature, 26 escenarios, con las CF-1..CF-7. Espera turno tras F-25 (una feature a la vez)."
     }
   ],
