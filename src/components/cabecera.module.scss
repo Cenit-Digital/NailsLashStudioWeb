@@ -95,12 +95,16 @@
   cursor: pointer;
 }
 
-// 🔴 EL BREAKPOINT: el literal 820px [criterio de proyecto MEDIDO: la nav envuelve en la banda
-// 793–806px → 820px da margen sobre toda la banda]. NUNCA el 767 de WebEmpresa (herencia muerta).
+// 🔴 EL BREAKPOINT: el literal 920px [criterio de proyecto MEDIDO sobre la nav definitiva, en
+// producción y de 1 en 1 px: cabe en una fila desde 891px con las fuentes cargadas y desde 908px
+// con la de respaldo → 920px deja 12px de margen sobre el peor caso]. NUNCA atribuido a una norma
+// y NUNCA el 767 de WebEmpresa (herencia muerta). Historia: F-06 puso 820px sobre la banda
+// 793–806px de la nav del prototipo; la ENMIENDA E-2 de F-25 lo subió a 920px
+// (features/logo_acoplado.feature @s42).
 //
-// A <= 820px: aparece el botón hamburguesa y la lista se pliega; la abre `aria-expanded="true"` del
+// A <= 920px: aparece el botón hamburguesa y la lista se pliega; la abre `aria-expanded="true"` del
 // botón (selector de hermano), NO un className condicional. Por encima: nav horizontal, sin botón.
-@media (max-width: 820px) {
+@media (max-width: 920px) {
   .disparador {
     display: inline-flex;
   }

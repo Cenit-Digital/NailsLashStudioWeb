@@ -689,3 +689,221 @@ F-25 suma **32** escenarios cubiertos por TDD (@s1-@s27, @s34 y @s35-@s38) y **9
   Sin commits: los hace el lead. No toco `feature_list.json` ni el status.
 - `bin/harness init` no se relanza. Por instrucción del lead la suite completa corre una sola vez, e
   `init` = typecheck + lint + format:check + test, medidos uno a uno arriba.
+
+## ENMIENDA E-2 — el menú plegable hasta 920 px (tdd_craftsman, 2026-09-30)
+
+Contrato: `features/logo_acoplado.feature` @s42 (NUEVO, bytes) y los retoques de @s20, @s35 y @s39;
+`features/header_nav_footer.feature` @s17 (el literal pasa a "920px"). APROBADA por Pablo el 2026-09-30
+(«Aprobado, prográmalo»). Spec: `project-spec.md` §F-25 «ENMIENDA E-2» (E-2-C1..E-2-C4). Derivados 1-6 de
+`progress/gherkin_logo_acoplado.md` §«ENMIENDA E-2». Punto de partida: `b23140e`.
+
+- Por TDD (bytes): F-06 @s17, F-25 @s20, @s35 (`MEDIA_MENU`) y @s42, todos en `cabecera.test.tsx`. Los de
+  @s42 van en describe prefijados «F-25 E-2 @s42».
+- @s39 (filas 920/921) y @s43 son `@verificacion-viva`: NO se fingen en jsdom. Los hace el lead en Chrome.
+- Por los reinicios del contenedor, durante los ciclos solo corre `pnpm exec vitest run
+src/components/cabecera.test.tsx src/styles/scroll-padding-cabecera.test.ts`. La suite completa, UNA vez,
+  al cierre.
+- Línea base acotada: **32/32** verde (29 de `cabecera.test.tsx` + 3 de `scroll-padding-cabecera.test.ts`).
+
+### Ciclos E-2
+
+Las cuatro anclas del literal (F-06 @s17, F-25 @s20, `MEDIA_MENU` de @s35 y la de @s42) fijan UN solo hecho
+de producción: el número del `@media` del menú. Si cambiara la hoja tras el primer rojo, @s20 y @s35 se
+pondrían rojos por llevar el contrato YA SUPERADO. Por eso los tres retoques que aprobó la puerta van
+primero, y cada uno se pone ROJO contra la hoja de 820 px. Después, UN cambio de un número los pone verdes a
+la vez.
+
+#### E2-1 — F-06 @s17: el literal a mano pasa a "920px"
+
+- **ROJO**: el comentario, el `describe`, el `it` y la regex de @s17 pasan a `920px` (el comentario, con la
+  medida nueva). Con la hoja en 820 px, 1 falla y 31 pasan: `AssertionError: expected '// La cabecera
+sticky, la nav y el pi…' to match /@media\s*\(\s*max-width:\s*920px\s*\)/`.
+
+#### E2-2 — F-25 @s20: el ancla positiva a "920px" y la NEGATIVA nueva, "max-width: 820px" sin comentarios
+
+- **ROJO (ancla positiva)**: el comentario, el `describe` y el `it` de ANCLAS de @s20 pasan a 920 px, y la
+  regex a `920px` → `AssertionError: expected '// La cabecera sticky, la nav y el pi…' to match
+/@media\s*\(\s*max-width:\s*920px\s*\)/`.
+- **ROJO (ancla negativa, `it` nuevo)**: «cabecera.module.scss, sin comentarios, NO contiene "max-width:
+  820px"». Va sobre `sinComentarios(CABECERA)`, porque el comentario de la hoja puede citar el 820 como
+  historia (el comentario del `.feature`). Reutiliza el helper `sinComentarios` del módulo (declaración de
+  función, elevada: se usa dentro del `it`) → `AssertionError: expected '\n\n\n\n\n\n\n\n\n\n\n.cabecera {\n
+…' not to contain 'max-width: 820px'`.
+- Suite acotada: 3 fallan (@s17 y los dos de @s20) y 30 pasan (33).
+
+#### E2-3 — F-25 @s35: `MEDIA_MENU` a "920px"
+
+- **ROJO**: `MEDIA_MENU` (el patrón a mano del bloque del menú) y los textos del `describe` y de sus dos `it`
+  pasan a 920 px. Con la hoja en 820 px caen los dos `it` que lo usan: ANCLAS → `AssertionError: expected
++0 to be 1 // Object.is equality`; el contenido del bloque → `AssertionError: expected [] to include
+'display: inline-flex'`. El resto de @s35 (el `@media (max-width: 430px)`) sigue verde.
+- Suite acotada: 5 fallan (@s17, dos de @s20 y dos de @s35) y 28 pasan (33).
+
+#### E2-4 — F-25 @s42: el ANCLA POSITIVA, EXACTAMENTE un `@media (max-width: 920px)`
+
+- **ROJO**: bloque nuevo al final de `cabecera.test.tsx`, con su comentario de cabecera E-2 y el describe
+  «F-25 E-2 @s42 …». Helper nuevo `mediaDeAncho(ancho)`: construye el patrón del encabezado `@media
+(max-width: <ancho>) {` con el ancho escrito A MANO en cada llamada. Así @s42 escribe sus literales en
+  su propio test, sin tomarlos de otra constante (el `.feature` lo pide). Primer `it`: «ANCLA POSITIVA:
+  EXACTAMENTE un bloque @media (max-width: 920px)», con `vecesQueCasa(HOJA_CABECERA,
+mediaDeAncho('920px'))` → `AssertionError: expected +0 to be 1 // Object.is equality`.
+- Suite acotada antes del verde: **6 fallan** (@s17, dos de @s20, dos de @s35 y @s42) y 28 pasan (34).
+
+#### VERDE — un solo número en `cabecera.module.scss`
+
+- `@media (max-width: 820px) {` → `@media (max-width: 920px) {`. El MISMO bloque, con el MISMO contenido y
+  en el mismo sitio (base → 920 → 430). Nada más cambia en la hoja → **34/34**.
+- **REFACTOR** (en verde): el comentario del `@media` en la hoja lleva la medida nueva. Una fila desde 891
+  px con las fuentes cargadas y desde 908 px con la de respaldo → 920 px, 12 px de margen sobre el peor
+  caso. Es criterio de proyecto MEDIDO, nunca atribuido a una norma, nunca el 767. Historia: F-06 puso 820
+  px sobre la banda 793–806 px de la nav del prototipo, y la ENMIENDA E-2 lo subió. «A <= 820px» pasa a «A <=
+  920px». El comentario no escribe "767px", "921px" ni "max-width: 820px" → **34/34**.
+
+#### @s42 — el resto del escenario: guardas, medidas con sabotajes (ciclos 42-2..42-6)
+
+El VERDE de arriba no toca el contenido del bloque, ni el orden de la hoja, ni `contacto.module.scss`. Por
+eso las demás aserciones de @s42 son GUARDAS y pasan a la primera. Cada una se mide con un sabotaje manual
+en el SCSS, que luego se revierte (Stryker no ve el SCSS: el mutante es HUMANO).
+
+- **42-2** — «ese bloque declara `.disparador` con `display: inline-flex`, `.lista` con `display: none` y
+  `flex-direction: column`, y `.disparador[aria-expanded='true'] + .lista` con `display: flex`» (derivado 3:
+  @s35 no exigía la columna). Es una GUARDA: pasa a la primera → 35/35. **Sabotaje (d)**, quitar
+  `flex-direction: column` del bloque de 920 px → ROJO SOLO en 42-2: `AssertionError: expected [
+'display: none', …(4) ] to include 'flex-direction: column'` (1 falla, 34 pasan). Restaurado.
+  **REFACTOR**: el cierre `declaracionesDe` de 42-2 duplicaba el de @s35-5. Sale a un helper del módulo,
+  `declaracionesDeLaRegla(fragmento, selector)`, y lo usan los dos → 35/35. Re-medido tras el refactor:
+  (d) → ROJO en 42-2 con el mismo mensaje; `.disparador` a `display: flex` dentro del bloque de 920 px →
+  ROJO en @s35-5 y 42-2 (`expected [ 'display: flex' ] to include 'display: inline-flex'`). Restaurado
+  (`cmp` contra la copia: idéntico).
+- **42-3** — «ese `@media (max-width: 920px)` empieza DESPUÉS de los bloques base `.lista` y `.disparador` de
+  primer nivel» (derivado 2: el orden no es cosmético, porque el `@media` no suma especificidad). Bases con
+  `/(^|\n)\.lista\s*\{/` y `/(^|\n)\.disparador\s*\{/` sobre la hoja sin comentarios, como la base
+  `.reservar` de @s35-4. Cada base lleva su ancla `not.toBeNull()`. Es una GUARDA: pasa a la primera →
+  36/36. **Sabotaje (c)**, en dos variantes (restauradas; `cmp`, idéntico):
+  - (c1) el bloque de 920 px, delante de `.nav` (tras el de 640 px) → ROJO en 42-3: `AssertionError:
+(^|\n)\.lista\s*\{: expected 473 to be greater than 859` (1 falla, 35 pasan).
+  - (c2) el bloque, entre la base `.lista` y la base `.disparador` → ROJO en 42-3: `AssertionError:
+(^|\n)\.disparador\s*\{: expected 1111 to be greater than 1412`. Caza también el orden a medias.
+- **42-4** — «EXACTAMENTE un bloque `@media (max-width: 430px)`, que empieza DESPUÉS del `@media (max-width:
+920px)`» (el orden base → 920 → 430 de E-2-C1). Es una GUARDA: pasa a la primera → 37/37. Sabotajes
+  (restaurados; `cmp`, idéntico):
+  - el bloque de 430 px, justo delante del de 920 px (sigue detrás de la base `.reservar`) → ROJO SOLO en
+    42-4: `AssertionError: expected 1435 to be greater than 1503`. @s35-4 no lo ve, porque solo mira la
+    base `.reservar`. Es el hueco que cierra @s42.
+  - un segundo bloque de 430 px al final → ROJO en 42-4 y en @s35-1 (`expected 2 to be 1`), y en @s35-4.
+- **42-5** — ANCLAS NEGATIVAS: «NO contiene "max-width: 820px" (un solo breakpoint del menú), ni "921px", ni
+  "767px"» (derivado 4). "max-width: 820px" va sobre la hoja SIN comentarios, porque el comentario la cita
+  como historia (como @s20). Se busca con `/max-width\s*:\s*820px/`, así que también caza `max-width:820px`
+  sin espacio. "921px" y "767px" van sobre los BYTES CRUDOS, más estricto, como "431px" en @s35. Es una
+  GUARDA: pasa a la primera → 38/38. Sabotajes (restaurados; `cmp`, idéntico):
+  - **(a) dejar 820 en vez de 920** → ROJO en 10 `it`: @s17, los dos de @s20, dos de @s35 y los cinco de
+    @s42 hasta aquí. Los mensajes: `to match /…920px…/`, `not to contain 'max-width: 820px'`, `expected +0
+to be 1`, `expected [] to include 'display: inline-flex'`, `la hoja debe tener el @media de 920 px:
+expected null not to be null` y `not to match /max-width\s*:\s*820px/`.
+  - **(b) DOS bloques, uno de 820 y otro de 920** (el olvido de dejar el viejo) → ROJO SOLO en las dos
+    anclas negativas: @s20 (`not to contain 'max-width: 820px'`) y 42-5 (`not to match
+/max-width\s*:\s*820px/`). Las positivas siguen verdes: hay EXACTAMENTE un 920. Solo lo cazan las
+    negativas nuevas de E-2.
+  - (b') un segundo bloque `@media (max-width:820px)` SIN espacio → ROJO solo en 42-5. **REFACTOR**: la
+    negativa de @s20 pasa de `not.toContain('max-width: 820px')` a la misma regex que la de 42-5, así que
+    (b') cae también en @s20 → 38/38. Re-medido: (b') → ROJO en @s20 y 42-5.
+  - `@media (min-width: 921px) { … }` añadido → ROJO en 42-5 (`not to contain '921px'`) y @s35-2 (`not to
+contain '@media (min-width'`).
+  - el `@media (max-width: 640px)` pasa a `767px` → ROJO en @s17, @s20, @s35-5 y 42-5 (`not to contain
+'767px'`).
+- **42-6** — `contacto.module.scss`: «SÍ contiene EXACTAMENTE un bloque `@media (max-width: 820px)`, que
+  declara `.telefono` con `display: inline-flex` y `min-height: 2.75rem`, y NO contiene "920px"» (derivado
+  1: el corte del tel:, por bytes). Hoja SIN comentarios: el troceo, como en @s35, y el "920px", porque su
+  comentario puede citar el 920 del menú para decir que este corte no se movió. Reutiliza `sinComentarios`,
+  `mediaDeAncho('820px')` (a mano), `cuerpoDelBloque`, `vecesQueCasa` y `declaracionesDeLaRegla`. Es una
+  GUARDA (contacto no cambia): pasa a la primera → 42/42 en la pasada que suma `contacto-estilos.test.ts`.
+  Sabotajes (restaurados; `cmp`, idéntico):
+  - **(e) el 820 de contacto pasa a 920** → ROJO en 42-6: `AssertionError: expected +0 to be 1 //
+Object.is equality`. `contacto-estilos.test.ts` sigue VERDE con el sabotaje, porque acepta cualquier
+    `max-width`. Es el hueco que el `.feature` anticipaba.
+  - quitar `min-height: 2.75rem` → ROJO (`expected [ 'display: inline-flex', …(2) ] to include 'min-height:
+2.75rem'`); `.telefono` a `display: flex` → ROJO (`expected [ 'display: flex', …(3) ] to include
+'display: inline-flex'`); un `max-width: 920px` en `.wa` → ROJO (`not to contain '920px'`); un segundo
+    `@media (max-width: 820px)` → ROJO (`expected 2 to be 1`).
+- **REFACTOR de cierre de @s42**: `MEDIA_MOVIL` y `MEDIA_MENU` repetían a mano la forma de la regex que
+  construye `mediaDeAncho`. El helper sube junto a los demás (tras las constantes de la hoja) y las dos
+  constantes pasan a `mediaDeAncho('430px')` y `mediaDeAncho('920px')`. El literal sigue ESCRITO A MANO en
+  cada uso, y los `it` de @s42 siguen llamando a `mediaDeAncho('920px' | '430px' | '820px')` con su literal,
+  sin tomarlo de `MEDIA_MENU` → 39/39 (36 de `cabecera.test.tsx` + 3). Re-medidos tras el refactor: (a) →
+  ROJO en los mismos 10 `it`; (b) → ROJO en los mismos 2 (las negativas de @s20 y 42-5). Restaurado (`cmp`).
+
+#### Comentarios (solo texto, E-2-C3) — sin test propio: no son comportamiento
+
+- `src/styles/_base.scss` (~34): «a <=820px hay botón hamburguesa; por encima, marca + 2 enlaces
+  horizontales» pasa a «a <=920px hay botón hamburguesa, 820px hasta la ENMIENDA E-2 de F-25; por encima,
+  la marca, los 7 enlaces y «Reservar» en horizontal». Lo de «2 enlaces» era falso: `MenuNavegacion.tsx`
+  tiene 7 `<a>` en la lista y «Reservar» fuera. El comentario no escribe `@media` ni llaves, porque
+  `nailbot-flotante-estilos.test.ts` busca `@media (max-width:…) {` en los bytes CRUDOS de esta hoja.
+- `src/styles/scroll-padding-cabecera.test.ts` (~20): la misma corrección en su JSDoc.
+- `src/components/contacto.module.scss` (~5 y ~114): el `@media (max-width: 820px)` NO cambia. El
+  comentario deja de decir «heredado de F-06» y dice que es el valor que tenía entonces el menú de F-06, y
+  que la ENMIENDA E-2 subió el del menú a 920px sin mover este, porque su eje es otro: la prominencia del
+  tel:. El segundo comentario remite a F-25 @s42. Sigue sin «WCAG» ni «2.5.8», que veta
+  `contacto-estilos.test.ts`. El "920px" del comentario no rompe 42-6, que mira la hoja sin comentarios.
+- Pasada acotada tras los comentarios (`cabecera`, `scroll-padding-cabecera`, `contacto-estilos`,
+  `cascara-global`, `nailbot-flotante-estilos`, los cinco ficheros que leen las hojas tocadas) → 5
+  ficheros, **76/76**.
+
+### Resumen de los sabotajes de E-2 (todos revertidos; `cmp` contra la copia, idéntico)
+
+| Sabotaje                                                            | Qué test cae                                                           |
+| ------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| (a) dejar `820px` en vez de `920px` en el bloque del menú           | 10: @s17, @s20 ×2, @s35 ×2 y @s42 ×5 (todos menos contacto)            |
+| (b) DOS bloques del menú, uno de 820 y otro de 920                  | 2: las anclas NEGATIVAS de @s20 y de @s42-5 (solo las de E-2)          |
+| (b') segundo bloque `@media (max-width:820px)` sin espacio          | @s20 y @s42-5 (tras el refactor a la regex)                            |
+| (c1) el bloque de 920 delante de `.nav`, antes de las bases         | @s42-3 (`.lista`: 473 no es mayor que 859)                             |
+| (c2) el bloque de 920 entre la base `.lista` y la `.disparador`     | @s42-3 (`.disparador`: 1111 no es mayor que 1412)                      |
+| (d) quitar `flex-direction: column` del bloque de 920               | @s42-2 (solo él: @s35 no pedía la columna)                             |
+| `.disparador` a `display: flex` dentro del bloque de 920            | @s35-5 y @s42-2                                                        |
+| el bloque de 430 delante del de 920 (tras la base `.reservar`)      | @s42-4 (solo él)                                                       |
+| un segundo bloque de 430                                            | @s35-1, @s35-4 y @s42-4                                                |
+| `@media (min-width: 921px)` añadido                                 | @s42-5 (`921px`) y @s35-2 (`@media (min-width`)                        |
+| el `@media (max-width: 640px)` pasa a `767px`                       | @s17, @s20, @s35-5 y @s42-5                                            |
+| (e) el `820px` de `contacto.module.scss` pasa a `920px`             | @s42-6 (`expected +0 to be 1`); `contacto-estilos.test.ts` sigue verde |
+| contacto: sin `min-height: 2.75rem` / `.telefono` a `display: flex` | @s42-6                                                                 |
+| contacto: `max-width: 920px` en `.wa` / un segundo bloque de 820    | @s42-6                                                                 |
+
+### Trazabilidad E-2 @s → test
+
+| @s        | Dónde                                           | Test(s)                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| --------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| F-06 @s17 | `cabecera.test.tsx`                             | «@s17 la media query del menú móvil usa exactamente "max-width: 920px"…» (retocado: literal a mano "920px", sin "767px")                                                                                                                                                                                                                                                                                                                               |
+| @s20      | `cabecera.test.tsx`                             | «@s20 ANCLAS: … el @media de 920 px, sin 767px; y ya NO tiene ningún bloque .marca» (retocado) · «@s20 cabecera.module.scss, sin comentarios, NO contiene "max-width: 820px"…» (NUEVO) · los otros dos `it` de @s20, sin cambios                                                                                                                                                                                                                       |
+| @s35      | `cabecera.test.tsx`                             | los 6 `it` de @s35, con `MEDIA_MENU = mediaDeAncho('920px')`: las anclas (EXACTAMENTE un `@media (max-width: 920px)`) y el contenido del bloque del menú; el resto, sin cambios                                                                                                                                                                                                                                                                        |
+| @s42      | `cabecera.test.tsx`, describe «F-25 E-2 @s42 …» | 6 `it`: 42-1 ANCLA POSITIVA, EXACTAMENTE un `@media (max-width: 920px)` · 42-2 su contenido, con `flex-direction: column` · 42-3 después de las bases `.lista` y `.disparador` · 42-4 EXACTAMENTE un `@media (max-width: 430px)`, detrás del de 920 · 42-5 ANCLAS NEGATIVAS, sin `max-width: 820px`, `921px` ni `767px` · 42-6 contacto: EXACTAMENTE un `@media (max-width: 820px)` con `.telefono` inline-flex y `min-height: 2.75rem`, y sin `920px` |
+| @s39      | EN VIVO (lead, Chrome + CDP)                    | — (filas 920/921: NO se fingen en jsdom)                                                                                                                                                                                                                                                                                                                                                                                                               |
+| @s43      | EN VIVO (lead, Chrome + CDP)                    | — (barrido de 800 a 960 px con fuentes cargadas y bloqueadas: NO se finge en jsdom)                                                                                                                                                                                                                                                                                                                                                                    |
+
+Literales A MANO en cada uso: "920px", "820px", "430px", "921px" y "767px". `mediaDeAncho` solo construye
+la forma de la regex: el ancho se lo pasa cada `it` escrito a mano. Nada se importa de producción.
+
+### Pendiente para el lead (E-2)
+
+- **@s43 y las filas 920/921 de @s39, EN VIVO** sobre `dist/` en Chrome + CDP (`vivo_f25.mjs s39 s43`),
+  más el repaso de @s32 y @s39 a sus anchos de siempre (E-2-C4). Resultados en
+  `progress/verificacion_viva_logo_acoplado.md`. Hay que hacer `pnpm build`: el `dist/` actual lleva todavía
+  el 820.
+- **judge**: E-2 no añade producción TS. `git diff` de producción: SOLO el número del `@media` de
+  `cabecera.module.scss` y comentarios (esa hoja, `contacto.module.scss` y `_base.scss`). Sin mutación
+  propia: Stryker no ve el SCSS. Su mutante es HUMANO y lo cubren los sabotajes de arriba.
+- No toco `feature_list.json`, el status ni `progress/current.md`: el lead pidió no tocar nada fuera de lo
+  listado. Sin commits.
+
+### Cierre E-2 (2026-09-30)
+
+- Durante los ciclos solo corrieron pasadas acotadas: de 32/32 a **39/39** (`cabecera.test.tsx` de 29 a
+  36, más los 3 de `scroll-padding-cabecera.test.ts`), y 76/76 con los cinco ficheros que leen las hojas
+  tocadas.
+- Al cierre, UNA vez cada uno: `prettier --write` sobre esta bitácora; `pnpm typecheck` limpio; `pnpm lint`
+  limpio; `pnpm format:check` → «All matched files use Prettier code style!». Después, `pnpm test` con la
+  suite COMPLETA → **51 ficheros, 1694 tests, todo verde** (81 s). Son los 1687 del cierre de E-1 más los 7
+  nuevos de E-2: 1 de @s20 (la negativa de "max-width: 820px") y 6 de @s42.
+- Ficheros tocados: `src/components/cabecera.module.scss` (el número y su comentario),
+  `src/components/cabecera.test.tsx`, `src/components/contacto.module.scss` (solo comentarios),
+  `src/styles/_base.scss` (solo comentario), `src/styles/scroll-padding-cabecera.test.ts` (solo JSDoc) y
+  esta bitácora. Sin builds ni Stryker.

@@ -122,21 +122,23 @@ describe('@s27 el botón del menú declara aria-controls igual al id de su lista
 })
 
 /**
- * @s17 — EL BREAKPOINT ES EL LITERAL 820px, LEÍDO DEL SCSS Y ANCLADO CONTRA EL LITERAL A MANO
- * (patrón `doble-de-test-anclado-al-literal-no-al-simbolo`). Criterio de PROYECTO MEDIDO: la nav
- * envuelve en la banda 793–806px → 820px da margen sobre toda la banda. NUNCA el 767 de WebEmpresa
- * (herencia muerta). NUNCA atribuido a WCAG (1.4.10 solo exige 320px). El breakpoint vive SOLO en el
- * SCSS (no hay rama JS de viewport, B-5): no hay símbolo que importar, así que el literal a mano es
- * la única referencia posible y la tautología es imposible por construcción.
+ * @s17 — EL BREAKPOINT ES EL LITERAL 920px, LEÍDO DEL SCSS Y ANCLADO CONTRA EL LITERAL A MANO
+ * (patrón `doble-de-test-anclado-al-literal-no-al-simbolo`). Criterio de PROYECTO MEDIDO sobre la nav
+ * definitiva: cabe en una fila desde 891px con las fuentes cargadas y desde 908px con la de respaldo
+ * → 920px deja 12px de margen sobre el peor caso. Era 820px (la banda 793–806px de la nav del
+ * prototipo) hasta la ENMIENDA E-2 de F-25. NUNCA el 767 de WebEmpresa (herencia muerta). NUNCA
+ * atribuido a WCAG (1.4.10 solo exige 320px). El breakpoint vive SOLO en el SCSS (no hay rama JS de
+ * viewport, B-5): no hay símbolo que importar, así que el literal a mano es la única referencia
+ * posible y la tautología es imposible por construcción.
  */
-describe('@s17 el breakpoint del menú es exactamente el literal 820px en el .module.scss', () => {
+describe('@s17 el breakpoint del menú es exactamente el literal 920px en el .module.scss', () => {
   const RUTA_SCSS = 'src/components/cabecera.module.scss'
 
-  it('@s17 la media query del menú móvil usa exactamente "max-width: 820px", comparado contra el literal a mano', () => {
+  it('@s17 la media query del menú móvil usa exactamente "max-width: 920px", comparado contra el literal a mano', () => {
     const scss = readFileSync(RUTA_SCSS, 'utf8')
 
-    // El literal 820px va ESCRITO A MANO aquí, jamás importado del SCSS ni de un símbolo de producción.
-    expect(scss).toMatch(/@media\s*\(\s*max-width:\s*820px\s*\)/)
+    // El literal 920px va ESCRITO A MANO aquí, jamás importado del SCSS ni de un símbolo de producción.
+    expect(scss).toMatch(/@media\s*\(\s*max-width:\s*920px\s*\)/)
     // Y NO el 767 heredado de WebEmpresa (0 en `src/` [V]).
     expect(scss).not.toContain('767px')
   })
@@ -180,10 +182,11 @@ describe('el pie emite Facebook y tel:, y NO enlaces legales ni una URL de Insta
 
 /**
  * @s20 (F-25, features/logo_acoplado.feature) — ENMIENDA a F-06: la marca pasa a `<LogoAcoplado />`
- * y las reglas de `.marca` se MUDAN a `logo-acoplado.module.scss`. El `@media (max-width: 820px)` se
- * queda (lo lee @s17 de arriba) y el horneado conserva lo que protegen @s12 y @s16. Literales A MANO.
+ * y las reglas de `.marca` se MUDAN a `logo-acoplado.module.scss`. El `@media` del menú se queda (lo
+ * lee @s17 de arriba; 920 px desde la ENMIENDA E-2) y el horneado conserva lo que protegen @s12 y
+ * @s16. Literales A MANO.
  */
-describe('@s20 ENMIENDA F-25: las reglas de .marca se MUDAN a la hoja del logo, el @media de 820 px se queda y el horneado de F-06 sigue', () => {
+describe('@s20 ENMIENDA F-25: las reglas de .marca se MUDAN a la hoja del logo, el @media de 920 px se queda y el horneado de F-06 sigue', () => {
   const CABECERA = readFileSync('src/components/cabecera.module.scss', 'utf8')
   const LOGO = readFileSync('src/components/logo-acoplado.module.scss', 'utf8')
 
@@ -199,11 +202,16 @@ describe('@s20 ENMIENDA F-25: las reglas de .marca se MUDAN a la hoja del logo, 
       .filter((declaracion) => declaracion !== '')
   }
 
-  it('@s20 ANCLAS: cabecera.module.scss conserva .cabecera y el @media de 820 px, sin 767px; y ya NO tiene ningún bloque .marca', () => {
+  it('@s20 ANCLAS: cabecera.module.scss conserva .cabecera y el @media de 920 px, sin 767px; y ya NO tiene ningún bloque .marca', () => {
     expect(CABECERA).toContain('.cabecera')
-    expect(CABECERA).toMatch(/@media\s*\(\s*max-width:\s*820px\s*\)/)
+    expect(CABECERA).toMatch(/@media\s*\(\s*max-width:\s*920px\s*\)/)
     expect(CABECERA).not.toContain('767px')
     expect(CABECERA).not.toMatch(/\.marca\b[^{;]*\{/)
+  })
+
+  it('@s20 cabecera.module.scss, sin comentarios, NO contiene "max-width: 820px": el menú tiene un solo breakpoint (ENMIENDA E-2)', () => {
+    // Sin comentarios: el comentario de la hoja puede citar el 820 como historia.
+    expect(sinComentarios(CABECERA)).not.toMatch(/max-width\s*:\s*820px/)
   })
 
   it('@s20 la mudanza: color, subrayado, cuerpo e interlineado de la marca viven ahora en .marca o .logoTexto de la hoja del logo', () => {
@@ -245,8 +253,13 @@ describe('@s20 ENMIENDA F-25: las reglas de .marca se MUDAN a la hoja del logo, 
 const BYTES_CABECERA = readFileSync('src/components/cabecera.module.scss', 'utf8')
 const HOJA_CABECERA = sinComentarios(BYTES_CABECERA)
 
-const MEDIA_MOVIL = /@media\s*\(\s*max-width:\s*430px\s*\)\s*\{/
-const MEDIA_MENU = /@media\s*\(\s*max-width:\s*820px\s*\)\s*\{/
+const MEDIA_MOVIL = mediaDeAncho('430px')
+const MEDIA_MENU = mediaDeAncho('920px')
+
+/** El encabezado `@media (max-width: <ancho>) {`, con el ancho escrito A MANO en cada llamada. */
+function mediaDeAncho(ancho: string): RegExp {
+  return new RegExp(`@media\\s*\\(\\s*max-width:\\s*${ancho}\\s*\\)\\s*\\{`)
+}
 
 function sinComentarios(fuente: string): string {
   return fuente.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '')
@@ -313,8 +326,13 @@ function declaraciones(cuerpo: string): string[] {
     .filter((declaracion) => declaracion !== '')
 }
 
-describe('F-25 E-1 @s35 cabecera.module.scss gana EXACTAMENTE un @media (max-width: 430px) que solo oculta «Reservar», después de su regla base; el @media de 820 px sigue intacto', () => {
-  it('@s35 ANCLAS POSITIVAS: la hoja contiene ".cabecera", ".reservar", ".disparador" y EXACTAMENTE un bloque @media (max-width: 820px) (F-06 @s17)', () => {
+/** Las declaraciones de la regla de ese selector EXACTO dentro del fragmento ([] si no está). */
+function declaracionesDeLaRegla(fragmento: string, selector: string): string[] {
+  return declaraciones(reglas(fragmento).find((regla) => regla.selector === selector)?.cuerpo ?? '')
+}
+
+describe('F-25 E-1 @s35 cabecera.module.scss gana EXACTAMENTE un @media (max-width: 430px) que solo oculta «Reservar», después de su regla base; el @media de 920 px sigue intacto', () => {
+  it('@s35 ANCLAS POSITIVAS: la hoja contiene ".cabecera", ".reservar", ".disparador" y EXACTAMENTE un bloque @media (max-width: 920px) (F-06 @s17)', () => {
     for (const ancla of ['.cabecera', '.reservar', '.disparador']) {
       expect(BYTES_CABECERA, ancla).toContain(ancla)
     }
@@ -364,14 +382,14 @@ describe('F-25 E-1 @s35 cabecera.module.scss gana EXACTAMENTE un @media (max-wid
     }
   })
 
-  it('@s35 el @media (max-width: 820px) de F-06 sigue declarando el menú plegable y NO contiene ".reservar"; la hoja sigue sin "767px"', () => {
+  it('@s35 el @media (max-width: 920px) de F-06 sigue declarando el menú plegable y NO contiene ".reservar"; la hoja sigue sin "767px"', () => {
     const menu = cuerpoDelBloque(HOJA_CABECERA, MEDIA_MENU) ?? ''
-    const declaracionesDe = (selector: string): string[] =>
-      declaraciones(reglas(menu).find((regla) => regla.selector === selector)?.cuerpo ?? '')
 
-    expect(declaracionesDe('.disparador')).toContain('display: inline-flex')
-    expect(declaracionesDe('.lista')).toContain('display: none')
-    expect(declaracionesDe(".disparador[aria-expanded='true'] + .lista")).toContain('display: flex')
+    expect(declaracionesDeLaRegla(menu, '.disparador')).toContain('display: inline-flex')
+    expect(declaracionesDeLaRegla(menu, '.lista')).toContain('display: none')
+    expect(declaracionesDeLaRegla(menu, ".disparador[aria-expanded='true'] + .lista")).toContain(
+      'display: flex',
+    )
     expect(menu).not.toContain('.reservar')
     expect(BYTES_CABECERA).not.toContain('767px')
   })
@@ -596,5 +614,75 @@ describe('F-25 E-1 @s38 guardas de FUENTE: MenuNavegacion.tsx sigue atando «Res
         expect(bytes, `${fichero}: ${vetado}`).not.toContain(vetado)
       }
     }
+  })
+})
+
+/* ————————————————————————————————————————————————————————————————————————————————————————————
+ * F-25 ENMIENDA E-2 (features/logo_acoplado.feature @s42) — el menú plegable hasta 920 px: SOLO cambia
+ * el número del `@media` de F-06, con el MISMO bloque y el MISMO contenido, CSS puro. El 820 de
+ * contacto.module.scss es OTRO corte (la prominencia del tel:, F-12) y no se mueve. Literales A MANO
+ * en cada uso: "920px", "820px", "430px", "921px" y "767px", nunca importados de producción ni tomados
+ * de otra constante. Que el menú se pliegue hasta 920 px y la nav quepa en una fila desde 921 px no lo
+ * ve jsdom (`css: false`, sin layout): es @s43 y las filas 920/921 de @s39, EN VIVO en Chrome.
+ * ———————————————————————————————————————————————————————————————————————————————————————————— */
+
+describe('F-25 E-2 @s42 el breakpoint del menú pasa a 920 px: cabecera.module.scss tiene EXACTAMENTE un @media (max-width: 920px) con el MISMO menú plegable, ninguna "max-width: 820px" y su @media (max-width: 430px) detrás; contacto.module.scss conserva su @media (max-width: 820px) del tel:', () => {
+  it('@s42 ANCLA POSITIVA: cabecera.module.scss contiene EXACTAMENTE un bloque @media (max-width: 920px)', () => {
+    expect(vecesQueCasa(HOJA_CABECERA, mediaDeAncho('920px'))).toBe(1)
+  })
+
+  it('@s42 ese bloque declara ".disparador" con "display: inline-flex", ".lista" con "display: none" y "flex-direction: column", y ".disparador[aria-expanded=\'true\'] + .lista" con "display: flex"', () => {
+    const menu = cuerpoDelBloque(HOJA_CABECERA, mediaDeAncho('920px')) ?? ''
+    const lista = declaracionesDeLaRegla(menu, '.lista')
+
+    expect(declaracionesDeLaRegla(menu, '.disparador')).toContain('display: inline-flex')
+    expect(lista).toContain('display: none')
+    expect(lista).toContain('flex-direction: column')
+    expect(declaracionesDeLaRegla(menu, ".disparador[aria-expanded='true'] + .lista")).toContain(
+      'display: flex',
+    )
+  })
+
+  it('@s42 ese @media (max-width: 920px) empieza en la hoja DESPUÉS de los bloques base ".lista" y ".disparador" de primer nivel', () => {
+    // El `@media` no suma especificidad: sus reglas (0,1,0) ganan a las base SOLO por ir detrás.
+    const media = mediaDeAncho('920px').exec(HOJA_CABECERA)
+
+    expect(media, 'la hoja debe tener el @media de 920 px').not.toBeNull()
+
+    for (const base of [/(^|\n)\.lista\s*\{/, /(^|\n)\.disparador\s*\{/]) {
+      const bloque = base.exec(HOJA_CABECERA)
+
+      expect(bloque, `la hoja debe tener el bloque base ${base.source}`).not.toBeNull()
+      expect(media?.index, base.source).toBeGreaterThan(bloque?.index ?? Infinity)
+    }
+  })
+
+  it('@s42 cabecera.module.scss contiene EXACTAMENTE un bloque @media (max-width: 430px), que empieza en la hoja DESPUÉS del @media (max-width: 920px)', () => {
+    const movil = mediaDeAncho('430px')
+    const menu = mediaDeAncho('920px').exec(HOJA_CABECERA)
+
+    expect(vecesQueCasa(HOJA_CABECERA, movil)).toBe(1)
+    expect(menu, 'la hoja debe tener el @media de 920 px').not.toBeNull()
+    expect(movil.exec(HOJA_CABECERA)?.index).toBeGreaterThan(menu?.index ?? Infinity)
+  })
+
+  it('@s42 ANCLAS NEGATIVAS: cabecera.module.scss NO contiene "max-width: 820px" (un solo breakpoint del menú), ni "921px", ni "767px"', () => {
+    // "820px", sin comentarios: el comentario de la hoja lo cita como historia.
+    expect(HOJA_CABECERA).not.toMatch(/max-width\s*:\s*820px/)
+    // Con un solo `max-width` no queda hueco fraccionario entre dos rangos (como "431px" en @s35).
+    expect(BYTES_CABECERA).not.toContain('921px')
+    expect(BYTES_CABECERA).not.toContain('767px')
+  })
+
+  it('@s42 contacto.module.scss SÍ contiene EXACTAMENTE un bloque @media (max-width: 820px), que declara ".telefono" con "display: inline-flex" y "min-height: 2.75rem", y NO contiene "920px" (el corte del tel: no se mueve)', () => {
+    const contacto = sinComentarios(readFileSync('src/components/contacto.module.scss', 'utf8'))
+    const delTel = mediaDeAncho('820px')
+    const telefono = declaracionesDeLaRegla(cuerpoDelBloque(contacto, delTel) ?? '', '.telefono')
+
+    expect(vecesQueCasa(contacto, delTel)).toBe(1)
+    expect(telefono).toContain('display: inline-flex')
+    expect(telefono).toContain('min-height: 2.75rem')
+    // Sin comentarios: el del tel: puede citar el 920 del menú para decir que este corte no se movió.
+    expect(contacto).not.toContain('920px')
   })
 })
