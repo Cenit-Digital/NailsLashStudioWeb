@@ -6,6 +6,8 @@
 # `feature_list.json`. DEPENDE de F-06 `header_nav_footer` y F-07 `hero_marca`, que se ENMIENDAN sin
 # romper (@s20-@s23). Implementación y revisiones: progress/tdd_logo_acoplado.md.
 # Bitácora de esta destilación y dudas para la puerta: progress/gherkin_logo_acoplado.md.
+# ENMIENDA E-1 (Pablo, 2026-09-30; destilada por el gherkin_author el 2026-09-30): la cabecera en móvil,
+# en UNA fila sin «Reservar». Son @s35-@s41, AL FINAL y sin renumerar nada. Pendiente de la PUERTA HUMANA.
 # =============================================================================================
 # FUENTES, EN ORDEN DE MANDO
 #   1. Decisiones FIRMES de Pablo (AskUserQuestion, 2026-09-29; brief §2). NO SE REABREN en la puerta:
