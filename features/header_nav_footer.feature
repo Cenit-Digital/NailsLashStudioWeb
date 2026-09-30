@@ -26,7 +26,7 @@
 #              va en el CONTENEDOR; «scroll-margin no actúa al tabular» era FALSO.
 #      · B-3 → breakpoint **820px** [criterio de proyecto MEDIDO], NUNCA el 767 heredado. SUBIDO a
 #              **920px** por la ENMIENDA E-2 de F-25 (decisión de Pablo, 2026-09-30; su destilación,
-#              PENDIENTE de la puerta humana): la medida de 820 quedó superada. Ver @s17.
+#              APROBADA por la puerta humana el 2026-09-30): la medida de 820 quedó superada. Ver @s17.
 #      · B-4 → @s1 como IGUALDAD DE CONJUNTOS + la PUERTA DE ANCLAS VIVAS. «Sección navegable» =
 #              `<section>` con `aria-labelledby` que resuelve a un heading real (reutiliza
 #              `REGLA_SECTION` de F-04). ESA REGLA YA NO ES [NV]: el humano la FIJÓ (ver @s3/@s20).
@@ -540,7 +540,7 @@ Feature: Cabecera, navegación, pie, y la PUERTA DE ANCLAS VIVAS que demuestra q
     # ✅ **DECIDIDO (B-3/B-5, 2026-07-17):** hay menú móvil → este escenario aplica. El breakpoint era
     # el literal `820px` [criterio de proyecto MEDIDO], NUNCA el 767 heredado; el TDD lo implementa.
     # ✏️ **ENMENDADO (E-2 de F-25, decisión de Pablo, 2026-09-30):** el literal pasa a `920px`. La
-    # destilación de E-2 está PENDIENTE de la puerta humana.
+    # destilación de E-2 la APROBÓ la puerta humana el 2026-09-30 («Aprobado, prográmalo»).
 
   # ---------------------------------------------------------------------------
   # Los mutantes que deben morir (I-6, umbral 1.0). El conjunto exacto se MIDE cuando el fichero exista.

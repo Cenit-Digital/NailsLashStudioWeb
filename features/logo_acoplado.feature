@@ -4,8 +4,8 @@
 # (`@keyframes` + tres custom properties; sin WAAPI) y la marca accesible «Nails Lash Studio» intacta.
 # Estado: @s1-@s34 APROBADOS por la puerta humana (Pablo, 2026-09-29); ENMIENDA E-1 (@s35-@s41) APROBADA
 # por su puerta el 2026-09-30 (decisión de Pablo: «Una fila sin "Reservar"»); ENMIENDA E-2 (@s42-@s43, y
-# los retoques de @s20, @s35 y @s39) PENDIENTE de la PUERTA HUMANA (decisión de Pablo: «Menú hasta
-# 920 px»). 43 escenarios. Entrada 25 de `feature_list.json`. DEPENDE de F-06 `header_nav_footer` y
+# los retoques de @s20, @s35 y @s39) APROBADA por su puerta el 2026-09-30 (decisión de Pablo: «Menú hasta
+# 920 px»; puerta: «Aprobado, prográmalo»). 43 escenarios. Entrada 25 de `feature_list.json`. DEPENDE de F-06 `header_nav_footer` y
 # F-07 `hero_marca`, que se ENMIENDAN sin romper (@s20-@s23; E-2 cambia el literal de F-06 @s17).
 # Implementación y revisiones: progress/tdd_logo_acoplado.md.
 # Bitácora de esta destilación y dudas para la puerta: progress/gherkin_logo_acoplado.md.
@@ -13,7 +13,7 @@
 # en UNA fila sin «Reservar». Son @s35-@s41, AL FINAL y sin renumerar nada. APROBADA el 2026-09-30.
 # ENMIENDA E-2 (Pablo, 2026-09-30; destilada por el gherkin_author el 2026-09-30): el menú plegable de
 # la cabecera hasta 920 px (antes 820). Son @s42-@s43, AL FINAL y sin renumerar nada; retoca las anclas
-# de @s20 y @s35 y las filas 820/821 de @s39. PENDIENTE de la PUERTA HUMANA.
+# de @s20 y @s35 y las filas 820/821 de @s39. APROBADA el 2026-09-30.
 # =============================================================================================
 # FUENTES, EN ORDEN DE MANDO
 #   1. Decisiones FIRMES de Pablo (AskUserQuestion, 2026-09-29; brief §2). NO SE REABREN en la puerta:

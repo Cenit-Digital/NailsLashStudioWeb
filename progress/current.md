@@ -55,7 +55,8 @@
 - [x] Decisión de Pablo: «Menú hasta 920 px» (brief §8). Barrido del lead de 800 a 960 px: una fila
       desde 891 px con las fuentes cargadas y desde 908 px con las de respaldo.
 - [x] Spec: `project-spec.md` §ENMIENDA E-2 (E-2-C1..C4), commit 6cf50b5.
-- [ ] gherkin_author: F-06 @s17 820→920; F-25 @s20/@s35/@s39 y escenarios nuevos (en curso)
-- [ ] ⏸ puerta humana de E-2
+- [x] gherkin_author: F-06 @s17 820→920; F-25 @s20/@s35/@s39, @s42 (bytes) y @s43 (en vivo); 43
+      escenarios (1a9799a). El lead cerró sus dos dudas (acceptance de F-06 y nota de E-1-C4).
+- [x] ⏸ puerta humana de E-2 APROBADA por Pablo el 2026-09-30 («Aprobado, prográmalo»)
 - [ ] tdd_craftsman → judge → verificación en vivo (`vivo_f25.mjs s39 s43`, preparada y en rojo sobre
       el `dist/` actual, como debe) → F-25 `done`
