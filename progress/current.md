@@ -32,8 +32,9 @@
 - [x] gherkin_author ×2: `logo_acoplado.feature` (34 escenarios, D-1..D-8 decididas por el lead; ENMIENDA D-1 en la spec) y `catalogo_fotos.feature` (26) → ambas `spec_ready`
       → `features/logo_acoplado.feature`, `features/catalogo_fotos.feature`
 - [x] ⏸ puerta humana APROBADA por Pablo el 2026-09-29 («Aprobado, empieza»): F-25 → `in_progress`, F-27 espera turno
-- [ ] F-25: tdd_craftsman (en curso) → judge → mutation_tester - **Feature en curso: 25 — logo_acoplado** (tdd_craftsman, 2026-09-29). Escenarios a recorrer
-      en orden: @s1-@s27 y @s34 por TDD; @s28-@s33 (`@verificacion-viva`) quedan para el lead.
-      Bitácora viva: `progress/tdd_logo_acoplado.md`.
+- [x] F-25 tdd_craftsman: 28 escenarios en jsdom/bytes (@s1-@s27, @s34), suite 1671/1671 (fff8588). El
+      contenedor se reinició a mitad (probablemente dos suites concurrentes): se relanzó desde la bitácora
+      sin perder nada (de08858). Desviación @s26 ratificada y enmendada en el `.feature` (7aa8ba9).
+- [ ] F-25 judge (en curso) → mutation_tester → verificación en vivo del lead (@s28-@s33)
 - [x] ~~F-26 `hero_foto`~~ — DESCARTADA por Pablo el 2026-09-29 («no quiero imagen»); en `no_se_construyen`
 - [ ] F-27: (fotos) tdd_craftsman → judge → mutation_tester
