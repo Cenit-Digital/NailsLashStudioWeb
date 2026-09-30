@@ -762,6 +762,11 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
     # 320 px cubre también el zoom de 200-400 % y el reflow a 320 px CSS (caso límite 16). Cálculo del
     # spec_partner: 320 − 2 × 24 = 272 px útiles; máx(«nails lash studio» ≈ 180 px [I, sin medir], 137 px)
     # + 16 px de gap + 44 px de hamburguesa ≈ 240 px. Si «nails lash studio» mide más de lo supuesto, se anota.
+    # [ENMIENDA E-1, 2026-09-30] Ese cálculo olvidaba el botón «Reservar». Medido en vivo por el lead: con
+    # «Reservar», la cabecera ya tenía DOS filas antes de F-25 (118 px entre 320 y 390 px), y con el logo
+    # caligráfico pasa a 131 px, entre 320 y 392 px. Una fila (75 px) solo desde 394 px. @s32 SOLO se
+    # cumple con E-1: sin «Reservar» hasta 430 px, la cabecera es una fila de 75 px de 320 a 440 px en
+    # los dos estados. Las fronteras 430/431 y 820/821, «Reservar» y el Tab, en @s39.
 
   @s33 @verificacion-viva
   Scenario: [VERIFICACIÓN EN VIVO CON CHROME, NO jsdom] En el árbol de accesibilidad de Chrome el enlace se llama «Nails Lash Studio» en los dos estados, la firma no roba clics durante el vuelo y se lee a su tamaño, sin terceros
