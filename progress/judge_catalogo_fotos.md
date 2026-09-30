@@ -253,3 +253,60 @@ Son 36 en total: 15 sobre `Catalogo.tsx`, 3 sobre datos, 14 sobre la hoja (5 pro
 2. **En la misma pasada (recomendado): N1** (corregir el comentario de `:14`), **N2** (quitar `:178`) y **N3** (escapar
    la regex de `:462`).
 3. Después, **re-judge acotado** del delta y `bin/harness init` una vez (lead).
+
+## Re-judge del delta (34bc89a)
+
+**Veredicto:** APPROVED — B1 resuelto, N1-N3 corregidos y H-1 con su test. Nada fuera de alcance.
+
+- **Qué revisé:** `git diff 81a17c6 34bc89a -- src` (3 ficheros: `catalogo.test.tsx`, `catalogo-estilos.test.ts`,
+  `catalogo.module.scss`). Árbol limpio antes y después (`git status --short` vacío).
+- **Qué ejecuté:** solo `pnpm vitest run src/components/catalogo.test.tsx src/components/catalogo-estilos.test.ts` →
+  **50/50 verdes** (36 + 14). Sin suite completa, sin build, sin Stryker (orden del lead).
+
+### (1) B1 — resuelto
+
+- `catalogo.test.tsx:283-290`: el helper `apariciones(texto, literal)` cuenta APARICIONES
+  (`split(literal).length - 1`), no elementos. Tiene un JSDoc que explica por qué `getAllByText` no basta.
+- @s8 (`:297-300`) y @s9 (`:319-322`) aseveran `apariciones(container.textContent, *_A_MANO) === 1`, con mensaje.
+  Los literales siguen escritos a mano (`:27`, `:30`) y no se importa `LEYENDA_*`. Se mantienen las aserciones previas
+  («contenido completo de un `<p>`», «hermano inmediato»).
+- **Sabotajes, reproducidos en el árbol real y restaurados con `git checkout --`:**
+
+  | Sabotaje en `Catalogo.tsx`, tras el `<p>` de fotos           | Antes (5482984) | Ahora (34bc89a)                               |
+  | ------------------------------------------------------------ | --------------- | --------------------------------------------- |
+  | `<p className={estilos.leyenda}>Nota: {LEYENDA_FOTOS}</p>`   | VERDE           | **ROJO**: @s8, `expected 2 to be 1` (1 de 36) |
+  | `<p className={estilos.leyenda}>Nota: {LEYENDA_PRECIOS}</p>` | VERDE           | **ROJO**: @s9, `expected 2 to be 1` (1 de 36) |
+
+- Impacto en la mutación: ninguno sobre `Catalogo.tsx`. El delta solo AÑADE aserciones y quita una tautológica (N2),
+  así que ningún mutante que moría puede sobrevivir.
+
+### (2) N1-N3 — corregidos
+
+- **N1:** `catalogo.test.tsx:14-15` ya dice la verdad: las clases del módulo salen `_<clase>_<hash>` y no se aseveran
+  porque una clase no es comportamiento. La discrepancia en el contrato (`.feature`, spec, `contacto.test.tsx`) sigue
+  siendo nota para el lead (I-8), fuera de este delta.
+- **N2:** retirada la aserción tautológica `hijos[1].parentElement` (antigua `:178`). «Hija directa» sigue cubierta
+  por `toHaveLength(2)` y `hijos[1].tagName === 'IMG'`.
+- **N3:** `normalizado` (`:477-482`) usa `/\p{Diacritic}/gu`, legible y con el mismo patrón que
+  `src/lib/placeholders.ts`. Sin caracteres invisibles.
+
+### (3) H-1 — `box-sizing: border-box` en `.foto`
+
+- `catalogo.module.scss:87-90`: la declaración va dentro de `.foto`, con un comentario que explica el POR QUÉ (2 px
+  de desborde por el borde).
+- `catalogo-estilos.test.ts:83-92`: el test lee los bytes del bloque `.foto` con `patronDeDeclaracion`.
+- **Sabotaje:** quitar la línea `box-sizing: border-box;` → **ROJO** (1 de 14, el `it` de H-1). Restaurado.
+- Trazado a @s5/@s23 (CF-2) y a la bitácora (`progress/tdd_catalogo_fotos.md:488-`). No hay producción sin test que la
+  pida.
+
+### (4) Alcance
+
+- En `src/` solo cambian los 3 ficheros citados. `Catalogo.tsx` y `catalogo-demo.ts` no se tocan.
+- Sin `.only`, `.skip`, `console.*` ni `toHaveClass` en el delta.
+
+### Checkpoints tras el delta
+
+- **C6:** [x]. Todos los `@s` (@s1-@s21) están cubiertos y @s8/@s9 muerden «EXACTAMENTE UNA VEZ».
+- **C1:** [x] condicionado. Sigue pendiente que el lead corra `bin/harness init` una vez antes de `done` (N8). Aquí no
+  lo ejecuté, por orden del lead.
+- **C7:** [ ] en manos del `mutation_tester`. Tiene que anotar que midió contra los tests de `34bc89a`.

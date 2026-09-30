@@ -526,8 +526,9 @@
       "depends_on": ["cero_terceros"],
       "mutable": true,
       "sdd": true,
-      "status": "in_progress",
-      "puerta_humana": "P1 (Pexels, selección autónoma) el 2026-09-29. PUERTA HUMANA APROBADA el 2026-09-29 (AskUserQuestion: «Aprobado, empieza»): features/catalogo_fotos.feature, 26 escenarios, con las CF-1..CF-7. Espera turno tras F-25 (una feature a la vez)."
+      "status": "done",
+      "puerta_humana": "P1 (Pexels, selección autónoma) el 2026-09-29. PUERTA HUMANA APROBADA el 2026-09-29 (AskUserQuestion: «Aprobado, empieza»): features/catalogo_fotos.feature, 26 escenarios, con las CF-1..CF-7. Espera turno tras F-25 (una feature a la vez).",
+      "cierre": "CERRADA 2026-09-30. 26/26 escenarios de features/catalogo_fotos.feature: @s1-@s21 por TDD (5482984; ronda delta 34bc89a) y @s22-@s26 en vivo. judge CHANGES_REQUESTED por B1 (@s8/@s9 no mordían «EXACTAMENTE UNA VEZ») → re-judge del delta APPROVED (progress/judge_catalogo_fotos.md). Mutación Catalogo.tsx 7/7 = 100 %, re-medida contra los tests de 34bc89a (progress/mutation_catalogo_fotos.md). VERIFICACIÓN EN VIVO (progress/verificacion_viva_catalogo_fotos.md, Chromium 141, copia inmutable de dist/): 23/23 ✓, CF-6 (loading=lazy) ratificada por medida (la foto de Uñas cae fuera del primer viewport a 1280 × 800 y a 1440 × 900; el LCP es el rótulo del hero); H-1 (la foto sobresalía 2 px de su columna por content-box) resuelto con box-sizing: border-box, 272 × 340 a 320 px. bin/harness init en verde (1761/1761)."
     }
   ],
   "no_se_construyen": [

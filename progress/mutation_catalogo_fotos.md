@@ -125,3 +125,9 @@ contra los 4 ficheros de test de F-27 (66 tests).
 - C7 (prueba de mutación) queda **cumplido** para F-27 con `Catalogo.tsx` al 100 %.
 - Quedan pendientes, fuera de mi papel, B1 del judge (`tdd_craftsman` → judge) y, tras B1, repetir
   la corrida 1 y el `bin/harness init` que pide el judge antes de `done`.
+
+## Re-medida tras la ronda delta (34bc89a), por el lead
+
+`node tools/mutate.mjs src/components/Catalogo.tsx` contra los tests de `34bc89a` (judge B1 + N1-N3 + H-1):
+**7/7 = 100 %**, con 0 supervivientes, 0 timeout y 0 sin cobertura. «Final mutation score of 100.00 is greater
+than or equal to break threshold 100».
