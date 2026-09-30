@@ -746,7 +746,7 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
     Then el alto del <header> en «caligrafia» es IDÉNTICO al de «texto», y los dos son <= 76 px
     And la caja del <a> (getBoundingClientRect) es idéntica en los dos estados, y el <svg> del logo mide 40 px de alto
     And la suma de los valores "layout-shift" registrados desde la carga es 0
-    And la marca y la hamburguesa (o la nav horizontal) quedan en UNA fila: la cabecera no envuelve
+    And la marca, la hamburguesa (o la nav horizontal) y, por encima de 430 px, «Reservar» quedan en UNA fila: la cabecera no envuelve (ENMIENDA E-1: hasta 430 px «Reservar» no se ve, @s39)
     And con la petición de Great Vibes bloqueada (Network.setBlockedURLs) el alto del <header> y la caja del <a> no cambian (caso límite 15)
 
     Examples:
