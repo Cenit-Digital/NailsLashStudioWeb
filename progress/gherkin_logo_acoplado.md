@@ -159,3 +159,89 @@ script).
    todo el rango» era falsa antes de E-1 y pasa a ser cierta con ella. Por otro lado, la línea «Estado: PROPUESTO…
    pendiente de la PUERTA HUMANA» de la cabecera del `.feature` está desfasada (la puerta se aprobó el 2026-09-29).
    No la he tocado.
+
+## ENMIENDA E-2
+
+**ENMIENDA E-2: el menú plegable hasta 920 px.** La destiló el gherkin_author el 2026-09-30. Fuente:
+`project-spec.md` §F-25 «ENMIENDA E-2» (E-2-C1..E-2-C4 y las alternativas descartadas). La decisión es FIRME, de
+Pablo (AskUserQuestion, 2026-09-30): «Menú hasta 920 px». La puerta ratifica la destilación, no la decisión.
+
+He ampliado `features/logo_acoplado.feature` de 41 a **43 escenarios**. Los nuevos son @s42 y @s43, añadidos AL
+FINAL y sin renumerar nada. Los tags van de @s1 a @s43, únicos y consecutivos, y todas las filas de cada tabla
+tienen el mismo número de celdas (comprobado con un script). No he tocado `src/`, los tests ni `project-spec.md`.
+No he ejecutado la suite ni he hecho commit.
+
+### Escenarios nuevos
+
+| @s  | Qué fija                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Dónde se prueba                                            | Contrato               |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ---------------------- |
+| s42 | Bytes, sin comentarios. `cabecera.module.scss` tiene EXACTAMENTE un `@media (max-width: 920px)` con el menú de F-06: `.disparador` inline-flex, `.lista` none y en columna, y `[aria-expanded='true'] + .lista` flex. Va DESPUÉS de las bases `.lista` y `.disparador`, y el `430px` de E-1 va detrás. Sin `max-width: 820px`, `921px` ni `767px`. `contacto.module.scss` conserva EXACTAMENTE un `@media (max-width: 820px)` con `.telefono` (inline-flex, `min-height: 2.75rem`) y no contiene `920px` | bytes SCSS (`cabecera.test.tsx`, describe «F-25 E-2 @s42») | E-2-C1, E-2-C3, E-2-C4 |
+| s43 | EN VIVO. Outline de 2 filas: fuentes cargadas y fuentes bloqueadas (ancla: `document.fonts.check` a false). Barrido de 800 a 960 px de 1 en 1, en los dos estados del logo. Cabecera ≤ 76 px y en una fila (centros verticales a ≤ 1 px). Hasta 920 px, «Menú» visible y la lista plegada; desde 921 px, la nav horizontal. El mismo alto en cada tramo (75 y 71 px medidos) y sin desbordamiento horizontal                                                                                             | Chrome + CDP                                               | E-2-C2, E-2-C4         |
+
+### Cambios en lo que ya estaba aprobado (sin renumerar)
+
+- **F-06 `features/header_nav_footer.feature`:**
+  - @s17: el título, el `Then` y el `And` del literal a mano pasan a `"920px"`. El comentario lleva la medida
+    nueva: una fila desde 891 px con las fuentes cargadas y desde 908 px con la de respaldo, y 920 px deja 12 px de
+    margen sobre el peor caso. Nunca se atribuye a una norma ni se usa el 767. Añade un bloque «HISTORIA»: la banda
+    793–806 px era de la nav del prototipo y quedó superada, y E-2 (Pablo, 2026-09-30) subió el literal. Remite a
+    `project-spec.md` §F-25 «ENMIENDA E-2». El «DECIDIDO» del 2026-07-17 se conserva como «era `820px`» y le sigue
+    un «ENMENDADO».
+  - También se han actualizado: el resumen B-3 (dice que el literal subió a 920px y remite a @s17), la nota
+    anti-tautología del literal, la línea de la mecánica del menú y la fila de @s18 («alterar el literal del
+    breakpoint 920px (820px antes de …)»).
+  - Las medidas del prototipo de @s11 sobre `scroll-padding` (282/385/647/821px) quedan intactas: son otra cosa.
+- **F-25 `features/logo_acoplado.feature`:**
+  - Cabecera: la línea de Estado (E-1 APROBADA, E-2 PENDIENTE, 43 escenarios) y la línea desfasada de E-1
+    («Pendiente de la PUERTA HUMANA» → «APROBADA el 2026-09-30»). Se añaden una línea E-2, la fuente «1bis» con la
+    decisión de Pablo, la fuente 2 con E-2-C1..C4, E-2 en ARTEFACTOS (TOCA / NO TOCA), en «VERDE ≠ FUNCIONA» y en
+    ANTI-TAUTOLOGÍA, y el bloque de traza E-2-C1..C4 con las alternativas (a)-(d) y el acceptance (43).
+  - @s20: el ancla pasa a `@media (max-width: 920px)`. Se añade un `And`: la hoja sin comentarios NO contiene
+    `max-width: 820px`.
+  - @s35: las anclas del bloque del menú (título, `Then` y el `And` del contenido) pasan a 920 px.
+  - @s39: las filas 820/821 pasan a **920/921**, con los mismos valores de celda que antes. Su texto ya no citaba
+    820/821 en el cuerpo, solo en las filas. Se añade un comentario E-2.
+  - Comentarios: ARTEFACTOS y la línea «NO TOCA» de E-1 («820 px entonces, 920 px desde E-2»), D-2, el comentario
+    de @s32 (fronteras 920/921) y la cabecera del bloque E-1. En esta última, «como los 820 px de F-06 sobre la
+    banda 793–806» se deja como historia y se añade «la ENMIENDA E-2 los subió a 920 px, con 12 px sobre los 908
+    medidos».
+- **`features/tipografia_global.feature:82`** (fuera de la lista, pero el grep lo pedía): citaba «el `820px` de
+  F-06 @s17» como ejemplo del patrón anti-tautología. Ahora dice «`920px` —`820px` antes de la ENMIENDA E-2 de
+  F-25—». Solo comentario.
+- **`feature_list.json` (F-25):** `acceptance[0]` dice «Los 43 escenarios … + ENMIENDA E-2 @s42-@s43».
+  `puerta_humana` gana la entrada de E-2 con «PUERTA HUMANA PENDIENTE», en el mismo formato que E-1. `status` sigue
+  `in_progress`.
+
+Grep final: en `features/*.feature` ya no queda ningún `820` que afirme el breakpoint ACTUAL del menú. Los que
+quedan son historia marcada («antes», «entonces», «HISTORIA»), anclas negativas o el corte del `tel:` de contacto.
+
+### Decisiones tomadas (derivados míos; hay que ratificarlos)
+
+1. **Contacto va por bytes en @s42, no en vivo en @s43.** El comportamiento de contacto ES su hoja, y ningún test
+   anclaba su `820px` (`contacto-estilos.test.ts` acepta cualquier `max-width`). El ancla POSITIVA (`820px` +
+   `.telefono` inline-flex y `min-height: 2.75rem`) y la NEGATIVA (`920px` no aparece) cazan una «armonización»
+   por error. Es determinista y la corre el TDD.
+2. **@s42 fija el orden: base → 920 → 430.** La spec lo dice («el orden de la hoja no cambia»). Lo convierto en
+   aserción porque no es cosmético: con el `@media` delante de `.disparador { display: none }`, «Menú» no
+   aparecería nunca.
+3. **@s42 exige `flex-direction: column` en `.lista`.** E-2-C1 dice «en columna». @s35 no lo exigía.
+4. **@s42 veta `921px`,** por lo mismo que @s35 veta `431px`: con un solo `max-width` no queda hueco fraccionario.
+5. **@s43 es un Outline por carga de fuentes, con un ancla** (`document.fonts.check('1em "Gilda Display"')` true o
+   false) que demuestra que el bloqueo funcionó. Los altos 75/71 px van «medidos», como registro. El contrato es
+   «≤ 76 px y el MISMO alto en cada tramo», para no atarse a redondeos de subpíxel.
+6. **La parte de E-2-C4 «a 920 px Tab de «Menú» a «Reservar»; a 921 px Tab de «FAQ» a «Reservar»»** la cubren las
+   filas 920/921 de @s39, sin duplicarla en @s43. «@s32 y @s39 a sus anchos de siempre» queda como instrucción
+   en el comentario de @s43 y en la traza, no como `Then`.
+
+### Ambigüedades para el lead
+
+1. **`feature_list.json` de F-06** (entrada 6, `acceptance`, líneas ~139-140) sigue diciendo «max-width: 820px» y
+   «el breakpoint (820px, …)». No lo he tocado: la instrucción era solo F-25, y E-2-C3 no lo lista. Si el
+   acceptance de F-06 debe reflejar el contrato vigente, hay que añadirle «(920px desde la ENMIENDA E-2 de F-25)».
+2. **`project-spec.md` E-1-C4** (≈ línea 3846) dice «el `@media (max-width: 820px)` sigue intacto (F-06 @s17)». Es
+   historia de E-1, pero se lee como contrato vigente. Es tuyo si quieres anotarlo.
+3. **Duplicación intencionada:** «NO contiene `max-width: 820px`» está en @s20 (lo pediste) y en @s42. El TDD puede
+   cubrir las dos aserciones con un único `expect`, siempre que cada `describe` cite su tag.
+4. **Fuentes «bloqueadas» en @s43.** He escrito «las peticiones de fuentes del sitio (.woff2) … Network.setBlockedURLs».
+   Tu verificación previa usó `route` de Playwright solo para Great Vibes. La medida de E-2 (908 px) es con TODAS
+   las fuentes bloqueadas (marca de 141,8 px), así que el `.feature` pide bloquear todas.

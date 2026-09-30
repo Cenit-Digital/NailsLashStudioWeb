@@ -3844,7 +3844,7 @@ cubrirla en móvil (con 131 px quedaban 35 px de título tapados al saltar a una
 
 **E-1-C4 · Verificación.** Test de BYTES sobre `cabecera.module.scss`: existe exactamente un
 `@media (max-width: 430px)` y dentro `.reservar { display: none }`; el `@media (max-width: 820px)` sigue
-intacto (F-06 @s17). En jsdom, el enlace «Reservar» sigue en el horneado (`renderToString`). **En vivo**
+intacto (F-06 @s17; la ENMIENDA E-2 lo subió después a 920 px). En jsdom, el enlace «Reservar» sigue en el horneado (`renderToString`). **En vivo**
 (@s32 de F-25, ahora cumplible): cabecera ≤ 76 px y en una fila de 320 a 1280 px, en los dos estados;
 «Reservar» visible de 431 px hacia arriba y ausente en 320–430 px.
 

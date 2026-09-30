@@ -3,12 +3,17 @@
 # Dos estados en ATRIBUTOS del <a> (`data-logo`, `data-vuelo`), un vuelo FLIP que vive en la HOJA
 # (`@keyframes` + tres custom properties; sin WAAPI) y la marca accesible «Nails Lash Studio» intacta.
 # Estado: @s1-@s34 APROBADOS por la puerta humana (Pablo, 2026-09-29); ENMIENDA E-1 (@s35-@s41) APROBADA
-# por su puerta el 2026-09-30 (decisión de Pablo: «Una fila sin "Reservar"»). Entrada 25 de
-# `feature_list.json`. DEPENDE de F-06 `header_nav_footer` y F-07 `hero_marca`, que se ENMIENDAN sin
-# romper (@s20-@s23). Implementación y revisiones: progress/tdd_logo_acoplado.md.
+# por su puerta el 2026-09-30 (decisión de Pablo: «Una fila sin "Reservar"»); ENMIENDA E-2 (@s42-@s43, y
+# los retoques de @s20, @s35 y @s39) PENDIENTE de la PUERTA HUMANA (decisión de Pablo: «Menú hasta
+# 920 px»). 43 escenarios. Entrada 25 de `feature_list.json`. DEPENDE de F-06 `header_nav_footer` y
+# F-07 `hero_marca`, que se ENMIENDAN sin romper (@s20-@s23; E-2 cambia el literal de F-06 @s17).
+# Implementación y revisiones: progress/tdd_logo_acoplado.md.
 # Bitácora de esta destilación y dudas para la puerta: progress/gherkin_logo_acoplado.md.
 # ENMIENDA E-1 (Pablo, 2026-09-30; destilada por el gherkin_author el 2026-09-30): la cabecera en móvil,
-# en UNA fila sin «Reservar». Son @s35-@s41, AL FINAL y sin renumerar nada. Pendiente de la PUERTA HUMANA.
+# en UNA fila sin «Reservar». Son @s35-@s41, AL FINAL y sin renumerar nada. APROBADA el 2026-09-30.
+# ENMIENDA E-2 (Pablo, 2026-09-30; destilada por el gherkin_author el 2026-09-30): el menú plegable de
+# la cabecera hasta 920 px (antes 820). Son @s42-@s43, AL FINAL y sin renumerar nada; retoca las anclas
+# de @s20 y @s35 y las filas 820/821 de @s39. PENDIENTE de la PUERTA HUMANA.
 # =============================================================================================
 # FUENTES, EN ORDEN DE MANDO
 #   1. Decisiones FIRMES de Pablo (AskUserQuestion, 2026-09-29; brief §2). NO SE REABREN en la puerta:
@@ -20,8 +25,13 @@
 #      · E-1 — «Una fila sin "Reservar"»: hasta 430 px de ancho, la cabecera muestra solo el logo y
 #        «Menú», y el botón «Reservar» de la cabecera se oculta con CSS puro. Por encima de 430 px no
 #        cambia nada (@s35-@s41). La puerta ratifica la DESTILACIÓN, no la decisión.
+#      · E-2 — «Menú hasta 920 px»: el breakpoint del menú plegable de la cabecera pasa del literal
+#        820px al 920px, con CSS puro y el MISMO bloque de F-06; solo cambia el número (@s20, @s35,
+#        @s39, @s42, @s43). Cambia el contrato de F-06 @s17. La puerta ratifica la DESTILACIÓN, no la
+#        decisión.
 #   2. `project-spec.md` → «Feature 25: logo_acoplado» (LA-C1..LA-C13, casos límite 1-20, LA-1..LA-16,
-#      enmiendas a F-06/F-07/F-03 y verificación en vivo) y su «ENMIENDA E-1» (E-1-C1..E-1-C4).
+#      enmiendas a F-06/F-07/F-03 y verificación en vivo), su «ENMIENDA E-1» (E-1-C1..E-1-C4) y su
+#      «ENMIENDA E-2» (E-2-C1..E-2-C4).
 #   3. `progress/brief_foto_logo_catalogo.md` §5 (F-26 DESCARTADA: la cabecera y el hero se quedan como
 #      están) y §6 (cálculos del spec_partner: contraste 5,3809; viewBox 4120:1200; ≤ 76 px).
 #
@@ -56,9 +66,9 @@
 #   tests: logo-acoplado.test.tsx · logo-acoplado-logica.test.ts · logo-acoplado-estilos.test.ts ·
 #          logo-acoplado-derivacion.test.tsx (el vi.mock de @s4 vive SOLO ahí)
 #   TOCA: Cabecera.tsx (monta <LogoAcoplado />) · cabecera.module.scss (las reglas de `.marca` se
-#         MUDAN a la hoja nueva; el `@media (max-width: 820px)` se queda) · Hero.tsx (SOLO dos
-#         atributos estáticos `data-acople`) · hero.test.tsx (aserciones nuevas de @s21) ·
-#         cabecera.test.tsx (@s20) · stryker.config.json (+2 en `mutate`).
+#         MUDAN a la hoja nueva; el `@media` del menú se queda: 820 px entonces, 920 px desde E-2) ·
+#         Hero.tsx (SOLO dos atributos estáticos `data-acople`) · hero.test.tsx (aserciones nuevas de
+#         @s21) · cabecera.test.tsx (@s20) · stryker.config.json (+2 en `mutate`).
 #   NO TOCA: data-firma, el control «Completar la firma» ni el reloj de 15 s del hero (LA-C8, LA-16);
 #         `MATRIZ_DE_USO` ni `MINIMO_DE_PARES` (LA-12); `_tokens.scss` ni el 88 % de `--header-bg`;
 #         `_base.scss` (el `scroll-padding-top: 6rem` y los 76 px que deriva a mano, F-06 @s11).
@@ -67,8 +77,19 @@
 #         DESPUÉS del bloque base `.reservar`. Sus tests (@s35-@s38) van en cabecera.test.tsx, con
 #         describe prefijados «F-25 E-1 @sN» para no confundirse con los tags de F-06 del mismo fichero.
 #     NO TOCA: MenuNavegacion.tsx (el enlace, su `href="#reserva-titulo"` y su clase se quedan),
-#         Cabecera.tsx, el `@media (max-width: 820px)` ni el `@media (max-width: 640px)`, `_base.scss`,
-#         «Reservar cita» del hero, «Reserva» de la lista del menú y el lanzador de Nailbot (E-1-C3).
+#         Cabecera.tsx, el `@media` del menú (entonces de 820 px) ni el `@media (max-width: 640px)`,
+#         `_base.scss`, «Reservar cita» del hero, «Reserva» de la lista del menú y el lanzador de
+#         Nailbot (E-1-C3).
+#   ENMIENDA E-2 (E-2-C1, E-2-C3):
+#     TOCA: cabecera.module.scss, SOLO el número de su `@media (max-width: 820px)`, que pasa a
+#         `@media (max-width: 920px)` con el MISMO contenido, y su comentario (con la medida nueva) ·
+#         cabecera.test.tsx: los literales a mano de F-06 @s17, @s20, `MEDIA_MENU` y @s35 pasan a
+#         "920px", y los tests de @s42 van con describe prefijados «F-25 E-2 @s42» · SOLO el texto de
+#         los comentarios que citan el corte del menú en `_base.scss`, scroll-padding-cabecera.test.ts y
+#         contacto.module.scss.
+#     NO TOCA: el `@media (max-width: 820px)` de contacto.module.scss (el del tel:, F-12: su
+#         comportamiento no cambia), ningún JS, el horneado, las anclas, los pares de contraste ni el
+#         `scroll-padding-top: 6rem` de `_base.scss`.
 #
 # =============================================================================================
 # GEOMETRÍA DE REFERENCIA (la MISMA en todos los escenarios de jsdom; asimétrica y SIN ceros)
@@ -116,6 +137,9 @@
 #     fuente @s38 · EN VIVO (mismas reglas que @s28-@s33) @s39, @s40 y @s41. jsdom no aplica ningún
 #     `@media` ni hace layout: que «Reservar» se oculte hasta 430 px y se vea desde 431 px SOLO se
 #     prueba en Chrome (@s39).
+#   · ENMIENDA E-2: BYTES de cabecera.module.scss y contacto.module.scss @s42 · EN VIVO (mismas reglas
+#     que @s28-@s33) @s43, y las filas 920/921 de @s39. Que el menú se pliegue hasta 920 px y la nav
+#     quepa en una fila desde 921 px SOLO se prueba en Chrome.
 #
 # =============================================================================================
 # ANTI-TAUTOLOGÍA Y PROHIBICIONES
@@ -123,7 +147,8 @@
 #   ✅ Literales A MANO en los tests: "Nails Lash Studio", "Nails Lash", "-80 -840 4120 1200", "texto",
 #      "caligrafia", "no", "si", "-73px 0px 0px 0px", "325px", "-75px", "4", "0.9s",
 #      "cubic-bezier(0.45, 0, 0.25, 1)", "0.35", "0.4s", "2.5rem", "2.75rem", "var(--ink)"; y, por E-1,
-#      "430px", "display: none", "Reservar" y "#reserva-titulo".
+#      "430px", "display: none", "Reservar" y "#reserva-titulo"; y, por E-2, "920px", "921px" y "820px"
+#      (ancla NEGATIVA en cabecera.module.scss y POSITIVA en contacto.module.scss).
 #   ❌ PROHIBIDO importar de producción NOMBRE, partirNombre, VISTA_MARCA ni ninguna constante del logo
 #      como VALOR ESPERADO (sí se sustituyen con vi.mock en @s4, que es lo contrario: prueba que se USAN).
 #   ❌ PROHIBIDO `toHaveClass` y aseverar por clase de CSS module (bajo `css: false` es una cadena con
@@ -161,8 +186,9 @@
 #         por encima de esa misma línea, así que aviso y decisión son coherentes por construcción y el
 #         acople nunca se pierde (@s6, @s7, EN VIVO @s29).
 #   ✅ D-2 RESUELTA por D-1(b), caso límite ACEPTADO. Si la cabecera cambia de alto tras montar (al cruzar
-#     820 px redimensionando: ≈ 74 px con hamburguesa y ≈ 70 px con la nav horizontal), el acople se
-#     adelanta o se retrasa ≈ 4 px como mucho, pero nunca se pierde. El observador NO se rehace (fila de @s7).
+#     el corte del menú redimensionando, 820 px entonces y 920 px desde E-2: ≈ 74 px con hamburguesa y
+#     ≈ 70 px con la nav horizontal), el acople se adelanta o se retrasa ≈ 4 px como mucho, pero nunca
+#     se pierde. El observador NO se rehace (fila de @s7).
 #   ✅ D-3 ACEPTADA como caso límite documentado, NO contrato: si se acopla con «reduce» activo y la
 #     persona lo retira después, el vuelo puede reproducirse UNA vez desde el origen antiguo. Es raro e
 #     inofensivo. Solo queda como observación en @s31.
@@ -199,8 +225,25 @@
 #     Alternativas descartadas: (a) encoger logo, botón y márgenes → la cierra @s35 (el @media solo trae
 #     `.reservar` con `display: none`) · (b) mover «Reservar» al menú → la cierra @s36 (sigue fuera de la
 #     <ul>) · (c) dejar dos filas → la cierran @s32 y @s39.
-#   Acceptance: E-1 lleva el fichero a 41 escenarios. @s35-@s38 entran en «escenarios verdes por TDD» y
-#   @s39-@s41 en «verificación en vivo». El «34» de feature_list.json lo actualiza el lead.
+#
+#   ENMIENDA E-2 — «Menú hasta 920 px» (decisión FIRME de Pablo, AskUserQuestion, 2026-09-30):
+#     E-2-C1 (el contrato: SOLO el número, mismo bloque y mismo contenido, CSS puro) → @s42
+#             (+ F-06 @s17)
+#     E-2-C2 (por qué 920: 12 px sobre el peor caso medido, 908 px; nunca norma, nunca el 767) → @s42
+#             (veta "767px"), @s43 (el barrido con fuentes cargadas y bloqueadas) y el comentario
+#             de F-06 @s17
+#     E-2-C3 (lo que arrastra) → @s20, @s35 y @s39 (anclas y filas 920/921), F-06 @s17 y su tabla
+#             @s18 · contacto.module.scss NO cambia de comportamiento → @s42 (su 820, ancla POSITIVA)
+#     E-2-C4 (verificación) → @s42 (bytes) · @s43 (el barrido de 800 a 960 px, EN VIVO) · @s39 (a 920
+#             px, «Menú» y Tab de «Menú» a «Reservar»; a 921 px, la nav horizontal y Tab de «FAQ» a
+#             «Reservar») · @s32 y @s39 se repasan enteros a sus anchos de siempre
+#     Alternativas descartadas: (a) 900 px → la cierra @s43 (con fuentes bloqueadas, de 901 a 907 px
+#     serían dos filas) · (b) apretar la nav → la cierra @s42 (el bloque del menú no cambia de
+#     contenido) · (c) dejar dos filas → la cierran @s43 y @s39 · (d) un número más alto → la cierran
+#     @s42 (EXACTAMENTE "920px") y @s43 (de 921 a 960 px, la nav horizontal a la vista).
+#   Acceptance: E-1 llevó el fichero a 41 escenarios y E-2 lo lleva a 43. @s35-@s38 y @s42 entran en
+#   «escenarios verdes por TDD»; @s39-@s41 y @s43, en «verificación en vivo». feature_list.json ya
+#   dice 43.
 # =============================================================================================
 
 Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del hero, se encoge y se queda de logo en la esquina superior izquierda, sin mover la cabecera ni cambiar el nombre del enlace
@@ -548,14 +591,18 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
   # ---------------------------------------------------------------------------------------------
 
   @s20
-  Scenario: ENMIENDA a F-06 — las reglas de .marca se MUDAN a la hoja nueva, el @media de 820 px se queda y el horneado de la cabecera conserva lo que F-06 protege (LA-14)
+  Scenario: ENMIENDA a F-06 — las reglas de .marca se MUDAN a la hoja nueva, el @media del menú (920 px desde la ENMIENDA E-2) se queda y el horneado de la cabecera conserva lo que F-06 protege (LA-14)
     Given los bytes de "src/components/cabecera.module.scss" y renderToString(<Cabecera />)
     When se comparan con lo que protegen F-06 @s12, @s16 y @s17
-    Then cabecera.module.scss SÍ contiene ".cabecera" y "@media (max-width: 820px)", y NO contiene "767px" (ANCLAS: F-06 @s17 intacto)
+    Then cabecera.module.scss SÍ contiene ".cabecera" y "@media (max-width: 920px)", y NO contiene "767px" (ANCLAS: F-06 @s17, con el literal de E-2)
+    And cabecera.module.scss, sin comentarios, NO contiene "max-width: 820px": el menú tiene un solo breakpoint (ENMIENDA E-2)
     And cabecera.module.scss NO contiene ningún bloque ".marca": sus reglas viven ahora en logo-acoplado.module.scss
     And el horneado de la cabecera sigue conteniendo "Nails Lash Studio", una nav con aria-label="Principal", y el botón del menú con aria-expanded="false" junto a sus enlaces "#servicios-titulo" y "#contacto-titulo" (F-06 @s12 y @s16)
     # cabecera.test.tsx @s17 lee esta hoja con readFileSync: la mudanza no la rompe porque el @media se
     # queda. @s15 y @s27 de F-06 no se tocan.
+    # [ENMIENDA E-2, 2026-09-30] El ancla positiva pasa de "820px" a "920px" y "max-width: 820px" pasa a
+    # ancla NEGATIVA: si el literal viejo se quedara junto al nuevo, habría dos breakpoints del menú.
+    # Sin comentarios, porque el comentario de la hoja puede citar el 820 como historia.
 
   @s21
   Scenario: ENMIENDA a F-07 — Hero.tsx solo gana dos atributos estáticos, data-acople="origen" en el <svg> del rótulo y data-acople="disparo" en el <span> de «Studio», y el <h1> sigue intacto (LA-C9, LA-8)
@@ -767,7 +814,8 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
     # «Reservar», la cabecera ya tenía DOS filas antes de F-25 (118 px entre 320 y 390 px), y con el logo
     # caligráfico pasa a 131 px, entre 320 y 392 px. Una fila (75 px) solo desde 394 px. @s32 SOLO se
     # cumple con E-1: sin «Reservar» hasta 430 px, la cabecera es una fila de 75 px de 320 a 440 px en
-    # los dos estados. Las fronteras 430/431 y 820/821, «Reservar» y el Tab, en @s39.
+    # los dos estados. Las fronteras 430/431 y 920/921 (820/821 antes de la ENMIENDA E-2), «Reservar» y
+    # el Tab, en @s39; el barrido de 800 a 960 px, en @s43.
 
   @s33 @verificacion-viva
   Scenario: [VERIFICACIÓN EN VIVO CON CHROME, NO jsdom] En el árbol de accesibilidad de Chrome el enlace se llama «Nails Lash Studio» en los dos estados, la firma no roba clics durante el vuelo y se lee a su tamaño, sin terceros
@@ -808,19 +856,19 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
   # 392 px y una (75 px) desde 394 px; SIN él, una fila de 75 px de 320 a 440 px, en los dos estados
   # del logo. El corte en 430 px (E-1-C2) es el ancho del iPhone Pro Max: cubre todos los móviles
   # habituales con una sola regla y deja 36 px de margen sobre los 394 px medidos (como los 820 px de
-  # F-06 sobre la banda 793–806).
+  # F-06 sobre la banda 793–806; la ENMIENDA E-2 los subió a 920 px, con 12 px sobre los 908 medidos).
   # =============================================================================================
 
   @s35
-  Scenario: ENMIENDA E-1 — cabecera.module.scss gana EXACTAMENTE un @media (max-width: 430px), que solo oculta «Reservar» con display: none y va después de su regla base; el @media de 820 px de F-06 sigue intacto (E-1-C1, E-1-C2)
+  Scenario: ENMIENDA E-1 — cabecera.module.scss gana EXACTAMENTE un @media (max-width: 430px), que solo oculta «Reservar» con display: none y va después de su regla base; el @media del menú de F-06 (920 px desde la ENMIENDA E-2) sigue intacto (E-1-C1, E-1-C2)
     Given los bytes de "src/components/cabecera.module.scss"
     When se leen sus bloques con cuerpoDelBloque, sobre la hoja sin comentarios
-    Then la hoja SÍ contiene ".cabecera", ".reservar", ".disparador" y EXACTAMENTE un bloque "@media (max-width: 820px)" (ANCLAS POSITIVAS: F-06 @s17)
+    Then la hoja SÍ contiene ".cabecera", ".reservar", ".disparador" y EXACTAMENTE un bloque "@media (max-width: 920px)" (ANCLAS POSITIVAS: F-06 @s17, con el literal de E-2)
     And la hoja contiene EXACTAMENTE un bloque "@media (max-width: 430px)", y NO contiene "431px" ni "@media (min-width"
     And ese "@media (max-width: 430px)" contiene EXACTAMENTE un bloque, de selector ".reservar" a secas, con una sola declaración: "display: none"
     And ese "@media (max-width: 430px)" empieza en la hoja DESPUÉS del bloque base ".reservar" de primer nivel
     And fuera de ese "@media (max-width: 430px)", ningún bloque cuyo selector contiene ".reservar" declara "display: none" ni "visibility: hidden"
-    And el bloque "@media (max-width: 820px)" sigue declarando ".disparador" con "display: inline-flex", ".lista" con "display: none" y ".disparador[aria-expanded='true'] + .lista" con "display: flex", y NO contiene ".reservar"
+    And el bloque "@media (max-width: 920px)" sigue declarando ".disparador" con "display: inline-flex", ".lista" con "display: none" y ".disparador[aria-expanded='true'] + .lista" con "display: flex", y NO contiene ".reservar"
     And la hoja sigue sin contener "767px"
     # CSS PURO (E-1-C1, el patrón de F-06): el eje responsive lo decide el `@media` y el horneado es el
     # mismo en cualquier ancho. La regla va en la MISMA hoja que el `.reservar` que usa MenuNavegacion.tsx
@@ -833,6 +881,9 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
     # alternativa (a), encoger logo, botón y márgenes, que se descartó. Stryker no ve el SCSS: el
     # mutante es HUMANO, y este test, con "430px" y "display: none" escritos A MANO, es su red. Los
     # tests de F-06 @s17 y F-25 @s20, que leen esta hoja, siguen verdes sin tocar una línea.
+    # [ENMIENDA E-2, 2026-09-30] Las dos anclas del bloque del menú pasan de "820px" a "920px" (el
+    # `MEDIA_MENU` de cabecera.test.tsx). El resto de @s35 no cambia: el contenido del bloque es el
+    # mismo, y el `@media (max-width: 430px)` sigue detrás de él (lo fija @s42).
 
   @s36
   Scenario: ENMIENDA E-1 — el enlace «Reservar» sigue horneado, dentro de la nav y FUERA de la lista del menú, con href="#reserva-titulo" y sin nada en el marcado que lo oculte; las anclas no cambian (E-1-C1)
@@ -896,8 +947,8 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
       | 430   | NO se ve | "none"             | 0 × 0                                                  | 0             | el botón «Menú»             | fuera del <header> | FRONTERA: el último ancho sin «Reservar» (iPhone Pro Max)              |
       | 431   | SÍ se ve | distinto de "none" | más de 0 × 0, con su borde derecho dentro del viewport | EXACTAMENTE 1 | el botón «Menú»             | en «Reservar»      | FRONTERA: el primer ancho con «Reservar», y en una sola fila           |
       | 768   | SÍ se ve | distinto de "none" | más de 0 × 0, con su borde derecho dentro del viewport | EXACTAMENTE 1 | el botón «Menú»             | en «Reservar»      | tablet: sin cambios                                                    |
-      | 820   | SÍ se ve | distinto de "none" | más de 0 × 0, con su borde derecho dentro del viewport | EXACTAMENTE 1 | el botón «Menú»             | en «Reservar»      | el último ancho con «Menú» (F-06 @s17)                                 |
-      | 821   | SÍ se ve | distinto de "none" | más de 0 × 0, con su borde derecho dentro del viewport | EXACTAMENTE 1 | el enlace «FAQ» de la lista | en «Reservar»      | el primer ancho con la nav horizontal: la fila más apretada por encima |
+      | 920   | SÍ se ve | distinto de "none" | más de 0 × 0, con su borde derecho dentro del viewport | EXACTAMENTE 1 | el botón «Menú»             | en «Reservar»      | el último ancho con «Menú» (F-06 @s17, 920 px desde E-2)               |
+      | 921   | SÍ se ve | distinto de "none" | más de 0 × 0, con su borde derecho dentro del viewport | EXACTAMENTE 1 | el enlace «FAQ» de la lista | en «Reservar»      | el primer ancho con la nav horizontal: la fila más apretada por encima |
       | 1280  | SÍ se ve | distinto de "none" | más de 0 × 0, con su borde derecho dentro del viewport | EXACTAMENTE 1 | el enlace «FAQ» de la lista | en «Reservar»      | escritorio; también el zoom al 100 %                                   |
 
     # «Fuera del <header>» = document.activeElement no es descendiente del <header>: con el menú cerrado,
@@ -908,6 +959,10 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
     # contrato. Los centros verticales, y no la altura sola, detectan que «Reservar» envuelva DENTRO de
     # la nav (que es flex-wrap). La prueba sin JS demuestra que el eje lo decide la hoja, no la
     # hidratación. Resultados, a progress/verificacion_viva_logo_acoplado.md.
+    # [ENMIENDA E-2, 2026-09-30] Las filas 820 y 821 pasan a 920 y 921, la nueva frontera del menú
+    # (F-06 @s17). La de 821 fue la que falló en vivo: dos filas, 126 px (hallazgo H-1). A 920 px siguen
+    # a la vista «Menú» y «Reservar», y el Tab va de «Menú» a «Reservar»; a 921 px, la nav horizontal, y
+    # el Tab va de «FAQ» a «Reservar» (E-2-C4). La franja de en medio se barre de 1 en 1 px en @s43.
 
   @s40 @verificacion-viva
   Scenario Outline: [VERIFICACIÓN EN VIVO CON CHROME, NO jsdom] ENMIENDA E-1 — a <ancho> px, con la cabecera en una fila, el scroll-padding-top de 96 px vuelve a cubrirla: tras cualquier salto a una sección, su título se ve entero, por debajo del borde de la cabecera (E-1-C3, F-06 @s11)
@@ -945,3 +1000,68 @@ Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del
     # Es la justificación de E-1-C3 comprobada en el navegador: ocultar «Reservar» es aceptable porque
     # la reserva sigue a un toque sin él. Si uno de los tres caminos falla, E-1 pierde su premisa y el
     # lead lo lleva a la puerta, no lo arregla el TDD.
+
+  # =============================================================================================
+  # ENMIENDA E-2 — EL MENÚ PLEGABLE HASTA 920 PX (Pablo, 2026-09-30, AskUserQuestion: «Menú hasta
+  # 920 px»). Fuente: project-spec.md §F-25 «ENMIENDA E-2» (E-2-C1..E-2-C4 y las alternativas
+  # descartadas). La destapó la verificación en vivo de F-25: @s39 a 821 px y el hallazgo H-1 de
+  # progress/verificacion_viva_logo_acoplado.md. Va AL FINAL para que la numeración siga estable.
+  # Medido en vivo por el lead (producción, Chromium, de 1 en 1 px entre 800 y 960 px; los dos estados
+  # del logo dan lo mismo): con el corte en 820 px, la nav horizontal se partía en DOS filas de 821 a
+  # 890 px con las fuentes cargadas (126 px) y de 821 a 907 px con la fuente de respaldo (123 px), y
+  # cabía en una (71 px) desde 891 y desde 908 px. El defecto ya existía antes de F-25 (821–891 px,
+  # 113 px): el 820 de F-06 se midió sobre la nav del prototipo. El corte en 920 px (E-2-C2) deja 12 px
+  # de margen sobre el peor caso medido (908 px, fuente de respaldo) y 29 px sobre el de las fuentes
+  # cargadas. Es criterio de proyecto MEDIDO: NUNCA se atribuye a SC 1.4.10 Reflow ni al 767 de
+  # Bootstrap. Cambia el literal de F-06 @s17; las anclas de @s20 y @s35 y las filas de @s39 ya están
+  # enmendadas arriba.
+  # =============================================================================================
+
+  @s42
+  Scenario: ENMIENDA E-2 — el breakpoint del menú pasa a 920 px: cabecera.module.scss tiene EXACTAMENTE un @media (max-width: 920px) con el MISMO menú plegable de F-06, ninguna "max-width: 820px" y su @media (max-width: 430px) de E-1 detrás; contacto.module.scss conserva su @media (max-width: 820px) del tel: (E-2-C1, E-2-C3, E-2-C4)
+    Given los bytes de "src/components/cabecera.module.scss" y de "src/components/contacto.module.scss"
+    When se leen sus bloques con cuerpoDelBloque, sobre las hojas sin comentarios
+    Then cabecera.module.scss contiene EXACTAMENTE un bloque "@media (max-width: 920px)" (ANCLA POSITIVA, primero)
+    And ese bloque declara ".disparador" con "display: inline-flex", ".lista" con "display: none" y "flex-direction: column", y ".disparador[aria-expanded='true'] + .lista" con "display: flex"
+    And ese "@media (max-width: 920px)" empieza en la hoja DESPUÉS de los bloques base ".lista" y ".disparador" de primer nivel
+    And cabecera.module.scss contiene EXACTAMENTE un bloque "@media (max-width: 430px)", que empieza en la hoja DESPUÉS del "@media (max-width: 920px)"
+    And cabecera.module.scss NO contiene "max-width: 820px" (ANCLA NEGATIVA: un solo breakpoint del menú), ni "921px", ni "767px"
+    And contacto.module.scss SÍ contiene EXACTAMENTE un bloque "@media (max-width: 820px)", que declara ".telefono" con "display: inline-flex" y "min-height: 2.75rem", y NO contiene "920px" (E-2-C3: el corte del tel: no se mueve)
+    And los literales "920px", "820px", "430px", "921px" y "767px" van escritos A MANO en el test, nunca importados de producción ni tomados de otra constante
+    # CSS PURO (E-2-C1, el patrón de F-06): solo cambia el número. El horneado, el JS y las anclas no se
+    # tocan, así que @s36-@s38 y F-06 @s15/@s16 siguen verdes sin tocar una línea. El orden base → 920
+    # → 430 es el de siempre y no es cosmético: el `@media` no suma especificidad, así que sus reglas
+    # (0,1,0) ganan a las base (`.lista { display: flex }`, `.disparador { display: none }`) SOLO por ir
+    # DESPUÉS; con el bloque delante, el botón «Menú» no aparecería nunca. "max-width: 820px" como ancla
+    # NEGATIVA caza el olvido de dejar el bloque viejo junto al nuevo (dos bloques del menú). "921px" se
+    # veta por lo mismo que "431px" en @s35: con un solo `max-width` no queda hueco fraccionario entre
+    # dos rangos. El 820 de contacto.module.scss es OTRO corte (la prominencia del tel:, F-12) y ningún
+    # hallazgo pide moverlo; se ancla aquí en POSITIVO porque ningún test lo vigilaba por su número
+    # (contacto-estilos.test.ts acepta cualquier `max-width`). Su comentario sí cambia, solo de texto:
+    # deja de decir «heredado de F-06» y dice que es el valor que F-06 tenía entonces. Stryker no ve el
+    # SCSS: el mutante es HUMANO y este test es su red (sin mutación propia, como E-1). Sus tests van en
+    # cabecera.test.tsx, con describe prefijados «F-25 E-2 @s42».
+
+  @s43 @verificacion-viva
+  Scenario Outline: [VERIFICACIÓN EN VIVO CON CHROME, NO jsdom] ENMIENDA E-2 — de 800 a 960 px, de 1 en 1, con las fuentes <fuentes> y en los dos estados del logo, la cabecera es UNA fila en todo el barrido: «Menú» hasta 920 px y la nav horizontal desde 921 px (E-2-C2, E-2-C4)
+    Given el dist/ de producción (pnpm build con las cinco puertas verdes) servido en Chrome real vía CDP, con deviceScaleFactor 1, el menú cerrado y <carga de fuentes>
+    When para cada ancho de 800 a 960 px (161 anchos) se fija el viewport a ese ancho × 800 px (Emulation.setDeviceMetricsOverride), se carga arriba del todo y se mide la cabecera en «texto» y, tras hacer scroll hasta el acople y esperar al final del vuelo, en «caligrafia»
+    Then en cada ancho y en los dos estados el alto del <header> es <= 76 px, y los centros verticales de las cajas visibles (ancho y alto > 0) del <a> del logo, del botón «Menú», de la lista de la nav y de «Reservar» difieren entre sí 1 px como mucho: una sola fila
+    And de 800 a 920 px el botón «Menú» computa display distinto de "none", la lista con id="menu-navegacion" computa display "none", «Reservar» mide más de 0 × 0, y el alto del <header> es el MISMO en todos esos anchos y en los dos estados (75 px medidos)
+    And de 921 a 960 px el botón «Menú» computa display "none", la lista con id="menu-navegacion" computa display distinto de "none", «Reservar» mide más de 0 × 0, y el alto del <header> es el MISMO en todos esos anchos y en los dos estados (71 px medidos)
+    And en ningún ancho document.documentElement.scrollWidth supera clientWidth
+
+    Examples:
+      | fuentes    | carga de fuentes                                                                                                                                                 | qué representa                                                                                  |
+      | cargadas   | las fuentes cargadas: se espera a document.fonts.ready y document.fonts.check('1em "Gilda Display"') es true                                                     | el caso habitual: antes de E-2, una fila solo desde 891 px (29 px de margen)                    |
+      | bloqueadas | las peticiones de fuentes del sitio (.woff2) bloqueadas antes de cargar (Network.setBlockedURLs), y document.fonts.check('1em "Gilda Display"') es false (ANCLA) | el PEOR caso, la fuente de respaldo: antes de E-2, una fila solo desde 908 px (12 px de margen) |
+
+    # Es la medida de E-2 repetida con el corte ya en 920 px: antes daba dos filas (126/123 px) entre 821
+    # y 890/907 px. Con 75 px en toda la franja, el scroll-padding-top de 96 px (F-06 @s11) vuelve a
+    # cubrir la cabecera al saltar a una sección, como en móvil tras E-1 (@s40). Los centros verticales,
+    # y no el alto solo, detectan que la nav envuelva por dentro (es flex-wrap), como en @s39. Los altos
+    # medidos (75 y 71 px) quedan como registro; el contrato es «<= 76 px y el MISMO alto en cada tramo».
+    # El check a false de la fila «bloqueadas» es el ancla de que el bloqueo funcionó: sin él, la fila
+    # repetiría la de las fuentes cargadas y pasaría en verde sin medir el peor caso. Tras E-2 el lead
+    # repasa también @s32 y @s39 enteros, a sus anchos de siempre (E-2-C4). Resultados, a
+    # progress/verificacion_viva_logo_acoplado.md.
