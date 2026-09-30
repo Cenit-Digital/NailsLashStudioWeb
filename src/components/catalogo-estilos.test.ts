@@ -80,6 +80,17 @@ describe('@s20 el bloque .foto declara lo que hace que la foto cubra el hueco 4:
   }
 })
 
+describe('@s5/@s23 H-1 (verificación en vivo): la caja del hueco incluye el borde', () => {
+  // En Chrome, la <img> computaba `content-box`: `width: 100%` + 1 px de borde por lado = columna + 2 px
+  // (274 × 342 a 320 px con la columna de 272). Con `border-box` ocupa el sitio del antiguo bloque.
+  it('@s5/@s23 el cuerpo de .foto declara "box-sizing: border-box"', () => {
+    const foto = cuerpoDelBloque(scss(), /\.foto\s*\{/)
+
+    expect(foto, 'falta el bloque .foto').not.toBeNull()
+    expect(foto as string).toMatch(patronDeDeclaracion('box-sizing: border-box'))
+  })
+})
+
 describe('@s21 el bloque .foto ya no fuerza un alto mínimo ni mueve el encuadre, y la rejilla de F-08 sigue intacta', () => {
   function cuerpoDeFoto(): string {
     const foto = cuerpoDelBloque(scss(), /\.foto\s*\{/)

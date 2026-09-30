@@ -11,7 +11,8 @@ import { Catalogo } from './Catalogo'
  * REGLAS DURAS aplicadas aquí:
  *  · ANTI-TAUTOLOGÍA: títulos, `alt`, ficheros, CTA, leyendas y clases globales van ESCRITOS A MANO;
  *    NUNCA se importa `CATALOGO_DEMO`, `LEYENDA_FOTOS` ni `LEYENDA_PRECIOS` como valor esperado.
- *  · ANTI-CLASE-CSS: `css: false` deja las clases del módulo en `undefined`; JAMÁS `toHaveClass`. Lo
+ *  · ANTI-CLASE-CSS: JAMÁS `toHaveClass`. Con `css: false` las clases del módulo NO salen `undefined`
+ *    (salen `_<clase>_<hash>`), pero no se asevera sobre ellas: una clase no es comportamiento. Lo
  *    global se lee del atributo `class` del horneado.
  *  · ANCLA POSITIVA en toda negativa sobre el horneado.
  */
@@ -175,7 +176,6 @@ describe('@s5 la foto ES el hueco: ocupa el sitio del bloque rosa, sin envoltori
       expect(hijos).toHaveLength(2)
       expect(hijos[0]).toBe(carta)
       expect(hijos[1].tagName).toBe('IMG')
-      expect(hijos[1].parentElement).toBe(contenedor)
     })
   }
 
@@ -280,11 +280,24 @@ describe('@s7 las tres fotos y las dos leyendas viajan HORNEADAS (SSR) y en el o
   })
 })
 
+/**
+ * Cuántas veces aparece `literal` en `texto`: APARICIONES, no elementos. `getAllByText(<cadena>)` solo
+ * casa elementos cuyo texto COMPLETO es la cadena; un duplicado metido como fragmento de otro párrafo
+ * se le escapa, y aquí cuenta (B1 del judge).
+ */
+function apariciones(texto: string, literal: string): number {
+  return texto.split(literal).length - 1
+}
+
 describe('@s8 la leyenda de las fotos aparece UNA vez, en su propio párrafo, justo después del de precios', () => {
   it('@s8 el texto es el contenido COMPLETO de un único <p>, hermano inmediato del <p> de precios', () => {
-    render(<Catalogo />)
+    const { container } = render(<Catalogo />)
     const leyendasFotos = screen.getAllByText(LEYENDA_FOTOS_A_MANO)
 
+    expect(
+      apariciones(container.textContent ?? '', LEYENDA_FOTOS_A_MANO),
+      'apariciones de la leyenda de fotos en el texto del catálogo',
+    ).toBe(1)
     expect(leyendasFotos).toHaveLength(1)
 
     const parrafoFotos = leyendasFotos[0]
@@ -300,9 +313,13 @@ describe('@s8 la leyenda de las fotos aparece UNA vez, en su propio párrafo, ju
 
 describe('@s9 la leyenda de precios NO cambia ni un byte', () => {
   it('@s9 su <p> dice EXACTAMENTE el literal de F-09, con sus dos «·» (U+00B7) y sin punto final, una sola vez', () => {
-    render(<Catalogo />)
+    const { container } = render(<Catalogo />)
     const leyendasPrecios = screen.getAllByText(LEYENDA_PRECIOS_A_MANO)
 
+    expect(
+      apariciones(container.textContent ?? '', LEYENDA_PRECIOS_A_MANO),
+      'apariciones de la leyenda de precios en el texto del catálogo',
+    ).toBe(1)
     expect(leyendasPrecios).toHaveLength(1)
 
     const texto = leyendasPrecios[0].textContent ?? ''
@@ -459,7 +476,10 @@ describe('@s12 las clases GLOBALES del diseño llegan al horneado en la sección
 
 /** Minúsculas y sin acentos, para comparar «sin distinguir mayúsculas ni acentos». */
 function normalizado(texto: string): string {
-  return texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+  return texto
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
 }
 
 describe('@s13 los alt describen lo que se ve y no fingen: ni «foto de», ni trabajo del salón, ni personas', () => {

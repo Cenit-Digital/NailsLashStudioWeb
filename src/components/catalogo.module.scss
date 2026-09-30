@@ -84,8 +84,10 @@
 // de la columna y la foto la cubre sin deformarse (encuadre centrado por defecto). Sin alto mínimo:
 // junto al aspect-ratio solo deformaría la caja en una columna estrecha. El degradado rosa queda de
 // FONDO del propio <img>: es lo que se ve mientras la foto carga o si no llega a cargar (@s26).
+// El borde va DENTRO del ancho (border-box): si no, la foto sobresale 2 px de su columna (H-1).
 .foto {
   display: block;
+  box-sizing: border-box;
   width: 100%;
   height: auto;
   aspect-ratio: 4 / 5;

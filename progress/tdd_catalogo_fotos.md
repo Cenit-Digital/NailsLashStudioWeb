@@ -429,3 +429,82 @@ passed (1760)` (98,8 s).
   ya cubre `Catalogo.tsx`).
 - Siguiente: `judge` → `mutation_tester` (`--mutate src/components/Catalogo.tsx`) → en vivo @s22-@s26
   (lead). NO se marca `done`.
+
+## Ronda delta (judge B1, N1-N3; en vivo H-1)
+
+> 2026-09-30, `tdd_craftsman`. Entrada: `progress/judge_catalogo_fotos.md` (CHANGES_REQUESTED: B1 y
+> N1-N3; N4-N8 se quedan como están) y `progress/verificacion_viva_catalogo_fotos.md` (H-1). Se
+> empieza cuando ya no queda Stryker vivo (`pgrep -f stryker` vacío; el `mutation_tester` cerró con
+> 7/7 contra `5482984`). Sabotajes por script de scratchpad (`delta_sab.mjs`: aplica UNO, exige una
+> sola coincidencia, corre el test acotado, restaura y compara bytes → `restaurado=true`), sin
+> disparar el hook.
+
+### B1 — @s8/@s9: «aparece EXACTAMENTE UNA VEZ en el catálogo» (solo test)
+
+- **ANTES (B1 reproducido, tests de `5482984`)** — con los dos sabotajes del judge en `Catalogo.tsx`,
+  tras el `<p>` de fotos:
+  - `b1-fotos`: `<p className={estilos.leyenda}>Nota: {LEYENDA_FOTOS}</p>` → `-t @s8`: `Tests 1
+passed | 35 skipped (36)`; el fichero entero: `Tests 36 passed (36)`. `restaurado=true`.
+  - `b1-precios`: `<p className={estilos.leyenda}>Nota: {LEYENDA_PRECIOS}</p>` → `-t @s9`: `Tests 2
+passed | 34 skipped (36)`; el fichero entero: `Tests 36 passed (36)`. `restaurado=true`.
+  - Confirmado: `getAllByText(<cadena>)` cuenta ELEMENTOS cuyo texto completo es la leyenda; un
+    duplicado como fragmento de otro `<p>` no cuenta.
+- **Cambio (solo `catalogo.test.tsx`)** — helper `apariciones(texto, literal)` (`split(literal).length
+  - 1`: cuenta APARICIONES, también como fragmento) y, en el `it`de @s8 y en el primer`it`de @s9,`render`pasa a`const { container } = render(<Catalogo />)`y se añade, ANTES de las aserciones
+que ya había (todas se conservan),`expect(apariciones(container.textContent ?? '',
+    <LITERAL_A_MANO>), '<mensaje>').toBe(1)`. El número de `it` no cambia (36).
+- **Fuente actual** → `pnpm vitest run src/components/catalogo.test.tsx`: `Tests 36 passed (36)`.
+- **ROJO (con los mismos sabotajes, fichero entero)**:
+  - `b1-fotos` → `Tests 1 failed | 35 passed (36)`: `@s8 el texto es el contenido COMPLETO de un
+único <p>…`: `AssertionError: apariciones de la leyenda de fotos en el texto del catálogo: expected
+2 to be 1 // Object.is equality`. `restaurado=true`.
+  - `b1-precios` → `Tests 1 failed | 35 passed (36)`: `@s9 su <p> dice EXACTAMENTE el literal de F-09…`:
+    `AssertionError: apariciones de la leyenda de precios en el texto del catálogo: expected 2 to be 1
+// Object.is equality`. `restaurado=true`.
+- Producción intacta: `git status` solo marca `catalogo.test.tsx` y esta bitácora; `git diff
+src/components/Catalogo.tsx` vacío.
+
+### N1-N3 — mismo fichero, sin cambiar lo que se asevera
+
+- **N1** — cabecera: el comentario FALSO («`css: false` deja las clases del módulo en `undefined`») pasa
+  a decir la verdad: con `css: false` salen `_<clase>_<hash>` (ya visto en (q) de @s8 y en (z4) de
+  @s12); la regla anti-`toHaveClass` sigue POR DISEÑO, porque una clase no es comportamiento.
+- **N2** — fuera `expect(hijos[1].parentElement).toBe(contenedor)` de @s5: tautológica (todo hijo de
+  `contenedor.children` tiene a `contenedor` por padre). «Hija DIRECTA» la siguen probando
+  `toHaveLength(2)`, `hijos[0]` = carta y `hijos[1].tagName` = `IMG`.
+- **N3** — `normalizado`: la regex con U+0300 y U+036F LITERALES (invisibles; bytes `314 200`-`315
+257`) pasa a `/\p{Diacritic}/gu`, como `src/lib/placeholders.ts:58`. (La forma `̀-ͯ` no
+  se pudo escribir con la herramienta `Edit`: el escape se decodificaba al carácter.) Equivalencia
+  comprobada con `node` sobre los 3 `alt`, las 4 prohibidas, los 7 nombres y los sabotajes de @s13:
+  mismas salidas. Ya no queda ningún byte `CC 80` en el fichero. Que la normalización sigue
+  MORDIENDO (solo caen si se quitan los diacríticos, porque la tilde está en un lado y no en el otro):
+  - `n3-lucia` (Uñas + « de Lucia», sin tilde, contra `'Lucía'`) → `-t @s13`: `Tests 1 failed | 3
+passed | 32 skipped (36)`: `expected 'manos con manicura en tono nude y ani…' not to contain
+'lucia'`. `restaurado=true`.
+  - `n3-salon` (Facial + « del salon», sin tilde, contra `'del salón'`) → `Tests 1 failed | 3 passed |
+32 skipped (36)`: `expected 'primer plano de pestanas largas sobre…' not to contain 'del salon'`.
+    `restaurado=true`.
+
+### H-1 (en vivo) — la `<img>` computa `content-box` y sobresale 2 px de su columna (@s5, @s23)
+
+Arreglo DENTRO del contrato aprobado: @s5 («ocupa el sitio del antiguo bloque») y la cifra de @s23
+(≈ 272 × 340 a 320 px). No añade escenario.
+
+- **ROJO** — `catalogo-estilos.test.ts`, `describe('@s5/@s23 H-1 (verificación en vivo): la caja del
+hueco incluye el borde')`, un `it` con el mismo helper y patrón que @s20 (`cuerpoDelBloque` +
+  `patronDeDeclaracion('box-sizing: border-box')`) → `pnpm vitest run
+src/components/catalogo-estilos.test.ts`: `Tests 1 failed | 13 passed (14)`: `@s5/@s23 el cuerpo de
+.foto declara "box-sizing: border-box"`: `AssertionError: expected '\n  display: block;\n  width:
+100%;\n…' to match /(?:^|[\s;{])box-sizing\s*:\s*border-b…/`.
+- **VERDE** — en `catalogo.module.scss`, `box-sizing: border-box;` en `.foto` (tras `display: block;`)
+  y UNA línea más en el comentario de encima: «El borde va DENTRO del ancho (border-box): si no, la
+  foto sobresale 2 px de su columna (H-1).» (sin `.foto` ni `;` en el comentario, para no tocar el
+  recuento de bloques de @s21) → `Tests 14 passed (14)`.
+- **Sabotajes** (sobre la hoja en verde; copia `scss_verde.bak` y `cmp` final → IDÉNTICA):
+  - `h1-sin-border-box` (quitar la línea) → `Tests 1 failed | 13 passed (14)`, el mismo mensaje del
+    ROJO. `restaurado=true`.
+  - `h1-content-box` (`box-sizing: content-box;`, el valor que se midió en vivo) → `Tests 1 failed | 13
+passed (14)`: `expected '\n  display: block;\n  box-sizing: co…' to match
+/(?:^|[\s;{])box-sizing\s*:\s*border-b…/`. `restaurado=true`.
+- **REFACTOR** — nada que limpiar. La RE-MEDIDA en vivo (272 × 340 a 320 px; borde derecho de la foto
+  = el de la carta) queda para el lead (I-8): jsdom no calcula cajas.

@@ -76,3 +76,18 @@
   @s20/@s21 documentados). `stryker.config.json` `mutate` += `Catalogo.tsx`. typecheck, lint y
   format:check limpios; suite completa 55 ficheros / 1760 tests en verde. Pendiente: judge →
   mutation_tester → en vivo @s22-@s26 (lead). NO `done`.
+
+### ⚠️ TRASPASO (2026-09-30 17:35 Madrid): créditos de la nube casi agotados (USD 1 de 250)
+
+Estado de F-27 `catalogo_fotos`, `in_progress`:
+
+- [x] TDD @s1-@s21 (5482984, suite 1760/1760) · mutación `Catalogo.tsx` 7/7 = 100 % (81a17c6) · en vivo 23/23 ✓
+      (b90caca, `progress/verificacion_viva_catalogo_fotos.md`)
+- [x] Ronda delta subida en este commit: judge B1 (@s8/@s9 «EXACTAMENTE UNA VEZ»), N1-N3 y H-1 en vivo
+      (`box-sizing: border-box` en `.foto`). 67/67 tests de F-27, typecheck, lint y format limpios. La suite
+      completa la corre CI. El lead detuvo el `tdd_craftsman` para asegurar el trabajo: su bitácora puede estar
+      incompleta en la parte final de la ronda.
+- [ ] **Falta para `done`:** (1) re-judge SOLO del delta (`git diff 81a17c6 HEAD -- src`); (2) `pnpm build` + copia
+      inmutable de `dist/` + `vivo_f27.mjs s23 s26` (a 320 px esperar la caja 272 × 340 y borde derecho = el de la
+      carta); (3) `feature_list.json` F-27 → `done` con su `cierre`, y resultado en
+      `progress/verificacion_viva_catalogo_fotos.md`; (4) mover el resumen de la sesión a `progress/history.md`.
