@@ -34,3 +34,14 @@
   sitio del antiguo bloque» (@s5): el `<div>` de antes, sin `width`, encajaba justo. Además, @s23 espera
   ≈ 272 × 340. **Remedio:** `box-sizing: border-box` en `.foto`, con su test de bytes, por TDD, y la
   re-medida en vivo.
+
+## Re-verificación tras la ronda delta (34bc89a) · 2026-09-30
+
+- **Artefacto:** `pnpm build` sobre `34bc89a`, exit 0 y las 5 puertas en verde. La copia inmutable se rehízo, se
+  sirvió en 4176 y siguió intacta; el CSS horneado lleva `box-sizing:border-box`.
+- **`vivo_f27.mjs todos`: 23/23 ✓** (@s22-@s26, todo igual que en la primera pasada salvo las cajas).
+- **H-1 RESUELTO.** Ahora el `<img>` computa `box-sizing: border-box`:
+  - a 320 px, la caja mide **272 × 340**, justo la cifra de la spec (@s23), y su borde derecho queda en 296,
+    igual que el de la carta de encima (296);
+  - a 1280 px mide 578 × 722,5 y su borde derecho queda en 1240, igual que el del contenido del contenedor (1240);
+  - @s26 (foto bloqueada) conserva la misma caja, 272 × 340 a 320 px, con el degradado y el `alt`.
