@@ -107,8 +107,9 @@
 #      "cubic-bezier(0.45, 0, 0.25, 1)", "0.35", "0.4s", "2.5rem", "2.75rem", "var(--ink)".
 #   ❌ PROHIBIDO importar de producción NOMBRE, partirNombre, VISTA_MARCA ni ninguna constante del logo
 #      como VALOR ESPERADO (sí se sustituyen con vi.mock en @s4, que es lo contrario: prueba que se USAN).
-#   ❌ PROHIBIDO `toHaveClass` y aseverar por clase de CSS module (bajo `css: false` es undefined): el
-#      estado vive en `data-logo`/`data-vuelo`, nunca en un className condicional (F-06 @s15).
+#   ❌ PROHIBIDO `toHaveClass` y aseverar por clase de CSS module (bajo `css: false` es una cadena con
+#      hash, no un literal estable —corregido por el lead 2026-09-30 a raíz de N2 del judge: NO es
+#      undefined—): el estado vive en `data-logo`/`data-vuelo`, nunca en un className condicional (F-06 @s15).
 #   ❌ PROHIBIDO decidir el acople fuera del callback del observador (LA-C10): en jsdom todo mide 0.
 #   ❌ PROHIBIDO `matchMedia`, `Element.animate`, escuchar "scroll"/"resize" y storage de cualquier tipo
 #      en el componente (@s9, @s13, @s26).

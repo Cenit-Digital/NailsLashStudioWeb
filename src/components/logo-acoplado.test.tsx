@@ -1,4 +1,5 @@
 import { act, render, screen } from '@testing-library/react'
+import { Profiler } from 'react'
 import { renderToString } from 'react-dom/server'
 import { HelmetProvider } from 'react-helmet-async'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -14,7 +15,8 @@ import { Hero } from './Hero'
  * Lo que hornea el SSG se asevera sobre `renderToString` (el mismo mecanismo que vite-react-ssg). Los
  * literales esperados van A MANO («Nails Lash Studio», «texto», «no»…): NUNCA se importan NOMBRE,
  * partirNombre ni VISTA_MARCA como valor esperado (anti-tautología). El estado se lee de `data-logo`
- * y `data-vuelo`, jamás de una clase (bajo `css: false` las del module no existen).
+ * y `data-vuelo`, jamás de una clase: el estado vive en atributos, y bajo `css: false` las clases del
+ * module son cadenas con hash (`_marca_0a3d44`), no un literal estable que se pueda aseverar.
  */
 
 afterEach(() => {
@@ -578,6 +580,34 @@ describe('@s11 el punto de salida del vuelo son tres custom properties en el sty
     io.entregar(entrada(73, true))
 
     expect([...document.querySelectorAll('[style]')]).toEqual([enlaceDeLaMarca()])
+  })
+
+  /**
+   * LA-C2, «en el MISMO render»: `act()` vacía los efectos, así que un segundo commit que añadiera las
+   * variables después (el fotograma de la firma en la esquina, sin punto de salida) acabaría igual con
+   * los atributos correctos. El <Profiler> cuenta los commits de la cabecera durante esa entrega.
+   */
+  it('@s11 la entrega que acopla hace EXACTAMENTE un commit: los atributos y las variables llegan en el MISMO render', () => {
+    const io = stubDeIntersectionObserver()
+    fijarGeometria()
+    const commits = vi.fn()
+    render(
+      <>
+        <Profiler id="cabecera" onRender={commits}>
+          <Cabecera />
+        </Profiler>
+        <PapelDelHero conOrigen conDisparo />
+      </>,
+    )
+    io.entregar(entrada(400, true))
+    commits.mockClear()
+
+    io.entregar(entrada(73, true))
+
+    // ANCLA POSITIVA: hubo acople con vuelo y con sus variables.
+    expect(enlaceDeLaMarca()).toHaveAttribute('data-vuelo', 'si')
+    expect(llevaLasVariablesDeVuelo(enlaceDeLaMarca())).toBe(true)
+    expect(commits).toHaveBeenCalledTimes(1)
   })
 })
 

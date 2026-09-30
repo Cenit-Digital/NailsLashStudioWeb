@@ -171,10 +171,13 @@ primeraObservacion)` a nivel de módulo. → 50/50, tsc limpio.
   La guarda «ninguna regla de las representaciones saca la caja del flujo» ya pasaba con las reglas de
   @s15/@s16.
 - **APOYO DERIVADO, declarado:** «LogoAcoplado.tsx importa la hoja y aplica .marca, .soloLectores,
-  .logoTexto y .logoCaligrafia a sus nodos; el `<text>` sin clase (D-8)». Lee la FUENTE. Motivo: bajo
-  `css: false` las clases del module son undefined y ningún render las ve; sin este test, el cableado
-  de `className` sería producción que ningún test pide (Ley 1) y podría perderse con la suite verde.
-  No asevera ESTADO por clase (lo prohíbe el `.feature`): solo qué clase CONSTANTE lleva cada etiqueta.
+  .logoTexto y .logoCaligrafia a sus nodos; el `<text>` sin clase (D-8)». Lee la FUENTE. Motivo
+  (corregido en la ronda del judge, N2): bajo `css: false` las clases del module son cadenas con hash
+  (`_marca_0a3d44`, medido), NO `undefined`. Pero no son un literal estable, y el contrato prohíbe
+  aseverar por clase en los renders (el estado vive en atributos), así que ningún render fija QUÉ
+  clase lleva cada nodo. Sin este test, el cableado de `className` sería producción que ningún test
+  pide (Ley 1) y podría perderse con la suite verde. No asevera ESTADO por clase: solo qué clase
+  CONSTANTE lleva cada etiqueta.
 - VERDE: `.marca { display: inline-grid }`; `.soloLectores` con la técnica clip/1 px COMPLETA del
   `.heroMarca` (incluye `margin: -1px; padding: 0; border: 0`, que el test no enumera: el `.feature`
   pide «la técnica del <h1> del hero»); `grid-area: 1 / 1` en las dos representaciones;
@@ -296,7 +299,8 @@ línea) !== HORNEADO`, y se pinta el estado que devuelve. `vueloHacia` pregunta 
 - Pasan a la primera, porque son guardas. **Sabotajes medidos** (cada uno 1 rojo en su `it`; restaurado):
   `// matchMedia` en la lógica; `// 'scroll'` en el componente; `// Nails Lash` en la lógica;
   `// trazo-marca` en el componente FUERA del import; `// aria-label` en el componente.
-- **DESVIACIÓN DECLARADA, A RATIFICAR POR EL LEAD (enmienda de una cláusula de @s26).** El contrato
+- **DESVIACIÓN DECLARADA, ratificada por el lead el 2026-09-30 (7aa8ba9: ENMIENDA @s26 en el
+  `.feature`).** El contrato ORIGINAL
   pide que ninguno de los dos ficheros contenga «trazo-marca», «los comentarios también son bytes».
   Pero `VISTA_MARCA` solo existe en `src/lib/trazo-marca.ts`, un dato GENERADO («no se edita a mano»;
   ningún otro módulo la reexporta), y @s4/LA-15 exigen usarla. La línea
@@ -309,9 +313,10 @@ línea) !== HORNEADO`, y se pinta el estado que devuelve. `vueloHacia` pregunta 
   - Alternativa que NO tomé: un módulo nuevo que solo reexporte `VISTA_MARCA` con otra ruta. Es un
     artefacto fuera de la lista fijada del `.feature` («el tdd_craftsman NO elige nombres») y solo
     serviría para esquivar la guarda.
-  - Enmienda propuesta para `features/logo_acoplado.feature` @s26, 3.ª línea: «…ni "trazo-marca", salvo
-    en el especificador del import de VISTA_MARCA (`from '../lib/trazo-marca'`), que el componente trae
-    EXACTAMENTE una vez (los comentarios también son bytes)».
+  - La enmienda, ratificada por el lead el 2026-09-30 y escrita en `features/logo_acoplado.feature`
+    @s26 (7aa8ba9): «…salvo el especificador del import de VISTA_MARCA, from '../lib/trazo-marca', que
+    LogoAcoplado.tsx trae EXACTAMENTE una vez». La excepción es SOLO del componente: la ronda del judge
+    (B1, abajo) corrigió el test, que la aplicaba también a la lógica.
 
 ### @s27 — los dos ficheros nuevos entran en `mutate` (ciclo 27)
 
@@ -359,55 +364,57 @@ línea) !== HORNEADO`, y se pinta el estado que devuelve. `vueloHacia` pregunta 
 
 ## Trazabilidad @s → test
 
-| @s   | Dónde                                      | Test(s)                                                                                          |
-| ---- | ------------------------------------------ | ------------------------------------------------------------------------------------------------ |
-| @s1  | `logo-acoplado.test.tsx`                   | «@s1 exactamente un <a> con data-logo, en "texto" y "no", href "/", sin style…»                  |
-| @s2  | `logo-acoplado.test.tsx`                   | 3 `it` «@s2 …» (orden y textos; atributos del `<svg>`/`<text>`; sin ids, máscara, trazo, imagen) |
-| @s3  | `logo-acoplado.test.tsx`                   | 3 filas «@s3 {estado} → un solo enlace «Nails Lash Studio»…»                                     |
-| @s4  | `logo-acoplado-derivacion.test.tsx`        | 3 `it` con `vi.mock` de NOMBRE y VISTA_MARCA                                                     |
-| @s5  | `logo-acoplado.test.tsx`                   | «@s5 constructor una vez con { threshold: 0, rootMargin "-73px…" }…» y «@s5 al desmontar…»       |
-| @s6  | `logo-acoplado.test.tsx`                   | 7 filas «@s6 bottom … → data-logo …»                                                             |
-| @s7  | `logo-acoplado.test.tsx`                   | 7 filas «@s7 rootBounds … · cabecera … · bottom …»                                               |
-| @s8  | `logo-acoplado.test.tsx`                   | «@s8 tras acoplar con vuelo, una entrega con «STUDIO» otra vez a la vista…»                      |
-| @s9  | `logo-acoplado.test.tsx`                   | «@s9 una primera vida que acopló… la segunda nace en «texto»…»                                   |
-| @s10 | `logo-acoplado.test.tsx`                   | 6 filas «@s10 … → data-vuelo …»                                                                  |
-| @s11 | `logo-acoplado.test.tsx`                   | «@s11 en UNA sola entrega… 325px, -75px, 4» y «@s11 ninguna otra etiqueta recibe style»          |
-| @s12 | `logo-acoplado.test.tsx`                   | 3 filas «@s12 … → "caligrafia", "no", sin style, sin console.error»                              |
-| @s13 | `logo-acoplado.test.tsx`                   | «@s13 con matchMedia respondiendo «reduce»…»                                                     |
-| @s14 | `logo-acoplado.test.tsx`                   | 3 filas «@s14 … → «texto» mientras está montada, sin errores»                                    |
-| @s15 | `logo-acoplado-estilos.test.ts`            | 7 `it` «@s15 …»                                                                                  |
-| @s16 | `logo-acoplado-estilos.test.ts`            | 5 `it` «@s16 …»                                                                                  |
-| @s17 | `logo-acoplado-estilos.test.ts`            | 8 `it` «@s17 …», con el APOYO declarado del cableado de `className`                              |
-| @s18 | `logo-acoplado-estilos.test.ts`            | 3 `it` «@s18 …»                                                                                  |
-| @s19 | `logo-acoplado-estilos.test.ts`            | 6 `it` «@s19 …»                                                                                  |
-| @s20 | `cabecera.test.tsx`                        | 3 `it` «@s20 …»                                                                                  |
-| @s21 | `hero.test.tsx`                            | 2 `it` «@s21 …»                                                                                  |
-| @s22 | `logo-acoplado.test.tsx`                   | «@s22 con Cabecera y Hero REALES…»                                                               |
-| @s23 | `logo-acoplado.test.tsx`                   | 4 `it` «@s23 …»                                                                                  |
-| @s24 | `logo-acoplado-logica.test.ts`             | 8 filas de `estadoTrasObservar` y 6 de `debeVolar`                                               |
-| @s25 | `logo-acoplado-logica.test.ts`             | 5 filas de `transformacionFlip`, 2 de `variablesDeVuelo` y 4 de `margenDeRaiz`                   |
-| @s26 | `logo-acoplado-estilos.test.ts`            | 4 `it` «@s26 …» (con la DESVIACIÓN de `trazo-marca`, abajo)                                      |
-| @s27 | `logo-acoplado-estilos.test.ts`            | «@s27 mutate trae EXACTAMENTE una vez…». La puntuación → `mutation_tester`                       |
-| @s34 | `logo-acoplado.test.tsx`                   | 3 filas «@s34 … entradas … en UNA entrega → …»                                                   |
-| @s28 | EN VIVO (lead, Chrome + CDP sobre `dist/`) | — (sin test jsdom a propósito)                                                                   |
-| @s29 | EN VIVO                                    | —                                                                                                |
-| @s30 | EN VIVO                                    | —                                                                                                |
-| @s31 | EN VIVO                                    | —                                                                                                |
-| @s32 | EN VIVO                                    | —                                                                                                |
-| @s33 | EN VIVO                                    | —                                                                                                |
+| @s   | Dónde                                      | Test(s)                                                                                                                                                              |
+| ---- | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| @s1  | `logo-acoplado.test.tsx`                   | «@s1 exactamente un <a> con data-logo, en "texto" y "no", href "/", sin style…»                                                                                      |
+| @s2  | `logo-acoplado.test.tsx`                   | 3 `it` «@s2 …» (orden y textos; atributos del `<svg>`/`<text>`; sin ids, máscara, trazo, imagen)                                                                     |
+| @s3  | `logo-acoplado.test.tsx`                   | 3 filas «@s3 {estado} → un solo enlace «Nails Lash Studio»…»                                                                                                         |
+| @s4  | `logo-acoplado-derivacion.test.tsx`        | 3 `it` con `vi.mock` de NOMBRE y VISTA_MARCA                                                                                                                         |
+| @s5  | `logo-acoplado.test.tsx`                   | «@s5 constructor una vez con { threshold: 0, rootMargin "-73px…" }…» y «@s5 al desmontar…»                                                                           |
+| @s6  | `logo-acoplado.test.tsx`                   | 7 filas «@s6 bottom … → data-logo …»                                                                                                                                 |
+| @s7  | `logo-acoplado.test.tsx`                   | 7 filas «@s7 rootBounds … · cabecera … · bottom …»                                                                                                                   |
+| @s8  | `logo-acoplado.test.tsx`                   | «@s8 tras acoplar con vuelo, una entrega con «STUDIO» otra vez a la vista…»                                                                                          |
+| @s9  | `logo-acoplado.test.tsx`                   | «@s9 una primera vida que acopló… la segunda nace en «texto»…»                                                                                                       |
+| @s10 | `logo-acoplado.test.tsx`                   | 6 filas «@s10 … → data-vuelo …»                                                                                                                                      |
+| @s11 | `logo-acoplado.test.tsx`                   | «@s11 en UNA sola entrega… 325px, -75px, 4», «@s11 ninguna otra etiqueta recibe style» y «@s11 la entrega que acopla hace EXACTAMENTE un commit…» (`<Profiler>`, N1) |
+| @s12 | `logo-acoplado.test.tsx`                   | 3 filas «@s12 … → "caligrafia", "no", sin style, sin console.error»                                                                                                  |
+| @s13 | `logo-acoplado.test.tsx`                   | «@s13 con matchMedia respondiendo «reduce»…»                                                                                                                         |
+| @s14 | `logo-acoplado.test.tsx`                   | 3 filas «@s14 … → «texto» mientras está montada, sin errores»                                                                                                        |
+| @s15 | `logo-acoplado-estilos.test.ts`            | 7 `it` «@s15 …»                                                                                                                                                      |
+| @s16 | `logo-acoplado-estilos.test.ts`            | 5 `it` «@s16 …»                                                                                                                                                      |
+| @s17 | `logo-acoplado-estilos.test.ts`            | 8 `it` «@s17 …», con el APOYO declarado del cableado de `className`                                                                                                  |
+| @s18 | `logo-acoplado-estilos.test.ts`            | 3 `it` «@s18 …»                                                                                                                                                      |
+| @s19 | `logo-acoplado-estilos.test.ts`            | 6 `it` «@s19 …»                                                                                                                                                      |
+| @s20 | `cabecera.test.tsx`                        | 3 `it` «@s20 …»                                                                                                                                                      |
+| @s21 | `hero.test.tsx`                            | 2 `it` «@s21 …»                                                                                                                                                      |
+| @s22 | `logo-acoplado.test.tsx`                   | «@s22 con Cabecera y Hero REALES…»                                                                                                                                   |
+| @s23 | `logo-acoplado.test.tsx`                   | 4 `it` «@s23 …»                                                                                                                                                      |
+| @s24 | `logo-acoplado-logica.test.ts`             | 8 filas de `estadoTrasObservar` y 6 de `debeVolar`                                                                                                                   |
+| @s25 | `logo-acoplado-logica.test.ts`             | 5 filas de `transformacionFlip`, 2 de `variablesDeVuelo` y 4 de `margenDeRaiz`                                                                                       |
+| @s26 | `logo-acoplado-estilos.test.ts`            | 4 `it` «@s26 …» (con la ENMIENDA ratificada de `trazo-marca`, solo en el componente; B1)                                                                             |
+| @s27 | `logo-acoplado-estilos.test.ts`            | «@s27 mutate trae EXACTAMENTE una vez…». La puntuación → `mutation_tester`                                                                                           |
+| @s34 | `logo-acoplado.test.tsx`                   | 3 filas «@s34 … entradas … en UNA entrega → …»                                                                                                                       |
+| @s28 | EN VIVO (lead, Chrome + CDP sobre `dist/`) | — (sin test jsdom a propósito)                                                                                                                                       |
+| @s29 | EN VIVO                                    | —                                                                                                                                                                    |
+| @s30 | EN VIVO                                    | —                                                                                                                                                                    |
+| @s31 | EN VIVO                                    | —                                                                                                                                                                    |
+| @s32 | EN VIVO                                    | —                                                                                                                                                                    |
+| @s33 | EN VIVO                                    | —                                                                                                                                                                    |
 
 Cubiertos por TDD en jsdom o por bytes: **28** (@s1-@s27 y @s34). En vivo, pendientes del lead: **6**
 (@s28-@s33).
 
 ## Desviaciones y apoyos declarados
 
-1. **@s26, cláusula «trazo-marca» → RATIFICADA por el lead el 2026-09-30** (enmienda escrita en `features/logo_acoplado.feature` @s26) (detalle en el ciclo 26). El import de
-   `VISTA_MARCA` desde el módulo generado `src/lib/trazo-marca.ts` hace imposible la letra. El test quita
-   ese especificador, y solo ese, y exige que aparezca exactamente una vez. Propongo enmendar esa
-   línea del `.feature`. Si el lead la rechaza, la otra salida es un módulo que solo reexporte la
-   constante (artefacto nuevo, no lo creo sin su permiso).
-2. **@s17, APOYO derivado** (ciclo 17): un test de FUENTE fija qué clase constante lleva cada etiqueta,
-   porque bajo `css: false` ningún render ve las clases del module.
+1. **@s26, cláusula «trazo-marca» → ratificada por el lead el 2026-09-30** (7aa8ba9: ENMIENDA @s26 en
+   `features/logo_acoplado.feature`; detalle en el ciclo 26). El import de `VISTA_MARCA` desde el
+   módulo generado `src/lib/trazo-marca.ts` hacía imposible la letra original. El test quita ese
+   especificador SOLO de `LogoAcoplado.tsx`, donde exige que aparezca exactamente una vez. La lógica no
+   puede nombrarlo de ninguna forma (B1 de la ronda del judge).
+2. **@s17, APOYO derivado** (ciclo 17): un test de FUENTE fija qué clase constante lleva cada etiqueta.
+   Bajo `css: false` las clases son cadenas con hash (`_marca_0a3d44`), no un literal estable, y el
+   contrato prohíbe aseverar por clase en los renders, así que ningún render fija qué clase lleva cada
+   nodo (porqué corregido en N2).
 3. **Ciclo @s24 sin asiento previo**: tests y funciones ya estaban en `de08858`. No se rehízo el ciclo:
    se midió con 4 sabotajes que muerden.
 4. **Guardas que pasan a la primera**: @s8, @s9, @s13, @s22, @s23 y @s26. Cada una con su sabotaje
@@ -415,7 +422,8 @@ Cubiertos por TDD en jsdom o por bytes: **28** (@s1-@s27 y @s34). En vivo, pendi
 
 ## Pendiente para el lead / siguientes agentes
 
-- **Ratificar la desviación de @s26** (arriba) y, si procede, enmendar el `.feature`.
+- ~~Ratificar la desviación de @s26~~ → ratificada por el lead el 2026-09-30 (7aa8ba9), con el
+  `.feature` ya enmendado.
 - **mutation_tester**: `--mutate src/components/LogoAcoplado.tsx` y `--mutate
 src/components/logo-acoplado-logica.ts` (jamás `--testFiles`), y re-medir `Cabecera.tsx` y `Hero.tsx`.
   El `[]` del efecto de montaje de `LogoAcoplado.tsx` está SIN marcar: su `// Stryker disable
@@ -437,3 +445,70 @@ next-line all` y la justificación en `progress/mutation_logo_acoplado.md` son d
     caja del `<a>` idéntica, `<svg>` de 40 px, CLS 0, una fila, Great Vibes bloqueada sin cambios.
   - @s33 árbol AX: un solo link «Nails Lash Studio» en los dos estados; `pointer-events: none` y el clic
     durante el vuelo cae en la nav; Great Vibes local y sin terceros; legibilidad a 320 y 1280 px.
+
+## Ronda del judge (CHANGES_REQUESTED, `progress/judge_logo_acoplado.md`), 2026-09-30
+
+Producción no se toca salvo que un test rojo lo pida. Tests acotados durante la ronda.
+
+### B1 — @s26: la excepción del import vale SOLO para `LogoAcoplado.tsx`
+
+- Hueco REPRODUCIDO antes de tocar el test: con la fuente saboteada en `logo-acoplado-logica.ts`,
+  P (`export { VISTA_MARCA } from '../lib/trazo-marca'`) → 34/34 VERDE, y P3 (comentario
+  `// VISTA_MARCA vive en from '../lib/trazo-marca'`) → 34/34 VERDE. El test quitaba el especificador de
+  los DOS ficheros.
+- Arreglo del TEST (ROJO contra la fuente saboteada): los bytes vigilados son `COMPONENTE` sin su ÚNICO
+  especificador y `LOGICA` ENTERA. El docblock pasa a «ENMIENDA @s26, ratificada por el lead el
+  2026-09-30 (7aa8ba9)».
+- **Medido tras el arreglo** (cada sabotaje restaurado):
+  - P → ROJO («logo-acoplado-logica.ts: trazo-marca: expected … not to contain 'trazo-marca'»);
+  - P3 → ROJO (el mismo mensaje);
+  - P4, control, `// ver trazo-marca` en la lógica → rojo;
+  - P2, control, un 2.º especificador en un comentario del componente → rojo («expected [ …(3) ] to
+    have a length of 2 but got 3»);
+  - control, `// ver trazo-marca` en el componente → rojo;
+  - fuente ACTUAL → **34/34 verde**. Producción intacta frente a HEAD.
+
+### N1 — @s11: LA-C2 «en el MISMO render», contado con `<Profiler>`
+
+- Hueco REPRODUCIDO: sabotaje S del informe (script `sabotaje_s.py` en el scratchpad). La entrega pone
+  solo `{ logo }` y un `useEffect` añade las variables en un SEGUNDO commit. Contra los tests de
+  entonces → 48/48 VERDE, porque `act()` vacía los efectos.
+- Test nuevo en `logo-acoplado.test.tsx`: «@s11 la entrega que acopla hace EXACTAMENTE un commit: los
+  atributos y las variables llegan en el MISMO render». Monta `<Profiler id="cabecera" onRender>`
+  alrededor de `<Cabecera />`, entrega 400, `mockClear`, entrega 73. Anclas: `data-vuelo="si"` y las tres
+  variables. Aserción: `onRender` EXACTAMENTE una vez.
+- **Medido**: fuente ACTUAL → 49/49 verde (producción ya hacía un único `setAcople`, sin cambios). S →
+  ROJO («expected "vi.fn()" to be called 1 times, but got 2 times»). Restaurado.
+
+### N2 — el porqué de `css: false`, corregido
+
+- Medido con un test temporal, ya borrado (en `src/__tmp_n2/`, fuera del árbol final): el `class` del
+  `<a>` montado es `_marca_0a3d44`, NO `undefined`.
+- Corregido en `logo-acoplado.test.tsx` (cabecera), en `logo-acoplado-estilos.test.ts` (docblock del
+  apoyo de @s17) y en esta bitácora (ciclo 17 y desviaciones, punto 2). La prohibición de aseverar por
+  clase sigue en pie: el hash no es un literal estable y el estado vive en atributos. El paréntesis de
+  la línea 110 del `.feature` lo corrige el lead.
+
+### N3 — textos caducados → «ratificada por el lead el 2026-09-30»
+
+- Ciclo 26 (encabezado de la desviación y la enmienda), la lista de desviaciones (punto 1), la lista de
+  pendientes y la fila @s26 del mapa. Además, el docblock del test de @s26 (B1).
+
+### N4, N5, N6 — sin acción
+
+- N4 (alineación vertical) → la mide el lead en vivo. N5 → constancia en el informe. N6 → del
+  `mutation_tester`.
+
+### Cierre de la ronda
+
+- `prettier --write` sobre los ficheros tocados · `pnpm typecheck` limpio · `pnpm lint` limpio ·
+  `pnpm format:check` → «All matched files use Prettier code style!».
+- `pnpm test` (suite COMPLETA, UNA vez) → **51 ficheros, 1672 tests, todo verde** (76 s): 1671 + el
+  test del `<Profiler>` de N1. F-25 acotado: 111/111.
+- Producción NO se ha tocado en esta ronda (`LogoAcoplado.tsx` y `logo-acoplado-logica.ts`, intactos
+  frente a HEAD). Ficheros tocados: `logo-acoplado-estilos.test.ts`, `logo-acoplado.test.tsx` y esta
+  bitácora. Sin commits.
+- Sabotajes medidos en la ronda, 8 en total, todos restaurados:
+  - reproducción del hueco: P y P3 → verdes antes del arreglo; S → verde antes del test nuevo;
+  - tras el arreglo: P, P3, P4, P2 y el control en el componente → ROJOS; S → ROJO;
+  - fuente actual → verde.

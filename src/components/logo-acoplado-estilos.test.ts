@@ -270,8 +270,10 @@ describe('@s17 el hueco es estable por construcción —las dos representaciones
 
   /**
    * APOYO (derivado de LA-C1, declarado en progress/tdd_logo_acoplado.md): bajo `css: false` las
-   * clases del module son undefined y ningún render las ve; sin esto, el <a> podría perder sus clases
-   * con toda la suite verde. Se lee la FUENTE: qué clase lleva cada etiqueta de la marca.
+   * clases del module son cadenas con hash (`_marca_0a3d44`), no un literal estable, y el contrato
+   * prohíbe aseverar por clase en los renders (el estado vive en atributos). Así que ningún render
+   * fija QUÉ clase lleva cada nodo, y sin esto el <a> podría perder sus clases con toda la suite
+   * verde. Se lee la FUENTE: qué clase lleva cada etiqueta de la marca.
    */
   it('@s17 apoyo: LogoAcoplado.tsx importa la hoja y aplica .marca, .soloLectores, .logoTexto y .logoCaligrafia a sus nodos', () => {
     const fuente = readFileSync('src/components/LogoAcoplado.tsx', 'utf8')
@@ -385,10 +387,10 @@ describe('@s26 guardas de FUENTE: sin matchMedia, sin WAAPI, sin scroll, sin sto
   ] as const
 
   /**
-   * DESVIACIÓN DECLARADA, A RATIFICAR por el lead (progress/tdd_logo_acoplado.md, @s26):
-   * VISTA_MARCA solo puede salir del módulo GENERADO `src/lib/trazo-marca.ts` (@s4, LA-15), y la
-   * ruta de su import contiene «trazo-marca». Se quita ese especificador, y SOLO ese, antes de
-   * buscar el id del rótulo.
+   * ENMIENDA @s26, ratificada por el lead el 2026-09-30 (7aa8ba9): VISTA_MARCA solo puede salir del
+   * módulo GENERADO `src/lib/trazo-marca.ts` (@s4, LA-15), y la ruta de su import contiene
+   * «trazo-marca». Ese especificador se quita SOLO de LogoAcoplado.tsx, que lo trae EXACTAMENTE una
+   * vez; la lógica pura no puede nombrar ese módulo de ninguna forma, comentarios incluidos.
    */
   const IMPORT_DE_LA_VISTA = "from '../lib/trazo-marca'"
 
@@ -430,11 +432,14 @@ describe('@s26 guardas de FUENTE: sin matchMedia, sin WAAPI, sin scroll, sin sto
   it('@s26 ninguno de los dos escribe la marca, el viewBox ni los ids del rótulo (los comentarios también son bytes)', () => {
     expect(COMPONENTE.split(IMPORT_DE_LA_VISTA)).toHaveLength(2)
 
-    for (const [nombre, fuente] of FUENTES) {
-      const sinElImportDeLaVista = fuente.replace(IMPORT_DE_LA_VISTA, '')
+    const bytesVigilados = [
+      ['LogoAcoplado.tsx', COMPONENTE.replace(IMPORT_DE_LA_VISTA, '')],
+      ['logo-acoplado-logica.ts', LOGICA],
+    ] as const
 
+    for (const [nombre, bytes] of bytesVigilados) {
       for (const vetado of ['Nails Lash', '-80 -840 4120 1200', 'tinta-marca', 'trazo-marca']) {
-        expect(sinElImportDeLaVista, `${nombre}: ${vetado}`).not.toContain(vetado)
+        expect(bytes, `${nombre}: ${vetado}`).not.toContain(vetado)
       }
     }
   })
