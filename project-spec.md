@@ -3626,7 +3626,8 @@ en coordenadas de viewport, medidos en el instante de la observación.
   devolvía `texto` y, como «STUDIO» ya no intersecaba, **no volvía a avisar: el acople se perdía** con scroll
   lento (Δ de 1-2 px por fotograma). Con `floor`, la línea queda en el borde de la cabecera o por encima, y al
   decidir contra `rootBounds.top` aviso y decisión son coherentes **por construcción**. **D-2 queda resuelta con
-  lo mismo:** si la cabecera cambia de alto tras montar (redimensionar cruzando los 820 px, ≈ 74 ↔ 70 px), el
+  lo mismo:** si la cabecera cambia de alto tras montar (redimensionar cruzando el corte del menú, 820 px y
+  920 px desde la ENMIENDA E-2, ≈ 74 ↔ 70 px), el
   acople se adelanta o se retrasa unos 4 px como mucho, pero **nunca se pierde**; no se rehace el observador.
   **D-3, aceptada como caso límite:** retirar `reduce` después de acoplar bajo `reduce` puede reproducir el
   vuelo una vez (raro e inofensivo; solo como observación en vivo).
@@ -3851,6 +3852,74 @@ intacto (F-06 @s17). En jsdom, el enlace «Reservar» sigue en el horneado (`ren
 menos de 2 px de holgura, y cualquier variación de fuente o zoom la rompe. (b) Mover «Reservar» dentro del
 menú: duplica «Reserva». (c) Dejar las dos filas: es lo que Pablo descartó, además del problema del
 `scroll-padding`.
+
+#### ENMIENDA E-2 — el menú plegable hasta 920 px (Pablo, 2026-09-30)
+
+> **Firme (Pablo, AskUserQuestion 2026-09-30):** «Menú hasta 920 px». Es enmienda de F-25 porque la destapa
+> su verificación en vivo: @s39 a 821 px y el hallazgo **H-1** de `progress/verificacion_viva_logo_acoplado.md`.
+> **Cambia un contrato de F-06:** el literal `820px` de su @s17.
+
+**El hallazgo, medido en vivo por el lead.** Producción (`pnpm build` + `vite preview`) en Chromium, barrido
+de 1 en 1 px de 800 a 960 px, con los dos estados del logo (dan lo mismo):
+
+| Fuentes                                                   | Hasta 820 px (hamburguesa) | Nav horizontal en DOS filas | Una fila desde     |
+| --------------------------------------------------------- | -------------------------- | --------------------------- | ------------------ |
+| Cargadas (Gilda Display; marca de 158,3 px)               | 75 px, una fila            | 821–890 px → **126 px**     | **891 px** (71 px) |
+| Bloqueadas (respaldo previo al _swap_; marca de 141,8 px) | 75 px, una fila            | 821–907 px → **123 px**     | **908 px** (71 px) |
+| Cargadas, **antes de F-25** (`d07e4ea`)                   | una fila                   | 821–891 px → **113 px**     | 892 px             |
+
+El defecto **ya existía antes de F-25**: la medida en la que F-06 basó el 820 («la nav envuelve en la banda
+793–806 px») era de la nav del prototipo y dejó de valer con la nav definitiva (7 enlaces, «Reservar» y la
+marca con su fuente real). F-25 lo agrava 13 px (el logo de 2,5 rem, LA-13). Con 126 px, además, el
+`scroll-padding-top` de 96 px (F-06 @s11) deja 30 px del título tapados al saltar a una sección, igual que en
+móvil antes de E-1. **Ojo con la fuente de respaldo:** la marca es más estrecha, pero los enlaces son más
+anchos, y el neto es PEOR (908 frente a 891 px). La medida que manda es la peor.
+
+**E-2-C1 · El contrato.** El breakpoint del menú de `src/components/cabecera.module.scss` pasa del literal
+`820px` al literal **`920px`**: `@media (max-width: 920px)`. Es el MISMO bloque de F-06, con el MISMO contenido
+(`.disparador` con `display: inline-flex`; `.lista` con `display: none` y en columna;
+`.disparador[aria-expanded='true'] + .lista` con `display: flex`). Solo cambia el número. **CSS puro, sin JS**
+(patrón F-06: el horneado SSR es correcto en cualquier ancho). Resultado: hasta 920 px, marca + «Menú» +
+«Reservar» en una fila de 75 px (≤ 430 px, sin «Reservar»: E-1); desde 921 px, la nav horizontal en una fila
+de 71 px. El orden de la hoja no cambia: base → `@media (max-width: 920px)` → `@media (max-width: 430px)`.
+
+**E-2-C2 · Por qué 920 px.** Es criterio de proyecto MEDIDO, **nunca atribuido a norma**: ni a SC 1.4.10
+Reflow ni al 767 de Bootstrap (herencia muerta). Deja **12 px de margen sobre el peor caso medido** (908 px,
+con la fuente de respaldo) y 29 px sobre el caso con las fuentes cargadas. Es el mismo criterio con el que F-06
+eligió 820 sobre 806 px (14 px) y E-1 eligió 430 sobre 394 px. Por encima de 920 px (portátiles, tabletas en
+horizontal de 1024 px y escritorio) la nav sigue a la vista.
+
+**E-2-C3 · Lo que arrastra.** Todo lo que ancla el literal a mano pasa de `820px` a `920px`:
+
+- **F-06** `features/header_nav_footer.feature`: @s17 (el título, el `Then` y su comentario, con la medida
+  nueva) y sus menciones (el resumen B-3, la nota del literal, la mecánica, la tabla de mutantes humanos).
+- **F-25** `features/logo_acoplado.feature`: @s20 (el ancla `@media (max-width: 820px)`), @s35 (sus anclas y
+  el bloque del menú), @s39 (las filas 820/821 pasan a **920/921**) y los comentarios que citan el 820.
+- **Tests:** `src/components/cabecera.test.tsx` (@s17, @s20, `MEDIA_MENU` y @s35): el literal a mano pasa a
+  `920px`. **Ancla negativa nueva:** la hoja ya NO contiene `max-width: 820px`, para que no queden dos
+  breakpoints del menú.
+- **Comentarios** que citan el corte del menú: `cabecera.module.scss` (con la medida nueva),
+  `src/styles/_base.scss` y `src/styles/scroll-padding-cabecera.test.ts`. Solo texto.
+- **`src/components/contacto.module.scss` NO se toca en su comportamiento.** Su `@media (max-width: 820px)` es
+  el de la prominencia del `tel:` (F-12), no el del menú, y ningún hallazgo pide moverlo. Solo se aclara su
+  comentario: «820px, heredado de F-06» pasa a decir que es el valor que F-06 tenía entonces y que E-2 subió
+  el del menú sin mover este.
+- **Sin cambios** en JS, en el horneado, en las anclas vivas, en los pares de contraste ni en el
+  `scroll-padding` (con 75 px en toda la franja, los 96 px vuelven a cubrir). **Sin mutación propia:** solo
+  cambia SCSS, que Stryker no ve (igual que E-1). El `judge` sí revisa.
+
+**E-2-C4 · Verificación.** **Bytes:** `cabecera.module.scss` contiene EXACTAMENTE un
+`@media (max-width: 920px)` con el contenido de E-2-C1, ninguna `max-width: 820px`, sigue su
+`@media (max-width: 430px)` de E-1 y ningún `767px`. **En vivo** (lead): el barrido de 800 a 960 px con fuentes
+cargadas y bloqueadas y en los dos estados da una sola fila en todo el rango (75 px hasta 920, 71 px desde
+921); a 920 px, «Menú» y «Reservar» a la vista y Tab de «Menú» a «Reservar»; a 921 px, la nav horizontal y Tab
+de «FAQ» a «Reservar»; y @s32 y @s39 a sus anchos de siempre.
+
+**Alternativas descartadas.** (a) **900 px:** con la fuente de respaldo aún partiría la cabecera entre 901 y
+907 px. (b) **Apretar la nav** (menos hueco o letra más pequeña): cambia el diseño de F-06 y deja un margen
+frágil, como la alternativa (a) de E-1. (c) **Dejar las dos filas:** es lo que Pablo descartó, y vuelve el
+problema del `scroll-padding`. (d) **Un número más alto** (p. ej., 1024 px): escondería la nav en tabletas en
+horizontal sin que ninguna medida lo pida.
 
 ### Feature 26: `hero_foto` — DESCARTADA
 

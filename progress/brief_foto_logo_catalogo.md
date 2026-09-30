@@ -236,3 +236,13 @@ Pregunta: «¿Qué hago?» → **«Una fila sin "Reservar"»**: en móviles la c
 «Menú» (≈ 75 px, una fila); el botón «Reservar» de la cabecera se oculta en ese ancho porque ya están
 «Reservar cita» en el hero, «Reserva» dentro del menú y el robot Nailbot. En tablet y escritorio no
 cambia nada. Se trata como ENMIENDA de F-25 (mismo pipeline: spec → gherkin → puerta → TDD).
+
+## 8. Cabecera en tableta (821–907 px) — decisión de Pablo (2026-09-30, AskUserQuestion)
+
+La verificación en vivo de F-25 (hallazgo H-1 de `progress/verificacion_viva_logo_acoplado.md`)
+destapó que entre 821 y 890 px la nav horizontal no cabe y la cabecera se parte en dos filas: 126 px
+(113 px ya antes de F-25). Con la fuente de respaldo, la franja rota llega hasta 907 px.
+
+Pregunta: «¿Qué hago en esa franja?» → **«Menú hasta 920 px»**: hasta 920 px se ve el botón «Menú»
+(una fila de 75 px); la nav horizontal solo aparece cuando cabe entera. Se trata como ENMIENDA E-2
+de F-25 (`project-spec.md` §ENMIENDA E-2), que cambia el literal `820px` de F-06 @s17.
