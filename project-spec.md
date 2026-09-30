@@ -3810,6 +3810,48 @@ sigue la caligrafía al volver arriba; recarga a mitad sin vuelo; `reduce` (emul
 alto de la cabecera igual en los dos estados y ≤ 76 px, y CLS 0 a 320/360/375/390/414/768/1280; nombre
 accesible del enlace «Nails Lash Studio» en el árbol de accesibilidad de Chrome, en los dos estados.
 
+#### ENMIENDA E-1 — la cabecera en móvil, en una sola fila sin «Reservar» (Pablo, 2026-09-30)
+
+> **Firme (Pablo, AskUserQuestion 2026-09-30):** «Una fila sin "Reservar"». El lead lo trata como enmienda de
+> F-25 porque es F-25 quien la destapa: su @s32 exige «≤ 76 px y la fila no envuelve» de 320 a 1280 px, y en
+> móvil no se cumplía. Registro de la decisión y de la medida en `progress/brief_foto_logo_catalogo.md` §7.
+
+**El hallazgo, medido en vivo por el lead** (Chromium + `vite` dev; `d07e4ea`, justo antes de F-25, frente a
+la rama): la cabecera ya ocupaba **DOS filas** en móvil ANTES de F-25 (118 px entre 320 y 390 px: logo
+arriba, «Menú» y «Reservar» debajo), un defecto previo que F-06 @s11 daba por inexistente («UNA SOLA FILA en
+todo el rango»). El logo caligráfico de 2,5 rem (LA-13) la lleva a **131 px**. Barrido de 2 en 2 px:
+**con** «Reservar», una fila (75 px) desde **394 px**, y dos filas (131 px) de 320 a 392 px; **sin**
+«Reservar», una fila de **75 px en todo el rango** de 320 a 440 px, en los dos estados del logo.
+
+**E-1-C1 · El contrato.** Con `@media (max-width: 430px)` en `src/components/cabecera.module.scss` (la MISMA
+hoja del `@media (max-width: 820px)` de F-06, que no se toca), el enlace «Reservar» de la cabecera (`.reservar`
+de `MenuNavegacion.tsx`) lleva `display: none`. **CSS puro, sin JS** (patrón F-06: el eje responsive lo decide
+`@media`, nunca un `useIsMobile`, así que el horneado SSR es correcto en cualquier ancho). El enlace **sigue en
+el HTML horneado** con su `href="#reserva-titulo"`: la igualdad de conjuntos de la puerta de anclas vivas y
+los tests de F-06 que leen el horneado no cambian. Por encima de 430 px, nada cambia.
+
+**E-1-C2 · Por qué 430 px.** El corte medido es 394 px; 430 px cubre **todos** los móviles habituales (de 320
+a 430 px, el ancho del iPhone Pro Max) con un único comportamiento y deja 36 px de margen sobre la medida,
+como el 820 px de F-06, elegido con margen sobre la banda 793–806 px. Entre 394 y 430 px «Reservar» cabría,
+pero se oculta igual: «en móvil» es una sola regla, no un salto a mitad de la gama de teléfonos.
+
+**E-1-C3 · Accesibilidad y alternativas.** `display: none` saca el enlace también del árbol de
+accesibilidad en ese ancho, y es correcto: la reserva sigue a un toque por tres caminos, «Reservar cita» del
+hero (`#reserva-titulo`), «Reserva» dentro del menú y el lanzador Nailbot. Ninguno se toca. Sin pares de
+contraste nuevos. Con la cabecera en 75 px, el `scroll-padding-top: 6rem` (96 px) de F-04/F-06 vuelve a
+cubrirla en móvil (con 131 px quedaban 35 px de título tapados al saltar a una sección, SC 2.4.11).
+
+**E-1-C4 · Verificación.** Test de BYTES sobre `cabecera.module.scss`: existe exactamente un
+`@media (max-width: 430px)` y dentro `.reservar { display: none }`; el `@media (max-width: 820px)` sigue
+intacto (F-06 @s17). En jsdom, el enlace «Reservar» sigue en el horneado (`renderToString`). **En vivo**
+(@s32 de F-25, ahora cumplible): cabecera ≤ 76 px y en una fila de 320 a 1280 px, en los dos estados;
+«Reservar» visible de 431 px hacia arriba y ausente en 320–430 px.
+
+**Alternativas descartadas.** (a) Encoger logo, botón y márgenes para que quepan los tres: a 320 px cabe con
+menos de 2 px de holgura, y cualquier variación de fuente o zoom la rompe. (b) Mover «Reservar» dentro del
+menú: duplica «Reserva». (c) Dejar las dos filas: es lo que Pablo descartó, además del problema del
+`scroll-padding`.
+
 ### Feature 26: `hero_foto` — DESCARTADA
 
 > **DESCARTADA por Pablo el 2026-09-29, antes de la puerta humana: la cabecera y el hero se quedan como
