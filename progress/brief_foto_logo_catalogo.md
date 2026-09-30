@@ -223,3 +223,16 @@ _template literals_ mueren leyendo el `class` del `renderToString` y aseverando 
 está en `mutate`. (2) `cabecera.test.tsx` @s17 lee los bytes de `cabecera.module.scss`; `_base.scss:36`
 y `scroll-padding-cabecera.test.ts` derivan de ella los 76 px **sin leerla**. (3) El hero usa
 `partirNombre(NOMBRE).marca` (`Hero.tsx:104`) y `VISTA_MARCA`; el logo debe reutilizar los dos.
+
+## 7. Cabecera en móvil — decisión de Pablo (2026-09-30, AskUserQuestion)
+
+Medido en vivo por el lead (Chromium, `vite` dev, comparando `d07e4ea` antes de F-25 con la rama):
+la cabecera ya ocupaba **dos filas** en móvil ANTES de F-25 (118 px a 320–390 px: logo arriba,
+«Menú» + «Reservar» debajo); con el logo caligráfico de 2,5 rem pasa a **131 px**. De 414 px hacia
+arriba es una sola fila (75 px; 71 px a 1280). En los dos estados del logo mide lo mismo (sin CLS).
+El @s32 de F-25 («≤ 76 px y la fila no envuelve» de 320 a 1280 px) NO se cumple a ≤ 390 px.
+
+Pregunta: «¿Qué hago?» → **«Una fila sin "Reservar"»**: en móviles la cabecera muestra solo el logo y
+«Menú» (≈ 75 px, una fila); el botón «Reservar» de la cabecera se oculta en ese ancho porque ya están
+«Reservar cita» en el hero, «Reserva» dentro del menú y el robot Nailbot. En tablet y escritorio no
+cambia nada. Se trata como ENMIENDA de F-25 (mismo pipeline: spec → gherkin → puerta → TDD).
