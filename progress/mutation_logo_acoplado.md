@@ -158,3 +158,12 @@ el judge (N6), demostrado a continuación.
   `M src/components/LogoAcoplado.tsx` (la marca) y este informe.
 - C7 (prueba de mutación) queda **cumplido** para F-25: los 4 ficheros están al 100 %. Siguen
   pendientes del lead la verificación en vivo (@s28-@s33) y el cierre.
+
+## ENMIENDA E-1 (2026-09-30) — sin mutación propia, declarado
+
+La ENMIENDA E-1 (cabecera móvil en una fila sin «Reservar», `ba65804`) solo toca
+`src/components/cabecera.module.scss` y tests: **no hay TypeScript mutable nuevo** (Stryker no ve SCSS; el
+`judge` lo confirma en `progress/judge_logo_acoplado_e1.md`). Su defensa son los tests de bytes de @s35-@s38,
+medidos con 38 sabotajes (37 rojos + 1 equivalente) por el `judge`. Los ficheros mutables de F-25 no cambian
+desde `117edd1`, así que su 100 % sigue vigente. Decisión del craftsman_lead, por escrito en vez de fingir
+cobertura (regla de `feature_list.json`: «Stryker no ve CSS/SCSS»).
