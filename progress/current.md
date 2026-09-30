@@ -45,4 +45,17 @@
   TSX). @s39-@s41 son `@verificacion-viva`: los verifica el lead en Chrome, no se fingen en jsdom.
 - Bitácora: `progress/tdd_logo_acoplado.md` §«ENMIENDA E-1».
 - TDD de E-1 en VERDE: @s35-@s38 con 15 tests en `cabecera.test.tsx`. Suite 1687/1687 y
-  typecheck, lint y format limpios. Pendiente: judge, mutation_tester y @s32/@s39-@s41 en vivo (lead).
+  typecheck, lint y format limpios. Judge E-1 APPROVED (4b6cb60); sin mutación propia (solo SCSS).
+- Verificación en vivo (f8bf0cf, `progress/verificacion_viva_logo_acoplado.md`): 54/56 ✓. H-1: de 821 a
+  890 px la nav horizontal no cabe y la cabecera va en dos filas (ya pasaba antes de F-25). H-2: favicon
+  404, fuera de alcance.
+
+### ENMIENDA E-2 de F-25 — el menú plegable hasta 920 px (Pablo, 2026-09-30)
+
+- [x] Decisión de Pablo: «Menú hasta 920 px» (brief §8). Barrido del lead de 800 a 960 px: una fila
+      desde 891 px con las fuentes cargadas y desde 908 px con las de respaldo.
+- [x] Spec: `project-spec.md` §ENMIENDA E-2 (E-2-C1..C4), commit 6cf50b5.
+- [ ] gherkin_author: F-06 @s17 820→920; F-25 @s20/@s35/@s39 y escenarios nuevos (en curso)
+- [ ] ⏸ puerta humana de E-2
+- [ ] tdd_craftsman → judge → verificación en vivo (`vivo_f25.mjs s39 s43`, preparada y en rojo sobre
+      el `dist/` actual, como debe) → F-25 `done`
