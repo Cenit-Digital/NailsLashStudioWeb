@@ -31,3 +31,14 @@ Rama `claude/favicon-marca` desde `origin/main` (ba5b498). **No** se toca la ram
 - TDD en DOS partes en paralelo (presupuesto de la sesión: 45 min): A = `tools/favicon/generar.mjs` (sin tests
   propios, por spec; nota en `progress/tdd_favicon_marca_generador.md`), B = @s1-@s8 por TDD y sabotajes 1-8
   (`progress/tdd_favicon_marca.md`). @s9/@s10 en vivo: el lead (`progress/verificacion_viva_favicon_marca.md`).
+
+### 2026-09-30 18:25 — corte (Pablo apaga el equipo): F-28 `in_progress`, NO `done`
+
+- Hecho: puerta humana APROBADA (10 escenarios, PA-28-1 «No, que no bloquee»); generador
+  `tools/favicon/generar.mjs` (parte A, `progress/tdd_favicon_marca_generador.md`); `public/` con los 3 iconos;
+  `index.html` con los 3 `<link>`; `src/pages/favicon-marca.test.ts` **40/40 verde** (@s1-@s7); typecheck 0,
+  ESLint 0, Prettier verde. ⚠️ El TDD (partes A/B) lo avanzó un actor distinto de este lead en este mismo
+  directorio (commit c94d23e y ficheros de 17:51-18:14); el lead no lanzó el `tdd_craftsman`. Revisar su bitácora.
+- PENDIENTE: @s8 (añadir lo horneado a `home-horneado.test.ts`) · suite completa + `pnpm build` 5 puertas ·
+  `judge` · sabotajes manuales (brief §6, 9) · verificación en vivo @s9/@s10 en Chromium (`vite preview`) ·
+  `progress/tdd_favicon_marca.md` con el mapa @s → test · PR a `main`.

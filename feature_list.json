@@ -508,7 +508,7 @@
       "depends_on": ["cascaron_semantico", "cero_terceros", "tokens_paleta_contraste"],
       "mutable": false,
       "sdd": true,
-      "status": "spec_ready",
+      "status": "in_progress",
       "puerta_humana": "Decisiones de Pablo por AskUserQuestion el 2026-09-30, sobre una hoja de candidatos renderizados a 16/32 px reales y en pestañas clara y oscura (docs/research/favicon/candidatos.png): FM-1 «B · N tinta sobre rosa suave» (docs/research/favicon/aprobado-B.svg); FM-2 «Sí, SVG + ICO + iPhone». PUERTA HUMANA sobre features/favicon_marca.feature: APROBADA por Pablo el 2026-09-30 (AskUserQuestion: «Aprobado», que ratifica también FM-3..FM-7). PA-28-1: no hay iPhone real; NO bloquea el done, el apple-touch-icon en un iPhone se declara [NV]."
     }
   ],
