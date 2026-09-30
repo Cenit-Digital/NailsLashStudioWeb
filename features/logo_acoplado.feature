@@ -15,8 +15,12 @@
 #        aunque se vuelva arriba del todo (@s8, @s30). «La visita» = la vida del documento: recargar
 #        arriba vuelve a «nails lash studio» (@s9, @s30). Sin storage.
 #      · P3 — «Solo "Nails Lash"»: el logo acoplado es SOLO la firma, SIN «STUDIO» (@s2, @s4).
+#   1bis. Decisión FIRME de Pablo (AskUserQuestion, 2026-09-30; brief §7). NO SE REABRE en la puerta:
+#      · E-1 — «Una fila sin "Reservar"»: hasta 430 px de ancho, la cabecera muestra solo el logo y
+#        «Menú», y el botón «Reservar» de la cabecera se oculta con CSS puro. Por encima de 430 px no
+#        cambia nada (@s35-@s41). La puerta ratifica la DESTILACIÓN, no la decisión.
 #   2. `project-spec.md` → «Feature 25: logo_acoplado» (LA-C1..LA-C13, casos límite 1-20, LA-1..LA-16,
-#      enmiendas a F-06/F-07/F-03 y verificación en vivo).
+#      enmiendas a F-06/F-07/F-03 y verificación en vivo) y su «ENMIENDA E-1» (E-1-C1..E-1-C4).
 #   3. `progress/brief_foto_logo_catalogo.md` §5 (F-26 DESCARTADA: la cabecera y el hero se quedan como
 #      están) y §6 (cálculos del spec_partner: contraste 5,3809; viewBox 4120:1200; ≤ 76 px).
 #
@@ -57,6 +61,13 @@
 #   NO TOCA: data-firma, el control «Completar la firma» ni el reloj de 15 s del hero (LA-C8, LA-16);
 #         `MATRIZ_DE_USO` ni `MINIMO_DE_PARES` (LA-12); `_tokens.scss` ni el 88 % de `--header-bg`;
 #         `_base.scss` (el `scroll-padding-top: 6rem` y los 76 px que deriva a mano, F-06 @s11).
+#   ENMIENDA E-1 (E-1-C1):
+#     TOCA: cabecera.module.scss, que gana UN `@media (max-width: 430px) { .reservar { display: none } }`
+#         DESPUÉS del bloque base `.reservar`. Sus tests (@s35-@s38) van en cabecera.test.tsx, con
+#         describe prefijados «F-25 E-1 @sN» para no confundirse con los tags de F-06 del mismo fichero.
+#     NO TOCA: MenuNavegacion.tsx (el enlace, su `href="#reserva-titulo"` y su clase se quedan),
+#         Cabecera.tsx, el `@media (max-width: 820px)` ni el `@media (max-width: 640px)`, `_base.scss`,
+#         «Reservar cita» del hero, «Reserva» de la lista del menú y el lanzador de Nailbot (E-1-C3).
 #
 # =============================================================================================
 # GEOMETRÍA DE REFERENCIA (la MISMA en todos los escenarios de jsdom; asimétrica y SIN ceros)
