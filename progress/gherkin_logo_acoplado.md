@@ -94,3 +94,68 @@ GEOMETRÍA DE REFERENCIA común a todos los escenarios de jsdom y las prohibicio
 
 Sin dudas abiertas. Pendiente del lead: la enmienda de LA-C4 y LA-C11 en `project-spec.md` (floor,
 `rootBounds.top` con caída al borde medido, «decide la última entrada») y marcar `spec_ready`.
+
+## E-1
+
+**ENMIENDA E-1: la cabecera en móvil, en una sola fila sin «Reservar».** Destilada por el gherkin_author el
+2026-09-30. Fuentes: `project-spec.md` §F-25 «ENMIENDA E-1» (E-1-C1..E-1-C4 y las alternativas descartadas) y el
+brief `progress/brief_foto_logo_catalogo.md` §7. La decisión es FIRME, de Pablo (AskUserQuestion, 2026-09-30):
+«Una fila sin "Reservar"». La puerta ratifica la destilación, no la decisión.
+
+He ampliado `features/logo_acoplado.feature` de 34 a **41 escenarios**. Los nuevos son @s35-@s41, añadidos AL
+FINAL y sin renumerar nada: cuatro de puerta unitaria (@s35-@s38) y tres EN VIVO (@s39-@s41, con
+`@verificacion-viva`). No he tocado `src/`, los tests, `project-spec.md` ni `feature_list.json`. Todas las filas de
+cada tabla tienen el mismo número de celdas, y los tags van de @s1 a @s41, únicos y consecutivos (comprobado con un
+script).
+
+### Escenarios nuevos
+
+| @s  | Qué fija                                                                                                                                                                                                                                                                                                                    | Dónde se prueba                  | Contrato                   |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | -------------------------- |
+| s35 | Bytes de `cabecera.module.scss`: EXACTAMENTE un `@media (max-width: 430px)` con un solo bloque, `.reservar`, cuya única declaración es `display: none`. Va DESPUÉS de la base `.reservar`, sin `431px` ni `@media (min-width`. El `@media (max-width: 820px)` sigue intacto y sin `.reservar`                               | bytes SCSS (`cabecera.test.tsx`) | E-1-C1, E-1-C2, alt. (a)   |
+| s36 | En el horneado, «Reservar» es EXACTAMENTE uno, dentro de la nav «Principal» y FUERA de la `<ul>`, con `href="#reserva-titulo"`, sin `hidden`, `aria-hidden`, `style`, `tabindex` ni `inert`. `href="#reserva-titulo"` aparece EXACTAMENTE dos veces                                                                         | renderToString(<Cabecera />)     | E-1-C1, alt. (b)           |
+| s37 | Con `innerWidth` 320 y un `matchMedia` que responde `true` a todo, «Reservar» sigue en el DOM, `matchMedia` no se llama y no se escucha `resize` ni `orientationchange`                                                                                                                                                     | jsdom                            | E-1-C1 (sin JS)            |
+| s38 | Guardas de fuente: `MenuNavegacion.tsx` contiene `estilos.reservar` una vez y `href="#reserva-titulo"` dos veces. Ni él ni `Cabecera.tsx` contienen `useIsMobile`, `matchMedia`, `innerWidth`, `outerWidth`, `screen.width` ni `'resize'`/`"resize"`                                                                        | bytes TSX                        | E-1-C1 (sin `useIsMobile`) |
+| s39 | EN VIVO, 12 anchos de 320 a 1280 px, en los dos estados del logo: `<header>` ≤ 76 px e igual en los dos estados; una fila (centros verticales a ≤ 1 px); sin desbordamiento. «Reservar» `display: none`, 0 × 0 y fuera del árbol de a11y y del Tab en 320-430 px; visible y en el Tab desde 431. Sin JS, el mismo resultado | Chrome + CDP                     | E-1-C2, E-1-C3, E-1-C4     |
+| s40 | EN VIVO a 320, 390 y 430 px: `scrollPaddingTop` = "96px". En los siete saltos por ancla y con «Reservar cita» del hero, el `top` del título es ≥ el `bottom` del `<header>` (≤ 76 px)                                                                                                                                       | Chrome + CDP                     | E-1-C3 (F-06 @s11)         |
+| s41 | EN VIVO a 320 y 430 px: los tres caminos a la reserva funcionan. «Reservar cita» del hero y «Reserva» del menú llevan a `#reserva-titulo`, y el lanzador de Nailbot abre su `<dialog>`                                                                                                                                      | Chrome + CDP                     | E-1-C3                     |
+
+### Cambios en lo que ya estaba aprobado (sin renumerar)
+
+- **Cabecera del fichero:** una línea de estado E-1; la fuente «1bis» con la decisión de Pablo y su fecha
+  (2026-09-30); E-1 en ARTEFACTOS (TOCA / NO TOCA); una línea E-1 en «VERDE ≠ FUNCIONA»; los literales de E-1 en
+  ANTI-TAUTOLOGÍA; y el bloque de traza E-1-C1..C4, las alternativas (a)/(b)/(c) y el acceptance.
+- **@s32:** en el `Then` de la fila, «la marca y la hamburguesa (o la nav horizontal)» pasa a «la marca, la
+  hamburguesa (o la nav horizontal) y, por encima de 430 px, «Reservar»», y se cita E-1 y @s39. Su comentario
+  explica que el cálculo del spec_partner olvidaba «Reservar» y que @s32 solo se cumple con E-1. Sus
+  `Examples` y el resto de sus `Then` no cambian.
+
+### Dudas para la puerta humana
+
+1. **El acceptance y el estado de F-25 (del lead).** `feature_list.json` dice «Los 34 escenarios» y F-25 está
+   `in_progress`, con la puerta aprobada el 2026-09-29. No lo he tocado por instrucción. Hay que decidir si E-1 pasa
+   por su propia puerta (anotada en `puerta_humana`) o si F-25 vuelve a `spec_ready`. En cualquier caso, el
+   «34» pasa a «41».
+2. **Derivados míos, no literales en la spec; hay que ratificarlos:**
+   - (a) @s35: el `@media (max-width: 430px)` va DESPUÉS de la base `.reservar`. Hoy da igual, porque la base no
+     declara `display`, pero así la regla no depende del orden si un día lo declara.
+   - (b) @s35: «un solo bloque con una sola declaración» y el veto de `431px` y `@media (min-width`. Cierran la
+     alternativa (a) y el hueco fraccionario entre dos rangos.
+   - (c) @s36/@s37: el veto de `hidden`, `aria-hidden`, `style`, `tabindex` e `inert` en el enlace.
+   - (d) @s38: la guarda de bytes `estilos.reservar`. Es el único puente comprobable entre la hoja y el enlace,
+     porque el `className` con hash no se asevera en el DOM.
+   - (e) @s39: el Tab y el árbol de accesibilidad como prueba medible de «ausente» y «visible».
+   - (f) @s41: comprobar en vivo los tres caminos de E-1-C3. La spec los da por hechos; si uno falla, E-1 pierde su
+     premisa.
+3. **Filas 392 y 394 de @s39.** Son los anchos que midió el lead (el último con dos filas con «Reservar» y el
+   primero con una) y quedan como registro. 820 y 821 comprueban que por encima de 430 px nada cambia, justo en la
+   frontera de F-06. Si la puerta quiere un barrido más corto, se pueden quitar sin tocar el contrato.
+4. **@s40 usa 640 px de alto.** Los títulos del final de la página no llegan arriba y quedan más abajo, así que la
+   desigualdad se cumple igual. Los píxeles son criterio de proyecto: no se atribuye ningún número a SC 2.4.11
+   (B-1 de F-06).
+5. **Observación, fuera de E-1.** `_base.scss` y `scroll-padding-cabecera.test.ts` derivan 76 px como
+   «padding-block 1rem × 2 + 44». La hoja declara `0.9375rem` (30 px + 44 + 1 px de borde = 75 px, lo mismo que
+   midió el lead). El tope de 76 px se sigue cumpliendo y no hace falta cambiar nada. Su frase «UNA SOLA FILA en
+   todo el rango» era falsa antes de E-1 y pasa a ser cierta con ella. Por otro lado, la línea «Estado: PROPUESTO…
+   pendiente de la PUERTA HUMANA» de la cabecera del `.feature` está desfasada (la puerta se aprobó el 2026-09-29).
+   No la he tocado.
