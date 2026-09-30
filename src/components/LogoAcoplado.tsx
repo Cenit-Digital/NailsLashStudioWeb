@@ -68,58 +68,68 @@ export function LogoAcoplado() {
   const enlace = useRef<HTMLAnchorElement>(null)
   const logo = useRef<SVGSVGElement>(null)
 
-  useEffect(() => {
-    if (typeof IntersectionObserver !== 'function') {
-      return
-    }
+  useEffect(
+    () => {
+      if (typeof IntersectionObserver !== 'function') {
+        return
+      }
 
-    const disparo = document.querySelector('[data-acople="disparo"]')
+      const disparo = document.querySelector('[data-acople="disparo"]')
 
-    if (disparo === null) {
-      return
-    }
+      if (disparo === null) {
+        return
+      }
 
-    const cabecera = enlace.current!.closest('header')!
-    let primeraEntrega = true
+      const cabecera = enlace.current!.closest('header')!
+      let primeraEntrega = true
 
-    const observador = new IntersectionObserver(
-      (entradas) => {
-        // Decide la ÚLTIMA entrada de la entrega; «primera» cuenta entregas, no entradas (D-4).
-        const entrada = entradas[entradas.length - 1]
-        const primeraObservacion = primeraEntrega
-        primeraEntrega = false
+      const observador = new IntersectionObserver(
+        (entradas) => {
+          // Decide la ÚLTIMA entrada de la entrega; «primera» cuenta entregas, no entradas (D-4).
+          const entrada = entradas[entradas.length - 1]
+          const primeraObservacion = primeraEntrega
+          primeraEntrega = false
 
-        const lineaDeCorte = entrada.rootBounds?.top ?? cabecera.getBoundingClientRect().bottom
-        // Solo escucha mientras la marca sigue en el horneado: al acoplar se desconecta.
-        const logoTrasEntrega = estadoTrasObservar(
-          HORNEADO,
-          entrada.boundingClientRect.bottom,
-          lineaDeCorte,
-        )
+          const lineaDeCorte = entrada.rootBounds?.top ?? cabecera.getBoundingClientRect().bottom
+          // Solo escucha mientras la marca sigue en el horneado: al acoplar se desconecta.
+          const logoTrasEntrega = estadoTrasObservar(
+            HORNEADO,
+            entrada.boundingClientRect.bottom,
+            lineaDeCorte,
+          )
 
-        if (logoTrasEntrega === HORNEADO) {
-          return
-        }
+          if (logoTrasEntrega === HORNEADO) {
+            return
+          }
 
+          observador.disconnect()
+
+          setAcople({
+            logo: logoTrasEntrega,
+            variables: vueloHacia(logo.current!, primeraObservacion),
+          })
+        },
+        {
+          threshold: 0,
+          rootMargin: margenDeRaiz(cabecera.getBoundingClientRect().height),
+        },
+      )
+
+      observador.observe(disparo)
+
+      return () => {
         observador.disconnect()
-
-        setAcople({
-          logo: logoTrasEntrega,
-          variables: vueloHacia(logo.current!, primeraObservacion),
-        })
-      },
-      {
-        threshold: 0,
-        rootMargin: margenDeRaiz(cabecera.getBoundingClientRect().height),
-      },
-    )
-
-    observador.observe(disparo)
-
-    return () => {
-      observador.disconnect()
-    }
-  }, [])
+      }
+    },
+    // MUTANTE EQUIVALENTE (ArrayDeclaration, deps → ['Stryker was here']), DEMOSTRADO en
+    // progress/mutation_logo_acoplado.md (LogoAcoplado.tsx 122:6 antes de esta marca: survived con
+    // los 182 tests relacionados; aplicado a mano, la suite COMPLETA siguió verde 1672/1672): deps
+    // CONSTANTES de un efecto solo-montaje se comparan elemento a elemento con Object.is y nunca
+    // difieren, así que el efecto corre EXACTAMENTE una vez al montar en ambas versiones. Misma
+    // familia que Hero.tsx, Galeria.tsx y Equipo.tsx.
+    // Stryker disable next-line ArrayDeclaration: equivalente demostrado en progress/mutation_logo_acoplado.md
+    [],
+  )
 
   return (
     <a
