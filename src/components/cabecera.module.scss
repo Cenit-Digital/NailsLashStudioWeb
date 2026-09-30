@@ -119,6 +119,16 @@
   }
 }
 
+// ENMIENDA E-1 de F-25 (features/logo_acoplado.feature @s35): hasta 430px la cabecera va en UNA
+// fila, sin «Reservar» (con él envolvía a dos filas por debajo de 394px, medido en vivo). CSS PURO:
+// el enlace sigue horneado y la reserva queda a un toque por el hero, el menú y Nailbot. Va DESPUÉS
+// de la base `.reservar`: empata en especificidad con ella y gana por ir detrás.
+@media (max-width: 430px) {
+  .reservar {
+    display: none;
+  }
+}
+
 // ── El PIE oscuro (footer) ──────────────────────────────────────────────────────────────────
 .pie {
   background: var(--ink);

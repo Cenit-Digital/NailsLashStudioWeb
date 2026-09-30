@@ -512,3 +512,180 @@ Producción no se toca salvo que un test rojo lo pida. Tests acotados durante la
   - reproducción del hueco: P y P3 → verdes antes del arreglo; S → verde antes del test nuevo;
   - tras el arreglo: P, P3, P4, P2 y el control en el componente → ROJOS; S → ROJO;
   - fuente actual → verde.
+
+## ENMIENDA E-1 — la cabecera en móvil, en una sola fila sin «Reservar» (tdd_craftsman, 2026-09-30)
+
+Contrato: `features/logo_acoplado.feature` @s35-@s41 (APROBADA por Pablo el 2026-09-30, «Aprobado,
+prográmalo»). Spec: `project-spec.md` §F-25 «ENMIENDA E-1» (E-1-C1..E-1-C4). Derivados (a)-(f) de
+`progress/gherkin_logo_acoplado.md` §E-1, RATIFICADOS por el lead. Punto de partida: `1a5b49a`, suite
+1672/1672.
+
+- Por TDD: @s35 (bytes SCSS), @s36 (renderToString), @s37 (jsdom) y @s38 (bytes TSX), todos en
+  `cabecera.test.tsx` con describe prefijados «F-25 E-1 @sN» (ARTEFACTOS del `.feature`).
+- @s39-@s41 son `@verificacion-viva`: NO se fingen en jsdom. Los verifica el lead en Chrome.
+- Por los reinicios del contenedor, durante los ciclos solo corre `pnpm exec vitest run
+src/components/cabecera.test.tsx`. La suite completa corre UNA vez, al cierre.
+- Línea base acotada: `cabecera.test.tsx` → 14/14 verde.
+
+### Ciclos E-1
+
+#### @s35 — un `@media (max-width: 430px)` que solo oculta «Reservar», detrás de su base (ciclos 35-1..35-6)
+
+Tests en `cabecera.test.tsx`, describe «F-25 E-1 @s35 …». Helpers de la hoja al nivel del módulo
+(`sinComentarios`, `vecesQueCasa`, `cuerpoDelBloque`, `reglas`, `declaraciones`, el patrón de
+`logo-acoplado-estilos.test.ts`). «Contiene / no contiene» va sobre los BYTES CRUDOS y el troceo en
+bloques, sobre la hoja SIN comentarios.
+
+- **35-1 ROJO**: «la hoja contiene EXACTAMENTE un bloque @media (max-width: 430px), y ni "431px" ni
+  "@media (min-width"» → `expected +0 to be 1`. **VERDE** mínimo: un `@media (max-width: 430px) {}`
+  VACÍO detrás del `@media` de 820 px → 15/15. Sabotajes (restaurados): un segundo bloque de 430 px →
+  ROJO («expected 2 to be 1»); `@media (min-width: 431px)` → ROJO (por `431px`); `@media (min-width:
+500px)` → ROJO (por `@media (min-width`). **REFACTOR**: el patrón `MEDIA_MOVIL` pierde la bandera
+  `g` (arrastraría `lastIndex` al usarlo con `exec`); `vecesQueCasa` la pone por su cuenta → 15/15.
+- **35-2 ROJO**: «ese @media contiene EXACTAMENTE un bloque, de selector ".reservar" a secas, con una
+  sola declaración: "display: none"» (además, UNA sola `{` en el cuerpo: ni anidamiento ni segundo
+  bloque) → `expected +0 to be 1`, porque el bloque estaba vacío. **VERDE**: `.reservar { display:
+none; }` dentro → 16/16. Sabotajes (restaurados): `visibility: hidden` añadido → ROJO; un segundo
+  bloque `.disparador { min-width: 2rem }`, la alternativa (a) de encoger → ROJO («expected 2 to be
+  1»); selector `.nav .reservar` → ROJO. **REFACTOR**: el comentario del porqué encima del `@media`,
+  sin los literales vetados → 16/16.
+- **35-3**: «ese @media empieza DESPUÉS del bloque base ".reservar" de primer nivel», el derivado (a)
+  ratificado. Es una guarda: pasa a la primera porque en 35-1 el bloque ya fue al final. Sabotaje:
+  mover el `@media` delante de la base (tras el de 640 px) → ROJO («expected 470 to be greater than
+  907»). Restaurado → 17/17.
+- **35-4**: «fuera de ese @media, ningún bloque cuyo selector contiene ".reservar" declara "display:
+  none" ni "visibility: hidden"». Helper nuevo, `sinElBloque`, que quita el `@media` entero
+  (encabezado y cuerpo). Revisa el cuerpo ENTERO de cada bloque con `.reservar` en el selector,
+  anidados incluidos, y lleva el ANCLA de que la base sigue fuera. Es una guarda: pasa a la primera
+  (18/18). Sabotajes (restaurados): `display: none` en la base → ROJO; `visibility: hidden` en su
+  `&:hover` → ROJO; un `@media (max-width: 500px) { .reservar { display: none } }` → ROJO.
+- **35-5**: «el @media (max-width: 820px) de F-06 sigue declarando `.disparador` inline-flex, `.lista`
+  none y `.disparador[aria-expanded='true'] + .lista` flex, NO contiene ".reservar", y la hoja sigue
+  sin "767px"». Es una guarda: pasa a la primera (19/19). Sabotajes (restaurados): `.reservar {
+padding }` dentro del de 820 px → ROJO; `.disparador` a `display: flex` → ROJO; la lista abierta a
+  `display: block` → ROJO.
+- **35-6**: las ANCLAS POSITIVAS, primer `it` del describe: `.cabecera`, `.reservar`, `.disparador` y
+  EXACTAMENTE un `@media (max-width: 820px)`. Es una guarda: pasa a la primera (20/20). Sabotaje: un
+  segundo bloque de 820 px → ROJO («expected 2 to be 1»); restaurado.
+- **REFACTOR de cierre**: nada más que limpiar; los tests de F-06 @s17 y F-25 @s20, que leen esta
+  hoja, siguen verdes sin tocar una línea. `cabecera.test.tsx` → **20/20**.
+- **Producción de @s35**: `cabecera.module.scss` gana, detrás del `@media` de 820 px (y, por tanto,
+  de la base `.reservar`), el comentario del porqué y `@media (max-width: 430px) { .reservar {
+display: none; } }`. Nada más cambia en la hoja.
+
+#### @s36 — «Reservar» sigue horneado, en la nav y fuera de la lista, sin nada que lo oculte (ciclos 36-1..36-4)
+
+Tests en `cabecera.test.tsx`, describe «F-25 E-1 @s36 …», sobre `renderToString(<Cabecera />)`.
+Helper `enlacesReservar(html)`: los `<a>` cuyo texto es EXACTAMENTE "Reservar", nunca «Reserva». Todo
+el escenario dice «el marcado no cambia» (E-1-C1), así que los cuatro `it` son GUARDAS: pasan a la
+primera. Producción no se toca: cada guarda se mide con sabotajes en `MenuNavegacion.tsx`, y todos
+se restauran (`git diff` de `MenuNavegacion.tsx`, vacío).
+
+- **36-1**: ANCLA POSITIVA. EXACTAMENTE un «Reservar», dentro de la `<nav>` «Principal», con `href`
+  exactamente `#reserva-titulo` → 21/21. Sabotajes: `href="#reserva"` → ROJO; enlace duplicado → ROJO
+  («expected [ …(2) ] to have a length of 1»).
+- **36-2**: DESPUÉS del `</ul>` de `id="menu-navegacion"` y ANTES de `</nav>` → 22/22. Sabotaje:
+  mudar «Reservar» a un `<li>` de la lista, la alternativa (b) → ROJO («expected 938 to be greater
+  than 1006»).
+- **36-3**: su etiqueta de apertura, con el ANCLA de que es la de `href="#reserva-titulo"`, no
+  contiene `hidden`, `aria-hidden`, `style=`, `tabindex` ni `inert` (derivado (c)) → 23/23. Sabotajes:
+  `hidden`, `aria-hidden="true"`, `style={{ opacity: 0 }}`, `tabIndex={-1}` e `inert` → los cinco ROJOS.
+- **36-4**: `href="#reserva-titulo"` EXACTAMENTE dos veces en la cabecera → 24/24. Sabotajes: «Reserva»
+  de la lista a otra ancla → ROJO (1); un tercer enlace a la reserva → ROJO (3). **REFACTOR**:
+  `split(...).toHaveLength(3)` pasa a `vecesQueCasa(horneado, /href="#reserva-titulo"/)` con `toBe(2)`,
+  que se lee mejor; re-medido el sabotaje del tercer enlace → ROJO («expected 3 to be 2»). → 24/24.
+
+#### @s37 — ningún JS decide el ancho (ciclos 37-1..37-3)
+
+Tests en `cabecera.test.tsx`, describe «F-25 E-1 @s37 …», con su propio `afterEach`
+(`restoreAllMocks` + `unstubAllGlobals`). El montaje, `montarA320()`, fija `innerWidth` a 320, pone un
+`matchMedia` espía que responde `matches: true` a todo, espía `window.addEventListener`, sustituye el
+`IntersectionObserver` y fija la caja del `<header>` de la geometría de referencia (alto 73,6).
+
+- **Apoyo derivado, declarado.** Monto `<Cabecera />` JUNTO al papel del hero (`<svg
+data-acople="origen">` y `<span data-acople="disparo">`), igual que `montar()` de
+  `logo-acoplado.test.tsx`. Sin el disparo, el efecto de `LogoAcoplado` vuelve antes de construir el
+  observador, y «corren sus efectos» con el observador sustituido no probaría nada. El Given se ancla
+  dentro de `montarA320`: `innerWidth` es 320, `window.matchMedia` es el espía, el observador se
+  construye UNA vez y con `rootMargin "-73px 0px 0px 0px"` (literal a mano: la geometría llega).
+- Los tres `it` son GUARDAS: producción no tiene JS de ancho, así que pasan a la primera. Se miden con
+  sabotajes en `MenuNavegacion.tsx`, todos restaurados.
+- **37-1**: ANCLA POSITIVA. `getAllByRole("link", { name: "Reservar" })` da EXACTAMENTE uno, dentro de
+  la navegación «Principal», con `href` `#reserva-titulo` → 25/25. Sabotaje `useIsMobile` (un efecto que
+  lee `matchMedia('(max-width: 430px)')` y condiciona el enlace) → ROJO («Unable to find … "Reservar"»).
+  Caen también @s15 y @s27 de F-06: jsdom no trae `matchMedia`.
+- **37-2**: el enlace no lleva `hidden`, `aria-hidden`, `style`, `tabindex` ni `inert`. Se consulta con
+  `hidden: true`, para que un enlace sacado del árbol no escape por la consulta y lo que se mire sea el
+  atributo → 26/26. Sabotajes `aria-hidden="true"`, `tabIndex={-1}` e `inert` → ROJO en los tres.
+- **37-3**: `matchMedia` no se llama ninguna vez y `window.addEventListener` no recibe `"resize"` ni
+  `"orientationchange"` → 27/27. Sabotajes: `useIsMobile` → ROJO (los tres `it` de @s37); un efecto con
+  `addEventListener('resize')` → ROJO; y con `'orientationchange'` → ROJO.
+- **REFACTOR**: `montarA320` se parte en `sustituirObservador`, `matchMediaQueDiceQueSi` y
+  `fijarCajaDeLaCabecera`, y gana el ancla del `rootMargin`. → 27/27. Re-medido tras el refactor:
+  `useIsMobile` → ROJO en los tres `it` de @s37.
+
+#### @s38 — guardas de FUENTE sobre `MenuNavegacion.tsx` y `Cabecera.tsx` (ciclos 38-1 y 38-2)
+
+Tests en `cabecera.test.tsx`, describe «F-25 E-1 @s38 …», sobre los BYTES CRUDOS (los comentarios
+también cuentan). Antes de escribirlos comprobé que la letra se cumple hoy sin tocar producción:
+`estilos.reservar` ×1, `href="#reserva-titulo"` ×2 y ningún vetado en los dos ficheros. Ninguna
+guarda veta `if (`, `?`, `&&` ni `||`: los dos ficheros están en `mutate`. Los dos `it` son GUARDAS y
+todos sus sabotajes se restauraron (`git diff` de los dos `.tsx`, vacío).
+
+- **38-1**: ANCLAS POSITIVAS, `estilos.reservar` EXACTAMENTE una vez y `href="#reserva-titulo"`
+  EXACTAMENTE dos (derivado (d)) → 28/28. Sabotajes: la clase de «Reservar» pasa a `estilos.nav` → ROJO
+  («expected +0 to be 1»). Solo lo caza @s38: @s36 y @s37 no miran la clase, como anticipa el `.feature`.
+  Y un comentario `// estilos.reservar` → ROJO («expected 2 to be 1»).
+- **38-2**: ni `MenuNavegacion.tsx` ni `Cabecera.tsx` contienen `useIsMobile`, `matchMedia`,
+  `innerWidth`, `outerWidth`, `screen.width`, `'resize'` ni `"resize"`. Cada fichero lleva el ANCLA
+  `export function` → 29/29. Sabotajes, uno a uno como comentario: en `Cabecera.tsx`, `useIsMobile`,
+  `window.innerWidth`, `window.outerWidth`, `screen.width`, `'resize'` y `"resize"`; en
+  `MenuNavegacion.tsx`, `matchMedia`. Los siete, ROJOS, con el fichero y el literal en el mensaje.
+- E-1-C3, «sin pares de contraste nuevos», ya lo cubre @s19 de F-25 («MINIMO_DE_PARES sigue en 18»,
+  `logo-acoplado-estilos.test.ts`). E-1 no toca `puerta-contraste`.
+
+### Trazabilidad E-1 @s → test
+
+| @s   | Dónde                                      | Test(s)                                                                                                                                                                                                                          |
+| ---- | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| @s35 | `cabecera.test.tsx`                        | 6 `it` «@s35 …»: anclas; EXACTAMENTE un `@media (max-width: 430px)` sin `431px` ni `@media (min-width`; un solo bloque `.reservar { display: none }`; después de la base; nada que lo oculte fuera; 820 px intacto y sin `767px` |
+| @s36 | `cabecera.test.tsx`                        | 4 `it` «@s36 …» sobre `renderToString(<Cabecera />)`: uno, en la nav y con su href; fuera de la `<ul>`; sin atributos que lo oculten; `href="#reserva-titulo"` ×2                                                                |
+| @s37 | `cabecera.test.tsx`                        | 3 `it` «@s37 …» en jsdom a 320 px con `matchMedia` que dice sí: el enlace sigue; sin atributos que lo oculten; ni `matchMedia` ni `resize`/`orientationchange`                                                                   |
+| @s38 | `cabecera.test.tsx`                        | 2 `it` «@s38 …» sobre bytes: `estilos.reservar` ×1 y `href="#reserva-titulo"` ×2; ningún literal de ancho en `MenuNavegacion.tsx` ni en `Cabecera.tsx`                                                                           |
+| @s32 | EN VIVO (lead)                             | — (enmendado por E-1: solo se cumple con ella; sin test jsdom a propósito)                                                                                                                                                       |
+| @s39 | EN VIVO (lead, Chrome + CDP sobre `dist/`) | — (430 frente a 431 px, una fila, árbol AX, Tab y sin JS: NO se finge en jsdom)                                                                                                                                                  |
+| @s40 | EN VIVO                                    | — (`scrollPaddingTop` 96 px y los ocho saltos a 320, 390 y 430 px)                                                                                                                                                               |
+| @s41 | EN VIVO                                    | — (los tres caminos a la reserva a 320 y 430 px)                                                                                                                                                                                 |
+
+E-1, cubiertos por TDD en bytes, `renderToString` o jsdom: **4** escenarios (@s35-@s38) con **15** tests
+nuevos. En vivo, pendientes del lead: **3** (@s39-@s41), más @s32, que solo se cumple con E-1. Con E-1,
+F-25 suma **32** escenarios cubiertos por TDD (@s1-@s27, @s34 y @s35-@s38) y **9** en vivo (@s28-@s33 y
+@s39-@s41), **41** en total.
+
+### Pendiente para el lead (E-1)
+
+- **@s39-@s41 y @s32 EN VIVO** sobre `dist/` en Chrome + CDP, con resultados en
+  `progress/verificacion_viva_logo_acoplado.md`. La frontera 430/431 px, «Reservar» en `display: none`
+  con caja 0 × 0 y fuera del árbol AX y del Tab hasta 430 px, la misma medida sin JS, el
+  `scroll-padding` de 96 px que vuelve a cubrir la cabecera y los tres caminos a la reserva.
+- **mutation_tester**: E-1 no añade producción TS. `MenuNavegacion.tsx` y `Cabecera.tsx` no cambian
+  (`git diff`, vacío). El SCSS no lo muta Stryker; su mutante es HUMANO y lo cubren los sabotajes de
+  @s35 medidos arriba.
+- `feature_list.json`: el acceptance ya dice 41 escenarios. No toco el status.
+
+### Cierre E-1 (2026-09-30)
+
+- Durante los ciclos solo corrió `pnpm exec vitest run src/components/cabecera.test.tsx`: de 14 a
+  **29/29**.
+- Al cierre, UNA vez cada uno: `prettier --write` sobre los cuatro ficheros tocados; `pnpm typecheck`
+  limpio; `pnpm lint` limpio; `pnpm format:check` → «All matched files use Prettier code style!»; y
+  `pnpm test` con la suite COMPLETA → **51 ficheros, 1687 tests, todo verde** (83 s). Son los 1672 de
+  `1a5b49a` más los 15 nuevos de E-1: @s35 6, @s36 4, @s37 3 y @s38 2.
+- Producción: SOLO `src/components/cabecera.module.scss`, que gana 10 líneas (el comentario y
+  `@media (max-width: 430px) { .reservar { display: none; } }`, detrás del `@media` de 820 px).
+  `MenuNavegacion.tsx`, `Cabecera.tsx`, `LogoAcoplado.tsx`, el hero, F-27 y `stryker.config.json`,
+  intactos frente a HEAD.
+- Ficheros tocados: `cabecera.module.scss`, `cabecera.test.tsx`, esta bitácora y `progress/current.md`.
+  Sin commits: los hace el lead. No toco `feature_list.json` ni el status.
+- `bin/harness init` no se relanza. Por instrucción del lead la suite completa corre una sola vez, e
+  `init` = typecheck + lint + format:check + test, medidos uno a uno arriba.

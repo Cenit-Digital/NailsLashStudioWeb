@@ -38,3 +38,11 @@
 - [ ] F-25 judge (en curso) → mutation_tester → verificación en vivo del lead (@s28-@s33)
 - [x] ~~F-26 `hero_foto`~~ — DESCARTADA por Pablo el 2026-09-29 («no quiero imagen»); en `no_se_construyen`
 - [ ] F-27: (fotos) tdd_craftsman → judge → mutation_tester
+
+### Feature en curso: 25 — logo_acoplado, ENMIENDA E-1 (tdd_craftsman, 2026-09-30)
+
+- Escenarios a recorrer por TDD: @s35 (bytes SCSS), @s36 (renderToString), @s37 (jsdom), @s38 (bytes
+  TSX). @s39-@s41 son `@verificacion-viva`: los verifica el lead en Chrome, no se fingen en jsdom.
+- Bitácora: `progress/tdd_logo_acoplado.md` §«ENMIENDA E-1».
+- TDD de E-1 en VERDE: @s35-@s38 con 15 tests en `cabecera.test.tsx`. Suite 1687/1687 y
+  typecheck, lint y format limpios. Pendiente: judge, mutation_tester y @s32/@s39-@s41 en vivo (lead).

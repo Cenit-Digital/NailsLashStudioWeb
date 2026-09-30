@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { renderToString } from 'react-dom/server'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { Cabecera } from './Cabecera'
 import { MenuNavegacion } from './MenuNavegacion'
@@ -227,5 +227,374 @@ describe('@s20 ENMIENDA F-25: las reglas de .marca se MUDAN a la hoja del logo, 
     expect(horneado).toMatch(/<button\b[^>]*aria-expanded="false"/)
     expect(horneado).toContain('href="#servicios-titulo"')
     expect(horneado).toContain('href="#contacto-titulo"')
+  })
+})
+
+/* ————————————————————————————————————————————————————————————————————————————————————————————
+ * F-25 ENMIENDA E-1 (features/logo_acoplado.feature @s35-@s38) — la cabecera en móvil, en UNA fila
+ * sin «Reservar»: hasta 430 px, `display: none` en la MISMA hoja, CSS puro. Los describe van
+ * prefijados «F-25 E-1 @sN» para no confundirse con los tags de F-06 de este fichero. Literales A
+ * MANO: "430px", "display: none", "Reservar" y "#reserva-titulo". Que el enlace se OCULTE de verdad
+ * hasta 430 px no lo ve jsdom (`css: false`, sin layout): es @s39, EN VIVO en Chrome.
+ * ———————————————————————————————————————————————————————————————————————————————————————————— */
+
+/**
+ * «Contiene / no contiene» va sobre los BYTES CRUDOS (los comentarios también cuentan); el troceo en
+ * bloques va sobre la hoja SIN comentarios, para que un comentario no se cuele en un selector.
+ */
+const BYTES_CABECERA = readFileSync('src/components/cabecera.module.scss', 'utf8')
+const HOJA_CABECERA = sinComentarios(BYTES_CABECERA)
+
+const MEDIA_MOVIL = /@media\s*\(\s*max-width:\s*430px\s*\)\s*\{/
+const MEDIA_MENU = /@media\s*\(\s*max-width:\s*820px\s*\)\s*\{/
+
+function sinComentarios(fuente: string): string {
+  return fuente.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '')
+}
+
+/** Cuántas veces casa el patrón (sin bandera `g`: aquí se le pone, sin estado compartido). */
+function vecesQueCasa(fuente: string, patron: RegExp): number {
+  return [...fuente.matchAll(new RegExp(patron.source, 'g'))].length
+}
+
+/** El cuerpo (entre llaves) del primer bloque cuyo encabezado casa, contando llaves. */
+function cuerpoDelBloque(fuente: string, encabezado: RegExp): string | null {
+  const indice = encabezado.exec(fuente)?.index ?? -1
+
+  if (indice < 0) {
+    return null
+  }
+
+  const apertura = fuente.indexOf('{', indice)
+  let profundidad = 0
+
+  for (let i = apertura; i < fuente.length; i++) {
+    if (fuente[i] === '{') {
+      profundidad += 1
+    } else if (fuente[i] === '}') {
+      profundidad -= 1
+
+      if (profundidad === 0) {
+        return fuente.slice(apertura + 1, i)
+      }
+    }
+  }
+
+  return null
+}
+
+/** La hoja SIN el primer bloque entero (encabezado y cuerpo) cuyo encabezado casa. */
+function sinElBloque(fuente: string, encabezado: RegExp): string {
+  const inicio = encabezado.exec(fuente)?.index
+  const cuerpo = cuerpoDelBloque(fuente, encabezado)
+
+  if (inicio === undefined || cuerpo === null) {
+    return fuente
+  }
+
+  const fin = fuente.indexOf('{', inicio) + cuerpo.length + '{}'.length
+
+  return fuente.slice(0, inicio) + fuente.slice(fin)
+}
+
+/** Las reglas «selector { declaraciones }» de un fragmento, sin anidamiento. */
+function reglas(fragmento: string): { selector: string; cuerpo: string }[] {
+  return [...fragmento.matchAll(/([^{};]+)\{([^{}]*)\}/g)].map((m) => ({
+    selector: m[1].trim(),
+    cuerpo: m[2],
+  }))
+}
+
+/** Las declaraciones de un bloque hoja, con los espacios normalizados. */
+function declaraciones(cuerpo: string): string[] {
+  return cuerpo
+    .split(';')
+    .map((declaracion) => declaracion.replace(/\s+/g, ' ').trim())
+    .filter((declaracion) => declaracion !== '')
+}
+
+describe('F-25 E-1 @s35 cabecera.module.scss gana EXACTAMENTE un @media (max-width: 430px) que solo oculta «Reservar», después de su regla base; el @media de 820 px sigue intacto', () => {
+  it('@s35 ANCLAS POSITIVAS: la hoja contiene ".cabecera", ".reservar", ".disparador" y EXACTAMENTE un bloque @media (max-width: 820px) (F-06 @s17)', () => {
+    for (const ancla of ['.cabecera', '.reservar', '.disparador']) {
+      expect(BYTES_CABECERA, ancla).toContain(ancla)
+    }
+
+    expect(vecesQueCasa(HOJA_CABECERA, MEDIA_MENU)).toBe(1)
+  })
+
+  it('@s35 la hoja contiene EXACTAMENTE un bloque @media (max-width: 430px), y ni "431px" ni "@media (min-width"', () => {
+    expect(vecesQueCasa(HOJA_CABECERA, MEDIA_MOVIL)).toBe(1)
+    expect(BYTES_CABECERA).not.toContain('431px')
+    expect(BYTES_CABECERA).not.toContain('@media (min-width')
+  })
+
+  it('@s35 ese @media contiene EXACTAMENTE un bloque, de selector ".reservar" a secas, con una sola declaración: "display: none"', () => {
+    const media = cuerpoDelBloque(HOJA_CABECERA, MEDIA_MOVIL) ?? ''
+    const bloques = reglas(media)
+
+    // Una sola llave de apertura: ni anidamiento ni un segundo bloque (cierra la alternativa (a)).
+    expect(vecesQueCasa(media, /\{/)).toBe(1)
+    expect(bloques.map(({ selector }) => selector)).toEqual(['.reservar'])
+    expect(declaraciones(bloques[0].cuerpo)).toEqual(['display: none'])
+  })
+
+  it('@s35 ese @media empieza en la hoja DESPUÉS del bloque base ".reservar" de primer nivel', () => {
+    // Empatan en especificidad (0,1,0): gana la que va detrás (la trampa de @s16).
+    const base = /(^|\n)\.reservar\s*\{/.exec(HOJA_CABECERA)
+    const media = MEDIA_MOVIL.exec(HOJA_CABECERA)
+
+    expect(base, 'la hoja debe tener el bloque base .reservar').not.toBeNull()
+    expect(media, 'la hoja debe tener el @media de 430 px').not.toBeNull()
+    expect(media?.index).toBeGreaterThan(base?.index ?? Infinity)
+  })
+
+  it('@s35 fuera de ese @media, ningún bloque cuyo selector contiene ".reservar" declara "display: none" ni "visibility: hidden"', () => {
+    const fuera = sinElBloque(HOJA_CABECERA, MEDIA_MOVIL)
+    const encabezados = [...fuera.matchAll(/[^{};]*\.reservar\b[^{};]*\{/g)]
+
+    // ANCLA POSITIVA: la base `.reservar` sigue fuera del @media.
+    expect(encabezados.length).toBeGreaterThan(0)
+
+    for (const { 0: encabezado, index } of encabezados) {
+      // El cuerpo ENTERO, anidados incluidos (`&:hover` también es `.reservar`).
+      const cuerpo = cuerpoDelBloque(fuera.slice(index), /\{/) ?? ''
+
+      expect(cuerpo, encabezado.trim()).not.toMatch(/display\s*:\s*none/)
+      expect(cuerpo, encabezado.trim()).not.toMatch(/visibility\s*:\s*hidden/)
+    }
+  })
+
+  it('@s35 el @media (max-width: 820px) de F-06 sigue declarando el menú plegable y NO contiene ".reservar"; la hoja sigue sin "767px"', () => {
+    const menu = cuerpoDelBloque(HOJA_CABECERA, MEDIA_MENU) ?? ''
+    const declaracionesDe = (selector: string): string[] =>
+      declaraciones(reglas(menu).find((regla) => regla.selector === selector)?.cuerpo ?? '')
+
+    expect(declaracionesDe('.disparador')).toContain('display: inline-flex')
+    expect(declaracionesDe('.lista')).toContain('display: none')
+    expect(declaracionesDe(".disparador[aria-expanded='true'] + .lista")).toContain('display: flex')
+    expect(menu).not.toContain('.reservar')
+    expect(BYTES_CABECERA).not.toContain('767px')
+  })
+})
+
+/** Los `<a>` cuyo texto es EXACTAMENTE "Reservar" (no «Reserva» de la lista), en el HTML dado. */
+function enlacesReservar(html: string): RegExpExecArray[] {
+  return [...html.matchAll(/<a\b[^>]*>Reservar<\/a>/g)]
+}
+
+describe('F-25 E-1 @s36 el enlace «Reservar» sigue horneado, dentro de la nav y FUERA de la lista del menú, con href="#reserva-titulo" y sin nada en el marcado que lo oculte', () => {
+  it('@s36 ANCLA POSITIVA: hay EXACTAMENTE un <a> «Reservar», dentro de la <nav> "Principal", con href exactamente "#reserva-titulo"', () => {
+    const horneado = renderToString(<Cabecera />)
+    const enlaces = enlacesReservar(horneado)
+    const nav = /<nav\b[^>]*aria-label="Principal"[^>]*>/.exec(horneado)
+
+    expect(enlaces).toHaveLength(1)
+    expect(nav, 'la cabecera debe hornear la nav "Principal"').not.toBeNull()
+
+    const inicioDeLaNav = nav?.index ?? Infinity
+    const finDeLaNav = horneado.indexOf('</nav>', inicioDeLaNav)
+
+    expect(enlaces[0].index).toBeGreaterThan(inicioDeLaNav)
+    expect(enlaces[0].index).toBeLessThan(finDeLaNav)
+    expect(enlaces[0][0]).toMatch(/\shref="#reserva-titulo"[\s>]/)
+  })
+
+  it('@s36 está DESPUÉS del </ul> de la lista id="menu-navegacion" y ANTES del </nav>: no se ha mudado al menú', () => {
+    const horneado = renderToString(<Cabecera />)
+    const lista = /<ul\b[^>]*\sid="menu-navegacion"/.exec(horneado)
+
+    expect(lista, 'la nav debe hornear la lista "menu-navegacion"').not.toBeNull()
+
+    const finDeLaLista = horneado.indexOf('</ul>', lista?.index ?? Infinity)
+    const finDeLaNav = horneado.indexOf('</nav>', finDeLaLista)
+    const [reservar] = enlacesReservar(horneado)
+
+    expect(finDeLaLista).toBeGreaterThan(-1)
+    expect(reservar.index).toBeGreaterThan(finDeLaLista)
+    expect(reservar.index).toBeLessThan(finDeLaNav)
+  })
+
+  it('@s36 su etiqueta de apertura NO contiene "hidden", "aria-hidden", "style=", "tabindex" ni "inert"', () => {
+    const [reservar] = enlacesReservar(renderToString(<Cabecera />))
+    const apertura = /^<a\b[^>]*>/.exec(reservar[0])?.[0] ?? ''
+
+    // ANCLA POSITIVA: la etiqueta existe y es la del enlace a la reserva.
+    expect(apertura).toContain('href="#reserva-titulo"')
+
+    for (const oculta of ['hidden', 'aria-hidden', 'style=', 'tabindex', 'inert']) {
+      expect(apertura, oculta).not.toContain(oculta)
+    }
+  })
+
+  it('@s36 el HTML de la cabecera contiene href="#reserva-titulo" EXACTAMENTE dos veces: «Reserva» en la lista y «Reservar»', () => {
+    const horneado = renderToString(<Cabecera />)
+
+    expect(vecesQueCasa(horneado, /href="#reserva-titulo"/)).toBe(2)
+  })
+})
+
+describe('F-25 E-1 @s37 ningún JS decide el ancho: montada en jsdom a 320 px con un matchMedia que responde que sí a todo, la cabecera conserva «Reservar» y no consulta matchMedia ni escucha "resize"', () => {
+  const ANCHO_MINIMO = 320
+  // La cabecera de la geometría de referencia del .feature: alto 73,6 (rootMargin "-73px …").
+  const CAJA_DE_LA_CABECERA = { x: 0, y: 0, left: 0, top: 0, width: 320, height: 73.6 }
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+    vi.unstubAllGlobals()
+  })
+
+  /** El IntersectionObserver que jsdom no trae: un doble con el constructor espiado. */
+  function sustituirObservador() {
+    const construir = vi.fn()
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        observe = vi.fn()
+        disconnect = vi.fn()
+
+        constructor(...argumentos: unknown[]) {
+          construir(...argumentos)
+        }
+      },
+    )
+
+    return construir
+  }
+
+  /** Un matchMedia que responde que SÍ a cualquier consulta: un `useIsMobile` quitaría el enlace. */
+  function matchMediaQueDiceQueSi() {
+    const matchMedia = vi.fn((consulta: string) => ({
+      matches: true,
+      media: consulta,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }))
+    vi.stubGlobal('matchMedia', matchMedia)
+
+    return matchMedia
+  }
+
+  /** El <header> mide la caja de referencia; el resto, los ceros de jsdom. */
+  function fijarCajaDeLaCabecera(): void {
+    const medir = Element.prototype.getBoundingClientRect
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (
+      this: Element,
+    ) {
+      return this.matches('header')
+        ? ({
+            ...CAJA_DE_LA_CABECERA,
+            right: CAJA_DE_LA_CABECERA.width,
+            bottom: CAJA_DE_LA_CABECERA.height,
+            toJSON: () => CAJA_DE_LA_CABECERA,
+          } as DOMRect)
+        : medir.call(this)
+    })
+  }
+
+  /**
+   * Monta la cabecera REAL a 320 px, con el papel del hero (origen y disparo) para que el efecto del
+   * logo llegue a construir su observador: sin el disparo, el efecto vuelve antes y «corren sus
+   * efectos» no probaría nada.
+   */
+  function montarA320() {
+    const construirObservador = sustituirObservador()
+    vi.stubGlobal('innerWidth', ANCHO_MINIMO)
+    const matchMedia = matchMediaQueDiceQueSi()
+    const escucharVentana = vi.spyOn(window, 'addEventListener')
+    fijarCajaDeLaCabecera()
+
+    render(
+      <>
+        <Cabecera />
+        <main>
+          <svg data-acople="origen" />
+          <span data-acople="disparo">Studio</span>
+        </main>
+      </>,
+    )
+
+    // El Given, de verdad: 320 px, el espía en su sitio y los efectos corridos con la geometría.
+    expect(window.innerWidth).toBe(ANCHO_MINIMO)
+    expect(window.matchMedia).toBe(matchMedia)
+    expect(construirObservador).toHaveBeenCalledTimes(1)
+    expect(construirObservador.mock.calls[0][1]).toMatchObject({ rootMargin: '-73px 0px 0px 0px' })
+
+    return { matchMedia, escucharVentana }
+  }
+
+  it('@s37 ANCLA POSITIVA: getAllByRole("link", { name: "Reservar" }) da EXACTAMENTE un enlace, dentro de la navegación "Principal", con href exactamente "#reserva-titulo"', () => {
+    montarA320()
+
+    const nav = screen.getByRole('navigation', { name: 'Principal' })
+    const enlaces = screen.getAllByRole('link', { name: 'Reservar' })
+
+    expect(enlaces).toHaveLength(1)
+    expect(nav).toContainElement(enlaces[0])
+    expect(enlaces[0]).toHaveAttribute('href', '#reserva-titulo')
+  })
+
+  it('@s37 ese enlace no lleva los atributos hidden, aria-hidden, style, tabindex ni inert', () => {
+    montarA320()
+
+    // `hidden: true` lo encuentra aunque algo lo sacara del árbol: el atributo es lo que se mira.
+    const [reservar] = screen.getAllByRole('link', { name: 'Reservar', hidden: true })
+
+    expect(reservar).toHaveAttribute('href', '#reserva-titulo')
+
+    for (const oculta of ['hidden', 'aria-hidden', 'style', 'tabindex', 'inert']) {
+      expect(reservar, oculta).not.toHaveAttribute(oculta)
+    }
+  })
+
+  it('@s37 matchMedia NO se ha llamado ninguna vez, y window.addEventListener no ha recibido "resize" ni "orientationchange"', () => {
+    const { matchMedia, escucharVentana } = montarA320()
+    const tipos = escucharVentana.mock.calls.map(([tipo]) => tipo)
+
+    expect(matchMedia).not.toHaveBeenCalled()
+    expect(tipos).not.toContain('resize')
+    expect(tipos).not.toContain('orientationchange')
+  })
+})
+
+/**
+ * La clase es el ÚNICO puente entre la hoja (@s35) y el enlace: bajo `css: false` el className es
+ * una cadena con hash y no se asevera en el DOM, así que se ata aquí, por BYTES (los comentarios
+ * también cuentan). Los dos ficheros están en `mutate`: ninguna guarda veta `if (`, `?`, `&&` ni `||`.
+ */
+describe('F-25 E-1 @s38 guardas de FUENTE: MenuNavegacion.tsx sigue atando «Reservar» a la clase .reservar, y ni él ni Cabecera.tsx conocen el ancho de la pantalla', () => {
+  const MENU = readFileSync('src/components/MenuNavegacion.tsx', 'utf8')
+
+  it('@s38 ANCLAS POSITIVAS: MenuNavegacion.tsx contiene EXACTAMENTE una vez "estilos.reservar" y EXACTAMENTE dos veces href="#reserva-titulo"', () => {
+    expect(vecesQueCasa(MENU, /estilos\.reservar/)).toBe(1)
+    expect(vecesQueCasa(MENU, /href="#reserva-titulo"/)).toBe(2)
+  })
+
+  it('@s38 ni MenuNavegacion.tsx ni Cabecera.tsx contienen "useIsMobile", "matchMedia", "innerWidth", "outerWidth", "screen.width", "\'resize\'" ni \'"resize"\'', () => {
+    const fuentes = {
+      'MenuNavegacion.tsx': MENU,
+      'Cabecera.tsx': readFileSync('src/components/Cabecera.tsx', 'utf8'),
+    }
+    const vetados = [
+      'useIsMobile',
+      'matchMedia',
+      'innerWidth',
+      'outerWidth',
+      'screen.width',
+      "'resize'",
+      '"resize"',
+    ]
+
+    for (const [fichero, bytes] of Object.entries(fuentes)) {
+      // ANCLA POSITIVA: son los ficheros de la cabecera, no un vacío.
+      expect(bytes, fichero).toContain('export function')
+
+      for (const vetado of vetados) {
+        expect(bytes, `${fichero}: ${vetado}`).not.toContain(vetado)
+      }
+    }
   })
 })
