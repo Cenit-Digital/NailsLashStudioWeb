@@ -58,5 +58,8 @@
 - [x] gherkin_author: F-06 @s17 820→920; F-25 @s20/@s35/@s39, @s42 (bytes) y @s43 (en vivo); 43
       escenarios (1a9799a). El lead cerró sus dos dudas (acceptance de F-06 y nota de E-1-C4).
 - [x] ⏸ puerta humana de E-2 APROBADA por Pablo el 2026-09-30 («Aprobado, prográmalo»)
-- [ ] tdd_craftsman → judge → verificación en vivo (`vivo_f25.mjs s39 s43`, preparada y en rojo sobre
-      el `dist/` actual, como debe) → F-25 `done`
+- [x] tdd_craftsman: VERDE, suite 1694/1694 (+1 negativa en @s20, +6 de @s42), typecheck/lint/format
+      limpios, sabotajes (a)-(e) demostrados → 199ca7a (instantánea en verde)
+- [ ] judge (en curso) · `pnpm build` en verde con las 5 puertas; CSS horneado con un solo 920 (menú),
+      un 430 (E-1) y un 820 (tel: de contacto) · verificación en vivo completa @s28-@s43 (en curso)
+- [ ] F-25 `done`
