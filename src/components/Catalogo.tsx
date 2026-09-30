@@ -1,4 +1,4 @@
-import { CATALOGO_DEMO, LEYENDA_PRECIOS } from '../lib/demo/catalogo-demo'
+import { CATALOGO_DEMO, LEYENDA_FOTOS, LEYENDA_PRECIOS } from '../lib/demo/catalogo-demo'
 import estilos from './catalogo.module.scss'
 
 /**
@@ -19,6 +19,10 @@ import estilos from './catalogo.module.scss'
  * sacarían del árbol de accesibilidad y dejarían la sección otra vez sin nombre accesible.
  */
 const ID_SERVICIOS = 'servicios-titulo'
+
+/** Medidas REALES de los tres ficheros (4:5): el navegador reserva la caja antes de descargarlos. */
+const ANCHO_FOTO = 800
+const ALTO_FOTO = 1000
 
 export function Catalogo() {
   return (
@@ -50,12 +54,20 @@ export function Catalogo() {
                   {categoria.textoBoton}
                 </a>
               </div>
-              <div className={estilos.foto} aria-hidden="true" />
+              <img
+                className={estilos.foto}
+                src={categoria.foto}
+                alt={categoria.alt}
+                width={ANCHO_FOTO}
+                height={ALTO_FOTO}
+                loading="lazy"
+              />
             </div>
           </div>
         ))}
 
         <p className={estilos.leyenda}>{LEYENDA_PRECIOS}</p>
+        <p className={estilos.leyenda}>{LEYENDA_FOTOS}</p>
       </div>
     </section>
   )

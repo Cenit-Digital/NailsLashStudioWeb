@@ -65,3 +65,14 @@
       rehacen `dist/` al editar y al parar) → `progress/verificacion_viva_logo_acoplado.md`
 - [x] **F-25 `done`** (2026-09-30)
 - [ ] F-27 `catalogo_fotos` → `in_progress` (2026-09-30): tdd_craftsman (en curso) → judge → mutation_tester → en vivo (@s22-@s26, lead)
+
+### Feature en curso: 27 — catalogo_fotos (tdd_craftsman, 2026-09-30)
+
+- Escenarios a recorrer por TDD, en orden: @s1, @s2, @s3, @s4, @s5, @s6, @s7, @s8, @s9, @s10, @s11,
+  @s12, @s13 (render), @s14, @s15, @s16 (datos y tipos), @s17, @s18, @s19 (guardas de fuente y
+  ficheros), @s20, @s21 (bytes de la hoja). @s22-@s26 son `@verificacion-viva`: los hace el lead.
+- Bitácora: `progress/tdd_catalogo_fotos.md`.
+- **Estado F-27 (2026-09-30): TDD @s1-@s21 VERDE** (relevo tras interrupción en @s20; sabotajes de
+  @s20/@s21 documentados). `stryker.config.json` `mutate` += `Catalogo.tsx`. typecheck, lint y
+  format:check limpios; suite completa 55 ficheros / 1760 tests en verde. Pendiente: judge →
+  mutation_tester → en vivo @s22-@s26 (lead). NO `done`.
