@@ -500,7 +500,7 @@
       "title": "Logo caligráfico «Nails Lash» que sube desde el hero y se acopla en la cabecera cuando «STUDIO» deja de verse",
       "description": "Punto 3 del encargo de Pablo (2026-09-29, progress/brief_foto_logo_catalogo.md). La marca de la cabecera tiene dos estados publicados en un atributo consultable: «texto» (el actual «nails lash studio» en Gilda, horneado) y «caligrafia» («Nails Lash» en Great Vibes, la tipografía del rótulo del hero, SIN «STUDIO» — P3). Al hacer scroll y dejar de verse «STUDIO» bajo la cabecera, un vuelo FLIP suave lleva «Nails Lash» del hero a la esquina superior izquierda pasando de translúcido a opaco. Monótono: una vez acoplado se queda aunque se vuelva arriba (P2). Sin vuelo bajo prefers-reduced-motion. Nombre accesible del enlace intacto y hueco estable (sin CLS).",
       "acceptance": [
-        "Los 34 escenarios de features/logo_acoplado.feature verdes por TDD (los @verificacion-viva en Chrome real)",
+        "Los 41 escenarios de features/logo_acoplado.feature verdes por TDD (@s1-@s34 + ENMIENDA E-1 @s35-@s41; los @verificacion-viva en Chrome real)",
         "judge APROBADO",
         "Mutación al 100% sobre la lógica pura del acople",
         "Verificación en vivo: disparo al ocultarse STUDIO, vuelo visible, se queda al volver arriba, reduce-motion sin vuelo, móvil 320 px sin CLS"
@@ -509,7 +509,7 @@
       "mutable": true,
       "sdd": true,
       "status": "in_progress",
-      "puerta_humana": "Decisiones de Pablo por AskUserQuestion el 2026-09-29: P2 «Se queda la caligrafía», P3 «Solo Nails Lash». PUERTA HUMANA APROBADA el 2026-09-29 (AskUserQuestion: «Aprobado, empieza»): features/logo_acoplado.feature, 34 escenarios, con las LA-1..LA-16 y la ENMIENDA D-1 del lead."
+      "puerta_humana": "Decisiones de Pablo por AskUserQuestion el 2026-09-29: P2 «Se queda la caligrafía», P3 «Solo Nails Lash». PUERTA HUMANA APROBADA el 2026-09-29 (AskUserQuestion: «Aprobado, empieza»): features/logo_acoplado.feature, 34 escenarios, con las LA-1..LA-16 y la ENMIENDA D-1 del lead. ENMIENDA E-1 (cabecera móvil en una fila sin «Reservar», @s35-@s41): decisión de Pablo por AskUserQuestion el 2026-09-30; su puerta sobre los escenarios, pendiente."
     },
     {
       "id": 27,
