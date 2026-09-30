@@ -121,7 +121,8 @@
 # =============================================================================================
 #   ✅ Literales A MANO en los tests: "Nails Lash Studio", "Nails Lash", "-80 -840 4120 1200", "texto",
 #      "caligrafia", "no", "si", "-73px 0px 0px 0px", "325px", "-75px", "4", "0.9s",
-#      "cubic-bezier(0.45, 0, 0.25, 1)", "0.35", "0.4s", "2.5rem", "2.75rem", "var(--ink)".
+#      "cubic-bezier(0.45, 0, 0.25, 1)", "0.35", "0.4s", "2.5rem", "2.75rem", "var(--ink)"; y, por E-1,
+#      "430px", "display: none", "Reservar" y "#reserva-titulo".
 #   ❌ PROHIBIDO importar de producción NOMBRE, partirNombre, VISTA_MARCA ni ninguna constante del logo
 #      como VALOR ESPERADO (sí se sustituyen con vi.mock en @s4, que es lo contrario: prueba que se USAN).
 #   ❌ PROHIBIDO `toHaveClass` y aseverar por clase de CSS module (bajo `css: false` es una cadena con
@@ -186,6 +187,19 @@
 #   Acceptance de feature_list.json: «escenarios verdes por TDD» → @s1-@s26 y @s34 · «mutación al 100 %» → @s27 ·
 #   «verificación en vivo: disparo, vuelo visible, se queda al volver arriba, reduce sin vuelo, 320 px
 #   sin CLS» → @s29, @s29, @s30, @s31, @s32 (+ @s28, @s33) · «judge APROBADO» → fuera de este fichero.
+#
+#   ENMIENDA E-1 — «Una fila sin "Reservar"» (decisión FIRME de Pablo, AskUserQuestion, 2026-09-30):
+#     E-1-C1 (CSS puro en la MISMA hoja; el enlace sigue horneado; sin JS) → @s35, @s36, @s37, @s38
+#     E-1-C2 (el corte en 430 px) → @s35 (el literal) y @s39 (430 frente a 431 px, EN VIVO)
+#     E-1-C3 (accesibilidad y alternativas) → @s39 (árbol de accesibilidad y Tab), @s40 (el
+#             scroll-padding vuelve a cubrir la cabecera), @s41 (los tres caminos a la reserva) y @s19
+#             (sin pares de contraste nuevos: MINIMO_DE_PARES sigue en 18)
+#     E-1-C4 (verificación) → @s35, @s36, @s39; y @s32, que SOLO se cumple con E-1 (Then y comentario enmendados)
+#     Alternativas descartadas: (a) encoger logo, botón y márgenes → la cierra @s35 (el @media solo trae
+#     `.reservar` con `display: none`) · (b) mover «Reservar» al menú → la cierra @s36 (sigue fuera de la
+#     <ul>) · (c) dejar dos filas → la cierran @s32 y @s39.
+#   Acceptance: E-1 lleva el fichero a 41 escenarios. @s35-@s38 entran en «escenarios verdes por TDD» y
+#   @s39-@s41 en «verificación en vivo». El «34» de feature_list.json lo actualiza el lead.
 # =============================================================================================
 
 Feature: Logo acoplado — al dejar de verse «STUDIO», «Nails Lash» sube del hero, se encoge y se queda de logo en la esquina superior izquierda, sin mover la cabecera ni cambiar el nombre del enlace
