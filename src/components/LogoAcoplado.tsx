@@ -3,10 +3,21 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { partirNombre } from '../lib/partir-nombre'
 import { NOMBRE } from '../lib/site'
 import { VISTA_MARCA } from '../lib/trazo-marca'
+import {
+  debeVolar,
+  estadoTrasObservar,
+  margenDeRaiz,
+  transformacionFlip,
+  variablesDeVuelo,
+  type EstadoLogo,
+} from './logo-acoplado-logica'
 import estilos from './logo-acoplado.module.scss'
 
+/** Lo que hornea el SSG y con lo que nace cada montaje; sin JS, la marca se queda así (LA-C13). */
+const HORNEADO: EstadoLogo = 'texto'
+
 interface Acople {
-  logo: 'texto' | 'caligrafia'
+  logo: EstadoLogo
   /** Las custom properties del vuelo: existen SOLO si el logo llegó volando (data-vuelo="si"). */
   variables?: CSSProperties
 }
@@ -24,21 +35,23 @@ function vueloHacia(destino: Element, primeraObservacion: boolean): CSSPropertie
   }
 
   const origen = rotulo.getBoundingClientRect()
-  const final = destino.getBoundingClientRect()
+  const flip = transformacionFlip(origen, destino.getBoundingClientRect())
 
-  if (origen.width <= 0 || final.width <= 0) {
+  if (flip === null) {
     return undefined
   }
 
-  if (primeraObservacion || origen.bottom <= -window.innerHeight) {
+  const vuela = debeVolar({
+    primeraObservacion,
+    bordeInferiorOrigen: origen.bottom,
+    altoViewport: window.innerHeight,
+  })
+
+  if (!vuela) {
     return undefined
   }
 
-  return {
-    '--vuelo-x': `${origen.left - final.left}px`,
-    '--vuelo-y': `${origen.top - final.top}px`,
-    '--vuelo-escala': `${origen.width / final.width}`,
-  } as CSSProperties
+  return variablesDeVuelo(flip) as CSSProperties
 }
 
 /**
@@ -51,7 +64,7 @@ function vueloHacia(destino: Element, primeraObservacion: boolean): CSSPropertie
  */
 export function LogoAcoplado() {
   const { marca } = partirNombre(NOMBRE)
-  const [acople, setAcople] = useState<Acople>({ logo: 'texto' })
+  const [acople, setAcople] = useState<Acople>({ logo: HORNEADO })
   const enlace = useRef<HTMLAnchorElement>(null)
   const logo = useRef<SVGSVGElement>(null)
 
@@ -71,23 +84,33 @@ export function LogoAcoplado() {
 
     const observador = new IntersectionObserver(
       (entradas) => {
-        const entrada = entradas[0]
+        // Decide la ÚLTIMA entrada de la entrega; «primera» cuenta entregas, no entradas (D-4).
+        const entrada = entradas[entradas.length - 1]
         const primeraObservacion = primeraEntrega
         primeraEntrega = false
 
         const lineaDeCorte = entrada.rootBounds?.top ?? cabecera.getBoundingClientRect().bottom
+        // Solo escucha mientras la marca sigue en el horneado: al acoplar se desconecta.
+        const logoTrasEntrega = estadoTrasObservar(
+          HORNEADO,
+          entrada.boundingClientRect.bottom,
+          lineaDeCorte,
+        )
 
-        if (entrada.boundingClientRect.bottom > lineaDeCorte) {
+        if (logoTrasEntrega === HORNEADO) {
           return
         }
 
         observador.disconnect()
 
-        setAcople({ logo: 'caligrafia', variables: vueloHacia(logo.current!, primeraObservacion) })
+        setAcople({
+          logo: logoTrasEntrega,
+          variables: vueloHacia(logo.current!, primeraObservacion),
+        })
       },
       {
         threshold: 0,
-        rootMargin: `-${Math.floor(cabecera.getBoundingClientRect().height)}px 0px 0px 0px`,
+        rootMargin: margenDeRaiz(cabecera.getBoundingClientRect().height),
       },
     )
 

@@ -375,3 +375,92 @@ describe('@s19 la firma se pinta en --ink con Great Vibes, sin opacity en la bas
     expect(filasDelLogo).toHaveLength(1)
   })
 })
+
+describe('@s26 guardas de FUENTE: sin matchMedia, sin WAAPI, sin scroll, sin storage, sin red y sin el literal de la marca', () => {
+  const COMPONENTE = readFileSync('src/components/LogoAcoplado.tsx', 'utf8')
+  const LOGICA = readFileSync('src/components/logo-acoplado-logica.ts', 'utf8')
+  const FUENTES = [
+    ['LogoAcoplado.tsx', COMPONENTE],
+    ['logo-acoplado-logica.ts', LOGICA],
+  ] as const
+
+  /**
+   * DESVIACIÓN DECLARADA, A RATIFICAR por el lead (progress/tdd_logo_acoplado.md, @s26):
+   * VISTA_MARCA solo puede salir del módulo GENERADO `src/lib/trazo-marca.ts` (@s4, LA-15), y la
+   * ruta de su import contiene «trazo-marca». Se quita ese especificador, y SOLO ese, antes de
+   * buscar el id del rótulo.
+   */
+  const IMPORT_DE_LA_VISTA = "from '../lib/trazo-marca'"
+
+  it('@s26 ANCLAS POSITIVAS: el componente exporta LogoAcoplado, usa el observador, los dos atributos y la fuente única; la lógica exporta funciones', () => {
+    for (const ancla of [
+      'export function LogoAcoplado',
+      'IntersectionObserver',
+      'data-logo',
+      'data-vuelo',
+      'partirNombre',
+      'VISTA_MARCA',
+    ]) {
+      expect(COMPONENTE, ancla).toContain(ancla)
+    }
+    expect(LOGICA).toContain('export function')
+  })
+
+  it('@s26 ninguno de los dos usa matchMedia, WAAPI, View Transitions, scroll, storage, cookies ni red', () => {
+    for (const [nombre, fuente] of FUENTES) {
+      for (const vetado of [
+        'matchMedia',
+        '.animate(',
+        'requestAnimationFrame',
+        'startViewTransition',
+        'animation-timeline',
+        "'scroll'",
+        '"scroll"',
+        'localStorage',
+        'sessionStorage',
+        'document.cookie',
+        'fetch(',
+        'XMLHttpRequest',
+      ]) {
+        expect(fuente, `${nombre}: ${vetado}`).not.toContain(vetado)
+      }
+    }
+  })
+
+  it('@s26 ninguno de los dos escribe la marca, el viewBox ni los ids del rótulo (los comentarios también son bytes)', () => {
+    expect(COMPONENTE.split(IMPORT_DE_LA_VISTA)).toHaveLength(2)
+
+    for (const [nombre, fuente] of FUENTES) {
+      const sinElImportDeLaVista = fuente.replace(IMPORT_DE_LA_VISTA, '')
+
+      for (const vetado of ['Nails Lash', '-80 -840 4120 1200', 'tinta-marca', 'trazo-marca']) {
+        expect(sinElImportDeLaVista, `${nombre}: ${vetado}`).not.toContain(vetado)
+      }
+    }
+  })
+
+  it('@s26 el componente no trae aria-label, ni animation, ni dangerouslySetInnerHTML', () => {
+    for (const vetado of ['aria-label', 'animation', 'dangerouslySetInnerHTML']) {
+      expect(COMPONENTE, vetado).not.toContain(vetado)
+    }
+  })
+})
+
+describe('@s27 LogoAcoplado.tsx y logo-acoplado-logica.ts entran en `mutate` (la puntuación la mide el mutation_tester, no un test)', () => {
+  const STRYKER = JSON.parse(readFileSync('stryker.config.json', 'utf8')) as {
+    mutate: string[]
+    thresholds: { break: number }
+  }
+
+  function vecesEnMutate(fichero: string): number {
+    return STRYKER.mutate.filter((ruta) => ruta === fichero).length
+  }
+
+  it('@s27 mutate trae EXACTAMENTE una vez cada fichero nuevo y sigue trayendo Cabecera.tsx y Hero.tsx; thresholds.break sigue en 100', () => {
+    expect(STRYKER.mutate).toContain('src/components/Cabecera.tsx')
+    expect(STRYKER.mutate).toContain('src/components/Hero.tsx')
+    expect(vecesEnMutate('src/components/LogoAcoplado.tsx')).toBe(1)
+    expect(vecesEnMutate('src/components/logo-acoplado-logica.ts')).toBe(1)
+    expect(STRYKER.thresholds.break).toBe(100)
+  })
+})

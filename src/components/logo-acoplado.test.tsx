@@ -800,3 +800,47 @@ describe('@s23 en la home horneada sigue habiendo UN <h1>, el logo no es un enca
     expect(aperturaDelLogo(home)).not.toContain('href="#')
   })
 })
+
+describe('@s34 si una entrega trae VARIAS entradas decide la ÚLTIMA; «primera observación» es la primera ENTREGA, no la primera entrada (D-4)', () => {
+  const filas: readonly (readonly [
+    boolean,
+    readonly number[],
+    'texto' | 'caligrafia',
+    'si' | 'no',
+    string,
+  ])[] = [
+    [true, [400, 73], 'caligrafia', 'si', 'la última está sobre la línea: acopla y vuela'],
+    [true, [73, 400], 'texto', 'no', 'la última vuelve a verse: decide ella, no «alguna de ellas»'],
+    [
+      false,
+      [400, 12.5],
+      'caligrafia',
+      'no',
+      'dos entradas en la PRIMERA entrega: carga desplazada',
+    ],
+  ]
+
+  for (const [conEntregaInicial, bordes, logo, vuelo, caso] of filas) {
+    const antecedente = conEntregaInicial
+      ? 'tras una entrega inicial a la vista'
+      : 'entrega INICIAL'
+
+    it(`@s34 ${antecedente} · entradas ${bordes.join(' y luego ')} en UNA entrega → "${logo}"/"${vuelo}" (${caso})`, () => {
+      const io = stubDeIntersectionObserver()
+      fijarGeometria()
+      montar()
+
+      if (conEntregaInicial) {
+        io.entregar(entrada(400, true))
+      }
+      // isIntersecting no decide (@s6): se da el realista, tocar la línea ya es intersecar.
+      io.entregar(...bordes.map((bottom) => entrada(bottom, bottom >= LINEA_DEL_OBSERVADOR.top)))
+
+      const enlace = enlaceDeLaMarca()
+
+      expect(enlace).toHaveAttribute('data-logo', logo)
+      expect(enlace).toHaveAttribute('data-vuelo', vuelo)
+      expect(io.desconectar).toHaveBeenCalledTimes(logo === 'caligrafia' ? 1 : 0)
+    })
+  }
+})
