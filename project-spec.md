@@ -3471,3 +3471,158 @@ texto, de sobra para 3:1): sin fila nueva y vigilado. Decide el lead.
   panel usa el `ChatNailbot` idéntico al de `#reserva`.
 - **HS-17 → el anillo del lanzador pasa a `--accent-dark`** (par ya vigilado, sin fila nueva); el disco
   sigue blanco. Verificación visual en vivo.
+
+### Feature 28: `favicon_marca` — la «N» de la marca en la pestaña: tres iconos declarados en `index.html`, generados desde la fuente autoalojada, y ningún 404
+
+> Feature `#28`. **Fuente de verdad: `progress/brief_favicon_marca.md`** (§2 = FM-1/FM-2 del humano; §4 =
+> FM-3..FM-7 del lead; §5 = techo). Oráculo de geometría: `docs/research/favicon/aprobado-B.svg`. Conversación
+> conducida por el `craftsman_lead` (`AskUserQuestion`, 2026-09-30); aquí **FS-n** = hueco resuelto con hechos
+> del repo y **PA-28-n** = lo que solo decide Pablo. **Al integrar:** la PR #16 desciende de la base de esta
+> rama (`ba5b498`) y, de los ficheros que toca F-28, solo comparte `project-spec.md`, `feature_list.json` y
+> `progress/current.md` **[V: `git diff --name-only`]**: esta sección va detrás de la de F-27.
+
+#### Propósito
+
+Curar el **H-2** de la verificación en vivo de F-25: sin icono declarado, Chrome pide `/favicon.ico` en la
+**raíz del origen** (`https://cenit-digital.github.io/favicon.ico`, fuera de este repo) y la primera carga pinta
+un 404 en la consola. Bajo una subruta la única cura es **declarar** el icono; y ya que se declara, que sea la
+marca: la «N» de Great Vibes del rótulo del hero, en `--ink` sobre un cuadrado redondeado `--accent-soft`.
+
+#### Qué es y qué no
+
+- **Es:** tres `<link>` en `index.html`, tres ficheros en `public/` y su generador, `tools/favicon/generar.mjs`.
+- **No es** (brief §5): manifest e iconos PWA 192/512, `mask-icon`, `theme-color`, variante oscura, el
+  `/favicon.ico` de la raíz del origen de GitHub Pages (sitio de la organización), ni los 404 **ajenos** al
+  icono que salgan al verificar: se anotan como hallazgo, no se arreglan aquí (lista cerrada).
+
+#### Contrato
+
+**1. `index.html`**, dentro de `<head>`, **en este orden**. Se asevera **por atributos**, no por el literal:
+el orden de atributos y el `/>` que pone Prettier son libres.
+
+| #   | `rel`              | `href`                  | Además                 |
+| --- | ------------------ | ----------------------- | ---------------------- |
+| 1   | `icon`             | `/favicon.ico`          | `sizes="32x32"`        |
+| 2   | `icon`             | `/favicon.svg`          | `type="image/svg+xml"` |
+| 3   | `apple-touch-icon` | `/apple-touch-icon.png` | —                      |
+
+Los `href` van **sin** la base: el literal `/NailsLashStudioWeb/` vive solo en `vite.config.ts` y Vite lo
+antepone (brief, hecho 1). Ningún `href` empieza por la base ni por un esquema.
+
+**2. Los tres ficheros de `public/`** (Vite los copia tal cual a la raíz de `dist/`):
+
+- **`favicon.svg`**: raíz `<svg>` con `xmlns="http://www.w3.org/2000/svg"`; `viewBox`, `<rect>` (`x`, `y`,
+  `width`, `height`, `rx`) y `<path>` (`d`, `stroke-width="18"`, `stroke-linejoin="round"`) **idénticos como
+  cadena** a los de `aprobado-B.svg`; `fill` del rect = `--accent-soft`; `fill` y `stroke` del path = `--ink`.
+  **Autocontenido**: sin `<text>`, `<image>`, `<use>`, `<style>`, `<script>` ni `<foreignObject>`, sin `href`
+  ni `xlink:href`, sin `url(` ni `@import`; el único `http` es el del `xmlns`. (Un `<text>` no sirve: un SVG
+  usado como imagen no carga fuentes web **[NV]** y la «N» saldría en la del sistema.) Delante de `<svg>`, el
+  comentario «generado por `tools/favicon/generar.mjs`; no se edita a mano».
+- **`favicon.ico`**: cabecera ICO (reservado 0, tipo 1) con **exactamente 2** imágenes, 16×16 y 32×32; cada
+  una, un PNG completo (firma, IHDR con las medidas de su entrada, tipo de color 6 = RGBA) cuyos
+  desplazamiento y tamaño caben en el fichero. Las 4 esquinas, transparentes (alfa ≤ 25); el píxel central
+  del borde superior, `--accent-soft` opaco.
+- **`apple-touch-icon.png`**: PNG **180×180**, tipo de color **2** (RGB, **sin** alfa), **a sangre**: las 4
+  esquinas son `--accent-soft` exacto (iOS pone su máscara y pinta de negro lo transparente).
+
+**Paleta de los raster:** todo píxel con alfa > 0 es mezcla de `--accent-soft` y `--ink` (±2 por canal).
+**Geometría de los raster:** a 32 y 180 px, la caja de los píxeles «de tinta» (más cerca de `--ink` que de
+`--accent-soft`) coincide, ±1 px por lado, con la del glifo engrosada con medio trazo: x 12,42–87,52 %,
+y 20,27–79,67 % del lado → 32 px: x 3,98–28,00, y 6,49–25,49; 180 px: x 22,36–157,53, y 36,49–143,40 **[V:
+cálculo sobre `aprobado-B.svg`: puntos (−3, −795)–(1194, 148) ± 9 en un lado de 1618]**. A 16 px solo paleta
+y transparencia: con el antialias, la caja no es fiable.
+
+**3. Lo horneado.** Tras el `pnpm build` real que **ya** lanza `home-horneado.test.ts`, `dist/index.html` trae
+**exactamente un** `<link>` por fila, en el mismo orden, con `href` `/NailsLashStudioWeb/favicon.ico`,
+`…/favicon.svg` y `…/apple-touch-icon.png` escritos a mano (como `PREFIJO_DE_ASSETS` de @s39); y cada `href`,
+sin la base, es un fichero de `dist/` con **los mismos bytes** que su gemelo de `public/`.
+
+**4. El generador** (`node tools/favicon/generar.mjs`; sin script en `package.json`, fuera de la lista
+cerrada). Node puro, cero dependencias; lee la «N» de la woff de `@fontsource/great-vibes` y los dos colores de
+`_tokens.scss` (FS-4) y rasteriza **la misma** geometría que el SVG (brief FM-6.3), el 180 con el mismo
+`viewBox` y sin esquinas. Sin tests ni mutación propios (precedente `aplicador.mjs`): se verifican sus
+**salidas**. Pasa `format:check`; el `.svg` no entra, Prettier no le infiere parser **[V: `--file-info`]**.
+
+#### Modo de fallo
+
+Todo es **estático** y se decide en el commit: no hay rama de ejecución que falle. Un fichero borrado o un
+`<link>` quitado → rojo en bytes y en lo horneado (en producción: icono genérico y, sin `rel="icon"`, vuelve el
+404 de la raíz). Un token cambiado sin regenerar → rojo (FM-7); la cura es regenerar. El generador editado sin
+regenerar → **no se detecta** (se vigilan salidas, no la herramienta; mismo límite que `aplicador.mjs`). Un
+navegador sin SVG → usa el `.ico`; uno que no entienda ninguno → icono genérico, sin error.
+
+#### Casos límite
+
+1. **La base pasa a `/`** (dominio propio): la fuente no cambia; lo horneado pasa a `/favicon.svg`, y los
+   esperados a mano de F-28 se ponen rojos **junto a** los de @s39/@s42: cambiar la base es una decisión que
+   los actualiza todos. De premio, `/favicon.ico` existe en la raíz (FM-4).
+2. **`pnpm dev`**: Vite antepone la base también en desarrollo a los `href` root-absolutos de los `<link>` y
+   sirve `public/` bajo ella **[V: `processNodeUrl` y `DEFAULT_HTML_ASSET_SOURCES` de Vite 7.3.6; no medido
+   en vivo]**. No es escenario: `dev` no ejercita el SSG (I-8).
+3. **Rutas futuras o un `<Head>` con otro icono**: todas heredan la plantilla `index.html` **[I]**, y Helmet
+   no deduplica lo de ella **[V: nota T3 de `puerta-cascaron.test.ts`]**: lo caza el «exactamente un» de H1.
+4. **Pestaña clara**: el borde rosa casi se funde con el blanco; la «N» se lee. **Aceptado** por Pablo (FM-1):
+   no se «arregla» con un borde.
+5. **Máscara de iOS** (~22 % de radio): la tinta no entra en las esquinas; su punto más a la derecha está a
+   ~27 % de altura y el más alto, cerca del centro **[I: cálculo sobre el `d`]**. Android sin manifest puede
+   usar el `apple-touch-icon` cuadrado para un acceso directo **[I]**: se acepta.
+6. **Caché**: Chrome guarda los favicons aparte de la caché HTTP **[I]**: V1 usa perfil limpio, y un cambio
+   futuro del icono puede tardar en verse.
+
+#### Decisiones (con su porqué)
+
+| #    | Decisión                                                                                        | Descartada                                                                    | Porqué                                                                                                                                                                                                                           |
+| ---- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FM-1 | «N» de Great Vibes en `--ink` sobre cuadrado `--accent-soft`; trazo 18, margen 13 %, radio 20 % | A (blanca sobre tinta, la recomendada), C («NL»), D (blanca sobre `--accent`) | Pablo, sobre la hoja de 16/32 px reales. Precio: la pestaña clara (caso 4). Par ya vigilado: 5,98:1 en la matriz de F-03 **[V]**                                                                                                 |
+| FM-2 | SVG + ICO (16 y 32) + `apple-touch-icon` 180                                                    | Solo SVG; el juego PWA                                                        | Pablo. El ICO cubre navegadores sin SVG; el 180 es lo que pide iOS                                                                                                                                                               |
+| FM-3 | Declarado en `index.html`                                                                       | En el `<Head>` de `home.tsx`                                                  | Es del sitio, no de una página; no depende de hidratar; Vite le pone la base con el mismo mecanismo con que copia `public/`; y una sola fuente (caso 3)                                                                          |
+| FM-4 | En `public/`, nombres fijos                                                                     | Importados desde `src/`, con hash                                             | URLs estables; con base `/`, `/favicon.ico` queda donde lo piden a ciegas los rastreadores. Vite no los incrusta como `data:` (`noInlineLinkRels` **[V]**)                                                                       |
+| FM-5 | ICO con `sizes="32x32"`, luego SVG, luego Apple                                                 | `sizes="any"` en el ICO                                                       | Con `any`, Chrome prefiere el ICO **[NV: guía pública]**; y entre iconos igual de apropiados el HTML usa el **último** **[NV: HTML LS, `rel=icon`, de memoria]**: el SVG va detrás. Se mide en V1                                |
+| FM-6 | Generados por `tools/favicon/generar.mjs`                                                       | A mano; un rasterizador de npm                                                | Una sola fuente de la geometría y cero dependencias (brief, hecho 5)                                                                                                                                                             |
+| FM-7 | Colores contra `_tokens.scss`                                                                   | Hex a mano en el test                                                         | Si cambia un token, rojo hasta regenerar                                                                                                                                                                                         |
+| FS-1 | `sizes="32x32"` aunque el ICO lleve también 16                                                  | `sizes="16x16 32x32"`                                                         | `sizes` es pista de selección, no inventario: anunciar 16 invitaría a Chrome a coger el ICO a 1× en vez del SVG **[I]**. El inventario lo asevera el test del ICO                                                                |
+| FS-2 | Oráculo de geometría = `aprobado-B.svg`, **por atributos**                                      | Byte a byte; el `d` a mano en el test                                         | Separa geometría (lo que aprobó Pablo) de color (lo que dicta el token) y admite la cabecera. Obliga a **versionar `docs/research/favicon/`**, hoy sin seguimiento **[V: `git status`]**                                         |
+| FS-3 | Identidad SVG↔raster por construcción + caja de tinta ±1 px + cobertura en vivo                 | Re-rasterizar en el test                                                      | Sería el generador probándose a sí mismo (tautología). La caja fija posición y escala pero no ve el trazo (a 180 px, medio trazo es 1 px): para eso, V2                                                                          |
+| FS-4 | El generador lee también los tokens                                                             | Hex fijos en el generador                                                     | Con hex fijos, un cambio de token toca dos sitios; así basta regenerar (I-7)                                                                                                                                                     |
+| FS-5 | Los tests de bytes no importan nada de `src/`                                                   | Reutilizar `hexARgb` de `contraste.ts`                                        | Precedente `home-horneado.test.ts`: esperados a mano y ningún mutante «cubierto» por casualidad                                                                                                                                  |
+| FS-6 | F-05 no se enmienda                                                                             | Añadir `apple-touch-icon` a `KEYWORDS_DE_PETICION`                            | F-05 está `done` y fuera de la lista cerrada. Sus cegueras (no lee `.svg` **[V: `ES_HTML_O_CSS`]** y `apple-touch-icon` no es `icon` **[V]**) las cubren los tests de F-28. Deuda anotada por si un icono apunta fuera algún día |
+
+#### Convivencia con lo `done` (sin tocarlo)
+
+- **F-01** lee **todo** `dist/` como texto, binarios incluidos **[V]**: `aprobado-B.svg` da 0 coincidencias
+  de la familia teléfono **[V: medido]**, y un choque en un binario lo delataría @s14 (exit 0). **F-03**: sin
+  fila nueva. **F-06**: la puerta de anclas solo lee `<a>`, `<nav>` y `<section>` **[V]**.
+- **F-04**: la anti-404 solo lee `<a href>` **[V: `extraerEnlaces`]** y `horneado.ts` solo retira
+  `rel="preload"` de imagen o fuente **[V]**: los iconos sobreviven. **F-05**: `icon` cuenta como petición y
+  la ruta root-absoluta propia pasa **[V]** (FS-6).
+- **Hueco del brief:** el hecho 1 se midió con `vite build`, pero el build real es `vite-react-ssg build`
+  (jsdom + `onPageRendered`) **[V: `package.json`]**: H1 es la prueba en el pipeline de verdad.
+
+#### Cómo se verifica (≤ 10 escenarios, ≤ 2 en vivo, ningún build-based nuevo)
+
+Reparto orientativo; el `gherkin_author` puede fundir, nunca añadir:
+
+- **Bytes** (`src/pages/favicon-marca.test.ts`, nuevo, sin importar de `src/`): B1 los `<link>` de
+  `index.html`; B2 la geometría del SVG; B3 su autocontención, con ancla positiva (`xmlns` y `<path`); B4
+  colores contra tokens, en SVG y raster; B5 estructura y transparencia del ICO; B6 el `apple-touch-icon`; B7 la
+  caja de tinta a 32 y 180 px.
+- **Horneado** (añadido al `beforeAll` existente de `home-horneado.test.ts`): H1, el contrato 3.
+- **En vivo**, anotado en `progress/`. **V1**: `pnpm build`, `vite preview` y Chromium con perfil limpio en
+  `/NailsLashStudioWeb/`: cero 404 en consola, se pide `…/favicon.svg` y no `/favicon.ico`, y la pestaña
+  muestra la «N». Se demuestra su rojo quitando los `<link>`: vuelve el 404 (`vite preview` no sirve fuera de
+  la base **[I, se mide]**). Si Chrome pide el ICO, es hallazgo para la puerta, no un cambio de `sizes` a
+  ciegas. **V2**: Chromium dibuja `favicon.svg` a 16, 32 y 180 px, y la cobertura de tinta (Σ de la mezcla
+  hacia `--ink`) de cada raster no se aparta más de un 10 % de la suya. Calibración previa: el mismo cálculo
+  entre el SVG con y sin trazo tiene que separarse claramente más del 10 %; si no, V2 pasa a ser una
+  ampliación ×6 lado a lado que juzga Pablo.
+- **Tras publicar** (no es escenario): se repite V1 sobre GitHub Pages, donde nació el H-2.
+- **Mutación**: no aplica (nada de `mutate` se toca **[V: `stryker.config.json`]**), **declarado**. Sabotajes
+  manuales con su rojo demostrado: los siete del brief §6, más «desplazar la N en un raster» (B7) y
+  «rasterizar sin trazo» (V2).
+
+#### Preguntas abiertas de F-28
+
+- **PA-28-1 · ¿Hay un iPhone real para probar el `apple-touch-icon` («Añadir a pantalla de inicio»)?** Si no,
+  se declara **[NV]**. Recomendación: que no bloquee el `done`; los bytes (180×180, RGB, a sangre) son lo que
+  pide Apple, y el resto es la máscara del sistema. **RESUELTA por Pablo (2026-09-30): no hay iPhone; no
+  bloquea, se declara [NV].**
