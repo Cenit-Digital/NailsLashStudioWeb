@@ -163,3 +163,11 @@
   fila del `<body>` (`expected +0 not to be +0`); revertido con `git checkout` del fichero de producción,
   301 passed.
 - VERDE y REFACTOR: sin cambios de producción; `prettier --write` en el test (barras: 77).
+
+### C12 · @s56 (el informe con dos páginas: orden y ruta lógica)
+
+- Test: el listado da `dist/servicios/index.html` y luego `dist/index.html`; 5 líneas EXACTAS en orden.
+- Nace en VERDE (302 passed): las de hoy van delante (`[...inspeccionarSitio, ...violacionesDeLinks]`) y
+  los `<link>` se recorren con `flatMap` en el orden del listado y de aparición. SABOTAJE medido: con las
+  de los `<link>` DELANTE, 1 failed (`expected [ …(5) ] to deeply equal [ …(5) ]`); revertido, 302 passed.
+- VERDE y REFACTOR: sin cambios de producción.

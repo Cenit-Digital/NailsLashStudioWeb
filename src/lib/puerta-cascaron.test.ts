@@ -2313,3 +2313,40 @@ describe('ejecutarPuertaDelCascaron → el href de TODO <link>, sea cual sea su 
     ])
   })
 })
+
+describe('ejecutarPuertaDelCascaron → el informe con los <link>: primero las líneas de hoy, después una por <link> roto (@s56)', () => {
+  it('@s56 en el orden de las páginas que da el listado y, dentro de cada una, en el de aparición, con la ruta de la página', () => {
+    const servicios = conElementos(
+      htmlCrudo({ canonica: 'https://example.invalid/servicios' }),
+      '<link rel="icon" href="/NailsLashStudioWeb/vacio.svg">',
+    )
+    const home = conElementos(
+      htmlCrudo({ title: null }),
+      [
+        '<link rel="icon" href="/favicon.svg">',
+        '<link rel="icon" href="/NailsLashStudioWeb/favicon.svg">',
+        '<link rel="icon" href="/favicon.svg">',
+        '<link rel="stylesheet" href="/NailsLashStudioWeb/no-existe.css">',
+      ].join(''),
+    )
+
+    const resultado = ejecutarPuertaDelCascaron({
+      artefacto: artefactoCon(
+        { ubicacion: 'dist/servicios/index.html', contenido: servicios },
+        { ubicacion: 'dist/index.html', contenido: home },
+      ),
+      rutasEsperadas: ['/', '/servicios'],
+      base: BASE_DE_REFERENCIA,
+      ficheros: dobleDeLaLista().lista,
+    })
+
+    expect(resultado.codigoSalida).not.toBe(0)
+    expect(resultado.lineas).toEqual([
+      '/ — title ausente o vacío: ""',
+      '/servicios — link root-absoluto a un fichero de 0 bytes en dist/: "/NailsLashStudioWeb/vacio.svg"',
+      '/ — link root-absoluto sin el prefijo de la base: "/favicon.svg"',
+      '/ — link root-absoluto sin el prefijo de la base: "/favicon.svg"',
+      '/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/no-existe.css"',
+    ])
+  })
+})
