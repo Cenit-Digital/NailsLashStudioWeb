@@ -230,11 +230,20 @@ function atributosDe(texto: string): Atributos {
   return atributos
 }
 
-/** Los elementos `<etiqueta …>` del HTML crudo, sin distinguir mayúsculas en el nombre de la etiqueta. */
-function elementos(etiqueta: string): readonly Atributos[] {
+/**
+ * Los elementos `<etiqueta …>` de `fuente`, sin distinguir mayúsculas en el nombre de la etiqueta. F-04
+ * ENMIENDA 5 (H-5, excepción DECLARADA en el banner): recibe el TEXTO, para medir una COPIA del artefacto
+ * leída del disco (@s62, @s67, @s71 y @s72). Es el MISMO patrón de siempre: no hay un segundo.
+ */
+function elementosDe(fuente: string, etiqueta: string): readonly Atributos[] {
   const apertura = new RegExp(`<${etiqueta}(?=[\\s/>])([^>]*)>`, 'gi')
 
-  return [...html.matchAll(apertura)].map((encontrado) => atributosDe(encontrado[1]))
+  return [...fuente.matchAll(apertura)].map((encontrado) => atributosDe(encontrado[1]))
+}
+
+/** Los elementos `<etiqueta …>` del HTML crudo del artefacto ORIGINAL (el `html` del `beforeAll`). */
+function elementos(etiqueta: string): readonly Atributos[] {
+  return elementosDe(html, etiqueta)
 }
 
 /** Un valor enumerado de HTML (`type`, `rel`, `as`, `loading`) se compara sin distinguir mayúsculas. */
