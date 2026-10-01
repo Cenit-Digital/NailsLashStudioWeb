@@ -141,3 +141,14 @@
   `limpio.startsWith('/')` (acepta `//`), 1 failed, la fila `//cdn.ejemplo/x.css` (`expected 1 to be
   +0`); revertido (`git diff` de producción vacío), 283 passed.
 - VERDE y REFACTOR: sin cambios de producción.
+
+### C10 · @s54 (sin base, la ruta entera; una base sin barra final CORTA con la línea de la base; 6 filas)
+
+- Test: las 6 filas; la base de la fila es `SIN_BASE` (campo ausente), `{ base: null }` o declarada.
+- ROJO visto: 1 failed, la fila 6 (base `"/NailsLashStudioWeb"`): `expected [ Array(1) ] to deeply equal
+  [ Array(1) ]`, daba la regla 2 de `dist//favicon.svg`, la acusación falsa que S-12 evita. Las filas 1-5
+  nacen en VERDE: las cubre el verde de C7 (el prefijo `base ?? '/'`), que forzaron @s51 filas 5 y 8.
+- VERDE mínimo: el corte de S-12 con su línea EXACTA y la base TAL CUAL, antes de pedir la lista, solo
+  con la condición que pide la fila: `base !== null && !base.endsWith('/')` (las demás condiciones del
+  predicado y «solo con candidatos» las fuerza @s68). 289 passed; `tsc` 0.
+- REFACTOR: `prettier --write` (una firma de tipo y una fila; barras sin cambios: 77 y 66). En verde.

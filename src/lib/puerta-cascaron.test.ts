@@ -2226,3 +2226,51 @@ describe('ejecutarPuertaDelCascaron → lo que NO es root-absoluto no es de esta
     expect(resultado.lineas).toEqual([])
   })
 })
+
+describe('ejecutarPuertaDelCascaron → sin base declarada la ruta entera se resuelve; una base sin barra final CORTA con la línea de la base (@s54)', () => {
+  it.each<
+    readonly [base: BaseDeLaFila, href: string, codigo: CodigoEsperado, lineas: readonly string[]]
+  >([
+    [SIN_BASE, '/favicon.svg', 0, []],
+    [
+      SIN_BASE,
+      '/no-existe.svg',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/no-existe.svg"'],
+    ],
+    [
+      { base: null },
+      '/no-existe.svg',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/no-existe.svg"'],
+    ],
+    [
+      SIN_BASE,
+      '/vacio.svg',
+      FALLA,
+      ['/ — link root-absoluto a un fichero de 0 bytes en dist/: "/vacio.svg"'],
+    ],
+    [
+      SIN_BASE,
+      '/NailsLashStudioWeb/favicon.svg',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/favicon.svg"'],
+    ],
+    [
+      { base: '/NailsLashStudioWeb' },
+      '/NailsLashStudioWeb/favicon.svg',
+      FALLA,
+      [
+        'la base declarada no es una ruta root-absoluta acabada en / y hay elementos link root-absolutos que resolver: "/NailsLashStudioWeb"',
+      ],
+    ],
+  ])('@s54 base %j, %j → %s', (base, href, codigo, lineas) => {
+    const html = conElementos(htmlCrudo(), `<link rel="icon" href="${href}">`)
+
+    const resultado = puertaSobreLaHome(html, { ...base, ficheros: dobleDeLaLista().lista })
+
+    expect(extraerLinks(html)).toContain(href)
+    expect(enElContrato(resultado.codigoSalida)).toBe(codigo)
+    expect(resultado.lineas).toEqual(lineas)
+  })
+})

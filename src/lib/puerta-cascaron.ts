@@ -958,6 +958,15 @@ function inspeccionarArtefacto(peticion: PeticionPuertaCascaron): ResultadoPuert
       }))
     : []
 
+  if (base !== null && !base.endsWith('/')) {
+    return {
+      codigoSalida: CODIGO_FALLO,
+      lineas: [
+        `la base declarada no es una ruta root-absoluta acabada en / y hay elementos link root-absolutos que resolver: "${base}"`,
+      ],
+    }
+  }
+
   let ubicaciones = new Map<string, number>()
 
   if (ficheros !== undefined) {
