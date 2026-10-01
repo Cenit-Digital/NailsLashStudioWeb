@@ -2667,3 +2667,43 @@ describe('ejecutarPuertaDelCascaron → regla 5: un <link> a un fichero OCULTO f
     comprobarUnLink('icon', href, codigo, lineas)
   })
 })
+
+describe('ejecutarPuertaDelCascaron → basta UN <link> root-absoluto en CUALQUIER página del artefacto (@s66)', () => {
+  it.each<readonly [lista: string, ficheros: () => ListaDeFicheros | undefined, linea: string]>([
+    [
+      'la lista de referencia',
+      () => dobleDeLaLista().lista,
+      '/servicios — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/no-existe.css"',
+    ],
+    ['una petición que NO trae la lista de ficheros', () => undefined, LINEA_SIN_LA_LISTA],
+    [
+      'una lista de ficheros cuyo método LANZA',
+      listaQueLanza,
+      'la puerta del cascarón no pudo completar la inspección: EACCES: lista de prueba',
+    ],
+  ])('@s66 con %s', (_lista, ficheros, linea) => {
+    const home = htmlCrudo()
+    const servicios = conElementos(
+      htmlCrudo({ canonica: 'https://example.invalid/servicios' }),
+      '<link rel="stylesheet" href="/NailsLashStudioWeb/no-existe.css">',
+    )
+    const lista = ficheros()
+
+    const resultado = ejecutarPuertaDelCascaron({
+      artefacto: artefactoCon(
+        { ubicacion: 'dist/index.html', contenido: home },
+        { ubicacion: 'dist/servicios/index.html', contenido: servicios },
+      ),
+      rutasEsperadas: ['/', '/servicios'],
+      base: BASE_DE_REFERENCIA,
+      ...(lista === undefined ? {} : { ficheros: lista }),
+    })
+
+    expect([extraerLinks(home), extraerLinks(servicios)]).toEqual([
+      ['https://example.invalid/'],
+      ['https://example.invalid/servicios', '/NailsLashStudioWeb/no-existe.css'],
+    ])
+    expect(resultado.codigoSalida).not.toBe(0)
+    expect(resultado.lineas).toEqual([linea])
+  })
+})

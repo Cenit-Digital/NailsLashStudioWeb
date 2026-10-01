@@ -238,3 +238,12 @@
   segmentos, sin `slice(1)`), mirado DESPUÉS de «no está en la lista» y ANTES de los 0 bytes: el orden
   4-1-2-5-3 de la spec. 326 passed; `tsc` 0; `prettier` limpio.
 - REFACTOR: ninguno.
+
+### C18 · @s66 (basta UN candidato en CUALQUIER página; 3 filas)
+
+- Test: el listado da `dist/index.html` (sin candidatos) y `dist/servicios/index.html` (uno); con la
+  lista de referencia, sin ella y con la que lanza; ANCLA por página, exit ≠ 0 y la línea EXACTA.
+- Nacen en VERDE (329 passed): `candidatosDe` recorre TODAS las páginas y el corte mira
+  `candidatos.length > 0`. SABOTAJE medido (candidatos solo de la 1.ª página, `paginas.slice(0, 1)`):
+  4 failed, las 3 filas de @s66 y @s56; restaurado desde una copia, 329 passed.
+- VERDE y REFACTOR: sin cambios de producción.
