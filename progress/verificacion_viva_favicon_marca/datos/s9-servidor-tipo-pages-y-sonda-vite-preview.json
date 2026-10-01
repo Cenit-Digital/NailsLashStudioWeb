@@ -1,0 +1,525 @@
+{
+  "fecha": "2026-10-01T08:16:57.121Z",
+  "chrome": "%LOCALAPPDATA%/ms-playwright/chromium-1243/chrome-win64/chrome.exe",
+  "vitePreview": {
+    "listo": true,
+    "sondas": {
+      "/favicon.ico": {
+        "estado": 404,
+        "tipo": "text/plain"
+      },
+      "/NailsLashStudioWeb/favicon.svg": {
+        "estado": 200,
+        "tipo": "image/svg+xml"
+      },
+      "/NailsLashStudioWeb/favicon.ico": {
+        "estado": 200,
+        "tipo": "image/x-icon"
+      },
+      "/NailsLashStudioWeb/": {
+        "estado": 200,
+        "tipo": "text/html"
+      },
+      "/no-existe.png": {
+        "estado": 404,
+        "tipo": "text/plain"
+      },
+      "/NailsLashStudioWeb/no-existe.png": {
+        "estado": 200,
+        "tipo": "text/html"
+      }
+    }
+  },
+  "contraprueba": {
+    "quitados": [
+      "<link rel=\"icon\" href=\"/NailsLashStudioWeb/favicon.ico\" sizes=\"32x32\">",
+      "<link rel=\"icon\" href=\"/NailsLashStudioWeb/favicon.svg\" type=\"image/svg+xml\">",
+      "<link rel=\"apple-touch-icon\" href=\"/NailsLashStudioWeb/apple-touch-icon.png\">"
+    ],
+    "quedan": 0,
+    "visita": {
+      "url": "http://127.0.0.1:4182/NailsLashStudioWeb/",
+      "bounds": {
+        "left": 0,
+        "top": 0,
+        "width": 1280,
+        "height": 860,
+        "windowState": "normal"
+      },
+      "dpr": 1.5,
+      "dom": {
+        "titulo": "Nails Lash Studio · Uñas, pestañas y cejas en Las Rozas de Madrid",
+        "iconos": []
+      },
+      "registro": [
+        {
+          "t": 1790842623653,
+          "metodo": "GET",
+          "ruta": "/NailsLashStudioWeb/",
+          "estado": 200
+        },
+        {
+          "t": 1790842623669,
+          "metodo": "GET",
+          "ruta": "/NailsLashStudioWeb/assets/app-VyTVqhjc.css",
+          "estado": 200
+        },
+        {
+          "t": 1790842623671,
+          "metodo": "GET",
+          "ruta": "/NailsLashStudioWeb/assets/app-CrMVYeMq.js",
+          "estado": 200
+        },
+        {
+          "t": 1790842623671,
+          "metodo": "GET",
+          "ruta": "/NailsLashStudioWeb/assets/manrope-latin-400-normal-PaqtzbVb.woff2",
+          "estado": 200
+        },
+        {
+          "t": 1790842623671,
+          "metodo": "GET",
+          "ruta": "/NailsLashStudioWeb/assets/manrope-latin-500-normal-BYYD-dBL.woff2",
+          "estado": 200
+        },
+        {
+          "t": 1790842623675,
+          "metodo": "GET",
+          "ruta": "/NailsLashStudioWeb/assets/manrope-latin-600-normal-4f0koTD-.woff2",
+          "estado": 200
+        },
+        {
+          "t": 1790842623675,
+          "metodo": "GET",
+          "ruta": "/NailsLashStudioWeb/assets/manrope-latin-700-normal-BZp_XxE4.woff2",
+          "estado": 200
+        },
+        {
+          "t": 1790842623675,
+          "metodo": "GET",
+          "ruta": "/NailsLashStudioWeb/assets/gilda-display-latin-400-normal-gyfWcafy.woff2",
+          "estado": 200
+        },
+        {
+          "t": 1790842623676,
+          "metodo": "GET",
+          "ruta": "/NailsLashStudioWeb/assets/great-vibes-latin-400-normal-q5-78SH_.woff2",
+          "estado": 200
+        },
+        {
+          "t": 1790842623695,
+          "metodo": "GET",
+          "ruta": "/NailsLashStudioWeb/assets/client-B-sWTJ7X.js",
+          "estado": 200
+        },
+        {
+          "t": 1790842623880,
+          "metodo": "GET",
+          "ruta": "/favicon.ico",
+          "estado": 404
+        },
+        {
+          "t": 1790842623898,
+          "metodo": "GET",
+          "ruta": "/NailsLashStudioWeb/assets/servicio-unas-manicura-nude-1SL7l6RF.jpg",
+          "estado": 200
+        },
+        {
+          "t": 1790842623899,
+          "metodo": "GET",
+          "ruta": "/NailsLashStudioWeb/assets/servicio-facial-pestanas-BGNHbAat.jpg",
+          "estado": 200
+        }
+      ],
+      "red": [
+        {
+          "fase": "request",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/"
+        },
+        {
+          "fase": "response",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/",
+          "estado": 200
+        },
+        {
+          "fase": "request",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/app-CrMVYeMq.js"
+        },
+        {
+          "fase": "request",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/app-VyTVqhjc.css"
+        },
+        {
+          "fase": "request",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/manrope-latin-400-normal-PaqtzbVb.woff2"
+        },
+        {
+          "fase": "request",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/manrope-latin-500-normal-BYYD-dBL.woff2"
+        },
+        {
+          "fase": "request",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/manrope-latin-600-normal-4f0koTD-.woff2"
+        },
+        {
+          "fase": "request",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/manrope-latin-700-normal-BZp_XxE4.woff2"
+        },
+        {
+          "fase": "request",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/gilda-display-latin-400-normal-gyfWcafy.woff2"
+        },
+        {
+          "fase": "request",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/great-vibes-latin-400-normal-q5-78SH_.woff2"
+        },
+        {
+          "fase": "response",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/app-VyTVqhjc.css",
+          "estado": 200
+        },
+        {
+          "fase": "response",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/manrope-latin-400-normal-PaqtzbVb.woff2",
+          "estado": 200
+        },
+        {
+          "fase": "response",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/manrope-latin-500-normal-BYYD-dBL.woff2",
+          "estado": 200
+        },
+        {
+          "fase": "response",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/manrope-latin-600-normal-4f0koTD-.woff2",
+          "estado": 200
+        },
+        {
+          "fase": "response",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/manrope-latin-700-normal-BZp_XxE4.woff2",
+          "estado": 200
+        },
+        {
+          "fase": "response",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/gilda-display-latin-400-normal-gyfWcafy.woff2",
+          "estado": 200
+        },
+        {
+          "fase": "response",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/app-CrMVYeMq.js",
+          "estado": 200
+        },
+        {
+          "fase": "request",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/client-B-sWTJ7X.js"
+        },
+        {
+          "fase": "response",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/great-vibes-latin-400-normal-q5-78SH_.woff2",
+          "estado": 200
+        },
+        {
+          "fase": "response",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/client-B-sWTJ7X.js",
+          "estado": 200
+        },
+        {
+          "fase": "request",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/servicio-unas-manicura-nude-1SL7l6RF.jpg"
+        },
+        {
+          "fase": "request",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/servicio-facial-pestanas-BGNHbAat.jpg"
+        },
+        {
+          "fase": "response",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/servicio-unas-manicura-nude-1SL7l6RF.jpg",
+          "estado": 200
+        },
+        {
+          "fase": "response",
+          "url": "http://127.0.0.1:4182/NailsLashStudioWeb/assets/servicio-facial-pestanas-BGNHbAat.jpg",
+          "estado": 200
+        }
+      ],
+      "fallos": [],
+      "consola": [
+        {
+          "tipo": "error",
+          "texto": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "url": "http://127.0.0.1:4182/favicon.ico"
+        }
+      ],
+      "capturas": [
+        {
+          "out": "<carpeta-de-trabajo>\\s9-contraprueba-pestana.png",
+          "ok": true,
+          "salida": "ok printwindow=True ventana=1920x1290 recorte=780x135",
+          "err": ""
+        }
+      ]
+    }
+  },
+  "real": {
+    "url": "http://127.0.0.1:4181/NailsLashStudioWeb/",
+    "bounds": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 860,
+      "windowState": "normal"
+    },
+    "dpr": 1.5,
+    "dom": {
+      "titulo": "Nails Lash Studio · Uñas, pestañas y cejas en Las Rozas de Madrid",
+      "iconos": [
+        {
+          "rel": "icon",
+          "href": "/NailsLashStudioWeb/favicon.ico"
+        },
+        {
+          "rel": "icon",
+          "href": "/NailsLashStudioWeb/favicon.svg"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/NailsLashStudioWeb/apple-touch-icon.png"
+        }
+      ]
+    },
+    "registro": [
+      {
+        "t": 1790842618213,
+        "metodo": "GET",
+        "ruta": "/NailsLashStudioWeb/",
+        "estado": 200
+      },
+      {
+        "t": 1790842618230,
+        "metodo": "GET",
+        "ruta": "/NailsLashStudioWeb/assets/app-VyTVqhjc.css",
+        "estado": 200
+      },
+      {
+        "t": 1790842618230,
+        "metodo": "GET",
+        "ruta": "/NailsLashStudioWeb/assets/manrope-latin-400-normal-PaqtzbVb.woff2",
+        "estado": 200
+      },
+      {
+        "t": 1790842618231,
+        "metodo": "GET",
+        "ruta": "/NailsLashStudioWeb/assets/app-CrMVYeMq.js",
+        "estado": 200
+      },
+      {
+        "t": 1790842618231,
+        "metodo": "GET",
+        "ruta": "/NailsLashStudioWeb/assets/manrope-latin-500-normal-BYYD-dBL.woff2",
+        "estado": 200
+      },
+      {
+        "t": 1790842618233,
+        "metodo": "GET",
+        "ruta": "/NailsLashStudioWeb/assets/manrope-latin-600-normal-4f0koTD-.woff2",
+        "estado": 200
+      },
+      {
+        "t": 1790842618233,
+        "metodo": "GET",
+        "ruta": "/NailsLashStudioWeb/assets/manrope-latin-700-normal-BZp_XxE4.woff2",
+        "estado": 200
+      },
+      {
+        "t": 1790842618234,
+        "metodo": "GET",
+        "ruta": "/NailsLashStudioWeb/assets/gilda-display-latin-400-normal-gyfWcafy.woff2",
+        "estado": 200
+      },
+      {
+        "t": 1790842618234,
+        "metodo": "GET",
+        "ruta": "/NailsLashStudioWeb/assets/great-vibes-latin-400-normal-q5-78SH_.woff2",
+        "estado": 200
+      },
+      {
+        "t": 1790842618250,
+        "metodo": "GET",
+        "ruta": "/NailsLashStudioWeb/assets/client-B-sWTJ7X.js",
+        "estado": 200
+      },
+      {
+        "t": 1790842618402,
+        "metodo": "GET",
+        "ruta": "/NailsLashStudioWeb/assets/servicio-unas-manicura-nude-1SL7l6RF.jpg",
+        "estado": 200
+      },
+      {
+        "t": 1790842618402,
+        "metodo": "GET",
+        "ruta": "/NailsLashStudioWeb/assets/servicio-facial-pestanas-BGNHbAat.jpg",
+        "estado": 200
+      },
+      {
+        "t": 1790842618403,
+        "metodo": "GET",
+        "ruta": "/NailsLashStudioWeb/favicon.svg",
+        "estado": 200
+      }
+    ],
+    "red": [
+      {
+        "fase": "request",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/"
+      },
+      {
+        "fase": "response",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/",
+        "estado": 200
+      },
+      {
+        "fase": "request",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/app-CrMVYeMq.js"
+      },
+      {
+        "fase": "request",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/app-VyTVqhjc.css"
+      },
+      {
+        "fase": "request",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/manrope-latin-400-normal-PaqtzbVb.woff2"
+      },
+      {
+        "fase": "request",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/manrope-latin-500-normal-BYYD-dBL.woff2"
+      },
+      {
+        "fase": "request",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/manrope-latin-600-normal-4f0koTD-.woff2"
+      },
+      {
+        "fase": "request",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/manrope-latin-700-normal-BZp_XxE4.woff2"
+      },
+      {
+        "fase": "request",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/gilda-display-latin-400-normal-gyfWcafy.woff2"
+      },
+      {
+        "fase": "request",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/great-vibes-latin-400-normal-q5-78SH_.woff2"
+      },
+      {
+        "fase": "response",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/app-VyTVqhjc.css",
+        "estado": 200
+      },
+      {
+        "fase": "response",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/manrope-latin-400-normal-PaqtzbVb.woff2",
+        "estado": 200
+      },
+      {
+        "fase": "response",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/manrope-latin-500-normal-BYYD-dBL.woff2",
+        "estado": 200
+      },
+      {
+        "fase": "response",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/manrope-latin-600-normal-4f0koTD-.woff2",
+        "estado": 200
+      },
+      {
+        "fase": "response",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/manrope-latin-700-normal-BZp_XxE4.woff2",
+        "estado": 200
+      },
+      {
+        "fase": "response",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/app-CrMVYeMq.js",
+        "estado": 200
+      },
+      {
+        "fase": "request",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/client-B-sWTJ7X.js"
+      },
+      {
+        "fase": "response",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/gilda-display-latin-400-normal-gyfWcafy.woff2",
+        "estado": 200
+      },
+      {
+        "fase": "response",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/great-vibes-latin-400-normal-q5-78SH_.woff2",
+        "estado": 200
+      },
+      {
+        "fase": "response",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/client-B-sWTJ7X.js",
+        "estado": 200
+      },
+      {
+        "fase": "request",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/servicio-unas-manicura-nude-1SL7l6RF.jpg"
+      },
+      {
+        "fase": "request",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/servicio-facial-pestanas-BGNHbAat.jpg"
+      },
+      {
+        "fase": "request",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/favicon.svg"
+      },
+      {
+        "fase": "response",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/servicio-unas-manicura-nude-1SL7l6RF.jpg",
+        "estado": 200
+      },
+      {
+        "fase": "response",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/assets/servicio-facial-pestanas-BGNHbAat.jpg",
+        "estado": 200
+      },
+      {
+        "fase": "response",
+        "url": "http://127.0.0.1:4181/NailsLashStudioWeb/favicon.svg",
+        "estado": 200
+      }
+    ],
+    "fallos": [],
+    "consola": [],
+    "capturas": [
+      {
+        "out": "<carpeta-de-trabajo>\\s9-real-pestana.png",
+        "ok": true,
+        "salida": "ok printwindow=True ventana=1920x1290 recorte=780x135",
+        "err": ""
+      }
+    ]
+  },
+  "juicio": {
+    "real": {
+      "peticionesIcono": ["200 /NailsLashStudioWeb/favicon.svg"],
+      "svg200": true,
+      "raizFaviconIco": [],
+      "servidor404": [],
+      "red404": [],
+      "consola404": [],
+      "consolaErroresYAvisos": [],
+      "totalPeticionesServidor": 13
+    },
+    "contraprueba": {
+      "peticionesIcono": ["404 /favicon.ico"],
+      "svg200": false,
+      "raizFaviconIco": [404],
+      "servidor404": ["/favicon.ico"],
+      "red404": [],
+      "consola404": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found) @ http://127.0.0.1:4182/favicon.ico"
+      ],
+      "consolaErroresYAvisos": [
+        "[error] Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "totalPeticionesServidor": 13
+    }
+  }
+}

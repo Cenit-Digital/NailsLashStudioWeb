@@ -8,6 +8,11 @@
 > ni `pnpm build`, ni `harness`); ficheros creados solo por Bash; cada sabotaje se aplica, se mide, se
 > revierte con git checkout -- (fichero) y se comprueba `git status --porcelain` SIN ningún fichero
 > rastreado modificado antes del siguiente. Ningún test, `tools/`, `index.html` ni `public/` queda tocado.
+>
+> **Ronda 2 (@s8), 2026-10-01 10:16-10:24**, HEAD `93796fa` (lleva fusionado `origin/main` con #16 y #17/H-3).
+> SOLO `pnpm exec vitest run src/pages/home-horneado.test.ts`: su `beforeAll` hace el `pnpm build` REAL en un
+> temporal (`NLS_DIST_DIR`), nunca en `dist/`. Mismas reglas de reversión. Único fichero de código tocado:
+> `src/pages/home-horneado.test.ts`, SOLO AÑADIDO al final (+84 líneas; sin imports nuevos).
 
 ## 0. Verde de partida y de llegada
 
@@ -15,46 +20,61 @@
   `Duration 2.19s` (≈ 6,1 s de reloj con el arranque de pnpm).
 - [V] Llegada, tras los 56 runs de esta ronda (09:57): **40/40**, `Duration 2.34s`; `git status --porcelain`
   vacío.
+- [V] Ronda 2, `src/pages/home-horneado.test.ts` con @s8: partida (10:16) **42/42**, `Duration 12.52s`; llegada,
+  tras los sabotajes (10:23), **42/42**, `Duration 10.29s` (≈ 13 s de reloj con el `pnpm build` real, no
+  ~1 min). Después solo corrió 2a (10:24, §3.3: 42/42 con su sabotaje, revertido). En las 16 corridas de la
+  ronda no cayó NADA fuera de @s8: H-3 y el exit 0 de @s14 en verde en todas.
 
 ## 1. Mapa @s → test
 
-Fichero único de @s1-@s7: `src/pages/favicon-marca.test.ts` (no importa nada de `src/` ni el generador).
+@s1-@s7: `src/pages/favicon-marca.test.ts` (no importa nada de `src/` ni el generador). @s8:
+`src/pages/home-horneado.test.ts`, SOLO AÑADIDO al final, sobre el `html` y el `artefacto` (el `dist/`
+temporal) de su `beforeAll` EXISTENTE y con la extracción de F-04 @s40 (`elementos('link')` + `valorDe`), sin
+build, `beforeAll` ni extractor nuevos y sin importar de `src/`. A mano: el prefijo `"/NailsLashStudioWeb/"`
+(`PREFIJO_DE_LA_BASE`, como `PREFIJO_DE_ASSETS`), los tres `href`, `"32x32"` e `"image/svg+xml"`. El esperado de
+los bytes es el gemelo de `public/`: ningún byte ni hex escrito a mano.
 
-| @s  | `describe` (líneas) | `it` (nombre; en los `it.each`, la plantilla y sus casos)                                                                | nº     |
-| --- | ------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------ |
-| @s1 | 96-132              | ANCLA POSITIVA: EXACTAMENTE 3 `<link>` de icono en `<head>`, y EXACTAMENTE 3 en el fichero entero                        | 1      |
-|     |                     | el 1.º: rel "icon", href exactamente "/favicon.ico" y sizes "32x32"                                                      | 1      |
-|     |                     | el 2.º: rel "icon", href exactamente "/favicon.svg" y type "image/svg+xml"                                               | 1      |
-|     |                     | el 3.º: rel "apple-touch-icon" y href exactamente "/apple-touch-icon.png"                                                | 1      |
-|     |                     | ningún href empieza por "/NailsLashStudioWeb/" ni por "//", ni contiene ":"                                              | 1      |
-| @s2 | 174-213             | ANCLA POSITIVA: cada fichero tiene EXACTAMENTE un `<svg>`, un `<rect>` y un `<path>`                                     | 1      |
-|     |                     | ANCLA A MANO del oráculo: viewBox, rect y el principio y el fin de su d                                                  | 1      |
-|     |                     | el viewBox y los x, y, width, height y rx del `<rect>` son IDÉNTICOS, como cadena, a los del oráculo                     | 1      |
-|     |                     | el d del `<path>` es IDÉNTICO, como cadena, al del oráculo                                                               | 1      |
-|     |                     | el `<path>` lleva stroke-width "18" y stroke-linejoin "round"                                                            | 1      |
-| @s3 | 241-278             | ANCLA POSITIVA: contiene el xmlns del SVG y un "<path"                                                                   | 1      |
-|     |                     | contiene 0 veces <text, <image, <use, <style, <script y <foreignObject                                                   | 1      |
-|     |                     | contiene 0 veces "href", "url(" y "@import"                                                                              | 1      |
-|     |                     | contiene EXACTAMENTE 1 vez "http", y es la del xmlns                                                                     | 1      |
-|     |                     | antes de la primera "<svg" hay un comentario con "tools/favicon/generar.mjs" y "no se edita a mano"                      | 1      |
-| @s4 | 617-663             | ANCLA POSITIVA: \_tokens.scss declara EXACTAMENTE una vez --accent-soft: y --ink:, cada una #RRGGBB, y son DISTINTAS     | 1      |
-|     |                     | el fill del `<rect>` es --accent-soft y el fill y el stroke del `<path>` son --ink                                       | 1      |
-|     |                     | ANCLA POSITIVA: $nombre tiene $pixeles píxeles, al menos uno --accent-soft opaco y al menos uno de tinta (16, 32, Apple) | 3      |
-|     |                     | en $nombre, todo píxel con alfa > 0 es mezcla de --accent-soft y --ink (±2 por canal) (16, 32, Apple)                    | 3      |
-| @s5 | 682-741             | ANCLA POSITIVA: la cabecera tiene reservado 0, tipo 1 y EXACTAMENTE 2 entradas                                           | 1      |
-|     |                     | las medidas declaradas son una de 16×16 y otra de 32×32                                                                  | 1      |
-|     |                     | en cada entrada, desplazamiento + tamaño ≤ la longitud del fichero                                                       | 1      |
-|     |                     | la entrada de %i px es un PNG completo: firma, IHDR con SUS medidas, profundidad 8, tipo 6, … e IEND justo al final      | 2      |
-|     |                     | ANCLA POSITIVA: en el PNG de %i px, el píxel central del borde superior es --accent-soft opaco                           | 2      |
-|     |                     | en el PNG de %i px, las cuatro esquinas tienen alfa ≤ 25                                                                 | 2      |
-| @s6 | 745-780             | ANCLA POSITIVA: empieza por la firma PNG, su primer trozo es IHDR y el último es IEND, que acaba en el último byte       | 1      |
-|     |                     | su IHDR declara 180×180, profundidad 8, tipo de color 2 (RGB) y sin entrelazado                                          | 1      |
-|     |                     | no contiene ningún trozo "tRNS"                                                                                          | 1      |
-|     |                     | los píxeles (0, 0), (179, 0), (0, 179) y (179, 179) tienen EXACTAMENTE el RGB de --accent-soft                           | 1      |
-| @s7 | 817-841             | ANCLA POSITIVA: el raster de $lado px tiene al menos un píxel de tinta (32, 180)                                         | 2      |
-|     |                     | a $lado px la caja de tinta está a ±1 px de ($x0, $y0)–($x1, $y1) (32, 180)                                              | 2      |
-| @s8 | —                   | **PENDIENTE** (§5): irá en `src/pages/home-horneado.test.ts`, sobre el `beforeAll` existente                             | 0      |
-|     |                     | **Total del fichero**                                                                                                    | **40** |
+| @s  | `describe` (líneas)                | `it` (nombre; en los `it.each`, la plantilla y sus casos)                                                                                        | nº     |
+| --- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------ |
+| @s1 | 96-132                             | ANCLA POSITIVA: EXACTAMENTE 3 `<link>` de icono en `<head>`, y EXACTAMENTE 3 en el fichero entero                                                | 1      |
+|     |                                    | el 1.º: rel "icon", href exactamente "/favicon.ico" y sizes "32x32"                                                                              | 1      |
+|     |                                    | el 2.º: rel "icon", href exactamente "/favicon.svg" y type "image/svg+xml"                                                                       | 1      |
+|     |                                    | el 3.º: rel "apple-touch-icon" y href exactamente "/apple-touch-icon.png"                                                                        | 1      |
+|     |                                    | ningún href empieza por "/NailsLashStudioWeb/" ni por "//", ni contiene ":"                                                                      | 1      |
+| @s2 | 174-213                            | ANCLA POSITIVA: cada fichero tiene EXACTAMENTE un `<svg>`, un `<rect>` y un `<path>`                                                             | 1      |
+|     |                                    | ANCLA A MANO del oráculo: viewBox, rect y el principio y el fin de su d                                                                          | 1      |
+|     |                                    | el viewBox y los x, y, width, height y rx del `<rect>` son IDÉNTICOS, como cadena, a los del oráculo                                             | 1      |
+|     |                                    | el d del `<path>` es IDÉNTICO, como cadena, al del oráculo                                                                                       | 1      |
+|     |                                    | el `<path>` lleva stroke-width "18" y stroke-linejoin "round"                                                                                    | 1      |
+| @s3 | 241-278                            | ANCLA POSITIVA: contiene el xmlns del SVG y un "<path"                                                                                           | 1      |
+|     |                                    | contiene 0 veces <text, <image, <use, <style, <script y <foreignObject                                                                           | 1      |
+|     |                                    | contiene 0 veces "href", "url(" y "@import"                                                                                                      | 1      |
+|     |                                    | contiene EXACTAMENTE 1 vez "http", y es la del xmlns                                                                                             | 1      |
+|     |                                    | antes de la primera "<svg" hay un comentario con "tools/favicon/generar.mjs" y "no se edita a mano"                                              | 1      |
+| @s4 | 617-663                            | ANCLA POSITIVA: \_tokens.scss declara EXACTAMENTE una vez --accent-soft: y --ink:, cada una #RRGGBB, y son DISTINTAS                             | 1      |
+|     |                                    | el fill del `<rect>` es --accent-soft y el fill y el stroke del `<path>` son --ink                                                               | 1      |
+|     |                                    | ANCLA POSITIVA: $nombre tiene $pixeles píxeles, al menos uno --accent-soft opaco y al menos uno de tinta (16, 32, Apple)                         | 3      |
+|     |                                    | en $nombre, todo píxel con alfa > 0 es mezcla de --accent-soft y --ink (±2 por canal) (16, 32, Apple)                                            | 3      |
+| @s5 | 682-741                            | ANCLA POSITIVA: la cabecera tiene reservado 0, tipo 1 y EXACTAMENTE 2 entradas                                                                   | 1      |
+|     |                                    | las medidas declaradas son una de 16×16 y otra de 32×32                                                                                          | 1      |
+|     |                                    | en cada entrada, desplazamiento + tamaño ≤ la longitud del fichero                                                                               | 1      |
+|     |                                    | la entrada de %i px es un PNG completo: firma, IHDR con SUS medidas, profundidad 8, tipo 6, … e IEND justo al final                              | 2      |
+|     |                                    | ANCLA POSITIVA: en el PNG de %i px, el píxel central del borde superior es --accent-soft opaco                                                   | 2      |
+|     |                                    | en el PNG de %i px, las cuatro esquinas tienen alfa ≤ 25                                                                                         | 2      |
+| @s6 | 745-780                            | ANCLA POSITIVA: empieza por la firma PNG, su primer trozo es IHDR y el último es IEND, que acaba en el último byte                               | 1      |
+|     |                                    | su IHDR declara 180×180, profundidad 8, tipo de color 2 (RGB) y sin entrelazado                                                                  | 1      |
+|     |                                    | no contiene ningún trozo "tRNS"                                                                                                                  | 1      |
+|     |                                    | los píxeles (0, 0), (179, 0), (0, 179) y (179, 179) tienen EXACTAMENTE el RGB de --accent-soft                                                   | 1      |
+| @s7 | 817-841                            | ANCLA POSITIVA: el raster de $lado px tiene al menos un píxel de tinta (32, 180)                                                                 | 2      |
+|     |                                    | a $lado px la caja de tinta está a ±1 px de ($x0, $y0)–($x1, $y1) (32, 180)                                                                      | 2      |
+|     |                                    | **Total de `favicon-marca.test.ts`**                                                                                                             | **40** |
+| @s8 | 578-630 de `home-horneado.test.ts` | ANCLA POSITIVA: EXACTAMENTE 3 `<link>` cuyo rel, en tokens y sin distinguir mayúsculas, contiene "icon" o "apple-touch-icon"                     | 1      |
+|     |                                    | el 1.º: rel "icon", href exactamente "/NailsLashStudioWeb/favicon.ico" y sizes "32x32"                                                           | 1      |
+|     |                                    | el 2.º: rel "icon", href exactamente "/NailsLashStudioWeb/favicon.svg" y type "image/svg+xml"                                                    | 1      |
+|     |                                    | el 3.º: rel "apple-touch-icon" y href exactamente "/NailsLashStudioWeb/apple-touch-icon.png"                                                     | 1      |
+|     |                                    | el href del %i.º, sin "/NailsLashStudioWeb/", es un fichero del artefacto de más de 0 bytes y byte a byte IGUAL a su gemelo de public/ (1, 2, 3) | 3      |
+|     |                                    | **Total de @s8** (el fichero `home-horneado.test.ts` pasa de 35 a 42 `it`)                                                                       | **7**  |
+|     |                                    | **Total F-28 en tests de bytes y de horneado** (@s9 y @s10 son en vivo)                                                                          | **47** |
 
 Cada nombre de `it` lleva delante su etiqueta (`@s1 …`, `@s2 …`). @s9 y @s10 son EN VIVO (Chromium real):
 los anota el lead en `progress/verificacion_viva_favicon_marca.md`.
@@ -74,6 +94,22 @@ El TDD de @s1-@s7 lo avanzó otro actor antes de esta ronda (ver `progress/curre
 - [V] **Rojo de @s1**: `index.html` sustituido temporalmente por el de `ba5b498` (antes de F-28, sin los tres
   `<link>`; `git diff ba5b498 HEAD -- index.html` = 3 inserciones) → **5 rojos** (los 5 de @s1), 35 verdes.
   Revertido.
+
+### 2.1 Rojo → Verde de @s8 (ronda 2)
+
+El código de @s8 (los tres `<link>` de `index.html`, los tres ficheros de `public/` y la base de
+`vite.config.ts`) ya existía: el test se escribió primero y pasó a la primera (42/42, 10:16). Su Rojo se
+DEMUESTRA saboteando (§3.3, §4.1) y con el árbol de antes de F-28:
+
+- [V] **Rojo de partida** (`R-arbol-pre-F28`, 10:23): `index.html` de `ba5b498` (`git diff ba5b498 HEAD -- index.html`
+  = exactamente los tres `<link>`) y SIN los tres ficheros de `public/` → **7 rojos / 35 verdes**. Caen los 7 de
+  @s8 y SOLO ellos: el ancla («hallados: » vacío, 0 ≠ 3), los tres posicionales (no hay elemento) y los tres de
+  bytes (`href del n.º: ""`). El exit 0 de @s14 sigue VERDE: ninguna de las cinco puertas echa de menos el icono.
+  Revertido con git checkout -- index.html public/; `git status --porcelain` sin ellos.
+- [V] **Verde**: HEAD con el test → **42/42** (10:16 y, tras todos los sabotajes, 10:23).
+- [V] Cambios al test DURANTE la ronda, solo de mensaje (la aserción no cambia): el ancla lista los `href`
+  hallados (Vitest trunca el array a `[ …(2) ]`) y el `> 0 bytes` dice qué fichero. Los sabotajes afectados (1a,
+  E14) se REPITIERON con el texto final; las cifras de §3.3 y §4.1 son de esa repetición.
 
 ## 3. Sabotajes 1-8 (y el 9 para el lead)
 
@@ -159,6 +195,29 @@ variantes solo cae @s7; la paleta (@s4), las esquinas (@s5/@s6) y la estructura 
 
 La caja sin trazo a 180 px (23–156 × 38–142) es exactamente la que predijo la sonda del gherkin_author [I → V].
 
+### 3.3 Parte @s8 de los sabotajes 1 y 7 (ronda 2)
+
+**Comando de cada fila** (C8): `pnpm exec vitest run src/pages/home-horneado.test.ts --reporter=default
+--reporter=json --outputFile.json=<scratchpad>/s8/<etiqueta>.json`, que hace el `pnpm build` REAL de su
+`beforeAll` en un temporal. Reversión: git checkout -- (fichero) + `git status --porcelain` sin rastreados
+modificados → **sí** en TODAS. Scripts en `…/scratchpad/s8/`: `quitar-linea.mjs`, `revertir.sh`, `correr.sh`.
+
+| nº     | Etiqueta (C8)                    | Qué se hizo exactamente                                                                | Rojos /42 | `it` de @s8 en rojo                                                                                                                                                                                                                     | ¿Cae algo fuera de @s8?   | Revertido |
+| ------ | -------------------------------- | -------------------------------------------------------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- | --------- |
+| 1a-@s8 | `1a-sin-ico`                     | `index.html`: quitada la línea `<link rel="icon" href="/favicon.ico" sizes="32x32" />` | 5         | ANCLA («hallados: /NailsLashStudioWeb/favicon.svg · /NailsLashStudioWeb/apple-touch-icon.png», 2 ≠ 3), el 1.º (href …favicon.svg ≠ …favicon.ico), el 2.º (rel "apple-touch-icon" ≠ "icon"), el 3.º (no hay 3.º), el href del 3.º (`""`) | no (@s14 exit 0 en verde) | sí        |
+| 1b-@s8 | `1b-sin-svg`                     | `index.html`: quitada `<link rel="icon" href="/favicon.svg" type="image/svg+xml" />`   | 4         | ANCLA (…favicon.ico · …apple-touch-icon.png), el 2.º, el 3.º, el href del 3.º                                                                                                                                                           | no                        | sí        |
+| 1c-@s8 | `1c-sin-apple`                   | `index.html`: quitada `<link rel="apple-touch-icon" href="/apple-touch-icon.png" />`   | 3         | ANCLA (…favicon.ico · …favicon.svg), el 3.º, el href del 3.º                                                                                                                                                                            | no                        | sí        |
+| 7a-@s8 | `7a-borrar-favicon.ico`          | borrado de public/favicon.ico                                                          | 2         | el 1.º (href **"/favicon.ico"** ≠ "/NailsLashStudioWeb/favicon.ico"), el href del 1.º («href del 1.º: "/favicon.ico"»)                                                                                                                  | no                        | sí        |
+| 7b-@s8 | `7b-borrar-favicon.svg`          | borrado de public/favicon.svg                                                          | 2         | el 2.º (href "/favicon.svg"), el href del 2.º                                                                                                                                                                                           | no                        | sí        |
+| 7c-@s8 | `7c-borrar-apple-touch-icon.png` | borrado de public/apple-touch-icon.png                                                 | 2         | el 3.º (href "/apple-touch-icon.png"), el href del 3.º                                                                                                                                                                                  | no                        | sí        |
+
+**Resultado: la parte @s8 de los sabotajes 1 y 7 en rojo, 6/6.** Nada fuera de @s8 cayó en ninguna: el `pnpm
+build` sale con 0 en las seis (las cinco puertas no ven ni un `<link>` de menos ni un icono que falta, H-5).
+
+- [V] **Sabotaje 2 contra @s8** (el **[I]** del gherkin §2, «no se cuenta con ello»): `2a-base-svg`, `index.html`
+  con `href="/favicon.svg"` → `href="/NailsLashStudioWeb/favicon.svg"` → **42/42 verde**. El 2 solo lo caza @s1
+  (ronda 1, 2a-2c), H-6.
+
 ## 4. Sabotajes extra dirigidos (los opcionales del gherkin §3)
 
 Sirven para que ningún `Then` dependa solo de un ENOENT o de un `throw`. Mismo comando C y misma reversión.
@@ -184,19 +243,35 @@ declara EXACTAMENTE una vez --accent-soft: y --ink: …»**. Su sabotaje propues
 `--ink` en `src/styles/_tokens.scss`) NO se ha demostrado A PROPÓSITO: toca `src/`, y el lead y el arnés
 construyen en paralelo en este mismo directorio. Queda para el `judge` o el lead, si lo quieren.
 
+### 4.1 Ronda 2 (@s8): extra dirigidos
+
+Mismo comando C8 de §3.3. Existen porque en el sabotaje 7 el `it` de bytes cae en su GUARDA de prefijo (Vite deja
+el `href` sin la base), nunca en «existe», «> 0 bytes» ni «byte a byte igual» (H-5). E13-E15 mutan SOLO el
+artefacto TEMPORAL de la propia corrida (sin build nuevo, sin tocar el proyecto): un vigilante
+(`…/scratchpad/s8/mutar-artefacto.mjs`) espera al `nls-horneado-*/dist` que crea el `beforeAll` después de
+arrancar él (aborta si ve más de uno), aguarda a que el SSG haya escrito su `index.html` (con «ld+json») y muta
+el fichero mientras corren las cinco puertas, antes de los `it`.
+
+| nº  | Etiqueta (C8)                 | Qué se hizo exactamente                                                                             | Rojos /42 | `it` en rojo                                                                                                                                          | Revertido                               |
+| --- | ----------------------------- | --------------------------------------------------------------------------------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| E13 | `E1-artefacto-sin-svg`        | artefacto temporal: quitado `favicon.svg` (10:21:13; 2244 B → no existe)                            | 1         | @s8 el href del 2.º («favicon.svg en el artefacto: expected undefined to be true»): **«existe»**                                                      | n/a: temporal (lo retira el `afterAll`) |
+| E14 | `E2-artefacto-ico-vacio`      | artefacto temporal: `favicon.ico` a 0 bytes (10:22:13; 1148 B → 0)                                  | 1         | @s8 el href del 1.º («favicon.ico: bytes en el artefacto: expected 0 to be greater than 0»): **«> 0 bytes»**                                          | n/a: temporal                           |
+| E15 | `E3-artefacto-apple-alterado` | artefacto temporal: último byte de `apple-touch-icon.png` XOR 0xFF (10:21:40; 3682 B → 3682 B)      | 1         | @s8 el href del 3.º («apple-touch-icon.png: artefacto ≠ public/»): **«byte a byte IGUAL»**                                                            | n/a: temporal                           |
+| E16 | `E4-cuarto-icono`             | `index.html`: añadido, tras el apple-touch-icon, `<link rel="shortcut icon" href="/favicon.ico" />` | 1         | @s8 ANCLA («hallados: … · /NailsLashStudioWeb/favicon.ico», 4 ≠ 3): el `rel` se trocea en tokens; los posicionales siguen verdes (el 4.º va al final) | sí                                      |
+
+**Cobertura por `it` de @s8** [V, sobre los 14 informes JSON conservados de la ronda 2]: **7 de 7** caen con al
+menos un sabotaje: ANCLA (1a, 1b, 1c, E16) · el 1.º (1a, 7a) · el 2.º (1a, 1b, 7b) · el 3.º (1a, 1b, 1c, 7c) · el
+href del 1.º (7a, E14) · del 2.º (7b, E13) · del 3.º (1a, 1b, 1c, 7c, E15). Con la ronda 1: **46 de los 47** `it`
+de F-28 (sigue fuera el mismo de @s4).
+
 ## 5. PENDIENTE
 
-- **@s8** (`src/pages/home-horneado.test.ts`, SOLO AÑADIR, sobre el `beforeAll` y el `dist/` existentes, con
-  la extracción de F-04 @s40): NO existe aún; el lead decide su base (la PR #17 reescribe
-  `home-horneado.test.ts`). Con él quedan pendientes:
-  - la parte @s8 del **sabotaje 1** (quitar un `<link>` → @s8 «EXACTAMENTE 3» en `dist/index.html`);
-  - la parte @s8 del **sabotaje 7** (borrar un fichero de `public/` → el gemelo de `dist/` no existe);
-  - las dos exigen un `pnpm build` real, PROHIBIDO en esta ronda.
+- ~~@s8~~ HECHO en la ronda 2 (§1, §2.1, §3.3, §4.1), con la parte @s8 de los sabotajes 1 y 7.
 - **Sabotaje 9 = @s10** (en vivo, del lead): los raster sin trazo están en
   `…/scratchpad/sabotajes/sin-trazo/`, y la copia del generador en `gen-sin-trazo.mjs`. En bytes, solo los
   caza @s7 a 180 px; el ICO sin trazo solo lo puede cazar @s10 (H-2).
 - @s9 (en vivo, del lead).
-- No marco `done`: faltan @s8, el `judge` y la verificación en vivo. La mutación de Stryker NO aplica
+- No marco `done`: faltan el `judge` y la verificación en vivo (@s9, @s10). La mutación de Stryker NO aplica
   (declarado en el contrato); la compensan estos sabotajes.
 
 ## 6. HALLAZGOS
@@ -221,3 +296,26 @@ test. Lo que sigue es información para el lead y el `judge`:
 - **H-4 · Herramienta de sabotaje validada**: el re-codificado sin cambios da bytes idénticos a HEAD, y la
   copia de control del generador reproduce `public/` byte a byte. Los rojos de 6, 8 y 9 son, por tanto,
   del sabotaje y no del método.
+
+### Ronda 2 (@s8)
+
+- **H-5 · El sabotaje 7 reproduce el H-2 dentro del build, y las cinco puertas no lo ven** [V: 7a-7c]. Si el fichero
+  falta en `public/`, `vite-react-ssg build` deja el `href` SIN la base (`/favicon.ico`, la raíz del origen: el
+  404 del H-2 en GitHub Pages) y sale con 0: F-05 lo da por ruta propia y la anti-404 de F-04 solo lee los
+  enlaces `<a>`. En el pipeline del build solo lo caza @s8 (y, en bytes, @s2-@s7 por el fichero que falta).
+  Consecuencia para el test: en 7a-7c el `it` de bytes cae en su GUARDA de prefijo, no en «existe / > 0 /
+  igual»; esas tres aserciones solo las demuestran E13-E15 (§4.1), sobre el artefacto temporal.
+- **H-6 · El sabotaje 2 es invisible para @s8** [V: 2a-base-svg, 42/42]. Vite no reconoce
+  `/NailsLashStudioWeb/favicon.svg` como fichero de `public/` y lo deja tal cual, que es justo el `href` esperado,
+  y el fichero existe en el artefacto. Lo preveía el gherkin («no se cuenta con ello»): el 2 es de @s1.
+- **H-7 · «Uno por fila» lo guarda SOLO el ancla** [V: E16]. Un 4.º icono añadido al final deja verdes los tres
+  posicionales y los tres de bytes; cae el «EXACTAMENTE 3». Es lo que pide el contrato (caso límite 3).
+- **H-8 · Concurrencia con la verificación en vivo del lead.** Durante la ronda aparecieron, sin rastrear,
+  `docs/research/favicon/verificacion-viva/`, `progress/verificacion_viva_favicon_marca/` y
+  `progress/verificacion_viva_favicon_marca.md` (del lead; no los he tocado). Ventanas en que un fichero
+  RASTREADO estuvo saboteado (cada corrida dura 10-14 s): `index.html` ≈ 10:17:25-10:17:40 (1a, primera pasada),
+  10:18:06-10:18:49 (1a, 1b, 1c), 10:22:18-10:22:31 (E16), 10:22:58-10:23:11 (R) y 10:24:12-10:24:25 (2a);
+  `public/` 10:19:15-10:19:56 (7a, 7b, 7c) y 10:22:58-10:23:11 (R). Si alguna medida en vivo leyó `index.html` o
+  `public/`, o construyó, dentro de esas ventanas, conviene repetirla. El `dist/` del proyecto no lo tocó ninguna
+  corrida (H-3 en verde en las 16; `dist/index.html` sigue con mtime 10:12:48) y los ficheros restaurados son
+  los de HEAD (`git status --porcelain` sin ellos).

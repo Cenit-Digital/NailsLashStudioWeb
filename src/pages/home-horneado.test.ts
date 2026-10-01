@@ -544,3 +544,87 @@ describe.each(PUERTAS_QUE_LEEN_EL_ARTEFACTO)(
     )
   },
 )
+
+/**
+ * F-28 @s8 (`features/favicon_marca.feature`) — el prefijo con el que el HTML crudo apunta a la RAÍZ del
+ * artefacto (base "/NailsLashStudioWeb/"), A MANO como `PREFIJO_DE_ASSETS`: si la base pasa a `/` (caso
+ * límite 1), @s8 cae en rojo JUNTO a @s39/@s42, y es lo correcto.
+ */
+const PREFIJO_DE_LA_BASE = '/NailsLashStudioWeb/'
+
+const RELS_DE_ICONO: readonly string[] = ['icon', 'apple-touch-icon']
+
+/** @s8 — su `rel`, partido en tokens por espacios y sin distinguir mayúsculas, contiene un rel de icono. */
+function esIcono(link: Atributos): boolean {
+  const tokens = (valorDe(link, 'rel') ?? '').split(/\s+/)
+
+  return tokens.some((token) => RELS_DE_ICONO.includes(token))
+}
+
+/** @s8 — los `<link>` de icono del HTML crudo, con la MISMA extracción de @s40, en orden de documento. */
+function iconosHorneados(): readonly Atributos[] {
+  return elementos('link').filter(esIcono)
+}
+
+/**
+ * F-28 @s8 — tras el `pnpm build` REAL de este `beforeAll` (NINGÚN build ni `beforeAll` nuevo), el HTML
+ * crudo declara los tres iconos con la base, uno por fila y en el orden de `index.html` (@s1), y cada
+ * `href` sirve los MISMOS bytes que su gemelo de `public/`. Es la prueba en el pipeline de verdad
+ * (`vite-react-ssg build`, no `vite build`). El nombre del fichero sale del `href`, quitado el prefijo,
+ * NUNCA por glob; se lee bajo el artefacto de ESTE build (H-3), no bajo el `dist/` del proyecto. Ningún
+ * byte esperado se escribe a mano: el esperado es `public/`, lo que Vite copia tal cual. El exit 0 con los
+ * iconos lo sigue exigiendo @s14 (F-10): no se duplica.
+ */
+describe('@s8 (F-28) el HTML crudo de producción declara los tres iconos con la base, en orden, y cada href sirve los MISMOS bytes que su gemelo de public/', () => {
+  it('@s8 ANCLA POSITIVA: EXACTAMENTE 3 <link> cuyo rel, en tokens y sin distinguir mayúsculas, contiene "icon" o "apple-touch-icon"', () => {
+    // Uno por fila: un <Head> que añadiera otro icono lo pone rojo. El mensaje lista los href hallados.
+    const hrefs = iconosHorneados().map((link) => link.get('href'))
+
+    expect(hrefs, `hallados: ${hrefs.join(' · ')}`).toHaveLength(3)
+  })
+
+  it('@s8 el 1.º: rel "icon", href exactamente "/NailsLashStudioWeb/favicon.ico" y sizes "32x32"', () => {
+    const [ico] = iconosHorneados()
+
+    expect(valorDe(ico, 'rel')).toBe('icon')
+    expect(ico.get('href')).toBe('/NailsLashStudioWeb/favicon.ico')
+    expect(valorDe(ico, 'sizes')).toBe('32x32')
+  })
+
+  it('@s8 el 2.º: rel "icon", href exactamente "/NailsLashStudioWeb/favicon.svg" y type "image/svg+xml"', () => {
+    const [, svg] = iconosHorneados()
+
+    expect(valorDe(svg, 'rel')).toBe('icon')
+    expect(svg.get('href')).toBe('/NailsLashStudioWeb/favicon.svg')
+    expect(valorDe(svg, 'type')).toBe('image/svg+xml')
+  })
+
+  it('@s8 el 3.º: rel "apple-touch-icon" y href exactamente "/NailsLashStudioWeb/apple-touch-icon.png"', () => {
+    const [, , apple] = iconosHorneados()
+
+    expect(valorDe(apple, 'rel')).toBe('apple-touch-icon')
+    expect(apple.get('href')).toBe('/NailsLashStudioWeb/apple-touch-icon.png')
+  })
+
+  it.each([1, 2, 3])(
+    '@s8 el href del %i.º, sin "/NailsLashStudioWeb/", es un fichero del artefacto de más de 0 bytes y byte a byte IGUAL a su gemelo de public/',
+    (orden) => {
+      const href = iconosHorneados()[orden - 1]?.get('href') ?? ''
+
+      expect(href.startsWith(PREFIJO_DE_LA_BASE), `href del ${orden}.º: "${href}"`).toBe(true)
+
+      const nombre = href.slice(PREFIJO_DE_LA_BASE.length)
+      const enElArtefacto = statSync(join(artefacto, nombre), { throwIfNoEntry: false })
+
+      expect(enElArtefacto?.isFile(), `${nombre} en el artefacto`).toBe(true)
+      expect(enElArtefacto?.size, `${nombre}: bytes en el artefacto`).toBeGreaterThan(0)
+
+      // `equals`, no `toEqual`: un fallo no vuelca los bytes enteros en el informe.
+      const iguales = readFileSync(join(artefacto, nombre)).equals(
+        readFileSync(resolve('public', nombre)),
+      )
+
+      expect(iguales, `${nombre}: artefacto ≠ public/`).toBe(true)
+    },
+  )
+})

@@ -1,0 +1,78 @@
+{
+  "fecha": "2026-10-01T08:14:12.292Z",
+  "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+  "soft": "#F7DDE8",
+  "ink": "#8E3355",
+  "ficheros": {
+    "favicon.svg": {
+      "md5": "69ffa8c46fbeda00da75d0f40c277ca0",
+      "igualAlCommit": true
+    },
+    "favicon.ico": {
+      "md5": "907b23175ec72508a80af917023a6b2b",
+      "igualAlCommit": true
+    },
+    "apple-touch-icon.png": {
+      "md5": "b82343170913f7ef4a6fabbb2be072fc",
+      "igualAlCommit": true
+    }
+  },
+  "filas": [
+    {
+      "lado": 16,
+      "C_chromium_con": 28.123,
+      "C_chromium_sin": 19.546,
+      "C_raster": 27.25,
+      "sin_entre_con": 0.695,
+      "raster_entre_con": 0.969,
+      "calibracion_ok": true,
+      "raster_ok": true,
+      "pintados": 256,
+      "natural": [150, 150]
+    },
+    {
+      "lado": 32,
+      "C_chromium_con": 107.405,
+      "C_chromium_sin": 78.738,
+      "C_raster": 108.947,
+      "sin_entre_con": 0.7331,
+      "raster_entre_con": 1.0144,
+      "calibracion_ok": true,
+      "raster_ok": true,
+      "pintados": 1004,
+      "natural": [150, 150]
+    },
+    {
+      "lado": 180,
+      "C_chromium_con": 3439.26,
+      "C_chromium_sin": 2480.532,
+      "C_raster": 3448.371,
+      "sin_entre_con": 0.7212,
+      "raster_entre_con": 1.0026,
+      "calibracion_ok": true,
+      "raster_ok": true,
+      "pintados": 31380,
+      "natural": [150, 150]
+    }
+  ],
+  "sabotaje9": [
+    {
+      "lado": 16,
+      "C_raster_sin_trazo": 19.632,
+      "cociente": 0.6981,
+      "cazado": true
+    },
+    {
+      "lado": 32,
+      "C_raster_sin_trazo": 78.434,
+      "cociente": 0.7303,
+      "cazado": true
+    },
+    {
+      "lado": 180,
+      "C_raster_sin_trazo": 2482.25,
+      "cociente": 0.7217,
+      "cazado": true
+    }
+  ]
+}

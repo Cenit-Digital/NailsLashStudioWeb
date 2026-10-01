@@ -59,3 +59,26 @@ Rama `claude/favicon-marca` desde `origin/main` (ba5b498). **No** se toca la ram
 - PENDIENTE: @s8 (añadir lo horneado a `home-horneado.test.ts`) · suite completa + `pnpm build` 5 puertas ·
   `judge` · sabotajes manuales (brief §6, 9) · verificación en vivo @s9/@s10 en Chromium (`vite preview`) ·
   `progress/tdd_favicon_marca.md` con el mapa @s → test · PR a `main`.
+
+### 2026-10-01 — F-28: cierre del pipeline (lead)
+
+- Arranque: memoria organizacional sincronizada (25 patrones); aplicado
+  `testing/medicion-de-verificacion-lleva-su-propio-control-y-cuenta-lo-ejecutado` a la medida en vivo (cazó
+  una contraprueba ciega, ver `progress/verificacion_viva_favicon_marca.md` §5).
+- Decisiones de Pablo (AskUserQuestion, 2026-10-01): fusionar #17 y luego #16 en `main` y continuar F-28
+  encima; aprobar el despliegue de F-28 y repetir la prueba del 404 en la web publicada. Hecho: #17 →
+  `ff4c5ed`, #16 (tras llevarle `main` y su CI en verde) → `8b7c4c5`; los dos despliegues los aprobó Pablo.
+- `origin/main` fusionado en la rama (`93796fa`): 3 conflictos de documentación (`feature_list.json`,
+  `project-spec.md`, este fichero) resueltos por unión, F-25..F-27 antes que F-28.
+- `tdd_craftsman` ronda 1: 8/8 sabotajes de bytes en rojo (27 variantes, más 12 extra) y Rojo → Verde
+  reproducido (`progress/tdd_favicon_marca.md`, commit `a5af21b`). Ronda 2: @s8 en `home-horneado.test.ts`
+  sobre el artefacto TEMPORAL de #17 (7 `it`, 42/42 en el fichero), rojo con 6/6 sabotajes.
+- Verificación en vivo del lead (@s9, @s10 y sabotaje 9): `progress/verificacion_viva_favicon_marca.md`, con
+  capturas y guiones en `docs/research/favicon/verificacion-viva/`. `dist/` intacto tras 16 builds de tests
+  (H-3 de #17 confirmado en uso real).
+- Siguiente: `harness init` completo, `judge`, PR y CI, fusión, despliegue y medida DESPUÉS en la web.
+- 10:50: `judge` APPROVED (0 bloqueantes, 8 menores: 1-5 quedan como deuda en el `cierre`; 6-8 resueltos en
+  documentación: PR, datos crudos archivados, nota de las pasadas de @s10 y H-5 como deuda de F-05).
+  `harness init` en verde (1820/1820, 0 avisos); un falso rojo LOCAL de Prettier en `package.json` (CRLF en la
+  copia de trabajo desde julio, LF en git) se normalizó sin cambiar el contenido versionado. F-28 → `done`.
+  En curso: `harness verify` completo (mutación de los 37 ficheros de `stryker.config.json`).
