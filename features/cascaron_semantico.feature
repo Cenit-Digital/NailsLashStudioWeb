@@ -222,6 +222,85 @@
 # escenarios por bytes nacen en ROJO sobre los artefactos de hoy (con sus anclas ya en VERDE), y el `judge`.
 # =============================================================================================
 
+# =============================================================================================
+# ENMIENDA 5 (2026-10-01): TODO `<link>` ROOT-ABSOLUTO DEL ARTEFACTO RESUELVE, BAJO LA BASE, A UN
+# FICHERO NO VACÍO (H-5). @s1-@s45 SE PRESERVAN INTACTOS; SE AÑADEN @s46-@s64.
+# =============================================================================================
+# ORIGEN: el H-5 de `progress/tdd_favicon_marca.md` §6 (ronda 2) y la menor 8 de
+# `progress/judge_favicon_marca.md`, que el `cierre` de F-28 anotó como «deuda de F-05»
+# (`feature_list.json:549`). Fuente en la spec: `project-spec.md` §Feature 4 → «Enmienda 5
+# (2026-10-01)». Brief: `progress/brief_h5_enlaces_horneados.md`; verificación previa, que lo corrige en
+# 19 puntos y PREVALECE sobre sus §2-§6: `progress/verificacion_decisiones_h5.md`. Mapa escenario →
+# spec → mutante: `progress/gherkin_h5_enlaces_horneados.md`.
+#
+# EL HALLAZGO: si falta en `public/` un fichero que `index.html` enlaza en un `<link>` (hoy, los tres
+# iconos de F-28, `index.html:6-8`), `vite-react-ssg build` hornea el `href` SIN la base y sale con 0, y
+# ninguna de las cinco puertas de `pnpm build` lo ve: en GitHub Pages DE PROYECTO ese `href` pide fuera
+# del sitio, el 404 del H-2 que curó F-28. Lo hace el CÓDIGO de Vite 7.3.6, no su documentación («asset
+# references in your `.html` files are all automatically adjusted», sin condición): lee el `href` de
+# todo `<link>` sea cual sea su `rel` (config.js:23280-23300), solo le pone la base si encuentra el
+# fichero (:24037-24038) y, si no, devuelve la URL intacta (:23972-23978). TRES FIRMAS del mismo 404
+# (medidas del lead, Node 22, Windows, `NLS_DIST_DIR`; brief §2):
+#
+#   Caso                                            pnpm build  href horneado                    fichero
+#   (a) public/favicon.svg borrado                  0           /favicon.svg (SIN la base)       no existe
+#   (b) base escrita a mano en index.html, sin él   0           /NailsLashStudioWeb/favicon.svg  no existe
+#   (c) public/favicon.svg a 0 bytes                0           /NailsLashStudioWeb/favicon.svg  0 B
+#
+# Es DEFENSA EN PROFUNDIDAD: en el camino oficial la suite corre antes que `pnpm build`
+# (`deploy-pages.yml:51` y `:68`) y ya lo caza (F-28 @s2-@s8); con esta enmienda lo para el propio build,
+# también en una publicación que se salte la suite.
+#
+# QUIÉN LO DECIDE: el HUMANO (Pablo, AskUserQuestion, 2026-10-01 ~11:50; brief §8). H5-1 dueño F-04
+# (FS-6 de F-28 NO era argumento); H5-2 alcance: TODO `<link>` con `href` root-absoluto, sea cual sea su
+# `rel`, en todo HTML del artefacto, con «root-absoluto» definido tras la limpieza del navegador, y `/\`
+# falla cerrado; H5-3 resolución ESTRICTA (solo la raíz del artefacto va a `index.html`); H5-4 `%` y `&`
+# fallan cerrado con regla PROPIA, sin decodificar (falso positivo CONSCIENTE); H5-5 la lista de ficheros
+# entra como campo OPCIONAL de la petición, que falla cerrado si falta y hay algo que resolver (precedente
+# `base?`); H5-6 al terminar, fusionar, publicar y comprobar en la web publicada. Los huecos que §8 no
+# cierra (S-1..S-6) y los textos exactos de las reglas y las líneas los decidió el `spec_partner`, y SE
+# RATIFICAN EN ESTA PUERTA.
+#
+# QUÉ CAMBIA: la puerta del cascarón extrae el `href` de TODOS los `<link>` de TODAS las HTML del
+# artefacto, sobre el documento ENTERO y con el extractor de la canónica (`ENLACE` + `ATRIBUTO_HREF`,
+# `src/lib/puerta-cascaron.ts:72-74`); lo limpia como el navegador; y resuelve cada root-absoluto contra
+# la LISTA de ficheros del artefacto, por igualdad EXACTA y con su caja, nunca con `existsSync` (en
+# Windows el disco no distingue la caja, y `/NailsLashStudioWeb/FAVICON.SVG` da 404 en GitHub Pages,
+# medido). Cuatro reglas nuevas, una guarda anti-vacuidad del extractor nuevo y una línea de corte por
+# lista ausente: textos EXACTOS al principio de la sección de @s46, al final de este fichero.
+#
+# QUÉ NO CAMBIA: NINGÚN escenario anterior (@s1-@s45) se toca, ni una letra, ni ningún fixture o ayudante
+# de sus tests: la guarda nueva cuenta también la canónica, que todos llevan, y ninguno trae un `<link>`
+# root-absoluto (los dos de `puerta-cascaron.test.ts` van a `canonicaDeLaPagina`, no a la puerta).
+# Ninguna línea de hoy: ni el `✓` del humilde, ni el `✗` final, ni las de @s26-@s29, ni `href interno
+# sin fichero en dist/`. La anti-404 de `<a>` (A-17, @s23/@s24, @s36-@s38) sigue igual, @s37 incluido:
+# un `<a href="/otra-cosa">` bajo base sigue FUERA de esta puerta, y un `<link>` así es la regla 1. Esa
+# ASIMETRÍA está DECLARADA (@s47): Vite procesa el `href` de todo `<link>` y lo deja sin la base cuando
+# falta el fichero, así que en este stack un `<link>` root-absoluto sin la base es la firma (a), no un
+# hiperenlace a otro sitio. Tampoco cambian `inspeccionarSitio` (S-4), `ArtefactoDeProduccion` (F-06 no se
+# toca), `tools/artefacto.ts`, F-05, `vite.config.ts`, `index.html` ni `public/`. `feature_list.json` no
+# se toca (F-04 sigue `done`; mismo patrón que las ENMIENDAS 1-4); la «deuda de F-05» de su línea 549 la
+# reetiqueta el lead como deuda de F-04 al cerrar (H5-1).
+#
+# MUTABLE: la lógica vive en `src/lib/puerta-cascaron.ts` (ya en `mutate`), que se re-muta ENTERO al 100 %
+# y con 0 exclusiones; los tests unitarios de @s46-@s60 lo matan SOLOS, guarda y lista incluidas.
+# NO-MUTABLE, DECLARADO: el humilde `tools/puerta-cascaron.ts` (cablea la lista con `readdirSync`
+# recursivo y `statSync`, NUNCA `readFileSync`) y el extremo a extremo de @s61/@s62, build-based y fuera
+# de Stryker (`vitest.stryker.config.ts`). Su defensa: @s61/@s62, la demostración del lead (@s63) y el
+# `judge`.
+#
+# TAG NUEVO: `@demostracion-del-lead` (@s63): un rojo demostrado A MANO por el lead sobre el árbol y
+# anotado en `progress/`; no es un test. @s64 lleva `@verificacion-viva` (precedente: @s9 de
+# `favicon_marca.feature`): se hace sobre la web publicada, después de H5-6.
+#
+# HUECOS DECLARADOS (spec, «Huecos DECLARADOS»; ningún escenario los cierra): `href` relativos; URL
+# absolutas y `//host` (las de terceros son de F-05); `<script src>`, `<img src|srcset>`, `<source>` y
+# `url()` del CSS (hoy salen con hash y con la base); `fetch()` del JS; `<base href>`, que la puerta
+# ignora; comillas simples o sin comillas (teórico: `jsdom.serialize()` emite dobles); el umbral de 0
+# bytes (un icono truncado a 1 B pasa); el atributo `vite-ignore`, que la puerta no lee (la regla 1 acusa
+# su efecto); y otros controles C0 en los extremos del `href`, que el navegador recorta y la puerta no.
+# =============================================================================================
+
 # Contrato de la feature 4 (`cascaron_semantico`) de feature_list.json.
 # Destilado de project-spec.md → «Feature 4: cascaron_semantico — la cáscara HORNEADA, el JSON-LD
 # de cero y la puerta que mira dist/». Encarna T-6 («JSON-LD escrito de cero, sin aggregateRating»)
@@ -1907,3 +1986,488 @@ Feature: Cáscara semántica horneada, JSON-LD escrito de cero y la puerta que m
       | src/lib/trampas-del-horneado.test.tsx | del experimento "head-mayusculas" |
       | src/lib/trampas-del-horneado.test.tsx | del experimento "head-atributo"   |
       | src/lib/trampas-del-horneado.test.tsx | del experimento "head-correcto"   |
+
+  # ---------------------------------------------------------------------------
+  # La puerta mira también los <link>: todo href root-absoluto del artefacto resuelve, bajo la base, a
+  # un fichero no vacío (ENMIENDA 5, 2026-10-01, H-5)
+  # ---------------------------------------------------------------------------
+  # @s1-@s45 (arriba) NO SE TOCAN. Ver el banner ENMIENDA 5 de la cabecera de este fichero y
+  # `project-spec.md` §Feature 4 → «Enmienda 5 (2026-10-01)». Mapa escenario → spec → mutante, ciegos y
+  # traza: `progress/gherkin_h5_enlaces_horneados.md`.
+  #
+  # TRES GRUPOS, QUE NO SE MEZCLAN:
+  #   - @s46-@s60 · PUERTA PURA. Tests UNITARIOS en `src/lib/puerta-cascaron.test.ts` sobre
+  #     `ejecutarPuertaDelCascaron`, con dobles escritos A MANO: sin build, sin `node:fs`, sin jsdom. Son
+  #     los ÚNICOS que cuentan para la mutación (D10): matan SOLOS el 100 %, guarda y lista incluidas.
+  #   - @s61-@s62 · EXTREMO A EXTREMO (D9). Build-based, en `src/pages/home-horneado.test.ts`, sobre el
+  #     artefacto temporal que YA construye su `beforeAll` (H-3) y con su `correrPuerta` (:498-511).
+  #     NINGÚN build nuevo; fuera de Stryker.
+  #   - @s63 (`@demostracion-del-lead`) y @s64 (`@verificacion-viva`) · los hace el LEAD a mano y los
+  #     anota en `progress/`. NO son tests.
+  #
+  # LAS CUATRO REGLAS NUEVAS, con su texto EXACTO (entran en la lista de TODAS las reglas: @s60):
+  #   regla 1 · link root-absoluto sin el prefijo de la base                                 firma (a)
+  #   regla 2 · link root-absoluto sin fichero en dist/                                      firma (b)
+  #   regla 3 · link root-absoluto a un fichero de 0 bytes en dist/                          firma (c)
+  #   regla 4 · link root-absoluto con %, & o barra invertida, que la puerta no interpreta   H5-4, S-1, S-2
+  # LAS DOS LÍNEAS NUEVAS QUE NO SON REGLAS (texto EXACTO; cada una sale SOLA, sin `<ruta> —`):
+  #   corte por lista ausente (S-3):
+  #     la puerta no recibió la lista de ficheros del artefacto y hay elementos link root-absolutos que resolver
+  #   guarda del extractor nuevo:
+  #     no se inspeccionó ningún elemento link del artefacto: el extractor de href de link no encontró nada
+  # FORMATO de toda línea de regla, el de siempre (D8): `<ruta> — <regla>: "<valor>"`, con la raya
+  # U+2014. `<ruta>` es la ruta LÓGICA de la página que trae el `<link>`; `<valor>`, el `href` CRUDO, sin
+  # limpiar (S-6). Como mucho UNA línea por `<link>`: la de la primera regla que aplica, en el orden de la
+  # resolución ESTRICTA (4, luego 1, luego 2, luego 3).
+  #
+  # PARA EL `tdd_craftsman` (vale para @s46-@s60):
+  #   - «LA PÁGINA CORRECTA» es la de @s12/@s30: la que hoy devuelve `htmlCrudo()` sin opciones (lang
+  #     "es", title, description, la canónica "https://example.invalid/", un h1, main/nav/footer, el JSON-LD
+  #     BeautySalon y un `<a href="/">`, que bajo la base queda fuera por @s37). El `<link>` de cada fila se
+  #     le AÑADE en el `<head>`, salvo que la fila diga `<body>`. PROHIBIDO cambiar `htmlCrudo`,
+  #     `paginaCompleta`, `artefactoCon` o `ficheroDe` (spec: ningún fixture, ayudante ni escenario de
+  #     @s1-@s45 cambia): se inserta en el HTML que ya devuelven, o se escribe un ayudante NUEVO.
+  #   - «LA LISTA DE REFERENCIA» la devuelve el doble de la lista de ficheros (campo OPCIONAL de la
+  #     petición, H5-5; nombre orientativo `ficheros`), escrita A MANO, como `ubicación (bytes)`:
+  #       dist/index.html (1500) · dist/favicon.ico (1148) · dist/favicon.svg (2244) ·
+  #       dist/apple-touch-icon.png (3682) · dist/assets/app.css (5000) · dist/assets/manrope.woff2 (20000) ·
+  #       dist/vacio.svg (0) · dist/uno.svg (1) · dist/x/index.html (900)
+  #     SIN carpetas: ni `dist/x` ni `dist/assets` están en ella (la lista es de ficheros). Los tres iconos
+  #     llevan los bytes de `public/` [V: `ls -la public/`, 2026-10-01]; el resto es fixture, y solo
+  #     importa 0 frente a 1 o más.
+  #   - SALVO QUE EL ESCENARIO DIGA OTRA COSA: base "/NailsLashStudioWeb/", la lista de referencia
+  #     PRESENTE, un único HTML ("dist/index.html", ruta "/") y la lista de rutas esperadas ["/"].
+  #   - NOTACIÓN. `⟨U+XXXX⟩` dentro de un `href` es UN carácter con ese código (en el test, con su escape);
+  #     el resto es literal, y la barra invertida es UNA sola. `(ninguna)` = la lista de líneas está
+  #     VACÍA; una línea en la columna `lineas` = la lista tiene EXACTAMENTE esa línea, y ninguna más.
+  #   - ANCLA POSITIVA PRIMERO: el 1er `Then` aplica a ESA página el MISMO extractor de `href` de `<link>`
+  #     que usan las reglas y la guarda (puro y exportado para los tests, como ya lo está `extraerEnlaces`;
+  #     nombre orientativo `extraerLinks`) y exige el valor CRUDO de la fila. Sin él, una fila `(ninguna)`
+  #     pasaría EN VACÍO con un extractor que solo viera la canónica: la guarda no salta (cuenta 1) y no
+  #     queda ningún `<link>` que acusar.
+  #   - EL EXTRACTOR que se reutiliza es el de la canónica, `ENLACE` + `ATRIBUTO_HREF`
+  #     (`src/lib/puerta-cascaron.ts:72-74`), sobre el documento ENTERO, nunca sobre `cabezaDe`.
+  #     `inspeccionarSitio` no cambia de firma ni de salida (S-4).
+  #   - ESPERADOS A MANO: los textos de las reglas y de las líneas se escriben LITERALES en el test, NUNCA se
+  #     importan de `src/lib/puerta-cascaron.ts` (anti-tautología: ver la cabecera de este fichero).
+  #   - Nacen en ROJO con la puerta de hoy: toda fila que espera una línea nueva, todo ANCLA (el extractor
+  #     nuevo aún no existe) y el 2º `Then` de @s46. Lo que esperan las filas `(ninguna)` ya se cumple hoy y
+  #     se tiene que seguir cumpliendo: son los CONTROLES.
+
+  @s46
+  Scenario: CONTROL — una página con un <link> root-absoluto de cada clase que trae el artefacto real, todos con su fichero no vacío bajo la base, pasa la puerta
+    Given la página correcta, que además trae en su <head>, en este orden, <link rel="icon" href="/NailsLashStudioWeb/favicon.ico" sizes="32x32">, <link rel="icon" href="/NailsLashStudioWeb/favicon.svg" type="image/svg+xml">, <link rel="apple-touch-icon" href="/NailsLashStudioWeb/apple-touch-icon.png">, <link rel="stylesheet" crossorigin href="/NailsLashStudioWeb/assets/app.css"> y <link rel="preload" as="font" type="font/woff2" crossorigin href="/NailsLashStudioWeb/assets/manrope.woff2">
+    And la base declarada "/NailsLashStudioWeb/" y la lista de referencia, cuyo doble REGISTRA cada vez que la puerta la pide
+    When se ejecuta la puerta del cascarón sobre ese artefacto, con la lista de rutas esperadas ["/"]
+    Then (ANCLA) el extractor de href de <link> devuelve, de esa página, exactamente 6 valores: "https://example.invalid/" y, en este orden, "/NailsLashStudioWeb/favicon.ico", "/NailsLashStudioWeb/favicon.svg", "/NailsLashStudioWeb/apple-touch-icon.png", "/NailsLashStudioWeb/assets/app.css" y "/NailsLashStudioWeb/assets/manrope.woff2"
+    And el doble registra que la puerta pidió la lista de ficheros al menos 1 vez
+    And el código de salida es 0
+    And la lista de líneas del informe está vacía
+    # EL CAMINO FELIZ DE LA ENMIENDA, y no es decorativo: sin él, una puerta que acusara TODO `<link>`
+    # pasaría todos los escenarios negativos de aquí abajo y rompería el build para siempre. Es el control
+    # en verde de las reglas 1, 2 y 3 a la vez. El artefacto real trae 11 `<link>`: 3 iconos, 1
+    # `stylesheet`, 6 `preload` de fuente y la canónica absoluta (spec, inventario con la corrección 1 de la
+    # verificación); aquí va UNO de cada clase, con nombres de fixture escritos a mano. El 2º `Then` ancla
+    # que la puerta MIRÓ la lista: un «0 líneas» sin haberla pedido no es estar protegidos, es no mirar.
+
+  @s47
+  Scenario Outline: regla 1 — bajo una base declarada, un <link> root-absoluto SIN su prefijo falla cerrado, exista o no el fichero: "<href>"
+    Given la página correcta, que además trae en su <head> <link rel="icon" href="<href>">
+    And la base declarada "/NailsLashStudioWeb/" y la lista de referencia
+    When se ejecuta la puerta del cascarón sobre ese artefacto, con la lista de rutas esperadas ["/"]
+    Then (ANCLA) el extractor de href de <link> devuelve, de esa página, el valor "<href>"
+    And el código de salida es <codigo>
+    And las líneas del informe son exactamente: <lineas>
+
+    Examples:
+      | href                            | codigo        | lineas                                                                              | por qué                                                                                                                                                |
+      | /NailsLashStudioWeb/favicon.svg | 0             | (ninguna)                                                                           | CONTROL: con el prefijo y con su fichero (2244 B)                                                                                                      |
+      | /favicon.svg                    | distinto de 0 | / — link root-absoluto sin el prefijo de la base: "/favicon.svg"                    | LA FIRMA (a) DEL H-5, la que hornea Vite cuando falta el fichero. "dist/favicon.svg" SÍ está en la lista: la regla 1 habla del PREFIJO, no del fichero |
+      | /no-existe.svg                  | distinto de 0 | / — link root-absoluto sin el prefijo de la base: "/no-existe.svg"                  | SOLO la 1, nunca además la 2: sin el prefijo, la puerta no busca ningún fichero                                                                        |
+      | /vacio.svg                      | distinto de 0 | / — link root-absoluto sin el prefijo de la base: "/vacio.svg"                      | SOLO la 1, nunca la 3, aunque "dist/vacio.svg" tenga 0 B                                                                                               |
+      | /NailsLashStudioWeb             | distinto de 0 | / — link root-absoluto sin el prefijo de la base: "/NailsLashStudioWeb"             | la base SIN su barra final: GitHub Pages la redirige con un 301 (medido), pero la puerta es estricta (caso límite 3)                                   |
+      | /nailslashstudioweb/favicon.svg | distinto de 0 | / — link root-absoluto sin el prefijo de la base: "/nailslashstudioweb/favicon.svg" | el prefijo se compara LITERAL y con su caja (caso límite 4)                                                                                            |
+      | ⟨U+0020⟩/favicon.svg            | distinto de 0 | / — link root-absoluto sin el prefijo de la base: "⟨U+0020⟩/favicon.svg"            | limpio, es root-absoluto (caso límite 5); la línea lleva el valor CRUDO, con su espacio (S-6)                                                          |
+      | /otra-cosa/x.css                | distinto de 0 | / — link root-absoluto sin el prefijo de la base: "/otra-cosa/x.css"                | LA ASIMETRÍA 1, DECLARADA: un <a href> así bajo base queda FUERA de esta puerta (@s37, que no cambia); un <link> así es la firma (a)                   |
+    # «Sin el prefijo de la base» dice SOLO lo que la puerta sabe: NUNCA «no existe» (corrección 12 de la
+    # verificación). Por qué la asimetría con @s37 no es arbitraria: un `<a>` a la raíz del dominio puede
+    # ser un hiperenlace legítimo a otro sitio (el Pages de la organización), pero Vite procesa el `href`
+    # de TODO `<link>` y lo deja sin la base cuando falta el fichero (config.js:23280-23300 y
+    # :23972-23978): en este stack, un `<link>` root-absoluto sin la base ES la firma (a). Quien de verdad
+    # quiera apuntar fuera escribe una URL absoluta, y esa salida solo vale para los `rel` de hiperenlace
+    # (`canonical`, `alternate`): para uno de petición, F-05 la rechaza (su lista de permitidos es `[]`,
+    # `tools/puerta-terceros.ts:100`). Un `<link vite-ignore href="/x">` bajo base cae aquí, en la regla 1:
+    # la puerta no lee ese atributo, y su efecto es justo la firma (a).
+
+  @s48
+  Scenario Outline: regla 2 — con el prefijo, la ubicación que nombra el href tiene que estar, LITERAL y con su caja, en la lista de ficheros: "<href>"
+    Given la página correcta, que además trae en su <head> <link rel="stylesheet" href="<href>">
+    And la base declarada "/NailsLashStudioWeb/" y la lista de referencia
+    When se ejecuta la puerta del cascarón sobre ese artefacto, con la lista de rutas esperadas ["/"]
+    Then (ANCLA) el extractor de href de <link> devuelve, de esa página, el valor "<href>"
+    And el código de salida es <codigo>
+    And las líneas del informe son exactamente: <lineas>
+
+    Examples:
+      | href                                      | codigo        | lineas                                                                                   | por qué                                                                                                                    |
+      | /NailsLashStudioWeb/assets/app.css        | 0             | (ninguna)                                                                                | CONTROL: un fichero de una subcarpeta resuelve                                                                             |
+      | /NailsLashStudioWeb/favicon.svg?v=2       | 0             | (ninguna)                                                                                | CONTROL: la ?query se quita antes de buscar                                                                                |
+      | /NailsLashStudioWeb/favicon.svg#x         | 0             | (ninguna)                                                                                | CONTROL: el #fragmento también                                                                                             |
+      | /NailsLashStudioWeb/no-existe.svg         | distinto de 0 | / — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/no-existe.svg"         | LA FIRMA (b): con la base y sin fichero (el H-6 de F-28)                                                                   |
+      | /NailsLashStudioWeb/FAVICON.SVG           | distinto de 0 | / — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/FAVICON.SVG"           | la caja cuenta: en GitHub Pages da 404 (medido con curl -I), y en Windows un existsSync lo daría por bueno (caso límite 4) |
+      | /NailsLashStudioWeb/assets                | distinto de 0 | / — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/assets"                | una CARPETA que existe no es un fichero (caso límite 2)                                                                    |
+      | /NailsLashStudioWeb/./favicon.svg         | distinto de 0 | / — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/./favicon.svg"         | la puerta NO normaliza el segmento "." aunque el navegador sí: falla cerrado (caso límite 10)                              |
+      | /NailsLashStudioWeb/assets/../favicon.svg | distinto de 0 | / — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/assets/../favicon.svg" | ni el ".."                                                                                                                 |
+    # Por qué una LISTA y nunca `existsSync`: en Windows el sistema de ficheros no distingue la caja y
+    # escondería un 404 que GitHub Pages sí da (`/NailsLashStudioWeb/FAVICON.SVG` → 404, re-medido con
+    # `curl -I` por la verificación el 2026-10-01). El porqué es la MEDIDA, no «Pages corre en Linux»
+    # (corrección 8). La búsqueda es por igualdad EXACTA de cadenas sobre `dist/<resto>`.
+
+  @s49
+  Scenario Outline: regla 3 — el fichero existe pero pesa 0 bytes: "<href>"
+    Given la página correcta, que además trae en su <head> <link rel="icon" href="<href>">
+    And la base declarada "/NailsLashStudioWeb/" y la lista de referencia
+    When se ejecuta la puerta del cascarón sobre ese artefacto, con la lista de rutas esperadas ["/"]
+    Then (ANCLA) el extractor de href de <link> devuelve, de esa página, el valor "<href>"
+    And el código de salida es <codigo>
+    And las líneas del informe son exactamente: <lineas>
+
+    Examples:
+      | href                              | codigo        | lineas                                                                                       | por qué                                                                                                                      |
+      | /NailsLashStudioWeb/uno.svg       | 0             | (ninguna)                                                                                    | CONTROL: 1 byte pasa. El umbral es DECLARADO arbitrario: un icono truncado a 1 B pasaría                                     |
+      | /NailsLashStudioWeb/vacio.svg     | distinto de 0 | / — link root-absoluto a un fichero de 0 bytes en dist/: "/NailsLashStudioWeb/vacio.svg"     | LA FIRMA (c): Vite le pone la base porque el fichero EXISTE (tryStatSync(…).isFile() es cierto con 0 B, config.js:8096-8104) |
+      | /NailsLashStudioWeb/vacio.svg?v=2 | distinto de 0 | / — link root-absoluto a un fichero de 0 bytes en dist/: "/NailsLashStudioWeb/vacio.svg?v=2" | la ?query no cambia de fichero; la línea lleva el valor CRUDO                                                                |
+    # `.nojekyll` (0 B) no da falso positivo: el despliegue lo crea DESPUÉS de la puerta
+    # (`deploy-pages.yml:74`) y nada lo enlaza; esta regla solo mira ficheros a los que apunta un `<link>`.
+
+  @s50
+  Scenario Outline: regla 4 — un href con %, & o barra invertida falla cerrado con su PROPIA regla, sin decodificar y antes que las otras tres: "<href>"
+    Given la página correcta, que además trae en su <head> <link rel="icon" href="<href>">
+    And la base declarada "/NailsLashStudioWeb/" y la lista de referencia
+    When se ejecuta la puerta del cascarón sobre ese artefacto, con la lista de rutas esperadas ["/"]
+    Then (ANCLA) el extractor de href de <link> devuelve, de esa página, el valor "<href>"
+    And el código de salida es <codigo>
+    And las líneas del informe son exactamente: <lineas>
+
+    Examples:
+      | href                                        | codigo        | lineas                                                                                                                        | por qué                                                                                                                                                                                       |
+      | /NailsLashStudioWeb/favicon.svg?v=2#x       | 0             | (ninguna)                                                                                                                     | CONTROL: "?" y "#" no son "%", "&" ni la barra invertida                                                                                                                                      |
+      | /NailsLashStudioWeb/favicon%2Esvg           | distinto de 0 | / — link root-absoluto con %, & o barra invertida, que la puerta no interpreta: "/NailsLashStudioWeb/favicon%2Esvg"           | FALSO POSITIVO CONSCIENTE (H5-4): GitHub Pages SÍ la sirve (200, medido) y "dist/favicon.svg" existe, pero la puerta no decodifica                                                            |
+      | /NailsLashStudioWeb/favicon.svg?a=1&amp;b=2 | distinto de 0 | / — link root-absoluto con %, & o barra invertida, que la puerta no interpreta: "/NailsLashStudioWeb/favicon.svg?a=1&amp;b=2" | el "&" (jsdom.serialize() lo escribe "&amp;", medido) se busca en el href ENTERO, ?query incluida                                                                                             |
+      | /\cdn.ejemplo/x.css                         | distinto de 0 | / — link root-absoluto con %, & o barra invertida, que la puerta no interpreta: "/\cdn.ejemplo/x.css"                         | el navegador lo lee como OTRO host, igual que "//" (WHATWG #relative-slash-state; medido con new URL de Node 22.15.0: host "cdn.ejemplo")                                                     |
+      | /NailsLashStudioWeb\favicon.svg             | distinto de 0 | / — link root-absoluto con %, & o barra invertida, que la puerta no interpreta: "/NailsLashStudioWeb\favicon.svg"             | en la ruta, el navegador la lee como "/" (medido, Node 22.15.0) y pediría el favicon que SÍ existe: falso positivo consciente, como el "%". Sin S-2 caería en la regla 1, una acusación falsa |
+      | /favicon%2Esvg                              | distinto de 0 | / — link root-absoluto con %, & o barra invertida, que la puerta no interpreta: "/favicon%2Esvg"                              | SOLO la 4, nunca la 1: la 4 se mira PRIMERO                                                                                                                                                   |
+      | /NailsLashStudioWeb/no%20existe.svg         | distinto de 0 | / — link root-absoluto con %, & o barra invertida, que la puerta no interpreta: "/NailsLashStudioWeb/no%20existe.svg"         | SOLO la 4, nunca la 2                                                                                                                                                                         |
+    # Una sola regla para los tres caracteres (S-1): la misma causa, la puerta compara bytes y no
+    # decodifica ni normaliza; el valor de la línea ya enseña el carácter. Una FILA por carácter, para que
+    # quitar cualquiera de los tres de la regla rompa un test. La única fuente realista de "%" es un fichero
+    # de `public/` con "%" en el nombre (Vite decodifica el href antes de buscarlo y al reescribirlo solo
+    # escapa "%" como "%25", config.js:2699-2711 y :24037-24038), y se arregla renombrándolo. Hoy hay 0 "%"
+    # y 0 "&" en los href de los `<link>` del artefacto (verificación, pregunta 4).
+
+  @s51
+  Scenario Outline: solo la RAÍZ del artefacto se resuelve a index.html; cualquier otro href acabado en / o que nombre una carpeta falla cerrado: "<href>"
+    Given la página correcta, que además trae en su <head> <link rel="alternate" href="<href>">
+    And la base <base> y la lista de referencia
+    When se ejecuta la puerta del cascarón sobre ese artefacto, con la lista de rutas esperadas ["/"]
+    Then (ANCLA) el extractor de href de <link> devuelve, de esa página, el valor "<href>"
+    And el código de salida es <codigo>
+    And las líneas del informe son exactamente: <lineas>
+
+    Examples:
+      | base                             | href                             | codigo        | lineas                                                                | por qué                                                                                                                                                                                                                  |
+      | declarada "/NailsLashStudioWeb/" | /NailsLashStudioWeb/             | 0             | (ninguna)                                                             | LA RAÍZ: el resto vacío va a "dist/index.html". Es lo único documentado («the entry file must be at the top level») y medido (/NailsLashStudioWeb/ → 200), y la misma URL que @s37 acepta en un <a> (caso límite 1)      |
+      | ausente (sin base)               | /                                | 0             | (ninguna)                                                             | la raíz sin base (caso límite 1)                                                                                                                                                                                         |
+      | declarada "/NailsLashStudioWeb/" | /NailsLashStudioWeb/x/index.html | 0             | (ninguna)                                                             | CONTROL: el fichero nombrado ENTERO sí resuelve                                                                                                                                                                          |
+      | declarada "/NailsLashStudioWeb/" | /NailsLashStudioWeb/x/           | distinto de 0 | / — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/x/" | acabado en "/" y NO es la raíz: falla cerrado AUNQUE "dist/x/index.html" exista. Que GitHub Pages sirva <carpeta>/index.html en subcarpetas no está documentado (28 artículos revisados) ni medido (H5-3, caso límite 2) |
+      | ausente (sin base)               | /x/                              | distinto de 0 | / — link root-absoluto sin fichero en dist/: "/x/"                    | lo mismo sin base                                                                                                                                                                                                        |
+      | declarada "/NailsLashStudioWeb/" | /NailsLashStudioWeb/x            | distinto de 0 | / — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/x"  | una carpeta sin barra final. LA ASIMETRÍA 2, DECLARADA: en un <a>, con "dist/x/index.html", sería la ruta lógica "/x" y pasaría (@s38); en un <link>, la puerta mira FICHEROS                                            |
+    # Lo que el humano descartó (H5-3): «todo <carpeta>/ → <carpeta>/index.html», la del brief, que daría
+    # por bueno en un `<link>` lo que la anti-404 de `<a>` ya marca como roto; y «todo href acabado en / es
+    # violación», que contradiría a @s37. La asimetría 2 hoy es latente: `RUTAS_ESPERADAS = ['/']`.
+
+  @s52
+  Scenario Outline: antes de clasificarlo, el href se limpia como lo limpia el navegador, y la línea enseña el valor CRUDO: "<href>"
+    Given la página correcta, que además trae en su <head> <link rel="icon" href="<href>">
+    And la base declarada "/NailsLashStudioWeb/" y la lista de referencia
+    When se ejecuta la puerta del cascarón sobre ese artefacto, con la lista de rutas esperadas ["/"]
+    Then (ANCLA) el extractor de href de <link> devuelve, de esa página, el valor "<href>"
+    And el código de salida es <codigo>
+    And las líneas del informe son exactamente: <lineas>
+
+    Examples:
+      | href                                                            | codigo        | lineas                                                                                   | por qué                                                                                                 |
+      | ⟨U+0020⟩/NailsLashStudioWeb/favicon.svg⟨U+0020⟩                 | 0             | (ninguna)                                                                                | un espacio en cada extremo: jsdom 24.1.3 los conserva al serializar (medido) y el navegador los recorta |
+      | ⟨U+0020⟩⟨U+000C⟩/NailsLashStudioWeb/favicon.svg⟨U+000C⟩⟨U+0020⟩ | 0             | (ninguna)                                                                                | DOS por extremo: se recortan todos, no solo el primero                                                  |
+      | ⟨U+0009⟩/NailsLashStudioWeb/favicon.svg                         | 0             | (ninguna)                                                                                | tabulador en un extremo                                                                                 |
+      | /NailsLashStudioWeb/favicon.svg⟨U+000A⟩                         | 0             | (ninguna)                                                                                | salto de línea LF en un extremo                                                                         |
+      | ⟨U+000C⟩/NailsLashStudioWeb/favicon.svg                         | 0             | (ninguna)                                                                                | salto de página FF en un extremo                                                                        |
+      | /NailsLashStudioWeb/favicon.svg⟨U+000D⟩                         | 0             | (ninguna)                                                                                | retorno de carro CR en un extremo                                                                       |
+      | /NailsLashStudioWeb/fav⟨U+0009⟩icon.svg                         | 0             | (ninguna)                                                                                | un tabulador DENTRO también se quita                                                                    |
+      | /NailsLashStudioWeb/fav⟨U+000A⟩icon.svg                         | 0             | (ninguna)                                                                                | un LF dentro también                                                                                    |
+      | /NailsLashStudioWeb/fav⟨U+000D⟩icon.svg                         | 0             | (ninguna)                                                                                | un CR dentro también                                                                                    |
+      | ⟨U+0020⟩/NailsLashStudioWeb/no-existe.svg                       | distinto de 0 | / — link root-absoluto sin fichero en dist/: "⟨U+0020⟩/NailsLashStudioWeb/no-existe.svg" | se limpia para DECIDIR; la línea lleva el valor CRUDO (S-6)                                             |
+      | /NailsLashStudioWeb/fav⟨U+0020⟩icon.svg                         | distinto de 0 | / — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/fav⟨U+0020⟩icon.svg"   | un espacio DENTRO no se quita: el navegador pide ".../fav%20icon.svg" (medido, Node 22.15.0)            |
+      | /NailsLashStudioWeb/fav⟨U+000C⟩icon.svg                         | distinto de 0 | / — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/fav⟨U+000C⟩icon.svg"   | un FF DENTRO tampoco: solo se recorta en los extremos (el navegador pide ".../fav%0Cicon.svg", medido)  |
+    # LA LIMPIEZA (H5-2; spec, «Definición de root-absoluto», punto 1): se recortan de los extremos los
+    # espacios ASCII (U+0009, U+000A, U+000C, U+000D y U+0020) y se quitan TODOS los tabuladores y saltos de
+    # línea (U+0009, U+000A y U+000D), como el navegador (https://url.spec.whatwg.org/#concept-basic-url-parser).
+    # Sin ella, " /favicon.svg" pasaría por relativo: un falso negativo. Una fila por carácter y por sitio,
+    # para que quitar cualquiera de la limpieza rompa un test. Lo que la puerta NO recorta (otros controles
+    # C0, U+000B incluido) es un hueco DECLARADO por la spec y ningún escenario lo fija.
+
+  @s53
+  Scenario Outline: lo que NO es root-absoluto no es de esta puerta, y ni siquiera pide la lista de ficheros: <elemento>
+    Given la página correcta, que además trae en su <head> el elemento <elemento>
+    And la base declarada "/NailsLashStudioWeb/" y una petición que NO trae la lista de ficheros
+    When se ejecuta la puerta del cascarón sobre ese artefacto, con la lista de rutas esperadas ["/"]
+    Then (ANCLA) el extractor de href de <link> devuelve, de esa página, exactamente: <extraidos>
+    And el código de salida es 0
+    And la lista de líneas del informe está vacía
+
+    Examples:
+      | elemento                                                     | extraidos                                                    | por qué                                                                                                 |
+      | <link rel="stylesheet" href="//cdn.ejemplo/x.css">           | "https://example.invalid/" y "//cdn.ejemplo/x.css"           | "//" es OTRO host (https://url.spec.whatwg.org/#scheme-relative-url-string): es de F-05 (caso límite 6) |
+      | <link rel="stylesheet" href="https://example.invalid/x.css"> | "https://example.invalid/" y "https://example.invalid/x.css" | URL absoluta: fuera (las de terceros son de F-05; las propias no se resuelven contra el artefacto)      |
+      | <link rel="icon" href="favicon.svg">                         | "https://example.invalid/" y "favicon.svg"                   | relativa: hueco DECLARADO (hoy ningún <link> del artefacto lo es)                                       |
+      | <link rel="stylesheet" href="./x.css">                       | "https://example.invalid/" y "./x.css"                       | relativa                                                                                                |
+      | <link rel="stylesheet" href="../x.css">                      | "https://example.invalid/" y "../x.css"                      | relativa                                                                                                |
+      | <link rel="icon" href="">                                    | "https://example.invalid/" y ""                              | vacío: no es root-absoluto, pero SÍ cuenta para la guarda (@s59)                                        |
+      | <link rel="icon">                                            | solo "https://example.invalid/"                              | sin href: ni se clasifica ni cuenta                                                                     |
+    # Sin la lista de ficheros A PROPÓSITO: si alguno de estos se tomara por root-absoluto, la puerta
+    # cortaría con la línea de la lista ausente (@s57) en vez de salir con 0. La fila de "//" mata el
+    # criterio que aceptara "//" como root-absoluto (el de `RUTA_INTERNA`, :561, lo excluye).
+
+  @s54
+  Scenario Outline: sin base declarada la ruta entera se resuelve y la regla 1 no aplica nunca; una base sin barra final falla cerrado, nunca abierto: "<href>"
+    Given la página correcta, que además trae en su <head> <link rel="icon" href="<href>">
+    And la base <base> y la lista de referencia
+    When se ejecuta la puerta del cascarón sobre ese artefacto, con la lista de rutas esperadas ["/"]
+    Then (ANCLA) el extractor de href de <link> devuelve, de esa página, el valor "<href>"
+    And el código de salida es <codigo>
+    And las líneas del informe son exactamente: <lineas>
+
+    Examples:
+      | base                                              | href                            | codigo        | lineas                                                                         | por qué                                                                                                                                                                             |
+      | ausente (campo ausente)                           | /favicon.svg                    | 0             | (ninguna)                                                                      | CONTROL: sin base, "/favicon.svg" va a "dist/favicon.svg" (2244 B)                                                                                                                  |
+      | ausente (campo ausente)                           | /no-existe.svg                  | distinto de 0 | / — link root-absoluto sin fichero en dist/: "/no-existe.svg"                  | la 2 y NUNCA la 1: sin base no hay prefijo que exigir (caso límite 12)                                                                                                              |
+      | ausente (campo a null)                            | /no-existe.svg                  | distinto de 0 | / — link root-absoluto sin fichero en dist/: "/no-existe.svg"                  | null significa lo mismo que el campo ausente (precedente `base?`)                                                                                                                   |
+      | ausente (campo ausente)                           | /vacio.svg                      | distinto de 0 | / — link root-absoluto a un fichero de 0 bytes en dist/: "/vacio.svg"          | la 3 también sin base                                                                                                                                                               |
+      | ausente (campo ausente)                           | /NailsLashStudioWeb/favicon.svg | distinto de 0 | / — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/favicon.svg" | sin base, el prefijo es una carpeta más: "dist/NailsLashStudioWeb/favicon.svg" no está                                                                                              |
+      | declarada "/NailsLashStudioWeb" (sin barra final) | /NailsLashStudioWeb/favicon.svg | distinto de 0 | / — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/favicon.svg" | la puerta no valida la base (es de F-05, @s27 de cero_terceros.feature): el resto "/favicon.svg" busca "dist//favicon.svg", que no está. Falla CERRADA, no abierta (caso límite 16) |
+
+  @s55
+  Scenario Outline: la puerta resuelve el href de TODO <link>, sea cual sea su rel, la caja de la etiqueta o su sitio en el documento: <elemento> en el <sitio>
+    Given la página correcta, que además trae en su <sitio> el elemento <elemento>
+    And la base declarada "/NailsLashStudioWeb/" y la lista de referencia
+    When se ejecuta la puerta del cascarón sobre ese artefacto, con la lista de rutas esperadas ["/"]
+    Then (ANCLA) el extractor de href de <link> devuelve, de esa página, el valor "/NailsLashStudioWeb/no-existe"
+    And el código de salida es distinto de 0
+    And las líneas del informe son exactamente: / — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/no-existe"
+
+    Examples:
+      | sitio  | elemento                                                                  | por qué                                                                                                                          |
+      | <head> | <link rel="icon" href="/NailsLashStudioWeb/no-existe">                    | icono, como los de F-28                                                                                                          |
+      | <head> | <link rel="apple-touch-icon" href="/NailsLashStudioWeb/no-existe">        | F-05 ni siquiera lo trata como petición: aquí sí se resuelve                                                                     |
+      | <head> | <link rel="stylesheet" href="/NailsLashStudioWeb/no-existe">              | hoja de estilo                                                                                                                   |
+      | <head> | <link rel="preload" as="font" href="/NailsLashStudioWeb/no-existe">       | precarga                                                                                                                         |
+      | <head> | <link rel="modulepreload" href="/NailsLashStudioWeb/no-existe">           | precarga de módulo                                                                                                               |
+      | <head> | <link rel="manifest" href="/NailsLashStudioWeb/no-existe">                | manifiesto                                                                                                                       |
+      | <head> | <link rel="alternate" hreflang="en" href="/NailsLashStudioWeb/no-existe"> | rel de hiperenlace; "hreflang" va ANTES y no confunde al extractor                                                               |
+      | <head> | <link rel="canonical" href="/NailsLashStudioWeb/no-existe">               | una SEGUNDA canónica, root-absoluta: rel de hiperenlace, se resuelve igual (para apuntar fuera, URL absoluta: asimetría 1, @s47) |
+      | <head> | <link rel="x-nls-inventado" href="/NailsLashStudioWeb/no-existe">         | un rel que no existe                                                                                                             |
+      | <head> | <link href="/NailsLashStudioWeb/no-existe">                               | sin rel                                                                                                                          |
+      | <head> | <LINK REL="icon" HREF="/NailsLashStudioWeb/no-existe">                    | en mayúsculas: el extractor de la canónica no distingue la caja (ENLACE y ATRIBUTO_HREF llevan la bandera i, :72-74)             |
+      | <body> | <link rel="stylesheet" href="/NailsLashStudioWeb/no-existe">              | se lee el documento ENTERO, nunca solo cabezaDe (caso límite 14)                                                                 |
+    # H5-2: Vite procesa el `href` de TODO `<link>` sin mirar su `rel` (config.js:23280-23300), así que
+    # filtrar por `rel` no baja el riesgo y obligaría a tokenizarlo (más código, más mutantes). Lo
+    # descartado: «solo iconos» y «todos los subrecursos». En la fila de la segunda canónica, la primera
+    # (la absoluta de la página correcta) sigue siendo la que lee la regla «canónica ausente».
+
+  @s56
+  Scenario: el informe — primero las líneas de hoy, después una línea por <link> roto, en el orden de las páginas y, dentro de cada una, en el de aparición, con la ruta de la página que lo trae
+    Given la base declarada "/NailsLashStudioWeb/" y la lista de referencia
+    And un artefacto cuyo listado de HTML devuelve, EN ESTE ORDEN, "dist/servicios/index.html" y "dist/index.html"
+    And en "dist/servicios/index.html" (ruta "/servicios"), la página correcta con la canónica "https://example.invalid/servicios" y un único <link> root-absoluto: <link rel="icon" href="/NailsLashStudioWeb/vacio.svg">
+    And en "dist/index.html" (ruta "/"), la página correcta SIN su <title> y con, en este orden, <link rel="icon" href="/favicon.svg">, <link rel="icon" href="/NailsLashStudioWeb/favicon.svg">, <link rel="icon" href="/favicon.svg"> y <link rel="stylesheet" href="/NailsLashStudioWeb/no-existe.css">
+    When se ejecuta la puerta del cascarón sobre ese artefacto, con la lista de rutas esperadas ["/", "/servicios"]
+    Then el código de salida es distinto de 0
+    And las líneas del informe son exactamente estas 5, en este orden:
+      | / — title ausente o vacío: ""                                                                     |
+      | /servicios — link root-absoluto a un fichero de 0 bytes en dist/: "/NailsLashStudioWeb/vacio.svg" |
+      | / — link root-absoluto sin el prefijo de la base: "/favicon.svg"                                  |
+      | / — link root-absoluto sin el prefijo de la base: "/favicon.svg"                                  |
+      | / — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/no-existe.css"                  |
+    # Spec, «Formato»: primero las violaciones de hoy, en su orden; detrás, las de los `<link>`, por el
+    # orden de las páginas que da el listado y, dentro de cada una, por orden de aparición. La 1ª línea
+    # (el title de "/") va ANTES que la de "/servicios" aunque "/servicios" se liste primero: así se ve que
+    # las de hoy van todas delante. "/servicios" va antes que "/" entre las de `<link>` porque el listado
+    # la da primero: un orden alfabético o invertido no casaría. El mismo href en dos `<link>` da DOS
+    # líneas; el `<link>` válido de en medio no da ninguna. La ruta es la LÓGICA de la página
+    # (`rutaDelFichero`): "/servicios", nunca "dist/servicios/index.html" (caso límite 15). Las canónicas
+    # son distintas a propósito: si no, sobraría la línea «canónica repetida entre rutas distintas».
+
+  @s57
+  Scenario Outline: sin la lista de ficheros, la puerta CORTA con una sola línea si hay algún <link> root-absoluto que resolver; si no hay ninguno, hace exactamente lo de hoy
+    Given en "dist/index.html", <pagina>
+    And la base declarada "/NailsLashStudioWeb/" y una petición que NO trae la lista de ficheros
+    When se ejecuta la puerta del cascarón sobre ese artefacto, con la lista de rutas esperadas ["/"]
+    Then (ANCLA) el extractor de href de <link> devuelve, de esa página, exactamente: <extraidos>
+    And el código de salida es <codigo>
+    And las líneas del informe son exactamente: <lineas>
+
+    Examples:
+      | pagina                                                                                           | extraidos                                                      | codigo        | lineas                                                                                                   | por qué                                                                                                                                      |
+      | la página correcta con <link rel="icon" href="/NailsLashStudioWeb/favicon.svg">                  | "https://example.invalid/" y "/NailsLashStudioWeb/favicon.svg" | distinto de 0 | la puerta no recibió la lista de ficheros del artefacto y hay elementos link root-absolutos que resolver | un fallo de CABLEADO, no del sitio (S-3; precedente @s27)                                                                                    |
+      | la página correcta SIN su <title> y con <link rel="icon" href="/NailsLashStudioWeb/favicon.svg"> | "https://example.invalid/" y "/NailsLashStudioWeb/favicon.svg" | distinto de 0 | la puerta no recibió la lista de ficheros del artefacto y hay elementos link root-absolutos que resolver | y NO evalúa nada más, ni el title que falta: un informe parcial parecería completo (S-3)                                                     |
+      | la página correcta con <link rel="icon" href="/favicon.svg">                                     | "https://example.invalid/" y "/favicon.svg"                    | distinto de 0 | la puerta no recibió la lista de ficheros del artefacto y hay elementos link root-absolutos que resolver | el corte va ANTES de toda regla, también de la 1, que no necesitaría la lista                                                                |
+      | la página correcta, sin ningún <link> root-absoluto                                              | solo "https://example.invalid/"                                | 0             | (ninguna)                                                                                                | EXACTAMENTE lo de hoy: el caso de las 11 llamadas de puerta-cascaron.test.ts y de la de F-06 (puerta-anclas.test.ts:432-435), que no cambian |
+      | la página correcta SIN su <title>, sin ningún <link> root-absoluto                               | solo "https://example.invalid/"                                | distinto de 0 | / — title ausente o vacío: ""                                                                            | lo de hoy también cuando hay violaciones                                                                                                     |
+    # H5-5: la lista entra como campo OPCIONAL (precedente `base?`, :756) para que ni las llamadas de hoy
+    # ni la de F-06 cambien; «opcional = verde por vacuidad» es falso porque su ausencia falla CERRADA en
+    # cuanto hay algo que resolver. Un campo obligatorio habría roto `tsc` (corre dentro de `lint`) en esas
+    # 12 llamadas.
+
+  @s58
+  Scenario Outline: la lista de ficheros se pide SOLO si hay algún <link> root-absoluto que resolver, y si al pedirla revienta, la puerta falla cerrada por la rama de @s29
+    Given <artefacto>
+    And la base declarada "/NailsLashStudioWeb/" y una lista de ficheros cuyo método LANZA un Error con el mensaje "EACCES: lista de prueba"
+    When se ejecuta la puerta del cascarón sobre ese artefacto, con la lista de rutas esperadas ["/"]
+    Then el código de salida es <codigo>
+    And las líneas del informe son exactamente: <lineas>
+
+    Examples:
+      | artefacto                                                                                              | codigo        | lineas                                                                          | por qué                                                                                            |
+      | un "dist/index.html" con la página correcta y <link rel="icon" href="/NailsLashStudioWeb/favicon.svg"> | distinto de 0 | la puerta del cascarón no pudo completar la inspección: EACCES: lista de prueba | la rama de @s29, con su línea de hoy y la causa CONCRETA                                           |
+      | un "dist/index.html" con la página correcta, sin ningún <link> root-absoluto                           | 0             | (ninguna)                                                                       | sin nada que resolver la lista NO se pide: el doble que lanza no llega a lanzar                    |
+      | un dist/ que NO existe (el doble de @s26: existe() da false y el listado de HTML lanza)                | distinto de 0 | / — ruta esperada sin HTML en dist/: ""                                         | la lista es un MÉTODO y no un valor: con dist/ ausente no se pide, y la línea de @s26 no se pierde |
+    # Spec, «El puerto nuevo»: es un método porque el humilde no puede listar antes de que la puerta pregunte
+    # `existe()`: con `dist/` ausente, `readdirSync` lanzaría FUERA de la puerta y se perdería la línea de
+    # @s26. Nunca lee el contenido de los ficheros (A-27: un binario leído como texto se decodifica a U+FFFD).
+
+  @s59
+  Scenario Outline: la guarda del extractor nuevo — si en TODO el artefacto no sale ni un href de <link>, la puerta falla cerrada con su línea; la canónica cuenta, y cualquier href también
+    Given un artefacto con <artefacto>
+    And la base declarada "/NailsLashStudioWeb/" y la lista de referencia <lista>
+    When se ejecuta la puerta del cascarón sobre ese artefacto, con la lista de rutas esperadas <rutas>
+    Then el extractor de href de <link> devuelve, del artefacto entero, exactamente: <extraidos>
+    And el código de salida es <codigo>
+    And las líneas del informe son exactamente: <lineas>
+
+    Examples:
+      | artefacto                                                                                          | lista    | rutas               | extraidos                                                 | codigo        | lineas                                                                                              | por qué                                                                                                                                 |
+      | "dist/index.html" = la página correcta con <link rel="canonical"> SIN href en lugar de su canónica | PRESENTE | ["/"]               | nada                                                      | distinto de 0 | no se inspeccionó ningún elemento link del artefacto: el extractor de href de link no encontró nada | EL FIXTURE QUE MATA LA GUARDA: la canónica sin href da "" y no «ausente», así que no salta «canónica ausente» y solo habla la guarda    |
+      | lo mismo                                                                                           | AUSENTE  | ["/"]               | nada                                                      | distinto de 0 | no se inspeccionó ningún elemento link del artefacto: el extractor de href de link no encontró nada | la guarda vigila el EXTRACTOR, no depende de la lista (aquí no hay nada que resolver)                                                   |
+      | lo mismo, y SIN ningún <a href>                                                                    | PRESENTE | ["/"]               | nada                                                      | distinto de 0 | no se inspeccionó ningún enlace del artefacto: el extractor de href no encontró nada                | la guarda de @s28 va ANTES y habla SOLA                                                                                                 |
+      | lo mismo, y SIN su <title>                                                                         | PRESENTE | ["/"]               | nada                                                      | distinto de 0 | / — title ausente o vacío: ""                                                                       | con violaciones, la guarda no corre                                                                                                     |
+      | "dist/index.html" = la página correcta, tal cual                                                   | PRESENTE | ["/"]               | "https://example.invalid/"                                | 0             | (ninguna)                                                                                           | CONTROL: la canónica CUENTA. Es el caso del experimento head-correcto de @s33, cuyo único <link> es la canónica absoluta y exige exit 0 |
+      | "dist/index.html" = la de la 1ª fila, más <link rel="stylesheet" href="">                          | PRESENTE | ["/"]               | ""                                                        | 0             | (ninguna)                                                                                           | CONTROL: un href VACÍO cuenta                                                                                                           |
+      | "dist/index.html" = la de la 1ª fila, más <link rel="icon" href="favicon.svg">                     | PRESENTE | ["/"]               | "favicon.svg"                                             | 0             | (ninguna)                                                                                           | CONTROL: un href RELATIVO cuenta. Se vigila el extractor, no que haya root-absolutos: tener 0 es LEGÍTIMO                               |
+      | "dist/index.html" = la página correcta, tal cual, y "dist/servicios/index.html" = la de la 1ª fila | PRESENTE | ["/", "/servicios"] | "https://example.invalid/" de "/", y nada de "/servicios" | 0             | (ninguna)                                                                                           | CONTROL: se cuenta en TODO el artefacto; basta UNA página con un href, no hace falta en cada una                                        |
+    # Molde de @s28 (spec, «Guarda anti-vacuidad del extractor nuevo»): lo vigilado es el EXTRACTOR, no el
+    # sitio. Cuenta TODOS los href que devuelve el MISMO extractor de las reglas, de cualquier forma y
+    # `rel`, canónica incluida; va DESPUÉS de la guarda de @s28 y solo corre si no hubo violaciones. Por qué
+    # no cuenta solo los root-absolutos: que haya 0 es un estado legítimo (el control head-correcto de
+    # @s33 corre la puerta REAL sobre una app sin ninguno, `src/lib/trampas-del-horneado.test.tsx:393-399`).
+    # La 1ª fila es la que la mutación necesita: `canonicaDeLaPagina` devuelve "" con un `<link
+    # rel="canonical">` sin href (`atributoDeEtiqueta`, :387-401). La última, con `.some()` y no `.every()`,
+    # por la misma razón que @s28.
+
+  @s60
+  Scenario: las cuatro reglas nuevas están en la lista de TODAS las reglas de la puerta, y ninguna habla del origen ni de placeholders
+    Given la lista de todas las reglas que la puerta del cascarón puede emitir, la que vigila @s34
+    When se busca en ella cada uno de los cuatro textos de las reglas nuevas, escritos a mano
+    Then (ANCLA) la lista sigue conteniendo "title ausente o vacío" y "href interno sin fichero en dist/"
+    And contiene exactamente 1 vez cada uno de estos cuatro: "link root-absoluto sin el prefijo de la base", "link root-absoluto sin fichero en dist/", "link root-absoluto a un fichero de 0 bytes en dist/" y "link root-absoluto con %, & o barra invertida, que la puerta no interpreta"
+    And ninguna regla de la lista contiene "origen" ni "placeholder"
+    # La 3ª aserción ya la hace @s34 sobre la lista ENTERA (`src/lib/seo.test.ts:355-356`); lo nuevo es
+    # que las cuatro ESTÉN, porque una regla que faltara en la lista escaparía a @s34 en silencio. Las dos
+    # líneas que no son reglas (el corte y la guarda) no entran en ella, igual que las de @s27 y @s28.
+
+  # ---------------------------------------------------------------------------
+  # Extremo a extremo (D9): la puerta REAL, como subproceso, sobre el artefacto REAL y sobre tres copias
+  # saboteadas, una por firma
+  # ---------------------------------------------------------------------------
+  # PARA EL `tdd_craftsman` (vale para @s61-@s62):
+  #   - Se AMPLÍA `src/pages/home-horneado.test.ts` (precedente de las ENMIENDAS 2-4). La entrada es el
+  #     artefacto temporal que deja el `pnpm build` de su `beforeAll` (H-3), y la puerta se corre con su
+  #     `correrPuerta` (:498-511), que ya pasa `NLS_DIST_DIR`. PROHIBIDO un build nuevo, un `execSync` de
+  #     build extra o jsdom. Sigue fuera de Stryker (`*-horneado.test.*`) y sin importar nada de `src/`.
+  #   - Cada sabotaje trabaja sobre su PROPIA copia del artefacto, dentro del temporal de ESE fichero;
+  #     NUNCA sobre el `dist/` ni el `public/` del proyecto, ni sobre el artefacto original, que siguen
+  #     leyendo F-28 @s8 y las demás aserciones del fichero.
+  #   - Literales A MANO ("/NailsLashStudioWeb/", "/NailsLashStudioWeb/favicon.svg", "/favicon.svg", las tres
+  #     líneas, "✓ Puerta del cascarón", " — link root-absoluto"). La extracción de `<link>` es LA MISMA que
+  #     ya usan @s40 y F-28 @s8 en ese fichero (`elementos('link')`, :234-238), no otra; y el `href` se lee
+  #     TAL CUAL, con `.get('href')` como F-28 @s8, NUNCA con `valorDe` (:241-243), que lo pasa a minúsculas.
+  #   - @s62 nace en ROJO con la puerta de hoy, que solo mira `<a href>`: las tres copias salen con 0. Sus
+  #     anclas, y todo @s61, ya están en VERDE.
+  #   - No se siembra un sabotaje de CAJA: en `vite build` la caja equivocada daría la firma (b) en Windows y
+  #     la (a) en Linux [I: código de Vite, sin medir] (spec, «Huecos»). La caja la fijan @s47 y @s48.
+
+  @s61
+  Scenario: extremo a extremo, ANCLA y CONTROL — la puerta real sobre el artefacto real sale con 0, y ese artefacto SÍ trae lo que los sabotajes rompen
+    Given el artefacto temporal que deja el "pnpm build" REAL del beforeAll de "src/pages/home-horneado.test.ts", con base "/NailsLashStudioWeb/"
+    When se corre "tools/puerta-cascaron.ts" como subproceso, con NLS_DIST_DIR apuntando a ese artefacto
+    Then (ANCLA) su "index.html" trae al menos 1 elemento "<link" cuyo "href" empieza por "/NailsLashStudioWeb/", y exactamente 1 cuyo "href" es "/NailsLashStudioWeb/favicon.svg"
+    And su "favicon.svg" existe y pesa más de 0 bytes
+    And el código de salida es 0
+    And la salida contiene "✓ Puerta del cascarón" y ninguna línea que contenga " — link root-absoluto"
+    # El código 0 es el «H-3 control» de `cascaron` que YA existe en ese fichero (:524-533): se cita, no
+    # se duplica. Lo nuevo es el ancla (sin ella, los sabotajes de @s62 podrían «fallar» sobre un artefacto
+    # sin nada que comprobar) y la última línea. Con la enmienda, este control es además la prueba del
+    # humilde: los 10 `<link>` root-absolutos del artefacto real (3 iconos en la raíz, 1 `stylesheet` y 6
+    # `preload` en `assets/`) solo resuelven si la lista trae TODOS los ficheros, también los de las
+    # subcarpetas, con su tamaño.
+
+  @s62
+  Scenario Outline: extremo a extremo, las TRES firmas del H-5 — la puerta real sobre una copia saboteada del artefacto real sale con un código distinto de 0 y su línea: <firma>
+    Given una COPIA del artefacto temporal de @s61, hecha SOLO para este caso dentro del temporal del fichero
+    And en esa copia, <sabotaje>
+    When se corre "tools/puerta-cascaron.ts" como subproceso, con NLS_DIST_DIR apuntando a esa copia
+    Then (ANCLA: el sabotaje está hecho) <estado>
+    And el código de salida es un número distinto de 0
+    And la salida contiene la línea <linea>
+    And esa es la ÚNICA línea de la salida que contiene " — link root-absoluto"
+    And la salida no contiene "✓"
+    And el artefacto ORIGINAL sigue con su "favicon.svg" de más de 0 bytes y su "index.html" con exactamente 1 "<link" de "href" "/NailsLashStudioWeb/favicon.svg"
+
+    Examples:
+      | firma                        | sabotaje                                                                                                                                                | estado                                                                                                                                                 | linea                                                                                      |
+      | (a) sin la base              | se borra "favicon.svg" y, en "index.html", el href "/NailsLashStudioWeb/favicon.svg" pasa a "/favicon.svg", como lo hornea Vite cuando falta el fichero | la copia NO tiene "favicon.svg", y su "index.html" trae exactamente 1 "<link" de "href" "/favicon.svg" y 0 de "href" "/NailsLashStudioWeb/favicon.svg" | / — link root-absoluto sin el prefijo de la base: "/favicon.svg"                           |
+      | (b) con la base, sin fichero | se borra "favicon.svg" y el href se deja con la base (el H-6 de F-28)                                                                                   | la copia NO tiene "favicon.svg", y su "index.html" trae exactamente 1 "<link" de "href" "/NailsLashStudioWeb/favicon.svg"                              | / — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/favicon.svg"             |
+      | (c) con fichero de 0 bytes   | "favicon.svg" se deja en 0 bytes                                                                                                                        | la copia tiene "favicon.svg" con 0 bytes, y su "index.html" trae exactamente 1 "<link" de "href" "/NailsLashStudioWeb/favicon.svg"                     | / — link root-absoluto a un fichero de 0 bytes en dist/: "/NailsLashStudioWeb/favicon.svg" |
+    # «Un número distinto de 0», como el «H-3 caso»: un proceso matado por señal (`status` null) no cuenta
+    # como fallo cerrado. Las tres copias pueden salir de UNA sola copia por sabotaje, hecha en el propio
+    # `it`; ninguna toca el artefacto original (último `Then`).
+
+  # ---------------------------------------------------------------------------
+  # A mano, por el LEAD: el rojo demostrado sobre el árbol y la comprobación en la web publicada (H5-6)
+  # ---------------------------------------------------------------------------
+  # No son tests: el lead los hace y los anota en `progress/`, con los comandos, los códigos y las líneas.
+
+  @s63 @demostracion-del-lead
+  Scenario: [A MANO, EL LEAD, sobre el árbol] borrar public/favicon.svg hace que "pnpm build" falle por la regla 1; restaurarlo lo devuelve a 0 y deja el árbol limpio
+    Given la rama con la ENMIENDA 5 ya implementada, "git status --porcelain" vacío y una copia de "public/favicon.svg" FUERA del repo
+    And dos "pnpm build", cada uno con NLS_DIST_DIR en su PROPIO temporal fuera del repo: el SABOTAJE, con "public/favicon.svg" borrado, y después el CONTROL, con el fichero restaurado desde la copia
+    When el lead los lanza, en ese orden
+    Then el SABOTAJE sale con un código distinto de 0, y su salida contiene la línea / — link root-absoluto sin el prefijo de la base: "/favicon.svg" y ninguna otra que contenga " — link root-absoluto"
+    And el CONTROL sale con 0 y su salida contiene "✓ Puerta del cascarón"
+    And tras el CONTROL, "git status --porcelain" vuelve a estar vacío y "public/favicon.svg" es byte a byte igual a la copia
+    And los dos comandos, sus códigos de salida y las líneas de la puerta quedan anotados en progress/
+    # Es el «rojo demostrado» de la definición de hecho (brief §3) y la fila (a) de las firmas, reproducida
+    # en el pipeline de verdad: `vite-react-ssg build` sale con 0 y la PRIMERA puerta de la cadena de
+    # `pnpm build` (`package.json:16`) es la del cascarón, así que la cadena se corta ahí. Reproducción sin
+    # ensuciar el árbol: brief §7.
+
+  @s64 @verificacion-viva
+  Scenario: [EN VIVO, tras publicar] cada href root-absoluto de un <link> de la home publicada responde 200, y el mismo método ve el 404 de la firma (a)
+    Given la PR fusionada en main y el despliegue de "github-pages" aprobado y terminado (H5-6)
+    When el lead descarga el HTML de "https://cenit-digital.github.io/NailsLashStudioWeb/", extrae los href root-absolutos de sus "<link" y pide cada uno con "curl -I" al origen "https://cenit-digital.github.io"
+    Then (ANCLA) hay al menos 1 de esos href, y entre ellos "/NailsLashStudioWeb/favicon.svg"
+    And cada uno responde 200
+    And (CONTRAPRUEBA: el método ve un 404) "curl -I https://cenit-digital.github.io/favicon.svg", la firma (a) del H-5, responde 404
+    And la lista de href con su código, y la contraprueba, quedan anotadas en progress/
+    # La propuesta de la spec («Prueba de extremo a extremo», punto 4), en el sitio donde nació el H-2. La
+    # contraprueba ya la midió la verificación el 2026-10-01 (`/favicon.svg` → 404): sin ella, un método que
+    # no viera los 404 daría «todo 200» en vacío.
