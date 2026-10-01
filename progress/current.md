@@ -159,3 +159,5 @@ el contrato son los invariantes I-1..I-7 de `progress/brief_deuda_favicon_legibi
   sabotajes del humilde, cada uno cazado por su escenario. Los 6 ficheros del encargo, 541/541; `pnpm build` real
   en un temporal: exit 0 y las cinco puertas en ✓. El corte S-3 de la FASE A queda cerrado. Bitácora: misma,
   sección «FASE B». Pendiente del lead: suite completa, @s63, `judge`, mutación y @s64 tras publicar.
+
+- 19:15 (sesión principal): H-5 CERRADO en la rama. Fase A (puerta pura, 127 tests) y fase B (humilde y extremo a extremo, 8 tests más en home-horneado) en verde; `harness init` 1955/1955; @s63 demostrado; judge APPROVED (0 bloqueantes); mutación de `puerta-cascaron.ts` al 100 % (625/625, concurrencia 1; la primera corrida a 23 tuvo 4 timeouts por contención, aplicado `informe-de-mutacion-con-timeouts-miente`). `feature_list.json`: ENMIENDA 5 en el cierre de F-04 y H-5 marcado como resuelto en el de F-28. Siguiente: PR, CI, fusión (squash, judge menor 3), despliegue y @s64.
