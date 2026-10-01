@@ -202,3 +202,17 @@
   principio, por sus líneas); sin TAB en las dos clases, 4 failed (el control `TAB …`, por «la lista se
   pidió», `fav TAB icon`, los siete del final y los siete del principio). Revertidos: 312 passed.
 - REFACTOR: ninguno (la forma E ya es la definitiva del cableado).
+
+### C15 · @s59 (la guarda del extractor nuevo; 8 filas)
+
+- Test: las 8 filas; la página «con `<link rel="canonical">` SIN href en lugar de su canónica» la da el
+  ayudante NUEVO `conLaCanonicaSinHref(opciones)` (`htmlCrudo({ canonica: null })` más ese `<link>`). El
+  1er `Then` mira el extractor en CADA página del artefacto (la fila 8 trae dos).
+- ROJO visto: 2 failed, las filas 1 y 2 (con la lista y sin ella): `expected +0 to be 'distinto de 0'`,
+  la puerta de hoy salía con 0, el CAMBIO DE VEREDICTO declarado del banner. Las filas 3-8 en verde (la
+  guarda de @s28, el title y los controles).
+- VERDE mínimo: la guarda DETRÁS de la de @s28: `paginas.some((pagina) => extraerLinks(pagina.html)
+  .length > 0)`, con su línea EXACTA. 320 passed; `tsc` 0; `prettier` limpio.
+- SABOTAJE medido (`.some` → `.every` en la guarda nueva): 1 failed, la fila 8 (dos páginas); restaurado
+  desde una copia, 320 passed.
+- REFACTOR: ninguno.

@@ -1024,6 +1024,22 @@ function inspeccionarArtefacto(peticion: PeticionPuertaCascaron): ResultadoPuert
     }
   }
 
+  // GUARDA DEL EXTRACTOR NUEVO (ENMIENDA 5), con el molde de la de @s28 y DETRÁS de ella: vigila
+  // `extraerLinks`, no el sitio. Cuenta TODOS los href de <link> (canónica, relativos y vacíos
+  // incluidos), porque tener 0 root-absolutos es LEGÍTIMO (el control head-correcto de @s33). Solo
+  // delata un extractor roto DEL TODO; que se resolviera algún root-absoluto lo prueba el extremo a
+  // extremo. `.some()` y `> 0`, por la misma razón que arriba.
+  const seInspeccionoAlgunLink = paginas.some((pagina) => extraerLinks(pagina.html).length > 0)
+
+  if (!seInspeccionoAlgunLink) {
+    return {
+      codigoSalida: CODIGO_FALLO,
+      lineas: [
+        'no se inspeccionó ningún elemento link del artefacto: el extractor de href de link no encontró nada',
+      ],
+    }
+  }
+
   return { codigoSalida: CODIGO_EXITO, lineas: [] }
 }
 

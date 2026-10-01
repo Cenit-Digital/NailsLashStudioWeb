@@ -2487,3 +2487,124 @@ describe('ejecutarPuertaDelCascaron → la lista se pide SOLO si hay algún <lin
     expect(resultado.lineas).toEqual(lineas)
   })
 })
+
+/** La página correcta con un `<link rel="canonical">` SIN href en lugar de su canónica (@s59). */
+function conLaCanonicaSinHref(opciones: OpcionesDeFixture = {}): string {
+  return conElementos(htmlCrudo({ ...opciones, canonica: null }), '<link rel="canonical">')
+}
+
+const LINEA_DE_LA_GUARDA_DE_LINKS =
+  'no se inspeccionó ningún elemento link del artefacto: el extractor de href de link no encontró nada'
+
+describe('ejecutarPuertaDelCascaron → la guarda del extractor nuevo: sin ni un href de <link> en TODO el artefacto, falla cerrada (@s59)', () => {
+  it.each<
+    readonly [
+      artefacto: string,
+      paginas: () => readonly FicheroHtml[],
+      conLaLista: boolean,
+      rutas: readonly string[],
+      extraidos: readonly (readonly string[])[],
+      codigo: CodigoEsperado,
+      lineas: readonly string[],
+    ]
+  >([
+    [
+      'la canónica SIN href, con la lista',
+      () => [{ ubicacion: 'dist/index.html', contenido: conLaCanonicaSinHref() }],
+      true,
+      ['/'],
+      [[]],
+      FALLA,
+      [LINEA_DE_LA_GUARDA_DE_LINKS],
+    ],
+    [
+      'la canónica SIN href, SIN la lista',
+      () => [{ ubicacion: 'dist/index.html', contenido: conLaCanonicaSinHref() }],
+      false,
+      ['/'],
+      [[]],
+      FALLA,
+      [LINEA_DE_LA_GUARDA_DE_LINKS],
+    ],
+    [
+      'la canónica SIN href y SIN ningún <a href>',
+      () => [{ ubicacion: 'dist/index.html', contenido: conLaCanonicaSinHref({ enlaces: [] }) }],
+      true,
+      ['/'],
+      [[]],
+      FALLA,
+      ['no se inspeccionó ningún enlace del artefacto: el extractor de href no encontró nada'],
+    ],
+    [
+      'la canónica SIN href y SIN su <title>',
+      () => [{ ubicacion: 'dist/index.html', contenido: conLaCanonicaSinHref({ title: null }) }],
+      true,
+      ['/'],
+      [[]],
+      FALLA,
+      ['/ — title ausente o vacío: ""'],
+    ],
+    [
+      'la página correcta, tal cual',
+      () => [{ ubicacion: 'dist/index.html', contenido: htmlCrudo() }],
+      true,
+      ['/'],
+      [['https://example.invalid/']],
+      0,
+      [],
+    ],
+    [
+      'la canónica SIN href, más un <link> de href VACÍO',
+      () => [
+        {
+          ubicacion: 'dist/index.html',
+          contenido: conElementos(conLaCanonicaSinHref(), '<link rel="stylesheet" href="">'),
+        },
+      ],
+      true,
+      ['/'],
+      [['']],
+      0,
+      [],
+    ],
+    [
+      'la canónica SIN href, más un <link> RELATIVO',
+      () => [
+        {
+          ubicacion: 'dist/index.html',
+          contenido: conElementos(conLaCanonicaSinHref(), '<link rel="icon" href="favicon.svg">'),
+        },
+      ],
+      true,
+      ['/'],
+      [['favicon.svg']],
+      0,
+      [],
+    ],
+    [
+      'la página correcta en "/" y la canónica SIN href en "/servicios"',
+      () => [
+        { ubicacion: 'dist/index.html', contenido: htmlCrudo() },
+        { ubicacion: 'dist/servicios/index.html', contenido: conLaCanonicaSinHref() },
+      ],
+      true,
+      ['/', '/servicios'],
+      [['https://example.invalid/'], []],
+      0,
+      [],
+    ],
+  ])('@s59 %s', (_artefacto, paginas, conLaLista, rutas, extraidos, codigo, lineas) => {
+    const ficheros = paginas()
+
+    const resultado = ejecutarPuertaDelCascaron({
+      artefacto: artefactoCon(...ficheros),
+      rutasEsperadas: rutas,
+      base: BASE_DE_REFERENCIA,
+      ...(conLaLista ? { ficheros: dobleDeLaLista().lista } : {}),
+    })
+
+    expect(ficheros.map((fichero) => extraerLinks(fichero.contenido))).toEqual(extraidos)
+    expect(enElContrato(resultado.codigoSalida)).toBe(codigo)
+    expect(resultado.lineas).toEqual(lineas)
+  })
+})
