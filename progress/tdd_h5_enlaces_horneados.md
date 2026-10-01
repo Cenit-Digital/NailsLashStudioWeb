@@ -95,6 +95,6 @@
 - VERDE mínimo: `NO_INTERPRETABLE = /[%&` + barra + `]/` sobre el `href` limpio ENTERO, lo PRIMERO de la
   resolución; `esCandidato(limpio)` = `esRutaInterna(limpio) || limpio.startsWith(BARRA_INVERTIDA)`
   (S-7). Barras comprobadas con `node -e`: `BARRA_INVERTIDA = '` + 2 barras + `'` y la clase con 2
-  (producción pasa de 51 a 55). 251 passed; `tsc` 0; `prettier --check` limpio.
+  (producción pasa de 51 a 55). 251 passed; `tsc` 0. `prettier --check` pidió juntar dos filas: `prettier --write` (barras: 31, sin cambios).
 - REFACTOR: ninguno (el doble `limpiar` del candidato y de la regla se recoge en C12, cuando la puerta
   necesite los candidatos para pedir la lista).

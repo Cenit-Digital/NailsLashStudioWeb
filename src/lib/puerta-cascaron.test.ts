@@ -2032,11 +2032,7 @@ describe('ejecutarPuertaDelCascaron → regla 4: un href con %, & o barra invert
       FALLA,
       [`${LINEA_DE_LA_REGLA_4}"/NailsLashStudioWeb/favicon.svg?a=1&amp;b=2"`],
     ],
-    [
-      '/\u005Ccdn.ejemplo/x.css',
-      FALLA,
-      [`${LINEA_DE_LA_REGLA_4}"/\u005Ccdn.ejemplo/x.css"`],
-    ],
+    ['/\u005Ccdn.ejemplo/x.css', FALLA, [`${LINEA_DE_LA_REGLA_4}"/\u005Ccdn.ejemplo/x.css"`]],
     [
       '/NailsLashStudioWeb\u005Cfavicon.svg',
       FALLA,
@@ -2059,11 +2055,7 @@ describe('ejecutarPuertaDelCascaron → regla 4: un href con %, & o barra invert
       FALLA,
       [`${LINEA_DE_LA_REGLA_4}"\u005C\u005Ccdn.ejemplo/x.css"`],
     ],
-    [
-      '\u005C/cdn.ejemplo/x.css',
-      FALLA,
-      [`${LINEA_DE_LA_REGLA_4}"\u005C/cdn.ejemplo/x.css"`],
-    ],
+    ['\u005C/cdn.ejemplo/x.css', FALLA, [`${LINEA_DE_LA_REGLA_4}"\u005C/cdn.ejemplo/x.css"`]],
   ])('@s50 %j → %s', (href, codigo, lineas) => {
     comprobarUnLink('icon', href, codigo, lineas)
   })
