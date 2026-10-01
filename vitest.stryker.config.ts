@@ -25,10 +25,12 @@ import baseConfig from './vitest.config'
  * unit tests siguen recolectándose y matando el 100%. Se PRESERVAN los `configDefaults.exclude`
  * (node_modules, dist, *.config.*…) al ampliar la lista, no se reemplazan.
  *
- * `fileParallelism: true`: el serializado (`false`) del base existe SOLO por el flaky entre
- * `home-horneado` y `contacto-horneado` compartiendo el mismo `dist/`. Excluidos ambos aquí, no hay
- * contención de artefacto → se puede paralelizar, y así la cobertura per-test de Stryker se aísla por
- * fichero en vez de compartir un proceso serial.
+ * `fileParallelism: true`: el serializado (`false`) del base existe SOLO por los builds reales de
+ * `home-horneado` y `contacto-horneado`. Desde H-3 cada uno construye en su `dist/` temporal, pero
+ * los dos comparten la carpeta `.vite-react-ssg-temp/`, que vite-react-ssg borra entera al acabar cada
+ * build (ver el comentario de `vitest.config.ts`). Excluidos todos los `*-horneado` aquí, ningún test
+ * construye → se puede paralelizar, y así la cobertura per-test de Stryker se aísla por fichero en vez
+ * de compartir un proceso serial.
  */
 export default mergeConfig(
   baseConfig,

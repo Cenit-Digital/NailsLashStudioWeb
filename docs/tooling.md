@@ -22,10 +22,18 @@ proyecto no los necesita (p. ej. `a11y_seo_auditor` en un proyecto sin UI web).
 El arnés automatiza dos verificaciones que **el harness ejecuta, no el
 agente**, así que no se pueden saltar:
 
-- **PostToolUse (Edit|Write)** → corre `bin/harness test` y muestra el
-  resumen. Feedback inmediato tras cada cambio de código.
-- **Stop** → corre `bin/harness init` antes de cerrar la sesión y avisa si
-  algo quedó rojo.
+- **PostToolUse (Edit|Write)** → corre `bin/harness test` (vía
+  `.claude/hooks/suite-tras-editar.mjs`) y muestra el resumen. Feedback
+  inmediato tras cada cambio de código. **Excepción:** si el fichero editado
+  es un `.md`, no la corre: ningún test lee Markdown y la suite tarda ~6 min
+  (dos `pnpm build` reales). Ante un evento que no se pueda leer, la corre.
+- **Stop** → corre `bin/harness init` al terminar cada turno del agente y
+  avisa si algo quedó rojo.
+
+Ninguno de los dos toca el `dist/` del proyecto: los tests build-based
+construyen en un `dist/` temporal (`NLS_DIST_DIR`), así que `vite preview`
+puede servir `dist/` mientras corren (hallazgo H-3). Claude Code lee los hooks
+al arrancar la sesión: un cambio aquí surte efecto en la sesión siguiente.
 
 Los hooks usan el motor agnóstico, así que funcionan igual en cualquier stack
 (los comandos concretos salen de `harness.config.json`).

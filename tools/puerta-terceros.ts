@@ -11,16 +11,21 @@
  * lista `mutate`. Pero «sin fichero de test propio» NO ES «sin ancla»: las DOS decisiones que viven
  * aquí se anclan desde tests que LEEN ESTE FICHERO (@s39 y @s40), forma `src/lib/diferidos.test.ts`.
  *
+ * H-3: el artefacto se lee de donde diga `tools/artefacto.ts` (`NLS_DIST_DIR`, o `dist`), y la
+ * puerta lo sigue recibiendo con ubicaciones LÓGICAS `dist/…`. El filtro de extensión NO se muda
+ * allí: es una decisión de ESTE humilde, y aquí la anclan @s40.
+ *
  * Se ejecuta con el type stripping de Node 22 (`--experimental-strip-types`), que exige la
  * extensión .ts explícita en el import. `tsconfig.json` ya trae `allowImportingTsExtensions`.
  */
 import { readdirSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import process from 'node:process'
 
 import { ejecutarPuertaDeTerceros, PARES_DE_FUENTE_ESPERADOS } from '../src/lib/puerta-terceros.ts'
 import type { RecursoDeArtefacto } from '../src/lib/terceros.ts'
+import { DIRECTORIO_ARTEFACTO, ubicacionLogica } from './artefacto.ts'
 
-const DIRECTORIO_ARTEFACTO = 'dist'
 const FICHERO_DE_CONFIG = 'vite.config.ts'
 
 /**
@@ -64,12 +69,12 @@ const artefactoReal = (): readonly RecursoDeArtefacto[] =>
   readdirSync(DIRECTORIO_ARTEFACTO, { recursive: true, withFileTypes: true })
     .filter((entrada) => entrada.isFile() && ES_HTML_O_CSS.test(entrada.name))
     .map((entrada) => {
-      const ubicacion = `${entrada.parentPath}/${entrada.name}`.replaceAll('\\', '/')
+      const ruta = join(entrada.parentPath, entrada.name)
 
       return {
-        ubicacion,
+        ubicacion: ubicacionLogica(ruta),
         tipo: ES_CSS.test(entrada.name) ? TIPO_CSS : ('html' as const),
-        contenido: readFileSync(ubicacion, 'utf8'),
+        contenido: readFileSync(ruta, 'utf8'),
       }
     })
 

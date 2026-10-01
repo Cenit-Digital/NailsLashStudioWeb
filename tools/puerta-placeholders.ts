@@ -11,20 +11,27 @@
  * extensión .ts explícita en el import. `tsconfig.json` ya trae `allowImportingTsExtensions`.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import process from 'node:process'
 
 import { ejecutarPuerta, type SistemaDeFicheros } from '../src/lib/puerta.ts'
 import { registros } from '../src/lib/site.ts'
+import { rutaFisica, ubicacionLogica } from './artefacto.ts'
 
+/**
+ * H-3: la puerta pregunta y lista con ubicaciones LÓGICAS (`dist`, `dist/…`). El adaptador las
+ * traduce en los TRES métodos a rutas FÍSICAS del artefacto (`NLS_DIST_DIR`, o `dist`; ver
+ * `tools/artefacto.ts`) y le devuelve lógicas: la puerta no se entera de dónde vive el artefacto.
+ */
 const sistemaDeFicherosReal: SistemaDeFicheros = {
   // Honra el contrato del puerto: responde sin lanzar. Es lo que permite a la puerta
   // preguntar antes de listar y no provocar el ENOENT de `readdirSync` (@s20).
-  existeDirectorio: (directorio) => existsSync(directorio),
+  existeDirectorio: (directorio) => existsSync(rutaFisica(directorio)),
   listarFicheros: (directorio) =>
-    readdirSync(directorio, { recursive: true, withFileTypes: true })
+    readdirSync(rutaFisica(directorio), { recursive: true, withFileTypes: true })
       .filter((entrada) => entrada.isFile())
-      .map((entrada) => `${entrada.parentPath}/${entrada.name}`.replaceAll('\\', '/')),
-  leer: (ruta) => readFileSync(ruta, 'utf8'),
+      .map((entrada) => ubicacionLogica(join(entrada.parentPath, entrada.name))),
+  leer: (ruta) => readFileSync(rutaFisica(ruta), 'utf8'),
 }
 
 /**

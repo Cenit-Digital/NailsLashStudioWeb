@@ -1,8 +1,9 @@
 import { execSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { mkdtempSync, readFileSync, rmSync, statSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join, resolve } from 'node:path'
 
-import { beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 /**
  * F-12 — la sección #contacto sobre el HTML CRUDO del artefacto de PRODUCCIÓN, leído por BYTES
@@ -14,33 +15,71 @@ import { beforeAll, describe, expect, it } from 'vitest'
  * bytes, que el build de este `beforeAll` es de PRODUCCIÓN; y F-04 @s45, su ampliación: lo demuestra
  * también el modo que escribe el propio log de Vite de ese build.
  *
+ * H-3: ese build escribe su artefacto en un `dist/` TEMPORAL (`NLS_DIST_DIR`), nunca en el del proyecto,
+ * y todo lo de abajo lo lee de ahí. Sigue siendo el artefacto de producción REAL: el que acaba de dejar
+ * ese mismo `pnpm build`, con sus CINCO puertas.
+ *
  * 🔴 ESTE FICHERO NO IMPORTA NADA DE `src/`, Y ES DELIBERADO (patrón de `home-horneado.test.ts`): corre
  * el BUILD REAL (lento) en `beforeAll`. Si importara `site.ts`/`Contacto.tsx`, Stryker lo contaría como
  * cobertura y lo re-ejecutaría POR CADA MUTANTE → decenas de builds → TIMEOUTS, y «un informe de
  * mutación con timeouts MIENTE». Los ESPERADOS se escriben A MANO aquí (anti-tautología), no se importan.
  */
-const RUTA_DIST = resolve('dist/index.html')
-
 const IG_URL = 'https://www.instagram.com/nailslash.studio_/'
 const TEL_HREF = 'tel:+34625223366'
 const FACEBOOK = 'https://www.facebook.com/nailslashstudiorozas/'
 const MARCA = 'Nails Lash Studio'
 
+/**
+ * H-3 (`progress/brief_tests_build_aislado.md`) — la HUELLA de un `dist/`: si existe, y el mtime del
+ * directorio y el de su `index.html`. No lanza si no existe (`throwIfNoEntry: false`): «no existía» es
+ * una huella válida, y tiene que seguir siéndolo después del build. Escrita A MANO, como la de
+ * `home-horneado` (este fichero no importa nada de otro test).
+ */
+interface HuellaDeDist {
+  readonly existe: boolean
+  readonly mtimeDelDirectorio?: number
+  readonly mtimeDelIndex?: number
+}
+
+function huellaDe(directorio: string): HuellaDeDist {
+  const delDirectorio = statSync(directorio, { throwIfNoEntry: false })
+  const delIndex = statSync(join(directorio, 'index.html'), { throwIfNoEntry: false })
+
+  return {
+    existe: delDirectorio !== undefined,
+    mtimeDelDirectorio: delDirectorio?.mtimeMs,
+    mtimeDelIndex: delIndex?.mtimeMs,
+  }
+}
+
+/** El `dist/` del PROYECTO: el que sirve `vite preview` y el que este fichero NO debe tocar (H-3). */
+const DIST_DEL_PROYECTO = resolve('dist')
+
+let huellaAntesDelBuild: HuellaDeDist | undefined
+/** H-3 — el directorio temporal de este fichero y, dentro, el artefacto de SU build (`<temporal>/dist`). */
+let temporal = ''
+let artefacto = ''
 let html = ''
 let codigoSalida = 0
 let salidaDelBuild = ''
 
 beforeAll(() => {
+  // H-3: la huella del `dist/` del proyecto se toma ANTES de nada, para compararla tras el build.
+  huellaAntesDelBuild = huellaDe(DIST_DEL_PROYECTO)
+  temporal = mkdtempSync(join(tmpdir(), 'nls-horneado-'))
+  artefacto = join(temporal, 'dist')
+
   // El `pnpm build` REAL con las CINCO puertas. Se captura el código de salida (execSync lanza en
   // fallo con `.status`): @s10 exige exit 0 «con todas las puertas», en especial la de ANCLAS de F-06.
   // F-04 @s43: `NODE_ENV=production` explícito en el SUBPROCESO (el resto se hereda); si heredara el
   // `test` de Vitest, React saldría en DESARROLLO. F-04 @s45: y `MODE=production`, porque Vitest exporta
   // también `MODE=test` y vite-react-ssg lo lee ANTES que `NODE_ENV`. Se CONSERVA su salida estándar (el
-  // log de Vite), y si falla, la que trae el error.
+  // log de Vite), y si falla, la que trae el error. H-3: y `NLS_DIST_DIR`, el artefacto temporal
+  // (vite.config.ts → `build.outDir`; las puertas lo leen vía tools/artefacto.ts).
   try {
     salidaDelBuild = execSync('pnpm build', {
       stdio: 'pipe',
-      env: { ...process.env, NODE_ENV: 'production', MODE: 'production' },
+      env: { ...process.env, NODE_ENV: 'production', MODE: 'production', NLS_DIST_DIR: artefacto },
     }).toString()
   } catch (error: unknown) {
     const fallo = error as { status: number; stdout: Buffer }
@@ -49,8 +88,12 @@ beforeAll(() => {
     salidaDelBuild = fallo.stdout.toString()
   }
 
-  html = readFileSync(RUTA_DIST, 'utf8')
+  html = readFileSync(join(artefacto, 'index.html'), 'utf8')
 }, 180_000)
+
+afterAll(() => {
+  rmSync(temporal, { recursive: true, force: true })
+})
 
 /**
  * La sección `#contacto` EXTRAÍDA del HTML crudo: el fragmento entre `<section aria-labelledby=
@@ -232,17 +275,16 @@ function modulosDeLaApp(): readonly Atributos[] {
   })
 }
 
-const RUTA_ASSETS = resolve('dist/assets')
-
 /**
  * @s43 — los bytes del fichero al que apunta ese módulo: se quita el prefijo y se lee bajo el
- * `dist/assets/` de ESTE build. NUNCA por glob. Si no hubiera módulo o fichero, `readFileSync` lanza.
+ * `dist/assets/` de ESTE build (H-3: el del temporal). NUNCA por glob. Si no hubiera módulo o fichero,
+ * `readFileSync` lanza.
  */
 function bundleDeLaApp(): string {
   const [modulo] = modulosDeLaApp()
   const fichero = (modulo?.get('src') ?? '').slice(PREFIJO_DE_ASSETS.length)
 
-  return readFileSync(resolve(RUTA_ASSETS, fichero), 'utf8')
+  return readFileSync(join(artefacto, 'assets', fichero), 'utf8')
 }
 
 /** @s43 — cuántas veces casa `patron` (con `g`: sin él, `matchAll` lanza) en `texto`. */
@@ -299,5 +341,23 @@ describe('@s45 (F-04) el build "pnpm build" que lanza contacto-horneado corre en
 
   it('@s45 esa misma salida contiene exactamente 0 veces "building client environment for test"', () => {
     expect(apariciones(salidaDelBuild, /building client environment for test/g)).toBe(0)
+  })
+})
+
+/**
+ * H-3 — el build de este fichero NO toca el `dist/` del PROYECTO: la misma huella que en
+ * `home-horneado`, para SU build. La huella se toma al PRINCIPIO del `beforeAll`, antes del build.
+ */
+describe('H-3 el build de contacto-horneado NO toca el dist/ del proyecto', () => {
+  it('H-3 ANCLA POSITIVA: la huella SÍ ve el dist/ que este build acaba de dejar (existe y trae index.html)', () => {
+    // Sin ella, una huella ciega (ruta equivocada) daría «no existe» antes y después: verde en VACÍO.
+    const huella = huellaDe(artefacto)
+
+    expect(huella.existe).toBe(true)
+    expect(huella.mtimeDelIndex).toBeTypeOf('number')
+  })
+
+  it('H-3 la huella del dist/ del proyecto (¿existe?, mtime del directorio y de dist/index.html) es la MISMA antes y después del build', () => {
+    expect(huellaDe(DIST_DEL_PROYECTO)).toEqual(huellaAntesDelBuild)
   })
 })

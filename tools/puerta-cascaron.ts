@@ -7,10 +7,14 @@
  * Aquí NO se decide nada: todo lo que decide vive en src/lib/puerta-cascaron.ts, que está
  * testeado y mutado. Por eso este fichero no lleva tests propios ni entra en la lista `mutate`.
  *
+ * H-3: el artefacto se lee de donde diga `tools/artefacto.ts` (`NLS_DIST_DIR`, o `dist`), y la
+ * puerta lo sigue recibiendo con ubicaciones LÓGICAS `dist/…`.
+ *
  * Se ejecuta con el type stripping de Node 22 (`--experimental-strip-types`), que exige la
  * extensión .ts explícita en el import. `tsconfig.json` ya trae `allowImportingTsExtensions`.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import process from 'node:process'
 
 import {
@@ -22,8 +26,8 @@ import {
 // para leer `base` de `vite.config.ts` — sin revalidar su legitimidad (eso es de F-05); esta puerta
 // solo necesita el PREFIJO literal. Ver src/lib/puerta-terceros.ts y progress/enmienda_cascaron_base.md.
 import { baseDeclarada } from '../src/lib/puerta-terceros.ts'
+import { DIRECTORIO_ARTEFACTO, ubicacionLogica } from './artefacto.ts'
 
-const DIRECTORIO_ARTEFACTO = 'dist'
 const ES_HTML = /\.html$/i
 const FICHERO_DE_CONFIG = 'vite.config.ts'
 
@@ -38,9 +42,9 @@ const artefactoReal: ArtefactoDeProduccion = {
     readdirSync(DIRECTORIO_ARTEFACTO, { recursive: true, withFileTypes: true })
       .filter((entrada) => entrada.isFile() && ES_HTML.test(entrada.name))
       .map((entrada) => {
-        const ubicacion = `${entrada.parentPath}/${entrada.name}`.replaceAll('\\', '/')
+        const ruta = join(entrada.parentPath, entrada.name)
 
-        return { ubicacion, contenido: readFileSync(ubicacion, 'utf8') }
+        return { ubicacion: ubicacionLogica(ruta), contenido: readFileSync(ruta, 'utf8') }
       }),
 }
 
