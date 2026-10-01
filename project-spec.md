@@ -1396,8 +1396,8 @@ oficial, `deploy-pages.yml:51` corre `node .harness/harness.mjs init` (con la su
 `src/pages/favicon-marca.test.ts` @s2-@s7 y en `src/pages/home-horneado.test.ts` @s8) ANTES de `pnpm build` (:68). Esta
 enmienda es **defensa en profundidad**: que el propio build lo pare, también en una publicación que se salte la suite.
 
-**Las tres firmas del mismo 404** (medidas del lead, 2026-10-01, Node 22, Windows, build en un temporal con
-`NLS_DIST_DIR`; brief §2):
+**Las tres firmas del H-5: dos 404 y un icono vacío** (medidas del lead, 2026-10-01, Node 22, Windows, build en un
+temporal con `NLS_DIST_DIR`; brief §2):
 
 | Caso                                                                | `pnpm build`        | `href` horneado                                           | Fichero en el artefacto | Firma                            |
 | ------------------------------------------------------------------- | ------------------- | --------------------------------------------------------- | ----------------------- | -------------------------------- |
@@ -1407,11 +1407,24 @@ enmienda es **defensa en profundidad**: que el propio build lo pare, también en
 | `public/favicon.svg` a 0 bytes                                      | **0**               | `/NailsLashStudioWeb/favicon.svg`                         | sí, **0 B**             | **(c)** con fichero, vacío       |
 
 Las filas (a) y (c) no las repitió la verificación (exigen un build), pero cuadran con el código citado (`ENOENT` →
-intacta; `tryStatSync(…).isFile()` es cierto con 0 B, config.js:8096-8104), y el «rojo demostrado» del TDD las
-reproduce. Inventario del artefacto real (`dist/index.html`, única página prerenderizada; brief §2 con la corrección 1):
+intacta; `tryStatSync(…).isFile()` es cierto con 0 B, config.js:8096-8104). Con la enmienda, el «rojo demostrado» del
+lead (@s63) reproduce en el pipeline REAL solo la (a); la (c) la siembra en la puerta el extremo a extremo, sobre una
+COPIA del artefacto real y sin pasar por Vite (@s62; S-10).
+
+**Solo (a) y (b) son un 404; (c) es un icono VACÍO, roto aunque responda 200** (ronda 1 de revisión, 2026-10-01).
+GitHub Pages sirve un fichero de 0 B con 200: `curl -I https://tmallfe.github.io/about.html` → `200` y
+`content-length: 0` **[V: medida propia, 2026-10-01, sobre un sitio de Pages publicado desde una rama; uno publicado
+con un artefacto de Actions, como el nuestro, no se ha medido]**. El 404 de `/NailsLashStudioWeb/.nojekyll` (0 B) no
+prueba nada sobre los 0 B: el despliegue no publica los ficheros ocultos (S-8). La puerta falla cerrada igual ante las
+tres.
+
+Inventario del artefacto real (`dist/index.html`, única página prerenderizada; brief §2 con la corrección 1):
 11 `<link>`, de ellos 3 iconos, 1 `stylesheet` y 6 `preload` de fuente, los 10 root-absolutos y con la base, más la
 canónica, absoluta (`https://example.invalid/`). Fuera de `<link>`: 1 `<script src>`, **16** `<img src>` (assets con
-hash y la base), 0 `srcset` y un solo `<a>` root-absoluto (la marca, ya vigilado por la anti-404).
+hash y la base), 0 `srcset` y un solo `<a>` root-absoluto (la marca, ya vigilado por la anti-404). Además, `dist/`
+trae `.vite/manifest.json` (8719 B) y `.vite/ssr-manifest.json` (264535 B), que escribe vite-react-ssg (`manifest: true`
+y `ssrManifest: true`, `vite-react-ssg.DsKK_1op.mjs:744-745`, bajo `.vite`, :695), que ningún `<link>` enlaza y que el
+despliegue no publica (S-8) **[V: `ls -la dist/.vite` del checkout principal, build de las 10:12]**.
 
 **Decisiones del humano** (brief §8; el porqué es el de la verificación, no el del brief):
 
@@ -1424,16 +1437,21 @@ hash y la base), 0 `srcset` y un solo `<a>` root-absoluto (la marca, ya vigilado
 | H5-5 | **La lista de ficheros entra como campo OPCIONAL de `PeticionPuertaCascaron`, que falla cerrado** si falta y hay algún `<link>` que comprobar; F-06 no se toca                                   | Campo obligatorio; un método nuevo en `ArtefactoDeProduccion`                                                     | Precedente `base?` (`src/lib/puerta-cascaron.ts:756`). Obligatorio rompería `tsc` (corre dentro de `lint`) en las 11 llamadas de `src/lib/puerta-cascaron.test.ts` y en la de F-06 (`src/lib/puerta-anclas.test.ts:432-435`); `ArtefactoDeProduccion` lo implementan además `tools/puerta-anclas.ts` y `src/lib/puerta-anclas.ts`. «Opcional = verde por vacuidad» es falso si su ausencia falla cerrada                                                                                                                                                                                                                                                                                                                         |
 | H5-6 | **Al terminar** (judge APPROVED, mutación al 100 %, CI verde): el lead fusiona la PR en `main` (squash), aprueba el despliegue de `github-pages` y repite la comprobación en la web publicada    | Dejar la PR sin fusionar (brief §3)                                                                               | Decisión de proceso de Pablo (brief §8.4)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 
-**Decisiones del `spec_partner`** (huecos que §8 no cierra; se ratifican en la puerta humana del `.feature`):
+**Decisiones del `spec_partner`** (huecos que §8 no cierra; se ratifican en la puerta humana del `.feature`). S-7 a
+S-10 salen de la ronda 1 de revisión de la spec (2026-10-01), con medidas propias:
 
-| #   | Decisión                                                                                         | Descartada                              | Porqué                                                                                                                                                                                                                                                                                                 |
-| --- | ------------------------------------------------------------------------------------------------ | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| S-1 | Una sola regla (la 4) para `%`, `&` y la barra invertida                                         | Una regla por carácter                  | Misma causa: la puerta compara bytes y no decodifica ni normaliza. El `valor` de la línea ya enseña el carácter; menos reglas, menos mutantes                                                                                                                                                          |
-| S-2 | La barra invertida en CUALQUIER posición del `href`, no solo en `/\` al principio                | Solo el prefijo `/\`                    | En un esquema especial el navegador trata `\` como `/` también dentro de la ruta **[NV: WHATWG URL #path-state, de memoria]**. Sin esto, `/NailsLashStudioWeb\favicon.svg` caería en la regla 1 o la 2: fallaría cerrado, pero con una acusación quizá falsa, el mismo defecto que H5-4 evita para `%` |
-| S-3 | Lista de ficheros ausente con algún `<link>` que resolver → la puerta CORTA con una línea propia | Mezclarla con las violaciones del sitio | Es un fallo de cableado, no del sitio (precedente @s27): sin la lista no se puede decidir ningún `<link>`, y un informe parcial parecería completo                                                                                                                                                     |
-| S-4 | Las reglas nuevas viven fuera de `inspeccionarSitio`, que no cambia de firma ni de salida        | Un cuarto parámetro opcional            | `inspeccionarSitio` tiene 39 llamadas en `puerta-cascaron.test.ts`, varias con igualdad exacta (verificación, pregunta 5), y la lista de ficheros solo la tiene la puerta                                                                                                                              |
-| S-5 | El extremo a extremo siembra las TRES firmas, (b) incluida                                       | Solo (a) y (c), como el D9 del brief    | (b) es la firma medida del H-6 de F-28 y la que daría en Windows un `href` con la caja equivocada **[I: código de Vite, sin medir]**; cuesta una copia del artefacto y una ejecución de la puerta, sin build                                                                                           |
-| S-6 | El `valor` de la línea es el `href` CRUDO, sin limpiar                                           | El `href` ya limpio                     | Igual que la anti-404 de `<a>`: es lo que se busca con `grep` en el fichero                                                                                                                                                                                                                            |
+| #    | Decisión                                                                                                                            | Descartada                                                                                     | Porqué                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| S-1  | Una sola regla (la 4) para `%`, `&` y la barra invertida                                                                            | Una regla por carácter                                                                         | Misma causa: la puerta compara bytes y no decodifica ni normaliza. El `valor` de la línea ya enseña el carácter; menos reglas, menos mutantes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| S-2  | La barra invertida en CUALQUIER posición del `href`, no solo en `/\` al principio                                                   | Solo el prefijo `/\`                                                                           | En un esquema especial el navegador trata `\` como `/` también dentro de la ruta **[V: https://url.spec.whatwg.org/#path-state, donde «url is special and c is U+005C» cierra el segmento como `/`; y medido con `new URL(href, 'https://cenit-digital.github.io/NailsLashStudioWeb/')` en Node 22.15.0: `/NailsLashStudioWeb\favicon.svg` → ruta `/NailsLashStudioWeb/favicon.svg`, y `/\cdn.ejemplo/x.css` → host `cdn.ejemplo`]**. Sin esto, `/NailsLashStudioWeb\favicon.svg` caería en la regla 1 o la 2: fallaría cerrado, pero con una acusación falsa, el mismo defecto que H5-4 evita para `%`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| S-3  | Lista de ficheros ausente con algún `<link>` que resolver → la puerta CORTA con una línea propia                                    | Mezclarla con las violaciones del sitio                                                        | Es un fallo de cableado, no del sitio (precedente @s27): sin la lista no se puede decidir ningún `<link>`, y un informe parcial parecería completo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| S-4  | Las reglas nuevas viven fuera de `inspeccionarSitio`, que no cambia de firma ni de salida                                           | Un cuarto parámetro opcional                                                                   | `inspeccionarSitio` tiene 39 llamadas en `puerta-cascaron.test.ts`, varias con igualdad exacta (verificación, pregunta 5), y la lista de ficheros solo la tiene la puerta                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| S-5  | El extremo a extremo siembra las TRES firmas, (b) incluida                                                                          | Solo (a) y (c), como el D9 del brief                                                           | (b) es la firma medida del H-6 de F-28 y la que daría en Windows un `href` con la caja equivocada **[I: código de Vite, sin medir]**; cuesta una copia del artefacto y una ejecución de la puerta, sin build                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| S-6  | El `valor` de la línea es el `href` CRUDO, sin limpiar                                                                              | El `href` ya limpio                                                                            | Igual que la anti-404 de `<a>`: es lo que se busca con `grep` en el fichero                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| S-7  | Un `href` limpio que EMPIEZA por barra invertida también es candidato, y la regla 4 lo hace fallar cerrado                          | Declararlo hueco, fuera como los relativos                                                     | Para el navegador no es relativo: en un esquema especial, `\` al principio va al «relative slash state» igual que `/` (https://url.spec.whatwg.org/#relative-state). Medido con `new URL` sobre la base publicada (Node 22.15.0): `\favicon.svg` → `/favicon.svg` del MISMO host, el 404 de la firma (a) (`curl -I https://cenit-digital.github.io/favicon.svg` → 404); `\NailsLashStudioWeb/favicon.svg` → `/NailsLashStudioWeb/favicon.svg`; `\\cdn.ejemplo/x.css` y `\/cdn.ejemplo/x.css` → host `cdn.ejemplo`. Vite 7.3.6 lo hornea TAL CUAL, sin la base y sin error, haya o no fichero (medido en un mini-proyecto con la base `/NailsLashStudioWeb/`; el control `/favicon.svg` sale con la base). Extiende H5-2 («root-absoluto» como el navegador; `/\` falla cerrado) y S-2. Sin esto, la guarda lo contaría como inspeccionado sin que ninguna regla lo mirase                                                                                                                                                                                                                 |
+| S-8  | Un `<link>` cuya ubicación ESTÁ en la lista pero es OCULTA (algún segmento empieza por `.`) → **regla 5**, propia                   | (i) Que el humilde quite los ocultos de la lista y caigan en la regla 2; (ii) declararlo hueco | La lista se justifica por lo que Pages SIRVE, y el despliegue no publica los ocultos: `actions/upload-pages-artifact@v4` (`deploy-pages.yml:76-79`) empaqueta con `tar … --exclude=".[^/]*" .` (https://raw.githubusercontent.com/actions/upload-pages-artifact/v4/action.yml, leído el 2026-10-01). Medido con GNU tar 1.35 sobre un árbol de prueba: excluye los ocultos a CUALQUIER profundidad (`.nojekyll`, `.vite/manifest.json`, `assets/.punto.css`, `assets/.oculta/f.css`) y conserva `x/a.b.c`; en la web, `/NailsLashStudioWeb/.vite/manifest.json` y `/NailsLashStudioWeb/.nojekyll` → 404 (el runner, `ubuntu-latest`, no se ha medido). El `dist/` real trae `.vite/`, y Vite copia `public/` entero, ocultos incluidos (`copyDir`, config.js:2173-2182, llamado en :33412). (i) diría «sin fichero en dist/» de un fichero que SÍ está en `dist/`: la acusación falsa que H5-4 evita con su regla propia. (ii) dejaría un falso negativo: un `<link>` a un oculto pasaría la puerta y daría 404. El puerto y el humilde no cambian: lo decide la lógica pura, que se muta |
+| S-9  | Un `<link rel="canonical">` sin `href` entre comillas dobles es canónica PRESENTE para @s13, y la ENMIENDA 5 lo FIJA (@s59, fila 1) | (i) Endurecer @s13 a «ausente o vacía», como title y description; (ii) no decirlo              | Hoy ya es así, pero nadie lo había decidido: `canonicaDeLaPagina` da la cadena vacía (`atributoDeEtiqueta`, `src/lib/puerta-cascaron.ts:396`) y la regla solo acusa `null` (:491), mientras title y description usan `ausenteOVacio` (:412-414, :479, :485); la fila de @s13 (`features/cascaron_semantico.feature:1045`) solo cubre «no hay ningún `<link rel="canonical">`». (i) tocaría @s1-@s45, que §8 deja intactos, y haría inalcanzable la guarda nueva («Guarda», acoplamiento); (ii) escondería ese acoplamiento                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| S-10 | El rojo demostrado del lead (@s63) es solo la firma (a)                                                                             | Una segunda pasada con `public/favicon.svg` a 0 B                                              | El eslabón Vite → `dist/` de la (c) lo midió el lead (brief §2: con la base, fichero de 0 B en el artefacto, 5 ✓) y la enmienda no toca Vite; el de la puerta lo cubre @s62 (c), con el humilde REAL sobre una copia del artefacto real. Una tercera build no añade ningún eslabón                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 
 **Contrato — qué hace la puerta.** `ejecutarPuertaDelCascaron` (`src/lib/puerta-cascaron.ts`), además de todo lo de
 hoy, extrae el `href` de TODOS los `<link>` de TODAS las HTML del artefacto, leyendo el documento entero (no solo
@@ -1449,10 +1467,14 @@ unitarios (nombres orientativos: `extraerLinks(html)`, `inspeccionarLinks(pagina
    potentially surrounded by spaces», https://html.spec.whatwg.org/multipage/semantics.html#attr-link-href). Sin ella,
    `" /favicon.svg"` pasaría por relativo, un falso negativo: jsdom 24.1.3 conserva esos espacios al serializar
    (medido) y el navegador los recorta antes de pedir el fichero.
-2. Es **root-absoluto** si, ya limpio, empieza por `/` y su segundo carácter no es `/` (el criterio de `RUTA_INTERNA`,
-   :561). `//host/x` es de otro host (https://url.spec.whatwg.org/#scheme-relative-url-string): queda fuera, es de F-05.
+2. Es **root-absoluto** si, ya limpio, (i) empieza por `/` y su segundo carácter no es `/` (el criterio de
+   `RUTA_INTERNA`, :561), o (ii) empieza por una barra invertida (S-7). `//host/x` es de otro host
+   (https://url.spec.whatwg.org/#scheme-relative-url-string): queda fuera; si su `rel` es de los que F-05 trata como
+   petición o contacto, es de F-05 (asimetría 1).
 3. `/\x` también lo parsea el navegador como host (https://url.spec.whatwg.org/#relative-slash-state), pero por el
-   punto 2 la puerta lo toma como root-absoluto y la regla 4 lo hace **fallar cerrado**.
+   punto 2 la puerta lo toma como root-absoluto y la regla 4 lo hace **fallar cerrado**. Igual todo `href` que empieza
+   por barra invertida (`\x`, `\\host/x`, `\/host/x`): el navegador lo lee como `/x` del mismo host o como otro
+   host (S-7), y como contiene la barra invertida, la regla 4 lo hace fallar cerrado siempre.
 
 **Resolución ESTRICTA** (H5-3), en este orden. Cada `<link>` da **como mucho una** violación, la primera que aplique:
 
@@ -1465,23 +1487,27 @@ unitarios (nombres orientativos: `extraerLinks(html)`, `inspeccionarLinks(pagina
 4. Resto vacío (la raíz del artefacto) → `dist/index.html`. Cualquier otro resto → `dist/<resto>`, tal cual: un resto
    acabado en `/`, o que nombre una carpeta, nunca es un fichero.
 5. Esa ubicación se busca en la LISTA de ficheros, por igualdad EXACTA de cadenas, sensible a la caja. No está →
-   **regla 2**. Está con 0 bytes → **regla 3**. Está con 1 byte o más → pasa.
+   **regla 2**. Está, y algún segmento suyo (separados por `/`) empieza por `.` → **regla 5** (S-8), pese a sus bytes.
+   Está con 0 bytes → **regla 3**. Está con 1 byte o más → pasa.
 
 Por qué una lista y nunca un `existsSync`: en Windows el sistema de ficheros no distingue la caja y escondería un 404
 que GitHub Pages sí da (`/NailsLashStudioWeb/FAVICON.SVG` → 404, re-medido con `curl -I` el 2026-10-01). Ninguna
 documentación oficial dice que Pages distinga la caja, salvo para el nombre `index.html`
 (https://docs.github.com/en/pages/getting-started-with-github-pages/troubleshooting-404-errors-for-github-pages-sites#indexhtml-file):
-el porqué es la MEDIDA, no «Pages corre en Linux» (corrección 8).
+el porqué es la MEDIDA, no «Pages corre en Linux» (corrección 8). La lista es la del `dist/` LOCAL, ocultos incluidos:
+lo que el despliegue no publica lo separa la regla 5 (S-8).
 
-**Las cuatro reglas nuevas**, con su texto EXACTO. Entran en `REGLAS_DEL_CASCARON` (:861, «TODAS las reglas») y
-ninguna contiene `origen` ni `placeholder` (@s34, `src/lib/seo.test.ts:355-356`):
+**Las cinco reglas nuevas** (la 5 es de la ronda 1 de revisión, S-8), con su texto EXACTO. Entran en
+`REGLAS_DEL_CASCARON` (:861, «TODAS las reglas») y ninguna contiene `origen` ni `placeholder` (@s34,
+`src/lib/seo.test.ts:355-356`):
 
 | #   | Regla (texto exacto)                                                         | Firma | Cuándo                                                                                                                                                 |
 | --- | ---------------------------------------------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 1   | `link root-absoluto sin el prefijo de la base`                               | (a)   | Hay `base` declarada y la ruta no empieza por ella. Dice SOLO lo que la puerta sabe: nunca «no existe»                                                 |
 | 2   | `link root-absoluto sin fichero en dist/`                                    | (b)   | La ubicación no está en la lista: fichero ausente, carpeta, `href` acabado en `/` que no es la raíz, caja distinta o segmentos `.`/`..` sin normalizar |
-| 3   | `link root-absoluto a un fichero de 0 bytes en dist/`                        | (c)   | La ubicación está en la lista con 0 bytes                                                                                                              |
-| 4   | `link root-absoluto con %, & o barra invertida, que la puerta no interpreta` | —     | Paso 1 de la resolución (H5-4, S-1, S-2)                                                                                                               |
+| 3   | `link root-absoluto a un fichero de 0 bytes en dist/`                        | (c)   | La ubicación está en la lista, no es oculta (S-8) y pesa 0 bytes                                                                                       |
+| 4   | `link root-absoluto con %, & o barra invertida, que la puerta no interpreta` | —     | Paso 1 de la resolución (H5-4, S-1, S-2, S-7)                                                                                                          |
+| 5   | `link root-absoluto a un fichero oculto, que el despliegue no publica`       | —     | Paso 5: la ubicación ESTÁ en la lista y algún segmento suyo empieza por `.` (S-8). Va antes que la 3: un oculto de 0 B da la 5                         |
 
 **Formato** (D8): una línea por violación, con el formato de siempre, `<ruta> — <regla>: "<valor>"`
 (`describirViolacion`, :777-779). `<ruta>` es la ruta lógica de la página que trae el `<link>` (`rutaDelFichero`) y
@@ -1501,12 +1527,18 @@ puerta y se perdería la línea de @s26.
   rama de @s29 (su línea de hoy, sin cambios).
 - **Ausente, con al menos un `<link>` root-absoluto en el artefacto**: la puerta falla cerrada con UNA sola línea y no
   evalúa nada más (S-3): `la puerta no recibió la lista de ficheros del artefacto y hay elementos link root-absolutos que resolver`.
-- **Ausente, sin ninguno**: la puerta hace EXACTAMENTE lo de hoy. Es el caso de las 11 llamadas de
-  `puerta-cascaron.test.ts` y de la de F-06: ningún fixture suyo lleva un `<link>` root-absoluto (los dos de ese
-  fichero, en las líneas 1116 y 1706, van a `canonicaDeLaPagina`, no a la puerta).
+- **Ausente, sin ninguno**: la puerta hace lo de hoy, con UNA excepción, la guarda nueva, que no depende de la lista:
+  una página cuya canónica no lleva `href` entre comillas dobles, sin ningún otro `href` de `<link>`, hoy sale con 0
+  (la canónica da la cadena vacía y no `null`, :491, y la guarda de @s28, :842-851, ve su `<a href>`) y con la enmienda
+  no (@s59, fila 2; S-9). Con al menos un `href` de `<link>` en el artefacto (basta la canónica con
+  `href`) es EXACTAMENTE lo de hoy. Es el caso de las 11 llamadas de `puerta-cascaron.test.ts` y de la de F-06: ningún
+  fixture suyo lleva un `<link>` root-absoluto (los dos de ese fichero, en las líneas 1116 y 1706, van a
+  `canonicaDeLaPagina`, no a la puerta), y todos llevan la canónica con `href` (mapa del Gherkin, §4.2).
 - **El humilde** `tools/puerta-cascaron.ts` lo cablea siempre: `readdirSync` recursivo con `withFileTypes`, solo
   ficheros, y `statSync(…).size`; nunca `readFileSync`. Sin tests ni mutación propios, como el resto del humilde: lo
-  prueba el extremo a extremo (D9).
+  prueba el extremo a extremo (D9). Lista también los ocultos (en el artefacto real, `dist/.vite/manifest.json` y
+  `dist/.vite/ssr-manifest.json`) y no filtra nada: lo que el despliegue no publica lo decide la lógica pura (regla 5,
+  S-8), que sí se muta.
 
 **Guarda anti-vacuidad del extractor nuevo** (pregunta 5 de la verificación, que Pablo delegó en el `spec_partner`,
 brief §8). Molde de @s28: lo vigilado es el EXTRACTOR, no el sitio.
@@ -1520,10 +1552,23 @@ brief §8). Molde de @s28: lo vigilado es el EXTRACTOR, no el sitio.
   la puerta REAL sobre una app sin ninguno y exige exit 0 (`src/lib/trampas-del-horneado.test.tsx:393-399`; su único
   `<link>` es la canónica absoluta), y para eso el patrón dice «no aplica»
   (`.memoria-cache/patterns/testing/verde-por-vacuidad-en-puerta-de-verificacion.md`, «Cuándo NO aplica»). Contando
-  todos, un artefacto que pasa el resto de la puerta lleva siempre la canónica (F-04 la exige), y un extractor roto se
-  delata.
+  todos, basta una canónica con `href` entre comillas dobles para satisfacerla: solo se delata un extractor roto DEL
+  TODO.
 - Se mata con un fixture cuyo ÚNICO `<link>` es `<link rel="canonical">` SIN `href`: `canonicaDeLaPagina` devuelve `''`
   y no `null` (`atributoDeEtiqueta`, :387-401), así que no salta «canónica ausente» (:491) y solo habla la guarda.
+- **Qué NO certifica** (ronda 1 de revisión): solo detecta un fallo TOTAL de `ENLACE` + `ATRIBUTO_HREF`. En el artefacto
+  real la canónica absoluta es el PRIMER `<link>` (de 11; medido sobre el `dist/index.html` del checkout principal) y
+  la satisface ella sola, así que la guarda nunca prueba que se resolviera un solo root-absoluto. Esa prueba es del
+  extremo a extremo: el ancla de @s61 (el artefacto real trae `<link>` con la base) y los tres sabotajes de @s62.
+- **Su acoplamiento con @s13, DECLARADO** (S-9). El único fixture que la mata existe porque la canónica sin `href`
+  cuenta como presente. Con el extractor correcto, la guarda solo puede hablar si ninguna canónica lleva `href` entre
+  comillas dobles; y con el código de hoy, solo en artefactos de UNA página: con dos o más, todas con la cadena vacía,
+  habla antes «canónica repetida entre rutas distintas» (`violacionesDeCanonicaRepetida`, :643-668, que solo se salta
+  las `null`). Si @s13 pasara a acusar la canónica «ausente o vacía», la guarda quedaría inalcanzable (toda canónica
+  aceptada aportaría un `href` al mismo extractor), la fila 1 de @s59 se contradiría y sus mutantes (`.some` →
+  `.every`, `> 0` → `>= 0`) serían equivalentes. Quien lo haga vuelve con la guarda a la puerta humana: darle otro
+  fixture que la mate, o retirarla; NUNCA excluir sus mutantes. No pasaría en silencio: con la mutación al 100 %,
+  sobrevivirían.
 - Descartadas: (i) que el ayudante `htmlCrudo` hornee un `<link rel="stylesheet">` con su fichero (la recomendación de
   partida del brief, REFUTADA: no llega al experimento `head-correcto`, y un único `href` con un único fichero no vale
   a la vez para los tests con base, donde @s37 exige `lineas` igual a `[]` en `puerta-cascaron.test.ts:979-991`, y para
@@ -1549,9 +1594,13 @@ brief §8). Molde de @s28: lo vigilado es el EXTRACTOR, no el sitio.
    **solo vale para los `rel` de hiperenlace** (`canonical`, `alternate`; Google los pide absolutos: «Use absolute
    paths rather than relative paths with the rel="canonical" link element»,
    https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls; «Alternate URLs must be
-   fully-qualified», https://developers.google.com/search/docs/specialty/international/localized-versions). Para un
-   `rel` de petición, F-05 la rechaza: su lista de permitidos es `[]` (`tools/puerta-terceros.ts:100`; hiperenlace
-   frente a petición en `src/lib/terceros.ts:86-99`).
+   fully-qualified», https://developers.google.com/search/docs/specialty/international/localized-versions). Para los
+   `rel` que F-05 trata como petición o contacto (`KEYWORDS_DE_PETICION`: `stylesheet`, `icon`, `preload`,
+   `modulepreload`, `prefetch` y `manifest`; `KEYWORDS_DE_CONTACTO`: `preconnect` y `dns-prefetch`;
+   `src/lib/terceros.ts:92-99` y :109, comparados token a token, :138-143), F-05 la rechaza: su lista de permitidos es
+   `[]` (`tools/puerta-terceros.ts:100`). Con cualquier OTRO `rel` (`apple-touch-icon`, uno desconocido) o sin `rel`,
+   F-05 ni lo mira (`urlsQuePide`, :256-271): una URL absoluta de un tercero ahí no la ve NINGUNA de las dos puertas
+   (hueco declarado).
 2. **Para `<link>` la puerta mira FICHEROS; para `<a>`, rutas LÓGICAS.** `/NailsLashStudioWeb/servicios` es la regla 2
    en un `<link>` (no hay fichero `dist/servicios`) y es válido en un `<a>` si existe `dist/servicios/index.html`
    (`rutaDelFichero`, :770-774). Hoy es latente: `RUTAS_ESPERADAS = ['/']` (:892).
@@ -1572,7 +1621,8 @@ brief §8). Molde de @s28: lo vigilado es el EXTRACTOR, no el sitio.
    `&` se mira en el `href` entero.
 9. `/NailsLashStudioWeb/favicon%2Esvg` → regla 4 aunque Pages la sirva (H5-4).
 10. `/NailsLashStudioWeb/./favicon.svg` o `…/assets/../favicon.svg` → regla 2: la puerta no normaliza los segmentos
-    `.`/`..`, aunque el navegador sí lo haga (falla cerrado).
+    `.`/`..`, aunque el navegador sí lo haga (falla cerrado). No es la regla 5: esa ubicación no está en la lista, y la
+    5 solo mira las que están.
 11. Un fichero de 1 byte → pasa; de 0 bytes → regla 3.
 12. Sin base: `/favicon.svg` con su fichero → pasa; sin él → regla 2, nunca la 1.
 13. `href=""`, un `<link>` sin `href`, uno relativo (`favicon.svg`, `./x`) o absoluto (`https://…`): ninguno es
@@ -1581,12 +1631,27 @@ brief §8). Molde de @s28: lo vigilado es el EXTRACTOR, no el sitio.
 15. Dos páginas: el `<link>` roto se acusa en la ruta de la página que lo lleva.
 16. Una `base` que no acabe en `/`: la puerta no valida la base (es de F-05, @s27, igual que en la ENMIENDA 1). Con
     ella, los `href` que no son la raíz no resuelven (`dist//x`) y dan la regla 2: falla cerrada, no abierta.
+17. Barra invertida AL PRINCIPIO (S-7): `\favicon.svg`, `\NailsLashStudioWeb/favicon.svg` y `\\cdn.ejemplo/x.css`
+    → regla 4. Son candidatos: sin la lista, cortan con la línea de la lista ausente (S-3).
+18. Ocultos (S-8), con la ubicación EN la lista: `/NailsLashStudioWeb/.vite/manifest.json` (carpeta oculta) y
+    `/NailsLashStudioWeb/assets/.oculto.css` (fichero oculto en una carpeta visible) → regla 5; un oculto de 0 B →
+    regla 5, nunca la 3. `/NailsLashStudioWeb/.vite/no-existe.json` (no está en la lista) → regla 2. Un punto que no
+    abre un segmento (`favicon.svg`, `x/a.b.c`) no oculta nada.
 
 **Huecos DECLARADOS** (no se cierran):
 
-- **`href` relativos** (`favicon.svg`, `./x`, `../x`): fuera. Hoy ningún `<link>` del artefacto lo es (inventario).
-- **URL absolutas** (`https://…`, `//…`): fuera. Las de terceros son de F-05; las propias (la canónica) no se resuelven
-  contra el artefacto.
+- **`href` relativos** (`favicon.svg`, `./x`, `../x`): fuera. Hoy ningún `<link>` del artefacto lo es (inventario). Uno
+  que empieza por barra invertida NO es relativo para el navegador: es candidato (S-7).
+- **URL absolutas** (`https://…`, `//…`): fuera. Las propias (la canónica) no se resuelven contra el artefacto. Las de
+  terceros son de F-05 SOLO con un `rel` de petición o contacto de sus listas (asimetría 1). Con `apple-touch-icon`, un
+  `rel` desconocido o sin `rel`, no las ve NINGUNA de las dos puertas **[V: medida propia, 2026-10-01:
+  `detectarOrigenesExternos` de `src/lib/terceros.ts`, con la lista de permitidos `[]`, devuelve `[]` para
+  `apple-touch-icon` (con `https://` y con `//`), `apple-touch-icon-precomposed`, `x-nls-inventado` y sin `rel`, y
+  `["tercero.example"]` para `icon` y `stylesheet`]**. Es la deuda de FS-6 (§Feature 28, «F-05 no se enmienda»), que
+  hoy cubren solo los tests de F-28 y solo para los 3 iconos actuales: fijan el `href` exacto de cada uno (el de
+  `apple-touch-icon`, en `src/pages/favicon-marca.test.ts:118-122` y `src/pages/home-horneado.test.ts:602-606`) y que
+  hay exactamente 3 `<link>` de icono (`home-horneado.test.ts:583`). Un `<link>` con un `rel` desconocido no lo pondría
+  rojo ningún test.
 - **`<script src>`, `<img src|srcset>`, `<source>` y `url()` del CSS**: fuera (H5-2), aunque el fallback silencioso de
   Vite también los afectaría. Hoy salen con hash y con la base (1 `<script>`, 16 `<img>`, 0 `srcset`).
 - **`fetch()` y demás peticiones del JS**: invisibles para una puerta que lee HTML (el mismo límite que @s34 de
@@ -1601,7 +1666,7 @@ brief §8). Molde de @s28: lo vigilado es el EXTRACTOR, no el sitio.
   entrada no las traiga (medido, jsdom 24.1.3).
 - **El umbral de 0 bytes** es arbitrario: un icono truncado a 1 byte pasa. `.nojekyll` (0 B) no da falso positivo: se
   crea DESPUÉS de la puerta (`deploy-pages.yml:74`) y nada lo enlaza; la regla 3 solo mira ficheros a los que apunta un
-  `<link>`.
+  `<link>`. Y si uno lo enlazara, sería un oculto: regla 5 (S-8), no la 3.
 - **`vite-ignore`**: la puerta no mira ese atributo. Un `<link vite-ignore href="/x">` bajo base es justo la firma (a) y
   la regla 1 lo acusa; para apuntar fuera de la base, URL absoluta (asimetría 1). En `<script>` o `<img>` queda fuera,
   como esos elementos.
@@ -1635,16 +1700,18 @@ brief §8). Molde de @s28: lo vigilado es el EXTRACTOR, no el sitio.
      `/ — link root-absoluto a un fichero de 0 bytes en dist/: "/NailsLashStudioWeb/favicon.svg"`.
 4. **Rojo demostrado del lead** (manual, anotado en `progress/`; la definición de hecho del brief §3): copiar
    `public/favicon.svg` fuera, borrarlo y lanzar `NLS_DIST_DIR=<temporal> pnpm build` → código distinto de 0 con la
-   línea (a). Después, restaurarlo y comprobar que `git status` queda limpio (brief §7). Tras publicar (H5-6), el lead
-   repite la comprobación en la web publicada (propuesta: cada `href` de un `<link>` root-absoluto de la home publicada
-   responde 200 a `curl -I`).
+   línea (a), y solo esa firma (S-10). Después, restaurarlo y comprobar que `git status` queda limpio (brief §7). Tras
+   publicar (H5-6), el lead repite la comprobación en la web publicada (propuesta: cada `href` de un `<link>`
+   root-absoluto de la home publicada responde 200 a `curl -I`).
 
 **Mutación (D10).**
 
-- `src/lib/puerta-cascaron.ts` (ya en `mutate`) al **100 %, con 0 exclusiones**, re-mutado ENTERO. Su última corrida,
-  el remate de la subruta, tuvo 497 mutantes: 493 muertos y 4 timeouts (`progress/mutation_subruta_github_pages.md`);
-  el último `verify` completo no tuvo ningún timeout en él (`progress/current.md`). Si la lógica nueva vive en un módulo
-  nuevo de `src/lib/`, ese módulo entra en `mutate`, con el mismo umbral.
+- `src/lib/puerta-cascaron.ts` (ya en `mutate`) al **100 %, con 0 exclusiones**, re-mutado ENTERO. El remate de la
+  subruta tuvo 497 mutantes: 493 muertos y 4 timeouts (`progress/mutation_subruta_github_pages.md:208-226`; la tabla ya
+  está en el commit `92d6b70`, del 2026-07-25). La ÚLTIMA corrida que lo mutó es el `harness verify` COMPLETO del
+  2026-10-01 (10:58), con los 37 ficheros de `stryker.config.json` (este, en :19): 100 % y ningún timeout en él, porque
+  sus 13 son de `placeholders.ts`, `equipo-logica.ts` y `resenas-logica.ts` (`progress/current.md:85-89`). Si la
+  lógica nueva vive en un módulo nuevo de `src/lib/`, ese módulo entra en `mutate`, con el mismo umbral.
 - Los tests unitarios (`src/lib/puerta-cascaron.test.ts`, con fixtures escritos a mano y sin tautologías) tienen que
   matar SOLOS el 100 %, guarda y puerto incluidos: el test de D9 es build-based, queda fuera de Stryker y no cuenta
   (corrección 16). `tools/puerta-cascaron.ts` sigue fuera de `mutate` (humilde).
@@ -1654,7 +1721,10 @@ brief §8). Molde de @s28: lo vigilado es el EXTRACTOR, no el sitio.
   de quitar `?query`/`#fragmento`; el orden de las reglas (un `href` sin la base y sin fichero da SOLO la regla 1; uno
   con `%` y sin fichero, SOLO la 4); el puerto ausente, con candidatos (corta con su línea) y sin ellos (todo igual); el
   puerto presente que lanza (rama de @s29) y que no se consulta si no hay candidatos; la guarda (`.some` → `.every`,
-  `> 0` → `>= 0`) con el fixture de la canónica sin `href`; y el texto de cada regla y línea nueva, aseverado literal.
+  `> 0` → `>= 0`) con el fixture de la canónica sin `href` (S-9); la barra invertida inicial (S-7: sin esa rama,
+  `\favicon.svg` no sería candidato y saldría 0); la regla 5 (S-8): quitar el predicado de oculto, mirar solo el
+  primer segmento tras `dist/` (la fila `assets/.oculto.css`), el orden 5 antes que 3 (el oculto de 0 B) y mirarlo ANTES
+  de buscar en la lista (`./favicon.svg` sigue siendo la 2); y el texto de cada regla y línea nueva, aseverado literal.
 - Ante supervivientes: ampliar el contrato, nunca quitar la guarda
   (`.memoria-cache/patterns/testing/superviviente-de-mutacion-en-guarda-defensiva-es-hueco-del-contrato.md`), y
   refactorizar el equivalente, nunca excluirlo
@@ -1665,7 +1735,23 @@ DESPUÉS del de la ENMIENDA 4 (que acaba en la línea 223) y antes de «Contrato
 desde **@s46**, al final, con «@s1-@s45 (arriba) NO SE TOCAN». Hay que nombrar el extractor que se reutiliza
 (`ENLACE` + `ATRIBUTO_HREF`), como piden las notas de @s41.
 
-**Preguntas abiertas: ninguna.** Pablo cerró H5-1 a H5-6. S-1 a S-6 y los textos exactos de las reglas y las líneas
+**Para el `gherkin_author`, ronda 1 de revisión de la spec (2026-10-01).** El `.feature` tiene que recoger:
+
+1. Banner: «TRES FIRMAS del mismo 404» pasa a «dos 404 y un icono vacío» (la (c) responde 200 con 0 B); cinco reglas;
+   en HUECOS, «las de terceros son de F-05» pasa a «solo con un `rel` de petición o contacto de F-05», más el hueco de
+   `apple-touch-icon`, `rel` desconocido o sin `rel` con URL absoluta (FS-6); y que @s59 fila 1 fija el alcance de
+   @s13 (S-9): «NINGÚN escenario anterior se toca» vale para la letra, no para ese comportamiento.
+2. @s47 (comentario): la asimetría 1 con los `rel` de las listas de F-05. @s49 (comentario de `.nojekyll`): oculto,
+   regla 5.
+3. @s50: las filas del caso límite 17 (S-7). La cita de S-2 ya es [V].
+4. La regla 5 (S-8): sus filas puras (caso límite 18), con la lista de referencia ampliada con
+   `dist/.vite/manifest.json`, `dist/assets/.oculto.css` y un oculto de 0 B; el orden de la resolución pasa a 4, 1, 2,
+   5 y 3.
+5. @s57: el título y la fila 4 dicen «lo de hoy, salvo la guarda (@s59, fila 2)».
+6. @s59 (comentario): lo que la guarda NO certifica y su acoplamiento con @s13 («Guarda»).
+7. @s60: cinco reglas. Ningún comentario dice que el rojo demostrado reproduzca la (c) (S-10).
+
+**Preguntas abiertas: ninguna.** Pablo cerró H5-1 a H5-6. S-1 a S-10 y los textos exactos de las reglas y las líneas
 los decide el `spec_partner` y se ratifican en la puerta humana del `.feature`, que sigue pendiente.
 
 ---
