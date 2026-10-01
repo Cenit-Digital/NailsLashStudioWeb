@@ -579,12 +579,26 @@ function esRutaInterna(href: string): boolean {
 
 export const REGLA_LINK_SIN_PREFIJO = 'link root-absoluto sin el prefijo de la base'
 export const REGLA_LINK_SIN_FICHERO = 'link root-absoluto sin fichero en dist/'
+export const REGLA_LINK_VACIO = 'link root-absoluto a un fichero de 0 bytes en dist/'
 export const REGLA_LINK_NO_INTERPRETA =
   'link root-absoluto con %, &, barra invertida, // o segmentos . o .., que la puerta no interpreta'
 
 function limpiar(href: string): string {
   return href.replace(/^ /, '')
 }
+
+const BARRA_INVERTIDA = '\\'
+
+/**
+ * Root-absoluto, ya limpio: el criterio de `RUTA_INTERNA` (`/` y no `//`), o una barra invertida AL
+ * PRINCIPIO (S-7), que el navegador no lee como relativa sino como `/` (mismo host u otro host).
+ */
+function esCandidato(limpio: string): boolean {
+  return esRutaInterna(limpio) || limpio.startsWith(BARRA_INVERTIDA)
+}
+
+/** H5-4, S-1, S-2 y S-7: la puerta compara bytes; ni decodifica `%`/`&` ni lee la barra invertida. */
+const NO_INTERPRETABLE = /[%&\\]/
 
 /**
  * S-11: el navegador NORMALIZA los segmentos `.` y `..` (el último incluido) y CONSERVA el `//`, y
@@ -599,10 +613,16 @@ function tieneSegmentosQueNoInterpreta(ruta: string): boolean {
 
 function reglaDelLink(
   href: string,
-  ubicaciones: ReadonlySet<string>,
+  ubicaciones: ReadonlyMap<string, number>,
   base: string | null,
 ): string | null {
-  const ruta = rutaDelHref(limpiar(href))
+  const limpio = limpiar(href)
+
+  if (NO_INTERPRETABLE.test(limpio)) {
+    return REGLA_LINK_NO_INTERPRETA
+  }
+
+  const ruta = rutaDelHref(limpio)
 
   if (tieneSegmentosQueNoInterpreta(ruta)) {
     return REGLA_LINK_NO_INTERPRETA
@@ -616,8 +636,14 @@ function reglaDelLink(
     return REGLA_LINK_SIN_PREFIJO
   }
 
-  if (!ubicaciones.has(`${DIRECTORIO_ARTEFACTO}/${ruta.slice(base.length)}`)) {
+  const bytes = ubicaciones.get(`${DIRECTORIO_ARTEFACTO}/${ruta.slice(base.length)}`)
+
+  if (bytes === undefined) {
     return REGLA_LINK_SIN_FICHERO
+  }
+
+  if (bytes === 0) {
+    return REGLA_LINK_VACIO
   }
 
   return null
@@ -626,12 +652,12 @@ function reglaDelLink(
 /** ENMIENDA 5 (H-5): los `<link>` root-absolutos de cada página, en el orden de las páginas. */
 function violacionesDeLinks(
   paginas: readonly PaginaArtefacto[],
-  ubicaciones: ReadonlySet<string>,
+  ubicaciones: ReadonlyMap<string, number>,
   base: string | null,
 ): ViolacionCascaron[] {
   return paginas.flatMap((pagina) =>
     extraerLinks(pagina.html)
-      .filter((href) => esRutaInterna(limpiar(href)))
+      .filter((href) => esCandidato(limpiar(href)))
       .flatMap((href) => {
         const regla = reglaDelLink(href, ubicaciones, base)
 
@@ -912,10 +938,10 @@ function inspeccionarArtefacto(peticion: PeticionPuertaCascaron): ResultadoPuert
       }))
     : []
 
-  let ubicaciones = new Set<string>()
+  let ubicaciones = new Map<string, number>()
 
   if (ficheros !== undefined) {
-    ubicaciones = new Set(ficheros.listar().map((fichero) => fichero.ubicacion))
+    ubicaciones = new Map(ficheros.listar().map((fichero) => [fichero.ubicacion, fichero.bytes]))
   }
 
   // La inspección incluye la GUARDA de «una HTML por cada ruta esperada» (@s26): va PRIMERO,

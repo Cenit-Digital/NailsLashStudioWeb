@@ -71,3 +71,30 @@
 - REFACTOR: el predicado sale a `tieneSegmentosQueNoInterpreta(ruta)`, con el porqué. `prettier --write`
   sobre los dos ficheros (solo partió una fila de @s47); barras invertidas contadas antes y después:
   17 en el test y 51 en producción, sin cambios. 237 passed.
+
+### C5 · @s49 (regla 3: el fichero existe y pesa 0 bytes; 3 filas)
+
+- Test: las 3 filas, `comprobarUnLink('icon', …)`.
+- ROJO visto: 2 failed (`vacio.svg` y `vacio.svg?v=2`), `expected +0 to be 'distinto de 0'`; la de 1 byte
+  (CONTROL), en verde.
+- VERDE mínimo: `REGLA_LINK_VACIO`; el `Set` pasa a `Map` ubicación → bytes (forma E:
+  `new Map(ficheros.listar().map((fichero) => [fichero.ubicacion, fichero.bytes]))`, que compila con
+  `strict` por el tipo declarado) y, tras «no está» → regla 2, `bytes === 0` → regla 3 (nunca `< 1`).
+  240 passed; `tsc` 0.
+- REFACTOR: ninguno.
+
+### C6 · @s50 (regla 4: `%`, `&` y la barra invertida, también AL PRINCIPIO, S-7; 11 filas)
+
+- Test: las 11 filas; la barra invertida va SIEMPRE con su escape `u005C` (también en las dos filas que
+  el `.feature` escribe literal), así que el fichero de test lleva 14 escapes nuevos (31 barras en total,
+  contadas con `String.fromCharCode(92)`).
+- ROJO visto: 10 failed. Cinco daban OTRA línea (`expected [ Array(1) ] to deeply equal [ Array(1) ]`: la
+  regla 1 en `/…cdn`, `NailsLashStudioWeb…favicon` y `/favicon%2Esvg`, la 2 en `%2Esvg` y `no%20existe`)
+  y cinco salían con 0 (`&amp;`, y las cuatro que EMPIEZAN por la barra invertida, que no eran
+  candidatas). El CONTROL `?v=2#x`, en verde.
+- VERDE mínimo: `NO_INTERPRETABLE = /[%&` + barra + `]/` sobre el `href` limpio ENTERO, lo PRIMERO de la
+  resolución; `esCandidato(limpio)` = `esRutaInterna(limpio) || limpio.startsWith(BARRA_INVERTIDA)`
+  (S-7). Barras comprobadas con `node -e`: `BARRA_INVERTIDA = '` + 2 barras + `'` y la clase con 2
+  (producción pasa de 51 a 55). 251 passed; `tsc` 0; `prettier --check` limpio.
+- REFACTOR: ninguno (el doble `limpiar` del candidato y de la regla se recoge en C12, cuando la puerta
+  necesite los candidatos para pedir la lista).

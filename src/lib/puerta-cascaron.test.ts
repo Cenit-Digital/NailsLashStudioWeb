@@ -1995,3 +1995,76 @@ describe('ejecutarPuertaDelCascaron → regla 2: con el prefijo, la ubicación q
     comprobarUnLink('stylesheet', href, codigo, lineas)
   })
 })
+
+describe('ejecutarPuertaDelCascaron → regla 3: el fichero existe pero pesa 0 bytes (@s49)', () => {
+  it.each<FilaDeUnLink>([
+    ['/NailsLashStudioWeb/uno.svg', 0, []],
+    [
+      '/NailsLashStudioWeb/vacio.svg',
+      FALLA,
+      ['/ — link root-absoluto a un fichero de 0 bytes en dist/: "/NailsLashStudioWeb/vacio.svg"'],
+    ],
+    [
+      '/NailsLashStudioWeb/vacio.svg?v=2',
+      FALLA,
+      [
+        '/ — link root-absoluto a un fichero de 0 bytes en dist/: "/NailsLashStudioWeb/vacio.svg?v=2"',
+      ],
+    ],
+  ])('@s49 %j → %s', (href, codigo, lineas) => {
+    comprobarUnLink('icon', href, codigo, lineas)
+  })
+})
+
+const LINEA_DE_LA_REGLA_4 =
+  '/ — link root-absoluto con %, &, barra invertida, // o segmentos . o .., que la puerta no interpreta: '
+
+describe('ejecutarPuertaDelCascaron → regla 4: un href con %, & o barra invertida, también AL PRINCIPIO, falla cerrado con su PROPIA regla (@s50)', () => {
+  it.each<FilaDeUnLink>([
+    ['/NailsLashStudioWeb/favicon.svg?v=2#x', 0, []],
+    [
+      '/NailsLashStudioWeb/favicon%2Esvg',
+      FALLA,
+      [`${LINEA_DE_LA_REGLA_4}"/NailsLashStudioWeb/favicon%2Esvg"`],
+    ],
+    [
+      '/NailsLashStudioWeb/favicon.svg?a=1&amp;b=2',
+      FALLA,
+      [`${LINEA_DE_LA_REGLA_4}"/NailsLashStudioWeb/favicon.svg?a=1&amp;b=2"`],
+    ],
+    [
+      '/\u005Ccdn.ejemplo/x.css',
+      FALLA,
+      [`${LINEA_DE_LA_REGLA_4}"/\u005Ccdn.ejemplo/x.css"`],
+    ],
+    [
+      '/NailsLashStudioWeb\u005Cfavicon.svg',
+      FALLA,
+      [`${LINEA_DE_LA_REGLA_4}"/NailsLashStudioWeb\u005Cfavicon.svg"`],
+    ],
+    ['/favicon%2Esvg', FALLA, [`${LINEA_DE_LA_REGLA_4}"/favicon%2Esvg"`]],
+    [
+      '/NailsLashStudioWeb/no%20existe.svg',
+      FALLA,
+      [`${LINEA_DE_LA_REGLA_4}"/NailsLashStudioWeb/no%20existe.svg"`],
+    ],
+    ['\u005Cfavicon.svg', FALLA, [`${LINEA_DE_LA_REGLA_4}"\u005Cfavicon.svg"`]],
+    [
+      '\u005CNailsLashStudioWeb/favicon.svg',
+      FALLA,
+      [`${LINEA_DE_LA_REGLA_4}"\u005CNailsLashStudioWeb/favicon.svg"`],
+    ],
+    [
+      '\u005C\u005Ccdn.ejemplo/x.css',
+      FALLA,
+      [`${LINEA_DE_LA_REGLA_4}"\u005C\u005Ccdn.ejemplo/x.css"`],
+    ],
+    [
+      '\u005C/cdn.ejemplo/x.css',
+      FALLA,
+      [`${LINEA_DE_LA_REGLA_4}"\u005C/cdn.ejemplo/x.css"`],
+    ],
+  ])('@s50 %j → %s', (href, codigo, lineas) => {
+    comprobarUnLink('icon', href, codigo, lineas)
+  })
+})
