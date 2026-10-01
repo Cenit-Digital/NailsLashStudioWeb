@@ -13,13 +13,14 @@
  * Se ejecuta con el type stripping de Node 22 (`--experimental-strip-types`), que exige la
  * extensión .ts explícita en el import. `tsconfig.json` ya trae `allowImportingTsExtensions`.
  */
-import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import process from 'node:process'
 
 import {
   type ArtefactoDeProduccion,
   ejecutarPuertaDelCascaron,
+  type ListaDeFicheros,
   RUTAS_ESPERADAS,
 } from '../src/lib/puerta-cascaron.ts'
 // 🟠 ENMIENDA 1 (2026-07-25, @s37): la MISMA extracción de texto que ya usa `tools/puerta-terceros.ts`
@@ -48,8 +49,20 @@ const artefactoReal: ArtefactoDeProduccion = {
       }),
 }
 
+const listaReal: ListaDeFicheros = {
+  listar: () =>
+    readdirSync(DIRECTORIO_ARTEFACTO, { recursive: true, withFileTypes: true })
+      .filter((entrada) => entrada.isFile())
+      .map((entrada) => {
+        const ruta = join(entrada.parentPath, entrada.name)
+
+        return { ubicacion: ubicacionLogica(ruta), bytes: statSync(ruta).size }
+      }),
+}
+
 const resultado = ejecutarPuertaDelCascaron({
   artefacto: artefactoReal,
+  ficheros: listaReal,
   rutasEsperadas: RUTAS_ESPERADAS,
   // LANZA si vite.config.ts no existe, mismo contrato que tools/puerta-terceros.ts. Se lee como
   // TEXTO, nunca se importa: la puerta no ejecuta la config, solo necesita el prefijo literal.
