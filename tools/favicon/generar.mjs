@@ -113,15 +113,15 @@ function glifoDe(tablas, cp) {
     const deltas = inicios + dobleDeSegmentos
     const rangos = deltas + dobleDeSegmentos
     for (let s = 0; s < dobleDeSegmentos / BYTES_POR_VALOR; s++) {
-      const desplazamiento = s * BYTES_POR_VALOR
-      const fin = cmap.readUInt16BE(finales + desplazamiento)
-      const inicio = cmap.readUInt16BE(inicios + desplazamiento)
+      const posicionDelSegmento = s * BYTES_POR_VALOR
+      const fin = cmap.readUInt16BE(finales + posicionDelSegmento)
+      const inicio = cmap.readUInt16BE(inicios + posicionDelSegmento)
       if (cp < inicio || cp > fin) continue
-      const delta = cmap.readInt16BE(deltas + desplazamiento)
-      const desplazamientoDelRango = cmap.readUInt16BE(rangos + desplazamiento)
+      const delta = cmap.readInt16BE(deltas + posicionDelSegmento)
+      const desplazamientoDelRango = cmap.readUInt16BE(rangos + posicionDelSegmento)
       if (desplazamientoDelRango === 0) return (cp + delta) & 0xffff
       const glifo = cmap.readUInt16BE(
-        rangos + desplazamiento + desplazamientoDelRango + (cp - inicio) * BYTES_POR_VALOR,
+        rangos + posicionDelSegmento + desplazamientoDelRango + (cp - inicio) * BYTES_POR_VALOR,
       )
       return glifo === 0 ? 0 : (glifo + delta) & 0xffff
     }
@@ -552,13 +552,13 @@ function componerIco(imagenes) {
 
 // ── Principal ───────────────────────────────────────────────────────────────────────────
 // Toda la validación (argumentos, glifo y tokens) va ANTES de la primera escritura (`mkdirSync`): un
-// error no deja iconos a medias.
+// error no deja iconos a medias. Devuelve la línea de resumen; la imprime la Interfaz.
 function generar(argv) {
   const salida = directorioDeSalida(argv)
   const tablas = leerWoff(FUENTE)
-  const glifo = contornosDelGlifo(tablas, glifoDe(tablas, LETRA.codePointAt(0)))
-  const d = pathDe(glifo)
-  const geo = geometria(cajaDe(glifo))
+  const contornos = contornosDelGlifo(tablas, glifoDe(tablas, LETRA.codePointAt(0)))
+  const d = pathDe(contornos)
+  const geo = geometria(cajaDe(contornos))
   const scss = readFileSync(TOKENS, 'utf8')
   const soft = leerColor(scss, '--accent-soft')
   const ink = leerColor(scss, '--ink')
@@ -579,21 +579,22 @@ function generar(argv) {
     codificarPng(LADO_APPLE, sinAlfa(apple), PNG_RGB),
   )
 
-  console.log(
+  return (
     `favicon: «${LETRA}» en ${ink} sobre ${soft}, viewBox ${geo.x} ${geo.y} ${geo.lado} ${geo.lado} ` +
-      `→ favicon.svg, favicon.ico (${LADOS_ICO.join(' + ')}) y apple-touch-icon.png (${LADO_APPLE}) ` +
-      `en ${salida}`,
+    `→ favicon.svg, favicon.ico (${LADOS_ICO.join(' + ')}) y apple-touch-icon.png (${LADO_APPLE}) ` +
+    `en ${salida}`
   )
 }
 
 // ── Interfaz ────────────────────────────────────────────────────────────────────────────
-// La única capa que habla con quien ejecuta el CLI: informa por stderr, sin traza, y sale con código
-// distinto de 0. Con process.exitCode y NO con process.exit(): en Windows, salir a la fuerza con E/S
-// pendiente tumba Node (el precedente está en tools/puerta-anclas.ts).
+// La única capa que habla con quien ejecuta el CLI: imprime el resumen por stdout y, si algo falla, lo
+// informa por stderr, sin traza, y sale con código distinto de 0. Con process.exitCode y NO con
+// process.exit(): en Windows, salir a la fuerza con E/S pendiente tumba Node (el precedente está en
+// tools/puerta-anclas.ts).
 const CODIGO_DE_SALIDA_CON_ERROR = 1
 
 try {
-  generar(process.argv.slice(2))
+  console.log(generar(process.argv.slice(2)))
 } catch (error) {
   const motivo =
     error instanceof ErrorDelFavicon ? error.message : `error inesperado: ${error.message}`
