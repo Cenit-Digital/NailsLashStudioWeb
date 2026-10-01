@@ -580,10 +580,10 @@ function esRutaInterna(href: string): boolean {
 export const REGLA_LINK_SIN_PREFIJO = 'link root-absoluto sin el prefijo de la base'
 export const REGLA_LINK_SIN_FICHERO = 'link root-absoluto sin fichero en dist/'
 export const REGLA_LINK_VACIO = 'link root-absoluto a un fichero de 0 bytes en dist/'
-export const REGLA_LINK_OCULTO =
-  'link root-absoluto a un fichero oculto, que el despliegue no publica'
 export const REGLA_LINK_NO_INTERPRETA =
   'link root-absoluto con %, &, barra invertida, // o segmentos . o .., que la puerta no interpreta'
+export const REGLA_LINK_OCULTO =
+  'link root-absoluto a un fichero oculto, que el despliegue no publica'
 
 /**
  * LA LIMPIEZA DEL NAVEGADOR (H5-2; https://url.spec.whatwg.org/#concept-basic-url-parser), en su
@@ -651,13 +651,18 @@ function esBaseUtilizable(base: string): boolean {
   return esRutaInterna(base) && base.endsWith('/')
 }
 
+/**
+ * LA RESOLUCIÓN ESTRICTA (H5-3) de un `href` ya limpio, en el orden de la spec: la 4 (`%`, `&` o
+ * barra invertida en el `href` ENTERO; `//`, `.` o `..` en la RUTA), la 1, la 2, la 5 y la 3. Como
+ * mucho UNA regla por `<link>`; `null` si resuelve a un fichero publicado y no vacío. La ruta sale de
+ * `rutaDelHref`, la de la anti-404 de `<a>`, y se busca por igualdad EXACTA, con su caja, en la lista
+ * (nunca con `existsSync`: en Windows el disco no distingue la caja y GitHub Pages sí, medido).
+ */
 function reglaDelLink(
-  href: string,
+  limpio: string,
   ubicaciones: ReadonlyMap<string, number>,
   base: string | null,
 ): string | null {
-  const limpio = limpiar(href)
-
   if (NO_INTERPRETABLE.test(limpio)) {
     return REGLA_LINK_NO_INTERPRETA
   }
@@ -693,18 +698,22 @@ function reglaDelLink(
   return null
 }
 
-/** Un `<link>` root-absoluto que resolver: la ruta LÓGICA de la página que lo trae y su `href` CRUDO. */
+/**
+ * Un `<link>` root-absoluto que resolver: la ruta LÓGICA de la página que lo trae, su `href` CRUDO
+ * (el valor de la línea, S-6) y el limpio (el que se clasifica y se resuelve).
+ */
 interface Candidato {
   readonly ruta: string
   readonly href: string
+  readonly limpio: string
 }
 
 /** ENMIENDA 5 (H-5): los candidatos de TODAS las páginas, en el orden del listado y de aparición. */
 function candidatosDe(paginas: readonly PaginaArtefacto[]): Candidato[] {
   return paginas.flatMap((pagina) =>
     extraerLinks(pagina.html)
-      .filter((href) => esCandidato(limpiar(href)))
-      .map((href) => ({ ruta: pagina.ruta, href })),
+      .map((href) => ({ ruta: pagina.ruta, href, limpio: limpiar(href) }))
+      .filter((candidato) => esCandidato(candidato.limpio)),
   )
 }
 
@@ -714,8 +723,8 @@ function violacionesDeLinks(
   ubicaciones: ReadonlyMap<string, number>,
   base: string | null,
 ): ViolacionCascaron[] {
-  return candidatos.flatMap(({ ruta, href }) => {
-    const regla = reglaDelLink(href, ubicaciones, base)
+  return candidatos.flatMap(({ ruta, href, limpio }) => {
+    const regla = reglaDelLink(limpio, ubicaciones, base)
 
     return regla === null ? [] : [{ ruta, regla, valor: href }]
   })
@@ -922,7 +931,11 @@ export interface PeticionPuertaCascaron {
    * existente sigue compilando y significa exactamente lo de hoy (@s23-@s30, sin tocar).
    */
   readonly base?: string | null
-  /** ENMIENDA 5 (H-5): la lista de ficheros del artefacto, campo OPCIONAL (precedente `base?`). */
+  /**
+   * ENMIENDA 5 (H-5): la lista de ficheros del artefacto, campo OPCIONAL (precedente `base?`) que
+   * falla CERRADO: si falta y hay algún `<link>` root-absoluto que resolver, la puerta corta (S-3).
+   * Es un método y no un valor: se pide SOLO entonces, y siempre DESPUÉS de `existe()`.
+   */
   readonly ficheros?: ListaDeFicheros
 }
 
@@ -952,6 +965,11 @@ function motivoDelReventon(error: unknown): string {
   return error instanceof Error ? error.message : String(error)
 }
 
+/** Las guardas, los cortes y la rama de @s29 fallan con UNA sola línea, sin `<ruta> —`. */
+function fallaCerradaCon(linea: string): ResultadoPuertaCascaron {
+  return { codigoSalida: CODIGO_FALLO, lineas: [linea] }
+}
+
 export function ejecutarPuertaDelCascaron(
   peticion: PeticionPuertaCascaron,
 ): ResultadoPuertaCascaron {
@@ -961,12 +979,9 @@ export function ejecutarPuertaDelCascaron(
     // FALLA CERRADA (@s29): ante la duda, BUILD ROTO, NUNCA BUILD VERDE. Tragarse la excepción y
     // devolver «0 violaciones» sería PEOR que no tener puerta, porque además daría confianza
     // falsa. Es literalmente cómo se evaporaron los 3 bloqueantes AA del stack base [V].
-    return {
-      codigoSalida: CODIGO_FALLO,
-      lineas: [
-        `la puerta del cascarón no pudo completar la inspección: ${motivoDelReventon(error)}`,
-      ],
-    }
+    return fallaCerradaCon(
+      `la puerta del cascarón no pudo completar la inspección: ${motivoDelReventon(error)}`,
+    )
   }
 }
 
@@ -977,10 +992,9 @@ function inspeccionarArtefacto(peticion: PeticionPuertaCascaron): ResultadoPuert
   // «una HTML por cada ruta esperada» se satisface VACUAMENTE y la puerta pasa sin inspeccionar
   // nada. El mutante «vaciar RUTAS_ESPERADAS» tiene que romper aquí.
   if (rutasEsperadas.length === 0) {
-    return {
-      codigoSalida: CODIGO_FALLO,
-      lineas: ['la lista de rutas esperadas está vacía: no hay nada que exigirle al artefacto'],
-    }
+    return fallaCerradaCon(
+      'la lista de rutas esperadas está vacía: no hay nada que exigirle al artefacto',
+    )
   }
 
   // El artefacto se lee SOLO si existe: `listarHtml` LANZA si no (contrato del puerto). Sin
@@ -993,26 +1007,25 @@ function inspeccionarArtefacto(peticion: PeticionPuertaCascaron): ResultadoPuert
       }))
     : []
 
+  // ENMIENDA 5: la lista de ficheros y la base se miran SOLO si hay algún `<link>` root-absoluto
+  // que resolver, en CUALQUIER página. Sin la lista no se puede decidir ninguno, y un informe
+  // parcial parecería completo (S-3); con una base no utilizable, quitarle el prefijo acusaría en
+  // falso (S-12). Los dos cortes salen SOLOS y la lista no se pide antes de ellos. Esta forma (la E
+  // del mapa del Gherkin) no deja código muerto: sin `?.`, `??` ni `!` sobre `ficheros`.
   const candidatos = candidatosDe(paginas)
   let ubicaciones = new Map<string, number>()
 
   if (candidatos.length > 0) {
     if (ficheros === undefined) {
-      return {
-        codigoSalida: CODIGO_FALLO,
-        lineas: [
-          'la puerta no recibió la lista de ficheros del artefacto y hay elementos link root-absolutos que resolver',
-        ],
-      }
+      return fallaCerradaCon(
+        'la puerta no recibió la lista de ficheros del artefacto y hay elementos link root-absolutos que resolver',
+      )
     }
 
     if (base !== null && !esBaseUtilizable(base)) {
-      return {
-        codigoSalida: CODIGO_FALLO,
-        lineas: [
-          `la base declarada no es una ruta root-absoluta acabada en / y hay elementos link root-absolutos que resolver: "${base}"`,
-        ],
-      }
+      return fallaCerradaCon(
+        `la base declarada no es una ruta root-absoluta acabada en / y hay elementos link root-absolutos que resolver: "${base}"`,
+      )
     }
 
     ubicaciones = new Map(ficheros.listar().map((fichero) => [fichero.ubicacion, fichero.bytes]))
@@ -1040,12 +1053,9 @@ function inspeccionarArtefacto(peticion: PeticionPuertaCascaron): ResultadoPuert
   const seInspeccionoAlgunEnlace = paginas.some((pagina) => extraerEnlaces(pagina.html).length > 0)
 
   if (!seInspeccionoAlgunEnlace) {
-    return {
-      codigoSalida: CODIGO_FALLO,
-      lineas: [
-        'no se inspeccionó ningún enlace del artefacto: el extractor de href no encontró nada',
-      ],
-    }
+    return fallaCerradaCon(
+      'no se inspeccionó ningún enlace del artefacto: el extractor de href no encontró nada',
+    )
   }
 
   // GUARDA DEL EXTRACTOR NUEVO (ENMIENDA 5), con el molde de la de @s28 y DETRÁS de ella: vigila
@@ -1056,12 +1066,9 @@ function inspeccionarArtefacto(peticion: PeticionPuertaCascaron): ResultadoPuert
   const seInspeccionoAlgunLink = paginas.some((pagina) => extraerLinks(pagina.html).length > 0)
 
   if (!seInspeccionoAlgunLink) {
-    return {
-      codigoSalida: CODIGO_FALLO,
-      lineas: [
-        'no se inspeccionó ningún elemento link del artefacto: el extractor de href de link no encontró nada',
-      ],
-    }
+    return fallaCerradaCon(
+      'no se inspeccionó ningún elemento link del artefacto: el extractor de href de link no encontró nada',
+    )
   }
 
   return { codigoSalida: CODIGO_EXITO, lineas: [] }

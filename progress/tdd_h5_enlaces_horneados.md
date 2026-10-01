@@ -273,3 +273,16 @@
   heredado de C10/C13).
 - VERDE mínimo: dentro del `if (candidatos.length > 0)`, el corte por lista ausente primero y el de la
   base después. 338 passed; `tsc` 0; `prettier` limpio.
+
+### C21 · REFACTOR final (en verde, sin test nuevo)
+
+- `reglaDelLink` recibe el `href` YA limpio: `Candidato` lleva `ruta`, `href` (crudo, el valor de la
+  línea) y `limpio`, que `candidatosDe` calcula una sola vez (antes se limpiaba dos veces). Comentario de
+  la resolución ESTRICTA con su orden (4-1-2-5-3).
+- `fallaCerradaCon(linea)`: las seis salidas de una sola línea (la rama de @s29, la guarda de @s27, los
+  dos cortes nuevos, la guarda de @s28 y la nueva) comparten el `{ codigoSalida: CODIGO_FALLO, lineas:
+  [linea] }`. Ninguna línea de hoy cambia de texto.
+- Las constantes de las reglas, en el orden de su número (1, 2, 3, 4, 5); comentario del campo
+  `ficheros?` (falla cerrado; es un método) y del bloque de los cortes (forma E, sin `?.`, `??` ni `!`).
+- 338 passed; `tsc` 0; `eslint` 0 en los dos ficheros; `prettier --check` limpio; barras en producción:
+  66, sin cambios.
