@@ -152,3 +152,10 @@ el contrato son los invariantes I-1..I-7 de `progress/brief_deuda_favicon_legibi
   `src/lib/puerta-cascaron.test.ts` (211 a 338), @s46-@s60, @s65, @s66, @s68 y @s69; bitácora
   `progress/tdd_h5_enlaces_horneados.md`. OJO: hasta la FASE B (el humilde cablea `ficheros`), `pnpm build`
   sale con 1 por el corte de S-3 (medido sobre una copia del build real): no correr la suite completa ni fusionar.
+- H-5 FASE B (humilde + extremo a extremo, `tdd_craftsman`): VERDE. `tools/puerta-cascaron.ts` cablea la lista de
+  ficheros (`ficheros`: recursiva, solo ficheros, con su tamaño, perezosa) y `src/pages/home-horneado.test.ts` gana 8
+  tests (42 a 50): @s61, @s62 (a, b, c), @s67, @s70, @s71 y @s72, más `elementosDe` (excepción declarada). Rojo
+  visto con el humilde de hoy (9 failed, S-3) y con la puerta previa a H-5 (los 5 que el contrato da por rojos); 7
+  sabotajes del humilde, cada uno cazado por su escenario. Los 6 ficheros del encargo, 541/541; `pnpm build` real
+  en un temporal: exit 0 y las cinco puertas en ✓. El corte S-3 de la FASE A queda cerrado. Bitácora: misma,
+  sección «FASE B». Pendiente del lead: suite completa, @s63, `judge`, mutación y @s64 tras publicar.

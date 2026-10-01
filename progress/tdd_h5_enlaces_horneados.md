@@ -396,3 +396,161 @@ del artefacto y hay elementos link root-absolutos que resolver`. Por tanto los `
 4. `git stash` es COMPARTIDO entre worktrees: hay un stash previo de `main` («WIP muerto de puerta.test.ts»)
    que no he tocado; en el sabotaje de C14 usé `push`/`pop` y la lista de stashes quedó como estaba. En los
    demás sabotajes restauré desde una copia o con `git checkout` del fichero, sin stash.
+
+---
+
+# FASE B — el humilde y el extremo a extremo (@s61, @s62, @s67, @s70-@s72) — 2026-10-01
+
+> Autor: `tdd_craftsman`. Mismo worktree y rama, desde `9ed713e` (cierre de la FASE A). Contrato: los escenarios
+> de extremo a extremo de `features/cascaron_semantico.feature` (sección «Extremo a extremo (D9)» y su cabecera
+> «PARA EL `tdd_craftsman`»), la excepción `elementos` → `elementosDe` y «QUÉ NO CAMBIA» del banner; spec:
+> `project-spec.md` §Feature 4 → «Enmienda 5», «El puerto nuevo» y «Prueba de extremo a extremo (D9)». @s63 y
+> @s64 son del LEAD (no son tests) y no se han hecho aquí.
+>
+> Alcance: SOLO `src/pages/home-horneado.test.ts` y `tools/puerta-cascaron.ts`. NO se tocan `tools/artefacto.ts`,
+> `ArtefactoDeProduccion`, `src/lib/puerta-cascaron.ts`, `tools/puerta-anclas.ts` ni F-05. `feature_list.json`
+> no se toca. Ficheros modificados SOLO con Bash y `scratchpad/h5/tdd-b/aplicar.mjs` (parches `p01`-`p05`); barras
+> invertidas contadas antes y después de cada parche con `String.fromCharCode(92)`.
+
+## Línea base (medida antes de tocar nada)
+
+`pnpm exec vitest run src/pages/home-horneado.test.ts` → 42 tests, **2 failed | 40 passed**: `@s14 el build de
+producción con las CINCO puertas termina en código de salida 0` (`expected 1 to be +0`) y el `H-3 control` de
+`cascaron` (salida: `  ✗ la puerta no recibió la lista de ficheros del artefacto y hay elementos link root-absolutos
+que resolver`). Es el hallazgo 1 de la FASE A, confirmado en el `beforeAll` real: `vite-react-ssg build` deja el
+artefacto, la 1.ª puerta corta por S-3 y `html` se lee igual, así que lo demás sigue en verde. Una corrida del
+fichero tarda unos 10 s.
+
+## Ciclos
+
+### B1 · REFACTOR del ayudante (excepción DECLARADA): `elementos` delega en `elementosDe(fuente, etiqueta)`
+
+- `elementosDe` lleva el MISMO patrón de apertura y el MISMO `atributosDe`, sobre `fuente`; `elementos(etiqueta)`
+  pasa a `return elementosDe(html, etiqueta)`. Ninguna llamada cambia; no hay un segundo patrón ni se reasigna
+  `html`. Barras del fichero: 24 antes y después.
+- Medido: @s39 (2 tests), @s40 (3), @s41 (3), @s42 (4) y F-28 @s8 (7), los 19, en verde; el fichero, igual que la
+  línea base (2 failed | 40 passed, los mismos dos del corte S-3). `tsc` 0, `eslint` 0, `prettier` limpio.
+  Commit `5145e70`.
+
+### B2 · ROJO: 8 tests nuevos (@s61; @s62 filas a, b y c; @s67; @s70; @s71; @s72)
+
+- Al final del fichero, tras F-28 @s8; un `it` por escenario y un `it.each(FIRMAS_DEL_H5)` de 3 filas para @s62.
+  Cada sabotaje, en su PROPIA copia (`cpSync` recursivo) dentro del `temporal` del fichero (`copia-s62-a` a
+  `copia-s72`); @s70 usa `join(temporal, "no-existe")`, el del «H-3 caso», sin copiar nada. La puerta se corre con
+  el `correrPuerta` de siempre. Ningún build, `beforeAll`, `execSync` de build ni jsdom nuevos.
+- Cada `Then` sobre una copia lee del DISCO después del sabotaje (`indexDe(copia)` + `elementosDe`, `statSync`); el
+  `href` se lee TAL CUAL con `.get("href")`; el último `Then` RELEE el `index.html` ORIGINAL y lo compara con `html`.
+  Las anclas van delante de lo demás en cada test.
+- **Medida 1, con la FASE A y el humilde de HOY** (lo que pide el lead): 50 tests, **9 failed | 41 passed**. En
+  TODOS los nuevos, las anclas pasan; el rojo cae así:
+
+| Test          | Dónde cae (medido)                                                                                                       |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| @s61          | en «la salida contiene "✓ Puerta del cascarón"»: `código 1`, la salida trae la línea del corte S-3                       |
+| @s62 (a)      | en «la salida contiene la línea»: el código es 1 (distinto de 0, pasa), pero la línea es la del corte S-3, no la regla 1 |
+| @s62 (b)      | ídem, no la regla 2                                                                                                      |
+| @s62 (c)      | ídem, no la regla 3                                                                                                      |
+| @s67          | ídem, no la regla 2 de `"/NailsLashStudioWeb/assets"`                                                                    |
+| @s70          | VERDE (CONTROL): línea de @s26, código distinto de 0, sin `ENOENT` ni `✓`                                                |
+| @s71          | en «la salida contiene la línea»: la del corte S-3, no la de la regla 5                                                  |
+| @s72          | en «el código de salida es 0»: sale con 1 por el corte S-3                                                               |
+| (ya existían) | @s14 (exit del `beforeAll` 1) y `H-3 control` de `cascaron`, los dos de la línea base                                    |
+
+- **Medida 2, con la puerta de ANTES de H-5** (`src/lib/puerta-cascaron.ts` de `df01310` puesto en su sitio solo
+  para esta corrida y restaurado acto seguido; `git diff HEAD` de ese fichero, vacío): **5 failed | 45 passed**.
+  @s62 (a, b, c), @s67 y @s71, en ROJO en «el código de salida es un número distinto de 0» (las copias salen con 0 y
+  `✓ Puerta del cascarón`); @s61, @s70 y @s72, en VERDE; el resto del fichero, en verde. Es exactamente el «NACEN EN
+  ROJO / NACEN EN VERDE» del contrato, que habla de la puerta que solo mira `<a href>`. Con la FASE A ya en la rama,
+  @s61 y @s72 nacen además en rojo por el corte S-3 (medida 1): lo anticipaba el lead.
+
+### B3 · VERDE: el puerto de la lista en el humilde
+
+- `tools/puerta-cascaron.ts`: `listaReal: ListaDeFicheros`, cuyo `listar()` es el `readdirSync` recursivo con
+  `withFileTypes` de `DIRECTORIO_ARTEFACTO`, solo `isFile()`, y por cada fichero su `ubicacionLogica(ruta)` y
+  `statSync(ruta).size`; NUNCA `readFileSync`. Se pasa como `ficheros: listaReal`. Es un método: no lista hasta que
+  la puerta lo pide, y la puerta lo pide DESPUÉS de `existe()`.
+- 50 passed (50): el `beforeAll` vuelve a salir con 0 (@s14 en verde), el `H-3 control` de `cascaron` en verde y los
+  8 nuevos en verde. `tsc` 0, `eslint` 0, `prettier` limpio. Commit `2ea2733`.
+
+### B4 · REFACTOR del humilde
+
+- `listarHtml` y `listar` repetían el recorrido: sale a `rutasDeLosFicheros()` (recursivo, solo ficheros, rutas
+  físicas; LANZA si no existe). `listarHtml` filtra con `ES_HTML` sobre la RUTA y no sobre el nombre: equivalente,
+  porque el patrón está anclado al final y la ruta acaba en el nombre. Comentarios del porqué (sin filtrar, sin leer,
+  perezoso) y una línea en la cabecera. Barras: 2, sin cambios.
+- 50 passed (50); `tsc` 0, `eslint` 0, `prettier` limpio. Commit `d2b8fcd`.
+
+### B5 · SABOTAJES del humilde (no se muta: su defensa es este extremo a extremo)
+
+Script `scratchpad/h5/tdd-b/sabotear.mjs`: cada variante reescribe SOLO el `listar` del humilde, corre el fichero con
+el reporter JSON y, en un `finally`, restaura el texto original (`git diff --exit-code` del humilde: 0; `git status`
+limpio). Resultados medidos:
+
+| Sabotaje del `listar`                               | Resultado          | Qué cae                                                                                                 |
+| --------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------- |
+| S1 no recursivo (sin `recursive: true`)             | 9 failed, 41 pass. | @s61, @s62 (a, b, c), @s67, @s71, @s72, @s14 y `H-3 control` (los `<link>` de `assets/` dan la regla 2) |
+| S2 sin `isFile()` (carpetas incluidas)              | 1 failed, 49 pass. | SOLO @s67: la carpeta `assets` pesa 0 B en Windows y da la regla 3, no la 2                             |
+| S3 quita los ocultos (algún segmento empieza por .) | 1 failed, 49 pass. | SOLO @s71: da la regla 2 («sin fichero en dist/») de un fichero que SÍ está                             |
+| S4 quita las `.html`                                | 1 failed, 49 pass. | SOLO @s72: la regla 2 sobre la raíz `"/NailsLashStudioWeb/"`                                            |
+| S5 ansioso (lista al cargar, antes de la puerta)    | 1 failed, 49 pass. | SOLO @s70: el `ENOENT` de `readdirSync` sale FUERA de la puerta y se pierde la línea de @s26            |
+| S6 ubicación FÍSICA en vez de `dist/…`              | 9 failed, 41 pass. | los mismos 9 que S1 (nada resuelve: regla 2 en todos los `<link>`)                                      |
+| S7 sin tamaño (`bytes: 1`)                          | 1 failed, 49 pass. | SOLO @s62 (c): sale con 0 y `✓`                                                                         |
+
+Así, @s70 y @s72 (CONTROLES) y @s67 y @s71 no son verdes a ciegas: cada uno, y solo él, mata la propiedad del humilde
+que el mapa le asigna (`progress/gherkin_h5_enlaces_horneados.md` §2).
+
+## Cierre (paso 4 del encargo)
+
+- Los seis ficheros que pide el lead (`home-horneado`, `contacto-horneado`, `trampas-del-horneado`,
+  `puerta-cascaron`, `puerta-anclas` y `seo`) en una sola corrida de `pnpm exec vitest run`: **541 passed (541)**;
+  por fichero, 50/50, 26/26, 45/45, 338/338, 39/39 y 43/43.
+- `pnpm typecheck` 0; `pnpm exec eslint tools/puerta-cascaron.ts src/pages/home-horneado.test.ts` 0; `pnpm exec
+prettier --check` de los dos, limpio.
+- **Build real** con `NLS_DIST_DIR` en `scratchpad/h5/tdd-b/build-real/dist`: `pnpm build` sale con **0** y las
+  CINCO puertas en `✓` (cascarón, placeholders, contraste, terceros y anclas vivas), sin ninguna línea `✗`. El `dist/`
+  del proyecto no existía antes ni existe después; `git status` limpio.
+- Ese artefacto, medido: 42 entradas del `readdirSync` recursivo (39 ficheros y 3 carpetas: `.vite`, `assets` y
+  `static-loader-data`), 2 ocultos (`.vite/manifest.json` y `.vite/ssr-manifest.json`) y 1 HTML (`index.html`); su
+  `index.html` trae 11 `<link>` con `href`, 10 root-absolutos y 7 bajo `/NailsLashStudioWeb/assets/`.
+- NO he corrido la suite completa, `bin/harness init` ni Stryker (los corre el lead o el `mutation_tester`).
+  `home-horneado` pasa de 42 a **50 tests** (8 nuevos).
+
+## Trazabilidad FASE B (@s → test, `src/pages/home-horneado.test.ts`)
+
+- @s61 → `it` de :722: ANCLA (al menos 1 `href` con `/NailsLashStudioWeb/`, al menos 1 con
+  `/NailsLashStudioWeb/assets/`, exactamente 1 `/NailsLashStudioWeb/favicon.svg`), `favicon.svg` de más de 0 B y «la
+  salida contiene "✓ Puerta del cascarón"». «El código de salida es 0» es el `H-3 control` de `cascaron` (:543),
+  CITADO y no duplicado, como manda el contrato.
+- @s62 → `it.each(FIRMAS_DEL_H5)` de :799, filas (a), (b) y (c) (los datos, en :759).
+- @s67 → `it` de :824. @s70 → `it` de :849. @s71 → `it` de :868. @s72 → `it` de :893.
+- Ayudantes NUEVOS: `elementosDe` (:247, en el que delega `elementos`, :254), `HREF_DEL_FAVICON`, `MARCA_DE_LINK`,
+  `copiaDelArtefacto`, `indexDe`, `linksConHref`, `cambiarElHrefDelFavicon`, `bytesDelFichero`, `lineasDeLink`,
+  `esperarQueLaPuertaPare`, `esperarElOriginalIntacto` (:659-719) y `FirmaDelH5` (:746). Literales y líneas, A MANO;
+  el fichero sigue sin importar nada de `src/`.
+- Humilde (`tools/puerta-cascaron.ts`): `rutasDeLosFicheros`, `listaReal` y `ficheros: listaReal`.
+
+## Desviaciones declaradas (FASE B)
+
+1. B1 es un refactor de un ayudante de TEST con el fichero en rojo por dos tests que no lo usan (el corte S-3 de la
+   FASE A); sus 19 tests estaban y siguieron en verde. Lo ordena el lead como paso 1.
+2. Los seis escenarios se escribieron en un solo paso (orden del lead), no uno a uno; cada test se midió por separado.
+3. @s61 no vuelve a aseverar el código 0: lo hace el `H-3 control` (contrato: «se cita, no se duplica»); el mensaje
+   de la aserción del `✓` lleva el código, para que un fallo lo diga.
+4. «La salida contiene la línea», por subcadena (el humilde antepone la marca `✗`); «esa es la ÚNICA», contando las
+   líneas (partidas por el salto de línea) que contienen ` — link root-absoluto`.
+5. «Exactamente 1 `<link>` de `href` X y 0 de Y» se cuenta con `elementosDe` sobre el `index.html` de la copia
+   releído y `.get("href")` por igualdad; el cambio de `href` reemplaza la 1.ª aparición del atributo del favicon, y
+   el ANCLA (1 nuevo, 0 viejo) comprueba que se hizo.
+6. B4 toca `listarHtml` del humilde (el filtro HTML sobre la ruta): no está en «QUÉ NO CAMBIA», y lo cubren el
+   `H-3 control`, @s61-@s72 y `trampas-del-horneado` (45/45).
+
+## Hallazgos (FASE B)
+
+1. El rojo de la FASE A (`pnpm build` en 1 por S-3) queda cerrado: el build real sale con 0 y las cinco puertas en `✓`.
+2. Con la FASE A ya en la rama, @s61 y @s72 no «nacen en verde» respecto del humilde de hoy (caen por S-3); el
+   contrato se refiere a la puerta anterior a H-5, y con ella sí nacen en verde (medida 2). No es un defecto del
+   contrato: es el corte en dos fases.
+3. El hook `Fact-Forcing Gate` paró tres órdenes (la medida con la puerta de `df01310`, el borrado del temporal del
+   build real y la escritura de esta bitácora, que solo citaba ese borrado); se presentaron los hechos y se
+   repitieron tal cual. Aparte, dos heredocs largos de Bash fallaron al analizarse («unexpected EOF while looking for
+   matching quote») y se escribieron por trozos, sin comillas simples en el texto: nada llegó a escribirse a medias.
