@@ -61,6 +61,10 @@ function directorioDeSalida(argv) {
 }
 
 // ── Fuente: WOFF1 → tablas sfnt ─────────────────────────────────────────────────────────
+// Los anchos de los enteros de la fuente, que comparten cmap, loca y glyf.
+const BYTES_POR_ENTERO_16 = 2
+const BYTES_POR_ENTERO_32 = 4
+
 // La cabecera WOFF1 mide 44 bytes y lleva numTables en el byte 12. Detrás va el directorio: una entrada
 // de 20 bytes por tabla, con su etiqueta (4 letras), su desplazamiento, su largo comprimido y su largo
 // original.
@@ -92,12 +96,12 @@ const INICIO_DE_LOS_REGISTROS_CMAP = 4
 const LARGO_DEL_REGISTRO_CMAP = 8
 const POSICION_DE_LA_SUBTABLA_EN_EL_REGISTRO = 4
 // Subtabla de formato 4: segCountX2 en el byte 6 y endCode[] desde el 14; tras él, 2 bytes de relleno
-// (reservedPad) y luego startCode[], idDelta[] e idRangeOffset[], de segCountX2 bytes cada uno.
+// (reservedPad) y luego startCode[], idDelta[] e idRangeOffset[], de segCountX2 bytes cada uno: un
+// entero de 16 bits por segmento.
 const FORMATO_POR_SEGMENTOS = 4
 const POSICION_DEL_DOBLE_DE_SEGMENTOS = 6
 const INICIO_DE_LOS_FINALES = 14
 const LARGO_DEL_RELLENO = 2
-const BYTES_POR_VALOR = 2 // los valores de esos arrays son uint16 (o int16)
 
 // cmap de formato 4: del punto de código al índice de glifo.
 function glifoDe(tablas, cp) {
@@ -112,8 +116,8 @@ function glifoDe(tablas, cp) {
     const inicios = finales + dobleDeSegmentos + LARGO_DEL_RELLENO
     const deltas = inicios + dobleDeSegmentos
     const rangos = deltas + dobleDeSegmentos
-    for (let s = 0; s < dobleDeSegmentos / BYTES_POR_VALOR; s++) {
-      const posicionDelSegmento = s * BYTES_POR_VALOR
+    for (let s = 0; s < dobleDeSegmentos / BYTES_POR_ENTERO_16; s++) {
+      const posicionDelSegmento = s * BYTES_POR_ENTERO_16
       const fin = cmap.readUInt16BE(finales + posicionDelSegmento)
       const inicio = cmap.readUInt16BE(inicios + posicionDelSegmento)
       if (cp < inicio || cp > fin) continue
@@ -121,7 +125,7 @@ function glifoDe(tablas, cp) {
       const desplazamientoDelRango = cmap.readUInt16BE(rangos + posicionDelSegmento)
       if (desplazamientoDelRango === 0) return (cp + delta) & 0xffff
       const glifo = cmap.readUInt16BE(
-        rangos + posicionDelSegmento + desplazamientoDelRango + (cp - inicio) * BYTES_POR_VALOR,
+        rangos + posicionDelSegmento + desplazamientoDelRango + (cp - inicio) * BYTES_POR_ENTERO_16,
       )
       return glifo === 0 ? 0 : (glifo + delta) & 0xffff
     }
@@ -130,22 +134,24 @@ function glifoDe(tablas, cp) {
 }
 
 // head.indexToLocFormat, en el byte 50: 1 si loca guarda los desplazamientos como uint32; 0 si como
-// uint16, a la mitad.
+// uint16, divididos entre 2.
 const POSICION_DEL_FORMATO_DE_LOCA = 50
 const LOCA_LARGA = 1
+const DIVISOR_DE_LA_LOCA_CORTA = 2
 
+// El glifo va desde donde empieza él en glyf hasta donde empieza el siguiente.
 function rangoDelGlifo(tablas, glifo) {
-  const loca = tablas.loca
   const locaLarga = tablas.head.readInt16BE(POSICION_DEL_FORMATO_DE_LOCA) === LOCA_LARGA
-  return locaLarga
-    ? [loca.readUInt32BE(glifo * 4), loca.readUInt32BE(glifo * 4 + 4)]
-    : [loca.readUInt16BE(glifo * 2) * 2, loca.readUInt16BE(glifo * 2 + 2) * 2]
+  const inicioEnGlyf = locaLarga
+    ? (entrada) => tablas.loca.readUInt32BE(entrada * BYTES_POR_ENTERO_32)
+    : (entrada) =>
+        tablas.loca.readUInt16BE(entrada * BYTES_POR_ENTERO_16) * DIVISOR_DE_LA_LOCA_CORTA
+  return [inicioEnGlyf(glifo), inicioEnGlyf(glifo + 1)]
 }
 
 // ── Glifo: glyf → contornos ─────────────────────────────────────────────────────────────
 // Cada glifo abre con una cabecera de 10 bytes: numberOfContours (int16, el primer campo) y su caja.
 const LARGO_DE_LA_CABECERA_DEL_GLIFO = 10
-const BYTES_POR_ENTERO_16 = 2
 // Las banderas de cada punto (con su nombre en la especificación TrueType).
 const BANDERA_EN_LA_CURVA = 1 // ON_CURVE_POINT
 const BANDERA_X_CORTA = 2 // X_SHORT_VECTOR
