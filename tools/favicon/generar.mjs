@@ -134,18 +134,17 @@ function glifoDe(tablas, cp) {
 }
 
 // head.indexToLocFormat, en el byte 50: 1 si loca guarda los desplazamientos como uint32; 0 si como
-// uint16, divididos entre 2.
+// uint16, divididos entre 2: al leerlos, se multiplican por FACTOR_DE_LA_LOCA_CORTA.
 const POSICION_DEL_FORMATO_DE_LOCA = 50
 const LOCA_LARGA = 1
-const DIVISOR_DE_LA_LOCA_CORTA = 2
+const FACTOR_DE_LA_LOCA_CORTA = 2
 
 // El glifo va desde donde empieza él en glyf hasta donde empieza el siguiente.
 function rangoDelGlifo(tablas, glifo) {
   const locaLarga = tablas.head.readInt16BE(POSICION_DEL_FORMATO_DE_LOCA) === LOCA_LARGA
   const inicioEnGlyf = locaLarga
     ? (entrada) => tablas.loca.readUInt32BE(entrada * BYTES_POR_ENTERO_32)
-    : (entrada) =>
-        tablas.loca.readUInt16BE(entrada * BYTES_POR_ENTERO_16) * DIVISOR_DE_LA_LOCA_CORTA
+    : (entrada) => tablas.loca.readUInt16BE(entrada * BYTES_POR_ENTERO_16) * FACTOR_DE_LA_LOCA_CORTA
   return [inicioEnGlyf(glifo), inicioEnGlyf(glifo + 1)]
 }
 
@@ -268,8 +267,8 @@ function pathDe(contornos) {
           : `L${redondeo(punto.x)} ${redondeo(punto.y)}`
         ctrl = null
       } else if (ctrl) {
-        const medio = { x: (ctrl.x + punto.x) / 2, y: (ctrl.y + punto.y) / 2 }
-        s += `Q${redondeo(ctrl.x)} ${redondeo(ctrl.y)} ${redondeo(medio.x)} ${redondeo(medio.y)}`
+        const puntoMedio = { x: (ctrl.x + punto.x) / 2, y: (ctrl.y + punto.y) / 2 }
+        s += `Q${redondeo(ctrl.x)} ${redondeo(ctrl.y)} ${redondeo(puntoMedio.x)} ${redondeo(puntoMedio.y)}`
         ctrl = punto
       } else ctrl = punto
     }
