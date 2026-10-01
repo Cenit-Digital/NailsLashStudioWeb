@@ -82,3 +82,13 @@ Rama `claude/favicon-marca` desde `origin/main` (ba5b498). **No** se toca la ram
   `harness init` en verde (1820/1820, 0 avisos); un falso rojo LOCAL de Prettier en `package.json` (CRLF en la
   copia de trabajo desde julio, LF en git) se normalizó sin cambiar el contenido versionado. F-28 → `done`.
   En curso: `harness verify` completo (mutación de los 37 ficheros de `stryker.config.json`).
+
+## 2026-10-01 — H-5: el `pnpm build` falla cerrado ante un `<link href>` horneado sin la base o sin fichero
+
+- Worktree `.claude/worktrees/amazing-montalcini-d6abb1`, rama `claude/amazing-montalcini-d6abb1`, avanzada
+  por fast-forward a `main` en `2a49c14` (F-28 ya fusionada, #18). `init` de partida en verde: 56 ficheros,
+  1820/1820 tests. Memoria organizacional sincronizada (25 patrones).
+- H-5 REPRODUCIDO [V] en un temporal (`NLS_DIST_DIR`): sin `public/favicon.svg` el build sale con 0 y hornea
+  `href="/favicon.svg"`; con el fichero a 0 bytes, sale con 0 y lo copia vacío. Las 5 puertas en ✓ en ambos.
+- Brief `progress/brief_h5_enlaces_horneados.md` (medidas, lo que dicen F-04/F-05, decisiones D1-D10).
+  Recomendación del lead: dueño F-04 (ENMIENDA 5, desde @s46). En curso: `spec_partner` → `project-spec.md`.
