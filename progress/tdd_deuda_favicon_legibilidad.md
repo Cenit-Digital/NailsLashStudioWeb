@@ -120,20 +120,25 @@ orden del informe JSON coincide con el de la lista en los 26 casos (se comprobó
 
 **Lo «Permitido» que se hizo en el paso 1, más dos sabotajes de control**:
 
-| ID  | Línea sabotada (antes → después)                      | Qué cambia                                                                                            | Rojas | `it` que caen                     |
-| --- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ----- | --------------------------------- |
-| S15 | `POSICION_EN_LA_CABECERA_ICO.reservado: 0` → `2`      | lee el tipo (1) como reservado                                                                        | 1/40  | 24                                |
-| S16 | `POSICION_EN_LA_CABECERA_ICO.tipo: 2` → `4`           | lee el número de entradas (2) como tipo                                                               | 1/40  | 24                                |
-| S17 | `POSICION_EN_LA_CABECERA_ICO.entradas: 4` → `2`       | lee el tipo (1) como número de entradas: falta la de 32                                               | 10/40 | 19, 22, 24-26, 28, 30, 32, 37, 39 |
-| S18 | `CANALES_RGB = 3` → `= 4`                             | el apple-touch-icon (RGB) se desfiltra con 4 canales: el IDAT no cuadra                               | 5/40  | 20, 23, 36, 38, 40                |
-| S19 | `CANALES_RGBA = 4` → `= 3`                            | los PNG del ICO se desfiltran con 3 canales, y `pixeles` cuenta de 3 en 3 también en el apple (it 20) | 11/40 | 18-22, 29-32, 37, 39              |
-| S20 | `FILTRO_NINGUNO = 0` → `= 5`                          | el filtro 0 cae en el `default` y lanza                                                               | 15/40 | 18-23, 29-32, 36-40               |
-| S21 | `FILTRO_IZQUIERDA = 1` → `= 5`                        | nada con ESTOS ficheros (nota 1)                                                                      | 0/40  | — (verde)                         |
-| S22 | `FILTRO_ARRIBA = 2` → `= 5`                           | ídem                                                                                                  | 0/40  | — (verde)                         |
-| S23 | `FILTRO_MEDIA = 3` → `= 5`                            | ídem                                                                                                  | 0/40  | — (verde)                         |
-| S24 | `FILTRO_PAETH = 4` → `= 5`                            | ídem                                                                                                  | 0/40  | — (verde)                         |
-| S25 | control: `POSICION_EN_EL_IHDR.ancho: 0` → `4`         | lee el alto como ancho, y los tres PNG son cuadrados (nota 2): equivalente                            | 0/40  | — (verde)                         |
-| S26 | control: `POSICION_EN_EL_IHDR.entrelazado: 12` → `11` | lee el byte de filtro, que también es 0 (nota 2): equivalente                                         | 0/40  | — (verde)                         |
+| ID  | Línea sabotada (antes → después)                                                       | Qué cambia                                                                                                                                                               | Rojas                                     | `it` que caen                                                  |
+| --- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------- | -------------------------------------------------------------- |
+| S15 | `POSICION_EN_LA_CABECERA_ICO.reservado: 0` → `2`                                       | lee el tipo (1) como reservado                                                                                                                                           | 1/40                                      | 24                                                             |
+| S16 | `POSICION_EN_LA_CABECERA_ICO.tipo: 2` → `4`                                            | lee el número de entradas (2) como tipo                                                                                                                                  | 1/40                                      | 24                                                             |
+| S17 | `POSICION_EN_LA_CABECERA_ICO.entradas: 4` → `2`                                        | lee el tipo (1) como número de entradas: falta la de 32                                                                                                                  | 10/40                                     | 19, 22, 24-26, 28, 30, 32, 37, 39                              |
+| S18 | `CANALES_RGB = 3` → `= 4`                                                              | el apple-touch-icon (RGB) se desfiltra con 4 canales: el IDAT no cuadra. Desde `58dc0e3` mueve también `POSICION_DEL_ALFA`: el alfa del ICO se lee un byte más allá (§8) | 5/40 en `884a66c`; **11/40** en `a48a296` | 20, 23, 36, 38, 40; en `a48a296`: 18-20, 23, 29-32, 36, 38, 40 |
+| S19 | `CANALES_RGBA = 4` → `= 3`                                                             | los PNG del ICO se desfiltran con 3 canales, y `pixeles` cuenta de 3 en 3 también en el apple (it 20)                                                                    | 11/40                                     | 18-22, 29-32, 37, 39                                           |
+| S20 | `FILTRO_NINGUNO = 0` → `= 5`                                                           | el filtro 0 cae en el `default` y lanza                                                                                                                                  | 15/40                                     | 18-23, 29-32, 36-40                                            |
+| S21 | `FILTRO_IZQUIERDA = 1` → `= 5`                                                         | nada con ESTOS ficheros (nota 1)                                                                                                                                         | 0/40                                      | — (verde)                                                      |
+| S22 | `FILTRO_ARRIBA = 2` → `= 5`                                                            | ídem                                                                                                                                                                     | 0/40                                      | — (verde)                                                      |
+| S23 | `FILTRO_MEDIA = 3` → `= 5`                                                             | ídem                                                                                                                                                                     | 0/40                                      | — (verde)                                                      |
+| S24 | `FILTRO_PAETH = 4` → `= 5`                                                             | ídem                                                                                                                                                                     | 0/40                                      | — (verde)                                                      |
+| S25 | control: `POSICION_EN_EL_IHDR.ancho: 0` → `4`                                          | lee el alto como ancho, y los tres PNG son cuadrados (nota 2): equivalente                                                                                               | 0/40                                      | — (verde)                                                      |
+| S26 | control: `POSICION_EN_EL_IHDR.entrelazado: 12` → `11`                                  | lee el byte de filtro, que también es 0 (nota 2): equivalente                                                                                                            | 0/40                                      | — (verde)                                                      |
+| S27 | `POSICION_DEL_ALFA = CANALES_RGB` → `= 2` (nace en `58dc0e3`; no existía en `884a66c`) | el alfa se lee del canal B y, en el apple, se escribe encima de B                                                                                                        | **9/40** en `a48a296`                     | 18-20, 23, 29-32, 36                                           |
+
+Las cifras de las dos tablas son de `884a66c`. En la ronda 2 (§10) se rehicieron los 27 sabotajes sobre
+`a48a296`: S1-S17 y S19-S26 dan lo mismo que aquí; S18 cambia y S27 es nuevo, los dos por el menor 5 de la
+ronda 1 (`58dc0e3`), como dicen sus filas.
 
 Notas, ambas medidas sobre los ficheros de `public/` (`filtros.mjs` y una lectura del IHDR):
 
@@ -248,7 +253,9 @@ glyf guarda los datos. Las cuatro responsabilidades del brief:
   del paso 2) y el actual, sin el bloque «Principal».
   - `contornos` contra `contornosDelGlifo`, sobre los **330** glifos de la fuente: **330 iguales**, 0
     distintos. Son 213 simples, 6 vacíos y 111 compuestos, que lanzan el mismo mensaje en los dos.
-  - `glifoDe` en los **65 536** puntos de código del BMP: **65 536 iguales**, 231 de ellos con glifo.
+  - `glifoDe` en los **65 536** puntos de código del BMP: **65 536 iguales**. De ellos, 231 se resuelven
+    sin error, pero U+FFFF (el segmento centinela del formato 4) da el glifo 0, `.notdef`: con glifo real
+    son 230 (corregido en la ronda 2, §10).
 - `git show --numstat f401f39`: `tools/favicon/generar.mjs` +86 −42, y esta bitácora +44 −1 (corregido en la
   ronda 1, §8).
 
@@ -332,11 +339,14 @@ líneas `at` a 0, y de 12-19 líneas de stderr (10-17 sin las en blanco) a 1.
   - `pnpm exec eslint src/pages/favicon-marca.test.ts` sale con exit 0: 0 errores y 0 avisos.
   - `generar.mjs` queda fuera del bloque `**/*.{ts,tsx}` de `eslint.config.js`, como dice el brief. Sus
     puertas son Prettier, `node --check` (exit 0) y ejecutarlo (I-1, I-2 e I-5).
-- **I-7**: `git diff --stat 06742d3 HEAD` toca 5 ficheros:
+- **I-7**: `git diff --stat 06742d3 HEAD`, medido en `f0a60fd`, toca 5 ficheros:
   - `src/pages/favicon-marca.test.ts` y `tools/favicon/generar.mjs`;
   - `progress/brief_deuda_favicon_legibilidad.md`, `progress/current.md` y esta bitácora.
   - Ni `public/`, ni `index.html`, ni `package.json`, ni `feature_list.json`: el `cierre` de F-28 es cosa
     del lead.
+  - Desfasado desde `b7d3567` (corregido en la ronda 2, §10): se suman los dos informes del judge,
+    `progress/judge_deuda_favicon_legibilidad.md` y `…_r2.md`. `git diff --name-only 06742d3` da 6 ficheros
+    en `d5ed7af`, y 7 en `3a00169` y en `a48a296`, todos dentro de lo permitido.
 
 ## 7. Resumen de invariantes
 
@@ -345,12 +355,13 @@ líneas `at` a 0, y de 12-19 líneas de stderr (10-17 sin las en blanco) a 1.
 | I-1 (bytes)                 | los tres md5 del brief §1 y `cmp` = `public/`, tras CADA paso (1, 2a, 2b y 3)                                                                                                                | §2, §3, §4 y §5 |
 | I-2 (stdout)                | la misma línea tras cada paso; stderr, 0 bytes                                                                                                                                               | §2, §3, §4 y §5 |
 | I-3 (nombres)               | 40/40 y `vitest list` con diff vacío contra `989d7d6`, tras cada paso                                                                                                                        | §2, §3, §4 y §5 |
-| I-4 (sabotajes del test)    | las 4 regiones obligatorias en rojo (S1-S14). S21-S24 en verde, por los fixtures (nota 1); S25-S26, controles                                                                                | §2              |
+| I-4 (sabotajes del test)    | las 4 regiones obligatorias en rojo (S1-S14). S21-S24 en verde, por los fixtures (nota 1); S25-S26, controles. Los 27, rehechos en `a48a296` (§10)                                           | §2              |
 | I-5 (errores del CLI)       | los 5 casos: exit 1, una línea `favicon: …`, 0 líneas `at`, stdout vacío y sin directorio de salida                                                                                          | §5              |
 | I-6 (`harness init`)        | NO medido aquí: lo mide el lead (suite completa)                                                                                                                                             | —               |
-| I-7 (alcance del diff)      | solo los dos ficheros, más `progress/`                                                                                                                                                       | §6              |
+| I-7 (alcance del diff)      | solo los dos ficheros, más `progress/`: 5 ficheros en `f0a60fd`; 7 en `a48a296`, con los dos informes del judge                                                                              | §6              |
 | Equivalencia (extra)        | `contornos`: 330/330 glifos iguales; `glifoDe`: 65 536/65 536 puntos de código                                                                                                               | §4              |
 | Ronda 1 (menores del judge) | I-1, I-2 (byte a byte), I-3 e I-5 iguales tras cada commit; I-4 rehecho (27 sabotajes): S18 pasa de 5 a 11 rojas y S27, nuevo, da 9; `rangoDelGlifo` equivalente en los dos formatos de loca | §8              |
+| Ronda 2 (menores del judge) | `a48a296`: I-1, I-2 (byte a byte), I-3 e I-5 iguales; I-4, 27/27 iguales a la ronda 1; `rangoDelGlifo`, `contornosDelGlifo`, `pathDe` y `glifoDe` equivalentes                               | §10             |
 | Mutación                    | NO APLICA, declarado en el brief §4                                                                                                                                                          | —               |
 
 ## 8. Ronda de corrección 1 — los menores del judge
@@ -391,7 +402,8 @@ stderr de 0 bytes, 40/40 y `vitest list` con diff vacío.
     usa el formato 0 (`indexToLocFormat` = 0): 330/330 iguales.
   - `contornosDelGlifo`: 330/330 glifos iguales (213 simples, 6 vacíos y 111 compuestos que lanzan el mismo
     mensaje).
-  - `glifoDe`: 65 536/65 536 puntos de código del BMP iguales (231 con glifo).
+  - `glifoDe`: 65 536/65 536 puntos de código del BMP iguales (231 sin error; con glifo real, 230,
+    porque U+FFFF da el glifo 0: corregido en la ronda 2, §10).
 
 ### Commit `58dc0e3` — menor 5 (`favicon-marca.test.ts` +5 −3)
 
@@ -404,11 +416,11 @@ stderr de 0 bytes, 40/40 y `vitest list` con diff vacío.
 
 ### Medido tras cada commit
 
-| Commit    | I-1                                                  | I-2                                                                                                                | I-3                              | I-5                                                                                                                                     |
-| --------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `e99f02a` | exit 0; los tres md5 del brief §1; `cmp` = `public/` | la misma línea: 147 bytes, igual byte a byte a la de `b7d3567` quitando la ruta (`ronda1/i2.mjs`); stderr, 0 bytes | 40/40; `vitest list`, diff vacío | `i5/r1a`: los 6 casos (c0-c5) iguales a los del paso 3 (`i5/despues`), normalizando solo la ruta de la copia (`ronda1/i5-comparar.mjs`) |
-| `6109869` | ídem                                                 | ídem                                                                                                               | ídem                             | `i5/r1b`: ídem                                                                                                                          |
-| `58dc0e3` | ídem                                                 | ídem                                                                                                               | ídem                             | no aplica: el commit solo toca el test                                                                                                  |
+| Commit    | I-1                                                  | I-2                                                                                                                                                                                           | I-3                              | I-5                                                                                                                                     |
+| --------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `e99f02a` | exit 0; los tres md5 del brief §1; `cmp` = `public/` | la misma línea, igual byte a byte a la de `b7d3567` con la ruta sustituida por `<dir>` (`ronda1/i2.mjs`): 147 B con el salto de línea; sin la ruta, 141 B (142 con el salto); stderr, 0 bytes | 40/40; `vitest list`, diff vacío | `i5/r1a`: los 6 casos (c0-c5) iguales a los del paso 3 (`i5/despues`), normalizando solo la ruta de la copia (`ronda1/i5-comparar.mjs`) |
+| `6109869` | ídem                                                 | ídem                                                                                                                                                                                          | ídem                             | `i5/r1b`: ídem                                                                                                                          |
+| `58dc0e3` | ídem                                                 | ídem                                                                                                                                                                                          | ídem                             | no aplica: el commit solo toca el test                                                                                                  |
 
 **Formato y calidad** (sobre `58dc0e3`):
 
@@ -464,6 +476,69 @@ más S27. Al terminar, el árbol queda restaurado (0 cambios).
     no sabe leer.
 - **Para el lead**: anotarla como DEUDA REGISTRADA en el `cierre` de F-28.
 
+## 10. Ronda de corrección 2 — los menores del judge de la ronda 2
+
+> `tdd_craftsman`, 2026-10-01. El texto de la tarea decía HEAD `884a66c`; el HEAD real de la rama era
+> `3a00169` (el commit del judge de la ronda 2, sobre `d5ed7af`), y se trabajó sobre él. Mismo método que en
+> el §8: un parche de reemplazo exacto (`ronda2/parche-r2a.txt`), `prettier --write` y `comprobar.sh`. Lo
+> medido está en `…/scratchpad/legibilidad/ronda2/`.
+
+**Partida** (`comprobar.sh r2-base`, en `3a00169`): exit 0, los tres md5 del brief §1, `cmp` = `public/`,
+stderr de 0 bytes, 40/40 y `vitest list` con diff vacío.
+
+### Commit `a48a296` — menores 2 y 3 (`generar.mjs` +5 −6)
+
+- **Menor 2.** En `pathDe`, el punto medio entre dos OFF seguidos pasa de `medio` a `puntoMedio`. `medio`
+  queda con un solo sentido: el medio trazo (`GROSOR_TRAZO / 2`) de `bajoElTrazo` y `rasterizar`. La rama
+  corre de verdad: la «N» (glifo 33) tiene 63 pares OFF-OFF, y 210 glifos de la fuente tienen al menos uno
+  (`ronda2/equiv/dos-off.mjs`).
+- **Menor 3** (opcional según el judge). `DIVISOR_DE_LA_LOCA_CORTA` → `FACTOR_DE_LA_LOCA_CORTA`, porque se
+  usa para multiplicar. El comentario de `head` lo dice: «al leerlos, se multiplican por
+  `FACTOR_DE_LA_LOCA_CORTA`». Prettier junta en una línea el lector del formato corto.
+
+**Medido** tras el commit:
+
+- **I-1**: exit 0; los tres md5 del brief §1; `cmp` = `public/`.
+- **I-2**: la misma línea, igual byte a byte a la de `3a00169` con la ruta sustituida por `<dir>` (147 B con
+  el salto; 141 B sin la ruta); stderr, 0 bytes.
+- **I-3**: 40/40; `vitest list`, diff vacío.
+- **I-5** (`i5/r2a`): los 6 casos (c0-c5) iguales a los del paso 3 (`i5/despues`) y a los de `6109869`
+  (`i5/r1b`), normalizando solo la ruta de la copia.
+- **Equivalencia** (`ronda2/equiv/comparar.mjs`, el generador de `3a00169` contra el de `a48a296`, cargados
+  como módulos sin «Principal»):
+  - `rangoDelGlifo`: 5000/5000 en cada formato de loca (sintética aleatoria) y 330/330 en la fuente real;
+  - `contornosDelGlifo`: 330/330;
+  - `pathDe`: 219/219 glifos que no lanzan (213 simples y 6 vacíos); los 111 compuestos lanzan igual;
+  - `glifoDe`: 65 536/65 536 puntos de código del BMP.
+- `prettier --check` y `node --check` de `generar.mjs`, limpios.
+- **I-4**, rehecho entero sobre `a48a296` (`ronda2/sabotear.sh`, el método del §2): 27/27 sabotajes aplicados
+  (cada uno, una línea), con las mismas rojas y las mismas `it` que en el §8: el `diff` de `indices.txt`
+  contra el de la ronda 1 sale vacío. El árbol queda restaurado (0 cambios). El test no cambia desde
+  `58dc0e3` (`git diff --quiet 58dc0e3 HEAD -- src/pages/favicon-marca.test.ts`).
+
+### Correcciones a esta bitácora (judge y verificador de la ronda 2)
+
+1. **§2, tabla de I-4** (menor 1). La fila S18 daba 5/40, cierto en `884a66c` (el HEAD del §2); desde
+   `58dc0e3` da 11/40 (§8), y S27 solo salía en prosa. Ahora la fila S18 lleva las dos cifras, S27 tiene
+   fila y las dos se midieron de nuevo en `a48a296`.
+2. **§4 y §8, «231 de ellos con glifo»** (menor 4). 231 puntos de código del BMP se resuelven sin error,
+   pero U+FFFF da el glifo 0 (`.notdef`): es el segmento centinela del formato 4 (inicio = fin = 0xFFFF,
+   delta 1, idRangeOffset 0; `ronda2/equiv/centinela.mjs`). Con glifo real son **230**
+   (`ronda2/equiv/bmp.mjs`, el mismo resultado con el generador de `3a00169` y con el de `a48a296`). La
+   equivalencia 65 536/65 536 no cambia.
+3. **§8, I-2.** «147 bytes … quitando la ruta» describía mal la medida. 147 B es la línea con la ruta
+   SUSTITUIDA por `<dir>` (5 B), más el salto de línea, que es lo que compara `ronda1/i2.mjs`. Sin la ruta, la
+   línea mide 141 B (142 con el salto). Medido con `ronda2/i2-bytes.mjs` sobre los stdout de `b7d3567`,
+   `e99f02a`, `6109869`, `58dc0e3`, `3a00169` y `a48a296`: las tres cifras, iguales en los seis. La igualdad
+   byte a byte no cambia.
+4. **§6, I-7.** Los 5 ficheros se midieron en `f0a60fd`. Luego se suman los dos informes del judge: 6 en
+   `d5ed7af`, y 7 en `3a00169` y `a48a296`. Ninguno es `public/`, `index.html`, `package.json` ni
+   `feature_list.json`. Corregido en su sitio y en el §7.
+5. **«Estado al cerrar»** (menor 5). Decía «Sin push y sin PR». Lo de la PR es cierto; lo del push, no: ver
+   el estado corregido abajo.
+
+Ningún menor queda como deuda nueva: los 5 están resueltos.
+
 ## Hallazgos
 
 1. **Ramas muertas en el decodificador del test.** Los filtros PNG 1-4 de `predictor` no los ejercita
@@ -479,8 +554,9 @@ más S27. Al terminar, el árbol queda restaurado (0 cambios).
 
 ## PENDIENTE (del lead)
 
-- **I-6**: `node .harness/harness.mjs init` completo, sobre el HEAD de la ronda 1.
-- Si el lead lo quiere, el `judge` de la ronda 1 → `progress/judge_deuda_favicon_legibilidad.md`.
+- **I-6**: `node .harness/harness.mjs init` completo, sobre el HEAD de la ronda 2.
+- Si el lead lo quiere, un `judge` de la ronda 2 de corrección. Los dos anteriores:
+  `progress/judge_deuda_favicon_legibilidad.md` (`b7d3567`) y `…_r2.md` (`3a00169`).
 - El `cierre` de F-28 en `feature_list.json`, con la deuda D-1 del §9, y la PR a `main`.
 
 ## Estado al cerrar
@@ -496,4 +572,12 @@ más S27. Al terminar, el árbol queda restaurado (0 cambios).
   - `6109869`: menor 3;
   - `58dc0e3`: menor 5;
   - y el de esta bitácora (§8 y §9, con la deuda del menor 6).
-- Sin push y sin PR. Árbol de trabajo limpio; `public/` sin tocar.
+- Ronda 2 (§10):
+  - `a48a296`: menores 2 y 3;
+  - y el de esta bitácora (§10: menores 1, 4 y 5, y las discrepancias del verificador).
+- Push y PR, medidos en la ronda 2 (aquí decía «Sin push y sin PR», y lo del push era falso):
+  - el reflog de `origin/claude/bold-liskov-c3323b` registra cuatro «update by push»: `0b7cd62` (11:57:38),
+    `e99f02a` (12:07:29), `d5ed7af` (12:15:42) y `3a00169` (12:29:42);
+  - los dos commits de la ronda 2 quedan sin push al cerrar esta ronda: el push es cosa del lead;
+  - PR, ninguna: `gh pr list --head claude/bold-liskov-c3323b --state all` da `[]`.
+- Árbol de trabajo limpio; `public/` sin tocar.

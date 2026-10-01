@@ -119,3 +119,9 @@ el contrato son los invariantes I-1..I-7 de `progress/brief_deuda_favicon_legibi
     nuevo (bitácora §8);
   - el menor 6 queda como deuda D-1 (bitácora §9), para el `cierre` de F-28;
   - falta I-6 (`harness init` completo), que corre el lead.
+- `judge` ronda 2 APPROVED (`3a00169`: 0 bloqueantes, 5 menores). Ronda de corrección 2 del `tdd_craftsman`
+  (bitácora §10):
+  - los menores 2 y 3, en `a48a296` (`puntoMedio` en `pathDe` y `FACTOR_DE_LA_LOCA_CORTA`), con I-1, I-2,
+    I-3, I-4 (27/27 iguales a la ronda 1) e I-5 medidos de nuevo, y las equivalencias de la fuente;
+  - los menores 1, 4 y 5 y las discrepancias del verificador, corregidos en la bitácora;
+  - falta I-6 (`harness init` completo), que corre el lead, y el push de la ronda 2.
