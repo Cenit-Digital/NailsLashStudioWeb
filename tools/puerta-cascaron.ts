@@ -10,6 +10,9 @@
  * H-3: el artefacto se lee de donde diga `tools/artefacto.ts` (`NLS_DIST_DIR`, o `dist`), y la
  * puerta lo sigue recibiendo con ubicaciones LÓGICAS `dist/…`.
  *
+ * ENMIENDA 5 (H-5): y la LISTA de ficheros del artefacto (`ficheros`), contra la que la puerta
+ * resuelve cada `<link>` root-absoluto. Sin ella, con algún `<link>` así, la puerta corta (S-3).
+ *
  * Se ejecuta con el type stripping de Node 22 (`--experimental-strip-types`), que exige la
  * extensión .ts explícita en el import. `tsconfig.json` ya trae `allowImportingTsExtensions`.
  */
@@ -32,6 +35,16 @@ import { DIRECTORIO_ARTEFACTO, ubicacionLogica } from './artefacto.ts'
 const ES_HTML = /\.html$/i
 const FICHERO_DE_CONFIG = 'vite.config.ts'
 
+/**
+ * Las rutas FÍSICAS de todos los FICHEROS del artefacto, en todas sus subcarpetas, sin las carpetas
+ * (en Windows, `statSync` de una carpeta da 0 B: @s67). LANZA si el directorio no existe.
+ */
+function rutasDeLosFicheros(): readonly string[] {
+  return readdirSync(DIRECTORIO_ARTEFACTO, { recursive: true, withFileTypes: true })
+    .filter((entrada) => entrada.isFile())
+    .map((entrada) => join(entrada.parentPath, entrada.name))
+}
+
 const artefactoReal: ArtefactoDeProduccion = {
   // Honra el contrato del puerto: responde sin lanzar. Es lo que permite a la puerta preguntar
   // antes de listar y no provocar el ENOENT de `readdirSync` (@s26).
@@ -40,24 +53,21 @@ const artefactoReal: ArtefactoDeProduccion = {
   // Solo HTML: un binario (.png, .woff2) leído como utf8 se decodifica a U+FFFD sin lanzar y
   // sería falso positivo en potencia.
   listarHtml: () =>
-    readdirSync(DIRECTORIO_ARTEFACTO, { recursive: true, withFileTypes: true })
-      .filter((entrada) => entrada.isFile() && ES_HTML.test(entrada.name))
-      .map((entrada) => {
-        const ruta = join(entrada.parentPath, entrada.name)
-
-        return { ubicacion: ubicacionLogica(ruta), contenido: readFileSync(ruta, 'utf8') }
-      }),
+    rutasDeLosFicheros()
+      .filter((ruta) => ES_HTML.test(ruta))
+      .map((ruta) => ({ ubicacion: ubicacionLogica(ruta), contenido: readFileSync(ruta, 'utf8') })),
 }
 
+// ENMIENDA 5 (H-5): TODOS los ficheros, de cualquier extensión, ocultos y HTML incluidos, con su tamaño
+// y SIN leer su contenido (A-27). No filtra nada: lo que el despliegue no publica lo decide la puerta
+// (la regla 5, que se muta; @s71). Es un método porque solo se recorre si la puerta lo pide, y siempre
+// DESPUÉS de `existe()`: listarlo antes daría, con `dist/` ausente, un ENOENT FUERA de la puerta (@s70).
 const listaReal: ListaDeFicheros = {
   listar: () =>
-    readdirSync(DIRECTORIO_ARTEFACTO, { recursive: true, withFileTypes: true })
-      .filter((entrada) => entrada.isFile())
-      .map((entrada) => {
-        const ruta = join(entrada.parentPath, entrada.name)
-
-        return { ubicacion: ubicacionLogica(ruta), bytes: statSync(ruta).size }
-      }),
+    rutasDeLosFicheros().map((ruta) => ({
+      ubicacion: ubicacionLogica(ruta),
+      bytes: statSync(ruta).size,
+    })),
 }
 
 const resultado = ejecutarPuertaDelCascaron({
