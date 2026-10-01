@@ -227,3 +227,14 @@
   `REGLA_LINK_OCULTO`, nace AQUÍ (la pide este test) y la usa la resolución en C17 (@s65).
   `REGLA_RUTA_AUSENTE` sigue fuera, hueco DECLARADO (@s60, puerta humana). 321 passed; `tsc` 0.
 - REFACTOR: `prettier --write` partió la constante de la regla 5 (barras: 81 y 66).
+
+### C17 · @s65 (regla 5: un fichero OCULTO de la lista, S-8; 5 filas)
+
+- Test: las 5 filas, `comprobarUnLink('icon', …)`.
+- ROJO visto: 3 failed: `.vite/manifest.json` y `assets/.oculto.css` salían con 0 (`expected +0 to be
+  'distinto de 0'`: están en la lista y pesan más de 0) y `.oculto-vacio.svg` daba la regla 3 (`expected
+  [ Array(1) ] to deeply equal [ Array(1) ]`). El CONTROL y `.vite/no-existe.json` (la 2), en verde.
+- VERDE mínimo: `esOculta(ubicacion)` = algún segmento de `dist/<resto>` empieza por `.` (TODOS los
+  segmentos, sin `slice(1)`), mirado DESPUÉS de «no está en la lista» y ANTES de los 0 bytes: el orden
+  4-1-2-5-3 de la spec. 326 passed; `tsc` 0; `prettier` limpio.
+- REFACTOR: ninguno.

@@ -633,6 +633,15 @@ function tieneSegmentosQueNoInterpreta(ruta: string): boolean {
   )
 }
 
+/**
+ * S-8: el despliegue NO publica los ficheros ocultos, a CUALQUIER profundidad
+ * (`actions/upload-pages-artifact` empaqueta con `--exclude=".[^/]*"`). Se miran TODOS los segmentos
+ * de `dist/<resto>`: `dist` nunca empieza por `.`, así que no hace falta saltárselo.
+ */
+function esOculta(ubicacion: string): boolean {
+  return ubicacion.split('/').some((segmento) => segmento.startsWith('.'))
+}
+
 function reglaDelLink(
   href: string,
   ubicaciones: ReadonlyMap<string, number>,
@@ -662,6 +671,10 @@ function reglaDelLink(
 
   if (bytes === undefined) {
     return REGLA_LINK_SIN_FICHERO
+  }
+
+  if (esOculta(ubicacion)) {
+    return REGLA_LINK_OCULTO
   }
 
   if (bytes === 0) {

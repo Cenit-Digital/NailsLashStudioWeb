@@ -2633,3 +2633,37 @@ describe('REGLAS_DEL_CASCARON, la lista que vigila @s34, trae las cinco reglas n
     ).toEqual([])
   })
 })
+
+describe('ejecutarPuertaDelCascaron → regla 5: un <link> a un fichero OCULTO falla cerrado aunque esté en la lista y pese más de 0 (@s65)', () => {
+  it.each<FilaDeUnLink>([
+    ['/NailsLashStudioWeb/favicon.svg', 0, []],
+    [
+      '/NailsLashStudioWeb/.vite/manifest.json',
+      FALLA,
+      [
+        '/ — link root-absoluto a un fichero oculto, que el despliegue no publica: "/NailsLashStudioWeb/.vite/manifest.json"',
+      ],
+    ],
+    [
+      '/NailsLashStudioWeb/assets/.oculto.css',
+      FALLA,
+      [
+        '/ — link root-absoluto a un fichero oculto, que el despliegue no publica: "/NailsLashStudioWeb/assets/.oculto.css"',
+      ],
+    ],
+    [
+      '/NailsLashStudioWeb/.oculto-vacio.svg',
+      FALLA,
+      [
+        '/ — link root-absoluto a un fichero oculto, que el despliegue no publica: "/NailsLashStudioWeb/.oculto-vacio.svg"',
+      ],
+    ],
+    [
+      '/NailsLashStudioWeb/.vite/no-existe.json',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/.vite/no-existe.json"'],
+    ],
+  ])('@s65 %j → %s', (href, codigo, lineas) => {
+    comprobarUnLink('icon', href, codigo, lineas)
+  })
+})
