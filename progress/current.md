@@ -92,3 +92,37 @@ Rama `claude/favicon-marca` desde `origin/main` (ba5b498). **No** se toca la ram
 - 11:08: los dos hallazgos fuera de alcance (deuda de legibilidad de F-28 y H-5) se propusieron como tareas
   aparte; Pablo prefiere hacerlo todo en ESTA sesión. Las dos sesiones abiertas estaban ya ociosas (brief
   escrito cada una); se continúan aquí, una a la vez, reutilizando sus briefs.
+
+## 2026-10-01 — deuda de legibilidad de F-28 (menores 1-4 del judge): refactor sin cambio de comportamiento
+
+Worktree `.claude/worktrees/bold-liskov-c3323b`, rama `claude/bold-liskov-c3323b`. Se llevó a `main` (`2a49c14`,
+F-28 fusionada) por avance rápido. No hay entrada nueva en `feature_list.json` ni `.feature` (precedente H-3):
+el contrato son los invariantes I-1..I-7 de `progress/brief_deuda_favicon_legibilidad.md`.
+
+- Arranque:
+  - memoria organizacional sincronizada (25 patrones; ninguno de refactor aplica directamente);
+  - descartado `tooling/valor-guardado-por-puerta-que-lee-config-como-texto`: ningún test lee `generar.mjs`
+    como texto, solo el comentario del SVG generado;
+  - `pnpm install` en el worktree, que no tenía `node_modules`.
+- Línea base (lead):
+  - `harness init` en verde: 56 ficheros, **1820/1820**, typecheck, ESLint y Prettier a 0;
+  - el generador ACTUAL reproduce `public/` byte a byte (md5 en el brief §1);
+  - su error de CLI sale con traza cruda.
+- Mutación: NO APLICA, porque ninguno de los dos ficheros está en el `mutate` de Stryker. Declarado en el
+  brief §4.
+- Siguiente:
+  - `tdd_craftsman` → `progress/tdd_deuda_favicon_legibilidad.md`;
+  - `judge` → `progress/judge_deuda_favicon_legibilidad.md`;
+  - PR a `main`, que no se fusiona sin Pablo.
+- `judge` APPROVED (`b7d3567`: 0 bloqueantes, 6 menores). Ronda de corrección 1 del `tdd_craftsman`:
+  - los menores 1-5, resueltos en `e99f02a`, `6109869` y `58dc0e3`, con I-1, I-2, I-3, I-4 e I-5 medidos de
+    nuevo (bitácora §8);
+  - el menor 6 queda como deuda D-1 (bitácora §9), para el `cierre` de F-28;
+  - falta I-6 (`harness init` completo), que corre el lead.
+- `judge` ronda 2 APPROVED (`3a00169`: 0 bloqueantes, 5 menores). Ronda de corrección 2 del `tdd_craftsman`
+  (bitácora §10):
+  - los menores 2 y 3, en `a48a296` (`puntoMedio` en `pathDe` y `FACTOR_DE_LA_LOCA_CORTA`), con I-1, I-2,
+    I-3, I-4 (27/27 iguales a la ronda 1) e I-5 medidos de nuevo, y las equivalencias de la fuente;
+  - los menores 1, 4 y 5 y las discrepancias del verificador, corregidos en la bitácora;
+  - falta I-6 (`harness init` completo), que corre el lead, y el push de los commits de la bitácora
+    (`a48a296` ya está en `origin`: lo empujó otro actor a las 12:49:46).
