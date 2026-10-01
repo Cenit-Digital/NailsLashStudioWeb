@@ -1,3 +1,7 @@
+import servicioUnasManicuraNude from '../../assets/servicios/servicio-unas-manicura-nude.jpg'
+import servicioFacialPestanas from '../../assets/servicios/servicio-facial-pestanas.jpg'
+import servicioDepilacionPielSuave from '../../assets/servicios/servicio-depilacion-piel-suave.jpg'
+
 /**
  * DATOS DEMO del catálogo (rama demo/lunes-prototipo). NO es la feature F-09 y NO entra en los
  * `registros` verificados de F-01 (src/lib/site.ts): son datos de MUESTRA para la demo del lunes.
@@ -19,6 +23,8 @@ export interface CategoriaDemo {
   readonly titulo: string
   readonly intro: string
   readonly servicios: readonly ServicioDemo[]
+  readonly foto: string
+  readonly alt: string
 }
 
 export const CATALOGO_DEMO: readonly CategoriaDemo[] = [
@@ -37,6 +43,8 @@ export const CATALOGO_DEMO: readonly CategoriaDemo[] = [
       { nombre: 'Pedicura spa completa', precio: '28 €' },
       { nombre: 'Nail art y diseño', precio: '20 €' },
     ],
+    foto: servicioUnasManicuraNude,
+    alt: 'Manos con manicura en tono nude y anillos dorados',
   },
   {
     clave: 'facial',
@@ -53,6 +61,8 @@ export const CATALOGO_DEMO: readonly CategoriaDemo[] = [
       { nombre: 'Diseño de cejas', precio: '30 €' },
       { nombre: 'Tinte de pestañas', precio: '30 €' },
     ],
+    foto: servicioFacialPestanas,
+    alt: 'Primer plano de pestañas largas sobre un párpado cerrado',
   },
   {
     clave: 'depilacion',
@@ -69,9 +79,15 @@ export const CATALOGO_DEMO: readonly CategoriaDemo[] = [
       { nombre: 'Piernas completas', precio: '10 €' },
       { nombre: 'Ingles o cavado', precio: '10 €' },
     ],
+    foto: servicioDepilacionPielSuave,
+    alt: 'Mano extendiendo crema sobre una pierna de piel suave',
   },
 ]
 
 /** Leyenda visible obligatoria (F-09 Q-B): los precios son de muestra y llevan IVA incluido. */
 export const LEYENDA_PRECIOS =
   'Precios de muestra · IVA incluido · pendientes de confirmar con el salón'
+
+/** Leyenda visible de F-27 (CF-4): las fotos son de banco de imágenes, no trabajos del salón. */
+export const LEYENDA_FOTOS =
+  'Fotos de banco de imágenes, ilustrativas del servicio · las fotos reales del salón se añaden antes de publicar'

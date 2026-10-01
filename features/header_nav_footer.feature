@@ -24,7 +24,9 @@
 #      · B-2 → @s11 en DOS CAPAS: (1) suelo CSS estático RE-MEDIDO ≥ altura máxima; (2) afinado JS
 #              OPCIONAL, fuera del acceptance. La razón de `scroll-padding` (no `scroll-margin`) es que
 #              va en el CONTENEDOR; «scroll-margin no actúa al tabular» era FALSO.
-#      · B-3 → breakpoint **820px** [criterio de proyecto MEDIDO], NUNCA el 767 heredado.
+#      · B-3 → breakpoint **820px** [criterio de proyecto MEDIDO], NUNCA el 767 heredado. SUBIDO a
+#              **920px** por la ENMIENDA E-2 de F-25 (decisión de Pablo, 2026-09-30; su destilación,
+#              APROBADA por la puerta humana el 2026-09-30): la medida de 820 quedó superada. Ver @s17.
 #      · B-4 → @s1 como IGUALDAD DE CONJUNTOS + la PUERTA DE ANCLAS VIVAS. «Sección navegable» =
 #              `<section>` con `aria-labelledby` que resuelve a un heading real (reutiliza
 #              `REGLA_SECTION` de F-04). ESA REGLA YA NO ES [NV]: el humano la FIJÓ (ver @s3/@s20).
@@ -150,11 +152,12 @@
 # =============================================================================================
 # ANTI-TAUTOLOGÍA (regla dura del arnés) Y LO PROHIBIDO EN ESTE FICHERO
 # =============================================================================================
-# TODO esperado se escribe A MANO en el escenario y en el test: el literal del breakpoint (`820px`),
-# el número del suelo de `scroll-padding-top` (RE-MEDIDO por el TDD, no importado), el conjunto de
-# ids esperados. **JAMÁS se importa la constante que el test debería vigilar PARA COMPARARSE CONTRA
-# ELLA** (precedente WebEmpresa: el fake atado al símbolo `MOBILE_QUERY` en vez del literal fue el
-# PRIMER mutante superviviente; patrón `doble-de-test-anclado-al-literal-no-al-simbolo`).
+# TODO esperado se escribe A MANO en el escenario y en el test: el literal del breakpoint (`920px`
+# desde la ENMIENDA E-2 de F-25; antes `820px`), el número del suelo de `scroll-padding-top`
+# (RE-MEDIDO por el TDD, no importado), el conjunto de ids esperados. **JAMÁS se importa la
+# constante que el test debería vigilar PARA COMPARARSE CONTRA ELLA** (precedente WebEmpresa: el fake
+# atado al símbolo `MOBILE_QUERY` en vez del literal fue el PRIMER mutante superviviente; patrón
+# `doble-de-test-anclado-al-literal-no-al-simbolo`).
 # ❌ **PROHIBIDO EN ESTE CONTRATO, EN LOS TESTS Y EN LOS MENSAJES DE VIOLACIÓN:** «foco no
 #    oscurecido» a secas · atribuir a SC 2.4.11 un umbral en px o rem · llamar a C43 «obligatorio»
 #    sin sujeto · afirmar que 2.4.11 cubre el scroll con `Tab` (es UA) · afirmar que `scroll-margin`
@@ -469,7 +472,8 @@ Feature: Cabecera, navegación, pie, y la PUERTA DE ANCLAS VIVAS que demuestra q
 
   # ---------------------------------------------------------------------------
   # El menú móvil — DECIDIDO POR LA PUERTA HUMANA (B-5/B-6/B-3, 2026-07-17): CSS puro + aria-expanded
-  # + 820px, SIN Radix. La mecánica es FIRME; el TDD la implementa tal cual, no es «propuesta».
+  # + 820px (hoy 920px: ENMIENDA E-2 de F-25, 2026-09-30), SIN Radix. La mecánica es FIRME; el TDD
+  # la implementa tal cual, no es «propuesta».
   # ---------------------------------------------------------------------------
 
   @s15
@@ -506,22 +510,37 @@ Feature: Cabecera, navegación, pie, y la PUERTA DE ANCLAS VIVAS que demuestra q
     # trampa de Radix/Portal quedó descartada (B-6), pero @s16 sigue blindando el prerender igual.
 
   @s17
-  Scenario: el breakpoint del menú es exactamente el literal 820px, leído del SCSS y anclado contra el literal escrito a mano
+  Scenario: el breakpoint del menú es exactamente el literal 920px, leído del SCSS y anclado contra el literal escrito a mano
     Given el fichero .module.scss de la cabecera con la media query del menú móvil
     When un test lee ese SCSS
-    Then la media query usa exactamente el literal "820px"
-    And el test compara contra el literal "820px" escrito A MANO, no contra el símbolo importado de producción
+    Then la media query usa exactamente el literal "920px"
+    And el test compara contra el literal "920px" escrito A MANO, no contra el símbolo importado de producción
     # 🔴 ESCENARIO OBLIGATORIO (B-3), patrón `doble-de-test-anclado-al-literal-no-al-simbolo`. El
-    # breakpoint es CRITERIO DE PROYECTO MEDIDO: la nav envuelve en la banda 793–806px (fuentes
-    # cargadas 805→806; fallback pre-swap 793) → `820px` da margen sobre toda la banda [V]. **NUNCA el
-    # `767` de WebEmpresa** (herencia muerta, 0 en `src/` [V]; es el `md` de Bootstrap, no una medida
-    # de este diseño). **NUNCA atribuido a WCAG:** SC 1.4.10 Reflow solo exige 320px sin scroll
-    # bidireccional y la cabecera ya lo cumple hoy [V]; el menú móvil NO se justifica por Reflow.
-    # 🔴 RE-MEDIR sobre la nav definitiva: el número se mueve ±12px según fuentes y al reetiquetar la
-    # nav. Si hay rama JS de viewport (vía B-5), el `@media` del SCSS y la constante JS son EL MISMO
-    # LITERAL, y el test lee el SCSS y lo ancla contra el literal a mano (anti-tautología).
-    # ✅ **DECIDIDO (B-3/B-5, 2026-07-17):** hay menú móvil → este escenario aplica. El breakpoint es
+    # breakpoint es CRITERIO DE PROYECTO MEDIDO sobre la nav DEFINITIVA (7 enlaces, «Reservar» y la
+    # marca con su fuente real), en producción y en Chromium, de 1 en 1 px entre 800 y 960 px: la nav
+    # horizontal cabe en UNA fila desde 891px con las fuentes cargadas y desde 908px con la fuente de
+    # respaldo previa al swap (la marca es más estrecha, pero los enlaces son más anchos y el neto es
+    # PEOR) → `920px` deja 12px de margen sobre el peor caso medido y 29px sobre el de las fuentes
+    # cargadas [V]. **NUNCA el `767` de WebEmpresa** (herencia muerta, 0 en `src/` [V]; es el `md` de
+    # Bootstrap, no una medida de este diseño). **NUNCA atribuido a WCAG:** SC 1.4.10 Reflow solo exige
+    # 320px sin scroll bidireccional y la cabecera ya lo cumple hoy [V]; el menú móvil NO se justifica
+    # por Reflow.
+    # 📜 HISTORIA: F-06 fijó `820px` sobre la medida «la nav envuelve en la banda 793–806px (fuentes
+    # cargadas 805→806; fallback pre-swap 793)». Era la nav del PROTOTIPO y QUEDÓ SUPERADA con la nav
+    # definitiva: desde 821px la cabecera se partía en DOS filas, hasta 891px ya antes de F-25 (113px)
+    # y hasta 890/907px con el logo de F-25 (126/123px, fuentes cargadas/respaldo). Lo destapó la
+    # verificación en vivo de F-25 (@s39 a 821px, hallazgo H-1), y la ENMIENDA E-2 de F-25 (Pablo,
+    # AskUserQuestion, 2026-09-30) subió el literal a `920px`: el MISMO bloque con el MISMO contenido,
+    # solo cambia el número. Ver `project-spec.md` §F-25 «ENMIENDA E-2» (E-2-C1, E-2-C2). El literal lo
+    # anclan también, escrito a mano, F-25 @s20, @s35 y @s42 (`features/logo_acoplado.feature`).
+    # 🔴 RE-MEDIR sobre la nav definitiva: el número se mueve según las fuentes (891 frente a 908px)
+    # y al reetiquetar la nav. Si hay rama JS de viewport (vía B-5), el `@media` del SCSS y la
+    # constante JS son EL MISMO LITERAL, y el test lee el SCSS y lo ancla contra el literal a mano
+    # (anti-tautología).
+    # ✅ **DECIDIDO (B-3/B-5, 2026-07-17):** hay menú móvil → este escenario aplica. El breakpoint era
     # el literal `820px` [criterio de proyecto MEDIDO], NUNCA el 767 heredado; el TDD lo implementa.
+    # ✏️ **ENMENDADO (E-2 de F-25, decisión de Pablo, 2026-09-30):** el literal pasa a `920px`. La
+    # destilación de E-2 la APROBÓ la puerta humana el 2026-09-30 («Aprobado, prográmalo»).
 
   # ---------------------------------------------------------------------------
   # Los mutantes que deben morir (I-6, umbral 1.0). El conjunto exacto se MIDE cuando el fichero exista.
@@ -540,7 +559,7 @@ Feature: Cabecera, navegación, pie, y la PUERTA DE ANCLAS VIVAS que demuestra q
       | «navegable = cualquier id» en vez de «section con aria-labelledby → heading real»   | @s20 (heading no referenciado → 0)   |
       | vaciar el extractor de ANCLAS de nav (verde por vacuidad del 1.er extractor)        | @s7                                  |
       | vaciar el extractor de SECCIONES navegables (verde por vacuidad del 2.º extractor)  | @s19                                 |
-      | alterar el literal del breakpoint 820px                                             | @s17                                 |
+      | alterar el literal del breakpoint 920px (820px antes de la ENMIENDA E-2 de F-25)     | @s17                                 |
       | tratar un `<a>` de nav SIN href como si tuviera href (leer el grupo de un match nulo) | @s21 (a sin href → 0 anclas, sin lanzar) |
       | contar un `id=""` (vacío) como destino de anclaje válido                            | @s22 (# a id="" → ancla muerta)      |
       | tratar como navegable una `<section>` cuyo aria-labelledby NO resuelve a un heading  | @s23 (gemelo simétrico de @s20)      |

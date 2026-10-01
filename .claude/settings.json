@@ -7,8 +7,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .harness/harness.mjs test",
-            "description": "Tras editar o escribir archivos, corre la suite de tests declarada en harness.config.json."
+            "command": "node .claude/hooks/suite-tras-editar.mjs",
+            "description": "Tras editar o escribir archivos, corre la suite de tests declarada en harness.config.json, salvo si el fichero es .md (ningún test lee Markdown; ver .claude/hooks/suite-tras-editar.mjs)."
           }
         ]
       }

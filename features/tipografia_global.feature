@@ -79,9 +79,9 @@
 # ANTI-TAUTOLOGÍA (regla dura): TODO nombre de fuente esperado se escribe A MANO en el test
 # («'Manrope'», «'Gilda Display'», y la allowlist {Manrope, Gilda Display, Great Vibes}). JAMÁS se
 # importa de site.ts, de main.tsx ni de ningún símbolo para compararse contra sí mismo (patrón
-# `doble-de-test-anclado-al-literal-no-al-simbolo`; como el `820px` de F-06 @s17 y el `'Great Vibes'`
-# de F-07 @s17). NOMBRE es entrada legítima de la derivación de F-07; aquí NO hay derivación: son
-# literales de estilo → van A MANO, punto.
+# `doble-de-test-anclado-al-literal-no-al-simbolo`; como el `920px` de F-06 @s17 —`820px` antes de
+# la ENMIENDA E-2 de F-25— y el `'Great Vibes'` de F-07 @s17). NOMBRE es entrada legítima de la
+# derivación de F-07; aquí NO hay derivación: son literales de estilo → van A MANO, punto.
 # =============================================================================================
 
 Feature: Tipografía global del documento — el cuerpo en Manrope y los encabezados de sección en Gilda Display, con las fuentes ya horneadas por F-05, sin introducir ninguna fuente no autohospedada

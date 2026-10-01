@@ -17,8 +17,9 @@ import { describe, expect, it } from 'vitest'
  *
  * 🔴 LA ALTURA MÁXIMA, RE-MEDIDA SOBRE LA NAV DEFINITIVA (no copiada del prototipo). El prototipo
  * tomaba hasta 231px porque su nav de 6 enlaces ENVOLVÍA; la cabecera de F-06 NO ENVUELVE (a
- * <=820px hay botón hamburguesa; por encima, solo la marca + 2 enlaces horizontales), así que es UNA
- * SOLA FILA en todo el rango. Su altura máxima, DERIVADA de `cabecera.module.scss`:
+ * <=920px hay botón hamburguesa, 820px hasta la ENMIENDA E-2 de F-25; por encima, la marca, los 7
+ * enlaces y «Reservar» en horizontal), así que es UNA SOLA FILA en todo el rango. Su altura máxima,
+ * DERIVADA de `cabecera.module.scss`:
  *   padding-block 1rem × 2 (32px)  +  destino táctil del botón min-height 2.75rem (44px)  =  76px.
  * Se escribe A MANO (anti-tautología): NO se importa del SCSS ni de un símbolo de producción.
  */

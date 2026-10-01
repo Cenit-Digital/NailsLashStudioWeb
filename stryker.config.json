@@ -43,7 +43,10 @@
     "src/components/chat-nailbot-logica.ts",
     "src/components/NailbotArte.tsx",
     "src/components/NailbotFlotante.tsx",
-    "src/components/nailbot-flotante-logica.ts"
+    "src/components/nailbot-flotante-logica.ts",
+    "src/components/LogoAcoplado.tsx",
+    "src/components/logo-acoplado-logica.ts",
+    "src/components/Catalogo.tsx"
   ],
   "thresholds": {
     "high": 100,

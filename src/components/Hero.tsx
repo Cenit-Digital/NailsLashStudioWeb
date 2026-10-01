@@ -200,8 +200,15 @@ export function Hero() {
         tabIndex={-1}
       >
         {/* El rótulo VISIBLE. Decorativo (`aria-hidden`): quien lo anuncia es el <h1> de abajo, así
-            que un lector de pantalla NO oye «Nails Lash» dos veces. */}
-        <svg className={estilos.rotulo} viewBox={VISTA_MARCA} aria-hidden="true" focusable="false">
+            que un lector de pantalla NO oye «Nails Lash» dos veces. `data-acople="origen"` (F-25): el
+            logo de la cabecera mide esta caja como punto de salida de su vuelo; el hero no se entera. */}
+        <svg
+          className={estilos.rotulo}
+          viewBox={VISTA_MARCA}
+          aria-hidden="true"
+          focusable="false"
+          data-acople="origen"
+        >
           <defs>
             {/* `maskUnits`/`maskContentUnits` en userSpaceOnUse (el valor por defecto del
                 contenido): así el trazo va en unidades del viewBox y NO se deforma con la relación
@@ -256,7 +263,11 @@ export function Hero() {
           <span className={estilos.heroMarca}>{marca}</span>
           {/* Text node de espacio REAL, NO whitespace de salto de línea (que JSX borra): sin él, el
               nombre accesible sería «Nails LashStudio» (16, sin espacio) — MEDIDO en los dos motores. */}{' '}
-          <span className={estilos.heroStudio}>{tipo}</span>
+          {/* `data-acople="disparo"` (F-25): cuando «STUDIO» queda bajo la cabecera, la firma se
+              acopla como logo. */}
+          <span className={estilos.heroStudio} data-acople="disparo">
+            {tipo}
+          </span>
         </h1>
         {/* El control sin cromo (@s10): un <button> NATIVO transparente superpuesto al rótulo,
             HERMANO del <h1> (la estructura protegida de F-07 no se toca). Solo existe mientras la

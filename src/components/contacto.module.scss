@@ -2,8 +2,9 @@
 //
 // 🔴 La PROMINENCIA del tel: en móvil es CSS (Stryker no ve SCSS): la aseveran los tests que LEEN esta
 // hoja (contacto-estilos.test.ts) + la verificación VISUAL. NO se atribuye a ningún umbral normativo
-// de tamaño de objetivo: es criterio de proyecto. El breakpoint 820px es criterio MEDIDO (heredado de
-// F-06), NUNCA atribuido a norma.
+// de tamaño de objetivo: es criterio de proyecto. El breakpoint 820px es criterio MEDIDO, NUNCA
+// atribuido a norma: es el valor que tenía entonces el menú de F-06. La ENMIENDA E-2 de F-25
+// subió el del menú a 920px sin mover este, porque su eje es otro: la prominencia del tel:.
 
 .rejilla {
   display: grid;
@@ -111,7 +112,8 @@
 
 // En móvil el tel: es la acción principal (llamar sin WhatsApp): se agranda y toma un objetivo cómodo
 // de pulsar. Este byte prueba que el tratamiento móvil EXISTE, no que sea prominente (eso lo dice el
-// ojo). Breakpoint 820px = criterio de proyecto MEDIDO, heredado de F-06, NUNCA atribuido a norma.
+// ojo). Breakpoint 820px = criterio de proyecto MEDIDO, NUNCA atribuido a norma: el valor que F-06
+// tenía entonces. La ENMIENDA E-2 de F-25 subió el del menú a 920px y dejó este (F-25 @s42).
 @media (max-width: 820px) {
   .telefono {
     display: inline-flex;

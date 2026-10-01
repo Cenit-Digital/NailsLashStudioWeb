@@ -1,5 +1,5 @@
 // Catálogo de servicios (capa visual del DEMO). Estilos derivados del prototipo Opcion-1-Rosa:
-// tarjeta con lista de precios + bloque de foto (aquí, placeholder rosa, sin fotos reales).
+// tarjeta con lista de precios + foto de la categoría (F-27: fotos de banco, ilustrativas).
 
 // El <h2> «Servicios» se oculta a la vista (decisión de Pablo) pero SIGUE en el árbol de
 // accesibilidad: es el nombre accesible de la sección y el destino de #servicios-titulo. Técnica
@@ -80,13 +80,21 @@
   font-size: 0.90625rem;
 }
 
-// Bloque de «foto»: placeholder rosa como el estado vacío del prototipo (sin fotos reales todavía).
+// Hueco de foto (F-27): la <img> de cada categoría ES el hueco, sin envoltorio. Caja 4:5 al ancho
+// de la columna y la foto la cubre sin deformarse (encuadre centrado por defecto). Sin alto mínimo:
+// junto al aspect-ratio solo deformaría la caja en una columna estrecha. El degradado rosa queda de
+// FONDO del propio <img>: es lo que se ve mientras la foto carga o si no llega a cargar (@s26).
+// El borde va DENTRO del ancho (border-box): si no, la foto sobresale 2 px de su columna (H-1).
 .foto {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: auto;
   aspect-ratio: 4 / 5;
+  object-fit: cover;
   border-radius: 22px;
   background: linear-gradient(160deg, var(--accent-soft), var(--surface2));
   border: 1px solid var(--line);
-  min-height: 260px;
 }
 
 .leyenda {

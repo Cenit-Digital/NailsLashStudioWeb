@@ -30,6 +30,16 @@ import { sinPrecargasDeFuenteWoff, sinPrecargasDeImagen } from './src/lib/hornea
 export default defineConfig({
   base: '/NailsLashStudioWeb/',
   plugins: [react()],
+  // H-3 (2026-09-30, progress/brief_tests_build_aislado.md): el directorio FÍSICO del artefacto sale de
+  // `NLS_DIST_DIR`; sin valor (o vacía), `dist`, exactamente como siempre. Los tests build-based
+  // (home-horneado, contacto-horneado) la apuntan a un temporal para no vaciar ni reescribir el `dist/`
+  // del proyecto mientras `vite preview` lo sirve: los hooks corren la suite en cada edición. Sin
+  // prefijo `VITE_`, porque Vite expone esas al código del cliente. Aquí SÍ vale una expresión: la
+  // puerta de terceros lee este fichero como TEXTO, pero solo vigila la `base` y NINGUNA puerta vigila
+  // `outDir`, así que NO aplica el patrón «valor guardado por puerta que lee la config como texto debe
+  // ser literal» (.memoria-cache/patterns/tooling/). Con un temporal fuera de la raíz, Vite avisa de
+  // que no lo vacía: da igual, el temporal es nuevo en cada build.
+  build: { outDir: process.env.NLS_DIST_DIR || 'dist' },
   ssgOptions: {
     entry: 'src/main.tsx',
     dirStyle: 'nested',
