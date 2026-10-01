@@ -204,7 +204,8 @@ flotante cambia de orden: solo cambian nombres.
   `cmp` idéntico a `public/` en los tres.
 - **I-2**: el stdout es la misma línea; stderr, 0 bytes.
 - **I-3**: **40/40**; `vitest list`, diff vacío.
-- `git diff --stat`: solo `tools/favicon/generar.mjs` (+123 −72).
+- `git show --numstat 591ebab`: `tools/favicon/generar.mjs` +123 −72, y esta bitácora +58 −2. (Corregido en la
+  ronda 1, §8: aquí decía «solo `generar.mjs`», medido antes de añadir la bitácora al commit.)
 
 ## 4. Paso 2b — `contornos` partido en funciones de un solo motivo (menor 3)
 
@@ -248,7 +249,8 @@ glyf guarda los datos. Las cuatro responsabilidades del brief:
   - `contornos` contra `contornosDelGlifo`, sobre los **330** glifos de la fuente: **330 iguales**, 0
     distintos. Son 213 simples, 6 vacíos y 111 compuestos, que lanzan el mismo mensaje en los dos.
   - `glifoDe` en los **65 536** puntos de código del BMP: **65 536 iguales**, 231 de ellos con glifo.
-- `git diff --stat` del paso: solo `tools/favicon/generar.mjs` (+86 −42).
+- `git show --numstat f401f39`: `tools/favicon/generar.mjs` +86 −42, y esta bitácora +44 −1 (corregido en la
+  ronda 1, §8).
 
 ## 5. Paso 3 — los errores llegan al usuario del CLI sin traza (menor 4)
 
@@ -262,19 +264,23 @@ Mismo método (`parche-3.txt`).
   - `<token>: se esperaba UNA declaración #RRGGBB…`.
 - El bloque «Principal» pasa a `generar(argv)` sin cambiar ni una sentencia ni su orden. Toda la validación
   (argumentos, glifo y tokens) sigue ANTES de `mkdirSync`, y un comentario lo dice.
-- La nueva sección `── Interfaz ──`, al final del fichero, es la única que habla con el usuario. Hace un
+- La nueva sección `── Interfaz ──`, al final del fichero, captura los errores y los informa. Hace un
   `try { generar(process.argv.slice(2)) }`, y si algo falla:
   - `ErrorDelFavicon` → `favicon: <mensaje>`;
   - cualquier otro → `favicon: error inesperado: <mensaje>`;
   - los dos, por `console.error`, sin traza y con `process.exitCode = CODIGO_DE_SALIDA_CON_ERROR` (1). NO
     `process.exit()`, por el precedente de Windows de `tools/puerta-anclas.ts`.
+  - Corregido en la ronda 1 (§8): aquí decía que la Interfaz «es la única que habla con el usuario», y en el
+    paso 3 no lo era, porque `generar` aún imprimía el resumen por stdout. Desde `e99f02a`, `generar` lo
+    devuelve y lo imprime la Interfaz.
 
 **Medido**: `comprobar.sh paso3`:
 
 - **I-1**: exit 0, los tres md5 del brief §1, y `cmp` = `public/`;
 - **I-2**: la misma línea; stderr, 0 bytes;
 - **I-3**: **40/40**; `vitest list`, diff vacío.
-- `git diff --stat` del paso: solo `tools/favicon/generar.mjs` (+58 −33).
+- `git show --numstat f0a60fd`: `tools/favicon/generar.mjs` +58 −33, y esta bitácora +64 −1 (corregido en la
+  ronda 1, §8).
 
 ### I-5 — la ruta de error del CLI
 
@@ -308,11 +314,14 @@ demuestra que la copia replica `RAIZ` y que los errores no vienen de la disposic
 **ANTES** (`generar.mjs` de `884a66c`, el mismo arnés; `i5/antes/informe.json`): en los cinco casos, exit 1,
 stdout vacío y sin directorio de salida, pero con la traza cruda.
 
-- Casos 1-4: 12 líneas de stderr cada uno, de ellas **5** `at`, con la línea fuente y el `^`.
-- Caso 5: 19 líneas, de ellas **7** `at`, más el objeto del error (`errno`, `code`, `syscall` y `path`).
+- Casos 1-4: 12 líneas de stderr cada uno (10 sin contar las 2 en blanco), de ellas **5** `at`, con la línea
+  fuente y el `^`.
+- Caso 5: 19 líneas (17 sin las 2 en blanco), de ellas **7** `at`, más el objeto del error (`errno`, `code`,
+  `syscall` y `path`).
+- Los «sin contar las en blanco» se añadieron en la ronda 1 (§8), recontados sobre `i5/antes/informe.json`.
 
 El exit, el stdout y el «no se crea la salida» ya estaban bien. Lo que arregla el paso 3 es la traza: de 5-7
-líneas `at` a 0, y de 12-19 líneas de stderr a 1.
+líneas `at` a 0, y de 12-19 líneas de stderr (10-17 sin las en blanco) a 1.
 
 ## 6. Paso 4 — formato y calidad de lo tocado (HEAD `f0a60fd`)
 
@@ -331,36 +340,148 @@ líneas `at` a 0, y de 12-19 líneas de stderr a 1.
 
 ## 7. Resumen de invariantes
 
-| Invariante               | Resultado                                                                                                     | Dónde           |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------- | --------------- |
-| I-1 (bytes)              | los tres md5 del brief §1 y `cmp` = `public/`, tras CADA paso (1, 2a, 2b y 3)                                 | §2, §3, §4 y §5 |
-| I-2 (stdout)             | la misma línea tras cada paso; stderr, 0 bytes                                                                | §2, §3, §4 y §5 |
-| I-3 (nombres)            | 40/40 y `vitest list` con diff vacío contra `989d7d6`, tras cada paso                                         | §2, §3, §4 y §5 |
-| I-4 (sabotajes del test) | las 4 regiones obligatorias en rojo (S1-S14). S21-S24 en verde, por los fixtures (nota 1); S25-S26, controles | §2              |
-| I-5 (errores del CLI)    | los 5 casos: exit 1, una línea `favicon: …`, 0 líneas `at`, stdout vacío y sin directorio de salida           | §5              |
-| I-6 (`harness init`)     | NO medido aquí: lo mide el lead (suite completa)                                                              | —               |
-| I-7 (alcance del diff)   | solo los dos ficheros, más `progress/`                                                                        | §6              |
-| Equivalencia (extra)     | `contornos`: 330/330 glifos iguales; `glifoDe`: 65 536/65 536 puntos de código                                | §4              |
-| Mutación                 | NO APLICA, declarado en el brief §4                                                                           | —               |
+| Invariante                  | Resultado                                                                                                                                                                                    | Dónde           |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| I-1 (bytes)                 | los tres md5 del brief §1 y `cmp` = `public/`, tras CADA paso (1, 2a, 2b y 3)                                                                                                                | §2, §3, §4 y §5 |
+| I-2 (stdout)                | la misma línea tras cada paso; stderr, 0 bytes                                                                                                                                               | §2, §3, §4 y §5 |
+| I-3 (nombres)               | 40/40 y `vitest list` con diff vacío contra `989d7d6`, tras cada paso                                                                                                                        | §2, §3, §4 y §5 |
+| I-4 (sabotajes del test)    | las 4 regiones obligatorias en rojo (S1-S14). S21-S24 en verde, por los fixtures (nota 1); S25-S26, controles                                                                                | §2              |
+| I-5 (errores del CLI)       | los 5 casos: exit 1, una línea `favicon: …`, 0 líneas `at`, stdout vacío y sin directorio de salida                                                                                          | §5              |
+| I-6 (`harness init`)        | NO medido aquí: lo mide el lead (suite completa)                                                                                                                                             | —               |
+| I-7 (alcance del diff)      | solo los dos ficheros, más `progress/`                                                                                                                                                       | §6              |
+| Equivalencia (extra)        | `contornos`: 330/330 glifos iguales; `glifoDe`: 65 536/65 536 puntos de código                                                                                                               | §4              |
+| Ronda 1 (menores del judge) | I-1, I-2 (byte a byte), I-3 e I-5 iguales tras cada commit; I-4 rehecho (27 sabotajes): S18 pasa de 5 a 11 rojas y S27, nuevo, da 9; `rangoDelGlifo` equivalente en los dos formatos de loca | §8              |
+| Mutación                    | NO APLICA, declarado en el brief §4                                                                                                                                                          | —               |
+
+## 8. Ronda de corrección 1 — los menores del judge
+
+> `tdd_craftsman`, 2026-10-01. El texto de la tarea decía HEAD `884a66c`; el HEAD real de la rama era
+> `b7d3567` (`32708c3`…`0b7cd62` y el commit del judge), y se trabajó sobre él. Mismo método que en los §3-§5:
+> parches de reemplazo exacto (`ronda1/parche-r1a.txt`, `parche-r1b.txt` y `parche-r1c.txt`),
+> `prettier --write` y `comprobar.sh` tras cada uno. Lo medido está en `…/scratchpad/legibilidad/ronda1/`.
+
+**Partida** (`comprobar.sh r1-base`, en `b7d3567`): exit 0, los tres md5 del brief §1, `cmp` = `public/`,
+stderr de 0 bytes, 40/40 y `vitest list` con diff vacío.
+
+### Commit `e99f02a` — menores 1, 2 y 4 (`generar.mjs` +18 −17)
+
+- **Menor 1.** `generar(argv)` devuelve la línea de resumen, y la Interfaz hace `console.log(generar(…))`.
+  De los dos arreglos que proponía el judge, es el que hace cierto el comentario: la Interfaz es la única
+  capa que habla con quien ejecuta el CLI, y su comentario dice ahora que imprime el resumen por stdout. El
+  resumen sigue saliendo el último, tras las tres escrituras.
+- **Menor 2.** En `generar`, `const glifo = contornosDelGlifo(…)` → `const contornos = …`, con
+  `pathDe(contornos)` y `cajaDe(contornos)`. `glifo` queda solo para el índice de glifo.
+- **Menor 4.** En `glifoDe`, `desplazamiento` → `posicionDelSegmento`, para no confundirlo con
+  `desplazamientoDelRango` (el idRangeOffset), que entra en la misma suma.
+
+### Commit `6109869` — menor 3 (`generar.mjs` +17 −11)
+
+- `BYTES_POR_ENTERO_16` (2) y `BYTES_POR_ENTERO_32` (4) se declaran una vez, al abrir la sección de la fuente,
+  y los usan cmap, loca y glyf. Desaparecen `BYTES_POR_VALOR` (cmap) y el `BYTES_POR_ENTERO_16` propio del
+  glyf.
+- `rangoDelGlifo`, sin literales:
+  - `inicioEnGlyf(entrada)` lee la entrada de loca con el ancho de su formato; la del formato corto se
+    multiplica por `DIVISOR_DE_LA_LOCA_CORTA` (2);
+  - el rango es `[inicioEnGlyf(glifo), inicioEnGlyf(glifo + 1)]`;
+  - el `glifo * 4 + 4` de antes pasa a ser `(glifo + 1) * 4`: aritmética entera, el mismo valor.
+- **Equivalencia** (`ronda1/equiv/`), del generador de `b7d3567` contra el de este commit, cargados como
+  módulos sin «Principal»:
+  - `rangoDelGlifo`, en los DOS formatos de loca, sobre una loca sintética aleatoria de 5000 entradas:
+    5000/5000 iguales en el formato 0 (uint16, dividido entre 2) y 5000/5000 en el 1 (uint32). La fuente real
+    usa el formato 0 (`indexToLocFormat` = 0): 330/330 iguales.
+  - `contornosDelGlifo`: 330/330 glifos iguales (213 simples, 6 vacíos y 111 compuestos que lanzan el mismo
+    mensaje).
+  - `glifoDe`: 65 536/65 536 puntos de código del BMP iguales (231 con glifo).
+
+### Commit `58dc0e3` — menor 5 (`favicon-marca.test.ts` +5 −3)
+
+- `POSICION_DEL_ALFA = CANALES_RGB`, con el comentario «en RGBA, el alfa va detrás de las tres muestras de
+  color». En `aRgba`, `p * canales + 3` → `+ CANALES_RGB`, y `p * CANALES_RGBA + 3` → `+ POSICION_DEL_ALFA`.
+- Fuera de lo que señaló el judge, se declara: `pixelEn` lee el alfa con `i + POSICION_DEL_ALFA` en vez de
+  `i + 3`. Es el mismo número, en la misma sección que el brief marca como «Permitida». Los `i + 1` e `i + 2`
+  de G y B se quedan.
+- No cambian ni las aserciones, ni los valores esperados, ni los títulos, ni los imports, ni el número de `it`.
+
+### Medido tras cada commit
+
+| Commit    | I-1                                                  | I-2                                                                                                                | I-3                              | I-5                                                                                                                                     |
+| --------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `e99f02a` | exit 0; los tres md5 del brief §1; `cmp` = `public/` | la misma línea: 147 bytes, igual byte a byte a la de `b7d3567` quitando la ruta (`ronda1/i2.mjs`); stderr, 0 bytes | 40/40; `vitest list`, diff vacío | `i5/r1a`: los 6 casos (c0-c5) iguales a los del paso 3 (`i5/despues`), normalizando solo la ruta de la copia (`ronda1/i5-comparar.mjs`) |
+| `6109869` | ídem                                                 | ídem                                                                                                               | ídem                             | `i5/r1b`: ídem                                                                                                                          |
+| `58dc0e3` | ídem                                                 | ídem                                                                                                               | ídem                             | no aplica: el commit solo toca el test                                                                                                  |
+
+**Formato y calidad** (sobre `58dc0e3`):
+
+- `prettier --check` de los dos ficheros, limpio;
+- `pnpm typecheck`, exit 0;
+- `pnpm exec eslint src/pages/favicon-marca.test.ts`, exit 0;
+- `node --check tools/favicon/generar.mjs`, exit 0.
+
+**I-4, rehecho entero sobre `58dc0e3`** (`ronda1/sabotear.sh`, el método del §2): 27 sabotajes, los 26 del §2
+más S27. Al terminar, el árbol queda restaurado (0 cambios).
+
+- S1-S17 y S19-S26 dan las mismas rojas y las mismas `it` que en el §2 (el diff de `indices.txt` contra el
+  del §2 solo muestra S18 y S27).
+- **S18** (`CANALES_RGB = 3` → `= 4`): pasa de 5/40 (20, 23, 36, 38, 40) a **11/40** (18-20, 23, 29-32, 36,
+  38, 40). Ahora también mueve `POSICION_DEL_ALFA`, así que el alfa del ICO se lee un byte más allá: el
+  sabotaje alcanza ya las líneas que, según el judge, no alcanzaba.
+- **S27** (nuevo; `POSICION_DEL_ALFA = CANALES_RGB` → `= 2`): **9/40** (18-20, 23, 29-32, 36). El alfa se
+  lee del canal B, y en el apple, además, se escribe encima de B.
+
+**I-7**: `git diff --numstat b7d3567 58dc0e3` da `src/pages/favicon-marca.test.ts` +5 −3 y
+`tools/favicon/generar.mjs` +33 −26; nada más. Esta bitácora y `progress/current.md` van en un commit aparte.
+
+### Correcciones a esta bitácora (de la verificación de la primera ronda)
+
+1. **§3, §4 y §5.** «`git diff --stat` del paso: solo `generar.mjs`» se midió antes de añadir la bitácora al
+   commit. `git show --numstat` da también la bitácora: +58 −2 (`591ebab`), +44 −1 (`f401f39`) y +64 −1
+   (`f0a60fd`). Las cifras del generador eran exactas. Corregido en su sitio.
+2. **§5, ANTES.** Las 12 y 19 líneas de stderr cuentan las líneas en blanco; sin ellas son 10 y 17
+   (recontado sobre `i5/antes/informe.json`). Las 5 y 7 líneas `at` no cambian. Corregido en su sitio.
+3. **§5, la Interfaz.** «La única que habla con el usuario» no era cierto en el paso 3. Corregido en su
+   sitio; es cierto desde `e99f02a`.
+4. **Línea base de I-3.** La de esta bitácora es `989d7d6`, y la del verificador, `origin/main` `06742d3`.
+   Son equivalentes: `git diff --quiet 989d7d6 06742d3` no ve diferencias ni en el test, ni en `public/`, ni
+   en el generador.
+
+## 9. Deuda registrada (menor 6 del judge)
+
+**D-1. El decodificador PNG del test tiene ramas que ningún fixture ejecuta.**
+
+- En `src/pages/favicon-marca.test.ts`, las ramas 1-4 de `predictor` (`FILTRO_IZQUIERDA`, `FILTRO_ARRIBA`,
+  `FILTRO_MEDIA` y `FILTRO_PAETH`, más la función `paeth`) no corren nunca. Los tres PNG de `public/` llevan
+  el filtro 0 en todas sus filas (16 de 16, 32 de 32 y 180 de 180; nota 1 del §2), porque el generador
+  siempre escribe el filtro 0.
+- La prueba: S21-S24 dan verde, aquí (§8) y en el judge. Esas constantes no tienen peso en ningún test. Si un
+  PNG futuro usara otro filtro, entraría por ramas que nunca se han probado.
+- Viene de F-28; este refactor no lo introduce.
+- Queda fuera del alcance: arreglarlo pide un fixture nuevo y al menos un `it` más, y el brief prohíbe
+  cambiar el número de `it`.
+- Dos salidas posibles para quien la salde:
+  - un PNG sintético construido en el propio test con `deflateSync` (cinco filas, una por filtro, con
+    valores conocidos) y un `it` que compare el `rgba` decodificado con lo esperado;
+  - o recortar `predictor` al filtro 0 y lanzar con cualquier otro, como ya hace el decodificador con lo que
+    no sabe leer.
+- **Para el lead**: anotarla como DEUDA REGISTRADA en el `cierre` de F-28.
 
 ## Hallazgos
 
 1. **Ramas muertas en el decodificador del test.** Los filtros PNG 1-4 de `predictor` no los ejercita
    ningún fixture: los tres PNG usan el filtro 0 en todas sus filas. Viene de F-28; no se ha tocado,
-   porque añadir fixtures queda fuera del alcance.
+   porque añadir fixtures queda fuera del alcance. Registrado como deuda D-1 en el §9.
 2. **Great Vibes tiene 111 glifos compuestos.** Entre ellos están la `i`, la `j`, `"` y `=`. Si algún día
    cambia `LETRA`, el generador puede negarse con `glifo compuesto: no soportado`, que ahora sale limpio.
 3. **Números que siguen sin nombre en el generador**, fuera de la lista del brief:
-   - los anchos de `loca` (`* 4`, `* 2`);
+   - los anchos de `loca` (`* 4`, `* 2`), que tienen nombre desde la ronda 1 (§8);
    - el IHDR del codificador PNG;
    - los 3/4 canales del rasterizador.
    - Están declarados en el §3, por si el judge los quiere en otra pasada.
 
 ## PENDIENTE (del lead)
 
-- **I-6**: `node .harness/harness.mjs init` completo.
-- El `judge` → `progress/judge_deuda_favicon_legibilidad.md`.
-- El `cierre` de F-28 en `feature_list.json`, y la PR a `main`.
+- **I-6**: `node .harness/harness.mjs init` completo, sobre el HEAD de la ronda 1.
+- Si el lead lo quiere, el `judge` de la ronda 1 → `progress/judge_deuda_favicon_legibilidad.md`.
+- El `cierre` de F-28 en `feature_list.json`, con la deuda D-1 del §9, y la PR a `main`.
 
 ## Estado al cerrar
 
@@ -370,4 +491,9 @@ líneas `at` a 0, y de 12-19 líneas de stderr a 1.
   - `f401f39`: paso 2b;
   - `f0a60fd`: paso 3;
   - y el de esta bitácora (paso 4).
+- Ronda 1 (§8):
+  - `e99f02a`: menores 1, 2 y 4;
+  - `6109869`: menor 3;
+  - `58dc0e3`: menor 5;
+  - y el de esta bitácora (§8 y §9, con la deuda del menor 6).
 - Sin push y sin PR. Árbol de trabajo limpio; `public/` sin tocar.

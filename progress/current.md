@@ -114,3 +114,8 @@ el contrato son los invariantes I-1..I-7 de `progress/brief_deuda_favicon_legibi
   - `tdd_craftsman` → `progress/tdd_deuda_favicon_legibilidad.md`;
   - `judge` → `progress/judge_deuda_favicon_legibilidad.md`;
   - PR a `main`, que no se fusiona sin Pablo.
+- `judge` APPROVED (`b7d3567`: 0 bloqueantes, 6 menores). Ronda de corrección 1 del `tdd_craftsman`:
+  - los menores 1-5, resueltos en `e99f02a`, `6109869` y `58dc0e3`, con I-1, I-2, I-3, I-4 e I-5 medidos de
+    nuevo (bitácora §8);
+  - el menor 6 queda como deuda D-1 (bitácora §9), para el `cierre` de F-28;
+  - falta I-6 (`harness init` completo), que corre el lead.
