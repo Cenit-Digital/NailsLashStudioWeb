@@ -82,6 +82,16 @@ Rama `claude/favicon-marca` desde `origin/main` (ba5b498). **No** se toca la ram
   `harness init` en verde (1820/1820, 0 avisos); un falso rojo LOCAL de Prettier en `package.json` (CRLF en la
   copia de trabajo desde julio, LF en git) se normalizó sin cambiar el contenido versionado. F-28 → `done`.
   En curso: `harness verify` completo (mutación de los 37 ficheros de `stryker.config.json`).
+- 10:58: `harness verify` COMPLETO en verde: mutación de los 37 ficheros al **100 %** (2624 mutantes: 2611
+  muertos + 13 por timeout, 0 supervivientes, 41 ignorados ya documentados). Aplicado
+  `testing/informe-de-mutacion-con-timeouts-miente`: los 13 timeouts (`placeholders.ts` 9, `equipo-logica.ts`
+  3, `resenas-logica.ts` 1) se repitieron a `--concurrency 1` y SIGUEN en timeout con 100 % (87+9, 38+3, 29+1):
+  son bucles infinitos genuinos (condición o avance del bucle mutados), no ruido de CPU.
+- 10:48-10:51: PR #18 fusionada (`2a49c14`), despliegue aprobado por el lead (autorización de Pablo) y el
+  DESPUÉS medido en GitHub Pages: consola vacía, iconos en 200 y la «N» en la pestaña. H-2 cerrado.
+- 11:08: los dos hallazgos fuera de alcance (deuda de legibilidad de F-28 y H-5) se propusieron como tareas
+  aparte; Pablo prefiere hacerlo todo en ESTA sesión. Las dos sesiones abiertas estaban ya ociosas (brief
+  escrito cada una); se continúan aquí, una a la vez, reutilizando sus briefs.
 
 ## 2026-10-01 — deuda de legibilidad de F-28 (menores 1-4 del judge): refactor sin cambio de comportamiento
 
