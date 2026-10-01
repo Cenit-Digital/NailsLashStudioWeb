@@ -150,3 +150,7 @@ en 19 puntos y prevalece sobre §2-§6 donde difieran):
 La guarda anti-vacuidad (pregunta 5) la resuelve el `spec_partner` con la alternativa VERIFICADA (guarda sobre
 el extractor que cuenta todo `<link>` con `href`, canónica incluida, en `inspeccionarArtefacto` tras la de
 @s28; ningún fixture ni escenario de @s1-@s45 cambia). La puerta humana sobre el `.feature` sigue pendiente.
+
+## 9. Puerta humana sobre el contrato
+
+PUERTA HUMANA APROBADA por Pablo el 2026-10-01 (~17:45, AskUserQuestion): el contrato tal cual (@s46-@s72); S-11 y S-12 RATIFICADOS, incluido el cambio de veredicto latente de S-12; aceptadas las dos excepciones (el ayudante `elementos` delega en `elementosDe`, y @s67, @s70, @s71 y @s72); `REGLA_RUTA_AUSENTE` NO entra en H-5 (queda declarada). Implementación: inmediata.

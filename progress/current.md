@@ -112,3 +112,5 @@ Rama `claude/favicon-marca` desde `origin/main` (ba5b498). **No** se toca la ram
   - Siguiente paso: `spec_partner` → `project-spec.md` §Feature 4 «Enmienda 5 (2026-10-01)» (antes de
     «### Feature 5»), con las decisiones D1-D10 y las preguntas de §6 del brief; luego `gherkin_author`
     (banner de ENMIENDA 5 + @s46…), revisión adversarial y la puerta humana.
+
+- 17:45 (sesión principal): PUERTA HUMANA APROBADA por Pablo el 2026-10-01 (~17:45, AskUserQuestion): el contrato tal cual (@s46-@s72); S-11 y S-12 RATIFICADOS, incluido el cambio de veredicto latente de S-12; aceptadas las dos excepciones (el ayudante `elementos` delega en `elementosDe`, y @s67, @s70, @s71 y @s72); `REGLA_RUTA_AUSENTE` NO entra en H-5 (queda declarada). Implementación: inmediata. Antes de la puerta: dos revisores independientes (A: 17/18 de la ronda 2 resueltos, 0 bloqueantes; B: modelo de la implementación, 0 regresiones, mutación al 100 % alcanzable) y una pasada final de texto (spec `8995b6f`, Gherkin `e6e4f24`); `harness init` del worktree en verde (1820/1820).

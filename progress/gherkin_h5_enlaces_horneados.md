@@ -985,3 +985,7 @@ sección nueva empieza dos líneas después; `git diff origin/main -- features/c
 **Lo que NO se aplica, y por qué.** Ninguno de los puntos resultó falso al medirlo. Dos matices: M2 llamaba
 «equivalente» al «`$` quitado», y no lo es del todo (U+2028), así que se escribe como la spec («ninguna fila lo
 distingue»); y de M1 no se añade la tercera ruta, `/NailsLashStudioWeb/..` (arriba).
+
+## Respuestas de la puerta humana (2026-10-01)
+
+PUERTA HUMANA APROBADA por Pablo el 2026-10-01 (~17:45, AskUserQuestion): el contrato tal cual (@s46-@s72); S-11 y S-12 RATIFICADOS, incluido el cambio de veredicto latente de S-12; aceptadas las dos excepciones (el ayudante `elementos` delega en `elementosDe`, y @s67, @s70, @s71 y @s72); `REGLA_RUTA_AUSENTE` NO entra en H-5 (queda declarada). Implementación: inmediata. Las preguntas 1-4 del §5 se resolvieron con su recomendación.
