@@ -2199,3 +2199,30 @@ describe('ejecutarPuertaDelCascaron → el href se limpia como lo limpia el nave
     expect(resultado.lineas).toEqual(lineas)
   })
 })
+
+describe('ejecutarPuertaDelCascaron → lo que NO es root-absoluto no es de esta puerta, y ni siquiera pide la lista (@s53)', () => {
+  // Sin la lista A PROPÓSITO: si alguno se tomara por root-absoluto, la puerta no saldría con 0.
+  it.each<readonly [elemento: string, extraidos: readonly string[]]>([
+    [
+      '<link rel="stylesheet" href="//cdn.ejemplo/x.css">',
+      ['https://example.invalid/', '//cdn.ejemplo/x.css'],
+    ],
+    [
+      '<link rel="stylesheet" href="https://example.invalid/x.css">',
+      ['https://example.invalid/', 'https://example.invalid/x.css'],
+    ],
+    ['<link rel="icon" href="favicon.svg">', ['https://example.invalid/', 'favicon.svg']],
+    ['<link rel="stylesheet" href="./x.css">', ['https://example.invalid/', './x.css']],
+    ['<link rel="stylesheet" href="../x.css">', ['https://example.invalid/', '../x.css']],
+    ['<link rel="icon" href="">', ['https://example.invalid/', '']],
+    ['<link rel="icon">', ['https://example.invalid/']],
+  ])('@s53 %s', (elemento, extraidos) => {
+    const html = conElementos(htmlCrudo(), elemento)
+
+    const resultado = puertaSobreLaHome(html, { base: BASE_DE_REFERENCIA })
+
+    expect(extraerLinks(html)).toEqual(extraidos)
+    expect(resultado.codigoSalida).toBe(0)
+    expect(resultado.lineas).toEqual([])
+  })
+})

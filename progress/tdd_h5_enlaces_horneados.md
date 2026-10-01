@@ -131,3 +131,13 @@
   `[TAB LF CR]` (bandera `g`, SIN `+`), el orden de WHATWG. Barras contadas: producción de 55 a 66 (8 + 3).
   276 passed; `tsc` 0.
 - REFACTOR: `prettier --write` juntó una fila del test (barras: 77, sin cambios). En verde.
+
+### C9 · @s53 (lo que NO es root-absoluto queda fuera, sin la lista; 7 filas)
+
+- Test: las 7 filas, con la base declarada y la petición SIN `ficheros`; ANCLA EXACTA (`toEqual`), exit 0
+  y 0 líneas.
+- Nacen en VERDE (283 passed), como dice el contrato: son CONTROLES de que la puerta de hoy no acusa lo
+  que no es candidato. Para no fiarme de un verde a la primera, SABOTAJE medido: con el candidato
+  `limpio.startsWith('/')` (acepta `//`), 1 failed, la fila `//cdn.ejemplo/x.css` (`expected 1 to be
+  +0`); revertido (`git diff` de producción vacío), 283 passed.
+- VERDE y REFACTOR: sin cambios de producción.
