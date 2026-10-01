@@ -577,6 +577,69 @@ function esRutaInterna(href: string): boolean {
   return RUTA_INTERNA.test(href)
 }
 
+export const REGLA_LINK_SIN_PREFIJO = 'link root-absoluto sin el prefijo de la base'
+export const REGLA_LINK_SIN_FICHERO = 'link root-absoluto sin fichero en dist/'
+export const REGLA_LINK_NO_INTERPRETA =
+  'link root-absoluto con %, &, barra invertida, // o segmentos . o .., que la puerta no interpreta'
+
+function limpiar(href: string): string {
+  return href.replace(/^ /, '')
+}
+
+/**
+ * S-11: el navegador NORMALIZA los segmentos `.` y `..` (el último incluido) y CONSERVA el `//`, y
+ * GitHub Pages sirve esas rutas con 200 (medido): «sin fichero en dist/» sería FALSO. La puerta no
+ * normaliza: los acusa con la regla 4. Un segmento `...` o `.vite` sigue adelante.
+ */
+function tieneSegmentosQueNoInterpreta(ruta: string): boolean {
+  return (
+    ruta.includes('//') || ruta.split('/').some((segmento) => segmento === '.' || segmento === '..')
+  )
+}
+
+function reglaDelLink(
+  href: string,
+  ubicaciones: ReadonlySet<string>,
+  base: string | null,
+): string | null {
+  const ruta = rutaDelHref(limpiar(href))
+
+  if (tieneSegmentosQueNoInterpreta(ruta)) {
+    return REGLA_LINK_NO_INTERPRETA
+  }
+
+  if (base === null) {
+    return null
+  }
+
+  if (!ruta.startsWith(base)) {
+    return REGLA_LINK_SIN_PREFIJO
+  }
+
+  if (!ubicaciones.has(`${DIRECTORIO_ARTEFACTO}/${ruta.slice(base.length)}`)) {
+    return REGLA_LINK_SIN_FICHERO
+  }
+
+  return null
+}
+
+/** ENMIENDA 5 (H-5): los `<link>` root-absolutos de cada página, en el orden de las páginas. */
+function violacionesDeLinks(
+  paginas: readonly PaginaArtefacto[],
+  ubicaciones: ReadonlySet<string>,
+  base: string | null,
+): ViolacionCascaron[] {
+  return paginas.flatMap((pagina) =>
+    extraerLinks(pagina.html)
+      .filter((href) => esRutaInterna(limpiar(href)))
+      .flatMap((href) => {
+        const regla = reglaDelLink(href, ubicaciones, base)
+
+        return regla === null ? [] : [{ ruta: pagina.ruta, regla, valor: href }]
+      }),
+  )
+}
+
 /** La ruta lógica de la home, tal y como la produce `rutaDelFichero('dist/index.html')`. */
 const RAIZ_DEL_ARTEFACTO = '/'
 
@@ -849,13 +912,18 @@ function inspeccionarArtefacto(peticion: PeticionPuertaCascaron): ResultadoPuert
       }))
     : []
 
+  let ubicaciones = new Set<string>()
+
   if (ficheros !== undefined) {
-    ficheros.listar()
+    ubicaciones = new Set(ficheros.listar().map((fichero) => fichero.ubicacion))
   }
 
   // La inspección incluye la GUARDA de «una HTML por cada ruta esperada» (@s26): va PRIMERO,
   // porque un dist/ vacío tiene que acusar QUÉ RUTA FALTA, no «no encontré enlaces».
-  const violaciones = inspeccionarSitio(paginas, rutasEsperadas, base)
+  const violaciones = [
+    ...inspeccionarSitio(paginas, rutasEsperadas, base),
+    ...violacionesDeLinks(paginas, ubicaciones, base),
+  ]
 
   if (violaciones.length > 0) {
     return { codigoSalida: CODIGO_FALLO, lineas: violaciones.map(describirViolacion) }

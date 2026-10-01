@@ -31,3 +31,43 @@
   (trampa deliberada: pedirla SIEMPRE que esté; la generalizan @s48 y @s58). 212 passed; `tsc` 0.
 - REFACTOR: `extraerEnlaces` y `extraerLinks` compartían el cuerpo → `hrefsDe(html, etiquetas)`.
   212 passed; `tsc` 0.
+
+### C2 · @s47 (regla 1: bajo base declarada, sin el prefijo; 9 filas)
+
+- Test: `it.each` con las 9 filas del `Examples:` escritas a mano (la del espacio, con su escape), sobre
+  el ayudante NUEVO `comprobarUnLink(rel, href, codigo, lineas)`: ANCLA (`extraerLinks` contiene el
+  `href` CRUDO), código en la notación del contrato (`enElContrato`: 0 o «distinto de 0») y líneas EXACTAS.
+- ROJO visto: 8 failed (las 8 filas que esperan la regla 1), `AssertionError: expected +0 to be 'distinto
+  de 0'`; la fila 1 (CONTROL) en verde, como dice el contrato.
+- VERDE mínimo: `REGLA_LINK_SIN_PREFIJO`; `violacionesDeLinks(paginas, base)` detrás de las de hoy:
+  candidato = `RUTA_INTERNA` sobre el `href` limpio; con base y sin el prefijo, la regla 1 con el valor
+  CRUDO. `limpiar` solo quita UN espacio inicial (lo que pide la fila del espacio; la generaliza @s52).
+  221 passed; `tsc` 0.
+- REFACTOR: ninguno todavía (el doble `limpiar(href)` se recoge al crecer las reglas en C3).
+
+### C3 · @s48, primer grupo (regla 2: la ubicación que nombra la RUTA, literal y con su caja; 10 filas)
+
+- Test: `it.each` de @s48 con las filas 1-6 y 11-14 (los 6 CONTROLES y las 4 de la regla 2), con
+  `comprobarUnLink('stylesheet', …)`.
+- ROJO visto: 4 failed (`no-existe.svg`, `FAVICON.SVG`, `assets` y `.../favicon.svg`), `expected +0 to be
+  'distinto de 0'`. Los 6 controles en verde (aún no había regla que mirase la lista).
+- VERDE mínimo: `REGLA_LINK_SIN_FICHERO`; `reglaDelLink(href, ubicaciones, base)` con la RUTA sacada con
+  `rutaDelHref` (la de la anti-404 de `<a>`, REUTILIZADA: la exigen los controles `?v=2`, `#x`,
+  `?v=/../x`, `#/./x` y `#//x`); con base: sin el prefijo, la 1; si no, `dist/<resto>` buscado por
+  igualdad EXACTA en un `Set` de las ubicaciones que da `ficheros.listar()`. Sin base, `return null`
+  (trampa: ninguna fila sin base todavía). 231 passed; `tsc` 0.
+- REFACTOR: `violacionesDeLinks` pasa de dos `filter` a `flatMap` sobre `reglaDelLink` (se va el doble
+  `limpiar`). En verde.
+
+### C4 · @s48, segundo grupo (los segmentos `.`, `..` y `//` de la RUTA son la regla 4, S-11; 6 filas)
+
+- Test: las filas 7-10, 15 y 16 de @s48, añadidas a la misma tabla en su sitio.
+- ROJO visto: 6 failed, `expected [ Array(1) ] to deeply equal [ Array(1) ]`: la puerta daba la regla 2
+  (`dist/./favicon.svg`, `dist/x/..`, `dist/.` no están) o la 1 (`/./favicon.svg`), justo la acusación
+  FALSA que S-11 evita.
+- VERDE mínimo: `REGLA_LINK_NO_INTERPRETA` (texto de S-11) y, nada más sacar la ruta y ANTES de la base:
+  `ruta.includes('//') || ruta.split('/').some((segmento) => segmento === '.' || segmento === '..')`
+  (TODOS los segmentos, el último incluido; igualdad, nunca `startsWith('.')`). 237 passed; `tsc` 0.
+- REFACTOR: el predicado sale a `tieneSegmentosQueNoInterpreta(ruta)`, con el porqué. `prettier --write`
+  sobre los dos ficheros (solo partió una fila de @s47); barras invertidas contadas antes y después:
+  17 en el test y 51 en producción, sin cambios. 237 passed.

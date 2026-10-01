@@ -1849,3 +1849,149 @@ describe('ejecutarPuertaDelCascaron → los <link> root-absolutos: el CONTROL (@
     expect(resultado.lineas).toEqual([])
   })
 })
+
+/** «distinto de 0» del contrato: la puerta falla, con el código que sea. */
+const FALLA = 'distinto de 0'
+
+type CodigoEsperado = 0 | typeof FALLA
+
+/** El código de salida en la notación del contrato: 0, o «distinto de 0». */
+function enElContrato(codigoSalida: number): CodigoEsperado {
+  return codigoSalida === 0 ? 0 : FALLA
+}
+
+type FilaDeUnLink = readonly [href: string, codigo: CodigoEsperado, lineas: readonly string[]]
+
+/**
+ * Las filas de un solo <link rel="…" href="…"> en el <head> de la página correcta, con la base
+ * declarada "/NailsLashStudioWeb/" y la lista de referencia. El ANCLA va PRIMERO: sin ella, una fila
+ * «(ninguna)» pasaría EN VACÍO con un extractor que solo viera la canónica.
+ */
+function comprobarUnLink(
+  rel: string,
+  href: string,
+  codigo: CodigoEsperado,
+  lineas: readonly string[],
+): void {
+  const html = conElementos(htmlCrudo(), `<link rel="${rel}" href="${href}">`)
+
+  const resultado = puertaSobreLaHome(html, {
+    base: BASE_DE_REFERENCIA,
+    ficheros: dobleDeLaLista().lista,
+  })
+
+  expect(extraerLinks(html)).toContain(href)
+  expect(enElContrato(resultado.codigoSalida)).toBe(codigo)
+  expect(resultado.lineas).toEqual(lineas)
+}
+
+describe('ejecutarPuertaDelCascaron → regla 1: bajo una base declarada, un <link> root-absoluto SIN su prefijo falla cerrado (@s47)', () => {
+  it.each<FilaDeUnLink>([
+    ['/NailsLashStudioWeb/favicon.svg', 0, []],
+    ['/favicon.svg', FALLA, ['/ — link root-absoluto sin el prefijo de la base: "/favicon.svg"']],
+    [
+      '/no-existe.svg',
+      FALLA,
+      ['/ — link root-absoluto sin el prefijo de la base: "/no-existe.svg"'],
+    ],
+    ['/vacio.svg', FALLA, ['/ — link root-absoluto sin el prefijo de la base: "/vacio.svg"']],
+    [
+      '/NailsLashStudioWeb',
+      FALLA,
+      ['/ — link root-absoluto sin el prefijo de la base: "/NailsLashStudioWeb"'],
+    ],
+    [
+      '/nailslashstudioweb/favicon.svg',
+      FALLA,
+      ['/ — link root-absoluto sin el prefijo de la base: "/nailslashstudioweb/favicon.svg"'],
+    ],
+    [
+      '\u0020/favicon.svg',
+      FALLA,
+      ['/ — link root-absoluto sin el prefijo de la base: "\u0020/favicon.svg"'],
+    ],
+    [
+      '/otra-cosa/x.css',
+      FALLA,
+      ['/ — link root-absoluto sin el prefijo de la base: "/otra-cosa/x.css"'],
+    ],
+    ['/', FALLA, ['/ — link root-absoluto sin el prefijo de la base: "/"']],
+  ])('@s47 %j → %s', (href, codigo, lineas) => {
+    comprobarUnLink('icon', href, codigo, lineas)
+  })
+})
+
+describe('ejecutarPuertaDelCascaron → regla 2: con el prefijo, la ubicación que nombra la RUTA tiene que estar, LITERAL y con su caja, en la lista (@s48)', () => {
+  it.each<FilaDeUnLink>([
+    ['/NailsLashStudioWeb/assets/app.css', 0, []],
+    ['/NailsLashStudioWeb/favicon.svg?v=2', 0, []],
+    ['/NailsLashStudioWeb/favicon.svg#x', 0, []],
+    [
+      '/NailsLashStudioWeb/no-existe.svg',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/no-existe.svg"'],
+    ],
+    [
+      '/NailsLashStudioWeb/FAVICON.SVG',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/FAVICON.SVG"'],
+    ],
+    [
+      '/NailsLashStudioWeb/assets',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/assets"'],
+    ],
+    [
+      '/NailsLashStudioWeb/./favicon.svg',
+      FALLA,
+      [
+        '/ — link root-absoluto con %, &, barra invertida, // o segmentos . o .., que la puerta no interpreta: "/NailsLashStudioWeb/./favicon.svg"',
+      ],
+    ],
+    [
+      '/NailsLashStudioWeb/assets/../favicon.svg',
+      FALLA,
+      [
+        '/ — link root-absoluto con %, &, barra invertida, // o segmentos . o .., que la puerta no interpreta: "/NailsLashStudioWeb/assets/../favicon.svg"',
+      ],
+    ],
+    [
+      '/NailsLashStudioWeb//favicon.svg',
+      FALLA,
+      [
+        '/ — link root-absoluto con %, &, barra invertida, // o segmentos . o .., que la puerta no interpreta: "/NailsLashStudioWeb//favicon.svg"',
+      ],
+    ],
+    [
+      '/./favicon.svg',
+      FALLA,
+      [
+        '/ — link root-absoluto con %, &, barra invertida, // o segmentos . o .., que la puerta no interpreta: "/./favicon.svg"',
+      ],
+    ],
+    [
+      '/NailsLashStudioWeb/.../favicon.svg',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/.../favicon.svg"'],
+    ],
+    ['/NailsLashStudioWeb/favicon.svg?v=/../x', 0, []],
+    ['/NailsLashStudioWeb/favicon.svg#/./x', 0, []],
+    ['/NailsLashStudioWeb/favicon.svg#//x', 0, []],
+    [
+      '/NailsLashStudioWeb/x/..',
+      FALLA,
+      [
+        '/ — link root-absoluto con %, &, barra invertida, // o segmentos . o .., que la puerta no interpreta: "/NailsLashStudioWeb/x/.."',
+      ],
+    ],
+    [
+      '/NailsLashStudioWeb/.',
+      FALLA,
+      [
+        '/ — link root-absoluto con %, &, barra invertida, // o segmentos . o .., que la puerta no interpreta: "/NailsLashStudioWeb/."',
+      ],
+    ],
+  ])('@s48 %j → %s', (href, codigo, lineas) => {
+    comprobarUnLink('stylesheet', href, codigo, lineas)
+  })
+})
