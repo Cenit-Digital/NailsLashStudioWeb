@@ -314,7 +314,60 @@ stdout vacío y sin directorio de salida, pero con la traza cruda.
 El exit, el stdout y el «no se crea la salida» ya estaban bien. Lo que arregla el paso 3 es la traza: de 5-7
 líneas `at` a 0, y de 12-19 líneas de stderr a 1.
 
-## PENDIENTE
+## 6. Paso 4 — formato y calidad de lo tocado (HEAD `f0a60fd`)
 
-- **Paso 4**: formato y calidad de lo tocado.
-- **I-6** (`node .harness/harness.mjs init` completo): lo mide el lead.
+- **Prettier**: `pnpm exec prettier --check` sobre los 5 ficheros del diff contra `main` (`06742d3`) da
+  «All matched files use Prettier code style!».
+- **TypeScript**: `pnpm typecheck` (`tsc --noEmit`) sale con exit 0 y sin salida.
+- **ESLint**:
+  - `pnpm exec eslint src/pages/favicon-marca.test.ts` sale con exit 0: 0 errores y 0 avisos.
+  - `generar.mjs` queda fuera del bloque `**/*.{ts,tsx}` de `eslint.config.js`, como dice el brief. Sus
+    puertas son Prettier, `node --check` (exit 0) y ejecutarlo (I-1, I-2 e I-5).
+- **I-7**: `git diff --stat 06742d3 HEAD` toca 5 ficheros:
+  - `src/pages/favicon-marca.test.ts` y `tools/favicon/generar.mjs`;
+  - `progress/brief_deuda_favicon_legibilidad.md`, `progress/current.md` y esta bitácora.
+  - Ni `public/`, ni `index.html`, ni `package.json`, ni `feature_list.json`: el `cierre` de F-28 es cosa
+    del lead.
+
+## 7. Resumen de invariantes
+
+| Invariante               | Resultado                                                                                                     | Dónde           |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------- | --------------- |
+| I-1 (bytes)              | los tres md5 del brief §1 y `cmp` = `public/`, tras CADA paso (1, 2a, 2b y 3)                                 | §2, §3, §4 y §5 |
+| I-2 (stdout)             | la misma línea tras cada paso; stderr, 0 bytes                                                                | §2, §3, §4 y §5 |
+| I-3 (nombres)            | 40/40 y `vitest list` con diff vacío contra `989d7d6`, tras cada paso                                         | §2, §3, §4 y §5 |
+| I-4 (sabotajes del test) | las 4 regiones obligatorias en rojo (S1-S14). S21-S24 en verde, por los fixtures (nota 1); S25-S26, controles | §2              |
+| I-5 (errores del CLI)    | los 5 casos: exit 1, una línea `favicon: …`, 0 líneas `at`, stdout vacío y sin directorio de salida           | §5              |
+| I-6 (`harness init`)     | NO medido aquí: lo mide el lead (suite completa)                                                              | —               |
+| I-7 (alcance del diff)   | solo los dos ficheros, más `progress/`                                                                        | §6              |
+| Equivalencia (extra)     | `contornos`: 330/330 glifos iguales; `glifoDe`: 65 536/65 536 puntos de código                                | §4              |
+| Mutación                 | NO APLICA, declarado en el brief §4                                                                           | —               |
+
+## Hallazgos
+
+1. **Ramas muertas en el decodificador del test.** Los filtros PNG 1-4 de `predictor` no los ejercita
+   ningún fixture: los tres PNG usan el filtro 0 en todas sus filas. Viene de F-28; no se ha tocado,
+   porque añadir fixtures queda fuera del alcance.
+2. **Great Vibes tiene 111 glifos compuestos.** Entre ellos están la `i`, la `j`, `"` y `=`. Si algún día
+   cambia `LETRA`, el generador puede negarse con `glifo compuesto: no soportado`, que ahora sale limpio.
+3. **Números que siguen sin nombre en el generador**, fuera de la lista del brief:
+   - los anchos de `loca` (`* 4`, `* 2`);
+   - el IHDR del codificador PNG;
+   - los 3/4 canales del rasterizador.
+   - Están declarados en el §3, por si el judge los quiere en otra pasada.
+
+## PENDIENTE (del lead)
+
+- **I-6**: `node .harness/harness.mjs init` completo.
+- El `judge` → `progress/judge_deuda_favicon_legibilidad.md`.
+- El `cierre` de F-28 en `feature_list.json`, y la PR a `main`.
+
+## Estado al cerrar
+
+- Rama `claude/bold-liskov-c3323b`, con los commits de esta sesión:
+  - `32708c3`: I-4;
+  - `591ebab`: paso 2a;
+  - `f401f39`: paso 2b;
+  - `f0a60fd`: paso 3;
+  - y el de esta bitácora (paso 4).
+- Sin push y sin PR. Árbol de trabajo limpio; `public/` sin tocar.
