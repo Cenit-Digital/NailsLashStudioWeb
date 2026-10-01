@@ -642,6 +642,15 @@ function esOculta(ubicacion: string): boolean {
   return ubicacion.split('/').some((segmento) => segmento.startsWith('.'))
 }
 
+/**
+ * S-12: quitarle el prefijo a un `href` solo tiene sentido con una base que empieza por `/`, no por
+ * `//` (el criterio de `RUTA_INTERNA`), y acaba en `/`. Es la PRECONDICIÓN del cálculo, no la política
+ * de `base` (same-origin, de F-05).
+ */
+function esBaseUtilizable(base: string): boolean {
+  return esRutaInterna(base) && base.endsWith('/')
+}
+
 function reglaDelLink(
   href: string,
   ubicaciones: ReadonlyMap<string, number>,
@@ -984,19 +993,19 @@ function inspeccionarArtefacto(peticion: PeticionPuertaCascaron): ResultadoPuert
       }))
     : []
 
-  if (base !== null && !base.endsWith('/')) {
-    return {
-      codigoSalida: CODIGO_FALLO,
-      lineas: [
-        `la base declarada no es una ruta root-absoluta acabada en / y hay elementos link root-absolutos que resolver: "${base}"`,
-      ],
-    }
-  }
-
   const candidatos = candidatosDe(paginas)
   let ubicaciones = new Map<string, number>()
 
   if (candidatos.length > 0) {
+    if (base !== null && !esBaseUtilizable(base)) {
+      return {
+        codigoSalida: CODIGO_FALLO,
+        lineas: [
+          `la base declarada no es una ruta root-absoluta acabada en / y hay elementos link root-absolutos que resolver: "${base}"`,
+        ],
+      }
+    }
+
     if (ficheros === undefined) {
       return {
         codigoSalida: CODIGO_FALLO,

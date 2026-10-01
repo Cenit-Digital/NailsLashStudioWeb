@@ -247,3 +247,20 @@
   `candidatos.length > 0`. SABOTAJE medido (candidatos solo de la 1.ª página, `paginas.slice(0, 1)`):
   4 failed, las 3 filas de @s66 y @s56; restaurado desde una copia, 329 passed.
 - VERDE y REFACTOR: sin cambios de producción.
+
+### C19 · @s68 (S-12 entero: cada condición del predicado, `/` utilizable, sin candidatos lo de hoy, la lista NO se pide; 8 filas)
+
+- Test: las 8 filas; el 2º `Then` («la lista se pidió 0 veces / al menos 1») en la notación del contrato
+  (`'ninguna'` o `'al menos 1'`); la línea de la base la arma el ayudante `lineaDeLaBase(base)` con el
+  texto escrito a mano y la base TAL CUAL.
+- ROJO visto: 4 failed (`./`, `//cdn.tercero.com/`, la expresión dinámica y `https://cdn.ejemplo/`, las
+  bases que ACABAN en `/`): `expected 'al menos 1' to be 'ninguna'`, la puerta pedía la lista y daba la
+  regla 1. En verde: la cadena vacía y la config en una línea (ya las cortaba el `endsWith` de C10), el
+  CONTROL `/` y `./` sin candidatos (pasaba solo porque `./` acaba en `/`).
+- VERDE mínimo: `esBaseUtilizable(base)` = `esRutaInterna(base) && base.endsWith('/')` (empieza por `/`,
+  no por `//`, y acaba en `/`), y el corte DENTRO de `if (candidatos.length > 0)`, antes de pedir la
+  lista. Las dos cosas a la vez porque la tabla las exige juntas: SABOTAJE medido con el predicado nuevo
+  y el corte FUERA del `if`, 1 failed, la fila 8 (`./` sin candidatos); restaurado, 337 passed. El corte
+  de S-12 queda, de momento, DELANTE del de la lista ausente (el orden que traía de C10/C13): lo decide
+  @s69. 337 passed; `tsc` 0; `prettier` limpio.
+- REFACTOR: ninguno.

@@ -2707,3 +2707,78 @@ describe('ejecutarPuertaDelCascaron → basta UN <link> root-absoluto en CUALQUI
     expect(resultado.lineas).toEqual([linea])
   })
 })
+
+/** La línea del corte por base NO UTILIZABLE (S-12), con la base TAL CUAL. */
+function lineaDeLaBase(base: string): string {
+  return `la base declarada no es una ruta root-absoluta acabada en / y hay elementos link root-absolutos que resolver: "${base}"`
+}
+
+describe('ejecutarPuertaDelCascaron → S-12: con una base declarada NO UTILIZABLE y algún <link> root-absoluto, CORTA sin pedir la lista; sin ninguno, lo de hoy (@s68)', () => {
+  const FAVICON = '<link rel="icon" href="/NailsLashStudioWeb/favicon.svg">'
+  const CON_EL_FAVICON = ['https://example.invalid/', '/NailsLashStudioWeb/favicon.svg']
+
+  it.each<
+    readonly [
+      base: string,
+      elemento: string,
+      extraidos: readonly string[],
+      pedidas: 'ninguna' | 'al menos 1',
+      codigo: CodigoEsperado,
+      lineas: readonly string[],
+    ]
+  >([
+    ['./', FAVICON, CON_EL_FAVICON, 'ninguna', FALLA, [lineaDeLaBase('./')]],
+    ['', FAVICON, CON_EL_FAVICON, 'ninguna', FALLA, [lineaDeLaBase('')]],
+    [
+      '//cdn.tercero.com/',
+      FAVICON,
+      CON_EL_FAVICON,
+      'ninguna',
+      FALLA,
+      [lineaDeLaBase('//cdn.tercero.com/')],
+    ],
+    [
+      '/NailsLashStudioWeb/ })',
+      FAVICON,
+      CON_EL_FAVICON,
+      'ninguna',
+      FALLA,
+      [lineaDeLaBase('/NailsLashStudioWeb/ })')],
+    ],
+    [
+      'process.env.PAGES_BASE_PATH ?? /',
+      FAVICON,
+      CON_EL_FAVICON,
+      'ninguna',
+      FALLA,
+      [lineaDeLaBase('process.env.PAGES_BASE_PATH ?? /')],
+    ],
+    [
+      'https://cdn.ejemplo/',
+      FAVICON,
+      CON_EL_FAVICON,
+      'ninguna',
+      FALLA,
+      [lineaDeLaBase('https://cdn.ejemplo/')],
+    ],
+    [
+      '/',
+      '<link rel="icon" href="/favicon.svg">',
+      ['https://example.invalid/', '/favicon.svg'],
+      'al menos 1',
+      0,
+      [],
+    ],
+    ['./', '', ['https://example.invalid/'], 'ninguna', 0, []],
+  ])('@s68 base %j, %j', (base, elemento, extraidos, pedidas, codigo, lineas) => {
+    const html = conElementos(htmlCrudo(), elemento)
+    const doble = dobleDeLaLista()
+
+    const resultado = puertaSobreLaHome(html, { base, ficheros: doble.lista })
+
+    expect(extraerLinks(html)).toEqual(extraidos)
+    expect(doble.pedidas() === 0 ? 'ninguna' : 'al menos 1').toBe(pedidas)
+    expect(enElContrato(resultado.codigoSalida)).toBe(codigo)
+    expect(resultado.lineas).toEqual(lineas)
+  })
+})
