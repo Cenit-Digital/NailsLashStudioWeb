@@ -2350,3 +2350,84 @@ describe('ejecutarPuertaDelCascaron → el informe con los <link>: primero las l
     ])
   })
 })
+
+const LINEA_SIN_LA_LISTA =
+  'la puerta no recibió la lista de ficheros del artefacto y hay elementos link root-absolutos que resolver'
+
+describe('ejecutarPuertaDelCascaron → sin la lista de ficheros, la puerta CORTA si hay algún <link> root-absoluto; si no, lo de hoy (@s57)', () => {
+  it.each<
+    readonly [
+      pagina: string,
+      opciones: OpcionesDeFixture,
+      elemento: string,
+      extraidos: readonly string[],
+      codigo: CodigoEsperado,
+      lineas: readonly string[],
+    ]
+  >([
+    [
+      'la página correcta con el favicon bajo la base',
+      {},
+      '<link rel="icon" href="/NailsLashStudioWeb/favicon.svg">',
+      ['https://example.invalid/', '/NailsLashStudioWeb/favicon.svg'],
+      FALLA,
+      [LINEA_SIN_LA_LISTA],
+    ],
+    [
+      'la página correcta SIN su <title> y con el favicon bajo la base',
+      { title: null },
+      '<link rel="icon" href="/NailsLashStudioWeb/favicon.svg">',
+      ['https://example.invalid/', '/NailsLashStudioWeb/favicon.svg'],
+      FALLA,
+      [LINEA_SIN_LA_LISTA],
+    ],
+    [
+      'la página correcta con /favicon.svg',
+      {},
+      '<link rel="icon" href="/favicon.svg">',
+      ['https://example.invalid/', '/favicon.svg'],
+      FALLA,
+      [LINEA_SIN_LA_LISTA],
+    ],
+    [
+      'la página correcta, sin ningún <link> root-absoluto',
+      {},
+      '',
+      ['https://example.invalid/'],
+      0,
+      [],
+    ],
+    [
+      'la página correcta SIN su <title>, sin ningún <link> root-absoluto',
+      { title: null },
+      '',
+      ['https://example.invalid/'],
+      FALLA,
+      ['/ — title ausente o vacío: ""'],
+    ],
+    [
+      'la página correcta con la barra invertida al principio',
+      {},
+      '<link rel="icon" href="\u005Cfavicon.svg">',
+      ['https://example.invalid/', '\u005Cfavicon.svg'],
+      FALLA,
+      [LINEA_SIN_LA_LISTA],
+    ],
+    [
+      'la página correcta con la barra invertida y luego "/", al principio',
+      {},
+      '<link rel="icon" href="\u005C/cdn.ejemplo/x.css">',
+      ['https://example.invalid/', '\u005C/cdn.ejemplo/x.css'],
+      FALLA,
+      [LINEA_SIN_LA_LISTA],
+    ],
+  ])('@s57 %s', (_pagina, opciones, elemento, extraidos, codigo, lineas) => {
+    const html = conElementos(htmlCrudo(opciones), elemento)
+
+    const resultado = puertaSobreLaHome(html, { base: BASE_DE_REFERENCIA })
+
+    expect(extraerLinks(html)).toEqual(extraidos)
+    expect(enElContrato(resultado.codigoSalida)).toBe(codigo)
+    expect(resultado.lineas).toEqual(lineas)
+  })
+})

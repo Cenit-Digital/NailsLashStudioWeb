@@ -669,21 +669,32 @@ function reglaDelLink(
   return null
 }
 
-/** ENMIENDA 5 (H-5): los `<link>` root-absolutos de cada página, en el orden de las páginas. */
-function violacionesDeLinks(
-  paginas: readonly PaginaArtefacto[],
-  ubicaciones: ReadonlyMap<string, number>,
-  base: string | null,
-): ViolacionCascaron[] {
+/** Un `<link>` root-absoluto que resolver: la ruta LÓGICA de la página que lo trae y su `href` CRUDO. */
+interface Candidato {
+  readonly ruta: string
+  readonly href: string
+}
+
+/** ENMIENDA 5 (H-5): los candidatos de TODAS las páginas, en el orden del listado y de aparición. */
+function candidatosDe(paginas: readonly PaginaArtefacto[]): Candidato[] {
   return paginas.flatMap((pagina) =>
     extraerLinks(pagina.html)
       .filter((href) => esCandidato(limpiar(href)))
-      .flatMap((href) => {
-        const regla = reglaDelLink(href, ubicaciones, base)
-
-        return regla === null ? [] : [{ ruta: pagina.ruta, regla, valor: href }]
-      }),
+      .map((href) => ({ ruta: pagina.ruta, href })),
   )
+}
+
+/** Como mucho UNA violación por `<link>`, la de la primera regla que aplica; con el `href` CRUDO (S-6). */
+function violacionesDeLinks(
+  candidatos: readonly Candidato[],
+  ubicaciones: ReadonlyMap<string, number>,
+  base: string | null,
+): ViolacionCascaron[] {
+  return candidatos.flatMap(({ ruta, href }) => {
+    const regla = reglaDelLink(href, ubicaciones, base)
+
+    return regla === null ? [] : [{ ruta, regla, valor: href }]
+  })
 }
 
 /** La ruta lógica de la home, tal y como la produce `rutaDelFichero('dist/index.html')`. */
@@ -967,6 +978,17 @@ function inspeccionarArtefacto(peticion: PeticionPuertaCascaron): ResultadoPuert
     }
   }
 
+  const candidatos = candidatosDe(paginas)
+
+  if (candidatos.length > 0 && ficheros === undefined) {
+    return {
+      codigoSalida: CODIGO_FALLO,
+      lineas: [
+        'la puerta no recibió la lista de ficheros del artefacto y hay elementos link root-absolutos que resolver',
+      ],
+    }
+  }
+
   let ubicaciones = new Map<string, number>()
 
   if (ficheros !== undefined) {
@@ -977,7 +999,7 @@ function inspeccionarArtefacto(peticion: PeticionPuertaCascaron): ResultadoPuert
   // porque un dist/ vacío tiene que acusar QUÉ RUTA FALTA, no «no encontré enlaces».
   const violaciones = [
     ...inspeccionarSitio(paginas, rutasEsperadas, base),
-    ...violacionesDeLinks(paginas, ubicaciones, base),
+    ...violacionesDeLinks(candidatos, ubicaciones, base),
   ]
 
   if (violaciones.length > 0) {

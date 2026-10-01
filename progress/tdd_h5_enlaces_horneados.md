@@ -171,3 +171,16 @@
   los `<link>` se recorren con `flatMap` en el orden del listado y de aparición. SABOTAJE medido: con las
   de los `<link>` DELANTE, 1 failed (`expected [ …(5) ] to deeply equal [ …(5) ]`); revertido, 302 passed.
 - VERDE y REFACTOR: sin cambios de producción.
+
+### C13 · @s57 (sin la lista, CORTA si hay candidatos; si no, lo de hoy; 7 filas)
+
+- Test: las 7 filas con la petición SIN `ficheros`; ANCLA EXACTA, código y líneas.
+- ROJO visto: 5 failed (las filas 1-3, 6 y 7): `expected [ Array(1) ] to deeply equal [ Array(1) ]` (sin
+  lista, la puerta resolvía contra un mapa vacío y daba la regla 2, la 1 o la 4) y, en la fila 2,
+  `expected [ …(2) ] to deeply equal [ Array(1) ]` (el title Y la regla 2: el informe parcial que S-3
+  prohíbe). Las filas 4 y 5 (sin candidatos) en verde: lo de hoy.
+- VERDE mínimo: `hayCandidatos && ficheros === undefined` → la línea del corte de S-3, sola, antes de
+  evaluar nada (detrás del corte de S-12, que ya existía: el orden lo fija @s69). 309 passed; `tsc` 0.
+- REFACTOR: los candidatos se calculaban dos veces → `candidatosDe(paginas)` (tipo `Candidato`: ruta
+  lógica de la página y `href` crudo) una sola vez en `inspeccionarArtefacto`; `violacionesDeLinks` recibe
+  los candidatos y el corte usa `candidatos.length > 0`. 309 passed; `tsc` 0; `prettier` limpio.
