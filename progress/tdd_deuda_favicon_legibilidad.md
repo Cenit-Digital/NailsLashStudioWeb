@@ -302,8 +302,9 @@ Los sabotajes se hacen sobre la COPIA, con una sustitución que exige haber camb
 toca. Se ejecuta con `spawnSync(node …)`, y el directorio de salida que se mira es el `--salida` del caso,
 o el `public/` del árbol en el caso 1.
 
-El caso 4 es reproducible. Recorriendo el BMP (`equiv/cmap.mjs`) salen 111 glifos compuestos en Great
-Vibes; la `i` (U+0069) es uno de ellos, y también `"`, `=`, `` ` ``, `j`, `¨`, `´` y `¸`.
+El caso 4 es reproducible. Great Vibes tiene 111 glifos compuestos en `glyf` (de 330: 213 simples y 6
+vacíos); recorriendo el BMP (`equiv/cmap.mjs`) se llega a uno compuesto desde 73 de los 230 puntos de
+código con glifo real (precisión del verificador, ronda 3); la `i` (U+0069) es uno de ellos, y también `"`, `=`, `` ` ``, `j`, `¨`, `´` y `¸`.
 
 El control `c0` es el árbol sin sabotear: exit 0 y los tres md5 del brief §1, antes y después. Eso
 demuestra que la copia replica `RAIZ` y que los errores no vienen de la disposición.
@@ -579,7 +580,23 @@ Ningún menor queda como deuda nueva: los 5 están resueltos.
   - el reflog de `origin/claude/bold-liskov-c3323b` registra cinco «update by push»: `0b7cd62` (11:57:38),
     `e99f02a` (12:07:29), `d5ed7af` (12:15:42), `3a00169` (12:29:42) y `a48a296` (12:49:46);
   - esta sesión no hizo ningún push: `a48a296` (creado a las 12:34:19) lo empujó otro actor mientras se
-    escribía esta bitácora, y los commits de la bitácora (`d7a3233` y su corrección) quedaban sin push al
-    cerrar; lo comprueba el lead;
+    escribía esta bitácora, y los commits de la bitácora (`d7a3233` y su corrección) los subió el lead a
+    las 13:13 (`ca36722`). El «otro actor» de todos esos push es la sesión principal (el lead), que subía
+    cada punto en verde;
   - PR, ninguna: `gh pr list --head claude/bold-liskov-c3323b --state all` da `[]`.
 - Árbol de trabajo limpio; `public/` sin tocar.
+
+## Cierre del lead (2026-10-01)
+
+- **Ronda 3** (`progress/judge_deuda_favicon_legibilidad_r3.md`): judge APPROVED, 0 bloqueantes y 2 menores;
+  verificador independiente con I-1, I-2, I-3, I-5 e I-7 en verde, medidos de nuevo sobre `ca36722`.
+  - Menor 1 (el comentario de `generar` prometía que «un error no deja iconos a medias»): corregido por el
+    lead; solo vale para los errores de validación (caso c8, fallo de E/S, idéntico en `main`).
+  - Menor 2 (`generar.mjs:271`, 107 columnas en un literal de plantilla que Prettier no puede partir):
+    ACEPTADO, cosmético; precedente en `main` (línea 332, 109 columnas) y `format:check` en verde.
+  - Discrepancias de redacción del verificador (recuento de glifos compuestos, estado del push):
+    corregidas arriba en esta bitácora.
+- **I-6** (lead, 13:24-13:29, sobre los remates de arriba): `node .harness/harness.mjs init` en este worktree en
+  VERDE: entorno, ficheros del arnés, `feature_list.json` (27), typecheck, ESLint y Prettier a 0, y la suite
+  completa con el build real, 56 ficheros y **1820/1820**. Las tres salidas del generador, con los md5 del
+  brief §1 tras el último cambio (el comentario).

@@ -557,7 +557,8 @@ function componerIco(imagenes) {
 
 // ── Principal ───────────────────────────────────────────────────────────────────────────
 // Toda la validación (argumentos, glifo y tokens) va ANTES de la primera escritura (`mkdirSync`): un
-// error no deja iconos a medias. Devuelve la línea de resumen; la imprime la Interfaz.
+// error de validación no deja iconos a medias (un fallo de E/S a mitad de la escritura sí puede dejar
+// alguno, igual que en `main`: caso c8 del judge, ronda 3). Devuelve la línea de resumen; la imprime la Interfaz.
 function generar(argv) {
   const salida = directorioDeSalida(argv)
   const tablas = leerWoff(FUENTE)
