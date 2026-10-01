@@ -98,3 +98,19 @@
   (producción pasa de 51 a 55). 251 passed; `tsc` 0. `prettier --check` pidió juntar dos filas: `prettier --write` (barras: 31, sin cambios).
 - REFACTOR: ninguno (el doble `limpiar` del candidato y de la regla se recoge en C12, cuando la puerta
   necesite los candidatos para pedir la lista).
+
+### C7 · @s51 (solo la RAÍZ va a `index.html`, y se BUSCA en la lista; 9 filas)
+
+- Test: las 9 filas con su base (`CON_LA_BASE` o `SIN_BASE`, este último el campo AUSENTE, no
+  `undefined`), su lista (`listaDeReferencia`, y los ayudantes NUEVOS `listaSinLaRaiz` y
+  `listaConLaRaizVacia`) y el 2º `Then` («la lista se pidió ≥ 1 vez»), con `rel="alternate"`.
+- ROJO visto: 4 failed: la raíz con base (`expected 'distinto de 0' to be +0`: buscaba `dist/`), `/x/` y
+  `/` sin base (`expected +0 to be 'distinto de 0'`: sin base no se resolvía nada) y la raíz de 0 bytes
+  (otra línea: la 2 y no la 3). La fila 7 (raíz con la lista SIN `dist/index.html`) salió VERDE a la
+  primera, por COINCIDENCIA: buscaba `dist/` y daba la 2, la línea que espera; tras el verde sigue verde
+  por la razón buena (busca `dist/index.html` y no está), y mata «la raíz pasa sin mirar».
+- VERDE mínimo: el prefijo es `base ?? PREFIJO_SIN_BASE` (`'/'`): sin base, la regla 1 no puede aplicar
+  (todo candidato que llega ahí empieza por `/`) y el resto es la ruta sin su `/` inicial (con `slice`,
+  nunca con una regex anclada a `^`); resto vacío → `dist/index.html` (`ENTRADA_DE_LA_RAIZ`), que se
+  busca en la lista como cualquier otra ubicación. 260 passed; `tsc` 0; `prettier` limpio.
+- REFACTOR: la `ubicacion` sale a su propia constante (la usará la regla 5). En verde.

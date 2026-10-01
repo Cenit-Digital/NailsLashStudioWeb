@@ -2060,3 +2060,83 @@ describe('ejecutarPuertaDelCascaron → regla 4: un href con %, & o barra invert
     comprobarUnLink('icon', href, codigo, lineas)
   })
 })
+
+/** La lista de referencia SIN "dist/index.html" (@s51). */
+function listaSinLaRaiz(): FicheroDelArtefacto[] {
+  return listaDeReferencia().filter((fichero) => fichero.ubicacion !== 'dist/index.html')
+}
+
+/** La lista de referencia con "dist/index.html" de 0 bytes (@s51). */
+function listaConLaRaizVacia(): FicheroDelArtefacto[] {
+  return listaDeReferencia().map((fichero) =>
+    fichero.ubicacion === 'dist/index.html' ? { ...fichero, bytes: 0 } : fichero,
+  )
+}
+
+/** «base declarada» o «ausente (sin base)»: el campo, o su AUSENCIA (nunca `undefined` explícito). */
+type BaseDeLaFila = { readonly base?: string | null }
+
+const CON_LA_BASE: BaseDeLaFila = { base: '/NailsLashStudioWeb/' }
+const SIN_BASE: BaseDeLaFila = {}
+
+describe('ejecutarPuertaDelCascaron → solo la RAÍZ del artefacto va a index.html, y se BUSCA en la lista (@s51)', () => {
+  it.each<
+    readonly [
+      base: BaseDeLaFila,
+      lista: () => FicheroDelArtefacto[],
+      href: string,
+      codigo: CodigoEsperado,
+      lineas: readonly string[],
+    ]
+  >([
+    [CON_LA_BASE, listaDeReferencia, '/NailsLashStudioWeb/', 0, []],
+    [SIN_BASE, listaDeReferencia, '/', 0, []],
+    [CON_LA_BASE, listaDeReferencia, '/NailsLashStudioWeb/x/index.html', 0, []],
+    [
+      CON_LA_BASE,
+      listaDeReferencia,
+      '/NailsLashStudioWeb/x/',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/x/"'],
+    ],
+    [
+      SIN_BASE,
+      listaDeReferencia,
+      '/x/',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/x/"'],
+    ],
+    [
+      CON_LA_BASE,
+      listaDeReferencia,
+      '/NailsLashStudioWeb/x',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/x"'],
+    ],
+    [
+      CON_LA_BASE,
+      listaSinLaRaiz,
+      '/NailsLashStudioWeb/',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/"'],
+    ],
+    [SIN_BASE, listaSinLaRaiz, '/', FALLA, ['/ — link root-absoluto sin fichero en dist/: "/"']],
+    [
+      CON_LA_BASE,
+      listaConLaRaizVacia,
+      '/NailsLashStudioWeb/',
+      FALLA,
+      ['/ — link root-absoluto a un fichero de 0 bytes en dist/: "/NailsLashStudioWeb/"'],
+    ],
+  ])('@s51 base %j, lista %O, %j → %s', (base, lista, href, codigo, lineas) => {
+    const html = conElementos(htmlCrudo(), `<link rel="alternate" href="${href}">`)
+    const doble = dobleDeLaLista(lista())
+
+    const resultado = puertaSobreLaHome(html, { ...base, ficheros: doble.lista })
+
+    expect(extraerLinks(html)).toContain(href)
+    expect(doble.pedidas()).toBeGreaterThanOrEqual(1)
+    expect(enElContrato(resultado.codigoSalida)).toBe(codigo)
+    expect(resultado.lineas).toEqual(lineas)
+  })
+})

@@ -590,6 +590,16 @@ function limpiar(href: string): string {
 const BARRA_INVERTIDA = '\\'
 
 /**
+ * Sin base declarada, el prefijo es la raíz del dominio: todo candidato que llega a la regla 1
+ * empieza por `/` (los que empiezan por barra invertida ya son la regla 4), así que sin base la
+ * regla 1 no aplica nunca y el resto es la ruta sin su `/` inicial.
+ */
+const PREFIJO_SIN_BASE = '/'
+
+/** H5-3, resolución ESTRICTA: SOLO la raíz del artefacto (el resto vacío) va a `index.html`. */
+const ENTRADA_DE_LA_RAIZ = 'index.html'
+
+/**
  * Root-absoluto, ya limpio: el criterio de `RUTA_INTERNA` (`/` y no `//`), o una barra invertida AL
  * PRINCIPIO (S-7), que el navegador no lee como relativa sino como `/` (mismo host u otro host).
  */
@@ -628,15 +638,15 @@ function reglaDelLink(
     return REGLA_LINK_NO_INTERPRETA
   }
 
-  if (base === null) {
-    return null
-  }
+  const prefijo = base ?? PREFIJO_SIN_BASE
 
-  if (!ruta.startsWith(base)) {
+  if (!ruta.startsWith(prefijo)) {
     return REGLA_LINK_SIN_PREFIJO
   }
 
-  const bytes = ubicaciones.get(`${DIRECTORIO_ARTEFACTO}/${ruta.slice(base.length)}`)
+  const resto = ruta.slice(prefijo.length)
+  const ubicacion = `${DIRECTORIO_ARTEFACTO}/${resto === '' ? ENTRADA_DE_LA_RAIZ : resto}`
+  const bytes = ubicaciones.get(ubicacion)
 
   if (bytes === undefined) {
     return REGLA_LINK_SIN_FICHERO
