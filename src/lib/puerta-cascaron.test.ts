@@ -2274,3 +2274,42 @@ describe('ejecutarPuertaDelCascaron → sin base declarada la ruta entera se res
     expect(resultado.lineas).toEqual(lineas)
   })
 })
+
+/** ANCLA DE SITIO (@s55), medida A MANO sobre el texto y nunca con `cabezaDe`. */
+function respectoDelCierreDelHead(html: string, texto: string): 'ANTES' | 'DESPUÉS' {
+  return html.indexOf(texto) < html.indexOf('</head>') ? 'ANTES' : 'DESPUÉS'
+}
+
+describe('ejecutarPuertaDelCascaron → el href de TODO <link>, sea cual sea su rel, la caja de la etiqueta o su sitio en el documento (@s55)', () => {
+  const ROTO = '/NailsLashStudioWeb/no-existe'
+
+  it.each<readonly [sitio: 'head' | 'body', posicion: 'ANTES' | 'DESPUÉS', elemento: string]>([
+    ['head', 'ANTES', '<link rel="icon" href="/NailsLashStudioWeb/no-existe">'],
+    ['head', 'ANTES', '<link rel="apple-touch-icon" href="/NailsLashStudioWeb/no-existe">'],
+    ['head', 'ANTES', '<link rel="stylesheet" href="/NailsLashStudioWeb/no-existe">'],
+    ['head', 'ANTES', '<link rel="preload" as="font" href="/NailsLashStudioWeb/no-existe">'],
+    ['head', 'ANTES', '<link rel="modulepreload" href="/NailsLashStudioWeb/no-existe">'],
+    ['head', 'ANTES', '<link rel="manifest" href="/NailsLashStudioWeb/no-existe">'],
+    ['head', 'ANTES', '<link rel="alternate" hreflang="en" href="/NailsLashStudioWeb/no-existe">'],
+    ['head', 'ANTES', '<link rel="canonical" href="/NailsLashStudioWeb/no-existe">'],
+    ['head', 'ANTES', '<link rel="x-nls-inventado" href="/NailsLashStudioWeb/no-existe">'],
+    ['head', 'ANTES', '<link href="/NailsLashStudioWeb/no-existe">'],
+    ['head', 'ANTES', '<LINK REL="icon" HREF="/NailsLashStudioWeb/no-existe">'],
+    ['body', 'DESPUÉS', '<link rel="stylesheet" href="/NailsLashStudioWeb/no-existe">'],
+  ])('@s55 en el <%s> (%s de </head>): %s', (sitio, posicion, elemento) => {
+    const html = conElementos(htmlCrudo(), elemento, sitio)
+
+    const resultado = puertaSobreLaHome(html, {
+      base: BASE_DE_REFERENCIA,
+      ficheros: dobleDeLaLista().lista,
+    })
+
+    expect(extraerLinks(html)).toContain(ROTO)
+    expect(html.split('</head>')).toHaveLength(2)
+    expect(respectoDelCierreDelHead(html, ROTO)).toBe(posicion)
+    expect(resultado.codigoSalida).not.toBe(0)
+    expect(resultado.lineas).toEqual([
+      '/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/no-existe"',
+    ])
+  })
+})

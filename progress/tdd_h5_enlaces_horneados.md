@@ -152,3 +152,14 @@
   con la condición que pide la fila: `base !== null && !base.endsWith('/')` (las demás condiciones del
   predicado y «solo con candidatos» las fuerza @s68). 289 passed; `tsc` 0.
 - REFACTOR: `prettier --write` (una firma de tipo y una fila; barras sin cambios: 77 y 66). En verde.
+
+### C11 · @s55 (todo `rel`, la caja de la etiqueta y el `<link>` del `<body>`; 12 filas)
+
+- Test: las 12 filas; ANCLA del extractor, ANCLA DE SITIO medida A MANO sobre el texto (un único
+  `</head>` y la posición del `href` respecto de él, con `indexOf`, nunca con `cabezaDe`), exit ≠ 0 y la
+  línea EXACTA de la regla 2.
+- Nacen en VERDE (301 passed): el extractor ya era el del documento entero, con la bandera `i`, y sin
+  filtrar por `rel`. SABOTAJE medido: con los candidatos sacados de `cabezaDe(pagina.html)`, 1 failed, la
+  fila del `<body>` (`expected +0 not to be +0`); revertido con `git checkout` del fichero de producción,
+  301 passed.
+- VERDE y REFACTOR: sin cambios de producción; `prettier --write` en el test (barras: 77).
