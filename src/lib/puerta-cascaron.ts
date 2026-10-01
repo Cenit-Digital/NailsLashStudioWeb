@@ -580,6 +580,8 @@ function esRutaInterna(href: string): boolean {
 export const REGLA_LINK_SIN_PREFIJO = 'link root-absoluto sin el prefijo de la base'
 export const REGLA_LINK_SIN_FICHERO = 'link root-absoluto sin fichero en dist/'
 export const REGLA_LINK_VACIO = 'link root-absoluto a un fichero de 0 bytes en dist/'
+export const REGLA_LINK_OCULTO =
+  'link root-absoluto a un fichero oculto, que el despliegue no publica'
 export const REGLA_LINK_NO_INTERPRETA =
   'link root-absoluto con %, &, barra invertida, // o segmentos . o .., que la puerta no interpreta'
 
@@ -1069,6 +1071,11 @@ export const REGLAS_DEL_CASCARON: readonly string[] = [
   REGLA_RESENAS,
   REGLA_HORARIO,
   REGLA_ENLACE_ROTO,
+  REGLA_LINK_SIN_PREFIJO,
+  REGLA_LINK_SIN_FICHERO,
+  REGLA_LINK_VACIO,
+  REGLA_LINK_NO_INTERPRETA,
+  REGLA_LINK_OCULTO,
 ]
 
 /**

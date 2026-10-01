@@ -23,6 +23,7 @@ import {
   nodosDe,
   type PaginaArtefacto,
   type ResultadoPuertaCascaron,
+  REGLAS_DEL_CASCARON,
   rutaDelFichero,
   tiposDe,
   RUTAS_ESPERADAS,
@@ -2606,5 +2607,29 @@ describe('ejecutarPuertaDelCascaron → la guarda del extractor nuevo: sin ni un
     expect(ficheros.map((fichero) => extraerLinks(fichero.contenido))).toEqual(extraidos)
     expect(enElContrato(resultado.codigoSalida)).toBe(codigo)
     expect(resultado.lineas).toEqual(lineas)
+  })
+})
+
+describe('REGLAS_DEL_CASCARON, la lista que vigila @s34, trae las cinco reglas nuevas (@s60)', () => {
+  // Una regla que faltara escaparía a @s34 en silencio. Los textos, escritos A MANO.
+  it('@s60 cada una de las cinco está exactamente 1 vez, y ninguna regla habla del origen ni de placeholders', () => {
+    const cinco = [
+      'link root-absoluto sin el prefijo de la base',
+      'link root-absoluto sin fichero en dist/',
+      'link root-absoluto a un fichero de 0 bytes en dist/',
+      'link root-absoluto con %, &, barra invertida, // o segmentos . o .., que la puerta no interpreta',
+      'link root-absoluto a un fichero oculto, que el despliegue no publica',
+    ]
+
+    expect(REGLAS_DEL_CASCARON).toContain('title ausente o vacío')
+    expect(REGLAS_DEL_CASCARON).toContain('href interno sin fichero en dist/')
+    expect(
+      cinco.map((texto) => REGLAS_DEL_CASCARON.filter((regla) => regla === texto).length),
+    ).toEqual([1, 1, 1, 1, 1])
+    expect(
+      REGLAS_DEL_CASCARON.filter(
+        (regla) => regla.includes('origen') || regla.includes('placeholder'),
+      ),
+    ).toEqual([])
   })
 })

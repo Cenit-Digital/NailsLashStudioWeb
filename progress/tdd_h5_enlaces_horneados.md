@@ -216,3 +216,14 @@
 - SABOTAJE medido (`.some` → `.every` en la guarda nueva): 1 failed, la fila 8 (dos páginas); restaurado
   desde una copia, 320 passed.
 - REFACTOR: ninguno.
+
+### C16 · @s60 (las cinco reglas en `REGLAS_DEL_CASCARON`)
+
+- Test: en `puerta-cascaron.test.ts` (importa `REGLAS_DEL_CASCARON`): ANCLA (`title ausente o vacío` y
+  `href interno sin fichero en dist/`), cada uno de los cinco textos, escritos A MANO, exactamente 1 vez,
+  y ninguna regla con «origen» ni «placeholder».
+- ROJO visto: `expected [ +0, +0, +0, +0, +0 ] to deeply equal [ 1, 1, 1, 1, 1 ]`.
+- VERDE mínimo: las cinco constantes al final de `REGLAS_DEL_CASCARON`. La de la regla 5,
+  `REGLA_LINK_OCULTO`, nace AQUÍ (la pide este test) y la usa la resolución en C17 (@s65).
+  `REGLA_RUTA_AUSENTE` sigue fuera, hueco DECLARADO (@s60, puerta humana). 321 passed; `tsc` 0.
+- REFACTOR: `prettier --write` partió la constante de la regla 5 (barras: 81 y 66).
