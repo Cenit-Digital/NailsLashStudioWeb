@@ -2782,3 +2782,21 @@ describe('ejecutarPuertaDelCascaron → S-12: con una base declarada NO UTILIZAB
     expect(resultado.lineas).toEqual(lineas)
   })
 })
+
+describe('ejecutarPuertaDelCascaron → S-12 va DESPUÉS del corte por lista ausente (@s69)', () => {
+  it('@s69 con una base no utilizable, algún <link> root-absoluto y SIN la lista, sale SOLO la línea de la lista', () => {
+    const html = conElementos(
+      htmlCrudo(),
+      '<link rel="icon" href="/NailsLashStudioWeb/favicon.svg">',
+    )
+
+    const resultado = puertaSobreLaHome(html, { base: './' })
+
+    expect(extraerLinks(html)).toEqual([
+      'https://example.invalid/',
+      '/NailsLashStudioWeb/favicon.svg',
+    ])
+    expect(resultado.codigoSalida).not.toBe(0)
+    expect(resultado.lineas).toEqual([LINEA_SIN_LA_LISTA])
+  })
+})

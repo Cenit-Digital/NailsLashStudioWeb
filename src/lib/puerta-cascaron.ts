@@ -997,20 +997,20 @@ function inspeccionarArtefacto(peticion: PeticionPuertaCascaron): ResultadoPuert
   let ubicaciones = new Map<string, number>()
 
   if (candidatos.length > 0) {
-    if (base !== null && !esBaseUtilizable(base)) {
-      return {
-        codigoSalida: CODIGO_FALLO,
-        lineas: [
-          `la base declarada no es una ruta root-absoluta acabada en / y hay elementos link root-absolutos que resolver: "${base}"`,
-        ],
-      }
-    }
-
     if (ficheros === undefined) {
       return {
         codigoSalida: CODIGO_FALLO,
         lineas: [
           'la puerta no recibió la lista de ficheros del artefacto y hay elementos link root-absolutos que resolver',
+        ],
+      }
+    }
+
+    if (base !== null && !esBaseUtilizable(base)) {
+      return {
+        codigoSalida: CODIGO_FALLO,
+        lineas: [
+          `la base declarada no es una ruta root-absoluta acabada en / y hay elementos link root-absolutos que resolver: "${base}"`,
         ],
       }
     }

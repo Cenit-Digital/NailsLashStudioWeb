@@ -264,3 +264,12 @@
   de S-12 queda, de momento, DELANTE del de la lista ausente (el orden que traía de C10/C13): lo decide
   @s69. 337 passed; `tsc` 0; `prettier` limpio.
 - REFACTOR: ninguno.
+
+### C20 · @s69 (S-12 va DESPUÉS del corte por lista ausente)
+
+- Test: la página con el favicon bajo la base, base `./` y SIN la lista; ANCLA EXACTA, exit ≠ 0 y SOLO la
+  línea de la lista.
+- ROJO visto: `expected [ Array(1) ] to deeply equal [ Array(1) ]`: salía la línea de la BASE (el orden
+  heredado de C10/C13).
+- VERDE mínimo: dentro del `if (candidatos.length > 0)`, el corte por lista ausente primero y el de la
+  base después. 338 passed; `tsc` 0; `prettier` limpio.
