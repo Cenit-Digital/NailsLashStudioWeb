@@ -1374,6 +1374,300 @@ llevan también `MODE: 'production'` (el valor que resuelve un `pnpm build` dire
 `NODE_ENV`). Se demuestra con la salida del propio build, que el test ya captura: contiene «building
 client environment for» (ancla) seguido de «production», y nunca «for test».
 
+#### Enmienda 5 (2026-10-01): todo `<link>` root-absoluto del artefacto resuelve, bajo la base, a un fichero no vacío (H-5)
+
+Origen: el **H-5** de `progress/tdd_favicon_marca.md` §6 (ronda 2) y la menor 8 de `progress/judge_favicon_marca.md`,
+que el `cierre` de F-28 anotó como «deuda de F-05» (`feature_list.json:549`). Brief del lead:
+`progress/brief_h5_enlaces_horneados.md`. Verificación previa a la puerta (4 agentes: documentación oficial, código,
+abogado del diablo y completitud): `progress/verificacion_decisiones_h5.md`, que **corrige el brief en 19 puntos y
+prevalece** sobre sus §2-§6. **Lo decide el humano** (Pablo, AskUserQuestion, 2026-10-01 ~11:50; brief §8). Dueña:
+F-04; los escenarios, desde **@s46**, y «@s1-@s45 NO SE TOCAN».
+
+El hallazgo: si falta en `public/` un fichero que `index.html` enlaza en un `<link>` (hoy, los tres iconos de F-28,
+`index.html:6-8`), `vite-react-ssg build` hornea el `href` SIN la base y sale con 0; ninguna de las cinco puertas de
+`pnpm build` (`package.json:16`) lo ve, y en GitHub Pages de proyecto ese `href` pide fuera del sitio: el 404 del H-2
+que curó F-28. La documentación de Vite no lo avisa («asset references in your `.html` files are all automatically
+adjusted», https://vite.dev/guide/build#public-base-path, sin condición): es comportamiento del **código** de Vite 7.3.6
+(`node_modules/.pnpm/vite@7.3.6…/vite/dist/node/chunks/config.js`). Lee el `href` de todo `<link>` sea cual sea su `rel`
+(:23280-23300), solo lo reescribe con la base si `checkPublicFile` encuentra el fichero (:24037-24038) y, si no,
+`processAssetUrl` se traga el `ENOENT` y devuelve la URL intacta (:23972-23978). Otra vía a la misma firma es el
+atributo `vite-ignore` (https://vite.dev/guide/features#html). Matiz (corrección 3 de la verificación): en el camino
+oficial, `deploy-pages.yml:51` corre `node .harness/harness.mjs init` (con la suite, que hoy lo caza en
+`src/pages/favicon-marca.test.ts` @s2-@s7 y en `src/pages/home-horneado.test.ts` @s8) ANTES de `pnpm build` (:68). Esta
+enmienda es **defensa en profundidad**: que el propio build lo pare, también en una publicación que se salte la suite.
+
+**Las tres firmas del mismo 404** (medidas del lead, 2026-10-01, Node 22, Windows, build en un temporal con
+`NLS_DIST_DIR`; brief §2):
+
+| Caso                                                                | `pnpm build`        | `href` horneado                                           | Fichero en el artefacto | Firma                            |
+| ------------------------------------------------------------------- | ------------------- | --------------------------------------------------------- | ----------------------- | -------------------------------- |
+| Árbol de `main` (control)                                           | 0                   | `/NailsLashStudioWeb/favicon.svg`                         | sí, 2244 B              | —                                |
+| `public/favicon.svg` borrado                                        | **0**               | **`/favicon.svg`** (sin la base)                          | no existe               | **(a)** sin la base              |
+| `index.html` con la base escrita a mano y sin fichero (H-6 de F-28) | 0 (medido por F-28) | `/NailsLashStudioWeb/favicon.svg` (Vite lo deja tal cual) | no existe               | **(b)** con la base, sin fichero |
+| `public/favicon.svg` a 0 bytes                                      | **0**               | `/NailsLashStudioWeb/favicon.svg`                         | sí, **0 B**             | **(c)** con fichero, vacío       |
+
+Las filas (a) y (c) no las repitió la verificación (exigen un build), pero cuadran con el código citado (`ENOENT` →
+intacta; `tryStatSync(…).isFile()` es cierto con 0 B, config.js:8096-8104), y el «rojo demostrado» del TDD las
+reproduce. Inventario del artefacto real (`dist/index.html`, única página prerenderizada; brief §2 con la corrección 1):
+11 `<link>`, de ellos 3 iconos, 1 `stylesheet` y 6 `preload` de fuente, los 10 root-absolutos y con la base, más la
+canónica, absoluta (`https://example.invalid/`). Fuera de `<link>`: 1 `<script src>`, **16** `<img src>` (assets con
+hash y la base), 0 `srcset` y un solo `<a>` root-absoluto (la marca, ya vigilado por la anti-404).
+
+**Decisiones del humano** (brief §8; el porqué es el de la verificación, no el del brief):
+
+| #    | Decisión                                                                                                                                                                                         | Descartadas                                                                                                       | Porqué                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| H5-1 | **Dueño: F-04, ENMIENDA 5**                                                                                                                                                                      | F-05 `cero_terceros`; una F-29 nueva con una sexta puerta                                                         | El invariante es la anti-404 (A-17) más la resolución bajo la base (ENMIENDA 1), las dos de F-04, cuyo ✓ ya promete que «ningún enlace interno apunta a la nada» (`tools/puerta-cascaron.ts:65`). F-05 es privacidad y solo compara el host (`src/lib/terceros.ts:303-311`): no distingue `/favicon.ico` de `/NailsLashStudioWeb/favicon.ico`, no lee `.svg` ni `.png`, y fallar su puerta por un 404 propio daría un motivo falso. F-29 duplicaría la resolución bajo la base, hoy privada en `esEnlaceRoto`. **FS-6 de F-28 NO es argumento**: rechazó añadir `apple-touch-icon` a `KEYWORDS_DE_PETICION`, no prohíbe enmendar F-05. Al cerrar, la «deuda de F-05» de `feature_list.json:549` se reetiqueta como deuda de F-04 |
+| H5-2 | **Alcance: todo `<link>` con `href` root-absoluto, sea cual sea su `rel`, en todo HTML del artefacto**, con «root-absoluto» definido abajo; `/\` falla cerrado                                   | Solo iconos (`icon`, `apple-touch-icon`); todos los subrecursos                                                   | Vite trata igual el `href` de todo `<link>` y lo deja sin la base si falta el fichero: filtrar por `rel` no baja el riesgo y obliga a tokenizarlo (más código y más mutantes). Los subrecursos (`<script>`, `<img>`, `url()`) salen hoy con hash y con la base: más coste sin cobertura nueva                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| H5-3 | **Resolución ESTRICTA**: solo la raíz (`href` igual a la base declarada, o `/` sin base) se resuelve a `index.html`; cualquier otro `href` acabado en `/` o que nombre una carpeta falla cerrado | Todo `<carpeta>/` → `<carpeta>/index.html` (la del brief); todo `href` acabado en `/` es violación, raíz incluida | La raíz es lo único documentado («the entry file must be at the top level», https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site) y medido (`/NailsLashStudioWeb/` → 200; `/NailsLashStudioWeb/assets/` → 404; `curl -I` de la verificación, 2026-10-01). Para subcarpetas no hay documentación (28 artículos revisados) ni medida. Es la misma URL que @s37 ya acepta en un `<a>`. El motivo del brief («una canónica root-absoluta algún día») choca con Google, que pide la canónica absoluta                                                                                                                                                                                      |
+| H5-4 | **`%` y `&` fallan cerrado con su PROPIA regla**, sin decodificar                                                                                                                                | Decodificar antes de comparar                                                                                     | Falso positivo CONSCIENTE: Pages sí decodifica (`/NailsLashStudioWeb/favicon%2Esvg` → 200, medido). Pero Vite decodifica el `href` antes de buscarlo y al reescribirlo solo escapa `%` como `%25` (config.js:2699-2711 y :24037-24038): la única fuente realista de `%` es un fichero de `public/` con `%` en el nombre, y se arregla renombrándolo. `jsdom.serialize()` escribe `&` como `&amp;` (medido, jsdom 24.1.3) y la puerta compara bytes crudos. Decodificar obligaría a tratar secuencias mal formadas y referencias de carácter. Hoy hay 0 `%` y 0 `&` en esos `href`. Regla propia, porque reutilizar «sin fichero» sería una acusación falsa                                                                       |
+| H5-5 | **La lista de ficheros entra como campo OPCIONAL de `PeticionPuertaCascaron`, que falla cerrado** si falta y hay algún `<link>` que comprobar; F-06 no se toca                                   | Campo obligatorio; un método nuevo en `ArtefactoDeProduccion`                                                     | Precedente `base?` (`src/lib/puerta-cascaron.ts:756`). Obligatorio rompería `tsc` (corre dentro de `lint`) en las 11 llamadas de `src/lib/puerta-cascaron.test.ts` y en la de F-06 (`src/lib/puerta-anclas.test.ts:432-435`); `ArtefactoDeProduccion` lo implementan además `tools/puerta-anclas.ts` y `src/lib/puerta-anclas.ts`. «Opcional = verde por vacuidad» es falso si su ausencia falla cerrada                                                                                                                                                                                                                                                                                                                         |
+| H5-6 | **Al terminar** (judge APPROVED, mutación al 100 %, CI verde): el lead fusiona la PR en `main` (squash), aprueba el despliegue de `github-pages` y repite la comprobación en la web publicada    | Dejar la PR sin fusionar (brief §3)                                                                               | Decisión de proceso de Pablo (brief §8.4)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+
+**Decisiones del `spec_partner`** (huecos que §8 no cierra; se ratifican en la puerta humana del `.feature`):
+
+| #   | Decisión                                                                                         | Descartada                              | Porqué                                                                                                                                                                                                                                                                                                 |
+| --- | ------------------------------------------------------------------------------------------------ | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| S-1 | Una sola regla (la 4) para `%`, `&` y la barra invertida                                         | Una regla por carácter                  | Misma causa: la puerta compara bytes y no decodifica ni normaliza. El `valor` de la línea ya enseña el carácter; menos reglas, menos mutantes                                                                                                                                                          |
+| S-2 | La barra invertida en CUALQUIER posición del `href`, no solo en `/\` al principio                | Solo el prefijo `/\`                    | En un esquema especial el navegador trata `\` como `/` también dentro de la ruta **[NV: WHATWG URL #path-state, de memoria]**. Sin esto, `/NailsLashStudioWeb\favicon.svg` caería en la regla 1 o la 2: fallaría cerrado, pero con una acusación quizá falsa, el mismo defecto que H5-4 evita para `%` |
+| S-3 | Lista de ficheros ausente con algún `<link>` que resolver → la puerta CORTA con una línea propia | Mezclarla con las violaciones del sitio | Es un fallo de cableado, no del sitio (precedente @s27): sin la lista no se puede decidir ningún `<link>`, y un informe parcial parecería completo                                                                                                                                                     |
+| S-4 | Las reglas nuevas viven fuera de `inspeccionarSitio`, que no cambia de firma ni de salida        | Un cuarto parámetro opcional            | `inspeccionarSitio` tiene 39 llamadas en `puerta-cascaron.test.ts`, varias con igualdad exacta (verificación, pregunta 5), y la lista de ficheros solo la tiene la puerta                                                                                                                              |
+| S-5 | El extremo a extremo siembra las TRES firmas, (b) incluida                                       | Solo (a) y (c), como el D9 del brief    | (b) es la firma medida del H-6 de F-28 y la que daría en Windows un `href` con la caja equivocada **[I: código de Vite, sin medir]**; cuesta una copia del artefacto y una ejecución de la puerta, sin build                                                                                           |
+| S-6 | El `valor` de la línea es el `href` CRUDO, sin limpiar                                           | El `href` ya limpio                     | Igual que la anti-404 de `<a>`: es lo que se busca con `grep` en el fichero                                                                                                                                                                                                                            |
+
+**Contrato — qué hace la puerta.** `ejecutarPuertaDelCascaron` (`src/lib/puerta-cascaron.ts`), además de todo lo de
+hoy, extrae el `href` de TODOS los `<link>` de TODAS las HTML del artefacto, leyendo el documento entero (no solo
+`cabezaDe`), con los extractores que ya usa la canónica: `ENLACE` + `ATRIBUTO_HREF` (:72-74). Clasifica cada `href` y
+resuelve los root-absolutos contra la lista de ficheros del artefacto. La lógica es pura y se exporta para los tests
+unitarios (nombres orientativos: `extraerLinks(html)`, `inspeccionarLinks(paginas, ficheros, base)`).
+
+**Definición de «root-absoluto»** (H5-2), sobre el `href` crudo:
+
+1. **Limpieza**: se recortan de los extremos los espacios ASCII (U+0009, U+000A, U+000C, U+000D y U+0020) y se quitan
+   TODOS los tabuladores y saltos de línea (U+0009, U+000A y U+000D), como hace el navegador
+   (https://url.spec.whatwg.org/#concept-basic-url-parser; el `href` de `<link>` es una «valid non-empty URL
+   potentially surrounded by spaces», https://html.spec.whatwg.org/multipage/semantics.html#attr-link-href). Sin ella,
+   `" /favicon.svg"` pasaría por relativo, un falso negativo: jsdom 24.1.3 conserva esos espacios al serializar
+   (medido) y el navegador los recorta antes de pedir el fichero.
+2. Es **root-absoluto** si, ya limpio, empieza por `/` y su segundo carácter no es `/` (el criterio de `RUTA_INTERNA`,
+   :561). `//host/x` es de otro host (https://url.spec.whatwg.org/#scheme-relative-url-string): queda fuera, es de F-05.
+3. `/\x` también lo parsea el navegador como host (https://url.spec.whatwg.org/#relative-slash-state), pero por el
+   punto 2 la puerta lo toma como root-absoluto y la regla 4 lo hace **fallar cerrado**.
+
+**Resolución ESTRICTA** (H5-3), en este orden. Cada `<link>` da **como mucho una** violación, la primera que aplique:
+
+1. Si el `href` limpio contiene `%`, `&` o una barra invertida → **regla 4**. Se mira el `href` entero, `?query`
+   incluida.
+2. La ruta es el `href` limpio sin `?query` ni `#fragmento` (como `rutaDelHref` para `<a>`, :571-573).
+3. Con `base` declarada: si la ruta no empieza por la base, literal y con su caja → **regla 1**; si empieza, el resto
+   es la ruta sin la base. Sin `base` (campo ausente o `null`): el resto es la ruta sin su `/` inicial, y la regla 1 no
+   aplica nunca.
+4. Resto vacío (la raíz del artefacto) → `dist/index.html`. Cualquier otro resto → `dist/<resto>`, tal cual: un resto
+   acabado en `/`, o que nombre una carpeta, nunca es un fichero.
+5. Esa ubicación se busca en la LISTA de ficheros, por igualdad EXACTA de cadenas, sensible a la caja. No está →
+   **regla 2**. Está con 0 bytes → **regla 3**. Está con 1 byte o más → pasa.
+
+Por qué una lista y nunca un `existsSync`: en Windows el sistema de ficheros no distingue la caja y escondería un 404
+que GitHub Pages sí da (`/NailsLashStudioWeb/FAVICON.SVG` → 404, re-medido con `curl -I` el 2026-10-01). Ninguna
+documentación oficial dice que Pages distinga la caja, salvo para el nombre `index.html`
+(https://docs.github.com/en/pages/getting-started-with-github-pages/troubleshooting-404-errors-for-github-pages-sites#indexhtml-file):
+el porqué es la MEDIDA, no «Pages corre en Linux» (corrección 8).
+
+**Las cuatro reglas nuevas**, con su texto EXACTO. Entran en `REGLAS_DEL_CASCARON` (:861, «TODAS las reglas») y
+ninguna contiene `origen` ni `placeholder` (@s34, `src/lib/seo.test.ts:355-356`):
+
+| #   | Regla (texto exacto)                                                         | Firma | Cuándo                                                                                                                                                 |
+| --- | ---------------------------------------------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | `link root-absoluto sin el prefijo de la base`                               | (a)   | Hay `base` declarada y la ruta no empieza por ella. Dice SOLO lo que la puerta sabe: nunca «no existe»                                                 |
+| 2   | `link root-absoluto sin fichero en dist/`                                    | (b)   | La ubicación no está en la lista: fichero ausente, carpeta, `href` acabado en `/` que no es la raíz, caja distinta o segmentos `.`/`..` sin normalizar |
+| 3   | `link root-absoluto a un fichero de 0 bytes en dist/`                        | (c)   | La ubicación está en la lista con 0 bytes                                                                                                              |
+| 4   | `link root-absoluto con %, & o barra invertida, que la puerta no interpreta` | —     | Paso 1 de la resolución (H5-4, S-1, S-2)                                                                                                               |
+
+**Formato** (D8): una línea por violación, con el formato de siempre, `<ruta> — <regla>: "<valor>"`
+(`describirViolacion`, :777-779). `<ruta>` es la ruta lógica de la página que trae el `<link>` (`rutaDelFichero`) y
+`<valor>`, el `href` crudo (S-6). Orden: primero las violaciones de hoy, en su orden; detrás, las de los `<link>`, por el
+orden de las páginas que da `listarHtml` y, dentro de cada página, por orden de aparición. Un mismo `href` en dos `<link>`
+da dos líneas. La línea del H-5: `/ — link root-absoluto sin el prefijo de la base: "/favicon.svg"`.
+
+**El puerto nuevo: opcional, y falla cerrado** (H5-5). Es un campo opcional de `PeticionPuertaCascaron` (nombre
+orientativo `ficheros?`) con un método que devuelve TODOS los ficheros del artefacto, de cualquier extensión y HTML
+incluidas, sin carpetas, como `{ ubicacion, bytes }`. `ubicacion` es la lógica, `dist/<relativa con />`, la misma de
+`FicheroHtml` (vía `ubicacionLogica` de `tools/artefacto.ts`, que honra `NLS_DIST_DIR`); `bytes`, el tamaño. **Nunca lee
+el contenido** (A-27: un binario leído como texto se decodifica a U+FFFD). Es un método y no un valor porque el humilde
+no puede listar antes de que la puerta pregunte `existe()`: con `dist/` ausente, `readdirSync` lanzaría FUERA de la
+puerta y se perdería la línea de @s26.
+
+- **Presente**: la puerta lo consulta solo si hay al menos un `<link>` root-absoluto que resolver. Si lanza, cae en la
+  rama de @s29 (su línea de hoy, sin cambios).
+- **Ausente, con al menos un `<link>` root-absoluto en el artefacto**: la puerta falla cerrada con UNA sola línea y no
+  evalúa nada más (S-3): `la puerta no recibió la lista de ficheros del artefacto y hay elementos link root-absolutos que resolver`.
+- **Ausente, sin ninguno**: la puerta hace EXACTAMENTE lo de hoy. Es el caso de las 11 llamadas de
+  `puerta-cascaron.test.ts` y de la de F-06: ningún fixture suyo lleva un `<link>` root-absoluto (los dos de ese
+  fichero, en las líneas 1116 y 1706, van a `canonicaDeLaPagina`, no a la puerta).
+- **El humilde** `tools/puerta-cascaron.ts` lo cablea siempre: `readdirSync` recursivo con `withFileTypes`, solo
+  ficheros, y `statSync(…).size`; nunca `readFileSync`. Sin tests ni mutación propios, como el resto del humilde: lo
+  prueba el extremo a extremo (D9).
+
+**Guarda anti-vacuidad del extractor nuevo** (pregunta 5 de la verificación, que Pablo delegó en el `spec_partner`,
+brief §8). Molde de @s28: lo vigilado es el EXTRACTOR, no el sitio.
+
+- Cuenta TODOS los `href` que el MISMO extractor de las reglas nuevas devuelve en todo el artefacto: de cualquier
+  forma (absolutos, relativos, vacíos) y de cualquier `rel`, **canónica incluida**. Si son 0, falla cerrada con su
+  línea: `no se inspeccionó ningún elemento link del artefacto: el extractor de href de link no encontró nada`.
+- Va en `inspeccionarArtefacto`, DESPUÉS de la guarda de @s28 (:842-851): solo corre si no hubo violaciones y la de
+  @s28 pasó. No va en `inspeccionarSitio`. Con `.some()` y no con una suma, por la misma razón que @s28.
+- Por qué no cuenta solo los root-absolutos: que haya 0 es un estado LEGÍTIMO. El control `head-correcto` de @s33 corre
+  la puerta REAL sobre una app sin ninguno y exige exit 0 (`src/lib/trampas-del-horneado.test.tsx:393-399`; su único
+  `<link>` es la canónica absoluta), y para eso el patrón dice «no aplica»
+  (`.memoria-cache/patterns/testing/verde-por-vacuidad-en-puerta-de-verificacion.md`, «Cuándo NO aplica»). Contando
+  todos, un artefacto que pasa el resto de la puerta lleva siempre la canónica (F-04 la exige), y un extractor roto se
+  delata.
+- Se mata con un fixture cuyo ÚNICO `<link>` es `<link rel="canonical">` SIN `href`: `canonicaDeLaPagina` devuelve `''`
+  y no `null` (`atributoDeEtiqueta`, :387-401), así que no salta «canónica ausente» (:491) y solo habla la guarda.
+- Descartadas: (i) que el ayudante `htmlCrudo` hornee un `<link rel="stylesheet">` con su fichero (la recomendación de
+  partida del brief, REFUTADA: no llega al experimento `head-correcto`, y un único `href` con un único fichero no vale
+  a la vez para los tests con base, donde @s37 exige `lineas` igual a `[]` en `puerta-cascaron.test.ts:979-991`, y para
+  los tests sin ella); (ii) una guarda sobre los root-absolutos cambiando la plantilla de trampas: toca un test de
+  @s33, y la propia feature manda volver a la puerta humana si una guarda nace en rojo.
+- Resultado: **ningún fixture, ayudante ni escenario de @s1-@s45 cambia.**
+
+**Qué NO cambia** (D8 y brief §3):
+
+- Ninguna línea de hoy: ni el `✓` del humilde (`tools/puerta-cascaron.ts:64-66`), ni el `✗` final, ni las líneas de
+  @s26-@s29, ni ninguna regla existente (`href interno sin fichero en dist/` incluida), ni el formato de línea.
+- La anti-404 de `<a>` (A-17, @s23/@s24, @s36-@s38), @s37 incluido: un `<a href="/otra-cosa">` bajo base sigue fuera
+  de ámbito.
+- `inspeccionarSitio` (S-4), `ArtefactoDeProduccion` (F-06 no se toca), `tools/artefacto.ts`, F-05 entera,
+  `vite.config.ts`, `index.html` y `public/`.
+
+**Las dos asimetrías, declaradas** (verificación, preguntas 2 y 3):
+
+1. **Bajo la base, un `<a>` sin el prefijo queda fuera (@s37), y un `<link>` sin el prefijo es la regla 1.** Un `<a>` a
+   la raíz del dominio puede ser un hiperenlace legítimo a otro sitio (el Pages de la organización); un `<link>`
+   root-absoluto sin la base es, en este stack, la firma (a), porque Vite procesa el `href` de todo `<link>` y lo deja
+   sin la base cuando falta el fichero. Quien de verdad quiera apuntar fuera escribe una URL absoluta, pero esa salida
+   **solo vale para los `rel` de hiperenlace** (`canonical`, `alternate`; Google los pide absolutos: «Use absolute
+   paths rather than relative paths with the rel="canonical" link element»,
+   https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls; «Alternate URLs must be
+   fully-qualified», https://developers.google.com/search/docs/specialty/international/localized-versions). Para un
+   `rel` de petición, F-05 la rechaza: su lista de permitidos es `[]` (`tools/puerta-terceros.ts:100`; hiperenlace
+   frente a petición en `src/lib/terceros.ts:86-99`).
+2. **Para `<link>` la puerta mira FICHEROS; para `<a>`, rutas LÓGICAS.** `/NailsLashStudioWeb/servicios` es la regla 2
+   en un `<link>` (no hay fichero `dist/servicios`) y es válido en un `<a>` si existe `dist/servicios/index.html`
+   (`rutaDelFichero`, :770-774). Hoy es latente: `RUTAS_ESPERADAS = ['/']` (:892).
+
+**Casos límite** (con base `/NailsLashStudioWeb/` salvo que se diga otra cosa):
+
+1. La raíz: `/NailsLashStudioWeb/` → `dist/index.html` → pasa. Sin base, `/` → ídem.
+2. `/NailsLashStudioWeb/x/` (acabado en `/`, no raíz) → regla 2. `/NailsLashStudioWeb/assets` (una carpeta que existe,
+   sin barra) → regla 2.
+3. `/NailsLashStudioWeb` (la base sin su barra final) → regla 1. Pages lo redirige con un 301 (medido), pero la puerta
+   es estricta.
+4. Caja: `/NailsLashStudioWeb/FAVICON.SVG` → regla 2; `/nailslashstudioweb/favicon.svg` → regla 1.
+5. Limpieza: `" /NailsLashStudioWeb/favicon.svg "`, o con un tabulador o un salto de línea dentro, se limpia y pasa si
+   el fichero existe. `" /favicon.svg"` → regla 1.
+6. `//cdn.ejemplo/x.css` → no es root-absoluto: no es de esta puerta.
+7. `/\cdn.ejemplo/x.css` y `/NailsLashStudioWeb\favicon.svg` → regla 4.
+8. `/NailsLashStudioWeb/favicon.svg?v=2` y `…#x` → resuelven a `dist/favicon.svg`. Pero `…?a=1&amp;b=2` → regla 4: el
+   `&` se mira en el `href` entero.
+9. `/NailsLashStudioWeb/favicon%2Esvg` → regla 4 aunque Pages la sirva (H5-4).
+10. `/NailsLashStudioWeb/./favicon.svg` o `…/assets/../favicon.svg` → regla 2: la puerta no normaliza los segmentos
+    `.`/`..`, aunque el navegador sí lo haga (falla cerrado).
+11. Un fichero de 1 byte → pasa; de 0 bytes → regla 3.
+12. Sin base: `/favicon.svg` con su fichero → pasa; sin él → regla 2, nunca la 1.
+13. `href=""`, un `<link>` sin `href`, uno relativo (`favicon.svg`, `./x`) o absoluto (`https://…`): ninguno es
+    root-absoluto. Los que tienen `href` sí cuentan para la guarda.
+14. Un `<link>` en el `<body>` también se resuelve (se lee el documento entero).
+15. Dos páginas: el `<link>` roto se acusa en la ruta de la página que lo lleva.
+16. Una `base` que no acabe en `/`: la puerta no valida la base (es de F-05, @s27, igual que en la ENMIENDA 1). Con
+    ella, los `href` que no son la raíz no resuelven (`dist//x`) y dan la regla 2: falla cerrada, no abierta.
+
+**Huecos DECLARADOS** (no se cierran):
+
+- **`href` relativos** (`favicon.svg`, `./x`, `../x`): fuera. Hoy ningún `<link>` del artefacto lo es (inventario).
+- **URL absolutas** (`https://…`, `//…`): fuera. Las de terceros son de F-05; las propias (la canónica) no se resuelven
+  contra el artefacto.
+- **`<script src>`, `<img src|srcset>`, `<source>` y `url()` del CSS**: fuera (H5-2), aunque el fallback silencioso de
+  Vite también los afectaría. Hoy salen con hash y con la base (1 `<script>`, 16 `<img>`, 0 `srcset`).
+- **`fetch()` y demás peticiones del JS**: invisibles para una puerta que lee HTML (el mismo límite que @s34 de
+  `cero_terceros.feature`).
+- **`<base href>`**: la puerta lo ignora. Con un `<base href>` de otro host, los `<link>` root-absolutos irían a ese host
+  (https://html.spec.whatwg.org/multipage/semantics.html#create-a-link-request y
+  https://html.spec.whatwg.org/multipage/urls-and-fetching.html#document-base-url). F-05 ya resuelve contra él
+  (`src/lib/terceros.ts:237`, @s9 de `cero_terceros.feature`) para los `rel` que trata como petición. Hoy ni
+  `index.html` ni ningún componente emiten `<base>` **[V: grep, 2026-10-01]**.
+- **Comillas simples o sin comillas**: `ATRIBUTO_HREF` solo casa comillas dobles (:74). Es teórico: en el pipeline real
+  todo pasa por `jsdom.serialize()` (`vite-react-ssg.DsKK_1op.mjs:902-904`), que emite comillas dobles aunque la
+  entrada no las traiga (medido, jsdom 24.1.3).
+- **El umbral de 0 bytes** es arbitrario: un icono truncado a 1 byte pasa. `.nojekyll` (0 B) no da falso positivo: se
+  crea DESPUÉS de la puerta (`deploy-pages.yml:74`) y nada lo enlaza; la regla 3 solo mira ficheros a los que apunta un
+  `<link>`.
+- **`vite-ignore`**: la puerta no mira ese atributo. Un `<link vite-ignore href="/x">` bajo base es justo la firma (a) y
+  la regla 1 lo acusa; para apuntar fuera de la base, URL absoluta (asimetría 1). En `<script>` o `<img>` queda fuera,
+  como esos elementos.
+- **Otros controles C0 en los extremos** (U+0000-U+001F, salvo los de la limpieza): el navegador los recorta
+  (https://url.spec.whatwg.org/#concept-basic-url-parser) y la puerta no, porque la decisión fija la limpieza en los
+  espacios ASCII. Con ellos, el `href` no se clasifica como root-absoluto y queda fuera. Es teórico.
+- **La caja en el build** (corrección 8): en `vite build`, `checkPublicFile` acaba en `tryStatSync` (config.js:8096-8104;
+  `initPublicFiles` solo se llama desde `_createServer`, :25445, y vite-react-ssg solo crea servidor en dev). Así, en
+  Windows un `href` con la caja equivocada se hornearía CON la base (firma b) y en Linux SIN ella (firma a) **[I:
+  inferencia del código, sin medir]**. La comparación exacta caza las dos; por eso el extremo a extremo no siembra un
+  sabotaje de caja.
+
+**Prueba de extremo a extremo (D9).** Vive en `src/pages/home-horneado.test.ts`, reutiliza el build de su `beforeAll`
+(el artefacto temporal de H-3) y su `correrPuerta('cascaron', directorio)` (:498-511). **Ningún build nuevo**
+(precedente de la Enmienda 2), y en un fichero `*-horneado.test.*` para que siga fuera de Stryker
+(`vitest.stryker.config.ts:39`).
+
+1. **Ancla, PRIMERO**: el `dist/index.html` del artefacto REAL trae al menos un `<link>` cuyo `href` empieza por
+   `/NailsLashStudioWeb/` (literal escrito a mano). Sin ella, los sabotajes podrían «pasar» sobre un artefacto sin nada
+   que comprobar.
+2. **Control**: la puerta sobre el artefacto real sale con 0. Es el control H-3 de `cascaron` que ya existe en ese
+   fichero (:524-533); el escenario lo cita, sin duplicar el build.
+3. **Tres sabotajes, uno por firma** (S-5), cada uno sobre su PROPIA copia del artefacto temporal, nunca sobre el
+   `dist/` ni el `public/` del proyecto. Cada uno sale con un código distinto de 0, su salida contiene su línea exacta,
+   escrita a mano, y NO contiene el `✓`:
+   - (a) se borra `favicon.svg` de la copia y su `href` pasa a `/favicon.svg`, como lo deja Vite →
+     `/ — link root-absoluto sin el prefijo de la base: "/favicon.svg"`;
+   - (b) se borra `favicon.svg` de la copia y el `href` se deja con la base →
+     `/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/favicon.svg"`;
+   - (c) el `favicon.svg` de la copia se deja en 0 bytes →
+     `/ — link root-absoluto a un fichero de 0 bytes en dist/: "/NailsLashStudioWeb/favicon.svg"`.
+4. **Rojo demostrado del lead** (manual, anotado en `progress/`; la definición de hecho del brief §3): copiar
+   `public/favicon.svg` fuera, borrarlo y lanzar `NLS_DIST_DIR=<temporal> pnpm build` → código distinto de 0 con la
+   línea (a). Después, restaurarlo y comprobar que `git status` queda limpio (brief §7). Tras publicar (H5-6), el lead
+   repite la comprobación en la web publicada (propuesta: cada `href` de un `<link>` root-absoluto de la home publicada
+   responde 200 a `curl -I`).
+
+**Mutación (D10).**
+
+- `src/lib/puerta-cascaron.ts` (ya en `mutate`) al **100 %, con 0 exclusiones**, re-mutado ENTERO. Su última corrida,
+  el remate de la subruta, tuvo 497 mutantes: 493 muertos y 4 timeouts (`progress/mutation_subruta_github_pages.md`);
+  el último `verify` completo no tuvo ningún timeout en él (`progress/current.md`). Si la lógica nueva vive en un módulo
+  nuevo de `src/lib/`, ese módulo entra en `mutate`, con el mismo umbral.
+- Los tests unitarios (`src/lib/puerta-cascaron.test.ts`, con fixtures escritos a mano y sin tautologías) tienen que
+  matar SOLOS el 100 %, guarda y puerto incluidos: el test de D9 es build-based, queda fuera de Stryker y no cuenta
+  (corrección 16). `tools/puerta-cascaron.ts` sigue fuera de `mutate` (humilde).
+- Mutantes que deben morir, cada uno con su fixture: quitar la limpieza (espacios en los extremos; un tabulador dentro);
+  aceptar `//` como root-absoluto; quitar `%`, `&` o la barra invertida de la regla 4 (una fila por carácter); la raíz
+  que deja de ir a `index.html`, con base y sin ella; `=== 0` → `<= 0` o `< 1` en la regla 3 (la fila de 1 byte); dejar
+  de quitar `?query`/`#fragmento`; el orden de las reglas (un `href` sin la base y sin fichero da SOLO la regla 1; uno
+  con `%` y sin fichero, SOLO la 4); el puerto ausente, con candidatos (corta con su línea) y sin ellos (todo igual); el
+  puerto presente que lanza (rama de @s29) y que no se consulta si no hay candidatos; la guarda (`.some` → `.every`,
+  `> 0` → `>= 0`) con el fixture de la canónica sin `href`; y el texto de cada regla y línea nueva, aseverado literal.
+- Ante supervivientes: ampliar el contrato, nunca quitar la guarda
+  (`.memoria-cache/patterns/testing/superviviente-de-mutacion-en-guarda-defensiva-es-hueco-del-contrato.md`), y
+  refactorizar el equivalente, nunca excluirlo
+  (`.memoria-cache/patterns/testing/mutante-equivalente-se-refactoriza-para-proteger-un-throw-real.md`).
+
+**Para el `gherkin_author`** (corrección 6): el banner de la ENMIENDA 5 va en `features/cascaron_semantico.feature`
+DESPUÉS del de la ENMIENDA 4 (que acaba en la línea 223) y antes de «Contrato de la feature 4» (:225); los escenarios,
+desde **@s46**, al final, con «@s1-@s45 (arriba) NO SE TOCAN». Hay que nombrar el extractor que se reutiliza
+(`ENLACE` + `ATRIBUTO_HREF`), como piden las notas de @s41.
+
+**Preguntas abiertas: ninguna.** Pablo cerró H5-1 a H5-6. S-1 a S-6 y los textos exactos de las reglas y las líneas
+los decide el `spec_partner` y se ratifican en la puerta humana del `.feature`, que sigue pendiente.
+
 ---
 
 ### Feature 5: `cero_terceros` — la petición que nunca sale, y la puerta que lo demuestra
