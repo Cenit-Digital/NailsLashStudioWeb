@@ -1,8 +1,9 @@
 import { execSync } from 'node:child_process'
-import { readdirSync, readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join, resolve } from 'node:path'
 
-import { beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 /**
  * F-10 @s12 y @s14, F-14 @s6 y F-04 @s39-@s42 y @s45 (ENMIENDAS 2, 3 y 4 de `cascaron_semantico.feature`)
@@ -13,28 +14,66 @@ import { beforeAll, describe, expect, it } from 'vitest'
  * contrato prohíbe un build nuevo solo para ellos. Que ese build es de PRODUCCIÓN lo demuestran @s42 (por
  * los bytes del bundle) y @s45 (por el modo que escribe el propio log de Vite).
  *
+ * H-3: ese build escribe su artefacto en un `dist/` TEMPORAL (`NLS_DIST_DIR`), nunca en el del proyecto,
+ * y todo lo de abajo lo lee de ahí. Sigue siendo el artefacto de producción REAL: el que acaba de dejar
+ * ese mismo `pnpm build`, con sus CINCO puertas.
+ *
  * 🔴 ESTE FICHERO NO IMPORTA NADA DE `src/lib/` NI DE `src/pages/`, Y ES DELIBERADO (patrón de
  * `trampas-del-horneado.test.tsx`): corre el BUILD REAL (lento) en `beforeAll`. Si importara
  * `horario.ts`, Stryker lo contaría como cobertura y lo re-ejecutaría POR CADA MUTANTE → decenas de
  * builds → TIMEOUTS, y «un informe de mutación con timeouts MIENTE» (docs/verification.md). Los
  * ESPERADOS se escriben A MANO aquí (anti-tautología), no se importan de producción.
  */
-const RUTA_DIST = resolve('dist/index.html')
 
+/**
+ * H-3 (`progress/brief_tests_build_aislado.md`) — la HUELLA de un `dist/`: si existe, y el mtime del
+ * directorio y el de su `index.html`. No lanza si no existe (`throwIfNoEntry: false`): «no existía» es
+ * una huella válida, y tiene que seguir siéndolo después del build.
+ */
+interface HuellaDeDist {
+  readonly existe: boolean
+  readonly mtimeDelDirectorio?: number
+  readonly mtimeDelIndex?: number
+}
+
+function huellaDe(directorio: string): HuellaDeDist {
+  const delDirectorio = statSync(directorio, { throwIfNoEntry: false })
+  const delIndex = statSync(join(directorio, 'index.html'), { throwIfNoEntry: false })
+
+  return {
+    existe: delDirectorio !== undefined,
+    mtimeDelDirectorio: delDirectorio?.mtimeMs,
+    mtimeDelIndex: delIndex?.mtimeMs,
+  }
+}
+
+/** El `dist/` del PROYECTO: el que sirve `vite preview` y el que este fichero NO debe tocar (H-3). */
+const DIST_DEL_PROYECTO = resolve('dist')
+
+let huellaAntesDelBuild: HuellaDeDist | undefined
+/** H-3 — el directorio temporal de este fichero y, dentro, el artefacto de SU build (`<temporal>/dist`). */
+let temporal = ''
+let artefacto = ''
 let html = ''
 let codigoSalida = 0
 let salidaDelBuild = ''
 
 beforeAll(() => {
+  // H-3: la huella del `dist/` del proyecto se toma ANTES de nada, para compararla tras el build.
+  huellaAntesDelBuild = huellaDe(DIST_DEL_PROYECTO)
+  temporal = mkdtempSync(join(tmpdir(), 'nls-horneado-'))
+  artefacto = join(temporal, 'dist')
+
   // El `pnpm build` REAL con las CINCO puertas. @s14 exige exit 0 «con todas las puertas»: se captura
   // el código de salida (execSync lanza en fallo con `.status`). @s42: `NODE_ENV=production` explícito
   // en el SUBPROCESO (el resto se hereda); si heredara el `test` de Vitest, React saldría en DESARROLLO.
   // @s45: y `MODE=production`, porque Vitest exporta también `MODE=test` y vite-react-ssg lo lee ANTES que
   // `NODE_ENV`. Se CONSERVA su salida estándar (el log de Vite), y si falla, la que trae el error.
+  // H-3: y `NLS_DIST_DIR`, el artefacto temporal (vite.config.ts → `build.outDir`).
   try {
     salidaDelBuild = execSync('pnpm build', {
       stdio: 'pipe',
-      env: { ...process.env, NODE_ENV: 'production', MODE: 'production' },
+      env: { ...process.env, NODE_ENV: 'production', MODE: 'production', NLS_DIST_DIR: artefacto },
     }).toString()
   } catch (error: unknown) {
     const fallo = error as { status: number; stdout: Buffer }
@@ -43,8 +82,12 @@ beforeAll(() => {
     salidaDelBuild = fallo.stdout.toString()
   }
 
-  html = readFileSync(RUTA_DIST, 'utf8')
+  html = readFileSync(join(artefacto, 'index.html'), 'utf8')
 }, 180_000)
+
+afterAll(() => {
+  rmSync(temporal, { recursive: true, force: true })
+})
 
 /**
  * El JSON-LD horneado, extraído del `<script … application/ld+json …>` de `dist/index.html`. Helmet
@@ -283,13 +326,16 @@ function precargasDeFuenteHacia(extension: string): readonly string[] {
     .filter((href) => terminaEn(href, extension))
 }
 
-const RUTA_ASSETS = resolve('dist/assets')
+/** El `assets/` del artefacto de ESTE build (H-3: bajo el temporal, no bajo el `dist/` del proyecto). */
+function rutaDeAssets(): string {
+  return join(artefacto, 'assets')
+}
 
 /** @s41 — los bytes de cada `.css` de `dist/assets/` que deja el build del `beforeAll`. */
 function hojasDeEstilo(): readonly string[] {
-  return readdirSync(RUTA_ASSETS)
+  return readdirSync(rutaDeAssets())
     .filter((fichero) => fichero.endsWith('.css'))
-    .map((fichero) => readFileSync(resolve(RUTA_ASSETS, fichero), 'utf8'))
+    .map((fichero) => readFileSync(join(rutaDeAssets(), fichero), 'utf8'))
 }
 
 /**
@@ -353,7 +399,7 @@ function bundleDeLaApp(): string {
   const [modulo] = modulosDeLaApp()
   const fichero = (modulo?.get('src') ?? '').slice(PREFIJO_DE_ASSETS.length)
 
-  return readFileSync(resolve(RUTA_ASSETS, fichero), 'utf8')
+  return readFileSync(join(rutaDeAssets(), fichero), 'utf8')
 }
 
 /** @s42 — cuántas veces casa `patron` (con `g`: sin él, `matchAll` lanza) en `texto`. */
@@ -411,3 +457,90 @@ describe('@s45 (F-04) el build "pnpm build" que lanza home-horneado corre en mod
     expect(apariciones(salidaDelBuild, /building client environment for test/g)).toBe(0)
   })
 })
+
+/**
+ * H-3 — el build de este fichero NO toca el `dist/` del PROYECTO. Los hooks de `.claude/settings.json`
+ * corren la suite en cada Edit/Write y en cada fin de turno: si el build escribiera en el `dist/`
+ * compartido, `vite preview` serviría un directorio a medio vaciar (`ERR_HTTP_RESPONSE_CODE_FAILURE`,
+ * páginas sin JS). La huella se toma al PRINCIPIO del `beforeAll`, antes del build.
+ */
+describe('H-3 el build de home-horneado NO toca el dist/ del proyecto', () => {
+  it('H-3 ANCLA POSITIVA: la huella SÍ ve el dist/ que este build acaba de dejar (existe y trae index.html)', () => {
+    // Sin ella, una huella ciega (ruta equivocada) daría «no existe» antes y después: verde en VACÍO.
+    const huella = huellaDe(artefacto)
+
+    expect(huella.existe).toBe(true)
+    expect(huella.mtimeDelIndex).toBeTypeOf('number')
+  })
+
+  it('H-3 la huella del dist/ del proyecto (¿existe?, mtime del directorio y de dist/index.html) es la MISMA antes y después del build', () => {
+    expect(huellaDe(DIST_DEL_PROYECTO)).toEqual(huellaAntesDelBuild)
+  })
+})
+
+/**
+ * H-3 — las puertas del `pnpm build` que LEEN el artefacto (`puerta-contraste` no lo lee). Escrita A MANO.
+ */
+const PUERTAS_QUE_LEEN_EL_ARTEFACTO = ['cascaron', 'placeholders', 'terceros', 'anclas']
+
+/** Medido: `placeholders` tarda ~2,5 s; los 5 s por defecto de Vitest quedan justos con la máquina cargada. */
+const TIMEOUT_DE_UNA_PUERTA = 30_000
+
+interface SalidaDeLaPuerta {
+  readonly codigo: number | null
+  readonly salida: string
+}
+
+/**
+ * H-3 — la puerta `tools/puerta-<puerta>.ts` como SUBPROCESO, igual que en `pnpm build`, con `cwd` en la
+ * raíz y `NLS_DIST_DIR` = `directorio`. Se conserva lo que escribe, para que un fallo diga POR QUÉ.
+ */
+function correrPuerta(puerta: string, directorio: string): SalidaDeLaPuerta {
+  try {
+    const salida = execSync(
+      `node --experimental-strip-types --disable-warning=ExperimentalWarning tools/puerta-${puerta}.ts`,
+      { cwd: process.cwd(), stdio: 'pipe', env: { ...process.env, NLS_DIST_DIR: directorio } },
+    ).toString()
+
+    return { codigo: 0, salida }
+  } catch (error: unknown) {
+    const fallo = error as { status: number | null; stdout: Buffer; stderr: Buffer }
+
+    return { codigo: fallo.status, salida: `${fallo.stdout.toString()}${fallo.stderr.toString()}` }
+  }
+}
+
+/**
+ * H-3 — cada puerta inspecciona el artefacto que señala `NLS_DIST_DIR`, SIEMPRE EN PAREJA (anti-vacuidad,
+ * `.memoria-cache/patterns/testing/verde-por-vacuidad-en-puerta-de-verificacion.md`):
+ *   - control: el artefacto que el build de este fichero acaba de dejar → exit 0. Sin él, el caso pasaría
+ *     en verde en una máquina SIN `dist/` (CI) aunque la puerta ignorase la variable.
+ *   - caso: un directorio INEXISTENTE dentro del temporal → exit ≠ 0. Sin él, el control pasaría leyendo
+ *     un `dist/` viejo y válido del proyecto.
+ */
+describe.each(PUERTAS_QUE_LEEN_EL_ARTEFACTO)(
+  'H-3 tools/puerta-%s.ts inspecciona el artefacto que señala NLS_DIST_DIR',
+  (puerta) => {
+    it(
+      'H-3 control: con NLS_DIST_DIR = el artefacto temporal recién construido, sale con 0',
+      () => {
+        const { codigo, salida } = correrPuerta(puerta, artefacto)
+
+        expect(codigo, salida).toBe(0)
+      },
+      TIMEOUT_DE_UNA_PUERTA,
+    )
+
+    it(
+      'H-3 caso: con NLS_DIST_DIR = un directorio INEXISTENTE dentro del temporal, sale con un código ≠ 0',
+      () => {
+        const { codigo, salida } = correrPuerta(puerta, join(temporal, 'no-existe'))
+
+        // Un número, y distinto de 0: un proceso matado por señal (`status` null) no cuenta como fallo cerrado.
+        expect(codigo, salida).toBeTypeOf('number')
+        expect(codigo, salida).not.toBe(0)
+      },
+      TIMEOUT_DE_UNA_PUERTA,
+    )
+  },
+)
