@@ -126,3 +126,38 @@ el contrato son los invariantes I-1..I-7 de `progress/brief_deuda_favicon_legibi
   - los menores 1, 4 y 5 y las discrepancias del verificador, corregidos en la bitácora;
   - falta I-6 (`harness init` completo), que corre el lead, y el push de los commits de la bitácora
     (`a48a296` ya está en `origin`: lo empujó otro actor a las 12:49:46).
+
+## 2026-10-01 — H-5: el `pnpm build` falla cerrado ante un `<link href>` horneado sin la base o sin fichero
+
+- Worktree `.claude/worktrees/amazing-montalcini-d6abb1`, rama `claude/amazing-montalcini-d6abb1`, avanzada
+  por fast-forward a `main` en `2a49c14` (F-28 ya fusionada, #18). `init` de partida en verde: 56 ficheros,
+  1820/1820 tests. Memoria organizacional sincronizada (25 patrones).
+- H-5 REPRODUCIDO [V] en un temporal (`NLS_DIST_DIR`): sin `public/favicon.svg` el build sale con 0 y hornea
+  `href="/favicon.svg"`; con el fichero a 0 bytes, sale con 0 y lo copia vacío. Las 5 puertas en ✓ en ambos.
+- Brief `progress/brief_h5_enlaces_horneados.md` (medidas, lo que dicen F-04/F-05, decisiones D1-D10).
+  Recomendación del lead: dueño F-04 (ENMIENDA 5, desde @s46).
+- **TRASPASO (2026-10-01, a petición de la sesión principal, por decisión de Pablo):** esta sesión PARA aquí y
+  H-5 sigue en la sesión principal. Estado exacto:
+  - El `spec_partner` de la ENMIENDA 5 se DETUVO antes de escribir: `project-spec.md` y
+    `features/cascaron_semantico.feature` están INTACTOS (no hay borrador de spec ni de Gherkin).
+  - Sabotajes de medida revertidos: `public/favicon.svg` restaurado byte a byte desde su copia, y
+    `git status` limpio tras cada uno. Los artefactos de medida viven solo en el scratchpad de esta sesión.
+  - Sin código, sin tests, sin `feature_list.json` tocado, sin push ni PR.
+  - Siguiente paso: `spec_partner` → `project-spec.md` §Feature 4 «Enmienda 5 (2026-10-01)» (antes de
+    «### Feature 5»), con las decisiones D1-D10 y las preguntas de §6 del brief; luego `gherkin_author`
+    (banner de ENMIENDA 5 + @s46…), revisión adversarial y la puerta humana.
+
+- 17:45 (sesión principal): PUERTA HUMANA APROBADA por Pablo el 2026-10-01 (~17:45, AskUserQuestion): el contrato tal cual (@s46-@s72); S-11 y S-12 RATIFICADOS, incluido el cambio de veredicto latente de S-12; aceptadas las dos excepciones (el ayudante `elementos` delega en `elementosDe`, y @s67, @s70, @s71 y @s72); `REGLA_RUTA_AUSENTE` NO entra en H-5 (queda declarada). Implementación: inmediata. Antes de la puerta: dos revisores independientes (A: 17/18 de la ronda 2 resueltos, 0 bloqueantes; B: modelo de la implementación, 0 regresiones, mutación al 100 % alcanzable) y una pasada final de texto (spec `8995b6f`, Gherkin `e6e4f24`); `harness init` del worktree en verde (1820/1820).
+- H-5 FASE A (puerta pura, `tdd_craftsman`): VERDE. `src/lib/puerta-cascaron.ts` y 127 tests nuevos en
+  `src/lib/puerta-cascaron.test.ts` (211 a 338), @s46-@s60, @s65, @s66, @s68 y @s69; bitácora
+  `progress/tdd_h5_enlaces_horneados.md`. OJO: hasta la FASE B (el humilde cablea `ficheros`), `pnpm build`
+  sale con 1 por el corte de S-3 (medido sobre una copia del build real): no correr la suite completa ni fusionar.
+- H-5 FASE B (humilde + extremo a extremo, `tdd_craftsman`): VERDE. `tools/puerta-cascaron.ts` cablea la lista de
+  ficheros (`ficheros`: recursiva, solo ficheros, con su tamaño, perezosa) y `src/pages/home-horneado.test.ts` gana 8
+  tests (42 a 50): @s61, @s62 (a, b, c), @s67, @s70, @s71 y @s72, más `elementosDe` (excepción declarada). Rojo
+  visto con el humilde de hoy (9 failed, S-3) y con la puerta previa a H-5 (los 5 que el contrato da por rojos); 7
+  sabotajes del humilde, cada uno cazado por su escenario. Los 6 ficheros del encargo, 541/541; `pnpm build` real
+  en un temporal: exit 0 y las cinco puertas en ✓. El corte S-3 de la FASE A queda cerrado. Bitácora: misma,
+  sección «FASE B». Pendiente del lead: suite completa, @s63, `judge`, mutación y @s64 tras publicar.
+
+- 19:15 (sesión principal): H-5 CERRADO en la rama. Fase A (puerta pura, 127 tests) y fase B (humilde y extremo a extremo, 8 tests más en home-horneado) en verde; `harness init` 1955/1955; @s63 demostrado; judge APPROVED (0 bloqueantes); mutación de `puerta-cascaron.ts` al 100 % (625/625, concurrencia 1; la primera corrida a 23 tuvo 4 timeouts por contención, aplicado `informe-de-mutacion-con-timeouts-miente`). `feature_list.json`: ENMIENDA 5 en el cierre de F-04 y H-5 marcado como resuelto en el de F-28. Siguiente: PR, CI, fusión (squash, judge menor 3), despliegue y @s64.

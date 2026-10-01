@@ -1,5 +1,14 @@
 import { execSync } from 'node:child_process'
-import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs'
+import {
+  cpSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  truncateSync,
+  writeFileSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 
@@ -230,11 +239,20 @@ function atributosDe(texto: string): Atributos {
   return atributos
 }
 
-/** Los elementos `<etiqueta …>` del HTML crudo, sin distinguir mayúsculas en el nombre de la etiqueta. */
-function elementos(etiqueta: string): readonly Atributos[] {
+/**
+ * Los elementos `<etiqueta …>` de `fuente`, sin distinguir mayúsculas en el nombre de la etiqueta. F-04
+ * ENMIENDA 5 (H-5, excepción DECLARADA en el banner): recibe el TEXTO, para medir una COPIA del artefacto
+ * leída del disco (@s62, @s67, @s71 y @s72). Es el MISMO patrón de siempre: no hay un segundo.
+ */
+function elementosDe(fuente: string, etiqueta: string): readonly Atributos[] {
   const apertura = new RegExp(`<${etiqueta}(?=[\\s/>])([^>]*)>`, 'gi')
 
-  return [...html.matchAll(apertura)].map((encontrado) => atributosDe(encontrado[1]))
+  return [...fuente.matchAll(apertura)].map((encontrado) => atributosDe(encontrado[1]))
+}
+
+/** Los elementos `<etiqueta …>` del HTML crudo del artefacto ORIGINAL (el `html` del `beforeAll`). */
+function elementos(etiqueta: string): readonly Atributos[] {
+  return elementosDe(html, etiqueta)
 }
 
 /** Un valor enumerado de HTML (`type`, `rel`, `as`, `loading`) se compara sin distinguir mayúsculas. */
@@ -626,5 +644,270 @@ describe('@s8 (F-28) el HTML crudo de producción declara los tres iconos con la
 
       expect(iguales, `${nombre}: artefacto ≠ public/`).toBe(true)
     },
+  )
+})
+
+/**
+ * F-04 @s61, @s62, @s67 y @s70-@s72 (ENMIENDA 5 de `cascaron_semantico.feature`, H-5) — EXTREMO A EXTREMO
+ * (D9): la puerta REAL del cascarón, como SUBPROCESO (`correrPuerta`), sobre el artefacto REAL que deja el
+ * `pnpm build` de este `beforeAll` (NINGÚN build nuevo), sobre COPIAS saboteadas de él y sobre un `dist/`
+ * AUSENTE. Cada sabotaje trabaja en su PROPIA copia, dentro del temporal de ESTE fichero, nunca en el
+ * artefacto original, que siguen leyendo F-28 @s8 y las demás aserciones. Todo `Then` sobre una copia lee
+ * sus ficheros del DISCO después del sabotaje (`elementosDe` sobre el texto releído), y el último RELEE el
+ * `index.html` original: `html` es solo la referencia de lo que había ANTES. Los literales, A MANO.
+ */
+const HREF_DEL_FAVICON = '/NailsLashStudioWeb/favicon.svg'
+
+/** Lo que llevan las líneas de las cinco reglas nuevas de los `<link>` y ninguna de las de hoy. */
+const MARCA_DE_LINK = ' — link root-absoluto'
+
+/** Una COPIA del artefacto de este build, dentro del temporal de ESTE fichero, solo para un caso. */
+function copiaDelArtefacto(nombre: string): string {
+  const copia = join(temporal, nombre)
+
+  cpSync(artefacto, copia, { recursive: true })
+
+  return copia
+}
+
+/** El `index.html` de `directorio`, LEÍDO DEL DISCO ahora mismo (nunca la foto `html`). */
+function indexDe(directorio: string): string {
+  return readFileSync(join(directorio, 'index.html'), 'utf8')
+}
+
+/** Cuántos `<link>` de `fuente` llevan EXACTAMENTE ese `href`, leído tal cual (nunca con `valorDe`). */
+function linksConHref(fuente: string, href: string): number {
+  return elementosDe(fuente, 'link').filter((link) => link.get('href') === href).length
+}
+
+/** En el `index.html` de la copia, el `href` del favicon pasa a `nuevo`; nada más cambia. */
+function cambiarElHrefDelFavicon(copia: string, nuevo: string): void {
+  const ruta = join(copia, 'index.html')
+
+  writeFileSync(ruta, indexDe(copia).replace(`href="${HREF_DEL_FAVICON}"`, `href="${nuevo}"`))
+}
+
+/** Los bytes de un FICHERO, o `null` si no existe o no es un fichero (una carpeta no cuenta). */
+function bytesDelFichero(ruta: string): number | null {
+  const estado = statSync(ruta, { throwIfNoEntry: false })
+
+  return estado?.isFile() === true ? estado.size : null
+}
+
+/** Las líneas de la salida que llevan la marca de las reglas de los `<link>`. */
+function lineasDeLink(salida: string): readonly string[] {
+  return salida.split('\n').filter((linea) => linea.includes(MARCA_DE_LINK))
+}
+
+/**
+ * Los `Then` de un sabotaje que la puerta debe PARAR: un código numérico distinto de 0, la salida contiene
+ * `linea` (por subcadena: el humilde la escribe tras «  ✗ »), es la ÚNICA con la marca, y no hay ningún `✓`.
+ */
+function esperarQueLaPuertaPare({ codigo, salida }: SalidaDeLaPuerta, linea: string): void {
+  // Un número, y distinto de 0: un proceso matado por señal (`status` null) no cuenta como fallo cerrado.
+  expect(codigo, salida).toBeTypeOf('number')
+  expect(codigo, salida).not.toBe(0)
+  expect(salida).toContain(linea)
+  expect(lineasDeLink(salida), salida).toHaveLength(1)
+  expect(salida).not.toContain('✓')
+}
+
+/** El último `Then` de cada sabotaje: el `index.html` ORIGINAL, RELEÍDO del disco, es el del `beforeAll`. */
+function esperarElOriginalIntacto(): void {
+  // Un booleano y no `toBe(html)`: un fallo no vuelca el HTML entero en el informe.
+  expect(indexDe(artefacto) === html, 'el index.html ORIGINAL cambió tras el sabotaje').toBe(true)
+}
+
+describe('@s61 (F-04) extremo a extremo, ANCLA y CONTROL: la puerta real sobre el artefacto real sale con 0, y ese artefacto SÍ trae lo que los sabotajes rompen', () => {
+  it(
+    '@s61 su index.html trae ≥ 1 <link> con href "/NailsLashStudioWeb/…", ≥ 1 con "/NailsLashStudioWeb/assets/…" y exactamente 1 con "/NailsLashStudioWeb/favicon.svg", su favicon.svg pesa más de 0 bytes, y la salida contiene "✓ Puerta del cascarón"',
+    () => {
+      const { codigo, salida } = correrPuerta('cascaron', artefacto)
+      const hrefs = elementos('link').map((link) => link.get('href') ?? '')
+
+      // ANCLA: sin ella, los sabotajes podrían «fallar» sobre un artefacto sin nada que comprobar; y sin
+      // la de `assets/`, un humilde NO recursivo pasaría @s61, @s62 y @s67.
+      expect(
+        hrefs.filter((href) => href.startsWith('/NailsLashStudioWeb/')).length,
+      ).toBeGreaterThanOrEqual(1)
+      expect(
+        hrefs.filter((href) => href.startsWith('/NailsLashStudioWeb/assets/')).length,
+      ).toBeGreaterThanOrEqual(1)
+      expect(linksConHref(html, HREF_DEL_FAVICON)).toBe(1)
+      expect(bytesDelFichero(join(artefacto, 'favicon.svg'))).toBeGreaterThan(0)
+      // El código 0 es el «H-3 control» de `cascaron` de arriba: se cita, no se duplica (contrato).
+      expect(salida, `código ${String(codigo)}`).toContain('✓ Puerta del cascarón')
+    },
+    TIMEOUT_DE_UNA_PUERTA,
+  )
+})
+
+/** @s62 — una FIRMA del H-5: su sabotaje y lo que la copia y la puerta muestran después. */
+interface FirmaDelH5 {
+  readonly firma: string
+  readonly copia: string
+  readonly sabotear: (copia: string) => void
+  /** Los bytes del `favicon.svg` de la copia tras el sabotaje; `null`, si ya no lo tiene. */
+  readonly bytesDelFavicon: number | null
+  /** El `href` que su `index.html` trae EXACTAMENTE 1 vez tras el sabotaje… */
+  readonly hrefHorneado: string
+  /** …y los que trae 0 veces. */
+  readonly hrefsRetirados: readonly string[]
+  readonly linea: string
+}
+
+const FIRMAS_DEL_H5: readonly FirmaDelH5[] = [
+  {
+    firma: '(a) sin la base: 404',
+    copia: 'copia-s62-a',
+    sabotear: (copia) => {
+      // Como lo hornea Vite cuando falta el fichero: el `href` SIN la base.
+      rmSync(join(copia, 'favicon.svg'))
+      cambiarElHrefDelFavicon(copia, '/favicon.svg')
+    },
+    bytesDelFavicon: null,
+    hrefHorneado: '/favicon.svg',
+    hrefsRetirados: ['/NailsLashStudioWeb/favicon.svg'],
+    linea: '/ — link root-absoluto sin el prefijo de la base: "/favicon.svg"',
+  },
+  {
+    firma: '(b) con la base, sin fichero: 404',
+    copia: 'copia-s62-b',
+    sabotear: (copia) => {
+      rmSync(join(copia, 'favicon.svg'))
+    },
+    bytesDelFavicon: null,
+    hrefHorneado: '/NailsLashStudioWeb/favicon.svg',
+    hrefsRetirados: [],
+    linea: '/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/favicon.svg"',
+  },
+  {
+    firma: '(c) con fichero de 0 bytes: icono vacío',
+    copia: 'copia-s62-c',
+    sabotear: (copia) => {
+      truncateSync(join(copia, 'favicon.svg'), 0)
+    },
+    bytesDelFavicon: 0,
+    hrefHorneado: '/NailsLashStudioWeb/favicon.svg',
+    hrefsRetirados: [],
+    linea:
+      '/ — link root-absoluto a un fichero de 0 bytes en dist/: "/NailsLashStudioWeb/favicon.svg"',
+  },
+]
+
+describe('@s62 (F-04) extremo a extremo, las TRES firmas del H-5 (dos 404 y un icono vacío): la puerta real sobre una copia saboteada del artefacto real sale con un código distinto de 0 y su línea', () => {
+  it.each(FIRMAS_DEL_H5)(
+    '@s62 $firma',
+    ({ copia: nombre, sabotear, bytesDelFavicon, hrefHorneado, hrefsRetirados, linea }) => {
+      const copia = copiaDelArtefacto(nombre)
+
+      sabotear(copia)
+
+      const resultado = correrPuerta('cascaron', copia)
+      const index = indexDe(copia)
+
+      // ANCLA: el sabotaje está hecho, medido sobre los ficheros de la COPIA leídos del disco.
+      expect(bytesDelFichero(join(copia, 'favicon.svg'))).toBe(bytesDelFavicon)
+      expect(linksConHref(index, hrefHorneado)).toBe(1)
+      expect(hrefsRetirados.map((href) => linksConHref(index, href))).toEqual(
+        hrefsRetirados.map(() => 0),
+      )
+      esperarQueLaPuertaPare(resultado, linea)
+      esperarElOriginalIntacto()
+      expect(bytesDelFichero(join(artefacto, 'favicon.svg'))).toBeGreaterThan(0)
+    },
+    TIMEOUT_DE_UNA_PUERTA,
+  )
+})
+
+describe('@s67 (F-04) extremo a extremo: el humilde lista solo FICHEROS', () => {
+  it(
+    '@s67 un <link> a la CARPETA real "/NailsLashStudioWeb/assets" de la copia sale por la regla 2, nunca por la 3 ni con 0',
+    () => {
+      const copia = copiaDelArtefacto('copia-s67')
+
+      cambiarElHrefDelFavicon(copia, '/NailsLashStudioWeb/assets')
+
+      const resultado = correrPuerta('cascaron', copia)
+      const index = indexDe(copia)
+
+      // ANCLA: el sabotaje está hecho, medido sobre los ficheros de la COPIA leídos del disco.
+      expect(statSync(join(copia, 'assets')).isDirectory()).toBe(true)
+      expect(linksConHref(index, '/NailsLashStudioWeb/assets')).toBe(1)
+      expect(linksConHref(index, HREF_DEL_FAVICON)).toBe(0)
+      esperarQueLaPuertaPare(
+        resultado,
+        '/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/assets"',
+      )
+      esperarElOriginalIntacto()
+    },
+    TIMEOUT_DE_UNA_PUERTA,
+  )
+})
+
+describe('@s70 (F-04) extremo a extremo, CONTROL: con dist/ AUSENTE, el humilde no lista antes de que la puerta pregunte existe()', () => {
+  it(
+    '@s70 sobre el directorio INEXISTENTE del «H-3 caso» sale la línea de @s26, con un código distinto de 0, sin "ENOENT" y sin "✓"',
+    () => {
+      const ausente = join(temporal, 'no-existe')
+      const { codigo, salida } = correrPuerta('cascaron', ausente)
+
+      // ANCLA: ese directorio NO existe en el disco.
+      expect(statSync(ausente, { throwIfNoEntry: false }), 'el directorio existe').toBeUndefined()
+      expect(codigo, salida).toBeTypeOf('number')
+      expect(codigo, salida).not.toBe(0)
+      expect(salida).toContain('/ — ruta esperada sin HTML en dist/: ""')
+      expect(salida).not.toContain('ENOENT')
+      expect(salida).not.toContain('✓')
+    },
+    TIMEOUT_DE_UNA_PUERTA,
+  )
+})
+
+describe('@s71 (F-04) extremo a extremo: el humilde lista también los OCULTOS y no filtra nada', () => {
+  it(
+    '@s71 un <link> a "/NailsLashStudioWeb/.vite/manifest.json" de la copia sale por la regla 5, nunca por la 2',
+    () => {
+      const copia = copiaDelArtefacto('copia-s71')
+
+      cambiarElHrefDelFavicon(copia, '/NailsLashStudioWeb/.vite/manifest.json')
+
+      const resultado = correrPuerta('cascaron', copia)
+      const index = indexDe(copia)
+
+      // ANCLA: el sabotaje está hecho, medido sobre los ficheros de la COPIA leídos del disco.
+      expect(bytesDelFichero(join(copia, '.vite', 'manifest.json'))).toBeGreaterThan(0)
+      expect(linksConHref(index, '/NailsLashStudioWeb/.vite/manifest.json')).toBe(1)
+      expect(linksConHref(index, HREF_DEL_FAVICON)).toBe(0)
+      esperarQueLaPuertaPare(
+        resultado,
+        '/ — link root-absoluto a un fichero oculto, que el despliegue no publica: "/NailsLashStudioWeb/.vite/manifest.json"',
+      )
+      esperarElOriginalIntacto()
+    },
+    TIMEOUT_DE_UNA_PUERTA,
+  )
+})
+
+describe('@s72 (F-04) extremo a extremo, CONTROL: el humilde lista también las HTML', () => {
+  it(
+    '@s72 un <link> a la RAÍZ "/NailsLashStudioWeb/" de la copia resuelve a su "index.html" y la puerta sale con 0 y "✓ Puerta del cascarón"',
+    () => {
+      const copia = copiaDelArtefacto('copia-s72')
+
+      cambiarElHrefDelFavicon(copia, '/NailsLashStudioWeb/')
+
+      const { codigo, salida } = correrPuerta('cascaron', copia)
+      const index = indexDe(copia)
+
+      // ANCLA: el sabotaje está hecho, medido sobre los ficheros de la COPIA leídos del disco.
+      expect(bytesDelFichero(join(copia, 'index.html'))).toBeGreaterThan(0)
+      expect(linksConHref(index, '/NailsLashStudioWeb/')).toBe(1)
+      expect(linksConHref(index, HREF_DEL_FAVICON)).toBe(0)
+      expect(codigo, salida).toBe(0)
+      expect(salida).toContain('✓ Puerta del cascarón')
+      esperarElOriginalIntacto()
+    },
+    TIMEOUT_DE_UNA_PUERTA,
   )
 })

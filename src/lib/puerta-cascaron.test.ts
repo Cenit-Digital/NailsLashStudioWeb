@@ -14,11 +14,16 @@ import {
   descripcionDe,
   esNodo,
   extraerEnlaces,
+  extraerLinks,
+  type FicheroDelArtefacto,
   idsDeHeadings,
   langsDe,
   leerJsonLd,
+  type ListaDeFicheros,
   nodosDe,
   type PaginaArtefacto,
+  type ResultadoPuertaCascaron,
+  REGLAS_DEL_CASCARON,
   rutaDelFichero,
   tiposDe,
   RUTAS_ESPERADAS,
@@ -1740,5 +1745,1058 @@ describe('los últimos huecos de los extractores', () => {
 
     expect(resultado.codigoSalida).toBe(0)
     expect(resultado.lineas).toEqual([])
+  })
+})
+
+// =============================================================================================
+// ENMIENDA 5 (2026-10-01, H-5): todo <link> root-absoluto del artefacto resuelve, bajo la base, a
+// un fichero no vacío y que se publica. Escenarios de la PUERTA PURA: @s46-@s60, @s65, @s66, @s68 y
+// @s69 (features/cascaron_semantico.feature, sección de @s46). Los textos de las reglas y de las
+// líneas se escriben A MANO en cada fila, NUNCA se importan de producción (anti-tautología). Los
+// ayudantes son NUEVOS: `htmlCrudo`, `paginaCompleta`, `artefactoCon` y `ficheroDe` no cambian; el
+// <link> de cada fila se INSERTA en el HTML que ya devuelven.
+// =============================================================================================
+
+const BASE_DE_REFERENCIA = '/NailsLashStudioWeb/'
+
+/**
+ * LA LISTA DE REFERENCIA del contrato, escrita A MANO como `ubicación (bytes)`. SIN carpetas (ni
+ * `dist/x`, ni `dist/assets`, ni `dist/.vite`) y CON ocultos, como la del humilde (S-8). Los tres
+ * iconos y el manifiesto llevan los bytes del artefacto real; el resto es fixture, y solo importa 0
+ * frente a 1 o más.
+ */
+function listaDeReferencia(): FicheroDelArtefacto[] {
+  return [
+    { ubicacion: 'dist/index.html', bytes: 1500 },
+    { ubicacion: 'dist/favicon.ico', bytes: 1148 },
+    { ubicacion: 'dist/favicon.svg', bytes: 2244 },
+    { ubicacion: 'dist/apple-touch-icon.png', bytes: 3682 },
+    { ubicacion: 'dist/assets/app.css', bytes: 5000 },
+    { ubicacion: 'dist/assets/manrope.woff2', bytes: 20000 },
+    { ubicacion: 'dist/vacio.svg', bytes: 0 },
+    { ubicacion: 'dist/uno.svg', bytes: 1 },
+    { ubicacion: 'dist/x/index.html', bytes: 900 },
+    { ubicacion: 'dist/.vite/manifest.json', bytes: 8719 },
+    { ubicacion: 'dist/assets/.oculto.css', bytes: 300 },
+    { ubicacion: 'dist/.oculto-vacio.svg', bytes: 0 },
+  ]
+}
+
+/** El doble de la lista de ficheros: devuelve la que se le da y REGISTRA cada vez que la puerta la pide. */
+function dobleDeLaLista(ficheros: readonly FicheroDelArtefacto[] = listaDeReferencia()): {
+  readonly lista: ListaDeFicheros
+  readonly pedidas: () => number
+} {
+  let pedidas = 0
+
+  return {
+    lista: {
+      listar: () => {
+        pedidas += 1
+        return ficheros
+      },
+    },
+    pedidas: () => pedidas,
+  }
+}
+
+/** Inserta `elementos` justo antes del cierre del `<head>` (o del `<body>`) del HTML que se le da. */
+function conElementos(html: string, elementos: string, sitio: 'head' | 'body' = 'head'): string {
+  const cierre = `</${sitio}>`
+
+  return html.replace(cierre, () => `${elementos}${cierre}`)
+}
+
+function puertaSobreLaHome(
+  html: string,
+  peticion: { readonly base?: string | null; readonly ficheros?: ListaDeFicheros },
+): ResultadoPuertaCascaron {
+  return ejecutarPuertaDelCascaron({
+    artefacto: artefactoCon({ ubicacion: 'dist/index.html', contenido: html }),
+    rutasEsperadas: ['/'],
+    ...peticion,
+  })
+}
+
+describe('ejecutarPuertaDelCascaron → los <link> root-absolutos: el CONTROL (@s46)', () => {
+  // EL CAMINO FELIZ DE LA ENMIENDA: sin él, una puerta que acusara TODO <link> pasaría todos los
+  // escenarios negativos y rompería el build para siempre. Y el 2º `Then` ancla que la puerta MIRÓ
+  // la lista: un «0 líneas» sin haberla pedido no es estar protegidos, es no mirar.
+  it('@s46 un <link> de cada clase del artefacto real, todos con su fichero no vacío bajo la base, pasa la puerta', () => {
+    const html = conElementos(
+      htmlCrudo(),
+      [
+        '<link rel="icon" href="/NailsLashStudioWeb/favicon.ico" sizes="32x32">',
+        '<link rel="icon" href="/NailsLashStudioWeb/favicon.svg" type="image/svg+xml">',
+        '<link rel="apple-touch-icon" href="/NailsLashStudioWeb/apple-touch-icon.png">',
+        '<link rel="stylesheet" crossorigin href="/NailsLashStudioWeb/assets/app.css">',
+        '<link rel="preload" as="font" type="font/woff2" crossorigin href="/NailsLashStudioWeb/assets/manrope.woff2">',
+      ].join(''),
+    )
+    const doble = dobleDeLaLista()
+
+    const resultado = puertaSobreLaHome(html, { base: BASE_DE_REFERENCIA, ficheros: doble.lista })
+
+    expect(extraerLinks(html)).toEqual([
+      'https://example.invalid/',
+      '/NailsLashStudioWeb/favicon.ico',
+      '/NailsLashStudioWeb/favicon.svg',
+      '/NailsLashStudioWeb/apple-touch-icon.png',
+      '/NailsLashStudioWeb/assets/app.css',
+      '/NailsLashStudioWeb/assets/manrope.woff2',
+    ])
+    expect(doble.pedidas()).toBeGreaterThanOrEqual(1)
+    expect(resultado.codigoSalida).toBe(0)
+    expect(resultado.lineas).toEqual([])
+  })
+})
+
+/** «distinto de 0» del contrato: la puerta falla, con el código que sea. */
+const FALLA = 'distinto de 0'
+
+type CodigoEsperado = 0 | typeof FALLA
+
+/** El código de salida en la notación del contrato: 0, o «distinto de 0». */
+function enElContrato(codigoSalida: number): CodigoEsperado {
+  return codigoSalida === 0 ? 0 : FALLA
+}
+
+type FilaDeUnLink = readonly [href: string, codigo: CodigoEsperado, lineas: readonly string[]]
+
+/**
+ * Las filas de un solo <link rel="…" href="…"> en el <head> de la página correcta, con la base
+ * declarada "/NailsLashStudioWeb/" y la lista de referencia. El ANCLA va PRIMERO: sin ella, una fila
+ * «(ninguna)» pasaría EN VACÍO con un extractor que solo viera la canónica.
+ */
+function comprobarUnLink(
+  rel: string,
+  href: string,
+  codigo: CodigoEsperado,
+  lineas: readonly string[],
+): void {
+  const html = conElementos(htmlCrudo(), `<link rel="${rel}" href="${href}">`)
+
+  const resultado = puertaSobreLaHome(html, {
+    base: BASE_DE_REFERENCIA,
+    ficheros: dobleDeLaLista().lista,
+  })
+
+  expect(extraerLinks(html)).toContain(href)
+  expect(enElContrato(resultado.codigoSalida)).toBe(codigo)
+  expect(resultado.lineas).toEqual(lineas)
+}
+
+describe('ejecutarPuertaDelCascaron → regla 1: bajo una base declarada, un <link> root-absoluto SIN su prefijo falla cerrado (@s47)', () => {
+  it.each<FilaDeUnLink>([
+    ['/NailsLashStudioWeb/favicon.svg', 0, []],
+    ['/favicon.svg', FALLA, ['/ — link root-absoluto sin el prefijo de la base: "/favicon.svg"']],
+    [
+      '/no-existe.svg',
+      FALLA,
+      ['/ — link root-absoluto sin el prefijo de la base: "/no-existe.svg"'],
+    ],
+    ['/vacio.svg', FALLA, ['/ — link root-absoluto sin el prefijo de la base: "/vacio.svg"']],
+    [
+      '/NailsLashStudioWeb',
+      FALLA,
+      ['/ — link root-absoluto sin el prefijo de la base: "/NailsLashStudioWeb"'],
+    ],
+    [
+      '/nailslashstudioweb/favicon.svg',
+      FALLA,
+      ['/ — link root-absoluto sin el prefijo de la base: "/nailslashstudioweb/favicon.svg"'],
+    ],
+    [
+      '\u0020/favicon.svg',
+      FALLA,
+      ['/ — link root-absoluto sin el prefijo de la base: "\u0020/favicon.svg"'],
+    ],
+    [
+      '/otra-cosa/x.css',
+      FALLA,
+      ['/ — link root-absoluto sin el prefijo de la base: "/otra-cosa/x.css"'],
+    ],
+    ['/', FALLA, ['/ — link root-absoluto sin el prefijo de la base: "/"']],
+  ])('@s47 %j → %s', (href, codigo, lineas) => {
+    comprobarUnLink('icon', href, codigo, lineas)
+  })
+})
+
+describe('ejecutarPuertaDelCascaron → regla 2: con el prefijo, la ubicación que nombra la RUTA tiene que estar, LITERAL y con su caja, en la lista (@s48)', () => {
+  it.each<FilaDeUnLink>([
+    ['/NailsLashStudioWeb/assets/app.css', 0, []],
+    ['/NailsLashStudioWeb/favicon.svg?v=2', 0, []],
+    ['/NailsLashStudioWeb/favicon.svg#x', 0, []],
+    [
+      '/NailsLashStudioWeb/no-existe.svg',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/no-existe.svg"'],
+    ],
+    [
+      '/NailsLashStudioWeb/FAVICON.SVG',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/FAVICON.SVG"'],
+    ],
+    [
+      '/NailsLashStudioWeb/assets',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/assets"'],
+    ],
+    [
+      '/NailsLashStudioWeb/./favicon.svg',
+      FALLA,
+      [
+        '/ — link root-absoluto con %, &, barra invertida, // o segmentos . o .., que la puerta no interpreta: "/NailsLashStudioWeb/./favicon.svg"',
+      ],
+    ],
+    [
+      '/NailsLashStudioWeb/assets/../favicon.svg',
+      FALLA,
+      [
+        '/ — link root-absoluto con %, &, barra invertida, // o segmentos . o .., que la puerta no interpreta: "/NailsLashStudioWeb/assets/../favicon.svg"',
+      ],
+    ],
+    [
+      '/NailsLashStudioWeb//favicon.svg',
+      FALLA,
+      [
+        '/ — link root-absoluto con %, &, barra invertida, // o segmentos . o .., que la puerta no interpreta: "/NailsLashStudioWeb//favicon.svg"',
+      ],
+    ],
+    [
+      '/./favicon.svg',
+      FALLA,
+      [
+        '/ — link root-absoluto con %, &, barra invertida, // o segmentos . o .., que la puerta no interpreta: "/./favicon.svg"',
+      ],
+    ],
+    [
+      '/NailsLashStudioWeb/.../favicon.svg',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/.../favicon.svg"'],
+    ],
+    ['/NailsLashStudioWeb/favicon.svg?v=/../x', 0, []],
+    ['/NailsLashStudioWeb/favicon.svg#/./x', 0, []],
+    ['/NailsLashStudioWeb/favicon.svg#//x', 0, []],
+    [
+      '/NailsLashStudioWeb/x/..',
+      FALLA,
+      [
+        '/ — link root-absoluto con %, &, barra invertida, // o segmentos . o .., que la puerta no interpreta: "/NailsLashStudioWeb/x/.."',
+      ],
+    ],
+    [
+      '/NailsLashStudioWeb/.',
+      FALLA,
+      [
+        '/ — link root-absoluto con %, &, barra invertida, // o segmentos . o .., que la puerta no interpreta: "/NailsLashStudioWeb/."',
+      ],
+    ],
+  ])('@s48 %j → %s', (href, codigo, lineas) => {
+    comprobarUnLink('stylesheet', href, codigo, lineas)
+  })
+})
+
+describe('ejecutarPuertaDelCascaron → regla 3: el fichero existe pero pesa 0 bytes (@s49)', () => {
+  it.each<FilaDeUnLink>([
+    ['/NailsLashStudioWeb/uno.svg', 0, []],
+    [
+      '/NailsLashStudioWeb/vacio.svg',
+      FALLA,
+      ['/ — link root-absoluto a un fichero de 0 bytes en dist/: "/NailsLashStudioWeb/vacio.svg"'],
+    ],
+    [
+      '/NailsLashStudioWeb/vacio.svg?v=2',
+      FALLA,
+      [
+        '/ — link root-absoluto a un fichero de 0 bytes en dist/: "/NailsLashStudioWeb/vacio.svg?v=2"',
+      ],
+    ],
+  ])('@s49 %j → %s', (href, codigo, lineas) => {
+    comprobarUnLink('icon', href, codigo, lineas)
+  })
+})
+
+const LINEA_DE_LA_REGLA_4 =
+  '/ — link root-absoluto con %, &, barra invertida, // o segmentos . o .., que la puerta no interpreta: '
+
+describe('ejecutarPuertaDelCascaron → regla 4: un href con %, & o barra invertida, también AL PRINCIPIO, falla cerrado con su PROPIA regla (@s50)', () => {
+  it.each<FilaDeUnLink>([
+    ['/NailsLashStudioWeb/favicon.svg?v=2#x', 0, []],
+    [
+      '/NailsLashStudioWeb/favicon%2Esvg',
+      FALLA,
+      [`${LINEA_DE_LA_REGLA_4}"/NailsLashStudioWeb/favicon%2Esvg"`],
+    ],
+    [
+      '/NailsLashStudioWeb/favicon.svg?a=1&amp;b=2',
+      FALLA,
+      [`${LINEA_DE_LA_REGLA_4}"/NailsLashStudioWeb/favicon.svg?a=1&amp;b=2"`],
+    ],
+    ['/\u005Ccdn.ejemplo/x.css', FALLA, [`${LINEA_DE_LA_REGLA_4}"/\u005Ccdn.ejemplo/x.css"`]],
+    [
+      '/NailsLashStudioWeb\u005Cfavicon.svg',
+      FALLA,
+      [`${LINEA_DE_LA_REGLA_4}"/NailsLashStudioWeb\u005Cfavicon.svg"`],
+    ],
+    ['/favicon%2Esvg', FALLA, [`${LINEA_DE_LA_REGLA_4}"/favicon%2Esvg"`]],
+    [
+      '/NailsLashStudioWeb/no%20existe.svg',
+      FALLA,
+      [`${LINEA_DE_LA_REGLA_4}"/NailsLashStudioWeb/no%20existe.svg"`],
+    ],
+    ['\u005Cfavicon.svg', FALLA, [`${LINEA_DE_LA_REGLA_4}"\u005Cfavicon.svg"`]],
+    [
+      '\u005CNailsLashStudioWeb/favicon.svg',
+      FALLA,
+      [`${LINEA_DE_LA_REGLA_4}"\u005CNailsLashStudioWeb/favicon.svg"`],
+    ],
+    [
+      '\u005C\u005Ccdn.ejemplo/x.css',
+      FALLA,
+      [`${LINEA_DE_LA_REGLA_4}"\u005C\u005Ccdn.ejemplo/x.css"`],
+    ],
+    ['\u005C/cdn.ejemplo/x.css', FALLA, [`${LINEA_DE_LA_REGLA_4}"\u005C/cdn.ejemplo/x.css"`]],
+  ])('@s50 %j → %s', (href, codigo, lineas) => {
+    comprobarUnLink('icon', href, codigo, lineas)
+  })
+})
+
+/** La lista de referencia SIN "dist/index.html" (@s51). */
+function listaSinLaRaiz(): FicheroDelArtefacto[] {
+  return listaDeReferencia().filter((fichero) => fichero.ubicacion !== 'dist/index.html')
+}
+
+/** La lista de referencia con "dist/index.html" de 0 bytes (@s51). */
+function listaConLaRaizVacia(): FicheroDelArtefacto[] {
+  return listaDeReferencia().map((fichero) =>
+    fichero.ubicacion === 'dist/index.html' ? { ...fichero, bytes: 0 } : fichero,
+  )
+}
+
+/** «base declarada» o «ausente (sin base)»: el campo, o su AUSENCIA (nunca `undefined` explícito). */
+type BaseDeLaFila = { readonly base?: string | null }
+
+const CON_LA_BASE: BaseDeLaFila = { base: '/NailsLashStudioWeb/' }
+const SIN_BASE: BaseDeLaFila = {}
+
+describe('ejecutarPuertaDelCascaron → solo la RAÍZ del artefacto va a index.html, y se BUSCA en la lista (@s51)', () => {
+  it.each<
+    readonly [
+      base: BaseDeLaFila,
+      lista: () => FicheroDelArtefacto[],
+      href: string,
+      codigo: CodigoEsperado,
+      lineas: readonly string[],
+    ]
+  >([
+    [CON_LA_BASE, listaDeReferencia, '/NailsLashStudioWeb/', 0, []],
+    [SIN_BASE, listaDeReferencia, '/', 0, []],
+    [CON_LA_BASE, listaDeReferencia, '/NailsLashStudioWeb/x/index.html', 0, []],
+    [
+      CON_LA_BASE,
+      listaDeReferencia,
+      '/NailsLashStudioWeb/x/',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/x/"'],
+    ],
+    [
+      SIN_BASE,
+      listaDeReferencia,
+      '/x/',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/x/"'],
+    ],
+    [
+      CON_LA_BASE,
+      listaDeReferencia,
+      '/NailsLashStudioWeb/x',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/x"'],
+    ],
+    [
+      CON_LA_BASE,
+      listaSinLaRaiz,
+      '/NailsLashStudioWeb/',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/"'],
+    ],
+    [SIN_BASE, listaSinLaRaiz, '/', FALLA, ['/ — link root-absoluto sin fichero en dist/: "/"']],
+    [
+      CON_LA_BASE,
+      listaConLaRaizVacia,
+      '/NailsLashStudioWeb/',
+      FALLA,
+      ['/ — link root-absoluto a un fichero de 0 bytes en dist/: "/NailsLashStudioWeb/"'],
+    ],
+  ])('@s51 base %j, lista %O, %j → %s', (base, lista, href, codigo, lineas) => {
+    const html = conElementos(htmlCrudo(), `<link rel="alternate" href="${href}">`)
+    const doble = dobleDeLaLista(lista())
+
+    const resultado = puertaSobreLaHome(html, { ...base, ficheros: doble.lista })
+
+    expect(extraerLinks(html)).toContain(href)
+    expect(doble.pedidas()).toBeGreaterThanOrEqual(1)
+    expect(enElContrato(resultado.codigoSalida)).toBe(codigo)
+    expect(resultado.lineas).toEqual(lineas)
+  })
+})
+
+const NO_EXISTE = '/NailsLashStudioWeb/no-existe.svg'
+
+describe('ejecutarPuertaDelCascaron → el href se limpia como lo limpia el navegador, y la línea enseña el valor CRUDO (@s52)', () => {
+  it.each<FilaDeUnLink>([
+    ['\u0020/NailsLashStudioWeb/favicon.svg\u0020', 0, []],
+    ['\u0020\u000C/NailsLashStudioWeb/favicon.svg\u000C\u0020', 0, []],
+    ['\u0009/NailsLashStudioWeb/favicon.svg', 0, []],
+    ['/NailsLashStudioWeb/favicon.svg\u000A', 0, []],
+    ['\u000C/NailsLashStudioWeb/favicon.svg', 0, []],
+    ['/NailsLashStudioWeb/favicon.svg\u000D', 0, []],
+    ['/NailsLashStudioWeb/fav\u0009icon.svg', 0, []],
+    ['/NailsLashStudioWeb/fav\u000Aicon.svg', 0, []],
+    ['/NailsLashStudioWeb/fav\u000Dicon.svg', 0, []],
+    ['/NailsLashStudioWeb/favicon.svg\u0020\u0009\u0020\u000A\u0020\u000D\u0020', 0, []],
+    [
+      `\u0020${NO_EXISTE}`,
+      FALLA,
+      [`/ — link root-absoluto sin fichero en dist/: "\u0020${NO_EXISTE}"`],
+    ],
+    [
+      `\u000C${NO_EXISTE}`,
+      FALLA,
+      [`/ — link root-absoluto sin fichero en dist/: "\u000C${NO_EXISTE}"`],
+    ],
+    [
+      `\u0020\u000C${NO_EXISTE}`,
+      FALLA,
+      [`/ — link root-absoluto sin fichero en dist/: "\u0020\u000C${NO_EXISTE}"`],
+    ],
+    [
+      `\u0020\u0009\u0020\u000A\u0020\u000D\u0020${NO_EXISTE}`,
+      FALLA,
+      [
+        `/ — link root-absoluto sin fichero en dist/: "\u0020\u0009\u0020\u000A\u0020\u000D\u0020${NO_EXISTE}"`,
+      ],
+    ],
+    [
+      '/NailsLashStudioWeb/fav\u0020icon.svg',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/fav\u0020icon.svg"'],
+    ],
+    [
+      '/NailsLashStudioWeb/fav\u000Cicon.svg',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/fav\u000Cicon.svg"'],
+    ],
+  ])('@s52 %j → %s', (href, codigo, lineas) => {
+    const html = conElementos(htmlCrudo(), `<link rel="icon" href="${href}">`)
+    const doble = dobleDeLaLista()
+
+    const resultado = puertaSobreLaHome(html, { base: BASE_DE_REFERENCIA, ficheros: doble.lista })
+
+    expect(extraerLinks(html)).toContain(href)
+    expect(doble.pedidas()).toBeGreaterThanOrEqual(1)
+    expect(enElContrato(resultado.codigoSalida)).toBe(codigo)
+    expect(resultado.lineas).toEqual(lineas)
+  })
+})
+
+describe('ejecutarPuertaDelCascaron → lo que NO es root-absoluto no es de esta puerta, y ni siquiera pide la lista (@s53)', () => {
+  // Sin la lista A PROPÓSITO: si alguno se tomara por root-absoluto, la puerta no saldría con 0.
+  it.each<readonly [elemento: string, extraidos: readonly string[]]>([
+    [
+      '<link rel="stylesheet" href="//cdn.ejemplo/x.css">',
+      ['https://example.invalid/', '//cdn.ejemplo/x.css'],
+    ],
+    [
+      '<link rel="stylesheet" href="https://example.invalid/x.css">',
+      ['https://example.invalid/', 'https://example.invalid/x.css'],
+    ],
+    ['<link rel="icon" href="favicon.svg">', ['https://example.invalid/', 'favicon.svg']],
+    ['<link rel="stylesheet" href="./x.css">', ['https://example.invalid/', './x.css']],
+    ['<link rel="stylesheet" href="../x.css">', ['https://example.invalid/', '../x.css']],
+    ['<link rel="icon" href="">', ['https://example.invalid/', '']],
+    ['<link rel="icon">', ['https://example.invalid/']],
+  ])('@s53 %s', (elemento, extraidos) => {
+    const html = conElementos(htmlCrudo(), elemento)
+
+    const resultado = puertaSobreLaHome(html, { base: BASE_DE_REFERENCIA })
+
+    expect(extraerLinks(html)).toEqual(extraidos)
+    expect(resultado.codigoSalida).toBe(0)
+    expect(resultado.lineas).toEqual([])
+  })
+})
+
+describe('ejecutarPuertaDelCascaron → sin base declarada la ruta entera se resuelve; una base sin barra final CORTA con la línea de la base (@s54)', () => {
+  it.each<
+    readonly [base: BaseDeLaFila, href: string, codigo: CodigoEsperado, lineas: readonly string[]]
+  >([
+    [SIN_BASE, '/favicon.svg', 0, []],
+    [
+      SIN_BASE,
+      '/no-existe.svg',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/no-existe.svg"'],
+    ],
+    [
+      { base: null },
+      '/no-existe.svg',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/no-existe.svg"'],
+    ],
+    [
+      SIN_BASE,
+      '/vacio.svg',
+      FALLA,
+      ['/ — link root-absoluto a un fichero de 0 bytes en dist/: "/vacio.svg"'],
+    ],
+    [
+      SIN_BASE,
+      '/NailsLashStudioWeb/favicon.svg',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/favicon.svg"'],
+    ],
+    [
+      { base: '/NailsLashStudioWeb' },
+      '/NailsLashStudioWeb/favicon.svg',
+      FALLA,
+      [
+        'la base declarada no es una ruta root-absoluta acabada en / y hay elementos link root-absolutos que resolver: "/NailsLashStudioWeb"',
+      ],
+    ],
+  ])('@s54 base %j, %j → %s', (base, href, codigo, lineas) => {
+    const html = conElementos(htmlCrudo(), `<link rel="icon" href="${href}">`)
+
+    const resultado = puertaSobreLaHome(html, { ...base, ficheros: dobleDeLaLista().lista })
+
+    expect(extraerLinks(html)).toContain(href)
+    expect(enElContrato(resultado.codigoSalida)).toBe(codigo)
+    expect(resultado.lineas).toEqual(lineas)
+  })
+})
+
+/** ANCLA DE SITIO (@s55), medida A MANO sobre el texto y nunca con `cabezaDe`. */
+function respectoDelCierreDelHead(html: string, texto: string): 'ANTES' | 'DESPUÉS' {
+  return html.indexOf(texto) < html.indexOf('</head>') ? 'ANTES' : 'DESPUÉS'
+}
+
+describe('ejecutarPuertaDelCascaron → el href de TODO <link>, sea cual sea su rel, la caja de la etiqueta o su sitio en el documento (@s55)', () => {
+  const ROTO = '/NailsLashStudioWeb/no-existe'
+
+  it.each<readonly [sitio: 'head' | 'body', posicion: 'ANTES' | 'DESPUÉS', elemento: string]>([
+    ['head', 'ANTES', '<link rel="icon" href="/NailsLashStudioWeb/no-existe">'],
+    ['head', 'ANTES', '<link rel="apple-touch-icon" href="/NailsLashStudioWeb/no-existe">'],
+    ['head', 'ANTES', '<link rel="stylesheet" href="/NailsLashStudioWeb/no-existe">'],
+    ['head', 'ANTES', '<link rel="preload" as="font" href="/NailsLashStudioWeb/no-existe">'],
+    ['head', 'ANTES', '<link rel="modulepreload" href="/NailsLashStudioWeb/no-existe">'],
+    ['head', 'ANTES', '<link rel="manifest" href="/NailsLashStudioWeb/no-existe">'],
+    ['head', 'ANTES', '<link rel="alternate" hreflang="en" href="/NailsLashStudioWeb/no-existe">'],
+    ['head', 'ANTES', '<link rel="canonical" href="/NailsLashStudioWeb/no-existe">'],
+    ['head', 'ANTES', '<link rel="x-nls-inventado" href="/NailsLashStudioWeb/no-existe">'],
+    ['head', 'ANTES', '<link href="/NailsLashStudioWeb/no-existe">'],
+    ['head', 'ANTES', '<LINK REL="icon" HREF="/NailsLashStudioWeb/no-existe">'],
+    ['body', 'DESPUÉS', '<link rel="stylesheet" href="/NailsLashStudioWeb/no-existe">'],
+  ])('@s55 en el <%s> (%s de </head>): %s', (sitio, posicion, elemento) => {
+    const html = conElementos(htmlCrudo(), elemento, sitio)
+
+    const resultado = puertaSobreLaHome(html, {
+      base: BASE_DE_REFERENCIA,
+      ficheros: dobleDeLaLista().lista,
+    })
+
+    expect(extraerLinks(html)).toContain(ROTO)
+    expect(html.split('</head>')).toHaveLength(2)
+    expect(respectoDelCierreDelHead(html, ROTO)).toBe(posicion)
+    expect(resultado.codigoSalida).not.toBe(0)
+    expect(resultado.lineas).toEqual([
+      '/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/no-existe"',
+    ])
+  })
+})
+
+describe('ejecutarPuertaDelCascaron → el informe con los <link>: primero las líneas de hoy, después una por <link> roto (@s56)', () => {
+  it('@s56 en el orden de las páginas que da el listado y, dentro de cada una, en el de aparición, con la ruta de la página', () => {
+    const servicios = conElementos(
+      htmlCrudo({ canonica: 'https://example.invalid/servicios' }),
+      '<link rel="icon" href="/NailsLashStudioWeb/vacio.svg">',
+    )
+    const home = conElementos(
+      htmlCrudo({ title: null }),
+      [
+        '<link rel="icon" href="/favicon.svg">',
+        '<link rel="icon" href="/NailsLashStudioWeb/favicon.svg">',
+        '<link rel="icon" href="/favicon.svg">',
+        '<link rel="stylesheet" href="/NailsLashStudioWeb/no-existe.css">',
+      ].join(''),
+    )
+
+    const resultado = ejecutarPuertaDelCascaron({
+      artefacto: artefactoCon(
+        { ubicacion: 'dist/servicios/index.html', contenido: servicios },
+        { ubicacion: 'dist/index.html', contenido: home },
+      ),
+      rutasEsperadas: ['/', '/servicios'],
+      base: BASE_DE_REFERENCIA,
+      ficheros: dobleDeLaLista().lista,
+    })
+
+    expect(resultado.codigoSalida).not.toBe(0)
+    expect(resultado.lineas).toEqual([
+      '/ — title ausente o vacío: ""',
+      '/servicios — link root-absoluto a un fichero de 0 bytes en dist/: "/NailsLashStudioWeb/vacio.svg"',
+      '/ — link root-absoluto sin el prefijo de la base: "/favicon.svg"',
+      '/ — link root-absoluto sin el prefijo de la base: "/favicon.svg"',
+      '/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/no-existe.css"',
+    ])
+  })
+})
+
+const LINEA_SIN_LA_LISTA =
+  'la puerta no recibió la lista de ficheros del artefacto y hay elementos link root-absolutos que resolver'
+
+describe('ejecutarPuertaDelCascaron → sin la lista de ficheros, la puerta CORTA si hay algún <link> root-absoluto; si no, lo de hoy (@s57)', () => {
+  it.each<
+    readonly [
+      pagina: string,
+      opciones: OpcionesDeFixture,
+      elemento: string,
+      extraidos: readonly string[],
+      codigo: CodigoEsperado,
+      lineas: readonly string[],
+    ]
+  >([
+    [
+      'la página correcta con el favicon bajo la base',
+      {},
+      '<link rel="icon" href="/NailsLashStudioWeb/favicon.svg">',
+      ['https://example.invalid/', '/NailsLashStudioWeb/favicon.svg'],
+      FALLA,
+      [LINEA_SIN_LA_LISTA],
+    ],
+    [
+      'la página correcta SIN su <title> y con el favicon bajo la base',
+      { title: null },
+      '<link rel="icon" href="/NailsLashStudioWeb/favicon.svg">',
+      ['https://example.invalid/', '/NailsLashStudioWeb/favicon.svg'],
+      FALLA,
+      [LINEA_SIN_LA_LISTA],
+    ],
+    [
+      'la página correcta con /favicon.svg',
+      {},
+      '<link rel="icon" href="/favicon.svg">',
+      ['https://example.invalid/', '/favicon.svg'],
+      FALLA,
+      [LINEA_SIN_LA_LISTA],
+    ],
+    [
+      'la página correcta, sin ningún <link> root-absoluto',
+      {},
+      '',
+      ['https://example.invalid/'],
+      0,
+      [],
+    ],
+    [
+      'la página correcta SIN su <title>, sin ningún <link> root-absoluto',
+      { title: null },
+      '',
+      ['https://example.invalid/'],
+      FALLA,
+      ['/ — title ausente o vacío: ""'],
+    ],
+    [
+      'la página correcta con la barra invertida al principio',
+      {},
+      '<link rel="icon" href="\u005Cfavicon.svg">',
+      ['https://example.invalid/', '\u005Cfavicon.svg'],
+      FALLA,
+      [LINEA_SIN_LA_LISTA],
+    ],
+    [
+      'la página correcta con la barra invertida y luego "/", al principio',
+      {},
+      '<link rel="icon" href="\u005C/cdn.ejemplo/x.css">',
+      ['https://example.invalid/', '\u005C/cdn.ejemplo/x.css'],
+      FALLA,
+      [LINEA_SIN_LA_LISTA],
+    ],
+  ])('@s57 %s', (_pagina, opciones, elemento, extraidos, codigo, lineas) => {
+    const html = conElementos(htmlCrudo(opciones), elemento)
+
+    const resultado = puertaSobreLaHome(html, { base: BASE_DE_REFERENCIA })
+
+    expect(extraerLinks(html)).toEqual(extraidos)
+    expect(enElContrato(resultado.codigoSalida)).toBe(codigo)
+    expect(resultado.lineas).toEqual(lineas)
+  })
+})
+
+/** Una lista de ficheros cuyo método LANZA (@s58, @s66). */
+function listaQueLanza(): ListaDeFicheros {
+  return {
+    listar: () => {
+      throw new Error('EACCES: lista de prueba')
+    },
+  }
+}
+
+describe('ejecutarPuertaDelCascaron → la lista se pide SOLO si hay algún <link> root-absoluto, y si revienta, la rama de @s29 (@s58)', () => {
+  it.each<
+    readonly [
+      artefacto: string,
+      construir: () => ArtefactoDeProduccion,
+      codigo: CodigoEsperado,
+      lineas: readonly string[],
+    ]
+  >([
+    [
+      'un "dist/index.html" con la página correcta y el favicon bajo la base',
+      () =>
+        artefactoCon({
+          ubicacion: 'dist/index.html',
+          contenido: conElementos(
+            htmlCrudo(),
+            '<link rel="icon" href="/NailsLashStudioWeb/favicon.svg">',
+          ),
+        }),
+      FALLA,
+      ['la puerta del cascarón no pudo completar la inspección: EACCES: lista de prueba'],
+    ],
+    [
+      'un "dist/index.html" con la página correcta, sin ningún <link> root-absoluto',
+      () => artefactoCon(ficheroDe('dist/index.html')),
+      0,
+      [],
+    ],
+    [
+      'un dist/ que NO existe',
+      artefactoInexistente,
+      FALLA,
+      ['/ — ruta esperada sin HTML en dist/: ""'],
+    ],
+  ])('@s58 %s', (_artefacto, construir, codigo, lineas) => {
+    const resultado = ejecutarPuertaDelCascaron({
+      artefacto: construir(),
+      rutasEsperadas: ['/'],
+      base: BASE_DE_REFERENCIA,
+      ficheros: listaQueLanza(),
+    })
+
+    expect(enElContrato(resultado.codigoSalida)).toBe(codigo)
+    expect(resultado.lineas).toEqual(lineas)
+  })
+})
+
+/** La página correcta con un `<link rel="canonical">` SIN href en lugar de su canónica (@s59). */
+function conLaCanonicaSinHref(opciones: OpcionesDeFixture = {}): string {
+  return conElementos(htmlCrudo({ ...opciones, canonica: null }), '<link rel="canonical">')
+}
+
+const LINEA_DE_LA_GUARDA_DE_LINKS =
+  'no se inspeccionó ningún elemento link del artefacto: el extractor de href de link no encontró nada'
+
+describe('ejecutarPuertaDelCascaron → la guarda del extractor nuevo: sin ni un href de <link> en TODO el artefacto, falla cerrada (@s59)', () => {
+  it.each<
+    readonly [
+      artefacto: string,
+      paginas: () => readonly FicheroHtml[],
+      conLaLista: boolean,
+      rutas: readonly string[],
+      extraidos: readonly (readonly string[])[],
+      codigo: CodigoEsperado,
+      lineas: readonly string[],
+    ]
+  >([
+    [
+      'la canónica SIN href, con la lista',
+      () => [{ ubicacion: 'dist/index.html', contenido: conLaCanonicaSinHref() }],
+      true,
+      ['/'],
+      [[]],
+      FALLA,
+      [LINEA_DE_LA_GUARDA_DE_LINKS],
+    ],
+    [
+      'la canónica SIN href, SIN la lista',
+      () => [{ ubicacion: 'dist/index.html', contenido: conLaCanonicaSinHref() }],
+      false,
+      ['/'],
+      [[]],
+      FALLA,
+      [LINEA_DE_LA_GUARDA_DE_LINKS],
+    ],
+    [
+      'la canónica SIN href y SIN ningún <a href>',
+      () => [{ ubicacion: 'dist/index.html', contenido: conLaCanonicaSinHref({ enlaces: [] }) }],
+      true,
+      ['/'],
+      [[]],
+      FALLA,
+      ['no se inspeccionó ningún enlace del artefacto: el extractor de href no encontró nada'],
+    ],
+    [
+      'la canónica SIN href y SIN su <title>',
+      () => [{ ubicacion: 'dist/index.html', contenido: conLaCanonicaSinHref({ title: null }) }],
+      true,
+      ['/'],
+      [[]],
+      FALLA,
+      ['/ — title ausente o vacío: ""'],
+    ],
+    [
+      'la página correcta, tal cual',
+      () => [{ ubicacion: 'dist/index.html', contenido: htmlCrudo() }],
+      true,
+      ['/'],
+      [['https://example.invalid/']],
+      0,
+      [],
+    ],
+    [
+      'la canónica SIN href, más un <link> de href VACÍO',
+      () => [
+        {
+          ubicacion: 'dist/index.html',
+          contenido: conElementos(conLaCanonicaSinHref(), '<link rel="stylesheet" href="">'),
+        },
+      ],
+      true,
+      ['/'],
+      [['']],
+      0,
+      [],
+    ],
+    [
+      'la canónica SIN href, más un <link> RELATIVO',
+      () => [
+        {
+          ubicacion: 'dist/index.html',
+          contenido: conElementos(conLaCanonicaSinHref(), '<link rel="icon" href="favicon.svg">'),
+        },
+      ],
+      true,
+      ['/'],
+      [['favicon.svg']],
+      0,
+      [],
+    ],
+    [
+      'la página correcta en "/" y la canónica SIN href en "/servicios"',
+      () => [
+        { ubicacion: 'dist/index.html', contenido: htmlCrudo() },
+        { ubicacion: 'dist/servicios/index.html', contenido: conLaCanonicaSinHref() },
+      ],
+      true,
+      ['/', '/servicios'],
+      [['https://example.invalid/'], []],
+      0,
+      [],
+    ],
+  ])('@s59 %s', (_artefacto, paginas, conLaLista, rutas, extraidos, codigo, lineas) => {
+    const ficheros = paginas()
+
+    const resultado = ejecutarPuertaDelCascaron({
+      artefacto: artefactoCon(...ficheros),
+      rutasEsperadas: rutas,
+      base: BASE_DE_REFERENCIA,
+      ...(conLaLista ? { ficheros: dobleDeLaLista().lista } : {}),
+    })
+
+    expect(ficheros.map((fichero) => extraerLinks(fichero.contenido))).toEqual(extraidos)
+    expect(enElContrato(resultado.codigoSalida)).toBe(codigo)
+    expect(resultado.lineas).toEqual(lineas)
+  })
+})
+
+describe('REGLAS_DEL_CASCARON, la lista que vigila @s34, trae las cinco reglas nuevas (@s60)', () => {
+  // Una regla que faltara escaparía a @s34 en silencio. Los textos, escritos A MANO.
+  it('@s60 cada una de las cinco está exactamente 1 vez, y ninguna regla habla del origen ni de placeholders', () => {
+    const cinco = [
+      'link root-absoluto sin el prefijo de la base',
+      'link root-absoluto sin fichero en dist/',
+      'link root-absoluto a un fichero de 0 bytes en dist/',
+      'link root-absoluto con %, &, barra invertida, // o segmentos . o .., que la puerta no interpreta',
+      'link root-absoluto a un fichero oculto, que el despliegue no publica',
+    ]
+
+    expect(REGLAS_DEL_CASCARON).toContain('title ausente o vacío')
+    expect(REGLAS_DEL_CASCARON).toContain('href interno sin fichero en dist/')
+    expect(
+      cinco.map((texto) => REGLAS_DEL_CASCARON.filter((regla) => regla === texto).length),
+    ).toEqual([1, 1, 1, 1, 1])
+    expect(
+      REGLAS_DEL_CASCARON.filter(
+        (regla) => regla.includes('origen') || regla.includes('placeholder'),
+      ),
+    ).toEqual([])
+  })
+})
+
+describe('ejecutarPuertaDelCascaron → regla 5: un <link> a un fichero OCULTO falla cerrado aunque esté en la lista y pese más de 0 (@s65)', () => {
+  it.each<FilaDeUnLink>([
+    ['/NailsLashStudioWeb/favicon.svg', 0, []],
+    [
+      '/NailsLashStudioWeb/.vite/manifest.json',
+      FALLA,
+      [
+        '/ — link root-absoluto a un fichero oculto, que el despliegue no publica: "/NailsLashStudioWeb/.vite/manifest.json"',
+      ],
+    ],
+    [
+      '/NailsLashStudioWeb/assets/.oculto.css',
+      FALLA,
+      [
+        '/ — link root-absoluto a un fichero oculto, que el despliegue no publica: "/NailsLashStudioWeb/assets/.oculto.css"',
+      ],
+    ],
+    [
+      '/NailsLashStudioWeb/.oculto-vacio.svg',
+      FALLA,
+      [
+        '/ — link root-absoluto a un fichero oculto, que el despliegue no publica: "/NailsLashStudioWeb/.oculto-vacio.svg"',
+      ],
+    ],
+    [
+      '/NailsLashStudioWeb/.vite/no-existe.json',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/.vite/no-existe.json"'],
+    ],
+  ])('@s65 %j → %s', (href, codigo, lineas) => {
+    comprobarUnLink('icon', href, codigo, lineas)
+  })
+})
+
+describe('ejecutarPuertaDelCascaron → basta UN <link> root-absoluto en CUALQUIER página del artefacto (@s66)', () => {
+  it.each<readonly [lista: string, ficheros: () => ListaDeFicheros | undefined, linea: string]>([
+    [
+      'la lista de referencia',
+      () => dobleDeLaLista().lista,
+      '/servicios — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/no-existe.css"',
+    ],
+    ['una petición que NO trae la lista de ficheros', () => undefined, LINEA_SIN_LA_LISTA],
+    [
+      'una lista de ficheros cuyo método LANZA',
+      listaQueLanza,
+      'la puerta del cascarón no pudo completar la inspección: EACCES: lista de prueba',
+    ],
+  ])('@s66 con %s', (_lista, ficheros, linea) => {
+    const home = htmlCrudo()
+    const servicios = conElementos(
+      htmlCrudo({ canonica: 'https://example.invalid/servicios' }),
+      '<link rel="stylesheet" href="/NailsLashStudioWeb/no-existe.css">',
+    )
+    const lista = ficheros()
+
+    const resultado = ejecutarPuertaDelCascaron({
+      artefacto: artefactoCon(
+        { ubicacion: 'dist/index.html', contenido: home },
+        { ubicacion: 'dist/servicios/index.html', contenido: servicios },
+      ),
+      rutasEsperadas: ['/', '/servicios'],
+      base: BASE_DE_REFERENCIA,
+      ...(lista === undefined ? {} : { ficheros: lista }),
+    })
+
+    expect([extraerLinks(home), extraerLinks(servicios)]).toEqual([
+      ['https://example.invalid/'],
+      ['https://example.invalid/servicios', '/NailsLashStudioWeb/no-existe.css'],
+    ])
+    expect(resultado.codigoSalida).not.toBe(0)
+    expect(resultado.lineas).toEqual([linea])
+  })
+})
+
+/** La línea del corte por base NO UTILIZABLE (S-12), con la base TAL CUAL. */
+function lineaDeLaBase(base: string): string {
+  return `la base declarada no es una ruta root-absoluta acabada en / y hay elementos link root-absolutos que resolver: "${base}"`
+}
+
+describe('ejecutarPuertaDelCascaron → S-12: con una base declarada NO UTILIZABLE y algún <link> root-absoluto, CORTA sin pedir la lista; sin ninguno, lo de hoy (@s68)', () => {
+  const FAVICON = '<link rel="icon" href="/NailsLashStudioWeb/favicon.svg">'
+  const CON_EL_FAVICON = ['https://example.invalid/', '/NailsLashStudioWeb/favicon.svg']
+
+  it.each<
+    readonly [
+      base: string,
+      elemento: string,
+      extraidos: readonly string[],
+      pedidas: 'ninguna' | 'al menos 1',
+      codigo: CodigoEsperado,
+      lineas: readonly string[],
+    ]
+  >([
+    ['./', FAVICON, CON_EL_FAVICON, 'ninguna', FALLA, [lineaDeLaBase('./')]],
+    ['', FAVICON, CON_EL_FAVICON, 'ninguna', FALLA, [lineaDeLaBase('')]],
+    [
+      '//cdn.tercero.com/',
+      FAVICON,
+      CON_EL_FAVICON,
+      'ninguna',
+      FALLA,
+      [lineaDeLaBase('//cdn.tercero.com/')],
+    ],
+    [
+      '/NailsLashStudioWeb/ })',
+      FAVICON,
+      CON_EL_FAVICON,
+      'ninguna',
+      FALLA,
+      [lineaDeLaBase('/NailsLashStudioWeb/ })')],
+    ],
+    [
+      'process.env.PAGES_BASE_PATH ?? /',
+      FAVICON,
+      CON_EL_FAVICON,
+      'ninguna',
+      FALLA,
+      [lineaDeLaBase('process.env.PAGES_BASE_PATH ?? /')],
+    ],
+    [
+      'https://cdn.ejemplo/',
+      FAVICON,
+      CON_EL_FAVICON,
+      'ninguna',
+      FALLA,
+      [lineaDeLaBase('https://cdn.ejemplo/')],
+    ],
+    [
+      '/',
+      '<link rel="icon" href="/favicon.svg">',
+      ['https://example.invalid/', '/favicon.svg'],
+      'al menos 1',
+      0,
+      [],
+    ],
+    ['./', '', ['https://example.invalid/'], 'ninguna', 0, []],
+  ])('@s68 base %j, %j', (base, elemento, extraidos, pedidas, codigo, lineas) => {
+    const html = conElementos(htmlCrudo(), elemento)
+    const doble = dobleDeLaLista()
+
+    const resultado = puertaSobreLaHome(html, { base, ficheros: doble.lista })
+
+    expect(extraerLinks(html)).toEqual(extraidos)
+    expect(doble.pedidas() === 0 ? 'ninguna' : 'al menos 1').toBe(pedidas)
+    expect(enElContrato(resultado.codigoSalida)).toBe(codigo)
+    expect(resultado.lineas).toEqual(lineas)
+  })
+})
+
+describe('ejecutarPuertaDelCascaron → S-12 va DESPUÉS del corte por lista ausente (@s69)', () => {
+  it('@s69 con una base no utilizable, algún <link> root-absoluto y SIN la lista, sale SOLO la línea de la lista', () => {
+    const html = conElementos(
+      htmlCrudo(),
+      '<link rel="icon" href="/NailsLashStudioWeb/favicon.svg">',
+    )
+
+    const resultado = puertaSobreLaHome(html, { base: './' })
+
+    expect(extraerLinks(html)).toEqual([
+      'https://example.invalid/',
+      '/NailsLashStudioWeb/favicon.svg',
+    ])
+    expect(resultado.codigoSalida).not.toBe(0)
+    expect(resultado.lineas).toEqual([LINEA_SIN_LA_LISTA])
   })
 })
