@@ -184,3 +184,21 @@
 - REFACTOR: los candidatos se calculaban dos veces → `candidatosDe(paginas)` (tipo `Candidato`: ruta
   lógica de la página y `href` crudo) una sola vez en `inspeccionarArtefacto`; `violacionesDeLinks` recibe
   los candidatos y el corte usa `candidatos.length > 0`. 309 passed; `tsc` 0; `prettier` limpio.
+
+### C14 · @s58 (la lista se pide SOLO con candidatos; si revienta, la rama de @s29; 3 filas)
+
+- Test: las 3 filas con una lista cuyo método LANZA `EACCES: lista de prueba` (ayudante NUEVO
+  `listaQueLanza`); el `dist/` ausente es el `artefactoInexistente` de @s26, que no cambia.
+- ROJO visto: 2 failed: sin candidatos (`expected 'distinto de 0' to be +0`: la trampa de C1 pedía la
+  lista SIEMPRE y la puerta caía por la rama de @s29) y con `dist/` ausente (`expected [ Array(1) ] to
+  deeply equal [ Array(1) ]`: la línea de @s29 en vez de la de @s26). La fila 1 (con candidato) en verde.
+- VERDE mínimo: la FORMA E del mapa, tal cual: `let ubicaciones = new Map()`; `if (candidatos.length > 0)
+  { if (ficheros === undefined) return <corte S-3>; ubicaciones = new Map(ficheros.listar()…) }`; y las
+  reglas se evalúan SIEMPRE sobre los candidatos, sin otro `if`. Fuera el `ficheros !== undefined` de C1:
+  ni `?.`, ni `??`, ni `!`, ni un `[]` por defecto sobre `ficheros`. 312 passed; `tsc` 0; `prettier`
+  limpio.
+- SABOTAJES pendientes de C8 (ahora el 2º `Then` de @s52 muerde): sin FF en la clase del recorte, 4
+  failed (los controles `SP FF … FF SP` y `FF …`, por «la lista se pidió», y las dos filas con FF al
+  principio, por sus líneas); sin TAB en las dos clases, 4 failed (el control `TAB …`, por «la lista se
+  pidió», `fav TAB icon`, los siete del final y los siete del principio). Revertidos: 312 passed.
+- REFACTOR: ninguno (la forma E ya es la definitiva del cableado).

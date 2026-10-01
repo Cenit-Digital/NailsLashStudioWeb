@@ -979,19 +979,18 @@ function inspeccionarArtefacto(peticion: PeticionPuertaCascaron): ResultadoPuert
   }
 
   const candidatos = candidatosDe(paginas)
-
-  if (candidatos.length > 0 && ficheros === undefined) {
-    return {
-      codigoSalida: CODIGO_FALLO,
-      lineas: [
-        'la puerta no recibió la lista de ficheros del artefacto y hay elementos link root-absolutos que resolver',
-      ],
-    }
-  }
-
   let ubicaciones = new Map<string, number>()
 
-  if (ficheros !== undefined) {
+  if (candidatos.length > 0) {
+    if (ficheros === undefined) {
+      return {
+        codigoSalida: CODIGO_FALLO,
+        lineas: [
+          'la puerta no recibió la lista de ficheros del artefacto y hay elementos link root-absolutos que resolver',
+        ],
+      }
+    }
+
     ubicaciones = new Map(ficheros.listar().map((fichero) => [fichero.ubicacion, fichero.bytes]))
   }
 

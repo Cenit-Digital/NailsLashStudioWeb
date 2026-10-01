@@ -2431,3 +2431,59 @@ describe('ejecutarPuertaDelCascaron → sin la lista de ficheros, la puerta CORT
     expect(resultado.lineas).toEqual(lineas)
   })
 })
+
+/** Una lista de ficheros cuyo método LANZA (@s58, @s66). */
+function listaQueLanza(): ListaDeFicheros {
+  return {
+    listar: () => {
+      throw new Error('EACCES: lista de prueba')
+    },
+  }
+}
+
+describe('ejecutarPuertaDelCascaron → la lista se pide SOLO si hay algún <link> root-absoluto, y si revienta, la rama de @s29 (@s58)', () => {
+  it.each<
+    readonly [
+      artefacto: string,
+      construir: () => ArtefactoDeProduccion,
+      codigo: CodigoEsperado,
+      lineas: readonly string[],
+    ]
+  >([
+    [
+      'un "dist/index.html" con la página correcta y el favicon bajo la base',
+      () =>
+        artefactoCon({
+          ubicacion: 'dist/index.html',
+          contenido: conElementos(
+            htmlCrudo(),
+            '<link rel="icon" href="/NailsLashStudioWeb/favicon.svg">',
+          ),
+        }),
+      FALLA,
+      ['la puerta del cascarón no pudo completar la inspección: EACCES: lista de prueba'],
+    ],
+    [
+      'un "dist/index.html" con la página correcta, sin ningún <link> root-absoluto',
+      () => artefactoCon(ficheroDe('dist/index.html')),
+      0,
+      [],
+    ],
+    [
+      'un dist/ que NO existe',
+      artefactoInexistente,
+      FALLA,
+      ['/ — ruta esperada sin HTML en dist/: ""'],
+    ],
+  ])('@s58 %s', (_artefacto, construir, codigo, lineas) => {
+    const resultado = ejecutarPuertaDelCascaron({
+      artefacto: construir(),
+      rutasEsperadas: ['/'],
+      base: BASE_DE_REFERENCIA,
+      ficheros: listaQueLanza(),
+    })
+
+    expect(enElContrato(resultado.codigoSalida)).toBe(codigo)
+    expect(resultado.lineas).toEqual(lineas)
+  })
+})
