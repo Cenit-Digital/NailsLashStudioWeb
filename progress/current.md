@@ -124,4 +124,5 @@ el contrato son los invariantes I-1..I-7 de `progress/brief_deuda_favicon_legibi
   - los menores 2 y 3, en `a48a296` (`puntoMedio` en `pathDe` y `FACTOR_DE_LA_LOCA_CORTA`), con I-1, I-2,
     I-3, I-4 (27/27 iguales a la ronda 1) e I-5 medidos de nuevo, y las equivalencias de la fuente;
   - los menores 1, 4 y 5 y las discrepancias del verificador, corregidos en la bitácora;
-  - falta I-6 (`harness init` completo), que corre el lead, y el push de la ronda 2.
+  - falta I-6 (`harness init` completo), que corre el lead, y el push de los commits de la bitácora
+    (`a48a296` ya está en `origin`: lo empujó otro actor a las 12:49:46).

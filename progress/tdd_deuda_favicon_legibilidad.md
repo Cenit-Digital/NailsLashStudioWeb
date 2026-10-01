@@ -576,8 +576,10 @@ Ningún menor queda como deuda nueva: los 5 están resueltos.
   - `a48a296`: menores 2 y 3;
   - y el de esta bitácora (§10: menores 1, 4 y 5, y las discrepancias del verificador).
 - Push y PR, medidos en la ronda 2 (aquí decía «Sin push y sin PR», y lo del push era falso):
-  - el reflog de `origin/claude/bold-liskov-c3323b` registra cuatro «update by push»: `0b7cd62` (11:57:38),
-    `e99f02a` (12:07:29), `d5ed7af` (12:15:42) y `3a00169` (12:29:42);
-  - los dos commits de la ronda 2 quedan sin push al cerrar esta ronda: el push es cosa del lead;
+  - el reflog de `origin/claude/bold-liskov-c3323b` registra cinco «update by push»: `0b7cd62` (11:57:38),
+    `e99f02a` (12:07:29), `d5ed7af` (12:15:42), `3a00169` (12:29:42) y `a48a296` (12:49:46);
+  - esta sesión no hizo ningún push: `a48a296` (creado a las 12:34:19) lo empujó otro actor mientras se
+    escribía esta bitácora, y los commits de la bitácora (`d7a3233` y su corrección) quedaban sin push al
+    cerrar; lo comprueba el lead;
   - PR, ninguna: `gh pr list --head claude/bold-liskov-c3323b --state all` da `[]`.
 - Árbol de trabajo limpio; `public/` sin tocar.
