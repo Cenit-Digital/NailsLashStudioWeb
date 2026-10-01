@@ -583,8 +583,18 @@ export const REGLA_LINK_VACIO = 'link root-absoluto a un fichero de 0 bytes en d
 export const REGLA_LINK_NO_INTERPRETA =
   'link root-absoluto con %, &, barra invertida, // o segmentos . o .., que la puerta no interpreta'
 
+/**
+ * LA LIMPIEZA DEL NAVEGADOR (H5-2; https://url.spec.whatwg.org/#concept-basic-url-parser), en su
+ * orden: se RECORTAN de los extremos los espacios ASCII (TAB, LF, FF, CR y espacio) y después se
+ * QUITAN, en cualquier sitio, TAB, LF y CR. jsdom conserva esos espacios al serializar (medido) y el
+ * navegador los recorta: sin esto, " /favicon.svg" pasaría por relativo (falso negativo). Lo que se
+ * quita dentro va SIN el cuantificador `+`: con la bandera `g`, quitarlo sería un mutante equivalente.
+ */
+const ESPACIOS_ASCII_EN_LOS_EXTREMOS = /^[\t\n\f\r ]+|[\t\n\f\r ]+$/g
+const TABULADOR_O_SALTO_DE_LINEA = /[\t\n\r]/g
+
 function limpiar(href: string): string {
-  return href.replace(/^ /, '')
+  return href.replace(ESPACIOS_ASCII_EN_LOS_EXTREMOS, '').replace(TABULADOR_O_SALTO_DE_LINEA, '')
 }
 
 const BARRA_INVERTIDA = '\\'

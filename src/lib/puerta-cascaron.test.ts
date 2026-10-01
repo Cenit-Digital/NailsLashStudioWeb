@@ -2140,3 +2140,62 @@ describe('ejecutarPuertaDelCascaron → solo la RAÍZ del artefacto va a index.h
     expect(resultado.lineas).toEqual(lineas)
   })
 })
+
+const NO_EXISTE = '/NailsLashStudioWeb/no-existe.svg'
+
+describe('ejecutarPuertaDelCascaron → el href se limpia como lo limpia el navegador, y la línea enseña el valor CRUDO (@s52)', () => {
+  it.each<FilaDeUnLink>([
+    ['\u0020/NailsLashStudioWeb/favicon.svg\u0020', 0, []],
+    ['\u0020\u000C/NailsLashStudioWeb/favicon.svg\u000C\u0020', 0, []],
+    ['\u0009/NailsLashStudioWeb/favicon.svg', 0, []],
+    ['/NailsLashStudioWeb/favicon.svg\u000A', 0, []],
+    ['\u000C/NailsLashStudioWeb/favicon.svg', 0, []],
+    ['/NailsLashStudioWeb/favicon.svg\u000D', 0, []],
+    ['/NailsLashStudioWeb/fav\u0009icon.svg', 0, []],
+    ['/NailsLashStudioWeb/fav\u000Aicon.svg', 0, []],
+    ['/NailsLashStudioWeb/fav\u000Dicon.svg', 0, []],
+    ['/NailsLashStudioWeb/favicon.svg\u0020\u0009\u0020\u000A\u0020\u000D\u0020', 0, []],
+    [
+      `\u0020${NO_EXISTE}`,
+      FALLA,
+      [`/ — link root-absoluto sin fichero en dist/: "\u0020${NO_EXISTE}"`],
+    ],
+    [
+      `\u000C${NO_EXISTE}`,
+      FALLA,
+      [`/ — link root-absoluto sin fichero en dist/: "\u000C${NO_EXISTE}"`],
+    ],
+    [
+      `\u0020\u000C${NO_EXISTE}`,
+      FALLA,
+      [`/ — link root-absoluto sin fichero en dist/: "\u0020\u000C${NO_EXISTE}"`],
+    ],
+    [
+      `\u0020\u0009\u0020\u000A\u0020\u000D\u0020${NO_EXISTE}`,
+      FALLA,
+      [
+        `/ — link root-absoluto sin fichero en dist/: "\u0020\u0009\u0020\u000A\u0020\u000D\u0020${NO_EXISTE}"`,
+      ],
+    ],
+    [
+      '/NailsLashStudioWeb/fav\u0020icon.svg',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/fav\u0020icon.svg"'],
+    ],
+    [
+      '/NailsLashStudioWeb/fav\u000Cicon.svg',
+      FALLA,
+      ['/ — link root-absoluto sin fichero en dist/: "/NailsLashStudioWeb/fav\u000Cicon.svg"'],
+    ],
+  ])('@s52 %j → %s', (href, codigo, lineas) => {
+    const html = conElementos(htmlCrudo(), `<link rel="icon" href="${href}">`)
+    const doble = dobleDeLaLista()
+
+    const resultado = puertaSobreLaHome(html, { base: BASE_DE_REFERENCIA, ficheros: doble.lista })
+
+    expect(extraerLinks(html)).toContain(href)
+    expect(doble.pedidas()).toBeGreaterThanOrEqual(1)
+    expect(enElContrato(resultado.codigoSalida)).toBe(codigo)
+    expect(resultado.lineas).toEqual(lineas)
+  })
+})

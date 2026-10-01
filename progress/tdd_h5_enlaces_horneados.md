@@ -114,3 +114,20 @@
   nunca con una regex anclada a `^`); resto vacío → `dist/index.html` (`ENTRADA_DE_LA_RAIZ`), que se
   busca en la lista como cualquier otra ubicación. 260 passed; `tsc` 0; `prettier` limpio.
 - REFACTOR: la `ubicacion` sale a su propia constante (la usará la regla 5). En verde.
+
+### C8 · @s52 (la limpieza del navegador; el valor CRUDO en la línea; 16 filas)
+
+- Test: las 16 filas con sus escapes (TAB `u0009`, LF `u000A`, FF `u000C`, CR `u000D`, espacio `u0020`)
+  y el 2º `Then` («la lista se pidió ≥ 1 vez») en cada una. 77 barras en el test tras escribirlo.
+- ROJO visto: 10 failed. Las de control que conservaban un carácter (`expected 'distinto de 0' to be
+  +0`: daban la regla 2 de `favicon.svg ` o de `fav` + TAB + `icon.svg`) y las de FF o varios caracteres
+  al principio (`expected +0 to be 'distinto de 0'`: el `href` quedaba FUERA, sin línea: la falla
+  abierta). Seis en verde a la primera: tres con línea que ya cuadraban (un solo espacio inicial, y el
+  espacio y el FF de DENTRO, que no se quitan) y tres CONTROLES que empiezan por TAB, FF o espacio + FF
+  (quedaban fuera con 0 líneas, como esperan, y su 2º `Then` pasaba solo porque la trampa de C1 pide la
+  lista SIEMPRE que la hay). Esos tres se vuelven a medir con sabotaje en C13, cuando la lista se pida
+  solo con candidatos.
+- VERDE mínimo: `limpiar` = recorte de `^[TAB LF FF CR espacio]+|[…]+$` (bandera `g`) y, DESPUÉS, quitar
+  `[TAB LF CR]` (bandera `g`, SIN `+`), el orden de WHATWG. Barras contadas: producción de 55 a 66 (8 + 3).
+  276 passed; `tsc` 0.
+- REFACTOR: `prettier --write` juntó una fila del test (barras: 77, sin cambios). En verde.
