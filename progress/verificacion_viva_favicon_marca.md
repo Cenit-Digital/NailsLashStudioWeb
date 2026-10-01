@@ -21,7 +21,7 @@
   no la página): en la primera pasada su evento `response` no vio el `404 /favicon.ico` que el servidor sí
   registró. Por eso cada sitio se sirve detrás de un registro propio de peticiones, que es la prueba de @s9.
 - **Perfil nuevo** por sitio y por pasada (sin caché de favicons).
-- **Datos crudos** de las pasadas finales, saneados de rutas locales: `verificacion_viva_favicon_marca/datos/` (`s9-vite-preview.json`, `s9-servidor-tipo-pages-y-sonda-vite-preview.json`, `s10-cobertura-de-tinta.json` y `s9-web-publicada-antes.json`).
+- **Datos crudos** de las pasadas finales, saneados de rutas locales: `verificacion_viva_favicon_marca/datos/` (`s9-vite-preview.json`, `s9-servidor-tipo-pages-y-sonda-vite-preview.json`, `s10-cobertura-de-tinta.json`, `s9-web-publicada-antes.json` y `s9-web-publicada-despues.json`).
 
 ## 1. ¿`vite preview` da 404 fuera de la base? Sí [V]
 
@@ -88,7 +88,15 @@ C = Σ t·α/255, con t la proyección del RGB sobre `--accent-soft` (#F7DDE8) �
   la consola muestra «Failed to load resource: the server responded with a status of 404 ()» en
   `https://cenit-digital.github.io/favicon.ico` (el H-2, reproducido en producción); el `/favicon.ico` de la
   raíz da 404, y las tres rutas del icono bajo la base también (aún no estaban publicadas).
-- **DESPUÉS**: se anota tras publicar F-28 (Pablo autorizó al lead a aprobar el despliegue el 2026-10-01).
+- **DESPUÉS** [V, 10:51, `main` = `2a49c14`, PR #18 fusionada y desplegada; el lead aprobó el entorno
+  `github-pages` con autorización de Pablo]: con Chromium 153 con ventana y perfil nuevo, la primera carga
+  de https://cenit-digital.github.io/NailsLashStudioWeb/ deja la consola **vacía** (0 errores, 0 avisos, 0
+  «Failed to load resource») y ninguna de las 13 respuestas que ve Playwright es un 404 (la petición del favicon la hace el navegador y no está entre ellas: su prueba es la consola vacía); el DOM declara los tres `<link>` con la base
+  (`/NailsLashStudioWeb/favicon.ico`, `favicon.svg` y `apple-touch-icon.png`), y las tres rutas responden
+  **200** (`image/vnd.microsoft.icon`, `image/svg+xml` e `image/png`). La pestaña muestra la «N»:
+  `verificacion_viva_favicon_marca/pestana-web-publicada.png`. Datos: `datos/s9-web-publicada-despues.json`.
+  El `/favicon.ico` de la RAÍZ del dominio de la organización sigue dando 404 si se pide a mano (fuera de
+  alcance por contrato), pero Chrome ya no lo pide: **el H-2 queda cerrado en producción**.
 
 ## 5. Incidencias de la medida (corregidas y declaradas)
 
