@@ -1,0 +1,60 @@
+{
+  "fecha": "2026-10-01T17:21:28.850Z",
+  "home": "https://cenit-digital.github.io/NailsLashStudioWeb/",
+  "httpHome": 200,
+  "html": {
+    "bytes": 59330,
+    "sha256": "b8f43e321d1bd1cadbaa48a0d854b3b0ba27f8b187fd05dfeb02663d414263a4"
+  },
+  "linksConHref": 11,
+  "rootAbsolutos": 10,
+  "filas": [
+    {
+      "href": "/NailsLashStudioWeb/favicon.ico",
+      "estado": 200
+    },
+    {
+      "href": "/NailsLashStudioWeb/favicon.svg",
+      "estado": 200
+    },
+    {
+      "href": "/NailsLashStudioWeb/apple-touch-icon.png",
+      "estado": 200
+    },
+    {
+      "href": "/NailsLashStudioWeb/assets/app-VyTVqhjc.css",
+      "estado": 200
+    },
+    {
+      "href": "/NailsLashStudioWeb/assets/manrope-latin-400-normal-PaqtzbVb.woff2",
+      "estado": 200
+    },
+    {
+      "href": "/NailsLashStudioWeb/assets/manrope-latin-500-normal-BYYD-dBL.woff2",
+      "estado": 200
+    },
+    {
+      "href": "/NailsLashStudioWeb/assets/manrope-latin-600-normal-4f0koTD-.woff2",
+      "estado": 200
+    },
+    {
+      "href": "/NailsLashStudioWeb/assets/manrope-latin-700-normal-BZp_XxE4.woff2",
+      "estado": 200
+    },
+    {
+      "href": "/NailsLashStudioWeb/assets/gilda-display-latin-400-normal-gyfWcafy.woff2",
+      "estado": 200
+    },
+    {
+      "href": "/NailsLashStudioWeb/assets/great-vibes-latin-400-normal-q5-78SH_.woff2",
+      "estado": 200
+    }
+  ],
+  "contraprueba": {
+    "url": "https://cenit-digital.github.io/favicon.svg",
+    "estado": 404
+  },
+  "ancla": true,
+  "todos200": true,
+  "contraprueba404": true
+}
