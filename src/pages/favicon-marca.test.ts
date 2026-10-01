@@ -402,6 +402,8 @@ const TIPO_RGB = 2
 const TIPO_RGBA = 6
 const CANALES_RGB = 3
 const CANALES_RGBA = 4
+/** En RGBA, el alfa va detrás de las tres muestras de color. */
+const POSICION_DEL_ALFA = CANALES_RGB
 const CANALES_POR_TIPO: ReadonlyMap<number, number> = new Map([
   [TIPO_RGB, CANALES_RGB],
   [TIPO_RGBA, CANALES_RGBA],
@@ -484,8 +486,8 @@ function aRgba(muestras: Uint8Array, canales: number): Uint8Array {
   const rgba = new Uint8Array(pixeles * CANALES_RGBA)
 
   for (let p = 0; p < pixeles; p++) {
-    rgba.set(muestras.subarray(p * canales, p * canales + 3), p * CANALES_RGBA)
-    rgba[p * CANALES_RGBA + 3] = ALFA_OPACO
+    rgba.set(muestras.subarray(p * canales, p * canales + CANALES_RGB), p * CANALES_RGBA)
+    rgba[p * CANALES_RGBA + POSICION_DEL_ALFA] = ALFA_OPACO
   }
 
   return rgba
@@ -607,7 +609,7 @@ function pixelEn(raster: Raster, x: number, y: number): Pixel {
     x,
     y,
     rgb: [raster.rgba[i], raster.rgba[i + 1], raster.rgba[i + 2]],
-    alfa: raster.rgba[i + 3],
+    alfa: raster.rgba[i + POSICION_DEL_ALFA],
   }
 }
 
