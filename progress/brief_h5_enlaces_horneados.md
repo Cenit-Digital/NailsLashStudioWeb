@@ -121,3 +121,26 @@ fichero en dist/'`, @s23/@s24) y de la resolución bajo `base` (ENMIENDA 1, @s36
   `src/pages/home-horneado.test.ts` (~línea 497), que corre `tools/puerta-<x>.ts` con `NLS_DIST_DIR`.
 - Reproducción manual de H-5 (sin ensuciar el árbol): copiar `public/favicon.svg` fuera, borrarlo,
   `NLS_DIST_DIR=<temporal> pnpm build`, restaurarlo y comprobar `git status` limpio.
+
+## 8. Decisiones del humano (puerta de diseño, Pablo, AskUserQuestion, 2026-10-01 ~11:50)
+
+Tomadas sobre las recomendaciones FINALES de `progress/verificacion_decisiones_h5.md` (que corrige este brief
+en 19 puntos y prevalece sobre §2-§6 donde difieran):
+
+1. **Dueño: F-04 `cascaron_semantico`, ENMIENDA 5** desde @s46. El puerto que lista los ficheros entra como
+   campo OPCIONAL de `PeticionPuertaCascaron` que falla cerrado si falta y hay algún `<link>` que comprobar
+   (precedente `base?`); no se toca F-06. FS-6 NO es argumento (era una decisión acotada a F-28); el texto
+   «deuda de F-05» del cierre de F-28 se reetiqueta como deuda de F-04 al cerrar.
+2. **Alcance: todo `<link>` con `href` root-absoluto**, sea cual sea su `rel`, en todo HTML del artefacto, con
+   «root-absoluto» definido tras recortar espacios ASCII de los extremos y quitar tabuladores y saltos de línea
+   (WHATWG); `/\` falla cerrado. La violación «sin la base» dice solo eso, nunca «no existe».
+3. **Casos límite: ESTRICTO.** Solo la raíz del artefacto (`href` igual a la base declarada, o `/` sin base) se
+   resuelve a `index.html`; cualquier otro `href` acabado en `/` o que apunte a una carpeta falla cerrado; un
+   `href` con `%` o `&` falla cerrado con su PROPIA regla (falso positivo consciente: GitHub Pages sí decodifica
+   los `%XX`, medido).
+4. **Al terminar** (judge APPROVED, mutación al 100 %, CI verde): el lead fusiona la PR en `main` (squash),
+   aprueba el despliegue de `github-pages` y repite la comprobación en la web publicada.
+
+La guarda anti-vacuidad (pregunta 5) la resuelve el `spec_partner` con la alternativa VERIFICADA (guarda sobre
+el extractor que cuenta todo `<link>` con `href`, canónica incluida, en `inspeccionarArtefacto` tras la de
+@s28; ningún fixture ni escenario de @s1-@s45 cambia). La puerta humana sobre el `.feature` sigue pendiente.
