@@ -47,145 +47,230 @@ const PNG_RGB = 2
 const PNG_RGBA = 6
 const BITS_POR_PIXEL_ICO = 32
 
+// Un error que quien ejecuta el CLI puede corregir (argumentos, glifo o tokens). La capa de interfaz, al
+// final del fichero, lo informa con su mensaje y sin traza.
+class ErrorDelFavicon extends Error {}
+
 // ── Argumentos ──────────────────────────────────────────────────────────────────────────
 function directorioDeSalida(argv) {
   const i = argv.indexOf('--salida')
   if (i === -1) return join(RAIZ, 'public')
   const dir = argv[i + 1]
-  if (!dir) throw new Error('--salida necesita un directorio')
+  if (!dir) throw new ErrorDelFavicon('--salida necesita un directorio')
   return resolve(dir)
 }
 
 // ── Fuente: WOFF1 → tablas sfnt ─────────────────────────────────────────────────────────
+// Los anchos de los enteros de la fuente, que comparten cmap, loca y glyf.
+const BYTES_POR_ENTERO_16 = 2
+const BYTES_POR_ENTERO_32 = 4
+
+// La cabecera WOFF1 mide 44 bytes y lleva numTables en el byte 12. Detrás va el directorio: una entrada
+// de 20 bytes por tabla, con su etiqueta (4 letras), su desplazamiento, su largo comprimido y su largo
+// original.
+const POSICION_DEL_NUMERO_DE_TABLAS_WOFF = 12
+const LARGO_DE_LA_CABECERA_WOFF = 44
+const LARGO_DE_LA_ENTRADA_WOFF = 20
+const LARGO_DE_LA_ETIQUETA = 4
+const POSICION_EN_LA_ENTRADA_WOFF = { desplazamiento: 4, largoComprimido: 8, largoOriginal: 12 }
+
 function leerWoff(ruta) {
   const woff = readFileSync(ruta)
   const tablas = {}
-  for (let i = 0; i < woff.readUInt16BE(12); i++) {
-    const o = 44 + i * 20
-    const etiqueta = woff.toString('ascii', o, o + 4)
-    const desde = woff.readUInt32BE(o + 4)
-    const comprimida = woff.readUInt32BE(o + 8)
-    const original = woff.readUInt32BE(o + 12)
+  for (let i = 0; i < woff.readUInt16BE(POSICION_DEL_NUMERO_DE_TABLAS_WOFF); i++) {
+    const entrada = LARGO_DE_LA_CABECERA_WOFF + i * LARGO_DE_LA_ENTRADA_WOFF
+    const etiqueta = woff.toString('ascii', entrada, entrada + LARGO_DE_LA_ETIQUETA)
+    const desde = woff.readUInt32BE(entrada + POSICION_EN_LA_ENTRADA_WOFF.desplazamiento)
+    const comprimida = woff.readUInt32BE(entrada + POSICION_EN_LA_ENTRADA_WOFF.largoComprimido)
+    const original = woff.readUInt32BE(entrada + POSICION_EN_LA_ENTRADA_WOFF.largoOriginal)
     const datos = woff.subarray(desde, desde + comprimida)
     tablas[etiqueta] = comprimida < original ? inflateSync(datos) : datos
   }
   return tablas
 }
 
+// cmap: numTables en el byte 2 y, desde el 4, un registro de 8 bytes por subtabla, con el desplazamiento
+// de la subtabla (uint32) en el byte 4 del registro.
+const POSICION_DEL_NUMERO_DE_SUBTABLAS = 2
+const INICIO_DE_LOS_REGISTROS_CMAP = 4
+const LARGO_DEL_REGISTRO_CMAP = 8
+const POSICION_DE_LA_SUBTABLA_EN_EL_REGISTRO = 4
+// Subtabla de formato 4: segCountX2 en el byte 6 y endCode[] desde el 14; tras él, 2 bytes de relleno
+// (reservedPad) y luego startCode[], idDelta[] e idRangeOffset[], de segCountX2 bytes cada uno: un
+// entero de 16 bits por segmento.
+const FORMATO_POR_SEGMENTOS = 4
+const POSICION_DEL_DOBLE_DE_SEGMENTOS = 6
+const INICIO_DE_LOS_FINALES = 14
+const LARGO_DEL_RELLENO = 2
+
 // cmap de formato 4: del punto de código al índice de glifo.
 function glifoDe(tablas, cp) {
   const cmap = tablas.cmap
-  const subtablas = cmap.readUInt16BE(2)
+  const subtablas = cmap.readUInt16BE(POSICION_DEL_NUMERO_DE_SUBTABLAS)
   for (let i = 0; i < subtablas; i++) {
-    const off = cmap.readUInt32BE(4 + i * 8 + 4)
-    if (cmap.readUInt16BE(off) !== 4) continue
-    const segX2 = cmap.readUInt16BE(off + 6)
-    const finales = off + 14
-    const inicios = finales + segX2 + 2
-    const deltas = inicios + segX2
-    const rangos = deltas + segX2
-    for (let s = 0; s < segX2 / 2; s++) {
-      const fin = cmap.readUInt16BE(finales + s * 2)
-      const ini = cmap.readUInt16BE(inicios + s * 2)
-      if (cp < ini || cp > fin) continue
-      const delta = cmap.readInt16BE(deltas + s * 2)
-      const ro = cmap.readUInt16BE(rangos + s * 2)
-      if (ro === 0) return (cp + delta) & 0xffff
-      const g = cmap.readUInt16BE(rangos + s * 2 + ro + (cp - ini) * 2)
-      return g === 0 ? 0 : (g + delta) & 0xffff
+    const registro = INICIO_DE_LOS_REGISTROS_CMAP + i * LARGO_DEL_REGISTRO_CMAP
+    const subtabla = cmap.readUInt32BE(registro + POSICION_DE_LA_SUBTABLA_EN_EL_REGISTRO)
+    if (cmap.readUInt16BE(subtabla) !== FORMATO_POR_SEGMENTOS) continue
+    const dobleDeSegmentos = cmap.readUInt16BE(subtabla + POSICION_DEL_DOBLE_DE_SEGMENTOS)
+    const finales = subtabla + INICIO_DE_LOS_FINALES
+    const inicios = finales + dobleDeSegmentos + LARGO_DEL_RELLENO
+    const deltas = inicios + dobleDeSegmentos
+    const rangos = deltas + dobleDeSegmentos
+    for (let s = 0; s < dobleDeSegmentos / BYTES_POR_ENTERO_16; s++) {
+      const posicionDelSegmento = s * BYTES_POR_ENTERO_16
+      const fin = cmap.readUInt16BE(finales + posicionDelSegmento)
+      const inicio = cmap.readUInt16BE(inicios + posicionDelSegmento)
+      if (cp < inicio || cp > fin) continue
+      const delta = cmap.readInt16BE(deltas + posicionDelSegmento)
+      const desplazamientoDelRango = cmap.readUInt16BE(rangos + posicionDelSegmento)
+      if (desplazamientoDelRango === 0) return (cp + delta) & 0xffff
+      const glifo = cmap.readUInt16BE(
+        rangos + posicionDelSegmento + desplazamientoDelRango + (cp - inicio) * BYTES_POR_ENTERO_16,
+      )
+      return glifo === 0 ? 0 : (glifo + delta) & 0xffff
     }
   }
-  throw new Error(`la fuente no tiene glifo para U+${cp.toString(16)}`)
+  throw new ErrorDelFavicon(`la fuente no tiene glifo para U+${cp.toString(16)}`)
 }
 
-function rangoDelGlifo(tablas, g) {
-  const loca = tablas.loca
-  const locaLarga = tablas.head.readInt16BE(50) === 1
-  return locaLarga
-    ? [loca.readUInt32BE(g * 4), loca.readUInt32BE(g * 4 + 4)]
-    : [loca.readUInt16BE(g * 2) * 2, loca.readUInt16BE(g * 2 + 2) * 2]
+// head.indexToLocFormat, en el byte 50: 1 si loca guarda los desplazamientos como uint32; 0 si como
+// uint16, divididos entre 2: al leerlos, se multiplican por FACTOR_DE_LA_LOCA_CORTA.
+const POSICION_DEL_FORMATO_DE_LOCA = 50
+const LOCA_LARGA = 1
+const FACTOR_DE_LA_LOCA_CORTA = 2
+
+// El glifo va desde donde empieza él en glyf hasta donde empieza el siguiente.
+function rangoDelGlifo(tablas, glifo) {
+  const locaLarga = tablas.head.readInt16BE(POSICION_DEL_FORMATO_DE_LOCA) === LOCA_LARGA
+  const inicioEnGlyf = locaLarga
+    ? (entrada) => tablas.loca.readUInt32BE(entrada * BYTES_POR_ENTERO_32)
+    : (entrada) => tablas.loca.readUInt16BE(entrada * BYTES_POR_ENTERO_16) * FACTOR_DE_LA_LOCA_CORTA
+  return [inicioEnGlyf(glifo), inicioEnGlyf(glifo + 1)]
 }
+
+// ── Glifo: glyf → contornos ─────────────────────────────────────────────────────────────
+// Cada glifo abre con una cabecera de 10 bytes: numberOfContours (int16, el primer campo) y su caja.
+const LARGO_DE_LA_CABECERA_DEL_GLIFO = 10
+// Las banderas de cada punto (con su nombre en la especificación TrueType).
+const BANDERA_EN_LA_CURVA = 1 // ON_CURVE_POINT
+const BANDERA_X_CORTA = 2 // X_SHORT_VECTOR
+const BANDERA_Y_CORTA = 4 // Y_SHORT_VECTOR
+const BANDERA_REPETIR = 8 // REPEAT_FLAG
+const BANDERA_X_IGUAL_O_POSITIVA = 16 // X_IS_SAME_OR_POSITIVE_X_SHORT_VECTOR
+const BANDERA_Y_IGUAL_O_POSITIVA = 32 // Y_IS_SAME_OR_POSITIVE_Y_SHORT_VECTOR
+// Las x y las y se leen igual; solo cambia la pareja de banderas de su eje.
+const EJE_X = { corta: BANDERA_X_CORTA, igualOPositiva: BANDERA_X_IGUAL_O_POSITIVA }
+const EJE_Y = { corta: BANDERA_Y_CORTA, igualOPositiva: BANDERA_Y_IGUAL_O_POSITIVA }
 
 // Contornos del glifo simple: puntos { x, y, on } con la y ya invertida (y hacia abajo, como SVG).
-function contornos(tablas, g) {
-  const [a, b] = rangoDelGlifo(tablas, g)
-  if (a === b) return []
-  const d = tablas.glyf.subarray(a, b)
-  const nc = d.readInt16BE(0)
-  if (nc < 0) throw new Error('glifo compuesto: no soportado')
-  const finales = []
-  for (let i = 0; i < nc; i++) finales.push(d.readUInt16BE(10 + i * 2))
-  const np = finales[nc - 1] + 1
-  let p = 10 + nc * 2
-  p += 2 + d.readUInt16BE(p) // salta las instrucciones de hinting
-  const flags = []
-  while (flags.length < np) {
-    const f = d[p++]
-    flags.push(f)
-    if (f & 8) {
-      let repeticiones = d[p++]
-      while (repeticiones--) flags.push(f)
+// El glyf guarda seguidos los finales, las instrucciones, las banderas, las x y las y: un solo lector
+// los recorre en ese orden.
+function contornosDelGlifo(tablas, glifo) {
+  const [desde, hasta] = rangoDelGlifo(tablas, glifo)
+  if (desde === hasta) return []
+  const datos = tablas.glyf.subarray(desde, hasta)
+  const numeroDeContornos = datos.readInt16BE(0)
+  if (numeroDeContornos < 0) throw new ErrorDelFavicon('glifo compuesto: no soportado')
+  const lector = lectorDe(datos, LARGO_DE_LA_CABECERA_DEL_GLIFO)
+  const finales = finalesDeContorno(lector, numeroDeContornos)
+  lector.saltar(lector.uint16()) // las instrucciones de hinting: su largo y luego ellas
+  const banderas = banderasDe(lector, finales.at(-1) + 1)
+  const xs = coordenadasDelEje(lector, banderas, EJE_X)
+  const ys = coordenadasDelEje(lector, banderas, EJE_Y)
+  return agruparEnContornos(finales, banderas, xs, ys)
+}
+
+// Un cursor sobre los bytes del glifo: cada lectura avanza lo que lee.
+function lectorDe(datos, inicio) {
+  let posicion = inicio
+  const avanzar = (bytes) => {
+    const actual = posicion
+    posicion += bytes
+    return actual
+  }
+  return {
+    byte: () => datos[avanzar(1)],
+    uint16: () => datos.readUInt16BE(avanzar(BYTES_POR_ENTERO_16)),
+    int16: () => datos.readInt16BE(avanzar(BYTES_POR_ENTERO_16)),
+    saltar: avanzar,
+  }
+}
+
+// El índice del último punto de cada contorno (endPtsOfContours).
+function finalesDeContorno(lector, numeroDeContornos) {
+  return Array.from({ length: numeroDeContornos }, () => lector.uint16())
+}
+
+// Una bandera por punto; con REPETIR, el byte siguiente dice cuántas veces más se repite.
+function banderasDe(lector, numeroDePuntos) {
+  const banderas = []
+  while (banderas.length < numeroDePuntos) {
+    const bandera = lector.byte()
+    banderas.push(bandera)
+    if (bandera & BANDERA_REPETIR) {
+      let repeticiones = lector.byte()
+      while (repeticiones--) banderas.push(bandera)
     }
   }
-  const xs = []
-  let x = 0
-  for (const f of flags) {
-    if (f & 2) x += f & 16 ? d[p++] : -d[p++]
-    else if (!(f & 16)) {
-      x += d.readInt16BE(p)
-      p += 2
-    }
-    xs.push(x)
+  return banderas
+}
+
+// Las coordenadas de un eje, acumuladas. Cada punto suma un byte con el signo en su bandera (corta),
+// nada (repite la anterior) o un int16.
+function coordenadasDelEje(lector, banderas, eje) {
+  const coordenadas = []
+  let valor = 0
+  for (const bandera of banderas) {
+    if (bandera & eje.corta) valor += bandera & eje.igualOPositiva ? lector.byte() : -lector.byte()
+    else if (!(bandera & eje.igualOPositiva)) valor += lector.int16()
+    coordenadas.push(valor)
   }
-  const ys = []
-  let y = 0
-  for (const f of flags) {
-    if (f & 4) y += f & 32 ? d[p++] : -d[p++]
-    else if (!(f & 32)) {
-      y += d.readInt16BE(p)
-      p += 2
-    }
-    ys.push(y)
-  }
-  const res = []
-  let ini = 0
+  return coordenadas
+}
+
+// Reparte los puntos entre los contornos según sus finales; la y se invierte (hacia abajo, como en SVG).
+function agruparEnContornos(finales, banderas, xs, ys) {
+  const contornos = []
+  let inicio = 0
   for (const fin of finales) {
-    const pts = []
-    for (let i = ini; i <= fin; i++) pts.push({ x: xs[i], y: -ys[i], on: (flags[i] & 1) === 1 })
-    res.push(pts)
-    ini = fin + 1
+    const puntos = []
+    for (let i = inicio; i <= fin; i++) {
+      puntos.push({ x: xs[i], y: -ys[i], on: (banderas[i] & BANDERA_EN_LA_CURVA) !== 0 })
+    }
+    contornos.push(puntos)
+    inicio = fin + 1
   }
-  return res
+  return contornos
 }
 
 // El `d` con EXACTAMENTE el formato de números de prototipo-glifos.mjs (un decimal, sin ceros de
 // relleno: «890.5», «147»). Si cambia el formato, el `d` deja de ser idéntico al del oráculo (@s2).
 const redondeo = (v) => Math.round(v * 10) / 10
-function pathDe(cs) {
+function pathDe(contornos) {
   let s = ''
-  for (const pts of cs) {
+  for (const puntos of contornos) {
     // Empieza en un punto ON (o en el medio implícito de dos OFF).
-    let k = pts.findIndex((q) => q.on)
+    let k = puntos.findIndex((punto) => punto.on)
     let inicio
     if (k === -1) {
-      inicio = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 }
+      inicio = { x: (puntos[0].x + puntos[1].x) / 2, y: (puntos[0].y + puntos[1].y) / 2 }
       k = 0
-    } else inicio = pts[k]
-    const orden = [...pts.slice(k), ...pts.slice(0, k)]
+    } else inicio = puntos[k]
+    const orden = [...puntos.slice(k), ...puntos.slice(0, k)]
     s += `M${redondeo(inicio.x)} ${redondeo(inicio.y)}`
     let ctrl = null
     for (let i = 1; i <= orden.length; i++) {
-      const q = orden[i % orden.length]
-      if (q.on) {
+      const punto = orden[i % orden.length]
+      if (punto.on) {
         s += ctrl
-          ? `Q${redondeo(ctrl.x)} ${redondeo(ctrl.y)} ${redondeo(q.x)} ${redondeo(q.y)}`
-          : `L${redondeo(q.x)} ${redondeo(q.y)}`
+          ? `Q${redondeo(ctrl.x)} ${redondeo(ctrl.y)} ${redondeo(punto.x)} ${redondeo(punto.y)}`
+          : `L${redondeo(punto.x)} ${redondeo(punto.y)}`
         ctrl = null
       } else if (ctrl) {
-        const m = { x: (ctrl.x + q.x) / 2, y: (ctrl.y + q.y) / 2 }
-        s += `Q${redondeo(ctrl.x)} ${redondeo(ctrl.y)} ${redondeo(m.x)} ${redondeo(m.y)}`
-        ctrl = q
-      } else ctrl = q
+        const puntoMedio = { x: (ctrl.x + punto.x) / 2, y: (ctrl.y + punto.y) / 2 }
+        s += `Q${redondeo(ctrl.x)} ${redondeo(ctrl.y)} ${redondeo(puntoMedio.x)} ${redondeo(puntoMedio.y)}`
+        ctrl = punto
+      } else ctrl = punto
     }
     if (ctrl)
       s += `Q${redondeo(ctrl.x)} ${redondeo(ctrl.y)} ${redondeo(inicio.x)} ${redondeo(inicio.y)}`
@@ -195,13 +280,13 @@ function pathDe(cs) {
 }
 
 // Caja de TODOS los puntos (ON y OFF), como el prototipo: de ella salen viewBox y rect.
-function cajaDe(cs) {
-  const todos = cs.flat()
+function cajaDe(contornos) {
+  const todos = contornos.flat()
   return [
-    Math.min(...todos.map((q) => q.x)),
-    Math.min(...todos.map((q) => q.y)),
-    Math.max(...todos.map((q) => q.x)),
-    Math.max(...todos.map((q) => q.y)),
+    Math.min(...todos.map((punto) => punto.x)),
+    Math.min(...todos.map((punto) => punto.y)),
+    Math.max(...todos.map((punto) => punto.x)),
+    Math.max(...todos.map((punto) => punto.y)),
   ]
 }
 
@@ -222,7 +307,9 @@ function leerColor(scss, nombre) {
   const declaracion = new RegExp(`(?<![\\w-])${nombre}\\s*:\\s*([^;]*);`, 'g')
   const halladas = [...scss.matchAll(declaracion)].map((m) => m[1].trim())
   if (halladas.length !== 1 || !/^#[0-9a-f]{6}$/i.test(halladas[0])) {
-    throw new Error(`${nombre}: se esperaba UNA declaración #RRGGBB en _tokens.scss (${halladas})`)
+    throw new ErrorDelFavicon(
+      `${nombre}: se esperaba UNA declaración #RRGGBB en _tokens.scss (${halladas})`,
+    )
   }
   return halladas[0]
 }
@@ -283,10 +370,10 @@ function aplanar(d) {
 
 function tramosDe(polilineas) {
   const tramos = []
-  for (const pts of polilineas) {
-    for (let i = 0; i < pts.length; i++) {
-      const [x1, y1] = pts[i]
-      const [x2, y2] = pts[(i + 1) % pts.length]
+  for (const puntos of polilineas) {
+    for (let i = 0; i < puntos.length; i++) {
+      const [x1, y1] = puntos[i]
+      const [x2, y2] = puntos[(i + 1) % puntos.length]
       tramos.push({
         x1,
         y1,
@@ -330,10 +417,10 @@ function bajoElTrazo(x, y, cercanos, medio) {
     const dx = t.x2 - t.x1
     const dy = t.y2 - t.y1
     const largo2 = dx * dx + dy * dy
-    const f =
+    const fraccion =
       largo2 === 0 ? 0 : Math.max(0, Math.min(1, ((x - t.x1) * dx + (y - t.y1) * dy) / largo2))
-    const ex = t.x1 + f * dx - x
-    const ey = t.y1 + f * dy - y
+    const ex = t.x1 + fraccion * dx - x
+    const ey = t.y1 + fraccion * dy - y
     if (ex * ex + ey * ey <= medio2) return true
   }
   return false
@@ -372,11 +459,13 @@ function rasterizar({ tramos, geo, soft, ink, lado, aSangre }) {
       }
     }
   }
-  const [s, k] = [hexARgb(soft), hexARgb(ink)]
+  const [rgbSoft, rgbInk] = [hexARgb(soft), hexARgb(ink)]
   const rgba = Buffer.alloc(lado * lado * 4)
   for (let i = 0; i < lado * lado; i++) {
     const t = enCuadrado[i] === 0 ? 0 : deTinta[i] / enCuadrado[i]
-    for (let c = 0; c < 3; c++) rgba[i * 4 + c] = Math.round(s[c] + t * (k[c] - s[c]))
+    for (let c = 0; c < 3; c++) {
+      rgba[i * 4 + c] = Math.round(rgbSoft[c] + t * (rgbInk[c] - rgbSoft[c]))
+    }
     rgba[i * 4 + 3] = Math.round((255 * enCuadrado[i]) / (MUESTRAS * MUESTRAS))
   }
   return rgba
@@ -429,54 +518,92 @@ function codificarPng(lado, pixeles, tipoColor) {
   ])
 }
 
-// ICO (reservado 0, tipo 1) con los PNG DENTRO, uno por entrada de 16 bytes.
+// ICO (reservado 0, tipo 1) con los PNG DENTRO: una cabecera de 6 bytes y una entrada de 16 por imagen.
+const LARGO_DE_LA_CABECERA_ICO = 6
+const LARGO_DE_LA_ENTRADA_ICO = 16
+const POSICION_EN_LA_CABECERA_ICO = { reservado: 0, tipo: 2, entradas: 4 }
+const POSICION_EN_LA_ENTRADA_ICO = {
+  ancho: 0,
+  alto: 1,
+  planos: 4,
+  bitsPorPixel: 6,
+  tamano: 8,
+  desplazamiento: 12,
+}
+const TIPO_ICONO = 1 // el 2 sería un cursor
+const PLANOS_DE_COLOR = 1
+const MEDIDA_CERO_DEL_ICO = 256 // una medida de 256 se escribe como 0
+
 function componerIco(imagenes) {
-  const cabecera = Buffer.alloc(6 + 16 * imagenes.length)
-  cabecera.writeUInt16LE(0, 0)
-  cabecera.writeUInt16LE(1, 2)
-  cabecera.writeUInt16LE(imagenes.length, 4)
+  const cabecera = Buffer.alloc(
+    LARGO_DE_LA_CABECERA_ICO + LARGO_DE_LA_ENTRADA_ICO * imagenes.length,
+  )
+  cabecera.writeUInt16LE(0, POSICION_EN_LA_CABECERA_ICO.reservado)
+  cabecera.writeUInt16LE(TIPO_ICONO, POSICION_EN_LA_CABECERA_ICO.tipo)
+  cabecera.writeUInt16LE(imagenes.length, POSICION_EN_LA_CABECERA_ICO.entradas)
   let desplazamiento = cabecera.length
-  imagenes.forEach(({ lado, png }, n) => {
-    const o = 6 + n * 16
-    cabecera[o] = lado % 256 // 256 se escribe como 0
-    cabecera[o + 1] = lado % 256
-    cabecera.writeUInt16LE(1, o + 4) // planos
-    cabecera.writeUInt16LE(BITS_POR_PIXEL_ICO, o + 6)
-    cabecera.writeUInt32LE(png.length, o + 8)
-    cabecera.writeUInt32LE(desplazamiento, o + 12)
+  imagenes.forEach(({ lado, png }, indice) => {
+    const entrada = LARGO_DE_LA_CABECERA_ICO + indice * LARGO_DE_LA_ENTRADA_ICO
+    cabecera[entrada + POSICION_EN_LA_ENTRADA_ICO.ancho] = lado % MEDIDA_CERO_DEL_ICO
+    cabecera[entrada + POSICION_EN_LA_ENTRADA_ICO.alto] = lado % MEDIDA_CERO_DEL_ICO
+    cabecera.writeUInt16LE(PLANOS_DE_COLOR, entrada + POSICION_EN_LA_ENTRADA_ICO.planos)
+    cabecera.writeUInt16LE(BITS_POR_PIXEL_ICO, entrada + POSICION_EN_LA_ENTRADA_ICO.bitsPorPixel)
+    cabecera.writeUInt32LE(png.length, entrada + POSICION_EN_LA_ENTRADA_ICO.tamano)
+    cabecera.writeUInt32LE(desplazamiento, entrada + POSICION_EN_LA_ENTRADA_ICO.desplazamiento)
     desplazamiento += png.length
   })
   return Buffer.concat([cabecera, ...imagenes.map(({ png }) => png)])
 }
 
 // ── Principal ───────────────────────────────────────────────────────────────────────────
-const salida = directorioDeSalida(process.argv.slice(2))
-const tablas = leerWoff(FUENTE)
-const glifo = contornos(tablas, glifoDe(tablas, LETRA.codePointAt(0)))
-const d = pathDe(glifo)
-const geo = geometria(cajaDe(glifo))
-const scss = readFileSync(TOKENS, 'utf8')
-const soft = leerColor(scss, '--accent-soft')
-const ink = leerColor(scss, '--ink')
-const tramos = tramosDe(aplanar(d))
+// Toda la validación (argumentos, glifo y tokens) va ANTES de la primera escritura (`mkdirSync`): un
+// error de validación no deja iconos a medias (un fallo de E/S a mitad de la escritura sí puede dejar
+// alguno, igual que en `main`: caso c8 del judge, ronda 3). Devuelve la línea de resumen; la imprime la Interfaz.
+function generar(argv) {
+  const salida = directorioDeSalida(argv)
+  const tablas = leerWoff(FUENTE)
+  const contornos = contornosDelGlifo(tablas, glifoDe(tablas, LETRA.codePointAt(0)))
+  const d = pathDe(contornos)
+  const geo = geometria(cajaDe(contornos))
+  const scss = readFileSync(TOKENS, 'utf8')
+  const soft = leerColor(scss, '--accent-soft')
+  const ink = leerColor(scss, '--ink')
+  const tramos = tramosDe(aplanar(d))
 
-mkdirSync(salida, { recursive: true })
-writeFileSync(join(salida, 'favicon.svg'), componerSvg({ d, geo, soft, ink }))
+  mkdirSync(salida, { recursive: true })
+  writeFileSync(join(salida, 'favicon.svg'), componerSvg({ d, geo, soft, ink }))
 
-const imagenesIco = LADOS_ICO.map((lado) => ({
-  lado,
-  png: codificarPng(lado, rasterizar({ tramos, geo, soft, ink, lado, aSangre: false }), PNG_RGBA),
-}))
-writeFileSync(join(salida, 'favicon.ico'), componerIco(imagenesIco))
+  const imagenesIco = LADOS_ICO.map((lado) => ({
+    lado,
+    png: codificarPng(lado, rasterizar({ tramos, geo, soft, ink, lado, aSangre: false }), PNG_RGBA),
+  }))
+  writeFileSync(join(salida, 'favicon.ico'), componerIco(imagenesIco))
 
-const apple = rasterizar({ tramos, geo, soft, ink, lado: LADO_APPLE, aSangre: true })
-writeFileSync(
-  join(salida, 'apple-touch-icon.png'),
-  codificarPng(LADO_APPLE, sinAlfa(apple), PNG_RGB),
-)
+  const apple = rasterizar({ tramos, geo, soft, ink, lado: LADO_APPLE, aSangre: true })
+  writeFileSync(
+    join(salida, 'apple-touch-icon.png'),
+    codificarPng(LADO_APPLE, sinAlfa(apple), PNG_RGB),
+  )
 
-console.log(
-  `favicon: «${LETRA}» en ${ink} sobre ${soft}, viewBox ${geo.x} ${geo.y} ${geo.lado} ${geo.lado} ` +
+  return (
+    `favicon: «${LETRA}» en ${ink} sobre ${soft}, viewBox ${geo.x} ${geo.y} ${geo.lado} ${geo.lado} ` +
     `→ favicon.svg, favicon.ico (${LADOS_ICO.join(' + ')}) y apple-touch-icon.png (${LADO_APPLE}) ` +
-    `en ${salida}`,
-)
+    `en ${salida}`
+  )
+}
+
+// ── Interfaz ────────────────────────────────────────────────────────────────────────────
+// La única capa que habla con quien ejecuta el CLI: imprime el resumen por stdout y, si algo falla, lo
+// informa por stderr, sin traza, y sale con código distinto de 0. Con process.exitCode y NO con
+// process.exit(): en Windows, salir a la fuerza con E/S pendiente tumba Node (el precedente está en
+// tools/puerta-anclas.ts).
+const CODIGO_DE_SALIDA_CON_ERROR = 1
+
+try {
+  console.log(generar(process.argv.slice(2)))
+} catch (error) {
+  const motivo =
+    error instanceof ErrorDelFavicon ? error.message : `error inesperado: ${error.message}`
+  console.error(`favicon: ${motivo}`)
+  process.exitCode = CODIGO_DE_SALIDA_CON_ERROR
+}
