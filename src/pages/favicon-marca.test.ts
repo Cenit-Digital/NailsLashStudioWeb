@@ -319,7 +319,10 @@ function paleta(): Paleta {
 // ── Decodificador PNG A MANO (profundidad 8, sin entrelazado, filtros 0-4, IDAT concatenados) ────────
 
 const FIRMA_PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
-const LARGO_DE_LA_CABECERA_DE_TROZO = 8
+/** La cabecera de cada trozo: el largo de sus datos (4 bytes) y su tipo (4 letras ASCII). */
+const LARGO_DEL_CAMPO_DE_LARGO = 4
+const LARGO_DEL_TIPO_DE_TROZO = 4
+const LARGO_DE_LA_CABECERA_DE_TROZO = LARGO_DEL_CAMPO_DE_LARGO + LARGO_DEL_TIPO_DE_TROZO
 const LARGO_DEL_CRC = 4
 
 interface Trozo {
@@ -335,7 +338,11 @@ function trozosDelPng(fichero: Buffer, inicio: number): readonly Trozo[] {
 
   while (posicion + LARGO_DE_LA_CABECERA_DE_TROZO <= fichero.length) {
     const largo = fichero.readUInt32BE(posicion)
-    const tipo = fichero.toString('latin1', posicion + 4, posicion + LARGO_DE_LA_CABECERA_DE_TROZO)
+    const tipo = fichero.toString(
+      'latin1',
+      posicion + LARGO_DEL_CAMPO_DE_LARGO,
+      posicion + LARGO_DE_LA_CABECERA_DE_TROZO,
+    )
     const datos = posicion + LARGO_DE_LA_CABECERA_DE_TROZO
     const fin = datos + largo + LARGO_DEL_CRC
 
@@ -365,13 +372,22 @@ interface Cabecera {
   readonly entrelazado: number
 }
 
+/** Dónde empieza cada campo leído del IHDR; la compresión (10) y el filtro (11) no se leen. */
+const POSICION_EN_EL_IHDR: Readonly<Record<keyof Cabecera, number>> = {
+  ancho: 0,
+  alto: 4,
+  profundidad: 8,
+  tipoDeColor: 9,
+  entrelazado: 12,
+}
+
 function cabeceraDe(ihdr: Trozo): Cabecera {
   return {
-    ancho: ihdr.datos.readUInt32BE(0),
-    alto: ihdr.datos.readUInt32BE(4),
-    profundidad: ihdr.datos[8],
-    tipoDeColor: ihdr.datos[9],
-    entrelazado: ihdr.datos[12],
+    ancho: ihdr.datos.readUInt32BE(POSICION_EN_EL_IHDR.ancho),
+    alto: ihdr.datos.readUInt32BE(POSICION_EN_EL_IHDR.alto),
+    profundidad: ihdr.datos[POSICION_EN_EL_IHDR.profundidad],
+    tipoDeColor: ihdr.datos[POSICION_EN_EL_IHDR.tipoDeColor],
+    entrelazado: ihdr.datos[POSICION_EN_EL_IHDR.entrelazado],
   }
 }
 
@@ -384,11 +400,15 @@ interface Raster {
 
 const TIPO_RGB = 2
 const TIPO_RGBA = 6
+const CANALES_RGB = 3
+const CANALES_RGBA = 4
 const CANALES_POR_TIPO: ReadonlyMap<number, number> = new Map([
-  [TIPO_RGB, 3],
-  [TIPO_RGBA, 4],
+  [TIPO_RGB, CANALES_RGB],
+  [TIPO_RGBA, CANALES_RGBA],
 ])
 const ALFA_OPACO = 255
+/** La única profundidad que lee este decodificador: 8 bits, una muestra por byte. */
+const PROFUNDIDAD_LEIDA = 8
 
 function paeth(a: number, b: number, c: number): number {
   const p = a + b - c
@@ -403,18 +423,25 @@ function paeth(a: number, b: number, c: number): number {
   return pb <= pc ? b : c
 }
 
+/** Los cinco filtros de fila del PNG (None, Sub, Up, Average y Paeth en la especificación). */
+const FILTRO_NINGUNO = 0
+const FILTRO_IZQUIERDA = 1
+const FILTRO_ARRIBA = 2
+const FILTRO_MEDIA = 3
+const FILTRO_PAETH = 4
+
 /** El predictor de cada filtro PNG: a = izquierda, b = arriba, c = arriba-izquierda. */
 function predictor(filtro: number, a: number, b: number, c: number): number {
   switch (filtro) {
-    case 0:
+    case FILTRO_NINGUNO:
       return 0
-    case 1:
+    case FILTRO_IZQUIERDA:
       return a
-    case 2:
+    case FILTRO_ARRIBA:
       return b
-    case 3:
+    case FILTRO_MEDIA:
       return Math.floor((a + b) / 2)
-    case 4:
+    case FILTRO_PAETH:
       return paeth(a, b, c)
     default:
       throw new Error(`filtro PNG desconocido: ${filtro}`)
@@ -449,16 +476,16 @@ function desfiltrar(crudo: Buffer, cabecera: Cabecera, canales: number): Uint8Ar
 }
 
 function aRgba(muestras: Uint8Array, canales: number): Uint8Array {
-  if (canales === CANALES_POR_TIPO.get(TIPO_RGBA)) {
+  if (canales === CANALES_RGBA) {
     return muestras
   }
 
   const pixeles = muestras.length / canales
-  const rgba = new Uint8Array(pixeles * 4)
+  const rgba = new Uint8Array(pixeles * CANALES_RGBA)
 
   for (let p = 0; p < pixeles; p++) {
-    rgba.set(muestras.subarray(p * canales, p * canales + 3), p * 4)
-    rgba[p * 4 + 3] = ALFA_OPACO
+    rgba.set(muestras.subarray(p * canales, p * canales + 3), p * CANALES_RGBA)
+    rgba[p * CANALES_RGBA + 3] = ALFA_OPACO
   }
 
   return rgba
@@ -477,7 +504,7 @@ function decodificarPng(fichero: Buffer, inicio = 0): Raster {
 
   if (
     ihdr.tipo !== 'IHDR' ||
-    cabecera.profundidad !== 8 ||
+    cabecera.profundidad !== PROFUNDIDAD_LEIDA ||
     cabecera.entrelazado !== 0 ||
     !canales
   ) {
@@ -497,6 +524,12 @@ const LARGO_DE_LA_ENTRADA_ICO = 16
 /** En una entrada ICO, el byte de medida 0 significa 256. */
 const MEDIDA_CERO_DEL_ICO = 256
 
+interface CabeceraIco {
+  readonly reservado: number
+  readonly tipo: number
+  readonly entradas: number
+}
+
 interface EntradaIco {
   readonly ancho: number
   readonly alto: number
@@ -504,11 +537,24 @@ interface EntradaIco {
   readonly desplazamiento: number
 }
 
-function cabeceraIco(ico: Buffer): { reservado: number; tipo: number; entradas: number } {
+/** Dónde empieza cada campo leído; de la entrada no se leen los planos ni los bits por píxel. */
+const POSICION_EN_LA_CABECERA_ICO: Readonly<Record<keyof CabeceraIco, number>> = {
+  reservado: 0,
+  tipo: 2,
+  entradas: 4,
+}
+const POSICION_EN_LA_ENTRADA_ICO: Readonly<Record<keyof EntradaIco, number>> = {
+  ancho: 0,
+  alto: 1,
+  tamano: 8,
+  desplazamiento: 12,
+}
+
+function cabeceraIco(ico: Buffer): CabeceraIco {
   return {
-    reservado: ico.readUInt16LE(0),
-    tipo: ico.readUInt16LE(2),
-    entradas: ico.readUInt16LE(4),
+    reservado: ico.readUInt16LE(POSICION_EN_LA_CABECERA_ICO.reservado),
+    tipo: ico.readUInt16LE(POSICION_EN_LA_CABECERA_ICO.tipo),
+    entradas: ico.readUInt16LE(POSICION_EN_LA_CABECERA_ICO.entradas),
   }
 }
 
@@ -517,10 +563,10 @@ function entradasIco(ico: Buffer): readonly EntradaIco[] {
     const base = LARGO_DE_LA_CABECERA_ICO + indice * LARGO_DE_LA_ENTRADA_ICO
 
     return {
-      ancho: ico[base] || MEDIDA_CERO_DEL_ICO,
-      alto: ico[base + 1] || MEDIDA_CERO_DEL_ICO,
-      tamano: ico.readUInt32LE(base + 8),
-      desplazamiento: ico.readUInt32LE(base + 12),
+      ancho: ico[base + POSICION_EN_LA_ENTRADA_ICO.ancho] || MEDIDA_CERO_DEL_ICO,
+      alto: ico[base + POSICION_EN_LA_ENTRADA_ICO.alto] || MEDIDA_CERO_DEL_ICO,
+      tamano: ico.readUInt32LE(base + POSICION_EN_LA_ENTRADA_ICO.tamano),
+      desplazamiento: ico.readUInt32LE(base + POSICION_EN_LA_ENTRADA_ICO.desplazamiento),
     }
   })
 }
@@ -555,7 +601,7 @@ interface Pixel {
 }
 
 function pixelEn(raster: Raster, x: number, y: number): Pixel {
-  const i = (y * raster.ancho + x) * 4
+  const i = (y * raster.ancho + x) * CANALES_RGBA
 
   return {
     x,
@@ -566,7 +612,7 @@ function pixelEn(raster: Raster, x: number, y: number): Pixel {
 }
 
 function pixeles(raster: Raster): readonly Pixel[] {
-  return Array.from({ length: raster.rgba.length / 4 }, (_, p) =>
+  return Array.from({ length: raster.rgba.length / CANALES_RGBA }, (_, p) =>
     pixelEn(raster, p % raster.ancho, Math.floor(p / raster.ancho)),
   )
 }
@@ -609,9 +655,9 @@ function esMezcla(pixel: Pixel, { soft, ink }: Paleta): boolean {
 // ── @s4 · los colores salen de _tokens.scss ─────────────────────────────────────────────────────────
 
 const LOS_TRES_RASTER = [
-  { nombre: 'el PNG de 16×16 del ICO', leer: () => rasterDelIco(16), pixeles: 256 },
-  { nombre: 'el PNG de 32×32 del ICO', leer: () => rasterDelIco(32), pixeles: 1024 },
-  { nombre: 'el apple-touch-icon', leer: rasterApple, pixeles: 32_400 },
+  { nombre: 'el PNG de 16×16 del ICO', leer: () => rasterDelIco(16), totalDePixeles: 256 },
+  { nombre: 'el PNG de 32×32 del ICO', leer: () => rasterDelIco(32), totalDePixeles: 1024 },
+  { nombre: 'el apple-touch-icon', leer: rasterApple, totalDePixeles: 32_400 },
 ]
 
 describe('@s4 los colores salen de _tokens.scss — el SVG pinta --accent-soft y --ink y los raster son mezcla de los dos', () => {
@@ -639,12 +685,12 @@ describe('@s4 los colores salen de _tokens.scss — el SVG pinta --accent-soft y
   })
 
   it.each(LOS_TRES_RASTER)(
-    '@s4 ANCLA POSITIVA: $nombre tiene $pixeles píxeles, al menos uno --accent-soft opaco y al menos uno de tinta',
-    ({ leer, pixeles: esperados }) => {
+    '@s4 ANCLA POSITIVA: $nombre tiene $totalDePixeles píxeles, al menos uno --accent-soft opaco y al menos uno de tinta',
+    ({ leer, totalDePixeles }) => {
       const colores = paleta()
       const todos = pixeles(leer())
 
-      expect(todos).toHaveLength(esperados)
+      expect(todos).toHaveLength(totalDePixeles)
       expect(todos.some((pixel) => esSoftOpaco(pixel, colores))).toBe(true)
       expect(todos.some((pixel) => esDeTinta(pixel, colores))).toBe(true)
     },
