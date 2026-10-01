@@ -22,6 +22,12 @@
 | `public/favicon.svg` a **0 bytes**                                  | **0**               | `/NailsLashStudioWeb/favicon.svg` (con base)              | **sí, 0 B**             | **5 ✓**          |
 | `index.html` con la base escrita a mano + sin fichero (H-6 de F-28) | 0 (medido por F-28) | `/NailsLashStudioWeb/favicon.svg` (Vite lo deja tal cual) | no existe               | 5 ✓              |
 
+> **Errata (ronda 2 de revisión de la spec, 2026-10-01).** La última fila NO la midió F-28: su H-6 (sabotaje
+> `2a-base-svg`) solo cambió el `href` de `index.html` y dejó el fichero en `public/`
+> (`progress/tdd_favicon_marca.md:129` y :308-310). La midió la ronda 1 de revisión: el árbol de HEAD con ese `href` y
+> sin `public/favicon.svg` sale con 0 en `vite-react-ssg build` y en las cinco puertas. La tabla se deja como estaba
+> (es histórica); la procedencia está en `project-spec.md`, Enmienda 5 de F-04, «Las tres firmas del H-5».
+
 Conclusión: hay TRES firmas distintas del mismo 404, y la puerta tiene que ver las tres: (a) `href` sin la
 base; (b) con la base, pero sin fichero; (c) con la base y fichero, pero vacío.
 
