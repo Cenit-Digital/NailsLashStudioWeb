@@ -32,4 +32,29 @@ primera puerta, la del cascarón (`package.json:16`).
 
 ## @s64 — en vivo tras publicar (control de regresión)
 
-Se anota tras fusionar la PR y aprobar el despliegue (H5-6).
+**Hecho** [V, 17:21 UTC]: PR #21 fusionada en `main` (`1fe4e00`) y despliegue de `github-pages` aprobado
+por el lead con la autorización de Pablo (H5-6) y terminado en verde. Método: el HTML de
+https://cenit-digital.github.io/NailsLashStudioWeb/ descargado (HTTP 200; **59330 bytes**, SHA-256
+`b8f43e321d1bd1cadbaa48a0d854b3b0ba27f8b187fd05dfeb02663d414263a4`), el extractor de la PROPIA puerta (`extraerLinks` = `ENLACE` + `ATRIBUTO_HREF`,
+importado de `src/lib/puerta-cascaron.ts`) y la definición de root-absoluto de la spec con su limpieza; cada href,
+pedido con `curl -I` al origen `https://cenit-digital.github.io`.
+
+- ANCLA ✓: 11 `<link>` con href, 10 root-absolutos, y entre ellos `/NailsLashStudioWeb/favicon.svg`.
+- Cada uno responde 200 ✓ (el que falta hasta 11 es la canónica, absoluta: `https://example.invalid/`,
+  marcador deliberado y documentado de `src/lib/seo.ts` hasta que haya dominio).
+
+| href                                                                       | estado |
+| -------------------------------------------------------------------------- | ------ |
+| `/NailsLashStudioWeb/favicon.ico`                                          | 200    |
+| `/NailsLashStudioWeb/favicon.svg`                                          | 200    |
+| `/NailsLashStudioWeb/apple-touch-icon.png`                                 | 200    |
+| `/NailsLashStudioWeb/assets/app-VyTVqhjc.css`                              | 200    |
+| `/NailsLashStudioWeb/assets/manrope-latin-400-normal-PaqtzbVb.woff2`       | 200    |
+| `/NailsLashStudioWeb/assets/manrope-latin-500-normal-BYYD-dBL.woff2`       | 200    |
+| `/NailsLashStudioWeb/assets/manrope-latin-600-normal-4f0koTD-.woff2`       | 200    |
+| `/NailsLashStudioWeb/assets/manrope-latin-700-normal-BZp_XxE4.woff2`       | 200    |
+| `/NailsLashStudioWeb/assets/gilda-display-latin-400-normal-gyfWcafy.woff2` | 200    |
+| `/NailsLashStudioWeb/assets/great-vibes-latin-400-normal-q5-78SH_.woff2`   | 200    |
+
+- CONTRAPRUEBA ✓: `curl -I https://cenit-digital.github.io/favicon.svg` (la firma (a) del H-5) responde **404**.
+- Datos crudos: `verificacion_viva_h5_enlaces_horneados/s64-web-publicada.json`.

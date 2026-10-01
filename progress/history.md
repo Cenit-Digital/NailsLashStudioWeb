@@ -926,3 +926,179 @@ contacto.feature` @s11/@s12 reservan «Cómo llegar» a F-11 pero el botón YA e
 >       inmutable de `dist/` + `vivo_f27.mjs s23 s26` (a 320 px esperar la caja 272 × 340 y borde derecho = el de la
 >       carta); (3) `feature_list.json` F-27 → `done` con su `cierre`, y resultado en
 >       `progress/verificacion_viva_catalogo_fotos.md`; (4) mover el resumen de la sesión a `progress/history.md`.
+
+## 2026-09-30/10-01 — F-28 `favicon_marca`, H-3 (`dist/` temporal), deuda de legibilidad de F-28 y H-5 (ENMIENDA 5 de F-04) · **CERRADAS**
+
+- **F-28 `favicon_marca` → done y PUBLICADA** (PR #18 y #19): la «N» de Great Vibes en la pestaña, SVG + ICO + apple-touch-icon
+  generados sin dependencias; 10/10 escenarios (@s9/@s10 en vivo en Chromium 153, con capturas y guiones); judge APPROVED;
+  mutación no aplica, compensada con 9 sabotajes en rojo. El H-2 (404 de `/favicon.ico`) cerrado en producción, antes y después.
+- **H-3** (PR #17): los tests build-based construyen en un `dist/` temporal; `dist/` intacto tras decenas de builds de tests.
+- **PR #16** (F-25/F-27) fusionada tras llevarle `main` y su CI en verde.
+- **Deuda de legibilidad de F-28** (PR #20): nombres con significado en el test y el generador del favicon, `contornos` partido y
+  errores del CLI sin traza; salidas idénticas byte a byte; judge APPROVED en tres rondas.
+- **H-5 → ENMIENDA 5 de F-04** (PR #21): `pnpm build` falla cerrado si un `<link>` horneado apunta a la nada bajo la base.
+  Decisiones verificadas con fuentes oficiales antes de la puerta; contrato de 27 escenarios con dos rondas adversariales
+  (44 hallazgos, 43 confirmados) y dos revisores independientes; TDD en dos fases (135 tests), judge APPROVED, mutación de
+  `puerta-cascaron.ts` 100 % (625/625, concurrencia 1), @s63 demostrado y @s64 en vivo.
+- `harness verify` completo en verde a media jornada (2624 mutantes al 100 %; los 13 timeouts, repetidos a concurrencia 1, eran
+  bucles infinitos genuinos). Patrones de memoria aplicados: la medición lleva su control y cuenta lo ejecutado; un informe de
+  mutación con timeouts miente; revisión adversarial del contrato antes de la puerta humana.
+- Dos tareas abiertas como sesiones aparte (botones de sugerencia) se consolidaron en ESTA sesión a petición de Pablo.
+- Bitácora detallada de la sesión, tal como estaba en `current.md`:
+
+> ## 2026-09-30 — H-3: los tests build-based construyen en un `dist/` temporal (infra, sin `.feature`)
+>
+> - Worktree `.claude/worktrees/tests-build-aislado` (otra sesión trabajaba en el checkout principal),
+>   rama `claude/tests-build-aislado`, PR a `main`. Sin entrada en `feature_list.json`: es infraestructura
+>   de tests, sin comportamiento del sitio (mismo trato que las PR #14 y #15).
+> - Brief `progress/brief_tests_build_aislado.md`; TDD `progress/tdd_tests_build_aislado.md` (R1-R3 con
+>   sus rojos reales); judge `progress/judge_tests_build_aislado.md` (si no está, quedó PENDIENTE).
+> - `NLS_DIST_DIR` → `build.outDir` (`vite.config.ts`) y `tools/artefacto.ts` (las 4 puertas que leen el
+>   artefacto); sin la variable, todo es idéntico. `src/lib/` intacto.
+> - `fileParallelism: false` se queda: vite-react-ssg borra entera `.vite-react-ssg-temp/` al acabar cada
+>   build. Riesgos residuales: un `pnpm build` lanzado a la vez desde fuera de la suite, y
+>   `trampas-del-horneado` heredaría `NLS_DIST_DIR` si alguien la exportara en su shell.
+> - Hook `PostToolUse`: salta la suite si lo editado es `.md` (decisión de Pablo). Surte efecto en
+>   sesiones nuevas (Claude Code toma los hooks al arrancar).
+> - Mutación: N/A. `src/lib/` intacto, `tools/` fuera de `mutate`, los `*-horneado` excluidos de Stryker;
+>   en `vitest.stryker.config.ts` solo cambia un comentario.
+>
+> ## 2026-09-30 — F-28 `favicon_marca` (cura del H-2 de F-25: el 404 de `/favicon.ico`)
+>
+> Rama `claude/favicon-marca` desde `origin/main` (ba5b498). **No** se toca la rama de PR #16
+> (`claude/hopeful-euler-jx0jq8`), donde F-27 está `in_progress`: el favicon no depende de F-25/F-27 y el
+> único solape al fusionar será el añadido al final de `feature_list.json`. Id 28 porque 25-27 ya existen allí.
+>
+> - Protocolo de arranque: memoria organizacional NO sincronizada (paso 2bis, no bloqueante; no se ejecutó
+>   `scripts/sync-memoria.ps1` en esta sesión). `bin/harness init` pendiente de correr antes del TDD.
+> - Decisiones de Pablo (AskUserQuestion): FM-1 diseño «B» (la «N» de Great Vibes en `--ink` sobre
+>   `--accent-soft`), FM-2 SVG + ICO (16+32) + apple-touch-icon 180. Referencia: `docs/research/favicon/`.
+> - Brief: `progress/brief_favicon_marca.md` (hechos medidos, propuestas FM-3..FM-7, techo de alcance).
+> - Siguiente: `spec_partner` → sección F-28 de `project-spec.md`; `gherkin_author` → `features/favicon_marca.feature`
+>   (≤ 10 escenarios); puerta humana.
+> - Arranque medido (2026-09-30): memoria organizacional sincronizada (25 patrones; aplicado «revisión
+>   adversarial del contrato» a escala reducida: una sola pasada con lentes, por ser un contrato corto).
+>   `bin/harness init` (vía `node .harness/harness.mjs init`; `bin/harness` es el lanzador POSIX): typecheck 0,
+>   ESLint 0, **1556/1556 tests**; `format:check` en rojo por DOS causas: el brief sin formatear (corregido) y
+>   `.claude/worktrees/tests-build-aislado/`, el worktree LOCAL de otra sesión de Claude que trabaja en paralelo
+>   sobre este repo (no se toca). Cura: `.claude/worktrees/` a `.prettierignore` y a `.gitignore` (git NO lo
+>   ignoraba: salía como `??`). Tras ello `prettier --check .` verde.
+> - Spec F-28 escrita por `spec_partner` (`project-spec.md` §F-28, 152 líneas; PA-28-1: iPhone real para el
+>   apple-touch-icon, recomendado no bloqueante). Corregida por el lead una frase inexacta sobre PR #16.
+> - **Puerta humana APROBADA** (Pablo, AskUserQuestion, 2026-09-30): `features/favicon_marca.feature` tal cual, con
+>   FM-3..FM-7 ratificadas; PA-28-1: no hay iPhone, no bloquea ([NV]). F-28 pasa a `in_progress`.
+> - TDD en DOS partes en paralelo (presupuesto de la sesión: 45 min): A = `tools/favicon/generar.mjs` (sin tests
+>   propios, por spec; nota en `progress/tdd_favicon_marca_generador.md`), B = @s1-@s8 por TDD y sabotajes 1-8
+>   (`progress/tdd_favicon_marca.md`). @s9/@s10 en vivo: el lead (`progress/verificacion_viva_favicon_marca.md`).
+>
+> ### 2026-09-30 18:25 — corte (Pablo apaga el equipo): F-28 `in_progress`, NO `done`
+>
+> - Hecho: puerta humana APROBADA (10 escenarios, PA-28-1 «No, que no bloquee»); generador
+>   `tools/favicon/generar.mjs` (parte A, `progress/tdd_favicon_marca_generador.md`); `public/` con los 3 iconos;
+>   `index.html` con los 3 `<link>`; `src/pages/favicon-marca.test.ts` **40/40 verde** (@s1-@s7); typecheck 0,
+>   ESLint 0, Prettier verde. ⚠️ El TDD (partes A/B) lo avanzó un actor distinto de este lead en este mismo
+>   directorio (commit c94d23e y ficheros de 17:51-18:14); el lead no lanzó el `tdd_craftsman`. Revisar su bitácora.
+> - PENDIENTE: @s8 (añadir lo horneado a `home-horneado.test.ts`) · suite completa + `pnpm build` 5 puertas ·
+>   `judge` · sabotajes manuales (brief §6, 9) · verificación en vivo @s9/@s10 en Chromium (`vite preview`) ·
+>   `progress/tdd_favicon_marca.md` con el mapa @s → test · PR a `main`.
+>
+> ### 2026-10-01 — F-28: cierre del pipeline (lead)
+>
+> - Arranque: memoria organizacional sincronizada (25 patrones); aplicado
+>   `testing/medicion-de-verificacion-lleva-su-propio-control-y-cuenta-lo-ejecutado` a la medida en vivo (cazó
+>   una contraprueba ciega, ver `progress/verificacion_viva_favicon_marca.md` §5).
+> - Decisiones de Pablo (AskUserQuestion, 2026-10-01): fusionar #17 y luego #16 en `main` y continuar F-28
+>   encima; aprobar el despliegue de F-28 y repetir la prueba del 404 en la web publicada. Hecho: #17 →
+>   `ff4c5ed`, #16 (tras llevarle `main` y su CI en verde) → `8b7c4c5`; los dos despliegues los aprobó Pablo.
+> - `origin/main` fusionado en la rama (`93796fa`): 3 conflictos de documentación (`feature_list.json`,
+>   `project-spec.md`, este fichero) resueltos por unión, F-25..F-27 antes que F-28.
+> - `tdd_craftsman` ronda 1: 8/8 sabotajes de bytes en rojo (27 variantes, más 12 extra) y Rojo → Verde
+>   reproducido (`progress/tdd_favicon_marca.md`, commit `a5af21b`). Ronda 2: @s8 en `home-horneado.test.ts`
+>   sobre el artefacto TEMPORAL de #17 (7 `it`, 42/42 en el fichero), rojo con 6/6 sabotajes.
+> - Verificación en vivo del lead (@s9, @s10 y sabotaje 9): `progress/verificacion_viva_favicon_marca.md`, con
+>   capturas y guiones en `docs/research/favicon/verificacion-viva/`. `dist/` intacto tras 16 builds de tests
+>   (H-3 de #17 confirmado en uso real).
+> - Siguiente: `harness init` completo, `judge`, PR y CI, fusión, despliegue y medida DESPUÉS en la web.
+> - 10:50: `judge` APPROVED (0 bloqueantes, 8 menores: 1-5 quedan como deuda en el `cierre`; 6-8 resueltos en
+>   documentación: PR, datos crudos archivados, nota de las pasadas de @s10 y H-5 como deuda de F-05).
+>   `harness init` en verde (1820/1820, 0 avisos); un falso rojo LOCAL de Prettier en `package.json` (CRLF en la
+>   copia de trabajo desde julio, LF en git) se normalizó sin cambiar el contenido versionado. F-28 → `done`.
+>   En curso: `harness verify` completo (mutación de los 37 ficheros de `stryker.config.json`).
+> - 10:58: `harness verify` COMPLETO en verde: mutación de los 37 ficheros al **100 %** (2624 mutantes: 2611
+>   muertos + 13 por timeout, 0 supervivientes, 41 ignorados ya documentados). Aplicado
+>   `testing/informe-de-mutacion-con-timeouts-miente`: los 13 timeouts (`placeholders.ts` 9, `equipo-logica.ts`
+>   3, `resenas-logica.ts` 1) se repitieron a `--concurrency 1` y SIGUEN en timeout con 100 % (87+9, 38+3, 29+1):
+>   son bucles infinitos genuinos (condición o avance del bucle mutados), no ruido de CPU.
+> - 10:48-10:51: PR #18 fusionada (`2a49c14`), despliegue aprobado por el lead (autorización de Pablo) y el
+>   DESPUÉS medido en GitHub Pages: consola vacía, iconos en 200 y la «N» en la pestaña. H-2 cerrado.
+> - 11:08: los dos hallazgos fuera de alcance (deuda de legibilidad de F-28 y H-5) se propusieron como tareas
+>   aparte; Pablo prefiere hacerlo todo en ESTA sesión. Las dos sesiones abiertas estaban ya ociosas (brief
+>   escrito cada una); se continúan aquí, una a la vez, reutilizando sus briefs.
+>
+> ## 2026-10-01 — deuda de legibilidad de F-28 (menores 1-4 del judge): refactor sin cambio de comportamiento
+>
+> Worktree `.claude/worktrees/bold-liskov-c3323b`, rama `claude/bold-liskov-c3323b`. Se llevó a `main` (`2a49c14`,
+> F-28 fusionada) por avance rápido. No hay entrada nueva en `feature_list.json` ni `.feature` (precedente H-3):
+> el contrato son los invariantes I-1..I-7 de `progress/brief_deuda_favicon_legibilidad.md`.
+>
+> - Arranque:
+>   - memoria organizacional sincronizada (25 patrones; ninguno de refactor aplica directamente);
+>   - descartado `tooling/valor-guardado-por-puerta-que-lee-config-como-texto`: ningún test lee `generar.mjs`
+>     como texto, solo el comentario del SVG generado;
+>   - `pnpm install` en el worktree, que no tenía `node_modules`.
+> - Línea base (lead):
+>   - `harness init` en verde: 56 ficheros, **1820/1820**, typecheck, ESLint y Prettier a 0;
+>   - el generador ACTUAL reproduce `public/` byte a byte (md5 en el brief §1);
+>   - su error de CLI sale con traza cruda.
+> - Mutación: NO APLICA, porque ninguno de los dos ficheros está en el `mutate` de Stryker. Declarado en el
+>   brief §4.
+> - Siguiente:
+>   - `tdd_craftsman` → `progress/tdd_deuda_favicon_legibilidad.md`;
+>   - `judge` → `progress/judge_deuda_favicon_legibilidad.md`;
+>   - PR a `main`, que no se fusiona sin Pablo.
+> - `judge` APPROVED (`b7d3567`: 0 bloqueantes, 6 menores). Ronda de corrección 1 del `tdd_craftsman`:
+>   - los menores 1-5, resueltos en `e99f02a`, `6109869` y `58dc0e3`, con I-1, I-2, I-3, I-4 e I-5 medidos de
+>     nuevo (bitácora §8);
+>   - el menor 6 queda como deuda D-1 (bitácora §9), para el `cierre` de F-28;
+>   - falta I-6 (`harness init` completo), que corre el lead.
+> - `judge` ronda 2 APPROVED (`3a00169`: 0 bloqueantes, 5 menores). Ronda de corrección 2 del `tdd_craftsman`
+>   (bitácora §10):
+>   - los menores 2 y 3, en `a48a296` (`puntoMedio` en `pathDe` y `FACTOR_DE_LA_LOCA_CORTA`), con I-1, I-2,
+>     I-3, I-4 (27/27 iguales a la ronda 1) e I-5 medidos de nuevo, y las equivalencias de la fuente;
+>   - los menores 1, 4 y 5 y las discrepancias del verificador, corregidos en la bitácora;
+>   - falta I-6 (`harness init` completo), que corre el lead, y el push de los commits de la bitácora
+>     (`a48a296` ya está en `origin`: lo empujó otro actor a las 12:49:46).
+>
+> ## 2026-10-01 — H-5: el `pnpm build` falla cerrado ante un `<link href>` horneado sin la base o sin fichero
+>
+> - Worktree `.claude/worktrees/amazing-montalcini-d6abb1`, rama `claude/amazing-montalcini-d6abb1`, avanzada
+>   por fast-forward a `main` en `2a49c14` (F-28 ya fusionada, #18). `init` de partida en verde: 56 ficheros,
+>   1820/1820 tests. Memoria organizacional sincronizada (25 patrones).
+> - H-5 REPRODUCIDO [V] en un temporal (`NLS_DIST_DIR`): sin `public/favicon.svg` el build sale con 0 y hornea
+>   `href="/favicon.svg"`; con el fichero a 0 bytes, sale con 0 y lo copia vacío. Las 5 puertas en ✓ en ambos.
+> - Brief `progress/brief_h5_enlaces_horneados.md` (medidas, lo que dicen F-04/F-05, decisiones D1-D10).
+>   Recomendación del lead: dueño F-04 (ENMIENDA 5, desde @s46).
+> - **TRASPASO (2026-10-01, a petición de la sesión principal, por decisión de Pablo):** esta sesión PARA aquí y
+>   H-5 sigue en la sesión principal. Estado exacto:
+>   - El `spec_partner` de la ENMIENDA 5 se DETUVO antes de escribir: `project-spec.md` y
+>     `features/cascaron_semantico.feature` están INTACTOS (no hay borrador de spec ni de Gherkin).
+>   - Sabotajes de medida revertidos: `public/favicon.svg` restaurado byte a byte desde su copia, y
+>     `git status` limpio tras cada uno. Los artefactos de medida viven solo en el scratchpad de esta sesión.
+>   - Sin código, sin tests, sin `feature_list.json` tocado, sin push ni PR.
+>   - Siguiente paso: `spec_partner` → `project-spec.md` §Feature 4 «Enmienda 5 (2026-10-01)» (antes de
+>     «### Feature 5»), con las decisiones D1-D10 y las preguntas de §6 del brief; luego `gherkin_author`
+>     (banner de ENMIENDA 5 + @s46…), revisión adversarial y la puerta humana.
+> - 17:45 (sesión principal): PUERTA HUMANA APROBADA por Pablo el 2026-10-01 (~17:45, AskUserQuestion): el contrato tal cual (@s46-@s72); S-11 y S-12 RATIFICADOS, incluido el cambio de veredicto latente de S-12; aceptadas las dos excepciones (el ayudante `elementos` delega en `elementosDe`, y @s67, @s70, @s71 y @s72); `REGLA_RUTA_AUSENTE` NO entra en H-5 (queda declarada). Implementación: inmediata. Antes de la puerta: dos revisores independientes (A: 17/18 de la ronda 2 resueltos, 0 bloqueantes; B: modelo de la implementación, 0 regresiones, mutación al 100 % alcanzable) y una pasada final de texto (spec `8995b6f`, Gherkin `e6e4f24`); `harness init` del worktree en verde (1820/1820).
+> - H-5 FASE A (puerta pura, `tdd_craftsman`): VERDE. `src/lib/puerta-cascaron.ts` y 127 tests nuevos en
+>   `src/lib/puerta-cascaron.test.ts` (211 a 338), @s46-@s60, @s65, @s66, @s68 y @s69; bitácora
+>   `progress/tdd_h5_enlaces_horneados.md`. OJO: hasta la FASE B (el humilde cablea `ficheros`), `pnpm build`
+>   sale con 1 por el corte de S-3 (medido sobre una copia del build real): no correr la suite completa ni fusionar.
+> - H-5 FASE B (humilde + extremo a extremo, `tdd_craftsman`): VERDE. `tools/puerta-cascaron.ts` cablea la lista de
+>   ficheros (`ficheros`: recursiva, solo ficheros, con su tamaño, perezosa) y `src/pages/home-horneado.test.ts` gana 8
+>   tests (42 a 50): @s61, @s62 (a, b, c), @s67, @s70, @s71 y @s72, más `elementosDe` (excepción declarada). Rojo
+>   visto con el humilde de hoy (9 failed, S-3) y con la puerta previa a H-5 (los 5 que el contrato da por rojos); 7
+>   sabotajes del humilde, cada uno cazado por su escenario. Los 6 ficheros del encargo, 541/541; `pnpm build` real
+>   en un temporal: exit 0 y las cinco puertas en ✓. El corte S-3 de la FASE A queda cerrado. Bitácora: misma,
+>   sección «FASE B». Pendiente del lead: suite completa, @s63, `judge`, mutación y @s64 tras publicar.
+>
+> - 19:15 (sesión principal): H-5 CERRADO en la rama. Fase A (puerta pura, 127 tests) y fase B (humilde y extremo a extremo, 8 tests más en home-horneado) en verde; `harness init` 1955/1955; @s63 demostrado; judge APPROVED (0 bloqueantes); mutación de `puerta-cascaron.ts` al 100 % (625/625, concurrencia 1; la primera corrida a 23 tuvo 4 timeouts por contención, aplicado `informe-de-mutacion-con-timeouts-miente`). `feature_list.json`: ENMIENDA 5 en el cierre de F-04 y H-5 marcado como resuelto en el de F-28. Siguiente: PR, CI, fusión (squash, judge menor 3), despliegue y @s64.
