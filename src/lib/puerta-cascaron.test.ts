@@ -14,11 +14,15 @@ import {
   descripcionDe,
   esNodo,
   extraerEnlaces,
+  extraerLinks,
+  type FicheroDelArtefacto,
   idsDeHeadings,
   langsDe,
   leerJsonLd,
+  type ListaDeFicheros,
   nodosDe,
   type PaginaArtefacto,
+  type ResultadoPuertaCascaron,
   rutaDelFichero,
   tiposDe,
   RUTAS_ESPERADAS,
@@ -1738,6 +1742,109 @@ describe('los últimos huecos de los extractores', () => {
       rutasEsperadas: ['/', '/servicios'],
     })
 
+    expect(resultado.codigoSalida).toBe(0)
+    expect(resultado.lineas).toEqual([])
+  })
+})
+
+// =============================================================================================
+// ENMIENDA 5 (2026-10-01, H-5): todo <link> root-absoluto del artefacto resuelve, bajo la base, a
+// un fichero no vacío y que se publica. Escenarios de la PUERTA PURA: @s46-@s60, @s65, @s66, @s68 y
+// @s69 (features/cascaron_semantico.feature, sección de @s46). Los textos de las reglas y de las
+// líneas se escriben A MANO en cada fila, NUNCA se importan de producción (anti-tautología). Los
+// ayudantes son NUEVOS: `htmlCrudo`, `paginaCompleta`, `artefactoCon` y `ficheroDe` no cambian; el
+// <link> de cada fila se INSERTA en el HTML que ya devuelven.
+// =============================================================================================
+
+const BASE_DE_REFERENCIA = '/NailsLashStudioWeb/'
+
+/**
+ * LA LISTA DE REFERENCIA del contrato, escrita A MANO como `ubicación (bytes)`. SIN carpetas (ni
+ * `dist/x`, ni `dist/assets`, ni `dist/.vite`) y CON ocultos, como la del humilde (S-8). Los tres
+ * iconos y el manifiesto llevan los bytes del artefacto real; el resto es fixture, y solo importa 0
+ * frente a 1 o más.
+ */
+function listaDeReferencia(): FicheroDelArtefacto[] {
+  return [
+    { ubicacion: 'dist/index.html', bytes: 1500 },
+    { ubicacion: 'dist/favicon.ico', bytes: 1148 },
+    { ubicacion: 'dist/favicon.svg', bytes: 2244 },
+    { ubicacion: 'dist/apple-touch-icon.png', bytes: 3682 },
+    { ubicacion: 'dist/assets/app.css', bytes: 5000 },
+    { ubicacion: 'dist/assets/manrope.woff2', bytes: 20000 },
+    { ubicacion: 'dist/vacio.svg', bytes: 0 },
+    { ubicacion: 'dist/uno.svg', bytes: 1 },
+    { ubicacion: 'dist/x/index.html', bytes: 900 },
+    { ubicacion: 'dist/.vite/manifest.json', bytes: 8719 },
+    { ubicacion: 'dist/assets/.oculto.css', bytes: 300 },
+    { ubicacion: 'dist/.oculto-vacio.svg', bytes: 0 },
+  ]
+}
+
+/** El doble de la lista de ficheros: devuelve la que se le da y REGISTRA cada vez que la puerta la pide. */
+function dobleDeLaLista(ficheros: readonly FicheroDelArtefacto[] = listaDeReferencia()): {
+  readonly lista: ListaDeFicheros
+  readonly pedidas: () => number
+} {
+  let pedidas = 0
+
+  return {
+    lista: {
+      listar: () => {
+        pedidas += 1
+        return ficheros
+      },
+    },
+    pedidas: () => pedidas,
+  }
+}
+
+/** Inserta `elementos` justo antes del cierre del `<head>` (o del `<body>`) del HTML que se le da. */
+function conElementos(html: string, elementos: string, sitio: 'head' | 'body' = 'head'): string {
+  const cierre = `</${sitio}>`
+
+  return html.replace(cierre, () => `${elementos}${cierre}`)
+}
+
+function puertaSobreLaHome(
+  html: string,
+  peticion: { readonly base?: string | null; readonly ficheros?: ListaDeFicheros },
+): ResultadoPuertaCascaron {
+  return ejecutarPuertaDelCascaron({
+    artefacto: artefactoCon({ ubicacion: 'dist/index.html', contenido: html }),
+    rutasEsperadas: ['/'],
+    ...peticion,
+  })
+}
+
+describe('ejecutarPuertaDelCascaron → los <link> root-absolutos: el CONTROL (@s46)', () => {
+  // EL CAMINO FELIZ DE LA ENMIENDA: sin él, una puerta que acusara TODO <link> pasaría todos los
+  // escenarios negativos y rompería el build para siempre. Y el 2º `Then` ancla que la puerta MIRÓ
+  // la lista: un «0 líneas» sin haberla pedido no es estar protegidos, es no mirar.
+  it('@s46 un <link> de cada clase del artefacto real, todos con su fichero no vacío bajo la base, pasa la puerta', () => {
+    const html = conElementos(
+      htmlCrudo(),
+      [
+        '<link rel="icon" href="/NailsLashStudioWeb/favicon.ico" sizes="32x32">',
+        '<link rel="icon" href="/NailsLashStudioWeb/favicon.svg" type="image/svg+xml">',
+        '<link rel="apple-touch-icon" href="/NailsLashStudioWeb/apple-touch-icon.png">',
+        '<link rel="stylesheet" crossorigin href="/NailsLashStudioWeb/assets/app.css">',
+        '<link rel="preload" as="font" type="font/woff2" crossorigin href="/NailsLashStudioWeb/assets/manrope.woff2">',
+      ].join(''),
+    )
+    const doble = dobleDeLaLista()
+
+    const resultado = puertaSobreLaHome(html, { base: BASE_DE_REFERENCIA, ficheros: doble.lista })
+
+    expect(extraerLinks(html)).toEqual([
+      'https://example.invalid/',
+      '/NailsLashStudioWeb/favicon.ico',
+      '/NailsLashStudioWeb/favicon.svg',
+      '/NailsLashStudioWeb/apple-touch-icon.png',
+      '/NailsLashStudioWeb/assets/app.css',
+      '/NailsLashStudioWeb/assets/manrope.woff2',
+    ])
+    expect(doble.pedidas()).toBeGreaterThanOrEqual(1)
     expect(resultado.codigoSalida).toBe(0)
     expect(resultado.lineas).toEqual([])
   })

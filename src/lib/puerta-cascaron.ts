@@ -544,9 +544,22 @@ const ANCLA = /<a\b[^>]*>/gi
  * que detecta es que EL EXTRACTOR ESTÁ ROTO, no que el sitio tenga pocos enlaces.
  */
 export function extraerEnlaces(html: string): string[] {
-  return [...html.matchAll(ANCLA)]
+  return hrefsDe(html, ANCLA)
+}
+
+/** El `href` entre comillas dobles de cada etiqueta que casa `etiquetas`, en orden de aparición. */
+function hrefsDe(html: string, etiquetas: RegExp): string[] {
+  return [...html.matchAll(etiquetas)]
     .map((etiqueta) => ATRIBUTO_HREF.exec(etiqueta[0])?.[1])
     .filter((href): href is string => href !== undefined)
+}
+
+/**
+ * ENMIENDA 5 (H-5): el `href` de TODOS los `<link>` del documento ENTERO (nunca solo `cabezaDe`),
+ * con el MISMO extractor que la canónica (`ENLACE` + `ATRIBUTO_HREF`), sea cual sea su `rel`.
+ */
+export function extraerLinks(html: string): string[] {
+  return hrefsDe(html, ENLACE)
 }
 
 /**
@@ -744,6 +757,17 @@ export interface ArtefactoDeProduccion {
   listarHtml(): readonly FicheroHtml[]
 }
 
+/** Un fichero del artefacto, de cualquier extensión: su ubicación lógica (`dist/…`) y su tamaño. */
+export interface FicheroDelArtefacto {
+  readonly ubicacion: string
+  readonly bytes: number
+}
+
+/** ENMIENDA 5 (H-5): el puerto de la lista de ficheros del artefacto. Nunca lee su contenido. */
+export interface ListaDeFicheros {
+  listar(): readonly FicheroDelArtefacto[]
+}
+
 export interface PeticionPuertaCascaron {
   readonly artefacto: ArtefactoDeProduccion
   readonly rutasEsperadas: readonly string[]
@@ -754,6 +778,8 @@ export interface PeticionPuertaCascaron {
    * existente sigue compilando y significa exactamente lo de hoy (@s23-@s30, sin tocar).
    */
   readonly base?: string | null
+  /** ENMIENDA 5 (H-5): la lista de ficheros del artefacto, campo OPCIONAL (precedente `base?`). */
+  readonly ficheros?: ListaDeFicheros
 }
 
 export interface ResultadoPuertaCascaron {
@@ -801,7 +827,7 @@ export function ejecutarPuertaDelCascaron(
 }
 
 function inspeccionarArtefacto(peticion: PeticionPuertaCascaron): ResultadoPuertaCascaron {
-  const { artefacto, rutasEsperadas, base = null } = peticion
+  const { artefacto, rutasEsperadas, base = null, ficheros } = peticion
 
   // LA GUARDA DE LA GUARDA (@s27). Sin ella, la de @s26 SE DESACTIVA SOLA: con la lista vacía,
   // «una HTML por cada ruta esperada» se satisface VACUAMENTE y la puerta pasa sin inspeccionar
@@ -822,6 +848,10 @@ function inspeccionarArtefacto(peticion: PeticionPuertaCascaron): ResultadoPuert
         html: fichero.contenido,
       }))
     : []
+
+  if (ficheros !== undefined) {
+    ficheros.listar()
+  }
 
   // La inspección incluye la GUARDA de «una HTML por cada ruta esperada» (@s26): va PRIMERO,
   // porque un dist/ vacío tiene que acusar QUÉ RUTA FALTA, no «no encontré enlaces».
