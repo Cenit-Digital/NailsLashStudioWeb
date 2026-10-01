@@ -138,56 +138,100 @@ function rangoDelGlifo(tablas, glifo) {
     : [loca.readUInt16BE(glifo * 2) * 2, loca.readUInt16BE(glifo * 2 + 2) * 2]
 }
 
+// ── Glifo: glyf → contornos ─────────────────────────────────────────────────────────────
+// Cada glifo abre con una cabecera de 10 bytes: numberOfContours (int16, el primer campo) y su caja.
+const LARGO_DE_LA_CABECERA_DEL_GLIFO = 10
+const BYTES_POR_ENTERO_16 = 2
+// Las banderas de cada punto (con su nombre en la especificación TrueType).
+const BANDERA_EN_LA_CURVA = 1 // ON_CURVE_POINT
+const BANDERA_X_CORTA = 2 // X_SHORT_VECTOR
+const BANDERA_Y_CORTA = 4 // Y_SHORT_VECTOR
+const BANDERA_REPETIR = 8 // REPEAT_FLAG
+const BANDERA_X_IGUAL_O_POSITIVA = 16 // X_IS_SAME_OR_POSITIVE_X_SHORT_VECTOR
+const BANDERA_Y_IGUAL_O_POSITIVA = 32 // Y_IS_SAME_OR_POSITIVE_Y_SHORT_VECTOR
+// Las x y las y se leen igual; solo cambia la pareja de banderas de su eje.
+const EJE_X = { corta: BANDERA_X_CORTA, igualOPositiva: BANDERA_X_IGUAL_O_POSITIVA }
+const EJE_Y = { corta: BANDERA_Y_CORTA, igualOPositiva: BANDERA_Y_IGUAL_O_POSITIVA }
+
 // Contornos del glifo simple: puntos { x, y, on } con la y ya invertida (y hacia abajo, como SVG).
+// El glyf guarda seguidos los finales, las instrucciones, las banderas, las x y las y: un solo lector
+// los recorre en ese orden.
 function contornosDelGlifo(tablas, glifo) {
-  const [a, b] = rangoDelGlifo(tablas, glifo)
-  if (a === b) return []
-  const d = tablas.glyf.subarray(a, b)
-  const nc = d.readInt16BE(0)
-  if (nc < 0) throw new Error('glifo compuesto: no soportado')
-  const finales = []
-  for (let i = 0; i < nc; i++) finales.push(d.readUInt16BE(10 + i * 2))
-  const np = finales[nc - 1] + 1
-  let p = 10 + nc * 2
-  p += 2 + d.readUInt16BE(p) // salta las instrucciones de hinting
-  const flags = []
-  while (flags.length < np) {
-    const f = d[p++]
-    flags.push(f)
-    if (f & 8) {
-      let repeticiones = d[p++]
-      while (repeticiones--) flags.push(f)
+  const [desde, hasta] = rangoDelGlifo(tablas, glifo)
+  if (desde === hasta) return []
+  const datos = tablas.glyf.subarray(desde, hasta)
+  const numeroDeContornos = datos.readInt16BE(0)
+  if (numeroDeContornos < 0) throw new Error('glifo compuesto: no soportado')
+  const lector = lectorDe(datos, LARGO_DE_LA_CABECERA_DEL_GLIFO)
+  const finales = finalesDeContorno(lector, numeroDeContornos)
+  lector.saltar(lector.uint16()) // las instrucciones de hinting: su largo y luego ellas
+  const banderas = banderasDe(lector, finales.at(-1) + 1)
+  const xs = coordenadasDelEje(lector, banderas, EJE_X)
+  const ys = coordenadasDelEje(lector, banderas, EJE_Y)
+  return agruparEnContornos(finales, banderas, xs, ys)
+}
+
+// Un cursor sobre los bytes del glifo: cada lectura avanza lo que lee.
+function lectorDe(datos, inicio) {
+  let posicion = inicio
+  const avanzar = (bytes) => {
+    const actual = posicion
+    posicion += bytes
+    return actual
+  }
+  return {
+    byte: () => datos[avanzar(1)],
+    uint16: () => datos.readUInt16BE(avanzar(BYTES_POR_ENTERO_16)),
+    int16: () => datos.readInt16BE(avanzar(BYTES_POR_ENTERO_16)),
+    saltar: avanzar,
+  }
+}
+
+// El índice del último punto de cada contorno (endPtsOfContours).
+function finalesDeContorno(lector, numeroDeContornos) {
+  return Array.from({ length: numeroDeContornos }, () => lector.uint16())
+}
+
+// Una bandera por punto; con REPETIR, el byte siguiente dice cuántas veces más se repite.
+function banderasDe(lector, numeroDePuntos) {
+  const banderas = []
+  while (banderas.length < numeroDePuntos) {
+    const bandera = lector.byte()
+    banderas.push(bandera)
+    if (bandera & BANDERA_REPETIR) {
+      let repeticiones = lector.byte()
+      while (repeticiones--) banderas.push(bandera)
     }
   }
-  const xs = []
-  let x = 0
-  for (const f of flags) {
-    if (f & 2) x += f & 16 ? d[p++] : -d[p++]
-    else if (!(f & 16)) {
-      x += d.readInt16BE(p)
-      p += 2
-    }
-    xs.push(x)
+  return banderas
+}
+
+// Las coordenadas de un eje, acumuladas. Cada punto suma un byte con el signo en su bandera (corta),
+// nada (repite la anterior) o un int16.
+function coordenadasDelEje(lector, banderas, eje) {
+  const coordenadas = []
+  let valor = 0
+  for (const bandera of banderas) {
+    if (bandera & eje.corta) valor += bandera & eje.igualOPositiva ? lector.byte() : -lector.byte()
+    else if (!(bandera & eje.igualOPositiva)) valor += lector.int16()
+    coordenadas.push(valor)
   }
-  const ys = []
-  let y = 0
-  for (const f of flags) {
-    if (f & 4) y += f & 32 ? d[p++] : -d[p++]
-    else if (!(f & 32)) {
-      y += d.readInt16BE(p)
-      p += 2
-    }
-    ys.push(y)
-  }
-  const res = []
-  let ini = 0
+  return coordenadas
+}
+
+// Reparte los puntos entre los contornos según sus finales; la y se invierte (hacia abajo, como en SVG).
+function agruparEnContornos(finales, banderas, xs, ys) {
+  const contornos = []
+  let inicio = 0
   for (const fin of finales) {
-    const pts = []
-    for (let i = ini; i <= fin; i++) pts.push({ x: xs[i], y: -ys[i], on: (flags[i] & 1) === 1 })
-    res.push(pts)
-    ini = fin + 1
+    const puntos = []
+    for (let i = inicio; i <= fin; i++) {
+      puntos.push({ x: xs[i], y: -ys[i], on: (banderas[i] & BANDERA_EN_LA_CURVA) !== 0 })
+    }
+    contornos.push(puntos)
+    inicio = fin + 1
   }
-  return res
+  return contornos
 }
 
 // El `d` con EXACTAMENTE el formato de números de prototipo-glifos.mjs (un decimal, sin ceros de

@@ -206,9 +206,52 @@ flotante cambia de orden: solo cambian nombres.
 - **I-3**: **40/40**; `vitest list`, diff vacío.
 - `git diff --stat`: solo `tools/favicon/generar.mjs` (+123 −72).
 
+## 4. Paso 2b — `contornos` partido en funciones de un solo motivo (menor 3)
+
+Mismo método que en el 2a (`parche-2b.txt`). Se abre una sección `── Glifo: glyf → contornos ──` con:
+
+- `LARGO_DE_LA_CABECERA_DEL_GLIFO` (10) y `BYTES_POR_ENTERO_16` (2);
+- las seis banderas en castellano, con el nombre de la especificación TrueType citado UNA vez en su
+  comentario: `BANDERA_EN_LA_CURVA` (1, ON_CURVE_POINT), `BANDERA_X_CORTA` (2), `BANDERA_Y_CORTA` (4),
+  `BANDERA_REPETIR` (8), `BANDERA_X_IGUAL_O_POSITIVA` (16) y `BANDERA_Y_IGUAL_O_POSITIVA` (32);
+- `EJE_X` y `EJE_Y`: la pareja de banderas de cada eje.
+
+`contornosDelGlifo` queda como orquestador de 12 líneas de cuerpo sobre un lector explícito, `lectorDe(datos,
+inicio)`: un cursor con `byte`, `uint16`, `int16` y `saltar`. Se pasa a cada función, en el orden en que el
+glyf guarda los datos. Las cuatro responsabilidades del brief:
+
+1. `finalesDeContorno(lector, numeroDeContornos)`;
+2. `banderasDe(lector, numeroDePuntos)`, con la repetición;
+3. `coordenadasDelEje(lector, banderas, eje)`: UNA función para las x y las y, parametrizada por `EJE_X` y
+   `EJE_Y`, sin duplicar el bucle;
+4. `agruparEnContornos(finales, banderas, xs, ys)`, con la y invertida.
+
+**Renombrados**:
+
+- Obligatorios: `d` (el buffer) → `datos`, `nc` → `numeroDeContornos`, `np` → el argumento
+  `numeroDePuntos`, `p` → el lector, `f` → `bandera` y `pts` → `puntos`.
+- Permitidos: `[a, b]` → `[desde, hasta]` e `ini` → `inicio`.
+- Fuera de la lista, declarados: `flags` → `banderas` y `res` → `contornos`.
+- Dos expresiones equivalentes:
+  - `(flags[i] & 1) === 1` → `(banderas[i] & BANDERA_EN_LA_CURVA) !== 0`, porque el bit vale 0 o 1;
+  - `finales[nc - 1] + 1` → `finales.at(-1) + 1`.
+  - Las dos quedan cubiertas por la comparación de abajo.
+
+**Medido**:
+
+- `comprobar.sh paso2b`:
+  - **I-1**: exit 0, los tres md5 del brief §1, y `cmp` = `public/`;
+  - **I-2**: la misma línea; stderr, 0 bytes;
+  - **I-3**: **40/40**; `vitest list`, diff vacío.
+- **Equivalencia más allá de la «N»** (`equiv/`). Se cargan como módulos el generador de `884a66c` (antes
+  del paso 2) y el actual, sin el bloque «Principal».
+  - `contornos` contra `contornosDelGlifo`, sobre los **330** glifos de la fuente: **330 iguales**, 0
+    distintos. Son 213 simples, 6 vacíos y 111 compuestos, que lanzan el mismo mensaje en los dos.
+  - `glifoDe` en los **65 536** puntos de código del BMP: **65 536 iguales**, 231 de ellos con glifo.
+- `git diff --stat` del paso: solo `tools/favicon/generar.mjs` (+86 −42).
+
 ## PENDIENTE
 
-- **Paso 2b**: el reparto de `contornos`, con la cabecera del glyf y las banderas con nombre.
 - **Paso 3**: los errores (menor 4) e I-5.
 - **Paso 4**: formato y calidad de lo tocado.
 - **I-6** (`node .harness/harness.mjs init` completo): lo mide el lead.
