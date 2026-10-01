@@ -96,3 +96,28 @@ fichero en dist/'`, @s23/@s24) y de la resolución bajo `base` (ENMIENDA 1, @s36
   `public/favicon.svg` → `pnpm build` ≠ 0.
 - **D10 · Mutación**: `src/lib/puerta-cascaron.ts` (ya en `mutate`) al 100 %, 0 exclusiones; si la lógica
   nueva vive en un módulo nuevo de `src/lib/`, entra en `mutate`.
+
+## 6. Preguntas para la puerta humana (una sola interrupción; recomendación primero)
+
+1. **Dueño** — F-04 ENMIENDA 5 (recomendada, D1) · F-05 · feature nueva F-29 con una sexta puerta.
+2. **Alcance** — todo `<link>` con `href` root-absoluto, sea cual sea su `rel` (recomendada, D2) · solo
+   iconos (`icon` y `apple-touch-icon`) · todos los subrecursos (`<script src>`, `<img src|srcset>`,
+   `<source>`, `url()` del CSS).
+3. **`href` acabado en `/`** — se resuelve a `<carpeta>/index.html`, como sirve GitHub Pages (recomendada:
+   evita un falso positivo si algún día hay una canónica root-absoluta) · violación (falla cerrada).
+4. **`%`-encoding** — no se decodifica y falla cerrado (recomendada: hoy no hay ningún caso; un falso
+   positivo ruidoso es mejor que un falso negativo) · se decodifica antes de comparar.
+5. **Guarda anti-vacuidad (D7)** — la decide el `spec_partner` leyendo `src/lib/puerta-cascaron.test.ts`;
+   recomendación de partida: el fixture compartido de los tests hornea un `<link rel="stylesheet">` con su
+   fichero (cambio de ayudante, declarado en el banner, sin tocar el texto de @s1-@s45).
+
+## 7. Notas para quien continúe
+
+- Exploración [V] de esta sesión: `ArtefactoDeProduccion` lo implementan también `tools/puerta-anclas.ts`,
+  `src/lib/puerta-anclas.ts` (líneas ~166, 197, 204) y los dobles de `src/lib/puerta-anclas.test.ts`; en
+  `src/lib/puerta-cascaron.test.ts` solo hay dos `<link>` root-absolutos (líneas ~1116 y ~1706) y ambos van
+  a `canonicaDeLaPagina`, no a la puerta: no colisionan.
+- Para la prueba de extremo a extremo (D9) ya existe `correrPuerta(puerta, directorio)` en
+  `src/pages/home-horneado.test.ts` (~línea 497), que corre `tools/puerta-<x>.ts` con `NLS_DIST_DIR`.
+- Reproducción manual de H-5 (sin ensuciar el árbol): copiar `public/favicon.svg` fuera, borrarlo,
+  `NLS_DIST_DIR=<temporal> pnpm build`, restaurarlo y comprobar `git status` limpio.

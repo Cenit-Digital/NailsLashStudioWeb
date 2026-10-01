@@ -101,4 +101,14 @@ Rama `claude/favicon-marca` desde `origin/main` (ba5b498). **No** se toca la ram
 - H-5 REPRODUCIDO [V] en un temporal (`NLS_DIST_DIR`): sin `public/favicon.svg` el build sale con 0 y hornea
   `href="/favicon.svg"`; con el fichero a 0 bytes, sale con 0 y lo copia vacío. Las 5 puertas en ✓ en ambos.
 - Brief `progress/brief_h5_enlaces_horneados.md` (medidas, lo que dicen F-04/F-05, decisiones D1-D10).
-  Recomendación del lead: dueño F-04 (ENMIENDA 5, desde @s46). En curso: `spec_partner` → `project-spec.md`.
+  Recomendación del lead: dueño F-04 (ENMIENDA 5, desde @s46).
+- **TRASPASO (2026-10-01, a petición de la sesión principal, por decisión de Pablo):** esta sesión PARA aquí y
+  H-5 sigue en la sesión principal. Estado exacto:
+  - El `spec_partner` de la ENMIENDA 5 se DETUVO antes de escribir: `project-spec.md` y
+    `features/cascaron_semantico.feature` están INTACTOS (no hay borrador de spec ni de Gherkin).
+  - Sabotajes de medida revertidos: `public/favicon.svg` restaurado byte a byte desde su copia, y
+    `git status` limpio tras cada uno. Los artefactos de medida viven solo en el scratchpad de esta sesión.
+  - Sin código, sin tests, sin `feature_list.json` tocado, sin push ni PR.
+  - Siguiente paso: `spec_partner` → `project-spec.md` §Feature 4 «Enmienda 5 (2026-10-01)» (antes de
+    «### Feature 5»), con las decisiones D1-D10 y las preguntas de §6 del brief; luego `gherkin_author`
+    (banner de ENMIENDA 5 + @s46…), revisión adversarial y la puerta humana.
