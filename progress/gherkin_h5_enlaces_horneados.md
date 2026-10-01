@@ -1,17 +1,20 @@
 # Gherkin — F-04 ENMIENDA 5 (H-5): todo `<link>` root-absoluto del artefacto resuelve, bajo la base, a un fichero no vacío y que se publica
 
 > Lo escribe el `gherkin_author` el 2026-10-01 y lo repara el mismo día en dos rondas tras las revisiones
-> adversariales (ronda 1, §7; ronda 2, §9). Contrato: `features/cascaron_semantico.feature`, banner ENMIENDA 5
-> (líneas 225-366, apilado tras el de la ENMIENDA 4 y antes de «Contrato de la feature 4», corrección 6 de la
-> verificación) y **27 escenarios, @s46-@s72** (líneas 2054-2905, al final, con «@s1-@s45 (arriba) NO SE TOCAN»).
-> @s65-@s67 los añadió la ronda 1 y @s68-@s72 la ronda 2; cada uno va en su grupo, así que el orden del fichero no
-> es el de los números (no se renumera nada de lo que ya se cita). @s1-@s45: 0 líneas tocadas [V: el script de la
-> ronda 2 comprueba que las líneas 1-224 y las 1687 de «Contrato de la feature 4» hasta el final de @s45 quedan
-> byte a byte iguales]. Estado: **PENDIENTE de la puerta humana**. Fuentes, en orden de mando:
-> `progress/brief_h5_enlaces_horneados.md` §8 (decisiones de Pablo) → `progress/verificacion_decisiones_h5.md`
-> (prevalece sobre §2-§6 del brief) → resto del brief; spec: `project-spec.md` §Feature 4 → «Enmienda 5
-> (2026-10-01)», reparada en sus rondas 1 (`cd1744a`: S-7 a S-10, regla 5) y 2 (`4bfbd4f`: S-11, S-12, asimetría
-> 3 y trazas). Etiquetas: **[V]** verificado en esta sesión · **[I]** inferencia · **[NV]** no verificado.
+> adversariales (ronda 1, §7; ronda 2, §9) y en una pasada final con los informes de dos revisores independientes,
+> A y B (§11). Contrato: `features/cascaron_semantico.feature`, banner ENMIENDA 5 (líneas 225-393, apilado tras
+> el de la ENMIENDA 4 y antes de «Contrato de la feature 4», corrección 6 de la verificación) y **27 escenarios,
+> @s46-@s72** (líneas 2081-2959, al final, con «@s1-@s45 (arriba) NO SE TOCAN»). @s65-@s67 los añadió la ronda 1 y
+> @s68-@s72 la ronda 2; cada uno va en su grupo, así que el orden del fichero no es el de los números (no se
+> renumera nada de lo que ya se cita). @s1-@s45: 0 líneas tocadas [V: el script de la pasada final comprueba que
+> las líneas 1-224 y las 1685 de «Contrato de la feature 4» hasta el final de @s45 quedan byte a byte iguales a las
+> de `origin/main`, y `git diff origin/main` no borra ni cambia ninguna]. Estado: **PENDIENTE de la puerta
+> humana**. Fuentes, en orden de mando: `progress/brief_h5_enlaces_horneados.md` §8 (decisiones de Pablo) →
+> `progress/verificacion_decisiones_h5.md` (prevalece sobre §2-§6 del brief) → resto del brief; spec:
+> `project-spec.md` §Feature 4 → «Enmienda 5 (2026-10-01)», reparada en sus rondas 1 (`cd1744a`: S-7 a S-10,
+> regla 5), 2 (`4bfbd4f`: S-11, S-12, asimetría 3 y trazas) y final (`8995b6f`: S-12 como cambio de veredicto
+> latente, el último segmento en S-11 y `rutaDelHref` prescrita). Etiquetas: **[V]** verificado en esta sesión ·
+> **[I]** inferencia · **[NV]** no verificado.
 >
 > **`feature_list.json` NO se ha tocado**: precedente de las ENMIENDAS 1-4 (F-04 sigue `done`; banner). El
 > reetiquetado de la «deuda de F-05» de su línea 549 lo hace el lead al cerrar (H5-1).
@@ -19,37 +22,37 @@
 ## 1. Reparto: de la spec al contrato
 
 Tres grupos que no se mezclan (lo pidió el lead): puerta pura, extremo a extremo y lo que hace el lead a mano. Las
-filas de la puerta pura las lee del `.feature` el modelo de la ronda 2 (§10): 125.
+filas de la puerta pura las lee del `.feature` el modelo de la ronda 2 (§10): 125; desde la pasada final, 127 (§11).
 
-| Grupo                                                                  | Escenario | Filas | Qué fija                                                                                                                                     |
-| ---------------------------------------------------------------------- | --------- | ----- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| Puerta pura (`src/lib/puerta-cascaron.test.ts`, cuenta para Stryker)   | @s46      | 1     | CONTROL: un `<link>` de cada clase del artefacto real, todos resuelven; la lista se pidió                                                    |
-|                                                                        | @s47      | 9     | regla 1 (sin el prefijo), su orden frente a la 2 y la 3, la asimetría 1 y `/` bajo la base                                                   |
-|                                                                        | @s48      | 14    | regla 2 (sin fichero): caja, carpeta, `...`; los segmentos `.`, `..` y `//` de la RUTA son la 4 (S-11); controles de `?query` y `#fragmento` |
-|                                                                        | @s49      | 3     | regla 3 (0 bytes) y su control de 1 byte                                                                                                     |
-|                                                                        | @s50      | 11    | regla 4: una fila por `%`, `&` y barra invertida (dentro y AL PRINCIPIO, S-7, también seguida de `/`), y su orden frente a la 1 y la 2       |
-|                                                                        | @s51      | 9     | solo la raíz va a `index.html`, y se BUSCA en la lista (dos listas variantes); `x/` y `x` fallan cerrado; asimetría 2; la lista se pidió     |
-|                                                                        | @s52      | 16    | la limpieza, con «la lista se pidió» en cada fila: cada carácter en cada extremo y dentro, y el valor CRUDO en la línea                      |
-|                                                                        | @s53      | 7     | lo que no es root-absoluto queda fuera y ni pide la lista                                                                                    |
-|                                                                        | @s54      | 6     | sin base (ausente o `null`); una base sin barra final corta con la línea de la base (S-12)                                                   |
-|                                                                        | @s55      | 12    | todo `rel`, la caja de la etiqueta y el `<link>` del `<body>`, con el ANCLA DE SITIO                                                         |
-|                                                                        | @s56      | 1     | formato y orden del informe con dos páginas                                                                                                  |
-|                                                                        | @s57      | 7     | la lista AUSENTE: corte con una sola línea (filas 1-3, 6 y 7), o lo de hoy salvo la guarda (4-5)                                             |
-|                                                                        | @s58      | 3     | la lista se pide solo con candidatos; si revienta, rama de @s29; con `dist/` ausente, la de @s26                                             |
-|                                                                        | @s59      | 8     | la guarda del extractor nuevo, su orden tras @s28, sus controles y su acoplamiento con @s13 (S-9)                                            |
-|                                                                        | @s60      | 1     | las 5 reglas en `REGLAS_DEL_CASCARON`, sin «origen» ni «placeholder»; la lista NO es «TODAS» (hueco)                                         |
-|                                                                        | @s65      | 5     | regla 5 (S-8): oculto en la lista → regla 5; antes que la 3; solo si está en la lista; cada segmento                                         |
-|                                                                        | @s66      | 3     | un candidato en la SEGUNDA página basta: lista presente, ausente y que lanza                                                                 |
-|                                                                        | @s68      | 8     | S-12: cada condición de la base no utilizable corta con su línea y sin pedir la lista; `/` es utilizable; sin candidatos, lo de hoy          |
-|                                                                        | @s69      | 1     | S-12 va DESPUÉS del corte por lista ausente                                                                                                  |
-| Extremo a extremo (`src/pages/home-horneado.test.ts`, fuera)           | @s61      | 1     | ANCLA del artefacto real (con la base, con `assets/` y el favicon) + CONTROL (exit 0, `✓`)                                                   |
-|                                                                        | @s62      | 3     | las tres firmas (a), (b) y (c), cada una en su copia, con su línea exacta y el original RELEÍDO intacto                                      |
-|                                                                        | @s67      | 1     | el humilde lista solo FICHEROS: un `<link>` a la carpeta real `assets` → regla 2                                                             |
-|                                                                        | @s70      | 1     | CONTROL: con `dist/` ausente el humilde no lista antes de `existe()`: línea de @s26, sin `ENOENT` (nace en VERDE)                            |
-|                                                                        | @s71      | 1     | el humilde lista también los OCULTOS: un `<link>` a `.vite/manifest.json` → regla 5 (nace en ROJO)                                           |
-|                                                                        | @s72      | 1     | CONTROL: el humilde lista también las HTML: un `<link>` a la raíz resuelve a `index.html` → 0 (nace en VERDE)                                |
-| A mano, el lead (`progress/verificacion_viva_h5_enlaces_horneados.md`) | @s63      | 1     | `@demostracion-del-lead`: borrar `public/favicon.svg` → `pnpm build` ≠ 0 con la (a); restaurar → 0 y limpio                                  |
-|                                                                        | @s64      | 1     | `@verificacion-viva`: tras publicar, cada `href` → 200, contraprueba `/favicon.svg` → 404. CONTROL, no evidencia de H-5                      |
+| Grupo                                                                  | Escenario | Filas | Qué fija                                                                                                                                                          |
+| ---------------------------------------------------------------------- | --------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Puerta pura (`src/lib/puerta-cascaron.test.ts`, cuenta para Stryker)   | @s46      | 1     | CONTROL: un `<link>` de cada clase del artefacto real, todos resuelven; la lista se pidió                                                                         |
+|                                                                        | @s47      | 9     | regla 1 (sin el prefijo), su orden frente a la 2 y la 3, la asimetría 1 y `/` bajo la base                                                                        |
+|                                                                        | @s48      | 16    | regla 2 (sin fichero): caja, carpeta, `...`; los segmentos `.`, `..` y `//` de la RUTA, el último incluido, son la 4 (S-11); controles de `?query` y `#fragmento` |
+|                                                                        | @s49      | 3     | regla 3 (0 bytes) y su control de 1 byte                                                                                                                          |
+|                                                                        | @s50      | 11    | regla 4: una fila por `%`, `&` y barra invertida (dentro y AL PRINCIPIO, S-7, también seguida de `/`), y su orden frente a la 1 y la 2                            |
+|                                                                        | @s51      | 9     | solo la raíz va a `index.html`, y se BUSCA en la lista (dos listas variantes); `x/` y `x` fallan cerrado; asimetría 2; la lista se pidió                          |
+|                                                                        | @s52      | 16    | la limpieza, con «la lista se pidió» en cada fila: cada carácter en cada extremo y dentro, y el valor CRUDO en la línea                                           |
+|                                                                        | @s53      | 7     | lo que no es root-absoluto queda fuera y ni pide la lista                                                                                                         |
+|                                                                        | @s54      | 6     | sin base (ausente o `null`); una base sin barra final corta con la línea de la base (S-12)                                                                        |
+|                                                                        | @s55      | 12    | todo `rel`, la caja de la etiqueta y el `<link>` del `<body>`, con el ANCLA DE SITIO                                                                              |
+|                                                                        | @s56      | 1     | formato y orden del informe con dos páginas                                                                                                                       |
+|                                                                        | @s57      | 7     | la lista AUSENTE: corte con una sola línea (filas 1-3, 6 y 7), o lo de hoy salvo la guarda (4-5)                                                                  |
+|                                                                        | @s58      | 3     | la lista se pide solo con candidatos; si revienta, rama de @s29; con `dist/` ausente, la de @s26                                                                  |
+|                                                                        | @s59      | 8     | la guarda del extractor nuevo, su orden tras @s28, sus controles y su acoplamiento con @s13 (S-9)                                                                 |
+|                                                                        | @s60      | 1     | las 5 reglas en `REGLAS_DEL_CASCARON`, sin «origen» ni «placeholder»; la lista NO es «TODAS» (hueco)                                                              |
+|                                                                        | @s65      | 5     | regla 5 (S-8): oculto en la lista → regla 5; antes que la 3; solo si está en la lista; cada segmento                                                              |
+|                                                                        | @s66      | 3     | un candidato en la SEGUNDA página basta: lista presente, ausente y que lanza                                                                                      |
+|                                                                        | @s68      | 8     | S-12: cada condición de la base no utilizable corta con su línea y sin pedir la lista; `/` es utilizable; sin candidatos, lo de hoy                               |
+|                                                                        | @s69      | 1     | S-12 va DESPUÉS del corte por lista ausente                                                                                                                       |
+| Extremo a extremo (`src/pages/home-horneado.test.ts`, fuera)           | @s61      | 1     | ANCLA del artefacto real (con la base, con `assets/` y el favicon) + CONTROL (exit 0, `✓`)                                                                        |
+|                                                                        | @s62      | 3     | las tres firmas (a), (b) y (c), cada una en su copia, con su línea exacta y el original RELEÍDO intacto                                                           |
+|                                                                        | @s67      | 1     | el humilde lista solo FICHEROS: un `<link>` a la carpeta real `assets` → regla 2                                                                                  |
+|                                                                        | @s70      | 1     | CONTROL: con `dist/` ausente el humilde no lista antes de `existe()`: línea de @s26, sin `ENOENT` (nace en VERDE)                                                 |
+|                                                                        | @s71      | 1     | el humilde lista también los OCULTOS: un `<link>` a `.vite/manifest.json` → regla 5 (nace en ROJO)                                                                |
+|                                                                        | @s72      | 1     | CONTROL: el humilde lista también las HTML: un `<link>` a la raíz resuelve a `index.html` → 0 (nace en VERDE)                                                     |
+| A mano, el lead (`progress/verificacion_viva_h5_enlaces_horneados.md`) | @s63      | 1     | `@demostracion-del-lead`: borrar `public/favicon.svg` → `pnpm build` ≠ 0 con la (a); restaurar → 0 y limpio                                                       |
+|                                                                        | @s64      | 1     | `@verificacion-viva`: tras publicar, cada `href` → 200, contraprueba `/favicon.svg` → 404. CONTROL, no evidencia de H-5                                           |
 
 Ningún escenario toca `inspeccionarSitio` (S-4): las reglas nuevas se observan por `ejecutarPuertaDelCascaron`,
 que es lo que recibe la lista. Los textos de las reglas y de las tres líneas nuevas son los de la spec, copiados
@@ -74,7 +77,8 @@ base, regla 1 si no empieza por ella y `resto = ruta.slice(base.length)`; sin ba
 regla 5 si algún segmento de `ubicacion` empieza por `.`; regla 3 si pesa 0. **[V: modelo]** = medido sobre el
 modelo de la ronda 1 (§8); **[V: Stryker r2]** = medido con el instrumentador de Stryker 9.6.1 sobre el modelo de
 la ronda 2 y las 125 filas leídas del `.feature` (§10: 159 mutantes del código nuevo, 0 supervivientes);
-**[V: modelo r2]** = una desviación de conducta corrida contra esas filas.
+**[V: modelo r2]** = una desviación de conducta corrida contra esas filas. **[V: final]** = medido en la pasada final
+con el arnés del revisor B (su modelo de la spec, las 127 filas leídas del `.feature` y sus variantes; §11).
 
 | Escenario / fila                                                            | `Then` que muerde                                    | Mutante que mata                                                                                                                                                                                                                                                                                                                                     |
 | --------------------------------------------------------------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -91,9 +95,10 @@ la ronda 2 y las 125 filas leídas del `.feature` (§10: 159 mutantes del códig
 | @s48 control `assets/app.css`                                               | 0 líneas                                             | `slice(base.length)` eliminado (`MethodExpression`): buscaría `dist//NailsLashStudioWeb/…`                                                                                                                                                                                                                                                           |
 | @s48 `no-existe.svg`                                                        | línea de la regla 2                                  | «no está» → `false` o `!==`; texto de la regla → `""`                                                                                                                                                                                                                                                                                                |
 | @s48 `FAVICON.SVG`, `assets`                                                | regla 2                                              | búsqueda sin caja, `existsSync` o resolver carpetas (desviaciones)                                                                                                                                                                                                                                                                                   |
-| @s48 `./`, `../`, `//` y `/./favicon.svg` (S-11, ronda 2)                   | regla 4                                              | quitar el `.`, el `..` o el `//` (`segmento === '..'` → `false` solo muere en `../`); `                                                                                                                                                                                                                                                              |     | `→`&&`; `.some`→`.every`; normalizar la ruta (desviación); mirar los segmentos DESPUÉS de la regla 1 (fila `/./favicon.svg`) [V: Stryker r2] |
+| @s48 `./`, `../`, `//` y `/./favicon.svg` (S-11, ronda 2)                   | regla 4                                              | quitar el `.`, el `..` o el `//` (`segmento === '..'` → `false` solo muere en `../`); `\|\|` → `&&`; `.some` → `.every`; normalizar la ruta (desviación); mirar los segmentos DESPUÉS de la regla 1 (fila `/./favicon.svg`) [V: Stryker r2]                                                                                                          |
 | @s48 `.../favicon.svg` (ronda 2)                                            | regla 2                                              | comparar los segmentos con `startsWith('.')` en vez de igualdad: también rompe las cuatro filas de @s65 que no son el control [V: modelo r2]                                                                                                                                                                                                         |
 | @s48 `?v=/../x`, `#/./x`, `#//x` (ronda 2)                                  | 0 líneas                                             | mirar los segmentos sobre el `href` entero y no sobre la ruta: las tres en rojo [V: modelo r2]                                                                                                                                                                                                                                                       |
+| @s48 `x/..` y `.` (pasada final, filas 15-16)                               | regla 4                                              | dejar de mirar el ÚLTIMO segmento: `split('/').slice(0, -1)`, o una regex que cierre el segmento con «`/` o fin» a la que Stryker le quite el `$`; las dos pasaban las otras 125 filas y aquí daban la regla 2, y NO son equivalentes [V: final]                                                                                                     |
 | @s49 `vacio.svg`, `vacio.svg?v=2`                                           | línea de la regla 3                                  | `bytes === 0` → `false` o `!==`; texto → `""`; la query sin quitar al buscar                                                                                                                                                                                                                                                                         |
 | @s49 `uno.svg` (1 B)                                                        | 0 líneas                                             | si se escribe `bytes < 1`: `<= 1` (`EqualityOperator`); con `=== 0`, el `!==` ya muere en la fila de 0 B                                                                                                                                                                                                                                             |
 | @s50 una fila por carácter                                                  | línea de la regla 4                                  | `ArrayDeclaration`, `StringLiteral` o `.some` → `.every` sobre los tres caracteres; texto → `""` [V: Stryker r2]                                                                                                                                                                                                                                     |
@@ -118,7 +123,7 @@ la ronda 2 y las 125 filas leídas del `.feature` (§10: 159 mutantes del códig
 | @s53 (todas)                                                                | 0 líneas con la lista AUSENTE                        | `candidatos.length > 0` → `>= 0` o `true`, `if (hayCandidatos)` → `true`: cortarían con la línea de la lista ausente [V: Stryker r2]                                                                                                                                                                                                                 |
 | @s54 sin base (ausente y `null`)                                            | regla 2, nunca la 1                                  | `base === null` → `false` (iría por la rama con base: regla 1); `slice(1)` eliminado (buscaría `dist//favicon.svg`); la base ausente sin normalizar a `null`; en el corte de S-12, `base !== null` → `true` o `===` (cortaría sin base) [V: Stryker r2]                                                                                              |
 | @s54 `/NailsLashStudioWeb/favicon.svg` sin base                             | regla 2                                              | quitar «a ojo» el prefijo cuando no hay base declarada                                                                                                                                                                                                                                                                                               |
-| @s54 base sin barra final (ronda 2: S-12)                                   | la línea de la base                                  | normalizar la base (añadirle la barra); en el predicado, `&&` → `                                                                                                                                                                                                                                                                                    |     | `, `endsWith('/')`→`startsWith`o`'/'`→`""` (estos dos, también con @s68 fila 4) [V: Stryker r2]                                              |
+| @s54 base sin barra final (ronda 2: S-12)                                   | la línea de la base                                  | normalizar la base (añadirle la barra); en el predicado, `&&` → `\|\|`, `endsWith('/')` → `startsWith` o `'/'` → `""` (estos dos, también con @s68 fila 4) [V: Stryker r2]                                                                                                                                                                           |
 | @s55 una fila por `rel`, la caja y el `<body>`                              | regla 2                                              | filtrar por `rel`; un extractor sin la bandera `i` (desviaciones: los extractores reutilizados ya la llevan)                                                                                                                                                                                                                                         |
 | @s55 fila `<body>` con el ANCLA DE SITIO (ronda 2)                          | regla 2, y el `href` DESPUÉS de `</head>`            | una puerta que saque los candidatos de `cabezaDe` [V: modelo r2, «solo-cabeza»: solo esta fila]; un ayudante del test que ignore la columna `sitio` y lo meta en el `<head>` (lo caza el ANCLA DE SITIO)                                                                                                                                             |
 | @s56                                                                        | las 5 líneas, en orden                               | `ArrayDeclaration` sobre `[...hoy, ...links]` → `[]`, u orden invertido; deduplicar (el `/favicon.svg` doble); ordenar páginas; ruta física en vez de lógica                                                                                                                                                                                         |
@@ -128,7 +133,7 @@ la ronda 2 y las 125 filas leídas del `.feature` (§10: 159 mutantes del códig
 | @s58 filas 2-3                                                              | 0 líneas / línea de @s26                             | pedir la lista SIEMPRE (`hayCandidatos` → `true`) o antes de `existe()` (un valor y no un método); en la 3, también `.some` → `.every` en los candidatos (`[].every(…)` es cierto con `dist/` ausente) [V: modelo]                                                                                                                                   |
 | @s59 fila 1                                                                 | línea de la guarda                                   | `> 0` → `>= 0`; quitar la guarda (`BlockStatement`); texto → `""`                                                                                                                                                                                                                                                                                    |
 | @s59 fila 2                                                                 | línea de la guarda sin lista                         | condicionar la guarda a la lista                                                                                                                                                                                                                                                                                                                     |
-| @s59 filas 3-4                                                              | SOLO @s28 / SOLO el title                            | guarda colocada antes de la de @s28 o antes de las violaciones de hoy                                                                                                                                                                                                                                                                                |
+| @s59 filas 3-4                                                              | SOLO @s28 / SOLO el title                            | guarda colocada antes de la de @s28 o antes de las violaciones de hoy; la fila 4 (sin ningún `href` de `<link>`, con violaciones) es la que protege el veredicto de F-06: @s57 fila 5 no lo distingue, porque lleva la canónica con `href` [V: final]                                                                                                |
 | @s59 fila 5                                                                 | 0 líneas                                             | guarda que excluya la canónica (`rel="canonical"`)                                                                                                                                                                                                                                                                                                   |
 | @s59 filas 6-7                                                              | 0 líneas                                             | guarda que cuente solo root-absolutos, o que filtre el `href` vacío (`filter(Boolean)`)                                                                                                                                                                                                                                                              |
 | @s59 fila 8 (dos páginas)                                                   | 0 líneas                                             | `.some` → `.every` en la guarda (`MethodExpression`)                                                                                                                                                                                                                                                                                                 |
@@ -157,7 +162,9 @@ lo genera: `equality-operator-mutator.js:10` solo da `!==` para `===`. Los equiv
 FORMA, no de la spec, y la cabecera de la sección dice cómo escribirlos para que no aparezcan: el cableado de la
 lista con `hayCandidatos && ficheros !== undefined ? … : []` más un `if (hayCandidatos)` (3 supervivientes) o con
 `ficheros?.listar() ?? []` (3), y tres idiomas: el `+` en lo que se quita dentro, el `slice(1)` en el predicado de
-oculto y el `^` al quitar la barra sin base (1 cada uno) [V: Stryker r2]. Si aparecen, se REFACTORIZAN, nunca se
+oculto y el `^` al quitar la barra sin base (1 cada uno) [V: Stryker r2]; y, desde la pasada final, un cuarto: la
+ruta sacada con una regex `[?#].*` anclada a `$` en vez de con `rutaDelHref` (su «`$` quitado» sobrevive: 179
+mutantes, 1 vivo, revisor B; la cabecera prescribe `rutaDelHref`). Si aparecen, se REFACTORIZAN, nunca se
 excluyen (`mutante-equivalente-se-refactoriza-para-proteger-un-throw-real`, spec «Mutación (D10)»). Si la limpieza
 se escribe quitando TAB, LF y CR ANTES de recortar, la clase del recorte basta con FF y espacio: con los cinco,
 esos tres serían hijos sobrantes de la clase (nivel 2 de `weapon-regex`, que Stryker 9.6.1 no genera:
@@ -175,7 +182,10 @@ esos tres serían hijos sobrantes de la clase (nivel 2 de `weapon-regex`, que St
   fuera, falso negativo HEREDADO de A-17; @s23/@s24 no se tocan) y `baseDeclarada`, que lee texto (un comentario
   `// base: '/vieja/',` delante de la línea real pasa el predicado de S-12 y daría reglas 1 inexactas; hoy
   `vite.config.ts` trae una sola aparición de `base:`, spec). @s53 FIJA que relativos, absolutos y `//` quedan
-  fuera; el resto no tiene escenario.
+  fuera; el resto no tiene escenario. Desde la pasada final (§11) el banner recoge además el hueco «La caja en el
+  build» de la spec (Windows hornearía la firma b y Linux la a [I]; por eso no hay sabotaje de caja) y, en el de
+  `baseDeclarada`, su cara inversa: la base real en una config de una línea no pasa el predicado y corta un build
+  que hoy pasa, el cambio de VEREDICTO latente de S-12.
 - **`REGLAS_DEL_CASCARON` no es «TODAS las reglas»**, aunque su comentario lo diga (`src/lib/puerta-cascaron.ts:857`):
   le falta `REGLA_RUTA_AUSENTE` (:670), que la puerta emite (@s26) [V: copia literal, 22 entradas, `includes` →
   `false`]. Hueco DECLARADO en @s60, en el banner y, desde su ronda 2, en la spec; no se cierra en H-5 (§5,
@@ -216,7 +226,8 @@ esos tres serían hijos sobrantes de la clase (nivel 2 de `weapon-regex`, que St
   rojo (§8). **Ronda 2**: las 125 filas puras se LEEN del `.feature` nuevo (las tablas tal cual; los escenarios
   sin tabla genérica, escritos a mano desde él) y se corren contra un modelo de la spec con S-11 y S-12 montado
   sobre una copia literal de `src/lib/puerta-cascaron.ts`, en la forma de cableado E: **0 en rojo**; con la
-  puerta de hoy, 96 en rojo y 29 en verde, los controles [V: §10].
+  puerta de hoy, 96 en rojo y 29 en verde, los controles [V: §10]. **Pasada final**: 127 filas (dos más en @s48),
+  0 en rojo con el modelo del revisor B; con la puerta de hoy, 98 en rojo y 29 en verde [V: final, §11].
 - **@s59 fila 1**: `<link rel="canonical">` sin `href` → `atributoDeEtiqueta` devuelve `''`, no `null`
   (:387-401), así que no salta «canónica ausente» [V: leído y medido].
 - **@s50 y @s52**: los comportamientos del navegador que se citan están medidos con `new URL(href,
@@ -247,6 +258,8 @@ esos tres serían hijos sobrantes de la clase (nivel 2 de `weapon-regex`, que St
 | **Ronda 2:** `/./favicon.svg`                                                                            | cenit-digital.github.io | `/favicon.svg`                                                          |
 | **Ronda 2:** `/NailsLashStudioWeb/.../favicon.svg`                                                       | cenit-digital.github.io | igual (Pages: 404)                                                      |
 | **Ronda 2:** `…/favicon.svg?v=/../x`, `…#/./x` y `…#//x`                                                 | cenit-digital.github.io | `/NailsLashStudioWeb/favicon.svg` (la query y el fragmento no se tocan) |
+| **Pasada final:** `/NailsLashStudioWeb/x/..` y `/NailsLashStudioWeb/.`                                   | cenit-digital.github.io | `/NailsLashStudioWeb/` (la raíz, que existe)                            |
+| **Pasada final:** `/NailsLashStudioWeb/..`                                                               | cenit-digital.github.io | `/` (fuera del sitio)                                                   |
 
 La barra invertida dentro de la ruta se lee como `/` (S-2, que la spec ya da por [V]). Consecuencia que el
 contrato escribe: la fila `/NailsLashStudioWeb⟨U+005C⟩favicon.svg` de @s50 es un falso positivo CONSCIENTE, como
@@ -285,23 +298,31 @@ también los segmentos `.`, `..` y `//` de @s48: GitHub Pages sirve `./`, `asset
   (:74-103): `<head></head>` y 0 `<link>`, y sale hoy con 6 violaciones (title, description, canónica, h1, JSON-LD
   y `/aviso-legal`) [V: §10, la puerta de hoy y el modelo sobre una copia literal del fixture]. Su veredicto (≠ 0,
   :436) no cambia SOLO porque las violaciones devuelven antes que cualquier guarda (`src/lib/puerta-cascaron.ts:830-832`):
-  es el caso de @s57 fila 5. Lo mismo los experimentos head-espacio, head-mayusculas y head-atributo de @s33, que
+  ese orden, en una página SIN ningún `href` de `<link>`, lo protege @s59 fila 4 (pasada final, N2: la ronda 2
+  citaba @s57 fila 5, que lleva la canónica con `href` y la pasa también una guarda puesta por error delante de las
+  violaciones [V: final]). Lo mismo los experimentos head-espacio, head-mayusculas y head-atributo de @s33, que
   corren el humilde: 0 `<link>` en su `dist/index.html` [V: §10] y ≠ 0 por otras violaciones
   (`src/lib/trampas-del-horneado.test.tsx:370` y :378). ACOPLAMIENTO declarado en el banner, con la condición
-  medida: quitarles las violaciones obliga a darles una canónica (si no, «canónica ausente»); con `href` la guarda
-  pasa (@s59 fila 5), sin él habla (@s59 fila 1).
+  medida: quitarles las violaciones obliga a darles una canónica (si no, «canónica ausente»); con `href` absoluto
+  la guarda pasa (@s59 fila 5), sin él habla (@s59 fila 1), y con uno root-absoluto y sin la lista (la llamada de
+  F-06 no la pasa) el `<link>` es candidato y la puerta sale por el corte de S-3 (@s57 filas 1-3), no con 0 [V:
+  final]. Por eso el banner dice «con `href` absoluto, o pasándole a la puerta una lista en la que resuelva» (N3).
 - **@s13 (canónica ausente)**: @s59 fila 1 FIJA que una canónica sin `href` entre comillas dobles cuenta como
   PRESENTE (S-9), cosa que @s13 nunca decidió (su fila solo cubre «no hay ningún `<link rel="canonical">`»,
-  `features/cascaron_semantico.feature:1109` desde esta ronda [V: grep]: era :1045 antes de la ronda 1 y :1079
-  después, y el banner de la ronda 2 crece 30 líneas). La spec (S-9, `project-spec.md:1463`) cita :1079, la línea
-  de `f850db8`: PENDIENTE para el `spec_partner`, fuera de mi alcance (§9, R2-14). Declarado en el banner: si
-  @s13 se endurece, la guarda vuelve a la puerta humana; nunca se excluyen sus mutantes.
+  `features/cascaron_semantico.feature:1136` desde la pasada final [V: grep]: era :966 en `main`, :1045 en
+  `ba661f9`, :1079 en `f850db8` y :1109 en `9a6e8e2`; se mueve cada vez que crece el banner). La spec (S-9) ya la
+  cita con su commit («:1109 en `9a6e8e2`») y manda localizarla por su texto: el pendiente de R2-14 queda cerrado.
+  Declarado en el banner: si @s13 se endurece, la guarda vuelve a la puerta humana; nunca se excluyen sus mutantes.
 - **Cambio de veredicto declarado**: una canónica sin `href` (o con comillas simples) y ningún otro `href` de
   `<link>` hoy sale con 0 y con la enmienda no [V: la puerta de hoy da `{"codigoSalida":0,"lineas":[]}`]. Está en
   el «QUÉ CAMBIA» del banner para que la puerta humana lo ratifique.
-- **Cambio de diagnóstico declarado (S-12, ronda 2)**: con una base declarada no utilizable y algún candidato, la
-  puerta del cascarón, la 1.ª de `pnpm build` (`package.json:16`), corta con su línea y la de F-05 (la 4.ª) no se
-  imprime. En el banner («QUÉ CAMBIA») y en @s68.
+- **Cambio de diagnóstico, y uno de veredicto latente, declarados (S-12; ronda 2 y pasada final)**: con una base
+  declarada no utilizable y algún candidato, la puerta del cascarón, la 1.ª de `pnpm build` (`package.json:16`),
+  corta con su línea y la de F-05 (la 4.ª), si la rechaza, no se imprime. Pero con una base que empieza por `/`, no
+  por `//`, y no acaba en `/` (la config en una línea: `baseDeclarada` lee `"/NailsLashStudioWeb/ })"`), F-05 la
+  ACEPTA y la puerta de hoy sale con 0 sobre la home real: con H-5, un build que hoy pasa fallaría (M3, §11) [V:
+  final, el sondeo del revisor B sobre la home horneada de la verificación; el build, I]. En el banner («QUÉ
+  CAMBIA», la recomendación de la puerta y el hueco de `baseDeclarada`) y en @s68 (fila 4 y comentario).
 - **@s33 `head-correcto`** (`src/lib/trampas-del-horneado.test.tsx`): su único `<link>` horneado es la canónica
   absoluta [V: §10, 1 `<link>`]: 0 candidatos, la guarda cuenta 1, exit 0 sigue. @s59 fila 5 es justo ese caso.
 - **@s32 `react19-nativa`**: su canónica sale en el `<body>` (`</head>` en el offset 148, el `<link>` en el 314
@@ -376,6 +397,9 @@ root-absoluto`», el original RELEÍDO e idéntico, el `href` leído tal cual (`
 18. **Ronda 2 — @s70, @s71 y @s72**: lo que la spec dice del humilde («no puede listar antes de que la puerta
     pregunte `existe()`», «lista también los ocultos y no filtra nada», «HTML incluidas») hecho observable.
     @s70 y @s72 NACEN EN VERDE: son controles que la puerta de hoy ya cumple y la enmienda no debe romper.
+19. **Pasada final — el último segmento** (@s48, filas 15-16) y **la ruta con `rutaDelHref`** (cabecera, cuarta
+    forma): la spec los escribe desde su ronda final (resolución, paso 2); el contrato hace observable el primero
+    y prescribe el segundo, para que no quede vivo ningún mutante.
 
 **Preguntas para la puerta humana, con su recomendación:**
 
@@ -389,70 +413,72 @@ root-absoluto`», el original RELEÍDO e idéntico, el `href` leído tal cual (`
    controles @s70 (`dist/` ausente) y @s72 (la raíz)? **Recomendación: sí**: cada uno ancla una propiedad del
    humilde que la spec da por probada por el extremo a extremo y que ningún otro `Then` veía (medido: un humilde
    sin ella pasaba todo lo demás, §10). Ninguno es una firma: S-5 sigue en tres.
-4. ¿Se ratifican S-11 (los segmentos `.`, `..` y vacíos a la regla 4, con su texto ampliado) y S-12 (cortar con
-   la línea de la base, también el cambio de diagnóstico frente a F-05)? **Recomendación: sí, tal cual**: es la
-   recomendación de la propia spec («Preguntas abiertas») y el contrato ya los fija (@s48, @s54, @s68, @s69).
+4. ¿Se ratifican S-11 (los segmentos `.`, `..` y vacíos a la regla 4, el último incluido, con su texto ampliado) y
+   S-12 (cortar con la línea de la base: un cambio de diagnóstico frente a F-05 y, con la config en una línea, uno
+   de VEREDICTO, porque un build que hoy pasa fallaría)? **Recomendación: sí, tal cual**: es la recomendación de la
+   propia spec («Preguntas abiertas»), que pide ratificar S-12 sabiéndolo, y el contrato ya los fija (@s48, @s54,
+   @s68, @s69).
 
 ## 6. Traza: spec → escenarios
 
-| Spec (`project-spec.md` §Feature 4 → «Enmienda 5»)                                                                 | Escenarios                                                                                                                                                       |
-| ------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| H5-1 dueño F-04 (ENMIENDA 5, desde @s46)                                                                           | todo el bloque; banner                                                                                                                                           |
-| H5-2 todo `<link>`, sea cual sea su `rel`, en todo HTML                                                            | @s46, @s55, @s56 y @s66 (dos páginas)                                                                                                                            |
-| H5-2 «root-absoluto» tras la limpieza; `/` + barra invertida falla cerrado                                         | @s52, @s47 (`⟨U+0020⟩/favicon.svg` y `/`), @s53 (`//`), @s50                                                                                                     |
-| H5-3 resolución ESTRICTA (solo la raíz → `index.html`, que se busca)                                               | @s51 (con las listas variantes), @s48 (`assets`, `...`), @s67 (carpeta real), @s72                                                                               |
-| H5-4 `%` y `&` con regla propia, sin decodificar                                                                   | @s50                                                                                                                                                             |
-| H5-5 lista OPCIONAL que falla cerrado                                                                              | @s57, @s58, @s66, @s69                                                                                                                                           |
-| H5-6 fusionar, publicar y comprobar                                                                                | @s64                                                                                                                                                             |
-| S-1 una sola regla para `%`, `&` y la barra invertida                                                              | @s50                                                                                                                                                             |
-| S-2 la barra invertida en CUALQUIER posición                                                                       | @s50 (`/NailsLashStudioWeb⟨U+005C⟩favicon.svg`)                                                                                                                  |
-| S-3 lista ausente con candidatos → corta con una línea                                                             | @s57 filas 1-3, 6 y 7, @s66 fila 2, @s69                                                                                                                         |
-| S-4 las reglas fuera de `inspeccionarSitio`                                                                        | @s57 filas 4-5 (lo de hoy); ciego estructural (§3)                                                                                                               |
-| S-5 el extremo a extremo siembra las TRES firmas                                                                   | @s62                                                                                                                                                             |
-| S-6 el valor es el `href` CRUDO                                                                                    | @s47 y @s52 (filas con espacio o FF), @s50 (`&amp;`), @s49 (`?v=2`)                                                                                              |
-| S-7 barra invertida AL PRINCIPIO: candidato, regla 4                                                               | @s50 (cuatro filas finales), @s57 filas 6 y 7                                                                                                                    |
-| S-8 regla 5, ocultos en la lista                                                                                   | @s65; @s71 (el humilde no los filtra); @s49 (comentario de `.nojekyll`)                                                                                          |
-| S-9 canónica sin `href` = presente para @s13; acoplamiento                                                         | @s59 fila 1 y comentario; banner                                                                                                                                 |
-| S-10 el rojo demostrado es solo la (a)                                                                             | @s63; @s62 siembra la (c) sobre una copia                                                                                                                        |
-| S-11 los segmentos `.`, `..` y `//` de la RUTA → regla 4                                                           | @s48 (título y 8 filas: `./`, `../`, `//`, `/./favicon.svg`, `...` y los controles `?v=/../x`, `#/./x`, `#//x`); texto de la regla 4 en la cabecera, @s50 y @s60 |
-| S-12 base declarada no utilizable con candidatos → corta                                                           | @s68, @s69, @s54 (última fila); banner («CAMBIO DE DIAGNÓSTICO»)                                                                                                 |
-| Las cinco reglas, texto exacto, en `REGLAS_DEL_CASCARON`                                                           | @s47-@s50, @s65, @s60                                                                                                                                            |
-| Formato y orden del informe                                                                                        | @s56                                                                                                                                                             |
-| El puerto: presente (se pide solo con candidatos y base utilizable; si lanza, @s29)                                | @s46, @s51, @s52, @s58, @s66, @s68                                                                                                                               |
-| El puerto: ausente con / sin candidatos                                                                            | @s57, @s53, @s66, @s69                                                                                                                                           |
-| El humilde lo cablea siempre, perezoso, todos los ficheros (ocultos y HTML) y solo ficheros, sin leer el contenido | @s61, @s62, @s67, @s70, @s71, @s72; «sin leer el contenido», ciego (§3)                                                                                          |
-| Guarda anti-vacuidad del extractor nuevo, qué no certifica y su acoplamiento                                       | @s59                                                                                                                                                             |
-| Qué NO cambia (con el cambio de veredicto de la guarda y las llamadas de hoy, declarados)                          | @s1-@s45 intactos; @s57 filas 4-5; @s59 fila 2; @s61 (`✓`); banner                                                                                               |
-| Asimetría 1 (`<a>` fuera, `<link>` regla 1; F-05 solo con sus `rel`)                                               | @s47 (`/otra-cosa/x.css` y comentario), @s55 (segunda canónica), @s53                                                                                            |
-| Asimetría 2 (ficheros frente a rutas lógicas)                                                                      | @s51 (`/NailsLashStudioWeb/x`)                                                                                                                                   |
-| Asimetría 3 (limpieza, barra invertida inicial y regla 4, solo de `<link>`)                                        | banner («QUÉ NO CAMBIA» y huecos); sin escenario: heredado de A-17, @s23/@s24 no se tocan                                                                        |
-| D9 extremo a extremo: ancla, control, tres sabotajes                                                               | @s61, @s62 (y @s67, @s70-@s72, el humilde)                                                                                                                       |
-| D9 rojo demostrado del lead                                                                                        | @s63                                                                                                                                                             |
-| D10 mutación al 100 %, solo con los unitarios                                                                      | @s46-@s60, @s65, @s66, @s68, @s69 (§2)                                                                                                                           |
+| Spec (`project-spec.md` §Feature 4 → «Enmienda 5»)                                                                 | Escenarios                                                                                                                                                                                                                  |
+| ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| H5-1 dueño F-04 (ENMIENDA 5, desde @s46)                                                                           | todo el bloque; banner                                                                                                                                                                                                      |
+| H5-2 todo `<link>`, sea cual sea su `rel`, en todo HTML                                                            | @s46, @s55, @s56 y @s66 (dos páginas)                                                                                                                                                                                       |
+| H5-2 «root-absoluto» tras la limpieza; `/` + barra invertida falla cerrado                                         | @s52, @s47 (`⟨U+0020⟩/favicon.svg` y `/`), @s53 (`//`), @s50                                                                                                                                                                |
+| H5-3 resolución ESTRICTA (solo la raíz → `index.html`, que se busca)                                               | @s51 (con las listas variantes), @s48 (`assets`, `...`), @s67 (carpeta real), @s72                                                                                                                                          |
+| H5-4 `%` y `&` con regla propia, sin decodificar                                                                   | @s50                                                                                                                                                                                                                        |
+| H5-5 lista OPCIONAL que falla cerrado                                                                              | @s57, @s58, @s66, @s69                                                                                                                                                                                                      |
+| H5-6 fusionar, publicar y comprobar                                                                                | @s64                                                                                                                                                                                                                        |
+| S-1 una sola regla para `%`, `&` y la barra invertida                                                              | @s50                                                                                                                                                                                                                        |
+| S-2 la barra invertida en CUALQUIER posición                                                                       | @s50 (`/NailsLashStudioWeb⟨U+005C⟩favicon.svg`)                                                                                                                                                                             |
+| S-3 lista ausente con candidatos → corta con una línea                                                             | @s57 filas 1-3, 6 y 7, @s66 fila 2, @s69                                                                                                                                                                                    |
+| S-4 las reglas fuera de `inspeccionarSitio`                                                                        | @s57 filas 4-5 (lo de hoy); ciego estructural (§3)                                                                                                                                                                          |
+| S-5 el extremo a extremo siembra las TRES firmas                                                                   | @s62                                                                                                                                                                                                                        |
+| S-6 el valor es el `href` CRUDO                                                                                    | @s47 y @s52 (filas con espacio o FF), @s50 (`&amp;`), @s49 (`?v=2`)                                                                                                                                                         |
+| S-7 barra invertida AL PRINCIPIO: candidato, regla 4                                                               | @s50 (cuatro filas finales), @s57 filas 6 y 7                                                                                                                                                                               |
+| S-8 regla 5, ocultos en la lista                                                                                   | @s65; @s71 (el humilde no los filtra); @s49 (comentario de `.nojekyll`)                                                                                                                                                     |
+| S-9 canónica sin `href` = presente para @s13; acoplamiento                                                         | @s59 fila 1 y comentario; banner                                                                                                                                                                                            |
+| S-10 el rojo demostrado es solo la (a)                                                                             | @s63; @s62 siembra la (c) sobre una copia                                                                                                                                                                                   |
+| S-11 los segmentos `.`, `..` y `//` de la RUTA → regla 4                                                           | @s48 (título y 10 filas: `./`, `../`, `//`, `/./favicon.svg`, `...`, los controles `?v=/../x`, `#/./x`, `#//x` y, desde la pasada final, el último segmento, `x/..` y `.`); texto de la regla 4 en la cabecera, @s50 y @s60 |
+| S-12 base declarada no utilizable con candidatos → corta                                                           | @s68, @s69, @s54 (última fila); banner («CAMBIO DE DIAGNÓSTICO, Y UNO DE VEREDICTO LATENTE»: @s68 fila 4)                                                                                                                   |
+| Las cinco reglas, texto exacto, en `REGLAS_DEL_CASCARON`                                                           | @s47-@s50, @s65, @s60                                                                                                                                                                                                       |
+| Formato y orden del informe                                                                                        | @s56                                                                                                                                                                                                                        |
+| El puerto: presente (se pide solo con candidatos y base utilizable; si lanza, @s29)                                | @s46, @s51, @s52, @s58, @s66, @s68                                                                                                                                                                                          |
+| El puerto: ausente con / sin candidatos                                                                            | @s57, @s53, @s66, @s69                                                                                                                                                                                                      |
+| El humilde lo cablea siempre, perezoso, todos los ficheros (ocultos y HTML) y solo ficheros, sin leer el contenido | @s61, @s62, @s67, @s70, @s71, @s72; «sin leer el contenido», ciego (§3)                                                                                                                                                     |
+| Guarda anti-vacuidad del extractor nuevo, qué no certifica y su acoplamiento                                       | @s59                                                                                                                                                                                                                        |
+| Qué NO cambia (con el cambio de veredicto de la guarda y las llamadas de hoy, declarados)                          | @s1-@s45 intactos; @s57 filas 4-5; @s59 fila 2; @s61 (`✓`); banner                                                                                                                                                          |
+| Asimetría 1 (`<a>` fuera, `<link>` regla 1; F-05 solo con sus `rel`)                                               | @s47 (`/otra-cosa/x.css` y comentario), @s55 (segunda canónica), @s53                                                                                                                                                       |
+| Asimetría 2 (ficheros frente a rutas lógicas)                                                                      | @s51 (`/NailsLashStudioWeb/x`)                                                                                                                                                                                              |
+| Asimetría 3 (limpieza, barra invertida inicial y regla 4, solo de `<link>`)                                        | banner («QUÉ NO CAMBIA» y huecos); sin escenario: heredado de A-17, @s23/@s24 no se tocan                                                                                                                                   |
+| D9 extremo a extremo: ancla, control, tres sabotajes                                                               | @s61, @s62 (y @s67, @s70-@s72, el humilde)                                                                                                                                                                                  |
+| D9 rojo demostrado del lead                                                                                        | @s63                                                                                                                                                                                                                        |
+| D10 mutación al 100 %, solo con los unitarios                                                                      | @s46-@s60, @s65, @s66, @s68, @s69 (§2)                                                                                                                                                                                      |
 
 Los 19 casos límite de la spec, uno a uno:
 
-| Caso límite                                                                                                              | Escenario / fila                                  |
-| ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
-| 1 la raíz, con base y sin ella (y se busca en la lista)                                                                  | @s51 filas 1-2 y las tres de las listas variantes |
-| 2 `x/` (no raíz) y `assets` (carpeta sin barra)                                                                          | @s51 (`x/`, `/x/`, `x`), @s48 (`assets`), @s67    |
-| 3 la base sin su barra final como `href`                                                                                 | @s47 (`/NailsLashStudioWeb`)                      |
-| 4 caja: `FAVICON.SVG` → 2; `nailslashstudioweb` → 1                                                                      | @s48, @s47                                        |
-| 5 limpieza; `" /favicon.svg"` → 1                                                                                        | @s52, @s47                                        |
-| 6 `//cdn…` no es de esta puerta                                                                                          | @s53                                              |
-| 7 `/` + barra invertida + `cdn…` y `/NailsLashStudioWeb` + barra invertida + `favicon.svg` → 4                           | @s50                                              |
-| 8 `?v=2` y `#x` resuelven; `&amp;` en la query → 4                                                                       | @s48, @s50                                        |
-| 9 `%2E` → 4 aunque Pages la sirva                                                                                        | @s50                                              |
-| 10 `.`, `..` y `//` → 4 (nunca la 2); `/./favicon.svg` → 4 antes que la 1; la query y el fragmento no cuentan; `...` → 2 | @s48 (S-11)                                       |
-| 11 1 byte pasa; 0 bytes → 3                                                                                              | @s49                                              |
-| 12 sin base: con fichero pasa; sin él → 2, nunca la 1                                                                    | @s54                                              |
-| 13 `href=""`, sin `href`, relativo o absoluto: fuera; con `href`, cuentan para la guarda                                 | @s53, @s59                                        |
-| 14 `<link>` en el `<body>`                                                                                               | @s55 (fila `<body>`, con el ANCLA DE SITIO)       |
-| 15 dos páginas: la línea con la ruta de la que lo trae                                                                   | @s56, @s66                                        |
-| 16 base sin barra final: corta con la línea de la base (S-12), nunca la 2                                                | @s54 (última fila)                                |
-| 17 barra invertida AL PRINCIPIO → 4; sin la lista, corta                                                                 | @s50 (cuatro filas finales), @s57 filas 6 y 7     |
-| 18 ocultos en la lista → 5 (también de 0 B); no en la lista → 2; un punto que no abre segmento no oculta                 | @s65                                              |
-| 19 base no utilizable (S-12): cada condición, la dinámica, la de una línea; `/` utilizable; sin candidatos, lo de hoy    | @s68; el orden tras la lista ausente, @s69        |
+| Caso límite                                                                                                                                                        | Escenario / fila                                  |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
+| 1 la raíz, con base y sin ella (y se busca en la lista)                                                                                                            | @s51 filas 1-2 y las tres de las listas variantes |
+| 2 `x/` (no raíz) y `assets` (carpeta sin barra)                                                                                                                    | @s51 (`x/`, `/x/`, `x`), @s48 (`assets`), @s67    |
+| 3 la base sin su barra final como `href`                                                                                                                           | @s47 (`/NailsLashStudioWeb`)                      |
+| 4 caja: `FAVICON.SVG` → 2; `nailslashstudioweb` → 1                                                                                                                | @s48, @s47                                        |
+| 5 limpieza; `" /favicon.svg"` → 1                                                                                                                                  | @s52, @s47                                        |
+| 6 `//cdn…` no es de esta puerta                                                                                                                                    | @s53                                              |
+| 7 `/` + barra invertida + `cdn…` y `/NailsLashStudioWeb` + barra invertida + `favicon.svg` → 4                                                                     | @s50                                              |
+| 8 `?v=2` y `#x` resuelven; `&amp;` en la query → 4                                                                                                                 | @s48, @s50                                        |
+| 9 `%2E` → 4 aunque Pages la sirva                                                                                                                                  | @s50                                              |
+| 10 `.`, `..` y `//` → 4 (nunca la 2), también el último segmento (`x/..`, `.`); `/./favicon.svg` → 4 antes que la 1; la query y el fragmento no cuentan; `...` → 2 | @s48 (S-11; el último segmento, filas 15-16)      |
+| 11 1 byte pasa; 0 bytes → 3                                                                                                                                        | @s49                                              |
+| 12 sin base: con fichero pasa; sin él → 2, nunca la 1                                                                                                              | @s54                                              |
+| 13 `href=""`, sin `href`, relativo o absoluto: fuera; con `href`, cuentan para la guarda                                                                           | @s53, @s59                                        |
+| 14 `<link>` en el `<body>`                                                                                                                                         | @s55 (fila `<body>`, con el ANCLA DE SITIO)       |
+| 15 dos páginas: la línea con la ruta de la que lo trae                                                                                                             | @s56, @s66                                        |
+| 16 base sin barra final: corta con la línea de la base (S-12), nunca la 2                                                                                          | @s54 (última fila)                                |
+| 17 barra invertida AL PRINCIPIO → 4; sin la lista, corta                                                                                                           | @s50 (cuatro filas finales), @s57 filas 6 y 7     |
+| 18 ocultos en la lista → 5 (también de 0 B); no en la lista → 2; un punto que no abre segmento no oculta                                                           | @s65                                              |
+| 19 base no utilizable (S-12): cada condición, la dinámica, la de una línea; `/` utilizable; sin candidatos, lo de hoy                                              | @s68; el orden tras la lista ausente, @s69        |
 
 Y la lista de «Mutantes que deben morir» de la spec («Mutación (D10)»): limpieza (extremos y tabulador dentro) →
 @s52; aceptar `//` → @s53; `%`, `&` y la barra invertida, una fila por carácter → @s50; la raíz con base y sin
@@ -463,9 +489,10 @@ sin fichero, SOLO la 1), @s50 (con `%` y sin fichero, SOLO la 4), @s48 (`/./favi
 que no se consulta → @s58 y @s66; la guarda (`.some` → `.every`, `> 0` → `>= 0`) con la canónica sin `href` →
 @s59; la barra invertida inicial (S-7) → @s50 y @s57; la regla 5 (predicado, primer segmento, 5 antes que 3,
 antes de buscar en la lista) → @s65; los segmentos (S-11: el `.`, el `..` y el `//`, sobre la ruta y no sobre el
-`href`, por igualdad y no con `startsWith`) → @s48 y @s65; la base no utilizable (S-12: cada condición, `/`, solo
-con candidatos, su orden, que no pide la lista y el valor de su línea) → @s68, @s69 y @s54; el texto de cada regla
-y línea, literal → todas las filas con línea, y @s60.
+`href`, por igualdad y no con `startsWith`, y el ÚLTIMO, ni con `slice(0, -1)` ni con una regex a la que se le
+quite el `$`) → @s48 y @s65; la ruta con `rutaDelHref` → la cabecera (cuarta forma); la base no utilizable (S-12:
+cada condición, `/`, solo con candidatos, su orden, que no pide la lista y el valor de su línea) → @s68, @s69 y
+@s54; el texto de cada regla y línea, literal → todas las filas con línea, y @s60.
 
 ## 7. Revisión adversarial — ronda 1 de reparación (2026-10-01)
 
@@ -738,7 +765,7 @@ Medido: sobre una copia sin los 7 `<link>` a `assets/`, el ancla antigua se cump
 ANCLA de @s61 exige además «al menos 1 cuyo `href` empieza por `/NailsLashStudioWeb/assets/`», su comentario, y
 @s72 nuevo (la raíz → 0, nace en VERDE).
 
-_*R2-11 · vacuidad · menor · feature — la premisa de F-06 y los head-* de @s33._* Veredicto: CONFIRMADO; es R2-1
+**R2-11 · vacuidad · menor · feature — la premisa de F-06 y los `head-*` de @s33.** Veredicto: CONFIRMADO; es R2-1
 visto desde la guarda. Medido además: head-espacio, head-mayusculas y head-atributo tienen 0 `<link>` en su
 `dist/index.html`; head-correcto, 1 (la canónica). Cambió: lo de R2-1; el banner nombra también los head-*.
 
@@ -864,3 +891,97 @@ undefined` → `true` muere en 97 filas (las de candidatos y lista presente, des
   de «Contrato de la feature 4» hasta el final de @s45 quedan byte a byte iguales, pinta las tablas con el pintor
   de la ronda 1 y cuenta las barras invertidas literales: 5 → 6 (la nueva, en la asimetría 3 del banner). Las
   filas nuevas la escriben `⟨U+005C⟩`.
+
+## 11. Pasada final (revisores A y B, 2026-10-01)
+
+Dos revisores independientes leyeron `9a6e8e2` (A: resolución y coherencia; B: ¿se construye tal cual, en verde, sin
+romper nada y con la mutación al 100 %?). Sus informes viven en `scratchpad/h5/revisor-a/` y `revisor-b/` de la sesión
+(no se versionan). Ninguno encontró nada bloqueante. Lo que era de spec lo aplicó antes el `spec_partner` (`8995b6f`,
+con su lista «Para el `gherkin_author`, ronda final de revisión», que se cumple entera aquí); aquí se alinean el
+`.feature` y este mapa, y cada punto se MIDE contra la fuente antes de aplicarlo. **[V: final]**: Node 22.15.0,
+Windows, con el arnés del revisor B re-corrido sobre el `.feature` ya editado (su modelo de la spec en la forma E,
+copia literal de `src/lib/puerta-cascaron.ts` más la enmienda; `correr.mts`, que LEE las tablas del `.feature` del
+worktree; y sus variantes), más dos variantes y dos sondas propias en `scratchpad/h5/final/`. Formato: **Punto ·
+revisor · severidad — objeto.** Medida. Qué cambió.
+
+**M1 · B · menor — el ÚLTIMO segmento (@s48).** Medido: `new URL` (Node 22.15.0) lleva `/NailsLashStudioWeb/x/..` y
+`/NailsLashStudioWeb/.` a `/NailsLashStudioWeb/` (la raíz, que existe) y `/NailsLashStudioWeb/..` a `/`. Con las 125
+filas de `9a6e8e2`, las dos variantes del revisor (la regex de segmentos con el `$` que le quita Stryker,
+`x-mutante-eol.ts`, y los segmentos sin el último, `v-segmentos-sin-ultimo.ts`) pasan TODO y dan la regla 2 en esas
+rutas; el modelo, la 4. Cambió: dos filas al final de @s48, la 15 (`/NailsLashStudioWeb/x/..`) y la 16
+(`/NailsLashStudioWeb/.`), las dos que nombra la spec (resolución, paso 2, y caso límite 10), con el texto EXACTO de
+la regla 4; al final, para no renumerar las filas que cita §10. Además, el párrafo «EL ÚLTIMO SEGMENTO» del
+comentario de @s48, el «QUÉ CAMBIA» del banner («el último incluido»), §1 (14 → 16), §2 (fila nueva), §4.1 (la tabla
+del navegador), §5 (punto 19 y pregunta 4) y §6 (S-11, caso límite 10 y la lista de mutantes). `/NailsLashStudioWeb/..`
+no lleva fila: es el mismo comportamiento (el último segmento `..`) que la fila 15, y la spec pide `x/..` y, «si
+cabe», `.`. Re-medido con las 127 filas: el modelo, 0 rojas; `x-mutante-eol.ts` y `v-segmentos-sin-ultimo.ts`, 2
+rojas cada una, justo @s48 f15 y f16, con la regla 2.
+
+**M2 · B · menor — la ruta con `rutaDelHref`.** Medido: `rutaDelHref` es el `split(/[?#]/)[0]` de
+`src/lib/puerta-cascaron.ts:571-573` (leído). Con un `href` que lleva U+2028 detrás del `?`, `replace(/[?#].*$/, '')`
+lo deja ENTERO (el `.` no cruza U+2028 y el `$` no casa) y `rutaDelHref` corta en el `?`: el «`$` quitado» no es del
+todo equivalente, pero ninguna fila lo distingue (revisor B: 179 mutantes, 1 vivo). Cambió: la lista de la cabecera
+pasa a «CUATRO FORMAS DE ESCRIBIR LA SPEC QUE DEJAN UN MUTANTE VIVO» (las tres de la ronda 2 siguen siendo
+equivalentes), con la cuarta escrita como la spec: la ruta con `rutaDelHref`, REUTILIZADA, nunca con una regex
+`[?#].*` anclada a `$`; §2 (párrafo de equivalentes), §5 (punto 19) y §6.
+
+**M3 · B · menor — S-12 cambia el VEREDICTO con la config en una línea.** Medido (`sonda-s12.mts` del revisor,
+re-corrido sobre la home horneada que guardó la verificación): `baseDeclarada` de la config en una línea da
+`"/NailsLashStudioWeb/ })"`; la puerta de hoy, `{"codigoSalida":0,"lineas":[]}`; el modelo, código 1 y SOLO la línea
+de la base; `esRutaPropiaRootAbsoluta`, `true`; con la base de hoy, el modelo da 0. `vite.config.ts:31` es
+`base: '/NailsLashStudioWeb/',` (leído). Cambió: el banner (el párrafo pasa a «CAMBIO DE DIAGNÓSTICO, Y UNO DE
+VEREDICTO LATENTE, DECLARADOS»: qué bases cambian solo el diagnóstico y cuál el veredicto; la recomendación de la
+puerta; y el hueco de `baseDeclarada`, con su cara inversa), el «por qué» de @s68 fila 4 y el comentario de @s68,
+como pide la spec; §4.2 (la colisión) y §5 (pregunta 4). Ningún `Then` cambia: la fila 4 ya esperaba la línea de la
+base.
+
+**N1 · A · menor — la cita de @s13 en S-9.** De spec: la corrigió el `spec_partner` (S-9 la cita con su commit y
+manda localizarla por su texto). Aquí: §4.2 la recalcula con `grep` tras alargar el banner, `:1136` (en `main`, `:966`,
+leído con `git show origin/main:…`), y cierra el pendiente de R2-14.
+
+**N2 · A · menor — la fila que protege el veredicto de F-06.** Medido: el modelo con la guarda nueva movida ANTES de
+`if (violaciones.length > 0)` (`n2-guarda-antes.ts`) deja @s57 fila 5 en verde (lleva la canónica con `href`, que
+satisface la guarda) y pone en rojo @s58 fila 3 y @s59 filas 3 y 4: la que reproduce F-06, una página sin ningún
+`href` de `<link>` y con violaciones, es @s59 fila 4. Cambió: el «por qué» de @s57 filas 4 y 5, el párrafo «LAS
+LLAMADAS DE HOY» de @s57, el banner («QUÉ NO CAMBIA», que ahora cita @s59 fila 4), §2 (fila de @s59 filas 3-4) y §4.2.
+Ningún `Then` cambia.
+
+**N3 · A · menor — el acoplamiento de F-06.** Medido (`sonda-n3.mts`, el modelo sin base): con la canónica absoluta
+de `htmlCrudo`, 0 con la lista y sin ella; con la canónica `"/"` y sin lista, la línea del corte de S-3; con una
+lista en la que `"/"` resuelve, 0. Cambió: el banner («con `href` ABSOLUTO, o pasándole a la puerta una lista en la
+que resuelva», y con uno root-absoluto y sin lista, el corte de S-3), el comentario de @s57 y §4.2.
+
+**N4 · A · menor — filas rotas en este mapa.** Cambió: las filas de §2 de @s48 (los segmentos de S-11) y de @s54 (el
+predicado de S-12) se reescriben con el `|` escapado dentro del código (las barras invertidas, generadas con
+`String.fromCharCode(92)`; comprobado con `grep` y con `prettier --check`), y la negrita de R2-11 (§9) se cierra: el
+`*` de `head-*` va dentro de código.
+
+**N5 · A · trivial — el navegador no normaliza el `//`.** Medido: `new URL('/NailsLashStudioWeb//favicon.svg', …)`
+conserva el `//` (y §10 midió que Pages lo sirve con 200). Cambió: el «QUÉ CAMBIA» del banner: `.` y `..`, que el
+navegador normaliza y la puerta no, y `//`, que el navegador CONSERVA y Pages sirve con 200.
+
+**N6-N9 · A — de spec** (el `<= 0` que Stryker no genera, la salvedad de los ayudantes, el caso límite 17 y las
+trazas históricas). Los aplicó el `spec_partner`. El contrato ya decía lo correcto: §2 ya dice que Stryker no genera
+`<= 0`; la excepción de `elementos` está DECLARADA en el banner y en la pregunta 2 de §5; las filas de
+`⟨U+005C⟩/cdn.ejemplo/x.css` ya están en @s50 y @s57. Sin cambios aquí.
+
+**N10 · A · trivial — el hueco «La caja en el build».** Cambió: el banner lo recoge en sus HUECOS, como la spec (la
+cabecera del extremo a extremo ya lo decía), y §3.
+
+**El trivial de §0 de A — «las 1687».** Son 1685: las líneas de «Contrato de la feature 4» hasta el final de @s45
+(225-1909 en `origin/main`; 395-2079 aquí). Corregido en la cabecera de este mapa.
+
+**Recuentos.** 27 escenarios (@s46-@s72), ninguno nuevo; 72 etiquetas `@sN` en el fichero. Puerta pura: 127 filas
+(@s48, 16); con el modelo, 0 rojas; con la puerta de hoy, 98 rojas y 29 verdes (las dos filas nuevas nacen en ROJO,
+como toda fila que espera una línea nueva). Extremo a extremo y a mano, sin cambios. El banner ocupa las líneas
+225-393 y la sección nueva, 2081-2959; las barras invertidas literales del `.feature` siguen siendo 6, sin CR ni
+tabuladores.
+
+**@s1-@s45** [V: final]: el script de esta pasada (`fase1.mjs`) comprueba contra `git show origin/main:…` que las
+líneas 1-224 y las 1685 de «Contrato de la feature 4» hasta el final de @s45 son byte a byte iguales, y que la
+sección nueva empieza dos líneas después; `git diff origin/main -- features/cascaron_semantico.feature`: 2 hunks,
+1050 inserciones y 0 líneas borradas.
+
+**Lo que NO se aplica, y por qué.** Ninguno de los puntos resultó falso al medirlo. Dos matices: M2 llamaba
+«equivalente» al «`$` quitado», y no lo es del todo (U+2028), así que se escribe como la spec («ninguna fila lo
+distingue»); y de M1 no se añade la tercera ruta, `/NailsLashStudioWeb/..` (arriba).
