@@ -1,0 +1,32 @@
+{
+  "fecha": "2026-10-01T08:51:34.455Z",
+  "url": "https://cenit-digital.github.io/NailsLashStudioWeb/",
+  "sondas": {
+    "/favicon.ico": {
+      "estado": 404,
+      "tipo": "text/html; charset=utf-8"
+    },
+    "/NailsLashStudioWeb/favicon.svg": {
+      "estado": 200,
+      "tipo": "image/svg+xml"
+    },
+    "/NailsLashStudioWeb/favicon.ico": {
+      "estado": 200,
+      "tipo": "image/vnd.microsoft.icon"
+    },
+    "/NailsLashStudioWeb/apple-touch-icon.png": {
+      "estado": 200,
+      "tipo": "image/png"
+    }
+  },
+  "iconosEnDom": [
+    "icon /NailsLashStudioWeb/favicon.ico",
+    "icon /NailsLashStudioWeb/favicon.svg",
+    "apple-touch-icon /NailsLashStudioWeb/apple-touch-icon.png"
+  ],
+  "captura": "<carpeta-de-trabajo>\\s9w-despues-pestana.png",
+  "respuestas404": [],
+  "consola404": [],
+  "consolaErroresYAvisos": [],
+  "totalRespuestas": 13
+}
