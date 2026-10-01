@@ -32,3 +32,9 @@ src/styles/_tokens.scss
 # global donde suele estar este fichero), así que sin esta línea `format:check` —dentro de `lint`
 # desde la PR #14— fallaría en local por un fichero que ni siquiera está en el repo.
 .claude/settings.local.json
+
+# Worktrees LOCALES que Claude Code crea para otras sesiones dentro del propio repo (también van al
+# `.gitignore`). Son copias del repo entero, con su propio estado a medio hacer: sin esta línea,
+# `format:check` de ESTA sesión fallaría por el trabajo en curso de OTRA (medido el 2026-09-30: 5
+# avisos, todos dentro de `.claude/worktrees/`).
+.claude/worktrees/

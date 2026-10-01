@@ -1,0 +1,32 @@
+{
+  "fecha": "2026-10-01T07:53:38.401Z",
+  "url": "https://cenit-digital.github.io/NailsLashStudioWeb/",
+  "sondas": {
+    "/favicon.ico": {
+      "estado": 404,
+      "tipo": "text/html; charset=utf-8"
+    },
+    "/NailsLashStudioWeb/favicon.svg": {
+      "estado": 404,
+      "tipo": "text/html; charset=utf-8"
+    },
+    "/NailsLashStudioWeb/favicon.ico": {
+      "estado": 404,
+      "tipo": "text/html; charset=utf-8"
+    },
+    "/NailsLashStudioWeb/apple-touch-icon.png": {
+      "estado": 404,
+      "tipo": "text/html; charset=utf-8"
+    }
+  },
+  "iconosEnDom": [],
+  "captura": "<carpeta-de-trabajo>\\s9w-antes-pestana.png",
+  "respuestas404": [],
+  "consola404": [
+    "Failed to load resource: the server responded with a status of 404 () @ https://cenit-digital.github.io/favicon.ico"
+  ],
+  "consolaErroresYAvisos": [
+    "[error] Failed to load resource: the server responded with a status of 404 () @ https://cenit-digital.github.io/favicon.ico"
+  ],
+  "totalRespuestas": 12
+}

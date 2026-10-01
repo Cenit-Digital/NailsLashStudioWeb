@@ -50,6 +50,9 @@ Thumbs.db
 # Experimentos de build de @s32/@s33 (F-04): artefactos temporales, nunca versionados.
 .experimentos-tmp/
 
+# Worktrees locales que Claude Code crea para otras sesiones (copias del repo; nunca se versionan)
+.claude/worktrees/
+
 # Configuración local del servidor de vista previa del IDE (no se versiona)
 .claude/launch.json
 

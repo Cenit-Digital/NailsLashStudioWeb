@@ -1,0 +1,30 @@
+{
+  "fecha": "2026-10-01T08:17:08.577Z",
+  "iconosEnContraprueba": 0,
+  "real": {
+    "listo": true,
+    "captura": "<carpeta-de-trabajo>\\s9p-real-pestana.png",
+    "peticionesIcono": ["200 /NailsLashStudioWeb/favicon.svg"],
+    "svg200": true,
+    "raizFaviconIco": [],
+    "proxy404": [],
+    "consola404": [],
+    "consolaErroresYAvisos": [],
+    "totalPeticiones": 13
+  },
+  "contraprueba": {
+    "listo": true,
+    "captura": "<carpeta-de-trabajo>\\s9p-contraprueba-pestana.png",
+    "peticionesIcono": ["404 /favicon.ico"],
+    "svg200": false,
+    "raizFaviconIco": [404],
+    "proxy404": ["/favicon.ico"],
+    "consola404": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found) @ http://127.0.0.1:4192/favicon.ico"
+    ],
+    "consolaErroresYAvisos": [
+      "[error] Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "totalPeticiones": 13
+  }
+}
