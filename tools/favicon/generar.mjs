@@ -57,58 +57,90 @@ function directorioDeSalida(argv) {
 }
 
 // ── Fuente: WOFF1 → tablas sfnt ─────────────────────────────────────────────────────────
+// La cabecera WOFF1 mide 44 bytes y lleva numTables en el byte 12. Detrás va el directorio: una entrada
+// de 20 bytes por tabla, con su etiqueta (4 letras), su desplazamiento, su largo comprimido y su largo
+// original.
+const POSICION_DEL_NUMERO_DE_TABLAS_WOFF = 12
+const LARGO_DE_LA_CABECERA_WOFF = 44
+const LARGO_DE_LA_ENTRADA_WOFF = 20
+const LARGO_DE_LA_ETIQUETA = 4
+const POSICION_EN_LA_ENTRADA_WOFF = { desplazamiento: 4, largoComprimido: 8, largoOriginal: 12 }
+
 function leerWoff(ruta) {
   const woff = readFileSync(ruta)
   const tablas = {}
-  for (let i = 0; i < woff.readUInt16BE(12); i++) {
-    const o = 44 + i * 20
-    const etiqueta = woff.toString('ascii', o, o + 4)
-    const desde = woff.readUInt32BE(o + 4)
-    const comprimida = woff.readUInt32BE(o + 8)
-    const original = woff.readUInt32BE(o + 12)
+  for (let i = 0; i < woff.readUInt16BE(POSICION_DEL_NUMERO_DE_TABLAS_WOFF); i++) {
+    const entrada = LARGO_DE_LA_CABECERA_WOFF + i * LARGO_DE_LA_ENTRADA_WOFF
+    const etiqueta = woff.toString('ascii', entrada, entrada + LARGO_DE_LA_ETIQUETA)
+    const desde = woff.readUInt32BE(entrada + POSICION_EN_LA_ENTRADA_WOFF.desplazamiento)
+    const comprimida = woff.readUInt32BE(entrada + POSICION_EN_LA_ENTRADA_WOFF.largoComprimido)
+    const original = woff.readUInt32BE(entrada + POSICION_EN_LA_ENTRADA_WOFF.largoOriginal)
     const datos = woff.subarray(desde, desde + comprimida)
     tablas[etiqueta] = comprimida < original ? inflateSync(datos) : datos
   }
   return tablas
 }
 
+// cmap: numTables en el byte 2 y, desde el 4, un registro de 8 bytes por subtabla, con el desplazamiento
+// de la subtabla (uint32) en el byte 4 del registro.
+const POSICION_DEL_NUMERO_DE_SUBTABLAS = 2
+const INICIO_DE_LOS_REGISTROS_CMAP = 4
+const LARGO_DEL_REGISTRO_CMAP = 8
+const POSICION_DE_LA_SUBTABLA_EN_EL_REGISTRO = 4
+// Subtabla de formato 4: segCountX2 en el byte 6 y endCode[] desde el 14; tras él, 2 bytes de relleno
+// (reservedPad) y luego startCode[], idDelta[] e idRangeOffset[], de segCountX2 bytes cada uno.
+const FORMATO_POR_SEGMENTOS = 4
+const POSICION_DEL_DOBLE_DE_SEGMENTOS = 6
+const INICIO_DE_LOS_FINALES = 14
+const LARGO_DEL_RELLENO = 2
+const BYTES_POR_VALOR = 2 // los valores de esos arrays son uint16 (o int16)
+
 // cmap de formato 4: del punto de código al índice de glifo.
 function glifoDe(tablas, cp) {
   const cmap = tablas.cmap
-  const subtablas = cmap.readUInt16BE(2)
+  const subtablas = cmap.readUInt16BE(POSICION_DEL_NUMERO_DE_SUBTABLAS)
   for (let i = 0; i < subtablas; i++) {
-    const off = cmap.readUInt32BE(4 + i * 8 + 4)
-    if (cmap.readUInt16BE(off) !== 4) continue
-    const segX2 = cmap.readUInt16BE(off + 6)
-    const finales = off + 14
-    const inicios = finales + segX2 + 2
-    const deltas = inicios + segX2
-    const rangos = deltas + segX2
-    for (let s = 0; s < segX2 / 2; s++) {
-      const fin = cmap.readUInt16BE(finales + s * 2)
-      const ini = cmap.readUInt16BE(inicios + s * 2)
-      if (cp < ini || cp > fin) continue
-      const delta = cmap.readInt16BE(deltas + s * 2)
-      const ro = cmap.readUInt16BE(rangos + s * 2)
-      if (ro === 0) return (cp + delta) & 0xffff
-      const g = cmap.readUInt16BE(rangos + s * 2 + ro + (cp - ini) * 2)
-      return g === 0 ? 0 : (g + delta) & 0xffff
+    const registro = INICIO_DE_LOS_REGISTROS_CMAP + i * LARGO_DEL_REGISTRO_CMAP
+    const subtabla = cmap.readUInt32BE(registro + POSICION_DE_LA_SUBTABLA_EN_EL_REGISTRO)
+    if (cmap.readUInt16BE(subtabla) !== FORMATO_POR_SEGMENTOS) continue
+    const dobleDeSegmentos = cmap.readUInt16BE(subtabla + POSICION_DEL_DOBLE_DE_SEGMENTOS)
+    const finales = subtabla + INICIO_DE_LOS_FINALES
+    const inicios = finales + dobleDeSegmentos + LARGO_DEL_RELLENO
+    const deltas = inicios + dobleDeSegmentos
+    const rangos = deltas + dobleDeSegmentos
+    for (let s = 0; s < dobleDeSegmentos / BYTES_POR_VALOR; s++) {
+      const desplazamiento = s * BYTES_POR_VALOR
+      const fin = cmap.readUInt16BE(finales + desplazamiento)
+      const inicio = cmap.readUInt16BE(inicios + desplazamiento)
+      if (cp < inicio || cp > fin) continue
+      const delta = cmap.readInt16BE(deltas + desplazamiento)
+      const desplazamientoDelRango = cmap.readUInt16BE(rangos + desplazamiento)
+      if (desplazamientoDelRango === 0) return (cp + delta) & 0xffff
+      const glifo = cmap.readUInt16BE(
+        rangos + desplazamiento + desplazamientoDelRango + (cp - inicio) * BYTES_POR_VALOR,
+      )
+      return glifo === 0 ? 0 : (glifo + delta) & 0xffff
     }
   }
   throw new Error(`la fuente no tiene glifo para U+${cp.toString(16)}`)
 }
 
-function rangoDelGlifo(tablas, g) {
+// head.indexToLocFormat, en el byte 50: 1 si loca guarda los desplazamientos como uint32; 0 si como
+// uint16, a la mitad.
+const POSICION_DEL_FORMATO_DE_LOCA = 50
+const LOCA_LARGA = 1
+
+function rangoDelGlifo(tablas, glifo) {
   const loca = tablas.loca
-  const locaLarga = tablas.head.readInt16BE(50) === 1
+  const locaLarga = tablas.head.readInt16BE(POSICION_DEL_FORMATO_DE_LOCA) === LOCA_LARGA
   return locaLarga
-    ? [loca.readUInt32BE(g * 4), loca.readUInt32BE(g * 4 + 4)]
-    : [loca.readUInt16BE(g * 2) * 2, loca.readUInt16BE(g * 2 + 2) * 2]
+    ? [loca.readUInt32BE(glifo * 4), loca.readUInt32BE(glifo * 4 + 4)]
+    : [loca.readUInt16BE(glifo * 2) * 2, loca.readUInt16BE(glifo * 2 + 2) * 2]
 }
 
 // Contornos del glifo simple: puntos { x, y, on } con la y ya invertida (y hacia abajo, como SVG).
-function contornos(tablas, g) {
-  const [a, b] = rangoDelGlifo(tablas, g)
+function contornosDelGlifo(tablas, glifo) {
+  const [a, b] = rangoDelGlifo(tablas, glifo)
   if (a === b) return []
   const d = tablas.glyf.subarray(a, b)
   const nc = d.readInt16BE(0)
@@ -161,31 +193,31 @@ function contornos(tablas, g) {
 // El `d` con EXACTAMENTE el formato de números de prototipo-glifos.mjs (un decimal, sin ceros de
 // relleno: «890.5», «147»). Si cambia el formato, el `d` deja de ser idéntico al del oráculo (@s2).
 const redondeo = (v) => Math.round(v * 10) / 10
-function pathDe(cs) {
+function pathDe(contornos) {
   let s = ''
-  for (const pts of cs) {
+  for (const puntos of contornos) {
     // Empieza en un punto ON (o en el medio implícito de dos OFF).
-    let k = pts.findIndex((q) => q.on)
+    let k = puntos.findIndex((punto) => punto.on)
     let inicio
     if (k === -1) {
-      inicio = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 }
+      inicio = { x: (puntos[0].x + puntos[1].x) / 2, y: (puntos[0].y + puntos[1].y) / 2 }
       k = 0
-    } else inicio = pts[k]
-    const orden = [...pts.slice(k), ...pts.slice(0, k)]
+    } else inicio = puntos[k]
+    const orden = [...puntos.slice(k), ...puntos.slice(0, k)]
     s += `M${redondeo(inicio.x)} ${redondeo(inicio.y)}`
     let ctrl = null
     for (let i = 1; i <= orden.length; i++) {
-      const q = orden[i % orden.length]
-      if (q.on) {
+      const punto = orden[i % orden.length]
+      if (punto.on) {
         s += ctrl
-          ? `Q${redondeo(ctrl.x)} ${redondeo(ctrl.y)} ${redondeo(q.x)} ${redondeo(q.y)}`
-          : `L${redondeo(q.x)} ${redondeo(q.y)}`
+          ? `Q${redondeo(ctrl.x)} ${redondeo(ctrl.y)} ${redondeo(punto.x)} ${redondeo(punto.y)}`
+          : `L${redondeo(punto.x)} ${redondeo(punto.y)}`
         ctrl = null
       } else if (ctrl) {
-        const m = { x: (ctrl.x + q.x) / 2, y: (ctrl.y + q.y) / 2 }
-        s += `Q${redondeo(ctrl.x)} ${redondeo(ctrl.y)} ${redondeo(m.x)} ${redondeo(m.y)}`
-        ctrl = q
-      } else ctrl = q
+        const medio = { x: (ctrl.x + punto.x) / 2, y: (ctrl.y + punto.y) / 2 }
+        s += `Q${redondeo(ctrl.x)} ${redondeo(ctrl.y)} ${redondeo(medio.x)} ${redondeo(medio.y)}`
+        ctrl = punto
+      } else ctrl = punto
     }
     if (ctrl)
       s += `Q${redondeo(ctrl.x)} ${redondeo(ctrl.y)} ${redondeo(inicio.x)} ${redondeo(inicio.y)}`
@@ -195,13 +227,13 @@ function pathDe(cs) {
 }
 
 // Caja de TODOS los puntos (ON y OFF), como el prototipo: de ella salen viewBox y rect.
-function cajaDe(cs) {
-  const todos = cs.flat()
+function cajaDe(contornos) {
+  const todos = contornos.flat()
   return [
-    Math.min(...todos.map((q) => q.x)),
-    Math.min(...todos.map((q) => q.y)),
-    Math.max(...todos.map((q) => q.x)),
-    Math.max(...todos.map((q) => q.y)),
+    Math.min(...todos.map((punto) => punto.x)),
+    Math.min(...todos.map((punto) => punto.y)),
+    Math.max(...todos.map((punto) => punto.x)),
+    Math.max(...todos.map((punto) => punto.y)),
   ]
 }
 
@@ -283,10 +315,10 @@ function aplanar(d) {
 
 function tramosDe(polilineas) {
   const tramos = []
-  for (const pts of polilineas) {
-    for (let i = 0; i < pts.length; i++) {
-      const [x1, y1] = pts[i]
-      const [x2, y2] = pts[(i + 1) % pts.length]
+  for (const puntos of polilineas) {
+    for (let i = 0; i < puntos.length; i++) {
+      const [x1, y1] = puntos[i]
+      const [x2, y2] = puntos[(i + 1) % puntos.length]
       tramos.push({
         x1,
         y1,
@@ -330,10 +362,10 @@ function bajoElTrazo(x, y, cercanos, medio) {
     const dx = t.x2 - t.x1
     const dy = t.y2 - t.y1
     const largo2 = dx * dx + dy * dy
-    const f =
+    const fraccion =
       largo2 === 0 ? 0 : Math.max(0, Math.min(1, ((x - t.x1) * dx + (y - t.y1) * dy) / largo2))
-    const ex = t.x1 + f * dx - x
-    const ey = t.y1 + f * dy - y
+    const ex = t.x1 + fraccion * dx - x
+    const ey = t.y1 + fraccion * dy - y
     if (ex * ex + ey * ey <= medio2) return true
   }
   return false
@@ -372,11 +404,13 @@ function rasterizar({ tramos, geo, soft, ink, lado, aSangre }) {
       }
     }
   }
-  const [s, k] = [hexARgb(soft), hexARgb(ink)]
+  const [rgbSoft, rgbInk] = [hexARgb(soft), hexARgb(ink)]
   const rgba = Buffer.alloc(lado * lado * 4)
   for (let i = 0; i < lado * lado; i++) {
     const t = enCuadrado[i] === 0 ? 0 : deTinta[i] / enCuadrado[i]
-    for (let c = 0; c < 3; c++) rgba[i * 4 + c] = Math.round(s[c] + t * (k[c] - s[c]))
+    for (let c = 0; c < 3; c++) {
+      rgba[i * 4 + c] = Math.round(rgbSoft[c] + t * (rgbInk[c] - rgbSoft[c]))
+    }
     rgba[i * 4 + 3] = Math.round((255 * enCuadrado[i]) / (MUESTRAS * MUESTRAS))
   }
   return rgba
@@ -429,21 +463,38 @@ function codificarPng(lado, pixeles, tipoColor) {
   ])
 }
 
-// ICO (reservado 0, tipo 1) con los PNG DENTRO, uno por entrada de 16 bytes.
+// ICO (reservado 0, tipo 1) con los PNG DENTRO: una cabecera de 6 bytes y una entrada de 16 por imagen.
+const LARGO_DE_LA_CABECERA_ICO = 6
+const LARGO_DE_LA_ENTRADA_ICO = 16
+const POSICION_EN_LA_CABECERA_ICO = { reservado: 0, tipo: 2, entradas: 4 }
+const POSICION_EN_LA_ENTRADA_ICO = {
+  ancho: 0,
+  alto: 1,
+  planos: 4,
+  bitsPorPixel: 6,
+  tamano: 8,
+  desplazamiento: 12,
+}
+const TIPO_ICONO = 1 // el 2 sería un cursor
+const PLANOS_DE_COLOR = 1
+const MEDIDA_CERO_DEL_ICO = 256 // una medida de 256 se escribe como 0
+
 function componerIco(imagenes) {
-  const cabecera = Buffer.alloc(6 + 16 * imagenes.length)
-  cabecera.writeUInt16LE(0, 0)
-  cabecera.writeUInt16LE(1, 2)
-  cabecera.writeUInt16LE(imagenes.length, 4)
+  const cabecera = Buffer.alloc(
+    LARGO_DE_LA_CABECERA_ICO + LARGO_DE_LA_ENTRADA_ICO * imagenes.length,
+  )
+  cabecera.writeUInt16LE(0, POSICION_EN_LA_CABECERA_ICO.reservado)
+  cabecera.writeUInt16LE(TIPO_ICONO, POSICION_EN_LA_CABECERA_ICO.tipo)
+  cabecera.writeUInt16LE(imagenes.length, POSICION_EN_LA_CABECERA_ICO.entradas)
   let desplazamiento = cabecera.length
-  imagenes.forEach(({ lado, png }, n) => {
-    const o = 6 + n * 16
-    cabecera[o] = lado % 256 // 256 se escribe como 0
-    cabecera[o + 1] = lado % 256
-    cabecera.writeUInt16LE(1, o + 4) // planos
-    cabecera.writeUInt16LE(BITS_POR_PIXEL_ICO, o + 6)
-    cabecera.writeUInt32LE(png.length, o + 8)
-    cabecera.writeUInt32LE(desplazamiento, o + 12)
+  imagenes.forEach(({ lado, png }, indice) => {
+    const entrada = LARGO_DE_LA_CABECERA_ICO + indice * LARGO_DE_LA_ENTRADA_ICO
+    cabecera[entrada + POSICION_EN_LA_ENTRADA_ICO.ancho] = lado % MEDIDA_CERO_DEL_ICO
+    cabecera[entrada + POSICION_EN_LA_ENTRADA_ICO.alto] = lado % MEDIDA_CERO_DEL_ICO
+    cabecera.writeUInt16LE(PLANOS_DE_COLOR, entrada + POSICION_EN_LA_ENTRADA_ICO.planos)
+    cabecera.writeUInt16LE(BITS_POR_PIXEL_ICO, entrada + POSICION_EN_LA_ENTRADA_ICO.bitsPorPixel)
+    cabecera.writeUInt32LE(png.length, entrada + POSICION_EN_LA_ENTRADA_ICO.tamano)
+    cabecera.writeUInt32LE(desplazamiento, entrada + POSICION_EN_LA_ENTRADA_ICO.desplazamiento)
     desplazamiento += png.length
   })
   return Buffer.concat([cabecera, ...imagenes.map(({ png }) => png)])
@@ -452,7 +503,7 @@ function componerIco(imagenes) {
 // ── Principal ───────────────────────────────────────────────────────────────────────────
 const salida = directorioDeSalida(process.argv.slice(2))
 const tablas = leerWoff(FUENTE)
-const glifo = contornos(tablas, glifoDe(tablas, LETRA.codePointAt(0)))
+const glifo = contornosDelGlifo(tablas, glifoDe(tablas, LETRA.codePointAt(0)))
 const d = pathDe(glifo)
 const geo = geometria(cajaDe(glifo))
 const scss = readFileSync(TOKENS, 'utf8')

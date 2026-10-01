@@ -149,10 +149,66 @@ Notas, ambas medidas sobre los ficheros de `public/` (`filtros.mjs` y una lectur
 **Veredicto I-4**: las cuatro regiones obligatorias dan rojo: tipo del trozo (S1-S2), IHDR (S3-S8),
 entrada ICO (S9-S12) y total de píxeles (S13-S14).
 
+## 3. Paso 2a — nombres y números de formato de `tools/favicon/generar.mjs` (menor 3)
+
+Se hizo con un parche de reemplazos exactos (`parchear.mjs`, `parche-2a.txt`): cada bloque ANTES tiene que
+aparecer UNA sola vez, o no se escribe nada. Después, `prettier --write`. Ninguna aritmética de coma
+flotante cambia de orden: solo cambian nombres.
+
+**Números de formato con nombre**, junto a su sección:
+
+- **WOFF**: `POSICION_DEL_NUMERO_DE_TABLAS_WOFF` (12), `LARGO_DE_LA_CABECERA_WOFF` (44),
+  `LARGO_DE_LA_ENTRADA_WOFF` (20), `LARGO_DE_LA_ETIQUETA` (4) y
+  `POSICION_EN_LA_ENTRADA_WOFF { desplazamiento: 4, largoComprimido: 8, largoOriginal: 12 }`.
+- **head**: `POSICION_DEL_FORMATO_DE_LOCA` (50, `indexToLocFormat`) y `LOCA_LARGA` (1).
+- **cmap** (el brief lo recomienda):
+  - `POSICION_DEL_NUMERO_DE_SUBTABLAS` (2), `INICIO_DE_LOS_REGISTROS_CMAP` (4),
+    `LARGO_DEL_REGISTRO_CMAP` (8) y `POSICION_DE_LA_SUBTABLA_EN_EL_REGISTRO` (4);
+  - `FORMATO_POR_SEGMENTOS` (4), `POSICION_DEL_DOBLE_DE_SEGMENTOS` (6), `INICIO_DE_LOS_FINALES` (14),
+    `LARGO_DEL_RELLENO` (2) y `BYTES_POR_VALOR` (2).
+- **ICO**:
+  - `LARGO_DE_LA_CABECERA_ICO` (6) y `LARGO_DE_LA_ENTRADA_ICO` (16), con los nombres que ya usa el test;
+  - `POSICION_EN_LA_CABECERA_ICO { reservado: 0, tipo: 2, entradas: 4 }` y
+    `POSICION_EN_LA_ENTRADA_ICO { ancho: 0, alto: 1, planos: 4, bitsPorPixel: 6, tamano: 8, desplazamiento: 12 }`;
+  - `TIPO_ICONO` (1), `PLANOS_DE_COLOR` (1) y `MEDIDA_CERO_DEL_ICO` (256).
+- Lo del **glyf** (la cabecera de 10 y las banderas) va con el reparto de `contornos`, en el paso 2b.
+
+**Nombres**:
+
+- Obligatorios:
+  - `o` → `entrada` (en `leerWoff` y en `componerIco`);
+  - `g` → `glifo` (en `glifoDe`, `rangoDelGlifo` y `contornosDelGlifo`);
+  - `ro` → `desplazamientoDelRango`;
+  - `cs` → `contornos`, y `pts` → `puntos` (en `pathDe`, `cajaDe` y `tramosDe`);
+  - `q` → `punto`;
+  - `f` → `fraccion`, en `bajoElTrazo`.
+  - Los `p`, `f`, `nc`, `np`, `pts` y el `d` buffer de `contornos` caen en el paso 2b.
+- De la lista «Permitidos»:
+  - `off` → `subtabla`, `segX2` → `dobleDeSegmentos` e `ini` → `inicio` (en `glifoDe`);
+  - `m` → `medio` (en `pathDe`);
+  - `s`/`k` → `rgbSoft`/`rgbInk` (en `rasterizar`).
+- Fuera de la lista, se declara:
+  - la función `contornos` pasa a `contornosDelGlifo`, para que el parámetro `contornos` de `pathDe` y
+    `cajaDe` no la tape;
+  - en `componerIco`, el índice `n` pasa a `indice`.
+- Se quedan, por estar fuera de la lista del brief:
+  - `s`/`k` de `pathDe`, `cp`, el `t` (tramo) de `crucesDeFila`/`bajoElTrazo`, el `c` de
+    `dentroPorNonzero`, los `t`/`c`/`n`/`k` de la tabla CRC y los `c`/`b` de `crc32`;
+  - los números de `loca` (`* 4`, `* 2`: los anchos de uint32/uint16 y la mitad del formato corto, que
+    ahora explica el comentario de `head`), los del IHDR del codificador PNG y los 3/4 de canales del
+    rasterizador.
+
+**Medido** (`comprobar.sh paso2a`):
+
+- **I-1**: exit 0; svg `69ffa8c4…`, ico `907b2317…` y png `b8234317…`, los tres md5 completos del brief §1;
+  `cmp` idéntico a `public/` en los tres.
+- **I-2**: el stdout es la misma línea; stderr, 0 bytes.
+- **I-3**: **40/40**; `vitest list`, diff vacío.
+- `git diff --stat`: solo `tools/favicon/generar.mjs` (+123 −72).
+
 ## PENDIENTE
 
-- **Paso 2**: los nombres y las constantes de `tools/favicon/generar.mjs` (menor 3), y el reparto de
-  `contornos`.
+- **Paso 2b**: el reparto de `contornos`, con la cabecera del glyf y las banderas con nombre.
 - **Paso 3**: los errores (menor 4) e I-5.
 - **Paso 4**: formato y calidad de lo tocado.
 - **I-6** (`node .harness/harness.mjs init` completo): lo mide el lead.
