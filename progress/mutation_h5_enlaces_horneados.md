@@ -13,8 +13,11 @@
 >
 > Umbral: `harness.config.json` → `mutation.threshold` = 1.0; `stryker.config.json` → `thresholds.break` = 100.
 >
-> Precondición: no hay un `progress/judge_h5_*.md` en HEAD `c3f988f`, y `progress/current.md:161` tiene el
-> `judge` como «pendiente del lead». La medición la encargó el lead. Este PASS no sustituye al `judge`.
+> Precondición: al empezar no había ningún `progress/judge_h5_*.md` en HEAD `c3f988f`. El `judge` APPROVED
+> (`progress/judge_h5_enlaces_horneados.md`) llegó a la rama en `0ce55f1` (19:02, durante la medición 2), y ese
+> commit solo añade ese fichero. `src/`, `stryker.config.json`, `vitest.stryker.config.ts`, `vitest.config.ts` y
+> `harness.config.json` son idénticos en `c3f988f` y en `0ce55f1` (`git diff --quiet` sale limpio), así que esta
+> medición vale también para `0ce55f1`.
 
 **Veredicto:** PASS
 **Score:** killed/total = 625/625 = 100 % (umbral: 100 %). Medido a `--concurrency 1`: 0 timeouts,
