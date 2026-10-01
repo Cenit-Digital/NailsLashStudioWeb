@@ -15,7 +15,7 @@
 > Entorno: Node 22.15.0, Windows. Ficheros modificados SOLO con Bash y scripts Node
 > (`scratchpad/h5/tdd-a/aplicar.mjs` + un parche por paso; la barra invertida se genera con
 > `String.fromCharCode(92)`). Durante el ciclo solo se corre `pnpm exec vitest run
-> src/lib/puerta-cascaron.test.ts` (y `pnpm typecheck`). Línea base del fichero: 211 tests en verde.
+src/lib/puerta-cascaron.test.ts` (y `pnpm typecheck`). Línea base del fichero: 211 tests en verde.
 
 ## Ciclos Rojo → Verde → Refactor
 
@@ -38,7 +38,7 @@
   el ayudante NUEVO `comprobarUnLink(rel, href, codigo, lineas)`: ANCLA (`extraerLinks` contiene el
   `href` CRUDO), código en la notación del contrato (`enElContrato`: 0 o «distinto de 0») y líneas EXACTAS.
 - ROJO visto: 8 failed (las 8 filas que esperan la regla 1), `AssertionError: expected +0 to be 'distinto
-  de 0'`; la fila 1 (CONTROL) en verde, como dice el contrato.
+de 0'`; la fila 1 (CONTROL) en verde, como dice el contrato.
 - VERDE mínimo: `REGLA_LINK_SIN_PREFIJO`; `violacionesDeLinks(paginas, base)` detrás de las de hoy:
   candidato = `RUTA_INTERNA` sobre el `href` limpio; con base y sin el prefijo, la regla 1 con el valor
   CRUDO. `limpiar` solo quita UN espacio inicial (lo que pide la fila del espacio; la generaliza @s52).
@@ -50,7 +50,7 @@
 - Test: `it.each` de @s48 con las filas 1-6 y 11-14 (los 6 CONTROLES y las 4 de la regla 2), con
   `comprobarUnLink('stylesheet', …)`.
 - ROJO visto: 4 failed (`no-existe.svg`, `FAVICON.SVG`, `assets` y `.../favicon.svg`), `expected +0 to be
-  'distinto de 0'`. Los 6 controles en verde (aún no había regla que mirase la lista).
+'distinto de 0'`. Los 6 controles en verde (aún no había regla que mirase la lista).
 - VERDE mínimo: `REGLA_LINK_SIN_FICHERO`; `reglaDelLink(href, ubicaciones, base)` con la RUTA sacada con
   `rutaDelHref` (la de la anti-404 de `<a>`, REUTILIZADA: la exigen los controles `?v=2`, `#x`,
   `?v=/../x`, `#/./x` y `#//x`); con base: sin el prefijo, la 1; si no, `dist/<resto>` buscado por
@@ -120,7 +120,7 @@
 - Test: las 16 filas con sus escapes (TAB `u0009`, LF `u000A`, FF `u000C`, CR `u000D`, espacio `u0020`)
   y el 2º `Then` («la lista se pidió ≥ 1 vez») en cada una. 77 barras en el test tras escribirlo.
 - ROJO visto: 10 failed. Las de control que conservaban un carácter (`expected 'distinto de 0' to be
-  +0`: daban la regla 2 de `favicon.svg ` o de `fav` + TAB + `icon.svg`) y las de FF o varios caracteres
++0`: daban la regla 2 de `favicon.svg ` o de `fav` + TAB + `icon.svg`) y las de FF o varios caracteres
   al principio (`expected +0 to be 'distinto de 0'`: el `href` quedaba FUERA, sin línea: la falla
   abierta). Seis en verde a la primera: tres con línea que ya cuadraban (un solo espacio inicial, y el
   espacio y el FF de DENTRO, que no se quitan) y tres CONTROLES que empiezan por TAB, FF o espacio + FF
@@ -139,14 +139,14 @@
 - Nacen en VERDE (283 passed), como dice el contrato: son CONTROLES de que la puerta de hoy no acusa lo
   que no es candidato. Para no fiarme de un verde a la primera, SABOTAJE medido: con el candidato
   `limpio.startsWith('/')` (acepta `//`), 1 failed, la fila `//cdn.ejemplo/x.css` (`expected 1 to be
-  +0`); revertido (`git diff` de producción vacío), 283 passed.
++0`); revertido (`git diff` de producción vacío), 283 passed.
 - VERDE y REFACTOR: sin cambios de producción.
 
 ### C10 · @s54 (sin base, la ruta entera; una base sin barra final CORTA con la línea de la base; 6 filas)
 
 - Test: las 6 filas; la base de la fila es `SIN_BASE` (campo ausente), `{ base: null }` o declarada.
 - ROJO visto: 1 failed, la fila 6 (base `"/NailsLashStudioWeb"`): `expected [ Array(1) ] to deeply equal
-  [ Array(1) ]`, daba la regla 2 de `dist//favicon.svg`, la acusación falsa que S-12 evita. Las filas 1-5
+[ Array(1) ]`, daba la regla 2 de `dist//favicon.svg`, la acusación falsa que S-12 evita. Las filas 1-5
   nacen en VERDE: las cubre el verde de C7 (el prefijo `base ?? '/'`), que forzaron @s51 filas 5 y 8.
 - VERDE mínimo: el corte de S-12 con su línea EXACTA y la base TAL CUAL, antes de pedir la lista, solo
   con la condición que pide la fila: `base !== null && !base.endsWith('/')` (las demás condiciones del
@@ -191,9 +191,9 @@
   `listaQueLanza`); el `dist/` ausente es el `artefactoInexistente` de @s26, que no cambia.
 - ROJO visto: 2 failed: sin candidatos (`expected 'distinto de 0' to be +0`: la trampa de C1 pedía la
   lista SIEMPRE y la puerta caía por la rama de @s29) y con `dist/` ausente (`expected [ Array(1) ] to
-  deeply equal [ Array(1) ]`: la línea de @s29 en vez de la de @s26). La fila 1 (con candidato) en verde.
+deeply equal [ Array(1) ]`: la línea de @s29 en vez de la de @s26). La fila 1 (con candidato) en verde.
 - VERDE mínimo: la FORMA E del mapa, tal cual: `let ubicaciones = new Map()`; `if (candidatos.length > 0)
-  { if (ficheros === undefined) return <corte S-3>; ubicaciones = new Map(ficheros.listar()…) }`; y las
+{ if (ficheros === undefined) return <corte S-3>; ubicaciones = new Map(ficheros.listar()…) }`; y las
   reglas se evalúan SIEMPRE sobre los candidatos, sin otro `if`. Fuera el `ficheros !== undefined` de C1:
   ni `?.`, ni `??`, ni `!`, ni un `[]` por defecto sobre `ficheros`. 312 passed; `tsc` 0; `prettier`
   limpio.
@@ -212,7 +212,7 @@
   la puerta de hoy salía con 0, el CAMBIO DE VEREDICTO declarado del banner. Las filas 3-8 en verde (la
   guarda de @s28, el title y los controles).
 - VERDE mínimo: la guarda DETRÁS de la de @s28: `paginas.some((pagina) => extraerLinks(pagina.html)
-  .length > 0)`, con su línea EXACTA. 320 passed; `tsc` 0; `prettier` limpio.
+.length > 0)`, con su línea EXACTA. 320 passed; `tsc` 0; `prettier` limpio.
 - SABOTAJE medido (`.some` → `.every` en la guarda nueva): 1 failed, la fila 8 (dos páginas); restaurado
   desde una copia, 320 passed.
 - REFACTOR: ninguno.
@@ -232,8 +232,8 @@
 
 - Test: las 5 filas, `comprobarUnLink('icon', …)`.
 - ROJO visto: 3 failed: `.vite/manifest.json` y `assets/.oculto.css` salían con 0 (`expected +0 to be
-  'distinto de 0'`: están en la lista y pesan más de 0) y `.oculto-vacio.svg` daba la regla 3 (`expected
-  [ Array(1) ] to deeply equal [ Array(1) ]`). El CONTROL y `.vite/no-existe.json` (la 2), en verde.
+'distinto de 0'`: están en la lista y pesan más de 0) y `.oculto-vacio.svg` daba la regla 3 (`expected
+[ Array(1) ] to deeply equal [ Array(1) ]`). El CONTROL y `.vite/no-existe.json` (la 2), en verde.
 - VERDE mínimo: `esOculta(ubicacion)` = algún segmento de `dist/<resto>` empieza por `.` (TODOS los
   segmentos, sin `slice(1)`), mirado DESPUÉS de «no está en la lista» y ANTES de los 0 bytes: el orden
   4-1-2-5-3 de la spec. 326 passed; `tsc` 0; `prettier` limpio.
@@ -281,8 +281,118 @@
   la resolución ESTRICTA con su orden (4-1-2-5-3).
 - `fallaCerradaCon(linea)`: las seis salidas de una sola línea (la rama de @s29, la guarda de @s27, los
   dos cortes nuevos, la guarda de @s28 y la nueva) comparten el `{ codigoSalida: CODIGO_FALLO, lineas:
-  [linea] }`. Ninguna línea de hoy cambia de texto.
+[linea] }`. Ninguna línea de hoy cambia de texto.
 - Las constantes de las reglas, en el orden de su número (1, 2, 3, 4, 5); comentario del campo
   `ficheros?` (falla cerrado; es un método) y del bloque de los cortes (forma E, sin `?.`, `??` ni `!`).
 - 338 passed; `tsc` 0; `eslint` 0 en los dos ficheros; `prettier --check` limpio; barras en producción:
   66, sin cambios.
+
+## Estado: VERDE (FASE A)
+
+| Fichero                                | Cambio                                                                                                                                                                                                                                                                                     |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/lib/puerta-cascaron.ts`           | `extraerLinks` (exportado, ANCLA) y `hrefsDe`; limpieza, candidato, resolución ESTRICTA y sus 5 reglas; el puerto OPCIONAL `ficheros?` (`ListaDeFicheros`, `FicheroDelArtefacto`) en la forma E; los dos cortes; la guarda nueva; las 5 reglas en `REGLAS_DEL_CASCARON`; `fallaCerradaCon` |
+| `src/lib/puerta-cascaron.test.ts`      | 127 tests NUEVOS (una fila de `Examples:` por test), al final del fichero, con ayudantes NUEVOS; 0 líneas borradas o cambiadas (solo 5 importaciones añadidas)                                                                                                                             |
+| `progress/tdd_h5_enlaces_horneados.md` | Esta bitácora                                                                                                                                                                                                                                                                              |
+
+Recuento (medido): `src/lib/puerta-cascaron.test.ts` pasa de 211 a **338 tests, todos en verde**; 127 nuevos =
+las 127 filas de la puerta pura (@s46 1, @s47 9, @s48 16, @s49 3, @s50 11, @s51 9, @s52 16, @s53 7, @s54 6,
+@s55 12, @s56 1, @s57 7, @s58 3, @s59 8, @s60 1, @s65 5, @s66 3, @s68 8, @s69 1). `git diff df01310`: el test,
+1058 inserciones y 0 borrados; producción, 264 líneas tocadas. `tools/` y `src/pages/` intactos.
+
+Regresiones (medidas al cerrar la fase): `pnpm exec vitest run src/lib/puerta-cascaron.test.ts
+src/lib/puerta-anclas.test.ts src/lib/seo.test.ts` da 3 ficheros y **420 passed** (la llamada de F-06 y @s34
+siguen en verde); `pnpm exec vitest run src/lib/trampas-del-horneado.test.tsx` da **45 passed** (los
+experimentos de @s32, @s33 y @s44, que corren el humilde de HOY: `head-correcto` solo trae la canónica
+absoluta, sin candidatos); `pnpm typecheck` 0; `pnpm exec eslint src/lib/puerta-cascaron.ts
+src/lib/puerta-cascaron.test.ts` 0; `pnpm exec prettier --check` de los dos, limpio. NO he corrido la suite
+completa ni Stryker (los corre el lead o el `mutation_tester`). `git status` limpio tras cada medida.
+
+## Trazabilidad (@s → test, `src/lib/puerta-cascaron.test.ts`)
+
+- @s46 (CONTROL, un `<link>` de cada clase; ANCLA de 6; la lista se pidió) → `it` de :1825.
+- @s47 (regla 1, 9 filas) → `it.each` de :1889-1923, vía `comprobarUnLink` (:1871).
+- @s48 (regla 2 y los segmentos de S-11, 16 filas) → `it.each` de :1925-1998.
+- @s49 (regla 3, 3 filas) → :2000-2018.
+- @s50 (regla 4, 11 filas) → :2023-2063.
+- @s51 (la raíz, con las dos listas variantes; la lista se pidió; 9 filas) → :2083-2143.
+- @s52 (la limpieza; la lista se pidió; 16 filas) → :2147-2202.
+- @s53 (fuera de la puerta, sin la lista; ANCLA EXACTA; 7 filas) → :2204-2229.
+- @s54 (sin base y base sin barra final, 6 filas) → :2231-2278.
+- @s55 (todo `rel`, la caja y el `<body>`, con el ANCLA DE SITIO; 12 filas) → :2284-2316.
+- @s56 (el informe con dos páginas) → `it` de :2319.
+- @s57 (sin la lista: corte o lo de hoy; 7 filas) → :2358-2435.
+- @s58 (la lista solo con candidatos; la que lanza; `dist/` ausente; 3 filas) → :2445-2491.
+- @s59 (la guarda nueva, 8 filas) → :2500-2611.
+- @s60 (las 5 reglas en `REGLAS_DEL_CASCARON`) → `it` de :2615.
+- @s65 (regla 5, 5 filas) → :2637-2669.
+- @s66 (un candidato en la 2.ª página: con lista, sin ella y la que lanza; 3 filas) → :2671-2710.
+- @s68 (S-12: cada condición del predicado, `/`, sin candidatos; la lista pedida 0 o al menos 1 vez; 8
+  filas) → :2716-2784.
+- @s69 (el corte por lista ausente antes que el de la base) → `it` de :2787.
+
+Ayudantes NUEVOS del test (ninguno de @s1-@s45 cambia): `listaDeReferencia` (:1768), `dobleDeLaLista`
+(:1786), `conElementos` (:1804), `puertaSobreLaHome` (:1810), `enElContrato`, `comprobarUnLink`,
+`listaSinLaRaiz`, `listaConLaRaizVacia`, `respectoDelCierreDelHead`, `listaQueLanza`, `conLaCanonicaSinHref` y
+`lineaDeLaBase`. Los textos de las reglas y de las tres líneas nuevas van ESCRITOS A MANO en el test; ninguno se
+importa de producción (solo `REGLAS_DEL_CASCARON`, que es lo vigilado por @s60).
+
+En producción (`src/lib/puerta-cascaron.ts`): `extraerLinks` :561 (con `hrefsDe` :551), `limpiar` :598,
+`esCandidato` :618, `tieneSegmentosQueNoInterpreta` :630, `esOculta` :641, `esBaseUtilizable` :650,
+`reglaDelLink` :661, `candidatosDe` :712, `violacionesDeLinks` :721, el puerto :914-939, `fallaCerradaCon` :969,
+el cableado de la forma E en `inspeccionarArtefacto` (:1018), la guarda nueva (:1066) y las 5 reglas en
+`REGLAS_DEL_CASCARON` (:1103-1107).
+
+## Cómo quedó la forma (lo que pide la cabecera «PARA EL `tdd_craftsman`»)
+
+- Cableado de la lista: la FORMA E literal (`let ubicaciones = new Map()`; `if (candidatos.length > 0) { if
+(ficheros === undefined) return …; if (base !== null && !esBaseUtilizable(base)) return …; ubicaciones = new
+Map(ficheros.listar()…) }`), y las reglas se evalúan SIEMPRE sobre los candidatos. Sin `?.`, `??` ni `!`
+  sobre `ficheros`, sin `[]` por defecto y sin volver a comprobar `ficheros !== undefined`.
+- Lo que se quita DENTRO del `href` (TAB, LF y CR): clase SIN `+`. El recorte, ANTES de quitar (orden WHATWG).
+- El predicado de oculto, sobre TODOS los segmentos de `dist/<resto>`, sin `slice(1)`.
+- El `/` inicial sin base: `ruta.slice(prefijo.length)` con `prefijo = base ?? '/'` (un `slice`, nunca una
+  regex anclada a `^`; la forma «prefijo único» que el revisor B midió con 0 vivos).
+- La RUTA, con `rutaDelHref` REUTILIZADA (nunca `replace(/[?#].*$/, '')`).
+- La regla 3, con `bytes === 0` (nunca `< 1`).
+
+## Desviaciones declaradas
+
+- Ninguna del contrato: todas las filas se escribieron tal cual (los textos, letra a letra; cada carácter
+  anotado como U+XXXX en el `.feature`, con su escape `uXXXX`, también la barra invertida de las dos filas de
+  @s50 que el `.feature` escribe literal).
+- «La lista de referencia» lleva los 12 ficheros del `.feature` con sus bytes; «la página correcta» es
+  `htmlCrudo()` sin opciones con el `<link>` INSERTADO antes de `</head>` (o de `</body>`). En @s59, «la
+  canónica SIN href en lugar de su canónica» se construye con `htmlCrudo({ canonica: null })` más
+  `<link rel="canonical">` al final del `<head>` (mismo `<head>`, otra posición: la puerta no mira el orden).
+- Notación del código en las tablas: `FALLA` = «distinto de 0», comparado con `enElContrato(codigoSalida)`; la
+  aserción sigue siendo «≠ 0», nunca `toBe(1)`.
+- Filas que nacieron VERDES respecto del código del ciclo anterior (todas nacerían ROJAS con la puerta de hoy,
+  por su ANCLA): @s53 entera, @s54 filas 1-5, @s55 entera, @s56, @s66 entera, @s51 fila 7, @s52 filas 2, 3, 5,
+  11, 15 y 16, @s68 filas 2, 4, 7 y 8, y los CONTROLES de cada tabla. Ninguna se dio por buena a ciegas: las de
+  @s53, @s55, @s56, @s59 (fila 8), @s66 y @s68 (fila 8) se midieron con un SABOTAJE de producción que las pone
+  en rojo, y las de @s52 que dependían de la trampa de C1 se re-midieron en C14 (arriba).
+- Trampas de VERDE que vivieron entre ciclos (todas retiradas): «pedir la lista siempre que la hay» (C1 a
+  C14), «sin base, devolver null» (C3 a C7), recortar solo un espacio inicial (C2 a C8), el corte de S-12 solo
+  con `endsWith` y fuera de «hay candidatos» (C10 a C19) y su orden delante del de la lista (C13 a C20).
+
+## Hallazgos
+
+1. **La FASE A sola ROMPE `pnpm build` hasta que la FASE B cablee la lista en el humilde** (esperado por S-3,
+   pero hay que saberlo). Medido: con `NLS_DIST_DIR` apuntando a `scratchpad/h5/verif/dist-build` (la copia
+   del build real que guardó la verificación), `node --experimental-strip-types tools/puerta-cascaron.ts` (el
+   humilde de HOY, que no pasa `ficheros`) sale con 1 y UNA línea: `la puerta no recibió la lista de ficheros
+del artefacto y hay elementos link root-absolutos que resolver`. Por tanto los `beforeAll` de
+   `src/pages/home-horneado.test.ts` (:74) y `src/pages/contacto-horneado.test.ts` (:80), que corren
+   `pnpm build`, caerían, y la suite completa, `harness init` y el despliegue quedan en rojo entre la fase A y
+   la B. No fusionar ni correr la suite completa hasta cerrar la fase B. (`trampas-del-horneado` no lo nota:
+   corre `vite-react-ssg build` y el humilde sobre experimentos sin candidatos.)
+2. El comentario de `REGLAS_DEL_CASCARON` sigue diciendo «TODAS las reglas» y le sigue faltando
+   `REGLA_RUTA_AUSENTE`: hueco DECLARADO por @s60 y por la puerta humana; no lo he tocado.
+3. Para el `mutation_tester`: el refactor `fallaCerradaCon` agrupa también las tres salidas de una línea que
+   ya existían (@s27, @s28 y @s29). Su texto no cambia y sus tests de hoy las siguen aseverando
+   (`toContain('rutas esperadas')`, `toContain('ningún enlace')`, `toContain(MOTIVO)`); el `ObjectLiteral` y
+   el `ArrayDeclaration` del ayudante los matan además todas las filas de corte nuevas.
+4. `git stash` es COMPARTIDO entre worktrees: hay un stash previo de `main` («WIP muerto de puerta.test.ts»)
+   que no he tocado; en el sabotaje de C14 usé `push`/`pop` y la lista de stashes quedó como estaba. En los
+   demás sabotajes restauré desde una copia o con `git checkout` del fichero, sin stash.
