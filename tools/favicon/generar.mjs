@@ -47,12 +47,16 @@ const PNG_RGB = 2
 const PNG_RGBA = 6
 const BITS_POR_PIXEL_ICO = 32
 
+// Un error que quien ejecuta el CLI puede corregir (argumentos, glifo o tokens). La capa de interfaz, al
+// final del fichero, lo informa con su mensaje y sin traza.
+class ErrorDelFavicon extends Error {}
+
 // ── Argumentos ──────────────────────────────────────────────────────────────────────────
 function directorioDeSalida(argv) {
   const i = argv.indexOf('--salida')
   if (i === -1) return join(RAIZ, 'public')
   const dir = argv[i + 1]
-  if (!dir) throw new Error('--salida necesita un directorio')
+  if (!dir) throw new ErrorDelFavicon('--salida necesita un directorio')
   return resolve(dir)
 }
 
@@ -122,7 +126,7 @@ function glifoDe(tablas, cp) {
       return glifo === 0 ? 0 : (glifo + delta) & 0xffff
     }
   }
-  throw new Error(`la fuente no tiene glifo para U+${cp.toString(16)}`)
+  throw new ErrorDelFavicon(`la fuente no tiene glifo para U+${cp.toString(16)}`)
 }
 
 // head.indexToLocFormat, en el byte 50: 1 si loca guarda los desplazamientos como uint32; 0 si como
@@ -161,7 +165,7 @@ function contornosDelGlifo(tablas, glifo) {
   if (desde === hasta) return []
   const datos = tablas.glyf.subarray(desde, hasta)
   const numeroDeContornos = datos.readInt16BE(0)
-  if (numeroDeContornos < 0) throw new Error('glifo compuesto: no soportado')
+  if (numeroDeContornos < 0) throw new ErrorDelFavicon('glifo compuesto: no soportado')
   const lector = lectorDe(datos, LARGO_DE_LA_CABECERA_DEL_GLIFO)
   const finales = finalesDeContorno(lector, numeroDeContornos)
   lector.saltar(lector.uint16()) // las instrucciones de hinting: su largo y luego ellas
@@ -298,7 +302,9 @@ function leerColor(scss, nombre) {
   const declaracion = new RegExp(`(?<![\\w-])${nombre}\\s*:\\s*([^;]*);`, 'g')
   const halladas = [...scss.matchAll(declaracion)].map((m) => m[1].trim())
   if (halladas.length !== 1 || !/^#[0-9a-f]{6}$/i.test(halladas[0])) {
-    throw new Error(`${nombre}: se esperaba UNA declaración #RRGGBB en _tokens.scss (${halladas})`)
+    throw new ErrorDelFavicon(
+      `${nombre}: se esperaba UNA declaración #RRGGBB en _tokens.scss (${halladas})`,
+    )
   }
   return halladas[0]
 }
@@ -545,33 +551,52 @@ function componerIco(imagenes) {
 }
 
 // ── Principal ───────────────────────────────────────────────────────────────────────────
-const salida = directorioDeSalida(process.argv.slice(2))
-const tablas = leerWoff(FUENTE)
-const glifo = contornosDelGlifo(tablas, glifoDe(tablas, LETRA.codePointAt(0)))
-const d = pathDe(glifo)
-const geo = geometria(cajaDe(glifo))
-const scss = readFileSync(TOKENS, 'utf8')
-const soft = leerColor(scss, '--accent-soft')
-const ink = leerColor(scss, '--ink')
-const tramos = tramosDe(aplanar(d))
+// Toda la validación (argumentos, glifo y tokens) va ANTES de la primera escritura (`mkdirSync`): un
+// error no deja iconos a medias.
+function generar(argv) {
+  const salida = directorioDeSalida(argv)
+  const tablas = leerWoff(FUENTE)
+  const glifo = contornosDelGlifo(tablas, glifoDe(tablas, LETRA.codePointAt(0)))
+  const d = pathDe(glifo)
+  const geo = geometria(cajaDe(glifo))
+  const scss = readFileSync(TOKENS, 'utf8')
+  const soft = leerColor(scss, '--accent-soft')
+  const ink = leerColor(scss, '--ink')
+  const tramos = tramosDe(aplanar(d))
 
-mkdirSync(salida, { recursive: true })
-writeFileSync(join(salida, 'favicon.svg'), componerSvg({ d, geo, soft, ink }))
+  mkdirSync(salida, { recursive: true })
+  writeFileSync(join(salida, 'favicon.svg'), componerSvg({ d, geo, soft, ink }))
 
-const imagenesIco = LADOS_ICO.map((lado) => ({
-  lado,
-  png: codificarPng(lado, rasterizar({ tramos, geo, soft, ink, lado, aSangre: false }), PNG_RGBA),
-}))
-writeFileSync(join(salida, 'favicon.ico'), componerIco(imagenesIco))
+  const imagenesIco = LADOS_ICO.map((lado) => ({
+    lado,
+    png: codificarPng(lado, rasterizar({ tramos, geo, soft, ink, lado, aSangre: false }), PNG_RGBA),
+  }))
+  writeFileSync(join(salida, 'favicon.ico'), componerIco(imagenesIco))
 
-const apple = rasterizar({ tramos, geo, soft, ink, lado: LADO_APPLE, aSangre: true })
-writeFileSync(
-  join(salida, 'apple-touch-icon.png'),
-  codificarPng(LADO_APPLE, sinAlfa(apple), PNG_RGB),
-)
+  const apple = rasterizar({ tramos, geo, soft, ink, lado: LADO_APPLE, aSangre: true })
+  writeFileSync(
+    join(salida, 'apple-touch-icon.png'),
+    codificarPng(LADO_APPLE, sinAlfa(apple), PNG_RGB),
+  )
 
-console.log(
-  `favicon: «${LETRA}» en ${ink} sobre ${soft}, viewBox ${geo.x} ${geo.y} ${geo.lado} ${geo.lado} ` +
-    `→ favicon.svg, favicon.ico (${LADOS_ICO.join(' + ')}) y apple-touch-icon.png (${LADO_APPLE}) ` +
-    `en ${salida}`,
-)
+  console.log(
+    `favicon: «${LETRA}» en ${ink} sobre ${soft}, viewBox ${geo.x} ${geo.y} ${geo.lado} ${geo.lado} ` +
+      `→ favicon.svg, favicon.ico (${LADOS_ICO.join(' + ')}) y apple-touch-icon.png (${LADO_APPLE}) ` +
+      `en ${salida}`,
+  )
+}
+
+// ── Interfaz ────────────────────────────────────────────────────────────────────────────
+// La única capa que habla con quien ejecuta el CLI: informa por stderr, sin traza, y sale con código
+// distinto de 0. Con process.exitCode y NO con process.exit(): en Windows, salir a la fuerza con E/S
+// pendiente tumba Node (el precedente está en tools/puerta-anclas.ts).
+const CODIGO_DE_SALIDA_CON_ERROR = 1
+
+try {
+  generar(process.argv.slice(2))
+} catch (error) {
+  const motivo =
+    error instanceof ErrorDelFavicon ? error.message : `error inesperado: ${error.message}`
+  console.error(`favicon: ${motivo}`)
+  process.exitCode = CODIGO_DE_SALIDA_CON_ERROR
+}

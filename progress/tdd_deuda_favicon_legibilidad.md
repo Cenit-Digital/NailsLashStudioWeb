@@ -250,8 +250,71 @@ glyf guarda los datos. Las cuatro responsabilidades del brief:
   - `glifoDe` en los **65 536** puntos de código del BMP: **65 536 iguales**, 231 de ellos con glifo.
 - `git diff --stat` del paso: solo `tools/favicon/generar.mjs` (+86 −42).
 
+## 5. Paso 3 — los errores llegan al usuario del CLI sin traza (menor 4)
+
+Mismo método (`parche-3.txt`).
+
+- `class ErrorDelFavicon extends Error {}`, junto a las constantes. Los cuatro `throw` del brief pasan a ser
+  `ErrorDelFavicon`, con el MISMO texto:
+  - `--salida necesita un directorio`;
+  - `la fuente no tiene glifo para U+…`;
+  - `glifo compuesto: no soportado`;
+  - `<token>: se esperaba UNA declaración #RRGGBB…`.
+- El bloque «Principal» pasa a `generar(argv)` sin cambiar ni una sentencia ni su orden. Toda la validación
+  (argumentos, glifo y tokens) sigue ANTES de `mkdirSync`, y un comentario lo dice.
+- La nueva sección `── Interfaz ──`, al final del fichero, es la única que habla con el usuario. Hace un
+  `try { generar(process.argv.slice(2)) }`, y si algo falla:
+  - `ErrorDelFavicon` → `favicon: <mensaje>`;
+  - cualquier otro → `favicon: error inesperado: <mensaje>`;
+  - los dos, por `console.error`, sin traza y con `process.exitCode = CODIGO_DE_SALIDA_CON_ERROR` (1). NO
+    `process.exit()`, por el precedente de Windows de `tools/puerta-anclas.ts`.
+
+**Medido**: `comprobar.sh paso3`:
+
+- **I-1**: exit 0, los tres md5 del brief §1, y `cmp` = `public/`;
+- **I-2**: la misma línea; stderr, 0 bytes;
+- **I-3**: **40/40**; `vitest list`, diff vacío.
+- `git diff --stat` del paso: solo `tools/favicon/generar.mjs` (+58 −33).
+
+### I-5 — la ruta de error del CLI
+
+**Método**: `i5/i5.mjs`, un árbol de copia NUEVO por caso en `…/legibilidad/i5/<etiqueta>/cN/`. Replica
+la disposición de `RAIZ`, con tres ficheros copiados:
+
+- `tools/favicon/generar.mjs`;
+- `src/styles/_tokens.scss`;
+- `node_modules/@fontsource/great-vibes/files/great-vibes-latin-400-normal.woff`.
+
+Los sabotajes se hacen sobre la COPIA, con una sustitución que exige haber cambiado algo; el repo no se
+toca. Se ejecuta con `spawnSync(node …)`, y el directorio de salida que se mira es el `--salida` del caso,
+o el `public/` del árbol en el caso 1.
+
+El caso 4 es reproducible. Recorriendo el BMP (`equiv/cmap.mjs`) salen 111 glifos compuestos en Great
+Vibes; la `i` (U+0069) es uno de ellos, y también `"`, `=`, `` ` ``, `j`, `¨`, `´` y `¸`.
+
+El control `c0` es el árbol sin sabotear: exit 0 y los tres md5 del brief §1, antes y después. Eso
+demuestra que la copia replica `RAIZ` y que los errores no vienen de la disposición.
+
+**DESPUÉS** (`generar.mjs` del paso 3; `i5/despues/informe.json`):
+
+| Caso | Sabotaje en la copia                                 | Exit | stderr literal (UNA línea)                                                                                                                                  | Líneas `at` | stdout | ¿Se creó la salida? |
+| ---- | ---------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ------ | ------------------- |
+| 1    | `--salida` sin directorio                            | 1    | `favicon: --salida necesita un directorio`                                                                                                                  | 0           | vacío  | no                  |
+| 2    | `--accent-soft: rosa;` en `_tokens.scss`             | 1    | `favicon: --accent-soft: se esperaba UNA declaración #RRGGBB en _tokens.scss (rosa)`                                                                        | 0           | vacío  | no                  |
+| 3    | `LETRA = 'Ж'` (U+0416, fuera del subconjunto latino) | 1    | `favicon: la fuente no tiene glifo para U+416`                                                                                                              | 0           | vacío  | no                  |
+| 4    | `LETRA = 'i'` (glifo compuesto)                      | 1    | `favicon: glifo compuesto: no soportado`                                                                                                                    | 0           | vacío  | no                  |
+| 5    | sin la woff (como sin `pnpm install`)                | 1    | `favicon: error inesperado: ENOENT: no such file or directory, open '<copia>\node_modules\@fontsource\great-vibes\files\great-vibes-latin-400-normal.woff'` | 0           | vacío  | no                  |
+
+**ANTES** (`generar.mjs` de `884a66c`, el mismo arnés; `i5/antes/informe.json`): en los cinco casos, exit 1,
+stdout vacío y sin directorio de salida, pero con la traza cruda.
+
+- Casos 1-4: 12 líneas de stderr cada uno, de ellas **5** `at`, con la línea fuente y el `^`.
+- Caso 5: 19 líneas, de ellas **7** `at`, más el objeto del error (`errno`, `code`, `syscall` y `path`).
+
+El exit, el stdout y el «no se crea la salida» ya estaban bien. Lo que arregla el paso 3 es la traza: de 5-7
+líneas `at` a 0, y de 12-19 líneas de stderr a 1.
+
 ## PENDIENTE
 
-- **Paso 3**: los errores (menor 4) e I-5.
 - **Paso 4**: formato y calidad de lo tocado.
 - **I-6** (`node .harness/harness.mjs init` completo): lo mide el lead.
