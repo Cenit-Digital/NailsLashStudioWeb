@@ -52,6 +52,8 @@ adjunta capturas de antes y después (móvil 390 px y tablet).
 - Mutación al 100 % sin exclusiones (aprendido en #34): nada de cadenas ni `Intl.DateTimeFormat` a nivel de módulo
   (son mutantes estáticos que el runner no activa, como en `horario.ts`); créalos dentro de las funciones. Y bucles
   con `Array.from({ length })` en vez de `for`/`while` con `+=`, para que ningún mutante los cuelgue (timeout).
+- Stryker (aprendido en #39): nada de estado calculado en el cuerpo de un `describe` (p. ej. `const x = aplicar(...)`).
+  Si un mutante lo rompe, falla la RECOGIDA del fichero y Stryker cuenta el mutante como superviviente: usa funciones.
 - `api/` (aprendido en #37): sus tests llevan `// @vitest-environment node` y usan los dobles de `api/src/dobles.ts`.
   Los que necesitan PostgreSQL real se llaman `*.integracion.test.ts` (con `embedded-postgres`, sin Docker ni root) y
   quedan fuera de Stryker, como los `*-horneado`. Ningún secreto en el código: todo llega por el entorno (`config.ts`).
