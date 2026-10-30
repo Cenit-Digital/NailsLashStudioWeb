@@ -59,7 +59,8 @@ export function MenuNavegacion() {
           <a href="#faq-titulo">FAQ</a>
         </li>
       </ul>
-      <a className={estilos.reservar} href="#reserva-titulo">
+      {/* `data-reserva-citas`: con la vía de citas encendida, abre el modal (D-13, issue #39). */}
+      <a className={estilos.reservar} href="#reserva-titulo" data-reserva-citas>
         Reservar
       </a>
     </nav>

@@ -5,6 +5,9 @@
 # ESTADO: ✅ APROBADO POR PABLO EL 2026-10-30 (puerta humana, issue #32), con las propuestas P1-P5
 # tal como están escritas. Las marcas «PROPUESTA (Px)» quedan como referencia a esas decisiones.
 #
+# ENMIENDA FASE 7 (Pablo, 2026-10-30, issue #39): se añaden @s29 y @s30, que fijan cómo se enciende
+# la vía de citas y cuándo se habla con orígenes externos. El resto del contrato no cambia.
+#
 # FUERA DE ALCANCE DEL MVP: que la clienta cancele o cambie la cita sola, WhatsApp automático, elegir
 # profesional, pagos o señal, integración con Treatwell y cualquier puente con la vía de chat (D-12).
 
@@ -243,3 +246,21 @@ Feature: Reserva de citas en línea
     When se busca en todo su HTML y JavaScript
     Then no aparece ningún secreto de Google, del correo ni de Turnstile (solo la clave pública de Turnstile)
     And el servidor rechaza las peticiones con un origen distinto de https://cenit-digital.github.io
+
+  # ── Activación y orígenes externos (enmienda de la Fase 7, issue #39) ────────────────────
+
+  @s29
+  Scenario: sin host de la API la vía de citas está apagada
+    Given el sitio construido sin la variable VITE_CITAS_API
+    When la clienta pulsa «Reservar» o «Reservar cita»
+    Then no hay ningún modal de citas y los dos botones llevan a «#reserva-titulo», como en @s4
+    And sin VITE_TURNSTILE_SITEKEY se usa la clave pública de pruebas de Cloudflare
+
+  @s30
+  Scenario: la API y Turnstile solo se contactan bajo demanda (enmienda de F-05)
+    Given la página de inicio cargada con la vía de citas encendida
+    When nadie abre el modal
+    Then no se hace ninguna petición a la API ni se carga el script de challenges.cloudflare.com
+    And la API se llama al llegar a los pasos «Día» y «Hora»
+    And el script de Turnstile se inyecta solo al llegar a «Tus datos»
+    And ningún HTML ni CSS de dist/ referencia la API ni challenges.cloudflare.com

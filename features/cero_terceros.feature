@@ -1,4 +1,15 @@
 # =============================================================================================
+# 🟠 ENMIENDA 2 (2026-10-30, Pablo, issue #39): LA VÍA DE CITAS HABLA CON DOS ORÍGENES EXTERNOS,
+# SOLO BAJO DEMANDA.
+# =============================================================================================
+# El modal de citas (features/reserva_citas.feature, @s30) llama a la API propia del clúster
+# (`VITE_CITAS_API`) y carga Cloudflare Turnstile (`challenges.cloudflare.com`). Son orígenes
+# externos a Pages, pero NINGUNO se pide automáticamente: la API, al llegar a los pasos «Día» y
+# «Hora»; Turnstile, al llegar a «Tus datos». Ningún HTML ni CSS de `dist/` los referencia, así que
+# esta puerta (alcance `(html|css)`, A-27) sigue igual y sin allowlist. La URL del script vive en el
+# JS del bundle, que es el hueco ya declarado de A-27; lo vigila src/components/reserva-citas.test.tsx.
+# Esta enmienda no toca ningún escenario de este fichero.
+# =============================================================================================
 # 🟠 ENMIENDA 1 (2026-07-25): SUBRUTA DE DESPLIEGUE (GITHUB PAGES DE PROYECTO) — @s27 SE AMPLÍA,
 # NO SE DEBILITA.
 # =============================================================================================
