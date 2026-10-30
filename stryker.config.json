@@ -47,7 +47,8 @@
     "src/components/LogoAcoplado.tsx",
     "src/components/logo-acoplado-logica.ts",
     "src/components/Catalogo.tsx",
-    "src/lib/citas/catalogo.ts"
+    "src/lib/citas/catalogo.ts",
+    "src/lib/citas/disponibilidad.ts"
   ],
   "thresholds": {
     "high": 100,
