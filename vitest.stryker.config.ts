@@ -36,7 +36,13 @@ export default mergeConfig(
   baseConfig,
   defineConfig({
     test: {
-      exclude: [...configDefaults.exclude, '**/*-horneado.test.{ts,tsx}'],
+      exclude: [
+        ...configDefaults.exclude,
+        '**/*-horneado.test.{ts,tsx}',
+        // El bloqueo con PostgreSQL REAL (api/, @s23): arranca un servidor de PG por proceso, como el
+        // build de los horneados. El adaptador fino `candado-pg.ts` lo cubre ese test, no la mutación.
+        '**/*.integracion.test.ts',
+      ],
       fileParallelism: true,
     },
   }),

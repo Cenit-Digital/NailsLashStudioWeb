@@ -17,11 +17,12 @@ export default defineConfig({
     // El coste es correr los ficheros en serie; la mayoría son rápidos.
     fileParallelism: false,
     css: false,
-    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    // `api/` (Fase 6): sus tests corren en Node (`// @vitest-environment node` en cada fichero).
+    include: ['src/**/*.{test,spec}.{ts,tsx}', 'api/src/**/*.test.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
-      include: ['src/lib/**/*.ts', 'src/components/**/*.tsx'],
+      include: ['src/lib/**/*.ts', 'src/components/**/*.tsx', 'api/src/**/*.ts'],
       exclude: ['src/**/*.test.*', 'src/**/*.d.ts'],
     },
   },

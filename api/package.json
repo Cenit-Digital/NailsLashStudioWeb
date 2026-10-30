@@ -1,0 +1,20 @@
+{
+  "name": "@nails-lash-studio/citas-api",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Backend de la reserva de citas (Fase 6, T-8): Google Calendar, email, Turnstile y bloqueo en PostgreSQL.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "node src/servidor.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.1.5",
+    "hono": "4.13.14",
+    "pg": "8.23.1"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1",
+    "embedded-postgres": "18.4.0-beta.17"
+  }
+}

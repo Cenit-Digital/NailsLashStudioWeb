@@ -16,6 +16,9 @@ name: Publicar en GitHub Pages
 on:
   push:
     branches: [main]
+    # El backend de citas (`api/`, T-8) no forma parte del sitio estático: cambiarlo solo no publica.
+    paths-ignore:
+      - 'api/**'
   workflow_dispatch:
 
 env:
