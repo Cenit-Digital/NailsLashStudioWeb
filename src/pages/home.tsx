@@ -14,6 +14,7 @@ import { Pie } from '../components/Pie'
 import { PruebaColor } from '../components/PruebaColor'
 import { Resenas } from '../components/Resenas'
 import { Reserva } from '../components/Reserva'
+import { ReservaCitas } from '../components/ReservaCitas'
 import { HORARIO_SEMANAL, openingHoursSpecification } from '../lib/horario'
 import { canonicaDe, componerTitulo, construirJsonLd, ORIGEN_CANONICA } from '../lib/seo'
 import { DIRECCION, GEO, NOMBRE, TELEFONO } from '../lib/site'
@@ -92,7 +93,8 @@ export default function Home() {
             cada detalle.
           </p>
           <div className="demo-hero-cta">
-            <a className="demo-btn demo-btn--solido" href="#reserva-titulo">
+            {/* `data-reserva-citas`: con la vía de citas encendida, abre el modal (D-13, issue #39). */}
+            <a className="demo-btn demo-btn--solido" href="#reserva-titulo" data-reserva-citas>
               Reservar cita
             </a>
             <a className="demo-btn demo-btn--ghost" href="#servicios-titulo">
@@ -137,6 +139,10 @@ export default function Home() {
       {/* Nailbot (F-24): el robot flotante que abre el chat de reserva. Fuera de <main> y antes del pie:
           es una capa fija que acompaña a toda la página, no una sección. Solo se monta en cliente. */}
       <NailbotFlotante />
+
+      {/* El modal de citas (issue #39): fuera de <main>, solo en cliente y solo con VITE_CITAS_API. Lo
+          abren los dos enlaces `data-reserva-citas` de D-13; sin JS siguen llevando a #reserva-titulo. */}
+      <ReservaCitas />
 
       {/* El pie de F-06: la marca, el `tel:` y Facebook (derivados de F-02). NO emite enlaces
           legales (los cazaría la anti-404 —el bug del cliente—; son F-16). Ver src/components/Pie.tsx. */}

@@ -1,0 +1,268 @@
+// Citas · Fase 7 (issue #39): el modal «Reserva tu cita». Mismo patrón que nailbot-flotante.module.scss:
+// <dialog> nativo, border-box, a 600 px o menos ocupa la pantalla (@s6) y todo lo pulsable mide al
+// menos 44 × 44 px. El elegido se marca también sin color (borde grueso y ✓), @s11.
+
+.dialogo {
+  box-sizing: border-box;
+  width: min(36rem, calc(100vw - 2rem));
+  max-height: min(48rem, calc(100dvh - 2rem));
+  margin: auto;
+  padding: 1.25rem;
+  border: 0;
+  border-radius: 24px;
+  background: var(--bg);
+  color: var(--text);
+  overflow: auto;
+  overflow-x: hidden;
+  box-shadow: 0 30px 60px color-mix(in srgb, var(--ink) 28%, transparent);
+}
+
+.dialogo::backdrop {
+  background: color-mix(in srgb, var(--ink) 35%, transparent);
+}
+
+.dialogo * {
+  box-sizing: border-box;
+}
+
+.cabeza {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.titulo {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.5rem;
+}
+
+.titulo:focus {
+  outline: none;
+}
+
+.titulo:focus-visible {
+  outline: 2px solid var(--accent-dark);
+  outline-offset: 4px;
+}
+
+.cerrar {
+  flex: none;
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--border-interactive);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.paso {
+  margin: 0.25rem 0 0.75rem;
+  color: var(--muted);
+}
+
+.cuerpo {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.subtitulo {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.15rem;
+}
+
+.pregunta {
+  margin: 0;
+  font-weight: 600;
+}
+
+.opciones,
+.horas,
+.dias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dias {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+}
+
+.opcion,
+.dia {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--border-interactive);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dia {
+  width: 100%;
+  text-align: center;
+}
+
+.opcion[aria-pressed='true'],
+.dia[aria-pressed='true'] {
+  border: 3px solid var(--accent-dark);
+  background: var(--accent-soft);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.dia:disabled {
+  border-style: dashed;
+  background: var(--surface2);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.estadoDia {
+  display: block;
+  font-size: 0.85rem;
+}
+
+.marca {
+  margin-left: 0.25rem;
+}
+
+.nota {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.aviso {
+  margin: 0;
+  padding: 0.75rem;
+  border: 2px solid var(--accent-dark);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.aviso p {
+  margin: 0 0 0.5rem;
+}
+
+.campo {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.campo label {
+  font-weight: 600;
+}
+
+.campo input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-interactive);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.campo input[aria-invalid='true'] {
+  border: 2px solid var(--accent-dark);
+}
+
+.error {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.resumen {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.35rem 1rem;
+  margin: 0;
+}
+
+.resumen dt {
+  font-weight: 700;
+}
+
+.resumen dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.principal,
+.secundario {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.principal {
+  border: 0;
+  background: var(--accent-dark);
+  color: var(--on-accent);
+}
+
+.principal:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.secundario {
+  border: 1px solid var(--border-interactive);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+@media (max-width: 600px) {
+  .dialogo {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0;
+    border-radius: 0;
+  }
+}
+
+@media (forced-colors: active) {
+  .dialogo {
+    border: 2px solid CanvasText;
+  }
+
+  .opcion[aria-pressed='true'],
+  .dia[aria-pressed='true'] {
+    outline: 3px solid Highlight;
+  }
+}
