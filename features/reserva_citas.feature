@@ -2,9 +2,8 @@
 # Decisiones de base: D-12 (dos vías que conviven), D-13 (solo dos botones), T-8 (backend propio),
 # A-32 (OAuth; Calendar acepta solapes → bloqueo propio). Catálogo: src/lib/citas/catalogo.ts (#30).
 #
-# ESTADO: BORRADOR PARA LA PUERTA HUMANA. Pablo lo aprueba antes de programar el modal y la API.
-# Las líneas marcadas «PROPUESTA (Px)» son decisiones de texto o de comportamiento que Pablo confirma
-# o cambia; el resto sale de decisiones ya tomadas.
+# ESTADO: ✅ APROBADO POR PABLO EL 2026-10-30 (puerta humana, issue #32), con las propuestas P1-P5
+# tal como están escritas. Las marcas «PROPUESTA (Px)» quedan como referencia a esas decisiones.
 #
 # FUERA DE ALCANCE DEL MVP: que la clienta cancele o cambie la cita sola, WhatsApp automático, elegir
 # profesional, pagos o señal, integración con Treatwell y cualquier puente con la vía de chat (D-12).
