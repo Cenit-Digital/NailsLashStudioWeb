@@ -77,6 +77,7 @@ export function crearClienteGoogle(config: ConfigGoogle): ClienteGoogle {
         refresh_token: config.refreshToken,
       }).toString(),
       headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      signal: AbortSignal.timeout(10_000),
     })
     if (!respuesta.ok) throw falla('token', respuesta)
 
@@ -105,6 +106,8 @@ export function crearClienteGoogle(config: ConfigGoogle): ClienteGoogle {
       headers: { authorization: `Bearer ${await acceso()}`, 'content-type': 'application/json' },
       // Sin cuerpo (GET), `JSON.stringify(undefined)` es `undefined`: la petición va sin body.
       body: JSON.stringify(cuerpo),
+      // Sin plazo, un Google colgado retendría el bloqueo del día y la conexión de PostgreSQL.
+      signal: AbortSignal.timeout(10_000),
     })
   }
 
@@ -189,7 +192,12 @@ export function crearClienteGoogle(config: ConfigGoogle): ClienteGoogle {
         'Content-Type: text/plain; charset=UTF-8',
         'Content-Transfer-Encoding: base64',
       ]
-      const mime = `${cabeceras.join('\r\n')}\r\n\r\n${base64(correo.texto)}`
+      // RFC 2045: el cuerpo en base64, en líneas de 76 caracteres como mucho.
+      const cuerpo = base64(correo.texto)
+      const lineas = Array.from({ length: Math.ceil(cuerpo.length / 76) }, (_, i) =>
+        cuerpo.slice(i * 76, (i + 1) * 76),
+      )
+      const mime = `${cabeceras.join('\r\n')}\r\n\r\n${lineas.join('\r\n')}`
       const respuesta = await llamar(
         'https://gmail.googleapis.com/gmail/v1/users/me/messages/send',
         'POST',

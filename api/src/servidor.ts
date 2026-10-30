@@ -12,7 +12,14 @@ import { verificarTurnstile } from './turnstile.ts'
  * reales. No tiene lógica propia; como `main.tsx`, queda fuera de la mutación. Despliegue: Fase 8.
  */
 const config = leerConfig(process.env)
-const pool = new pg.Pool({ connectionString: config.databaseUrl, max: 5 })
+const pool = new pg.Pool({
+  connectionString: config.databaseUrl,
+  max: 5,
+  connectionTimeoutMillis: 5_000,
+  idle_in_transaction_session_timeout: 60_000,
+})
+// Sin este listener, el error de una conexión inactiva (PostgreSQL reiniciado) tumbaría el proceso.
+pool.on('error', (error) => console.warn(`[citas-api] PostgreSQL: ${error.message}`))
 
 const app = crearApp({
   google: crearClienteGoogle({ ...config.google, fetch, ahora: () => Date.now() }),

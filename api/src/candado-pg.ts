@@ -13,6 +13,9 @@ export function crearCandadoPg(pool: Pick<pg.Pool, 'connect'>): Candado {
   return {
     async conDia(fecha, trabajo) {
       const cliente = await pool.connect()
+      // Si ni el ROLLBACK funciona, la conexión puede seguir con la transacción (y el bloqueo)
+      // abierta: se destruye en vez de devolverla al pool.
+      let rota = false
       try {
         await cliente.query('BEGIN')
         // Si otra reserva del mismo día se atasca, esta no espera para siempre: falla y la API da 503.
@@ -22,10 +25,12 @@ export function crearCandadoPg(pool: Pick<pg.Pool, 'connect'>): Candado {
         await cliente.query('COMMIT')
         return resultado
       } catch (error) {
-        await cliente.query('ROLLBACK').catch(() => undefined)
+        await cliente.query('ROLLBACK').catch(() => {
+          rota = true
+        })
         throw error
       } finally {
-        cliente.release()
+        cliente.release(rota)
       }
     },
   }

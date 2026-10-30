@@ -177,7 +177,7 @@ describe('reservar', () => {
   })
 
   it('@s24: la misma clave otra vez devuelve la misma cita sin crear otro evento ni otro email', async () => {
-    const { google, deps } = montar()
+    const { google, avisar, deps } = montar()
     await reservar(valida(), undefined, deps)
     const segunda = await reservar(valida(), undefined, deps)
 
@@ -191,6 +191,7 @@ describe('reservar', () => {
     })
     expect(google.eventos).toHaveLength(1)
     expect(google.correos).toHaveLength(2)
+    expect(avisar.mock.calls).toEqual([[`reserva repetida (${ID_EVENTO})`]])
   })
 
   it('@s24: dos clics a la vez crean un solo evento', async () => {

@@ -325,6 +325,23 @@ describe('enviarCorreo (Gmail API, @s21)', () => {
     expect(Buffer.from(cuerpo, 'base64').toString('utf8')).toBe('Clienta: Ana\nMañana')
   })
 
+  it('parte el cuerpo base64 en líneas de 76 caracteres', async () => {
+    const { google, llamadas } = cliente(() => json({ id: 'm1' }))
+    const texto = 'ñ'.repeat(100)
+    await google.enviarCorreo('ana@mail.es', { asunto: 'a', texto })
+    const partes = decodificar(llamadas[1].cuerpo).split('\r\n\r\n')
+    expect(partes).toHaveLength(2)
+    const cuerpo = partes[1]
+    const esperado = Buffer.from(texto).toString('base64')
+    expect(cuerpo.split('\r\n')).toEqual([
+      esperado.slice(0, 76),
+      esperado.slice(76, 152),
+      esperado.slice(152, 228),
+      esperado.slice(228),
+    ])
+    expect(esperado.length).toBe(268)
+  })
+
   it('sin Reply-To no pone esa cabecera', async () => {
     const { google, llamadas } = cliente(() => json({ id: 'm1' }))
     await google.enviarCorreo('ana@mail.es', { asunto: 'a', texto: 'b' })

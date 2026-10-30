@@ -28,6 +28,7 @@ export async function verificarTurnstile(datos: DatosTurnstile): Promise<boolean
       remoteip: datos.ip,
       idempotency_key: datos.clave,
     }),
+    signal: AbortSignal.timeout(10_000),
   })
   if (!respuesta.ok) throw new ErrorServicio(`turnstile: HTTP ${respuesta.status}`)
 

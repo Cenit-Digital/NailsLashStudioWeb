@@ -54,7 +54,13 @@ export function validarReserva(cuerpo: unknown): ResultadoValidacion {
   const encontrada = opcionReservable(c.opcion)
   if (encontrada === null) return { ok: false, campo: 'opcion' }
 
-  if (!esTexto(c.inicio) || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00\.000Z$/.test(c.inicio)) {
+  // Solo el ISO UTC canónico (`toISOString`) de una media hora: una fecha imposible no pasa.
+  if (
+    !esTexto(c.inicio) ||
+    !c.inicio.endsWith(':00.000Z') ||
+    Number.isNaN(Date.parse(c.inicio)) ||
+    new Date(c.inicio).toISOString() !== c.inicio
+  ) {
     return { ok: false, campo: 'inicio' }
   }
 
@@ -74,7 +80,7 @@ export function validarReserva(cuerpo: unknown): ResultadoValidacion {
   }
 
   const email = esTexto(c.email) ? c.email.trim() : null
-  if (email === null || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (email === null || email.length > 254 || !/^[\w.%+-]+@[\w.-]+\.[a-z]{2,}$/i.test(email)) {
     return { ok: false, campo: 'email' }
   }
 

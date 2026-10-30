@@ -101,6 +101,8 @@ export async function reservar(
     },
   )
 
+  // Si el proceso cayó entre el insert y los emails, la repetición no los reenvía: queda rastro aquí.
+  if (resultado.tipo === 'repetida') deps.avisar(`reserva repetida (${id})`)
   if (resultado.tipo === 'creada') {
     const envios = await Promise.allSettled([
       deps.google.enviarCorreo(peticion.email, emailClienta(datos)),

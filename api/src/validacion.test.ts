@@ -136,10 +136,23 @@ describe('validarReserva', () => {
       'ana @mail.es',
       'ana@mail.es\r\nBcc: x@y.es',
       'a@b@c.es',
+      'x@a.com,b.es',
+      'a<b@mail.es',
+      '"a"@mail.es',
+      'ana@mail.e',
+      'ana@mail.e5',
+      'ana@ma il.es',
       7,
     ])('rechaza el email %j', (email) => {
       expect(campoRechazado(peticion({ email }))).toBe('email')
     })
+
+    it.each(['ana.maria+citas@mail-x.es', 'A_B%1@Mail.ES', 'ana@sub.mail.com'])(
+      'acepta %j',
+      (email) => {
+        expect(campoRechazado(peticion({ email }))).toBeNull()
+      },
+    )
 
     it('acepta 254 caracteres y rechaza 255', () => {
       const largo = (n: number) => `${'a'.repeat(n - 8)}@mail.es`
@@ -156,6 +169,9 @@ describe('validarReserva', () => {
       'x2026-11-03T09:00:00.000Z',
       '2026-11-03T09:00:00.000Zx',
       '2026-11-03T09:00:01.000Z',
+      '2026-13-45T25:00:00.000Z',
+      '2026-02-30T09:00:00.000Z',
+      '+002026-11-03T09:00:00.000Z',
       7,
     ])('rechaza %j', (inicio) => {
       expect(campoRechazado(peticion({ inicio }))).toBe('inicio')
