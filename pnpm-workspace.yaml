@@ -1,3 +1,7 @@
+# Paquetes del workspace: la web (raíz) y el backend de citas (Fase 6, T-8).
+packages:
+  - api
+
 # Ajustes de pnpm (v11): el hogar de estos settings dejó de ser package.json.
 
 # Aprobación de scripts de build de dependencias (reemplaza a onlyBuiltDependencies).
@@ -6,6 +10,8 @@ allowBuilds:
   '@swc/core': true
   esbuild: true
   '@parcel/watcher': true
+  # Binarios de PostgreSQL para el test de integración del bloqueo (@s23, solo desarrollo).
+  '@embedded-postgres/linux-x64': true
 
 # react-helmet-async (vía vite-react-ssg) es compatible con React 19 pero aún no
 # lo declara en su rango de peers. Acotamos la excepción para no arrastrar avisos.
