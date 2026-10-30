@@ -1,31 +1,11 @@
 {
-  "$schema_comment": "Hooks que automatizan la verificación del arnés. El harness los ejecuta (no el agente), así que no se pueden saltar. Usan el motor agnóstico: los comandos concretos salen de harness.config.json.",
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/suite-tras-editar.mjs",
-            "description": "Tras editar o escribir archivos, corre la suite de tests declarada en harness.config.json, salvo si el fichero es .md (ningún test lee Markdown; ver .claude/hooks/suite-tras-editar.mjs)."
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node .harness/harness.mjs init",
-            "description": "Antes de cerrar la sesión, fuerza una verificación completa del entorno y el arnés."
-          }
-        ]
-      }
-    ]
-  },
+  "$schema_comment": "Ajustes de proyecto del arnés: modelo por defecto y una allowlist mínima. Sin hooks que corran los tests: bloquean a Claude hasta terminar y, al salir con 1 en rojo, no condicionan nada; la verificación va en el cierre de tarea, la revisión local del diff y la CI (ver docs/tooling.md).",
+  "model": "opusplan",
   "permissions": {
-    "allow": ["Bash(./init.sh)", "Bash(bin/harness:*)", "Bash(node .harness/harness.mjs:*)"]
+    "allow": [
+      "Bash(./init.sh)",
+      "Bash(bin/harness:*)",
+      "Bash(node .harness/harness.mjs:*)"
+    ]
   }
 }

@@ -38,3 +38,31 @@ src/styles/_tokens.scss
 # `format:check` de ESTA sesión fallaría por el trabajo en curso de OTRA (medido el 2026-09-30: 5
 # avisos, todos dentro de `.claude/worktrees/`).
 .claude/worktrees/
+
+# Ficheros de la PLANTILLA (harness.manifest.json → template, optional y blockSource): los
+# reemplaza `scripts/harness-upgrade.mjs` byte a byte. Si Prettier los reformateara, `--check`
+# los daría por deriva en cada comprobación. AGENTS.md entra por su bloque gestionado
+# (harness:begin/end), que también se compara byte a byte.
+.claude/agents/
+.claude/settings.json
+.codex/
+.github/agents/
+.github/ISSUE_TEMPLATE/
+.github/pull_request_template.md
+.harness/
+.opencode/
+AGENTS.md
+CHECKPOINTS.md
+CLAUDE.md
+GEMINI.md
+docs/configuration.md
+docs/gherkin.md
+docs/instrucciones-de-usuario.md
+docs/modelos.md
+docs/mutation-testing.md
+docs/tdd.md
+docs/tooling.md
+docs/verification.md
+harness.manifest.json
+harness.schema.json
+scripts/harness-upgrade.mjs
