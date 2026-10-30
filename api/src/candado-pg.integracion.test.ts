@@ -54,18 +54,34 @@ function pausa(ms: number) {
 }
 
 describe('crearCandadoPg (PostgreSQL real)', () => {
+  /** Una señal que se abre una vez: sincroniza los trabajos sin depender de pausas fijas. */
+  function senal() {
+    let abrir = () => undefined as void
+    const abierta = new Promise<void>((resuelve) => {
+      abrir = resuelve
+    })
+    return { abrir, abierta }
+  }
+
   it('dos trabajos del mismo día se ejecutan de uno en uno', async () => {
     const candado = crearCandadoPg(pool)
     const traza: string[] = []
-    const trabajo = (nombre: string) => async () => {
-      traza.push(`${nombre}:entra`)
-      await pausa(150)
-      traza.push(`${nombre}:sale`)
-    }
+    const aDentro = senal()
 
+    // `b` se lanza cuando `a` ya TIENE el bloqueo; `a` lo retiene 150 ms más.
     await Promise.all([
-      candado.conDia('2026-11-03', trabajo('a')),
-      pausa(30).then(() => candado.conDia('2026-11-03', trabajo('b'))),
+      candado.conDia('2026-11-03', async () => {
+        traza.push('a:entra')
+        aDentro.abrir()
+        await pausa(150)
+        traza.push('a:sale')
+      }),
+      aDentro.abierta.then(() =>
+        candado.conDia('2026-11-03', async () => {
+          traza.push('b:entra')
+          traza.push('b:sale')
+        }),
+      ),
     ])
     expect(traza).toEqual(['a:entra', 'a:sale', 'b:entra', 'b:sale'])
   })
@@ -73,18 +89,28 @@ describe('crearCandadoPg (PostgreSQL real)', () => {
   it('días distintos no se bloquean entre sí', async () => {
     const candado = crearCandadoPg(pool)
     const traza: string[] = []
-    const trabajo = (nombre: string) => async () => {
-      traza.push(`${nombre}:entra`)
-      await pausa(150)
-      traza.push(`${nombre}:sale`)
-    }
+    const aDentro = senal()
+    const bDentro = senal()
 
+    // `a` no suelta su día hasta que `b` ha entrado en el suyo: si se bloquearan, no acabaría
+    // nunca (y el plazo del test lo delataría).
     await Promise.all([
-      candado.conDia('2026-11-03', trabajo('a')),
-      pausa(30).then(() => candado.conDia('2026-11-04', trabajo('b'))),
+      candado.conDia('2026-11-03', async () => {
+        traza.push('a:entra')
+        aDentro.abrir()
+        await bDentro.abierta
+        traza.push('a:sale')
+      }),
+      aDentro.abierta.then(() =>
+        candado.conDia('2026-11-04', async () => {
+          traza.push('b:entra')
+          bDentro.abrir()
+          traza.push('b:sale')
+        }),
+      ),
     ])
-    expect(traza).toEqual(['a:entra', 'b:entra', 'a:sale', 'b:sale'])
-  })
+    expect(traza).toEqual(['a:entra', 'b:entra', 'b:sale', 'a:sale'])
+  }, 15_000)
 
   it('si el trabajo falla, el error sube y el día queda libre', async () => {
     const candado = crearCandadoPg(pool)
