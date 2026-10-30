@@ -45,6 +45,8 @@ export function ReservaCitasTurnstile({
     return () => {
       vivo = false
       if (id !== undefined) window.turnstile?.remove(id)
+      // Sin widget no hay `expired-callback`: el token que diera ya no vale (al volver, otro nuevo).
+      alToken(null)
     }
   }, [sitekey, alToken, alFallar])
 

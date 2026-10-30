@@ -429,6 +429,129 @@ describe('@s20-@s25 confirmar', () => {
   })
 })
 
+describe('revisión: foco, token, reserva en vuelo y listas vacías', () => {
+  it('Ctrl-clic o Mayús-clic en «Reservar» siguen siendo del navegador', () => {
+    montar()
+    for (const tecla of [{ ctrlKey: true }, { metaKey: true }, { shiftKey: true }]) {
+      const clic = new MouseEvent('click', { bubbles: true, cancelable: true, ...tecla })
+      screen.getByRole('link', { name: 'Reservar' }).dispatchEvent(clic)
+      expect(clic.defaultPrevented).toBe(false)
+    }
+    expect(dialogo()).not.toHaveAttribute('open')
+  })
+
+  it('al cambiar de paso el foco va al encabezado del paso', async () => {
+    const usuario = userEvent.setup()
+    montar()
+    await usuario.click(screen.getByRole('link', { name: 'Reservar' }))
+    const d = within(dialogo())
+    await usuario.click(d.getByRole('button', { name: 'Manicura' }))
+    await usuario.click(
+      d.getByRole('button', { name: 'Manicura Completa con Base Proteínica (Técnica Rusa)' }),
+    )
+    await usuario.click(d.getByRole('button', { name: 'Uña Mediana · 29 € · 1 h' }))
+    await usuario.click(d.getByRole('button', { name: 'Continuar' }))
+    expect(d.getByRole('heading', { name: 'Día' })).toHaveFocus()
+  })
+
+  it('«Revisar la cita» con errores lleva el foco al primer campo inválido', async () => {
+    const usuario = userEvent.setup()
+    montar()
+    await hastaElResumen(usuario)
+    const d = within(dialogo())
+    await usuario.click(d.getByRole('button', { name: 'Atrás' }))
+    await usuario.clear(d.getByLabelText('Teléfono'))
+    await usuario.click(d.getByRole('button', { name: 'Revisar la cita' }))
+    expect(d.getByLabelText('Teléfono')).toHaveFocus()
+  })
+
+  it('volver del resumen y regresar pide un token nuevo (el anterior puede haber caducado)', async () => {
+    const usuario = userEvent.setup()
+    const { pedir } = montar(
+      backend([() => json(201, { cita: { opcion: 'o', inicio: 'i', fin: 'f' } })]),
+    )
+    await hastaElResumen(usuario)
+    const d = within(dialogo())
+    await usuario.click(d.getByRole('button', { name: 'Atrás' }))
+    await usuario.click(d.getByRole('button', { name: 'Revisar la cita' }))
+    await usuario.click(await d.findByRole('button', { name: 'Confirmar cita' }))
+    await d.findByRole('heading', { name: '¡Cita confirmada!' })
+    expect(cuerposDeReserva(pedir)[0].turnstile).toBe('tok-2')
+  })
+
+  it('con una reserva en vuelo no se puede cerrar el modal', async () => {
+    const usuario = userEvent.setup()
+    let responder: (r: Response) => void = () => {}
+    const pedir = backend([])
+    pedir.mockImplementation(async (url: string) => {
+      if (url.includes('/dias')) return json(200, { dias: DIAS })
+      if (url.includes('/horas')) return json(200, { horas: HORAS })
+      return new Promise<Response>((r) => (responder = r))
+    })
+    montar(pedir)
+    await hastaElResumen(usuario)
+    const d = within(dialogo())
+    await usuario.click(d.getByRole('button', { name: 'Confirmar cita' }))
+    expect(d.getByRole('button', { name: 'Cerrar' })).toBeDisabled()
+    expect(d.getByText('Enviando tu reserva…')).toBeInTheDocument()
+    const cancelar = new Event('cancel', { cancelable: true })
+    act(() => {
+      dialogo().dispatchEvent(cancelar)
+    })
+    expect(cancelar.defaultPrevented).toBe(true)
+    await act(async () => responder(json(201, { cita: { opcion: 'o', inicio: 'i', fin: 'f' } })))
+    expect(await d.findByRole('heading', { name: '¡Cita confirmada!' })).toBeInTheDocument()
+  })
+
+  it('un día sin horas lo dice', async () => {
+    const usuario = userEvent.setup()
+    const pedir = backend([])
+    pedir.mockImplementation(async (url: string) =>
+      url.includes('/dias') ? json(200, { dias: DIAS }) : json(200, { horas: [] }),
+    )
+    montar(pedir)
+    await usuario.click(screen.getByRole('link', { name: 'Reservar' }))
+    const d = within(dialogo())
+    await usuario.click(d.getByRole('button', { name: 'Manicura' }))
+    await usuario.click(
+      d.getByRole('button', { name: 'Manicura Completa con Base Proteínica (Técnica Rusa)' }),
+    )
+    await usuario.click(d.getByRole('button', { name: 'Uña Mediana · 29 € · 1 h' }))
+    await usuario.click(d.getByRole('button', { name: 'Continuar' }))
+    await usuario.click(await d.findByRole('button', { name: /mar 3 nov/ }))
+    await usuario.click(d.getByRole('button', { name: 'Continuar' }))
+    expect(
+      await d.findByText('No quedan horas libres este día. Elige otro, por favor.'),
+    ).toBeInTheDocument()
+  })
+
+  it('una hora elegida que ya no se ofrece deja de estar elegida', async () => {
+    const usuario = userEvent.setup()
+    let horas = HORAS
+    const pedir = backend([])
+    pedir.mockImplementation(async (url: string) =>
+      url.includes('/dias') ? json(200, { dias: DIAS }) : json(200, { horas }),
+    )
+    montar(pedir)
+    await usuario.click(screen.getByRole('link', { name: 'Reservar' }))
+    const d = within(dialogo())
+    await usuario.click(d.getByRole('button', { name: 'Manicura' }))
+    await usuario.click(
+      d.getByRole('button', { name: 'Manicura Completa con Base Proteínica (Técnica Rusa)' }),
+    )
+    await usuario.click(d.getByRole('button', { name: 'Uña Mediana · 29 € · 1 h' }))
+    await usuario.click(d.getByRole('button', { name: 'Continuar' }))
+    await usuario.click(await d.findByRole('button', { name: /mar 3 nov/ }))
+    await usuario.click(d.getByRole('button', { name: 'Continuar' }))
+    await usuario.click(await d.findByRole('button', { name: '10:00' }))
+    horas = HORAS.slice(1)
+    await usuario.click(d.getByRole('button', { name: 'Atrás' }))
+    await usuario.click(d.getByRole('button', { name: 'Continuar' }))
+    await d.findByRole('button', { name: '10:30' })
+    await waitFor(() => expect(d.getByRole('button', { name: 'Continuar' })).toBeDisabled())
+  })
+})
+
 describe('@s30 F-05 enmendada: Turnstile y la API solo bajo demanda', () => {
   it('nada se pide al montar; el script de Turnstile se inyecta al llegar a «Tus datos»', async () => {
     delete window.turnstile

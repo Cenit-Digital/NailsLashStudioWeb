@@ -31,12 +31,13 @@ export function cargarTurnstile(): Promise<TurnstileApi> {
     const script = document.createElement('script')
     script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
     script.async = true
-    script.onload = () => (window.turnstile ? resolver(window.turnstile) : rechazar(new Error()))
-    script.onerror = () => {
+    const fallar = () => {
       carga = null
       script.remove()
       rechazar(new Error('turnstile'))
     }
+    script.onload = () => (window.turnstile ? resolver(window.turnstile) : fallar())
+    script.onerror = fallar
     document.head.append(script)
   })
   return carga

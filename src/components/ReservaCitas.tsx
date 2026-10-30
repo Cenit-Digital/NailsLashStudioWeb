@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import {
+  type FormEvent,
+  type SyntheticEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 
 import { CATALOGO_PROVISIONAL } from '../lib/citas/catalogo'
 import {
@@ -45,7 +53,15 @@ const CAMPOS: { campo: CampoClienta; etiqueta: string; tipo: string; auto: strin
     { campo: 'email', etiqueta: 'Email', tipo: 'email', auto: 'email', max: 254 },
   ]
 
-type Carga<T> = { estado: 'cargando' } | { estado: 'error' } | { estado: 'listo'; datos: T[] }
+/** `para` es la consulta (opción, u opción y fecha): con otra, la lista es de antes y no se pinta. */
+type Carga<T> =
+  | { estado: 'cargando' }
+  | { estado: 'error'; para: string }
+  | { estado: 'listo'; para: string; datos: T[] }
+
+function cargaDe<T>(carga: Carga<T>, para: string): Carga<T> {
+  return carga.estado !== 'cargando' && carga.para === para ? carga : { estado: 'cargando' }
+}
 
 function Llamar() {
   return (
@@ -83,6 +99,8 @@ export function ReservaCitas({
   const dialogo = useRef<HTMLDialogElement>(null)
   const titulo = useRef<HTMLHeadingElement>(null)
   const abridor = useRef<HTMLElement | null>(null)
+  const pasoEnfocado = useRef<string>('servicio')
+  const [enfocarError, setEnfocarError] = useState(0)
 
   /** Aplica el evento al estado ACTUAL (síncrono: el doble clic ve el «enviando» del primero). */
   const despachar = useCallback((evento: EventoReserva) => {
@@ -100,9 +118,13 @@ export function ReservaCitas({
       const objetivo =
         evento.target instanceof Element ? evento.target.closest('[data-reserva-citas]') : null
       if (!(objetivo instanceof HTMLElement)) return
+      // Ctrl/Cmd/Mayús-clic o el botón central siguen siendo del navegador (pestaña nueva, etc.).
+      if (evento.defaultPrevented || evento.button !== 0) return
+      if (evento.ctrlKey || evento.metaKey || evento.shiftKey || evento.altKey) return
       evento.preventDefault()
       abridor.current = objetivo
       despachar({ tipo: 'reiniciar' })
+      pasoEnfocado.current = 'servicio'
       setToken(null)
       setTurnstileFallo(false)
       setAbierto(true)
@@ -124,41 +146,84 @@ export function ReservaCitas({
 
   const { paso, opcion, fecha } = estado
 
+  // Al cambiar de paso, el foco va a su encabezado: el botón pulsado desaparece o se desactiva y un
+  // lector de pantalla debe anunciar el paso nuevo. Al abrir, el foco es del título (@s1).
+  useEffect(() => {
+    if (!abierto || paso === pasoEnfocado.current) return
+    pasoEnfocado.current = paso
+    document.getElementById('reserva-citas-paso')?.focus()
+  }, [abierto, paso])
+
+  // Tras «Revisar la cita» con errores, o un 400 de un campo, el foco va al primer campo inválido.
+  useEffect(() => {
+    if (enfocarError > 0) {
+      dialogo.current?.querySelector<HTMLInputElement>('input[aria-invalid="true"]')?.focus()
+    }
+  }, [enfocarError])
+
   useEffect(() => {
     if (!abierto || paso !== 'dia' || opcion === null || cliente === null) return
     let vivo = true
-    setDias({ estado: 'cargando' })
     void cliente.dias(opcion).then((lista) => {
-      if (vivo) setDias(lista === null ? { estado: 'error' } : { estado: 'listo', datos: lista })
+      if (!vivo) return
+      setDias(
+        lista === null
+          ? { estado: 'error', para: opcion }
+          : { estado: 'listo', para: opcion, datos: lista },
+      )
+      // Un día elegido antes que ya no está disponible deja de estar elegido.
+      const elegido = actual.current.fecha
+      if (
+        lista &&
+        elegido &&
+        !lista.some((d) => d.fecha === elegido && d.estado === 'disponible')
+      ) {
+        despachar({ tipo: 'opcion', id: opcion })
+      }
     })
     return () => {
       vivo = false
     }
-  }, [abierto, paso, opcion, cliente, recarga])
+  }, [abierto, paso, opcion, cliente, recarga, despachar])
 
   useEffect(() => {
     if (!abierto || paso !== 'hora' || opcion === null || fecha === null || cliente === null) return
     let vivo = true
-    setHoras({ estado: 'cargando' })
+    const para = `${opcion} ${fecha}`
     void cliente.horas(opcion, fecha).then((lista) => {
-      if (vivo) setHoras(lista === null ? { estado: 'error' } : { estado: 'listo', datos: lista })
+      if (!vivo) return
+      setHoras(lista === null ? { estado: 'error', para } : { estado: 'listo', para, datos: lista })
+      // Una hora elegida antes que ya no se ofrece deja de estar elegida.
+      const elegida = actual.current.hueco
+      if (lista && elegida && !lista.some((h) => h.inicio === elegida.inicio)) {
+        despachar({ tipo: 'dia', fecha })
+      }
     })
     return () => {
       vivo = false
     }
-  }, [abierto, paso, opcion, fecha, cliente, recarga])
+  }, [abierto, paso, opcion, fecha, cliente, recarga, despachar])
 
   // Decisión 3: el script de Turnstile se pide al llegar a «Tus datos», no antes.
   useEffect(() => {
     if (abierto && paso === 'datos') cargarTurnstile().catch(() => setTurnstileFallo(true))
   }, [abierto, paso])
 
-  const alToken = useCallback((t: string | null) => setToken(t), [])
+  const alToken = useCallback((t: string | null) => {
+    setToken(t)
+    if (t !== null) setTurnstileFallo(false)
+  }, [])
   const alFallarTurnstile = useCallback(() => setTurnstileFallo(true), [])
 
   if (!montado || config === null || cliente === null) return null
 
-  const cerrar = () => setAbierto(false)
+  // Con una reserva en vuelo no se cierra: la clienta debe ver si quedó confirmada (× y Escape).
+  const cerrar = () => {
+    if (!actual.current.enviando) setAbierto(false)
+  }
+  const alCancelar = (evento: SyntheticEvent) => {
+    if (actual.current.enviando) evento.preventDefault()
+  }
   const alCerrar = () => {
     setAbierto(false)
     abridor.current?.focus()
@@ -170,7 +235,10 @@ export function ReservaCitas({
     const peticion = enviando === antes ? null : peticionDe(enviando, token ?? '')
     if (peticion === null) return
     void cliente.reservar(peticion).then((resultado) => {
-      despachar({ tipo: 'respuesta', resultado })
+      // Una respuesta de una reserva que ya no está en curso (se reabrió el modal) se descarta.
+      if (!actual.current.enviando || actual.current.clave !== peticion.clave) return
+      const siguiente = despachar({ tipo: 'respuesta', resultado })
+      if (siguiente.paso === 'datos') setEnfocarError((n) => n + 1)
       if (resultado.tipo !== 'confirmada') {
         // El token es de un solo uso: «Reintentar» pide uno nuevo y conserva la clave.
         setToken(null)
@@ -181,12 +249,14 @@ export function ReservaCitas({
 
   const revisar = (evento: FormEvent) => {
     evento.preventDefault()
-    despachar({ tipo: 'revisar' })
+    if (despachar({ tipo: 'revisar' }).paso === 'datos') setEnfocarError((n) => n + 1)
   }
 
   const numero = numeroDePaso(paso)
   const vista = vistaServicio(estado)
   const resumen = resumenDe(estado)
+  const cargaDias = cargaDe(dias, String(opcion))
+  const cargaHoras = cargaDe(horas, `${opcion} ${fecha}`)
 
   const avisoCarga = (que: 'dias' | 'horas') => (
     <div className={estilos.aviso} role="alert">
@@ -210,13 +280,20 @@ export function ReservaCitas({
       className={estilos.dialogo}
       aria-labelledby="reserva-citas-titulo"
       onClose={alCerrar}
+      onCancel={alCancelar}
       data-paso={paso}
     >
       <div className={estilos.cabeza}>
         <h2 id="reserva-citas-titulo" ref={titulo} tabIndex={-1} className={estilos.titulo}>
           Reserva tu cita
         </h2>
-        <button type="button" className={estilos.cerrar} aria-label="Cerrar" onClick={cerrar}>
+        <button
+          type="button"
+          className={estilos.cerrar}
+          aria-label="Cerrar"
+          disabled={estado.enviando}
+          onClick={cerrar}
+        >
           <span aria-hidden="true">×</span>
         </button>
       </div>
@@ -224,7 +301,7 @@ export function ReservaCitas({
 
       {paso === 'servicio' && (
         <section aria-labelledby="reserva-citas-paso" className={estilos.cuerpo}>
-          <h3 id="reserva-citas-paso" className={estilos.subtitulo}>
+          <h3 id="reserva-citas-paso" tabIndex={-1} className={estilos.subtitulo}>
             Servicio
           </h3>
           <ul className={estilos.opciones} aria-label="Categorías">
@@ -286,14 +363,20 @@ export function ReservaCitas({
 
       {paso === 'dia' && (
         <section aria-labelledby="reserva-citas-paso" className={estilos.cuerpo}>
-          <h3 id="reserva-citas-paso" className={estilos.subtitulo}>
+          <h3 id="reserva-citas-paso" tabIndex={-1} className={estilos.subtitulo}>
             Día
           </h3>
-          {dias.estado === 'cargando' && <p role="status">Cargando los días…</p>}
-          {dias.estado === 'error' && avisoCarga('dias')}
-          {dias.estado === 'listo' && (
+          {cargaDias.estado === 'cargando' && <p role="status">Cargando los días…</p>}
+          {cargaDias.estado === 'error' && avisoCarga('dias')}
+          {cargaDias.estado === 'listo' && cargaDias.datos.length === 0 && (
+            <div className={estilos.aviso} role="alert">
+              <p>No quedan días libres. Llámanos al {TELEFONO.legible}, por favor.</p>
+              <Llamar />
+            </div>
+          )}
+          {cargaDias.estado === 'listo' && (
             <ul className={estilos.dias} aria-label="Días">
-              {dias.datos.map((d) => {
+              {cargaDias.datos.map((d) => {
                 const { semana, dia, mes } = diaCorto(d.fecha)
                 return (
                   <li key={d.fecha}>
@@ -328,7 +411,7 @@ export function ReservaCitas({
 
       {paso === 'hora' && (
         <section aria-labelledby="reserva-citas-paso" className={estilos.cuerpo}>
-          <h3 id="reserva-citas-paso" className={estilos.subtitulo}>
+          <h3 id="reserva-citas-paso" tabIndex={-1} className={estilos.subtitulo}>
             Hora
           </h3>
           {estado.aviso && (
@@ -336,11 +419,16 @@ export function ReservaCitas({
               {estado.aviso}
             </p>
           )}
-          {horas.estado === 'cargando' && <p role="status">Cargando las horas…</p>}
-          {horas.estado === 'error' && avisoCarga('horas')}
-          {horas.estado === 'listo' && (
+          {cargaHoras.estado === 'cargando' && <p role="status">Cargando las horas…</p>}
+          {cargaHoras.estado === 'error' && avisoCarga('horas')}
+          {cargaHoras.estado === 'listo' && cargaHoras.datos.length === 0 && (
+            <p className={estilos.aviso} role="alert">
+              No quedan horas libres este día. Elige otro, por favor.
+            </p>
+          )}
+          {cargaHoras.estado === 'listo' && (
             <ul className={estilos.horas} aria-label="Horas">
-              {horas.datos.map((h) => (
+              {cargaHoras.datos.map((h) => (
                 <li key={h.inicio}>
                   <button
                     type="button"
@@ -364,7 +452,7 @@ export function ReservaCitas({
           onSubmit={revisar}
           aria-labelledby="reserva-citas-paso"
         >
-          <h3 id="reserva-citas-paso" className={estilos.subtitulo}>
+          <h3 id="reserva-citas-paso" tabIndex={-1} className={estilos.subtitulo}>
             Tus datos
           </h3>
           {CAMPOS.map(({ campo, etiqueta, tipo, auto, max }) => {
@@ -413,7 +501,7 @@ export function ReservaCitas({
 
       {(paso === 'resumen' || paso === 'confirmada') && resumen && (
         <section aria-labelledby="reserva-citas-paso" className={estilos.cuerpo}>
-          <h3 id="reserva-citas-paso" className={estilos.subtitulo}>
+          <h3 id="reserva-citas-paso" tabIndex={-1} className={estilos.subtitulo}>
             {paso === 'confirmada' ? '¡Cita confirmada!' : 'Revisa tu cita'}
           </h3>
           <dl className={estilos.resumen}>
@@ -448,6 +536,13 @@ export function ReservaCitas({
                   {estado.aviso ?? mensajeDeError()}
                 </p>
               )}
+              <p role="status" className={estilos.nota}>
+                {estado.enviando
+                  ? 'Enviando tu reserva…'
+                  : token === null && !turnstileFallo
+                    ? 'Comprobando que no eres un robot…'
+                    : ''}
+              </p>
               <div className={estilos.acciones}>
                 <button
                   type="button"
