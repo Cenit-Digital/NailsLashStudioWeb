@@ -23,7 +23,7 @@ contrato de cada capacidad es su `features/<capacidad>.feature`.
 | --- | --- |
 | `harness.config.json` | Comandos del stack (instalar, lint = typecheck + ESLint + Prettier, test, mutación, build) |
 | `src/` | Código y tests co-ubicados (`*.test.ts(x)`); `src/lib/site.ts` es la fuente única de los datos del negocio |
-| `api/` | Backend de citas (Hono + `pg`, T-8): reserva en Google Calendar, email, Turnstile y bloqueo en PostgreSQL; se arranca con `node api/src/servidor.ts` |
+| `api/` | Backend de citas (Hono + `pg`, T-8): reserva en Google Calendar, email, Turnstile y bloqueo en PostgreSQL; se arranca con `node api/src/servidor.ts`. `pnpm --filter ./api build` lo empaqueta en `api/dist/servidor.mjs` y `api-image.yml` publica la imagen (`ghcr.io/cenit-digital/nailslashstudioweb-citas-api`) que despliega KubernetesInfrastructure |
 | `features/<capacidad>.feature` | Spec viva de cada capacidad (Given/When/Then con tags `@sN` estables) |
 | `project-spec.md` | Registro de decisiones y preguntas abiertas del proyecto, y specs históricas por feature |
 | `feature_list.json` · `progress/` | Historial de la plantilla antigua (estado y bitácoras por feature); no se reabren |

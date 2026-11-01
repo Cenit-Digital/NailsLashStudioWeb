@@ -60,6 +60,7 @@
     "api/src/google.ts",
     "api/src/reservar.ts",
     "api/src/app.ts",
+    "api/src/cache.ts",
     "api/src/config.ts"
   ],
   "thresholds": {

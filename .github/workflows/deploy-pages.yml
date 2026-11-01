@@ -67,7 +67,14 @@ jobs:
         id: pages
         uses: actions/configure-pages@v5
 
+      # La vía de citas (D-13, @s29/@s30; issue #41) se enciende con las VARIABLES DEL REPO `CITAS_API` (host de la
+      # API, p. ej. https://citas-nails.cenitdigital.es) y `TURNSTILE_SITEKEY` (clave PÚBLICA de Turnstile). Mientras
+      # no tengan valor llegan vacías y el build es el de siempre: los dos botones siguen siendo enlaces a #reserva.
+      # No se ponen hasta que existan la política de privacidad sin placeholders (D-6) y la clave real de Turnstile.
       - name: Build de producción (vite-react-ssg + las 5 puertas)
+        env:
+          VITE_CITAS_API: ${{ vars.CITAS_API }}
+          VITE_TURNSTILE_SITEKEY: ${{ vars.TURNSTILE_SITEKEY }}
         run: pnpm build
 
       # GitHub Pages pasa el artefacto por Jekyll si no existe este fichero, e ignoraría

@@ -121,6 +121,9 @@ importers:
       embedded-postgres:
         specifier: 18.4.0-beta.17
         version: 18.4.0-beta.17
+      esbuild:
+        specifier: 0.28.1
+        version: 0.28.1
 
 packages:
 

@@ -4,6 +4,7 @@ import { cors } from 'hono/cors'
 
 import { diasReservables, horasDisponibles } from '../../src/lib/citas/disponibilidad.ts'
 import { TELEFONO } from '../../src/lib/site.ts'
+import { crearCacheCorta } from './cache.ts'
 import { type DependenciasReserva, reservar } from './reservar.ts'
 import { opcionReservable, validarReserva } from './validacion.ts'
 
@@ -11,7 +12,8 @@ import { opcionReservable, validarReserva } from './validacion.ts'
  * Citas · Fase 6 (issue #37): la API HTTP.
  *
  * Rutas:
- * - `GET /dias` y `GET /horas`: la disponibilidad para el modal (Fase 7).
+ * - `GET /dias` y `GET /horas`: la disponibilidad para el modal (Fase 7), con la ocupación de Google
+ *   guardada 60 s (Fase 8, issue #41). Al crear una cita se vacía; la reserva nunca la usa.
  * - `POST /reservas`: confirma una cita (@s20-@s27).
  * - `GET /salud`: para las sondas del clúster.
  *
@@ -39,18 +41,19 @@ export function crearApp(deps: DependenciasReserva): Hono {
     }),
   )
 
-  async function ocupacionDeLaVentana(ahora: Date) {
-    // 31 días cubren entera la ventana de 30 días de Madrid, empiece a la hora que empiece.
+  // 31 días cubren entera la ventana de 30 días de Madrid, empiece a la hora que empiece, y también
+  // si lo guardado tiene hasta 60 s.
+  const ocupacion = crearCacheCorta(60_000, async (ahora: Date) => {
     const hasta = new Date(ahora.getTime() + 31 * 24 * 60 * 60_000)
     return deps.google.ocupacion(deps.calendarios, ahora.toISOString(), hasta.toISOString())
-  }
+  })
 
   app.get('/dias', async (c) => {
     const encontrada = opcionReservable(c.req.query('opcion'))
     if (encontrada === null) return c.json({ codigo: 'peticion-invalida', campo: 'opcion' }, 400)
 
     const ahora = deps.ahora()
-    const calendarios = await ocupacionDeLaVentana(ahora)
+    const calendarios = await ocupacion.obtener(ahora)
     const minutos = encontrada.opcion.minutos as number
 
     return c.json({ dias: diasReservables({ ahora, minutos, calendarios }) })
@@ -66,7 +69,7 @@ export function crearApp(deps: DependenciasReserva): Hono {
     }
 
     const ahora = deps.ahora()
-    const calendarios = await ocupacionDeLaVentana(ahora)
+    const calendarios = await ocupacion.obtener(ahora)
     const minutos = encontrada.opcion.minutos as number
 
     return c.json({ horas: horasDisponibles(fecha, { ahora, minutos, calendarios }) })
@@ -99,6 +102,9 @@ export function crearApp(deps: DependenciasReserva): Hono {
           )
         case 'clave-reutilizada':
           return c.json({ codigo: 'peticion-invalida', campo: 'clave' }, 400)
+        case 'creada':
+          ocupacion.invalidar()
+          return c.json({ cita: resultado.cita }, 201)
         default:
           return c.json({ cita: resultado.cita }, 201)
       }
