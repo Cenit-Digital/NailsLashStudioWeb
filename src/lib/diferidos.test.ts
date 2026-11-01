@@ -94,4 +94,16 @@ describe('el ancla de lo diferido (A-11, A-21)', () => {
     // La decisión va ESCRITA donde se toma: quien la revierta tiene que leer por qué.
     expect(humilde).toContain('A-21')
   })
+
+  /**
+   * Issue #41 (A-29): los registros de la política de privacidad de las citas SÍ se cablean, y con el
+   * MISMO entorno que verá Vite (`loadEnv` lee también los `.env*`, no solo `process.env`): si la
+   * puerta mirara otro entorno, la ruta podría hornearse sin que nadie vigilara sus placeholders.
+   */
+  it('@s31 el humilde cablea los registros de la política con el entorno de Vite', () => {
+    const humilde = readFileSync('tools/puerta-placeholders.ts', 'utf8')
+
+    expect(humilde).toContain("loadEnv(modoDelBuild(process.env), process.cwd(), 'VITE_')")
+    expect(humilde).toContain('...registrosDelBuild(entorno)')
+  })
 })

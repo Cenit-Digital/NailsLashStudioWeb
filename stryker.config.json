@@ -50,6 +50,7 @@
     "src/lib/citas/catalogo.ts",
     "src/lib/citas/disponibilidad.ts",
     "src/lib/citas/config.ts",
+    "src/lib/citas/privacidad.ts",
     "src/lib/citas/datos-clienta.ts",
     "src/lib/citas/formato.ts",
     "src/lib/citas/cliente-api.ts",

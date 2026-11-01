@@ -266,3 +266,17 @@
     outline: 3px solid Highlight;
   }
 }
+
+// Texto solo para lectores de pantalla («visually hidden» estándar, como en catalogo.module.scss).
+.soloLector {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  border: 0;
+}

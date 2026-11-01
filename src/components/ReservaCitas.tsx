@@ -16,6 +16,7 @@ import {
   type Pedir,
 } from '../lib/citas/cliente-api'
 import { configCitas, type EntornoCitas } from '../lib/citas/config'
+import { urlPrivacidad } from '../lib/citas/privacidad'
 import type { CampoClienta } from '../lib/citas/datos-clienta'
 import type { DiaReservable, Hueco } from '../lib/citas/disponibilidad'
 import {
@@ -482,7 +483,12 @@ export function ReservaCitas({
           <p className={estilos.nota}>
             Responsable: {NOMBRE}. Finalidad: gestionar tu cita y enviarte la confirmación.
             Derechos: acceso, rectificación y supresión llamando al {TELEFONO.legible}. Más
-            información en la política de privacidad.
+            información en la{' '}
+            <a href={urlPrivacidad(import.meta.env.BASE_URL)} target="_blank" rel="noopener">
+              política de privacidad
+              <span className={estilos.soloLector}> (se abre en una pestaña nueva)</span>
+            </a>
+            .
           </p>
           <div className={estilos.acciones}>
             <button

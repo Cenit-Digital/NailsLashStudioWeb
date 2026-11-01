@@ -8,6 +8,10 @@
 # ENMIENDA FASE 7 (Pablo, 2026-10-30, issue #39): se añaden @s29 y @s30, que fijan cómo se enciende
 # la vía de citas y cuándo se habla con orígenes externos. El resto del contrato no cambia.
 #
+# ENMIENDA POLÍTICA DE PRIVACIDAD (Pablo, 2026-11-01, issue #41, decisión 8): se añade @s31 y el enlace del
+# aviso de capa 1 de @s17 deja de ser una propuesta. La página existe solo con la vía encendida y lleva
+# placeholders (A-29) que hacen fallar el build de producción hasta que el salón dé sus datos.
+#
 # FUERA DE ALCANCE DEL MVP: que la clienta cancele o cambie la cita sola, WhatsApp automático, elegir
 # profesional, pagos o señal, integración con Treatwell y cualquier puente con la vía de chat (D-12).
 
@@ -152,7 +156,7 @@ Feature: Reserva de citas en línea
     Given la clienta ha elegido servicio, día y hora
     When llega al paso «Tus datos»
     Then se le piden solo «Nombre», «Teléfono» y «Email», los tres obligatorios
-    And junto al botón ve el aviso de privacidad de capa 1 con responsable, finalidad, derechos y enlace a la política (PROPUESTA P4)
+    And junto al botón ve el aviso de privacidad de capa 1 con responsable, finalidad, derechos y enlace a la política de privacidad (PROPUESTA P4; el destino lo fija @s31)
     And no hay ningún campo de texto libre
 
   @s18
@@ -264,3 +268,15 @@ Feature: Reserva de citas en línea
     And la API se llama al llegar a los pasos «Día» y «Hora»
     And el script de Turnstile se inyecta solo al llegar a «Tus datos»
     And ningún HTML ni CSS de dist/ referencia la API ni challenges.cloudflare.com
+
+  # ── Política de privacidad (enmienda del issue #41) ──────────────────────────────────────
+
+  @s31
+  Scenario: con la vía encendida el aviso enlaza a la política, y con placeholders el build de producción falla
+    Given el sitio construido con la variable VITE_CITAS_API
+    When la clienta llega al paso «Tus datos»
+    Then el aviso de capa 1 lleva el enlace «política de privacidad (se abre en una pestaña nueva)» a /privacidad-citas/
+    And esa página existe con un solo h1 y con responsable, finalidad, base jurídica, datos, destinatarios (Google y Cloudflare Turnstile), conservación y derechos con la reclamación ante la AEPD
+    And la razón social, el NIF, el email de contacto y el plazo de conservación aparecen como «[PENDIENTE: …]» (A-29)
+    And mientras sigan siendo placeholders, pnpm build de producción falla en la puerta de placeholders nombrando los cuatro registros
+    And sin la variable no existe la ruta ni el enlace, y dist/ queda igual que antes
