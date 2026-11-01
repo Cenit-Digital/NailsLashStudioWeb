@@ -1,0 +1,76 @@
+// La política de privacidad de las citas (issue #41): una columna de lectura, sin adornos.
+// Colores solo de los tokens (los pares texto/fondo ya están medidos en la puerta de contraste).
+
+.cabecera {
+  padding-block: 0.9375rem;
+  padding-inline: 1.5rem;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--line);
+  font-family: 'Manrope', system-ui, sans-serif;
+}
+
+.pagina {
+  box-sizing: border-box;
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+  color: var(--text);
+  font-family: 'Manrope', system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+.titulo {
+  margin: 0 0 0.75rem;
+  color: var(--ink);
+  font-size: 2rem;
+}
+
+.intro {
+  margin: 0 0 1.5rem;
+}
+
+.indice {
+  margin-bottom: 2rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.indice ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.indice a {
+  display: inline-block;
+  min-height: 44px;
+  line-height: 44px;
+}
+
+.seccion {
+  margin-bottom: 1.75rem;
+}
+
+.seccion h2 {
+  margin: 0 0 0.5rem;
+  color: var(--ink);
+  font-size: 1.35rem;
+}
+
+.seccion p {
+  margin: 0 0 0.5rem;
+}
+
+.enlace {
+  color: var(--accent-dark);
+  text-decoration: underline;
+}
+
+.pie {
+  padding: 1.5rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  text-align: center;
+  font-family: 'Manrope', system-ui, sans-serif;
+}

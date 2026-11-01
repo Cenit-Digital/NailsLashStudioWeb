@@ -14,8 +14,11 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import process from 'node:process'
 
+import { loadEnv } from 'vite'
+
 import { ejecutarPuerta, type SistemaDeFicheros } from '../src/lib/puerta.ts'
-import { registros } from '../src/lib/site.ts'
+import { registrosDelBuild } from '../src/lib/citas/privacidad.ts'
+import { registros as registrosVerificados } from '../src/lib/site.ts'
 import { rutaFisica, ubicacionLogica } from './artefacto.ts'
 
 /**
@@ -53,6 +56,14 @@ const sistemaDeFicherosReal: SistemaDeFicheros = {
  *   → Cuando el cliente decida el dominio: se cambia el DATO y el flag a `false` en `seo.ts`, el
  *     registro **deja de ser placeholder solo** y no hay que acordarse de recablear nada aquí.
  */
+/**
+ * Issue #41 (A-29): con la vía de citas encendida, la política de privacidad añade sus registros
+ * `esPlaceholder: true` (razón social, NIF, email, conservación) y el build de producción FALLA hasta
+ * que el salón los dé. El entorno es el que verá Vite (`.env*` y `process.env`, solo `VITE_*`).
+ */
+const entorno = loadEnv('production', process.cwd(), 'VITE_')
+const registros = [...registrosVerificados, ...registrosDelBuild(entorno)]
+
 const resultado = ejecutarPuerta({ modo: 'produccion', registros, ficheros: sistemaDeFicherosReal })
 
 for (const linea of resultado.lineas) {

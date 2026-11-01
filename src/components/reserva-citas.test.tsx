@@ -278,6 +278,20 @@ describe('@s7-@s16 pasos «Servicio», «Día» y «Hora»', () => {
 })
 
 describe('@s17-@s19 «Tus datos» y el resumen', () => {
+  it('@s31 el aviso de capa 1 enlaza a la política de privacidad, con nombre accesible claro', async () => {
+    const usuario = userEvent.setup()
+    montar()
+    await hastaElResumen(usuario)
+    const d = within(dialogo())
+    await usuario.click(d.getByRole('button', { name: 'Atrás' }))
+    const enlace = d.getByRole('link', {
+      name: 'política de privacidad (se abre en una pestaña nueva)',
+    })
+    expect(enlace).toHaveAttribute('href', '/privacidad-citas/')
+    expect(enlace).toHaveAttribute('target', '_blank')
+    expect(enlace).toHaveAttribute('rel', 'noopener')
+  })
+
   it('@s17-@s18 solo tres campos obligatorios, el aviso de privacidad y los mensajes junto al campo', async () => {
     const usuario = userEvent.setup()
     montar()
