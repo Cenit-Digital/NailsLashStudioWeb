@@ -12,9 +12,12 @@ import { verificarTurnstile } from './turnstile.ts'
  * reales. No tiene lógica propia; como `main.tsx`, queda fuera de la mutación. Despliegue: Fase 8.
  */
 const config = leerConfig(process.env)
+// Una sola conexión (Fase 8, issue #41): en el PostgreSQL compartido, `citas_app` tiene CONNECTION LIMIT 2 (esta
+// más 1 de margen; KubernetesInfrastructure, ADR 0019). Basta: `/dias` y `/horas` no tocan PostgreSQL y las reservas
+// ya se serializan con el candado del día. Si llega a hacer falta más, se sube aquí y allí a la vez.
 const pool = new pg.Pool({
   connectionString: config.databaseUrl,
-  max: 5,
+  max: 1,
   connectionTimeoutMillis: 5_000,
   idle_in_transaction_session_timeout: 60_000,
 })
