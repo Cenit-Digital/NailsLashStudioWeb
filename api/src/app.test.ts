@@ -321,3 +321,46 @@ describe('POST /reservas', () => {
     expect(respuesta.status).toBe(503)
   })
 })
+
+describe('Fase 8 (#41): caché de 60 s de la ocupación en /dias y /horas', () => {
+  function dias(app: ReturnType<typeof montar>['app']) {
+    return app.request('/dias?opcion=manicura-rusa-m', { headers: { origin: ORIGEN } })
+  }
+
+  it('dos /dias y un /horas seguidos consultan Google una sola vez', async () => {
+    const { app, google } = montar()
+    const ocupacion = vi.spyOn(google, 'ocupacion')
+    expect((await dias(app)).status).toBe(200)
+    expect((await dias(app)).status).toBe(200)
+    const horas = await app.request('/horas?opcion=manicura-rusa-m&fecha=2026-11-07', {
+      headers: { origin: ORIGEN },
+    })
+    expect(horas.status).toBe(200)
+    expect(ocupacion).toHaveBeenCalledTimes(1)
+    expect(ocupacion).toHaveBeenCalledWith(
+      ['trabajadora-1', 'trabajadora-2'],
+      '2026-10-30T10:00:00.000Z',
+      '2026-11-30T10:00:00.000Z',
+    )
+  })
+
+  it('la reserva vuelve a consultar y, al crear la cita, la caché se vacía', async () => {
+    const { app, google } = montar()
+    const ocupacion = vi.spyOn(google, 'ocupacion')
+    await dias(app)
+    expect((await app.request('/reservas', post(cuerpo()))).status).toBe(201)
+    expect(ocupacion).toHaveBeenCalledTimes(2)
+    await dias(app)
+    expect(ocupacion).toHaveBeenCalledTimes(3)
+  })
+
+  it('una reserva que no se crea no vacía la caché', async () => {
+    const { app, google, verificarTurnstile } = montar()
+    verificarTurnstile.mockResolvedValue(false)
+    const ocupacion = vi.spyOn(google, 'ocupacion')
+    await dias(app)
+    expect((await app.request('/reservas', post(cuerpo()))).status).toBe(403)
+    await dias(app)
+    expect(ocupacion).toHaveBeenCalledTimes(1)
+  })
+})

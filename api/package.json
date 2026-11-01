@@ -6,6 +6,7 @@
   "type": "module",
   "license": "UNLICENSED",
   "scripts": {
+    "build": "node construir.mjs",
     "start": "node src/servidor.ts"
   },
   "dependencies": {
@@ -15,6 +16,7 @@
   },
   "devDependencies": {
     "@types/pg": "^8.23.1",
-    "embedded-postgres": "18.4.0-beta.17"
+    "embedded-postgres": "18.4.0-beta.17",
+    "esbuild": "0.28.1"
   }
 }

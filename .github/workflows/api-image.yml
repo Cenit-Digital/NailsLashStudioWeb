@@ -1,0 +1,267 @@
+name: Imagen de la API de citas
+
+# Construye la imagen del backend de citas (`api/`, T-8), la prueba y la publica en GHCR (Fase 8, issue #41). Patrón de
+# RAGchatbotIA (image.yml + tools/ensamblar-imagen.py), sin Docker:
+# - El bundle ESM de api/src/servidor.ts (esbuild, api/construir.mjs) se hace en un job de Node, tras el arnés.
+# - La capa se ensambla con crane (tools/ensamblar-imagen.py) sobre la base oficial de Node fijada por digest y sube como
+#   :candidato-sha-<commit>; el humo arranca ese candidato como `container:`.
+# - Solo en push a main (o a mano desde main) se re-etiqueta el MISMO manifiesto como :sha-<commit> y el resumen deja la
+#   referencia con digest, que se copia al Deployment de KubernetesInfrastructure. Nunca `latest`.
+# Runners: ubuntu-latest, como el resto de la CI de este repo. Es PÚBLICO (los runners de GitHub son gratis) y el grupo
+# cenit-runners está limitado a repos privados seleccionados (KubernetesInfrastructure, kubernetes/runners): un runner
+# propio en un repo público ejecutaría código de cualquier PR dentro del clúster.
+# En un PR desde un fork no se sube nada: su GITHUB_TOKEN no puede escribir paquetes, así que solo corre el bundle.
+
+on:
+  push:
+    branches: [main]
+    paths: &rutas
+      - "api/**"
+      # El bundle incluye el catálogo, la disponibilidad y site.ts (y lo que importan).
+      - "src/lib/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "tsconfig.json"
+      - "tools/ensamblar-imagen.py"
+      - ".github/workflows/api-image.yml"
+  pull_request:
+    paths: *rutas
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: api-imagen-${{ github.ref }}
+  # Una publicación a medias no se cancela; las pruebas de un PR, sí.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  NO_COLOR: "1"
+  IMAGEN: ghcr.io/cenit-digital/nailslashstudioweb-citas-api
+  # node:22-bookworm-slim (Node 22.23.4), manifiesto linux/amd64: el mismo digest que fija RAGchatbotIA (leído con
+  # `crane digest --platform linux/amd64` el 2026-10-30). Trae el usuario node (uid 1000).
+  BASE: docker.io/library/node:22-bookworm-slim@sha256:9f0dde62d10e7ff7a310ecaebd66225f6b46c17e6cb778449a77b05d3541bea2
+  # Tope de tamaño: suma de capas COMPRIMIDAS. La base ocupa ~80 MB y el bundle ~0,1 MB comprimido.
+  TOPE_BYTES: "100000000"
+
+jobs:
+  bundle:
+    name: Bundle de la API
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # pnpm ANTES de setup-node (mismo motivo que harness-ci.yml).
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # typecheck, lint, formato y tests: no se empaqueta código que no pasa el arnés.
+      - run: node .harness/harness.mjs init
+      # El bundle lleva dentro hono, @hono/node-server y pg: trivy no los ve (no hay node_modules en la imagen), así que
+      # sus avisos se miran aquí, contra el lockfile. Falla con altos o críticos de dependencias de producción.
+      - name: Auditoría de dependencias de producción
+        run: pnpm audit --prod --audit-level=high
+      - name: Empaquetar y preparar la entrada de la capa
+        run: |
+          set -euo pipefail
+          pnpm --filter ./api build
+          e="$RUNNER_TEMP/imagen"
+          rm -rf "$e" && mkdir -p "$e"
+          cp api/dist/servidor.mjs "$e/"
+          ls -l "$e"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: imagen-entrada
+          path: ${{ runner.temp }}/imagen/
+          retention-days: 1
+          if-no-files-found: error
+
+  # Con packages: write, así que aquí solo corren crane, trivy (fijados por sha256) y tools/ensamblar-imagen.py. OJO: el
+  # bundle que sube SÍ sale de `pnpm install` y del código de la rama; por eso en un PR solo corre si la rama es de este
+  # repo, y nunca desde un fork.
+  candidato:
+    name: Ensamblar candidato, tamaño y escaneo
+    needs: bundle
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - &herramientas
+        name: Herramientas con versión y sha256 fijados (crane, trivy)
+        env:
+          # nombre URL sha256 (linux amd64). Las mismas versiones y hashes que el resto de repos de la organización.
+          HERRAMIENTAS: |
+            crane https://github.com/google/go-containerregistry/releases/download/v0.22.1/go-containerregistry_Linux_x86_64.tar.gz 0ab7a1d6932a213aed964ce97666c3077fe691c8606413674a8b3e0b9ec4cda0
+            trivy https://github.com/aquasecurity/trivy/releases/download/v0.69.3/trivy_0.69.3_Linux-64bit.tar.gz 1816b632dfe529869c740c0913e36bd1629cb7688bd5634f4a858c1d57c88b75
+        run: |
+          python3 - <<'PY'
+          import hashlib, io, os, sys, tarfile, urllib.request
+          destino = os.path.join(os.environ["RUNNER_TEMP"], "bin")
+          os.makedirs(destino, exist_ok=True)
+          for linea in os.environ["HERRAMIENTAS"].splitlines():
+              if not linea.strip():
+                  continue
+              nombre, url, esperado = linea.split()
+              datos = urllib.request.urlopen(url, timeout=120).read()
+              if hashlib.sha256(datos).hexdigest() != esperado:  # no assert: PYTHONOPTIMIZE lo quitaría
+                  sys.exit(f"sha256 de {nombre} distinto del fijado")
+              with tarfile.open(fileobj=io.BytesIO(datos)) as tf:
+                  tf.extract(nombre, destino, filter="data")
+              os.chmod(os.path.join(destino, nombre), 0o755)
+          PY
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: imagen-entrada
+          path: ${{ runner.temp }}/imagen
+      - name: Ensamblar y subir el candidato (crane)
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FUENTE: ${{ github.server_url }}/${{ github.repository }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$TOKEN" | crane auth login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          unset TOKEN
+          python3 -I tools/ensamblar-imagen.py --entrada "$RUNNER_TEMP/imagen" --salida "$RUNNER_TEMP/capa.tar"
+          ref="$IMAGEN:candidato-sha-$GITHUB_SHA"
+          crane append --platform linux/amd64 -b "$BASE" -f "$RUNNER_TEMP/capa.tar" -t "$ref"
+          # Usuario numérico (node de la imagen oficial): con runAsNonRoot el kubelet no puede comprobar un nombre.
+          crane mutate "$ref" -t "$ref" \
+            --user 1000:1000 --workdir /app --cmd node,/app/servidor.mjs \
+            --env NODE_ENV=production \
+            --label "org.opencontainers.image.source=$FUENTE" \
+            --label "org.opencontainers.image.revision=$GITHUB_SHA" \
+            --label "org.opencontainers.image.description=API de reservas de citas de Nails Lash Studio (Hono + pg, bundle ESM)"
+          echo "- candidato: \`$ref@$(crane digest "$ref")\`" >> "$GITHUB_STEP_SUMMARY"
+      - name: Configuración de la imagen (usuario, WORKDIR, ENV y CMD)
+        run: |
+          set -euo pipefail
+          crane config "$IMAGEN:candidato-sha-$GITHUB_SHA" | python3 -I -c '
+          import json, sys
+          c = json.load(sys.stdin)["config"]
+          env = dict(e.split("=", 1) for e in c.get("Env", []))
+          fallos = [m for m, ok in [
+              ("User 1000:1000", c.get("User") == "1000:1000"),
+              ("WorkingDir /app", c.get("WorkingDir") == "/app"),
+              ("Cmd node /app/servidor.mjs", c.get("Cmd") == ["node", "/app/servidor.mjs"]),
+              ("NODE_ENV=production", env.get("NODE_ENV") == "production"),
+              ("PATH de la base", "/usr/local/bin" in env.get("PATH", "").split(":")),
+          ] if not ok]
+          print(json.dumps(c, indent=1))
+          sys.exit("configuración incorrecta: " + ", ".join(fallos) if fallos else 0)'
+      - name: Tamaño (suma de capas comprimidas)
+        run: |
+          set -euo pipefail
+          bytes="$(crane manifest "$IMAGEN:candidato-sha-$GITHUB_SHA" | python3 -I -c 'import json,sys; print(sum(l["size"] for l in json.load(sys.stdin)["layers"]))')"
+          echo "Tamaño comprimido: ${bytes} bytes (tope ${TOPE_BYTES})"
+          echo "- Tamaño comprimido: $((bytes / 1000000)) MB (tope $((TOPE_BYTES / 1000000)) MB)" >> "$GITHUB_STEP_SUMMARY"
+          [ "$bytes" -lt "$TOPE_BYTES" ] || { echo "::error::La imagen ocupa ${bytes} bytes, no menos que el tope"; exit 1; }
+      # Puerta: falla con vulnerabilidades CRITICAL que ya tienen arreglo. El informe de HIGH se imprime sin bloquear.
+      - name: Escaneo de vulnerabilidades (trivy contra el registro, sin daemon)
+        env:
+          TRIVY_USERNAME: ${{ github.actor }}
+          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          t() { trivy image --image-src remote --cache-dir "$RUNNER_TEMP/trivy" --skip-version-check "$@" "$IMAGEN:candidato-sha-$GITHUB_SHA"; }
+          echo "::group::Informe CRITICAL y HIGH (no bloquea)"
+          t --scanners vuln --severity CRITICAL,HIGH --format table --exit-code 0
+          echo "::endgroup::"
+          t --scanners vuln --severity CRITICAL --ignore-unfixed --exit-code 1
+
+  # Arranque DENTRO de la imagen candidata (su Node y su bundle). Solo pasos `run` con sh: sin acciones de JavaScript.
+  humo:
+    name: Prueba de arranque
+    needs: candidato
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: read
+    container:
+      image: ghcr.io/cenit-digital/nailslashstudioweb-citas-api:candidato-sha-${{ github.sha }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    defaults:
+      run:
+        shell: sh
+    steps:
+      - name: Contenido de /app
+        run: |
+          set -eu
+          [ "$(ls -A /app)" = "servidor.mjs" ] || { echo "::error::/app debe tener solo servidor.mjs: $(ls -A /app)"; exit 1; }
+          node --version
+      # @s28: los secretos llegan solo por el entorno; sin ellos el arranque falla nombrándolos, sin valores.
+      - name: Sin entorno → sale con 1 nombrando las variables que faltan
+        run: |
+          set -eu
+          rc=0
+          salida="$(env -i PATH="$PATH" NODE_ENV=production node /app/servidor.mjs 2>&1)" || rc=$?
+          echo "$salida"
+          [ "$rc" = 1 ] || { echo "::error::salió con $rc (se esperaba 1)"; exit 1; }
+          echo "$salida" | grep -q 'Faltan variables de entorno: CITAS_CALENDARIOS, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN, CITAS_REMITENTE, CITAS_EMAIL_SALON, TURNSTILE_SECRETO, DATABASE_URL' \
+            || { echo "::error::no nombra las variables que faltan"; exit 1; }
+      # El pool de pg conecta bajo demanda: /salud responde sin PostgreSQL, y sin Origin el resto da 403 (@s28).
+      - name: Con entorno ficticio → /salud 200 y 403 sin Origin
+        run: |
+          set -eu
+          # En /tmp: el proceso corre como 1000 (el usuario de la imagen) y el RUNNER_TEMP montado es del usuario del runner.
+          log=/tmp/api.log
+          env PORT=8080 CITAS_CALENDARIOS=humo GOOGLE_CLIENT_ID=humo GOOGLE_CLIENT_SECRET=humo \
+            GOOGLE_REFRESH_TOKEN=humo CITAS_REMITENTE=humo@example.com CITAS_EMAIL_SALON=humo@example.com \
+            TURNSTILE_SECRETO=humo DATABASE_URL='postgresql://humo@127.0.0.1:1/no_existe' \
+            node /app/servidor.mjs >"$log" 2>&1 &
+          node -e '
+            const pedir = async (ruta) => (await fetch(`http://127.0.0.1:8080${ruta}`)).status
+            const esperar = (ms) => new Promise((r) => setTimeout(r, ms))
+            ;(async () => {
+              for (let i = 0; i < 40; i++) {
+                try {
+                  const salud = await pedir("/salud")
+                  const dias = await pedir("/dias?opcion=manicura-rusa-m")
+                  console.log(`/salud ${salud} · /dias sin Origin ${dias}`)
+                  process.exit(salud === 200 && dias === 403 ? 0 : 1)
+                } catch { await esperar(250) }
+              }
+              console.log("::error::la API no escuchó en 10 s"); process.exit(1)
+            })()
+          ' || { cat "$log"; exit 1; }
+          cat "$log"
+
+  # Solo en main: re-etiqueta en el registro el MISMO manifiesto que pasó el escaneo y el humo (sin reconstruir).
+  publicar:
+    name: Publicar
+    needs: humo
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - *herramientas
+      - name: Etiquetar :sha-<commit> y dejar la referencia para el Deployment
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$TOKEN" | crane auth login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          unset TOKEN
+          crane tag "$IMAGEN:candidato-sha-$GITHUB_SHA" "sha-$GITHUB_SHA"
+          ref="$IMAGEN:sha-$GITHUB_SHA@$(crane digest "$IMAGEN:sha-$GITHUB_SHA")"
+          echo "$ref"
+          { echo "## Imagen publicada (ensamblada con crane)"; echo ""; echo '```'; echo "$ref"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
