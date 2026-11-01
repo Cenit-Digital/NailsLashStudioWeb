@@ -18,7 +18,9 @@ const config = leerConfig(process.env)
 const pool = new pg.Pool({
   connectionString: config.databaseUrl,
   max: 1,
-  connectionTimeoutMillis: 5_000,
+  // Con una sola conexión, una segunda reserva la espera mientras la primera hace sus llamadas a Google dentro del
+  // candado (cada una corta a los 10 s): 30 s cubren ese trabajo sin convertir la espera en un 503.
+  connectionTimeoutMillis: 30_000,
   idle_in_transaction_session_timeout: 60_000,
 })
 // Sin este listener, el error de una conexión inactiva (PostgreSQL reiniciado) tumbaría el proceso.
@@ -35,6 +37,18 @@ const app = crearApp({
   avisar: (mensaje) => console.warn(`[citas-api] ${mensaje}`),
 })
 
-serve({ fetch: app.fetch, port: config.puerto }, ({ port }) => {
+const servidor = serve({ fetch: app.fetch, port: config.puerto }, ({ port }) => {
   console.log(`[citas-api] escuchando en el puerto ${port}`)
 })
+
+// En el contenedor Node es el PID 1, y el kernel ignora en él las señales sin manejador: sin esto, cada despliegue
+// esperaría los 30 s de gracia hasta el SIGKILL. Se deja de aceptar conexiones, se terminan las peticiones en curso
+// (una reserva a medias acaba y manda sus emails) y se cierra el pool.
+for (const senal of ['SIGTERM', 'SIGINT'] as const) {
+  process.once(senal, () => {
+    console.log(`[citas-api] ${senal}: cerrando`)
+    servidor.close(() => {
+      void pool.end().finally(() => process.exit(0))
+    })
+  })
+}
