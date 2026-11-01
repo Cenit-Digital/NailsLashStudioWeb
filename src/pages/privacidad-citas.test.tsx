@@ -67,12 +67,27 @@ describe('@s31 la política de privacidad de las citas', () => {
       'Email',
       'Servicio elegido',
       'Día y hora de la cita',
+      'Al verificar que no eres un programa automático, Cloudflare Turnstile trata tu dirección IP y datos técnicos de tu navegador.',
     ])
+    expect(
+      datos.getByText(
+        'Nombre, teléfono y email son necesarios para reservar: sin ellos no podemos confirmar la cita. Si prefieres no darlos, puedes reservar llamando por teléfono o por WhatsApp.',
+      ),
+    ).toBeVisible()
     const destinatarios = within(screen.getByRole('region', { name: 'Quién más los recibe' }))
     expect(destinatarios.getAllByRole('listitem').map((i) => i.textContent)).toEqual([
       'Google, como proveedor del calendario donde se apunta la cita y del correo con el que se envía la confirmación.',
       'Cloudflare Turnstile, para comprobar que quien reserva no es un programa automático.',
     ])
+  })
+
+  it('las transferencias internacionales, con prudencia', () => {
+    pintar()
+    expect(
+      within(screen.getByRole('region', { name: 'Quién más los recibe' })).getByText(
+        'Google y Cloudflare pueden tratar datos fuera del Espacio Económico Europeo. Según la información que publican esos proveedores, lo hacen amparados en el Marco de Privacidad de Datos UE-EE. UU. y/o en cláusulas contractuales tipo.',
+      ),
+    ).toBeVisible()
   })
 
   it('la conservación es un pendiente visible', () => {
@@ -91,7 +106,6 @@ describe('@s31 la política de privacidad de las citas', () => {
       'Acceso',
       'Rectificación',
       'Supresión',
-      'Oposición',
       'Limitación del tratamiento',
       'Portabilidad',
     ])

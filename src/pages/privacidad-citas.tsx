@@ -109,7 +109,15 @@ export default function PrivacidadCitas() {
             <li>Email</li>
             <li>Servicio elegido</li>
             <li>Día y hora de la cita</li>
+            <li>
+              Al verificar que no eres un programa automático, Cloudflare Turnstile trata tu
+              dirección IP y datos técnicos de tu navegador.
+            </li>
           </ul>
+          <p>
+            Nombre, teléfono y email son necesarios para reservar: sin ellos no podemos confirmar la
+            cita. Si prefieres no darlos, puedes reservar llamando por teléfono o por WhatsApp.
+          </p>
         </section>
 
         <section aria-labelledby="destinatarios-titulo" className={estilos.seccion}>
@@ -123,6 +131,11 @@ export default function PrivacidadCitas() {
               Cloudflare Turnstile, para comprobar que quien reserva no es un programa automático.
             </li>
           </ul>
+          <p>
+            Google y Cloudflare pueden tratar datos fuera del Espacio Económico Europeo. Según la
+            información que publican esos proveedores, lo hacen amparados en el Marco de Privacidad
+            de Datos UE-EE. UU. y/o en cláusulas contractuales tipo.
+          </p>
         </section>
 
         <section aria-labelledby="conservacion-titulo" className={estilos.seccion}>
@@ -137,7 +150,6 @@ export default function PrivacidadCitas() {
             <li>Acceso</li>
             <li>Rectificación</li>
             <li>Supresión</li>
-            <li>Oposición</li>
             <li>Limitación del tratamiento</li>
             <li>Portabilidad</li>
           </ul>

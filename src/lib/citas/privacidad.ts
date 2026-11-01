@@ -54,3 +54,12 @@ export function registrosDelBuild(entorno: EntornoCitas): readonly RegistroDatos
   const { razonSocial, nif, email, conservacion } = datosPrivacidad()
   return [razonSocial, nif, email, conservacion]
 }
+
+/**
+ * El modo con el que vite-react-ssg carga la config y los `.env*`: `MODE || NODE_ENV || 'production'`
+ * (cadena vacía cuenta como ausente, igual que `||`). La puerta de placeholders lo usa para leer el
+ * mismo entorno que verá Vite; con otro modo podría hornearse la página sin que nadie la vigilara.
+ */
+export function modoDelBuild(entorno: Record<string, string | undefined>): string {
+  return entorno.MODE || entorno.NODE_ENV || 'production'
+}

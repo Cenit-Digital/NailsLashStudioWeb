@@ -103,7 +103,7 @@ describe('el ancla de lo diferido (A-11, A-21)', () => {
   it('@s31 el humilde cablea los registros de la política con el entorno de Vite', () => {
     const humilde = readFileSync('tools/puerta-placeholders.ts', 'utf8')
 
-    expect(humilde).toContain("loadEnv('production', process.cwd(), 'VITE_')")
+    expect(humilde).toContain("loadEnv(modoDelBuild(process.env), process.cwd(), 'VITE_')")
     expect(humilde).toContain('...registrosDelBuild(entorno)')
   })
 })

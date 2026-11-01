@@ -17,7 +17,7 @@ import process from 'node:process'
 import { loadEnv } from 'vite'
 
 import { ejecutarPuerta, type SistemaDeFicheros } from '../src/lib/puerta.ts'
-import { registrosDelBuild } from '../src/lib/citas/privacidad.ts'
+import { modoDelBuild, registrosDelBuild } from '../src/lib/citas/privacidad.ts'
 import { registros as registrosVerificados } from '../src/lib/site.ts'
 import { rutaFisica, ubicacionLogica } from './artefacto.ts'
 
@@ -61,7 +61,7 @@ const sistemaDeFicherosReal: SistemaDeFicheros = {
  * `esPlaceholder: true` (razón social, NIF, email, conservación) y el build de producción FALLA hasta
  * que el salón los dé. El entorno es el que verá Vite (`.env*` y `process.env`, solo `VITE_*`).
  */
-const entorno = loadEnv('production', process.cwd(), 'VITE_')
+const entorno = loadEnv(modoDelBuild(process.env), process.cwd(), 'VITE_')
 const registros = [...registrosVerificados, ...registrosDelBuild(entorno)]
 
 const resultado = ejecutarPuerta({ modo: 'produccion', registros, ficheros: sistemaDeFicherosReal })

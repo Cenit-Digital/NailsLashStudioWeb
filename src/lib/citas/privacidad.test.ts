@@ -4,6 +4,7 @@ import { detectarPlaceholders } from '../placeholders.ts'
 import {
   datosPrivacidad,
   hayPoliticaDePrivacidad,
+  modoDelBuild,
   registrosDelBuild,
   rutaPrivacidad,
   urlPrivacidad,
@@ -94,5 +95,22 @@ describe('@s31 registrosDelBuild: lo que ve la puerta de placeholders', () => {
       ['flag', 'privacidad.conservacion'],
     ])
     expect(detectarPlaceholders({ registros: registrosDelBuild({}) })).toEqual([])
+  })
+})
+
+describe('@s31 modoDelBuild: el modo que usará vite-react-ssg (MODE || NODE_ENV || production)', () => {
+  it('MODE manda sobre NODE_ENV', () => {
+    expect(modoDelBuild({ MODE: 'staging', NODE_ENV: 'development' })).toBe('staging')
+  })
+
+  it('sin MODE, NODE_ENV', () => {
+    expect(modoDelBuild({ NODE_ENV: 'test' })).toBe('test')
+    expect(modoDelBuild({ MODE: '', NODE_ENV: 'development' })).toBe('development')
+  })
+
+  it('sin ninguno, o con cadenas vacías, production', () => {
+    expect(modoDelBuild({})).toBe('production')
+    expect(modoDelBuild({ MODE: '' })).toBe('production')
+    expect(modoDelBuild({ MODE: '', NODE_ENV: '' })).toBe('production')
   })
 })
