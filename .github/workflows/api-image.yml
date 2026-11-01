@@ -56,7 +56,7 @@ jobs:
         with:
           persist-credentials: false
       # pnpm ANTES de setup-node (mismo motivo que harness-ci.yml).
-      - uses: pnpm/action-setup@v6
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "22"
@@ -64,6 +64,10 @@ jobs:
       - run: pnpm install --frozen-lockfile
       # typecheck, lint, formato y tests: no se empaqueta código que no pasa el arnés.
       - run: node .harness/harness.mjs init
+      # El bundle lleva dentro hono, @hono/node-server y pg: trivy no los ve (no hay node_modules en la imagen), así que
+      # sus avisos se miran aquí, contra el lockfile. Falla con altos o críticos de dependencias de producción.
+      - name: Auditoría de dependencias de producción
+        run: pnpm audit --prod --audit-level=high
       - name: Empaquetar y preparar la entrada de la capa
         run: |
           set -euo pipefail
@@ -79,7 +83,9 @@ jobs:
           retention-days: 1
           if-no-files-found: error
 
-  # Sin código de terceros (solo crane, trivy y tools/ensamblar-imagen.py): por eso puede tener packages: write.
+  # Con packages: write, así que aquí solo corren crane, trivy (fijados por sha256) y tools/ensamblar-imagen.py. OJO: el
+  # bundle que sube SÍ sale de `pnpm install` y del código de la rama; por eso en un PR solo corre si la rama es de este
+  # repo, y nunca desde un fork.
   candidato:
     name: Ensamblar candidato, tamaño y escaneo
     needs: bundle
@@ -213,7 +219,8 @@ jobs:
       - name: Con entorno ficticio → /salud 200 y 403 sin Origin
         run: |
           set -eu
-          log="${RUNNER_TEMP:-/tmp}/api.log"
+          # En /tmp: el proceso corre como 1000 (el usuario de la imagen) y el RUNNER_TEMP montado es del usuario del runner.
+          log=/tmp/api.log
           env PORT=8080 CITAS_CALENDARIOS=humo GOOGLE_CLIENT_ID=humo GOOGLE_CLIENT_SECRET=humo \
             GOOGLE_REFRESH_TOKEN=humo CITAS_REMITENTE=humo@example.com CITAS_EMAIL_SALON=humo@example.com \
             TURNSTILE_SECRETO=humo DATABASE_URL='postgresql://humo@127.0.0.1:1/no_existe' \
