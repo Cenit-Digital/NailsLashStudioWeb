@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
 
 import {
   NAILBOT_AVISO,
@@ -39,7 +39,7 @@ import {
  * src/lib/demo/nailbot-demo.ts. Aquí solo se CABLEA: estado, foco y enlace final. No envía nada: el
  * mensaje lo manda la persona desde su WhatsApp (F-13).
  */
-export function ChatNailbot() {
+export function ChatNailbot({ nota }: { readonly nota?: ReactNode }) {
   const [estado, setEstado] = useState<EstadoChat>(() => estadoInicial())
   const [borrador, setBorrador] = useState('')
   const hilo = useRef<HTMLDivElement>(null)
@@ -85,6 +85,12 @@ export function ChatNailbot() {
         </div>
       </div>
       <p className={estilos.leyenda}>{NAILBOT_LEYENDA}</p>
+      {/* Solo el fallback del modo IA (issue #35) pasa `nota`: sin ella, el HTML es el de siempre. */}
+      {nota && (
+        <p className={estilos.leyenda} role="alert">
+          {nota}
+        </p>
+      )}
       <div
         className={estilos.hilo}
         ref={hilo}

@@ -1,6 +1,6 @@
 import { RESERVA_WHATSAPP_TEXTO } from '../lib/demo/reserva-demo'
 import { TELEFONO, telHref, waHref } from '../lib/site'
-import { ChatNailbot } from './ChatNailbot'
+import { ChatNailbotSegunModo } from './ChatNailbotSegunModo'
 import estilos from './reserva.module.scss'
 
 /**
@@ -46,7 +46,7 @@ export function Reserva() {
         </div>
 
         {/* — Chat guiado: el asistente COMPARTIDO con el robot flotante (ChatNailbot) — */}
-        <ChatNailbot />
+        <ChatNailbotSegunModo />
       </div>
     </section>
   )

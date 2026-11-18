@@ -54,6 +54,13 @@ adjunta capturas de antes y después (móvil 390 px y tablet).
   con `Array.from({ length })` en vez de `for`/`while` con `+=`, para que ningún mutante los cuelgue (timeout).
 - Stryker (aprendido en #39): nada de estado calculado en el cuerpo de un `describe` (p. ej. `const x = aplicar(...)`).
   Si un mutante lo rompe, falla la RECOGIDA del fichero y Stryker cuenta el mutante como superviviente: usa funciones.
+- Stryker (aprendido en #35): (a) `useEffect(fn, [])` y `useEffect(fn, ['x'])` son equivalentes y Stryker muta uno en
+  el otro: haz depender el efecto del estado que limpia (`[peticion]`). (b) Un test que espera una promesa que un
+  mutante puede dejar colgada la compite contra una marca (`Promise.race([p, Promise.resolve('colgada')])`): así el
+  mutante FALLA la prueba en vez de agotar el tiempo (un timeout invalida el score). (c) Un `catch` y un validador que
+  lanzan el MISMO error forman un mutante equivalente: deja que lance solo el `catch` y que el validador asuma un
+  objeto. Con `cenit-compilar`, `--memoria-mib 1536 pnpm exec stryker run --mutate a,b,c --concurrency 1` (186 mutantes,
+  ~12 min); con 4 procesos salió con 1 y sin salida.
 - `api/` (aprendido en #37): sus tests llevan `// @vitest-environment node` y usan los dobles de `api/src/dobles.ts`.
   Los que necesitan PostgreSQL real se llaman `*.integracion.test.ts` (con `embedded-postgres`, sin Docker ni root) y
   quedan fuera de Stryker, como los `*-horneado`. Ningún secreto en el código: todo llega por el entorno (`config.ts`).
