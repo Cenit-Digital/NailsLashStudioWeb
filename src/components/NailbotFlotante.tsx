@@ -9,7 +9,7 @@ import {
   NAILBOT_LANZADOR_ETIQUETA,
   NAILBOT_PAUSA_ETIQUETA,
 } from '../lib/demo/nailbot-demo'
-import { ChatNailbot } from './ChatNailbot'
+import { ChatNailbotSegunModo as ChatNailbot } from './ChatNailbotSegunModo'
 import { NailbotArte } from './NailbotArte'
 import {
   detenerTecla,

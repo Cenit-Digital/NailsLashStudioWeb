@@ -4855,3 +4855,11 @@ la vea al instante en su Google Calendar de las tablets, sin tocar la vía de ch
 A-29, A-30, A-31 y A-32 (tabla general). Además, a debatir antes del Gherkin: copy exacto del aviso de
 capa 1 de esta vía; qué hace el modal si la API no responde (propuesta: mensaje y enlace a llamar al
 estudio, **sin** derivar al chat, por D-12); host final de la API.
+
+## Enmienda N-1bis y N-4bis — Nailbot con IA opcional (issue #35)
+
+**N-1bis.** Solo un build con `VITE_NAILBOT_API_URL` monta el modo IA. En las dos entradas de Nailbot muestra «Asistente de IA» y mantiene visible «Hablas con un sistema de inteligencia artificial, no con una persona». El servidor incluye su aviso en la primera respuesta. Un build sin la variable mantiene el HTML, el guion local y la leyenda de N-1.
+
+**N-4bis.** El modo IA admite texto libre de hasta 1000 caracteres y no pide teléfono. Envía solo el texto y, después del primer turno, el ID de conversación. El ID se conserva en memoria por instancia; la protección de datos de entrada corresponde a la API. El modo demo mantiene N-4. Ante un fallo, ofrece el contacto del salón sin mostrar el diagnóstico del servidor.
+
+Esta enmienda habilita la preparación de builds de prueba. La activación pública requiere el OK separado de D-10, un origen de API compatible con el navegador y la verificación del despliegue. El workflow de Pages no recibe esta variable.

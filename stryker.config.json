@@ -40,6 +40,8 @@
     "src/lib/resenas-agregado.ts",
     "src/components/hero-logica.ts",
     "src/components/ChatNailbot.tsx",
+    "src/components/ChatNailbotSegunModo.tsx",
+    "src/components/chat-nailbot-ia-logica.ts",
     "src/components/chat-nailbot-logica.ts",
     "src/components/NailbotArte.tsx",
     "src/components/NailbotFlotante.tsx",

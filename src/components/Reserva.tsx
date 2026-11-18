@@ -1,6 +1,6 @@
 import { RESERVA_WHATSAPP_TEXTO } from '../lib/demo/reserva-demo'
 import { TELEFONO, telHref, waHref } from '../lib/site'
-import { ChatNailbot } from './ChatNailbot'
+import { ChatNailbotSegunModo as ChatNailbot } from './ChatNailbotSegunModo'
 import estilos from './reserva.module.scss'
 
 /**
