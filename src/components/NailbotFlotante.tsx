@@ -9,7 +9,7 @@ import {
   NAILBOT_LANZADOR_ETIQUETA,
   NAILBOT_PAUSA_ETIQUETA,
 } from '../lib/demo/nailbot-demo'
-import { ChatNailbot } from './ChatNailbot'
+import { ChatNailbotSegunModo } from './ChatNailbotSegunModo'
 import { NailbotArte } from './NailbotArte'
 import {
   detenerTecla,
@@ -207,7 +207,7 @@ export function NailbotFlotante() {
         <h2 id={idTitulo} className={estilos.titulo}>
           {NAILBOT_DIALOGO_TITULO}
         </h2>
-        {abiertoAlgunaVez && <ChatNailbot />}
+        {abiertoAlgunaVez && <ChatNailbotSegunModo />}
         <button
           type="button"
           className={estilos.cerrarDialogo}

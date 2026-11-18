@@ -82,7 +82,14 @@ beforeAll(() => {
   try {
     salidaDelBuild = execSync('pnpm build', {
       stdio: 'pipe',
-      env: { ...process.env, NODE_ENV: 'production', MODE: 'production', NLS_DIST_DIR: artefacto },
+      env: {
+        ...process.env,
+        NODE_ENV: 'production',
+        MODE: 'production',
+        NLS_DIST_DIR: artefacto,
+        // Issue #35 @s1: el build de Pages NO lleva la variable del modo IA (vale en blanco, como ausente).
+        VITE_NAILBOT_API_URL: '',
+      },
     }).toString()
   } catch (error: unknown) {
     const fallo = error as { status: number; stdout: Buffer }
@@ -910,4 +917,20 @@ describe('@s72 (F-04) extremo a extremo, CONTROL: el humilde lista también las 
     },
     TIMEOUT_DE_UNA_PUERTA,
   )
+})
+
+describe('@s1 (issue #35, nailbot_ia) el build SIN VITE_NAILBOT_API_URL hornea el Nailbot de siempre en #reserva', () => {
+  it('@s1 ANCLA POSITIVA: #reserva está horneada con el guion local — la leyenda de demo y el subtítulo automático', () => {
+    expect(html).toContain('id="reserva-titulo"')
+    expect(html).toContain(
+      'Demo · Nailbot responde con opciones predefinidas: no es una persona ni usa inteligencia artificial.',
+    )
+    expect(html).toContain('Asistente automático · demo')
+  })
+
+  it('@s1 el HTML horneado NO trae «Asistente de IA», la línea fija del modo IA ni su campo «Mensaje»', () => {
+    expect(html).not.toContain('Asistente de IA')
+    expect(html).not.toContain('Hablas con un sistema de inteligencia artificial')
+    expect(html).not.toContain('aria-label="Mensaje"')
+  })
 })
